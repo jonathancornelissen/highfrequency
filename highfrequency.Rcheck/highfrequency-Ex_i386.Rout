@@ -1,0 +1,1389 @@
+
+R version 2.15.1 (2012-06-22) -- "Roasted Marshmallows"
+Copyright (C) 2012 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+Platform: i386-apple-darwin9.8.0/i386 (32-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> pkgname <- "highfrequency"
+> source(file.path(R.home("share"), "R", "examples-header.R"))
+> options(warn = 1)
+> library('highfrequency')
+Loading required package: xts
+Loading required package: zoo
+
+Attaching package: ‘zoo’
+
+The following object(s) are masked from ‘package:base’:
+
+    as.Date, as.Date.numeric
+
+> 
+> assign(".oldSearch", search(), pos = 'CheckExEnv')
+> cleanEx()
+> nameEx("TAQload")
+> ### * TAQload
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: TAQLoad
+> ### Title: Load trade or quote data into R
+> ### Aliases: TAQLoad
+> ### Keywords: data manipulation
+> 
+> ### ** Examples
+> 
+> #In order for these examples to work, the folder datasource 
+> #should contain two folders named 2008-01-02 and 2008-01-03.
+> #These folder contain the files with the trade data,
+> #which are named "AAPL_trades.RData" or "AA_trades.RData".
+> 
+> from="2008-01-02";
+> to = "2008-01-03";
+> ## Not run: datasource="C:\data";
+> 
+> #TAQLoad: load data for stock AAPL
+> ## Not run: 
+> ##D xx = TAQLoad(tickers="AAPL",from,to,trades=TRUE,quotes=FALSE,
+> ##D datasource=datasource,variables=NULL)
+> ## End(Not run)
+> ## Not run: head(xx);
+> 
+> #Load only price data for stocks AA and AAPL
+> ## Not run: 
+> ##D xx = TAQLoad(tickers=c("AA","AAPL"),from,to,trades=TRUE,
+> ##D quotes=FALSE,datasource=datasource,variables="PRICE")
+> ## End(Not run)
+> ## Not run: head(xx);                                                                                                    
+> ## Not run: tail(xx);                                                                                                    
+> 
+> 
+> 
+> cleanEx()
+> nameEx("aggregatePrice")
+> ### * aggregatePrice
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: aggregatePrice
+> ### Title: Aggregate a time series but keep first and last observation
+> ### Aliases: aggregatePrice
+> ### Keywords: data manipulation
+> 
+> ### ** Examples
+> 
+> #load data
+> data("sample_tdata");
+> #aggregate price data to the 30 second frequency
+> head(sample_tdata$PRICE)
+                    PRICE    
+2008-01-04 09:30:27 "193.71" 
+2008-01-04 09:30:28 "193.59" 
+2008-01-04 09:30:29 "193.445"
+2008-01-04 09:30:30 "193.38" 
+2008-01-04 09:30:31 "193.34" 
+2008-01-04 09:30:33 "193.52" 
+> head(aggregatePrice(sample_tdata$PRICE,on="secs",k=30));
+Warning: timezone of object (GMT) is different than current timezone ().
+                       [,1]
+2008-01-04 09:30:00 193.710
+2008-01-04 09:30:30 193.380
+2008-01-04 09:31:00 192.680
+2008-01-04 09:31:30 192.880
+2008-01-04 09:32:00 192.400
+2008-01-04 09:32:30 192.415
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:timeDate’
+
+> nameEx("aggregateQuotes")
+> ### * aggregateQuotes
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: aggregateQuotes
+> ### Title: Aggregate an xts object containing quote data
+> ### Aliases: aggregateQuotes
+> ### Keywords: data manipulation
+> 
+> ### ** Examples
+> 
+> #load data
+> data("sample_qdata");
+> #aggregate quote data to the 30 second frequency
+> xx = aggregateQuotes(sample_qdata,on="seconds",k=30);
+Loading required package: quantmod
+Loading required package: Defaults
+Loading required package: TTR
+> head(xx);
+Warning: timezone of object (GMT) is different than current timezone ().
+                    SYMBOL EX  BID       BIDSIZ  OFR       OFRSIZ 
+2008-01-04 09:30:00 "XXX"  "N" "193.340" "  4.5" "193.890" " 11.5"
+2008-01-04 09:30:30 "XXX"  "N" "193.470" " 17.5" "193.630" " 20.5"
+2008-01-04 09:31:00 "XXX"  "N" "192.620" "108.5" "193.280" " 70.5"
+2008-01-04 09:31:30 "XXX"  "N" "192.880" " 47.5" "193.000" " 67.5"
+2008-01-04 09:32:00 "XXX"  "N" "192.400" " 23.5" "192.670" " 54.5"
+2008-01-04 09:32:30 "XXX"  "N" "192.140" " 28.0" "192.380" " 61.0"
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:timeDate’, ‘package:quantmod’, ‘package:TTR’,
+  ‘package:Defaults’
+
+> nameEx("aggregateTrades")
+> ### * aggregateTrades
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: aggregateTrades
+> ### Title: Aggregate an xts object containing trade data
+> ### Aliases: aggregateTrades
+> ### Keywords: data manipulation
+> 
+> ### ** Examples
+> 
+> data("sample_tdata");
+> #aggregate trade data to 5 minute frequency
+> x = aggregateTrades(sample_tdata,on="minutes",k=5)
+Loading required package: quantmod
+Loading required package: Defaults
+Loading required package: TTR
+> head(x);
+Warning: timezone of object (GMT) is different than current timezone ().
+                    SYMBOL EX  PRICE     SIZE    
+2008-01-04 09:30:00 "XXX"  "N" "193.710" "  9100"
+2008-01-04 09:35:00 "XXX"  "N" "193.920" " 65450"
+2008-01-04 09:40:00 "XXX"  "N" "194.630" " 50100"
+2008-01-04 09:45:00 "XXX"  "N" "193.520" " 52250"
+2008-01-04 09:50:00 "XXX"  "N" "192.850" " 43500"
+2008-01-04 09:55:00 "XXX"  "N" "190.795" " 63500"
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:timeDate’, ‘package:quantmod’, ‘package:TTR’,
+  ‘package:Defaults’
+
+> nameEx("aggregatets")
+> ### * aggregatets
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: aggregatets
+> ### Title: Aggregate a time series
+> ### Aliases: aggregatets
+> ### Keywords: data manipulation
+> 
+> ### ** Examples
+> 
+> #load sample price data
+> data("sample_tdata");
+> ts = sample_tdata$PRICE;
+> 
+> #Previous tick aggregation to the 5-minute sampling frequency:
+> tsagg5min = aggregatets(ts,on="minutes",k=5);
+> head(tsagg5min);
+                      PRICE
+2008-01-04 09:35:00 193.920
+2008-01-04 09:40:00 194.630
+2008-01-04 09:45:00 193.520
+2008-01-04 09:50:00 192.850
+2008-01-04 09:55:00 190.795
+2008-01-04 10:00:00 190.420
+> 
+> #Previous tick aggregation to the 30-second sampling frequency:
+> tsagg30sec = aggregatets(ts,on="seconds",k=30);
+> tail(tsagg30sec);
+                      PRICE
+2008-01-04 15:57:30 191.790
+2008-01-04 15:58:00 191.740
+2008-01-04 15:58:30 191.760
+2008-01-04 15:59:00 191.470
+2008-01-04 15:59:30 191.825
+2008-01-04 16:00:00 191.670
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:timeDate’
+
+> nameEx("convert")
+> ### * convert
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: convert
+> ### Title: Convert trade or quote data into xts object saved in the RData
+> ###   format
+> ### Aliases: convert
+> 
+> ### ** Examples
+> 
+> #In order for these examples to work, the folder datasource 
+> #should contain two folders named 2008-01-02 and 2008-01-03.
+> #These folder contain the files with the trade data,
+> #which are named "AAPL_trades.txt" or "AA_trades.txt".
+> 
+> from="2008-01-02";
+> to = "2008-01-03";
+> ## Not run: 
+> ##D datasource=datadestination="C:\data"
+> ##D 
+> ##D ### txt files from NYSE:
+> ##D 
+> ##D convert(from,to,datasource,datadestination,trades=TRUE,
+> ##D           quotes=FALSE,ticker=c("AA","AAPL"),dir=FALSE,extension="txt",
+> ##D           header=FALSE,tradecolnames=NULL,quotecolnames=NULL,
+> ##D           format="%Y%m%d %H:%M:%S");
+> ##D 
+> ##D #Now, the folder datadestination will contain two folders
+> ##D #named 2008-01-02 and 2008-01-03 containing 
+> ##D #the files AAPL_trades.RData and AAPL_trades.RData containing the trades.
+> ##D #The data can now be loaded with the TAQLoad function.
+> ##D 
+> ##D ########## Csv file from WRDS
+> ##D #Suppose the datasource folder contains one csv file from WRDS 
+> ##D #with data on IBM for multiple days.
+> ##D #The file should be named "IBM_trades.csv" and can be easily converted into xts 
+> ##D #and then saved in RData format by:
+> ##D 
+> ##D  convert(from=from, to=to, datasource=datasource, datadestination=datadestination, trades = T, 
+> ##D                        quotes = T, ticker="IBM", dir = FALSE, extension = "csv", header = TRUE, 
+> ##D                        tradecolnames = NULL, quotecolnames = NULL, format = format, onefile = TRUE )  
+> ##D 
+> ##D ####### ASC file from www.tickdata.com
+> ##D #Suppose the datasource folder contains asc files for trades and quotes 
+> ##D #from "www.tickdata.com" for GLP. 
+> ##D #The files "GLP_quotes.asc" and "GLP_trades.asc" should be saved in datasource folder.
+> ##D 
+> ##D  convert(from=from, to=to, datasource=datasource, datadestination=datadestination, trades = T, 
+> ##D             quotes = T, ticker="GLP", dir = TRUE, extension = "tickdatacom", header = TRUE, 
+> ##D             tradecolnames = NULL, quotecolnames = NULL, format = "##D 
+> ## End(Not run)
+> 
+> 
+> 
+> cleanEx()
+> nameEx("harModel")
+> ### * harModel
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: harModel
+> ### Title: HAR model estimation (Heterogeneous Autoregressive model for
+> ###   Realized volatility)
+> ### Aliases: harModel
+> ### Keywords: forecasting
+> 
+> ### ** Examples
+>  
+>  ##### Example 1: HARRVCJ ##### 
+>  data("sample_5minprices_jumps"); 
+>  data = sample_5minprices_jumps[,1];
+>  data = makeReturns(data); #Get the high-frequency return data
+>  
+>  x = harModel(data, periods = c(1,5,10), periodsJ=c(1,5,10), RVest = c("rCov","rBPCov"), 
++               type="HARRVCJ",transform="sqrt"); # Estimate the HAR model of type HARRVCJ  
+>  class(x);
+[1] "harModel" "lm"      
+>  x 
+
+Model:
+sqrt(RV1) = beta0  +  beta1 * sqrt(C1) +  beta2 * sqrt(C5) +  beta3 * sqrt(C10) +  beta4 * sqrt(J1) +  beta5 * sqrt(J5) +  beta6 * sqrt(J10)
+
+Coefficients:
+   beta0     beta1     beta2     beta3     beta4     beta5     beta6  
+ -0.8835    1.1957  -25.1922   38.9909   -0.4483    0.8084   -6.8305  
+
+
+    r.squared  adj.r.squared  
+       0.9915         0.9661  
+
+> 
+>  ##### Example 2:  ##### 
+>  # Forecasting daily Realized volatility for DJI 2008 using the basic harModel: HARRV
+>  data(realized_library); #Get sample daily Realized Volatility data
+>  DJI_RV = realized_library$Dow.Jones.Industrials.Realized.Variance; #Select DJI
+>  DJI_RV = DJI_RV[!is.na(DJI_RV)]; #Remove NA's
+>  DJI_RV = DJI_RV['2008'];
+> 
+>  x = harModel(data=DJI_RV , periods = c(1,5,22), RVest = c("rCov"), type="HARRV",h=1,transform=NULL);
+>  class(x); 
+[1] "harModel" "lm"      
+>  x;
+
+Model:
+RV1 = beta0  +  beta1 * RV1 +  beta2 * RV5 +  beta3 * RV22
+
+Coefficients:
+    beta0      beta1      beta2      beta3  
+4.432e-05  1.586e-01  6.213e-01  8.721e-02  
+
+
+    r.squared  adj.r.squared  
+       0.4679         0.4608  
+
+>  summary(x);
+
+Call:
+"RV1 = beta0  +  beta1 * RV1 +  beta2 * RV5 +  beta3 * RV22"
+
+Residuals:
+       Min         1Q     Median         3Q        Max 
+-0.0017683 -0.0000626 -0.0000427 -0.0000087  0.0044331 
+
+Coefficients:
+       Estimate Std. Error t value Pr(>|t|)    
+beta0 4.432e-05  3.695e-05   1.200   0.2315    
+beta1 1.586e-01  8.089e-02   1.960   0.0512 .  
+beta2 6.213e-01  1.362e-01   4.560 8.36e-06 ***
+beta3 8.721e-02  1.217e-01   0.716   0.4745    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1 
+
+Residual standard error: 0.0004344 on 227 degrees of freedom
+Multiple R-squared: 0.4679,	Adjusted R-squared: 0.4608 
+F-statistic: 66.53 on 3 and 227 DF,  p-value: < 2.2e-16 
+
+>  plot(x);
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:timeDate’
+
+> nameEx("heavyModel")
+> ### * heavyModel
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: heavyModel
+> ### Title: HEAVY Model estimation
+> ### Aliases: heavyModel
+> ### Keywords: forecasting
+> 
+> ### ** Examples
+>  
+>  # Implementation of the heavy model on DJI:
+>  data("realized_library");
+>  returns =  realized_library$Dow.Jones.Industrials.Returns; 
+>  rk      =  realized_library$Dow.Jones.Industrials.Realized.Kernel; 
+>  returns = returns[!is.na(rk)];  rk = rk[!is.na(rk)]; # Remove NA's 
+>  data = cbind( returns^2, rk ); # Make data matrix with returns and realized measures
+>  backcast = matrix( c(var(returns),mean(rk)) ,ncol=1);
+>  
+>  startvalues = c(0.004,0.02,0.44,0.41,0.74,0.56); # Initial values
+> # output = heavyModel( data = as.matrix(data,ncol=2), compconst=FALSE, 
+> #                    startingvalues = startvalues, backcast=backcast); 
+> 
+> 
+> 
+> cleanEx()
+> nameEx("highfrequency-package")
+> ### * highfrequency-package
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: highfrequency-package
+> ### Title: highfrequency: Toolkit for the analysis of highfrequency
+> ###   financial data in R.
+> ### Aliases: highfrequency-package highfrequency
+> ### Keywords: package
+> 
+> ### ** Examples
+> 
+> # see users manual
+> 
+> 
+> 
+> cleanEx()
+> nameEx("lltc.xts")
+> ### * lltc.xts
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: lltc.xts
+> ### Title: LLTC Data
+> ### Aliases: lltc.xts
+> ### Keywords: datasets
+> 
+> ### ** Examples
+> 
+> data(lltc.xts)
+> plot(lltc.xts) 
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:timeDate’
+
+> nameEx("matchTradesQuotes")
+> ### * matchTradesQuotes
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: matchTradesQuotes
+> ### Title: Match trade and quote data
+> ### Aliases: matchTradesQuotes
+> ### Keywords: data manipulation
+> 
+> ### ** Examples
+> 
+> #load data samples
+> data("sample_tdata");
+> data("sample_qdata");
+> #match the trade and quote data
+> tqdata = matchTradesQuotes(sample_tdata,sample_qdata);
+Loading required package: quantmod
+Loading required package: Defaults
+Loading required package: TTR
+> #have a look
+> head(tqdata);
+                    SYMBOL EX  PRICE     SIZE   COND CORR G127 BID      BIDSIZ
+2008-01-04 10:30:27 "XXX"  "N" "193.71"  "9100" "E"  "0"  "0"  "193.34" "4.5" 
+2008-01-04 10:30:28 "XXX"  "N" "193.59"  "200"  "E"  "0"  "0"  "193.34" "4.5" 
+2008-01-04 10:30:29 "XXX"  "N" "193.445" "200"  "E"  "0"  "0"  "193.25" "12.5"
+2008-01-04 10:30:30 "XXX"  "N" "193.38"  "250"  "E"  "0"  "0"  "193.47" "0.5" 
+2008-01-04 10:30:31 "XXX"  "N" "193.34"  "300"  "E"  "0"  "0"  "193.47" "0.5" 
+2008-01-04 10:30:33 "XXX"  "N" "193.52"  "400"  "E"  "0"  "0"  "193.3"  "2.5" 
+                    OFR      OFRSIZ MODE
+2008-01-04 10:30:27 "193.89" "11.5" "12"
+2008-01-04 10:30:28 "193.89" "11.5" "12"
+2008-01-04 10:30:29 "193.81" "8.5"  "12"
+2008-01-04 10:30:30 "193.63" "0.5"  "12"
+2008-01-04 10:30:31 "193.63" "0.5"  "12"
+2008-01-04 10:30:33 "193.64" "0.5"  "12"
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:timeDate’, ‘package:quantmod’, ‘package:TTR’,
+  ‘package:Defaults’
+
+> nameEx("medRV")
+> ### * medRV
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: medRV
+> ### Title: medRV
+> ### Aliases: medRV
+> ### Keywords: volatility
+> 
+> ### ** Examples
+> 
+>  data(sample_tdata);  
+>  medrv = medRV( rdata = sample_tdata$PRICE, align.by ="minutes", 
++             align.period =5, makeReturns=TRUE); 
+>  medrv 
+[1] 0.0003997029
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:timeDate’
+
+> nameEx("minRV")
+> ### * minRV
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: minRV
+> ### Title: minRV
+> ### Aliases: minRV
+> ### Keywords: volatility
+> 
+> ### ** Examples
+> 
+>  data(sample_tdata); 
+>  
+>  minrv = minRV( rdata = sample_tdata$PRICE, align.by ="minutes", 
++             align.period =5, makeReturns=TRUE); 
+>  minrv 
+[1] 0.0003513061
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:timeDate’
+
+> nameEx("quotescleanup")
+> ### * quotescleanup
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: quotesCleanup
+> ### Title: Cleans quote data
+> ### Aliases: quotesCleanup
+> ### Keywords: cleaning
+> 
+> ### ** Examples
+> 
+> #Consider you have raw quote data for 1 stock for 1 day 
+> data("sample_qdataraw");
+> head(sample_qdataraw);
+                    SYMBOL EX  BID      BIDSIZ OFR      OFRSIZ MODE
+2008-01-04 09:30:00 "XXX"  "T" "193.12" "0.5"  "193.94" "0.5"  "12"
+2008-01-04 09:30:26 "XXX"  "P" "193.31" "0.5"  "193.96" "2.5"  "12"
+2008-01-04 09:30:26 "XXX"  "N" "193.18" "2"    "193.82" "10"   "12"
+2008-01-04 09:30:26 "XXX"  "T" "193.52" "0.5"  "193.97" "0.5"  "12"
+2008-01-04 09:30:26 "XXX"  "T" "193.47" "2"    "193.97" "0.5"  "12"
+2008-01-04 09:30:26 "XXX"  "N" "193.5"  "2.5"  "193.96" "1.5"  "12"
+> dim(sample_qdataraw);
+[1] 48380     7
+> qdata_aftercleaning = quotesCleanup(qdataraw=sample_qdataraw,exchanges="N");
+Loading required package: quantmod
+Loading required package: Defaults
+Loading required package: TTR
+> qdata_aftercleaning$report; 
+        initial number         no zero quotes        select exchange 
+                 48380                  48305                   9792 
+remove negative spread    remove large spread   merge same timestamp 
+                  9792                   9792                   7706 
+       remove outliers 
+                  7706 
+> barplot(qdata_aftercleaning$report);
+> dim(qdata_aftercleaning$qdata);
+[1] 7706    7
+> 
+> #In case you have more data it is advised to use the on-disk functionality
+> #via "from","to","datasource",etc. arguments
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:quantmod’, ‘package:TTR’, ‘package:Defaults’,
+  ‘package:timeDate’
+
+> nameEx("rAVGCov")
+> ### * rAVGCov
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: rAVGCov
+> ### Title: Realized Covariance: Average Subsample
+> ### Aliases: rAVGCov
+> ### Keywords: volatility
+> 
+> ### ** Examples
+>  
+>  # Average subsampled realized variance/covariance for CTS aligned at one minute returns at 
+>  # 5 subgrids (5 minutes).
+>  data(sample_tdata); 
+>  data(lltc.xts);
+>  data(sbux.xts);
+>  
+>  # Univariate
+>  rvSub = rAVGCov( rdata = sample_tdata$PRICE, period = 5, align.by ="minutes", 
++                    align.period=5, makeReturns=TRUE); 
+xts -> realizedObject [2008-01-04 09:30:27 :: 2008-01-04 16:00:00] 
+>  rvSub
+[1] 0.0004648037
+>  
+>  # Multivariate:
+>  rcSub = rAVGCov( rdata = list(lltc.xts,sbux.xts), period = 5, align.by ="minutes", 
++                    align.period=5, makeReturns=FALSE); 
+xts -> realizedObject [2010-07-01 09:30:00 :: 2010-07-01 16:00:00] 
+xts -> realizedObject [2010-07-01 09:30:00 :: 2010-07-01 16:00:00] 
+>  rcSub
+             [,1]         [,2]
+[1,] 0.0007106435 0.0005485482
+[2,] 0.0005485482 0.0006892969
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:timeDate’
+
+> nameEx("rAccumulation")
+> ### * rAccumulation
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: rAccumulation
+> ### Title: Realized Accumulation Plot
+> ### Aliases: rAccumulation
+> ### Keywords: methods
+> 
+> ### ** Examples
+> 
+> data(sbux.xts)
+> 
+> cumm <- list() 
+> cumm[[1]] <- rCumSum(sbux.xts, period=1, align.by="seconds", align.period=60) 
+xts -> realizedObject [2010-07-01 09:30:00 :: 2010-07-01 16:00:00] 
+xts -> realizedObject [2010-07-01 09:30:00 :: 2010-07-01 16:00:00] 
+> cumm[[2]] <- rCumSum(sbux.xts, period=10, align.by="seconds", align.period=60) 
+xts -> realizedObject [2010-07-01 09:30:00 :: 2010-07-01 16:00:00] 
+xts -> realizedObject [2010-07-01 09:30:00 :: 2010-07-01 16:00:00] 
+> cumm[[3]] <- rCumSum(sbux.xts, period=20, align.by="seconds", align.period=60) 
+xts -> realizedObject [2010-07-01 09:30:00 :: 2010-07-01 16:00:00] 
+xts -> realizedObject [2010-07-01 09:30:00 :: 2010-07-01 16:00:00] 
+> cumm[[4]] <- rCumSum(sbux.xts, period=30, align.by="seconds", align.period=60) 
+xts -> realizedObject [2010-07-01 09:30:00 :: 2010-07-01 16:00:00] 
+xts -> realizedObject [2010-07-01 09:30:00 :: 2010-07-01 16:00:00] 
+> accum <- list() 
+> accum[[1]] <- rAccumulation(sbux.xts, period=10, align.by="seconds", align.period=60) 
+xts -> realizedObject [2010-07-01 09:30:00 :: 2010-07-01 16:00:00] 
+xts -> realizedObject [2010-07-01 09:30:00 :: 2010-07-01 16:00:00] 
+xts -> realizedObject [2010-07-01 09:30:00 :: 2010-07-01 16:00:00] 
+xts -> realizedObject [2010-07-01 09:30:00 :: 2010-07-01 16:00:00] 
+> accum[[2]] <- rAccumulation(sbux.xts, period=20, align.by="seconds", align.period=60) 
+xts -> realizedObject [2010-07-01 09:30:00 :: 2010-07-01 16:00:00] 
+xts -> realizedObject [2010-07-01 09:30:00 :: 2010-07-01 16:00:00] 
+xts -> realizedObject [2010-07-01 09:30:00 :: 2010-07-01 16:00:00] 
+xts -> realizedObject [2010-07-01 09:30:00 :: 2010-07-01 16:00:00] 
+> accum[[3]] <- rAccumulation(sbux.xts, period=30, align.by="seconds", align.period=60)
+xts -> realizedObject [2010-07-01 09:30:00 :: 2010-07-01 16:00:00] 
+xts -> realizedObject [2010-07-01 09:30:00 :: 2010-07-01 16:00:00] 
+xts -> realizedObject [2010-07-01 09:30:00 :: 2010-07-01 16:00:00] 
+xts -> realizedObject [2010-07-01 09:30:00 :: 2010-07-01 16:00:00] 
+> 
+> par(mfrow=c(2,1)) 
+> plot(cumm[[1]], xlab="", ylab="Cumulative Ruturns", main="Starbucks (SBUX)", sub='20110701', type="p", col=16, lwd=2) 
+> lines(cumm[[2]], col=2, lwd=2) 
+> lines(cumm[[3]], col=3, lwd=2) 
+> lines(cumm[[4]], col=4, lwd=2) 
+> plot(accum[[1]], xlab="", ylab="Realized Accumulation", type="l",main="Starbucks (SBUX)", sub='20110701', col=2, lwd=2) 
+> lines(accum[[2]], col=3, lwd=2) 
+> lines(accum[[3]], col=4, lwd=2) 
+> 
+> 
+> 
+> graphics::par(get("par.postscript", pos = 'CheckExEnv'))
+> cleanEx()
+
+detaching ‘package:timeDate’
+
+> nameEx("rBPCov")
+> ### * rBPCov
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: rBPCov
+> ### Title: Realized BiPower Covariance
+> ### Aliases: rBPCov
+> ### Keywords: volatility
+> 
+> ### ** Examples
+> 
+>  # Realized Bipower Variance/Covariance for CTS aligned   
+>  # at 5 minutes.
+>  data(sample_tdata); 
+>  data(sample_5minprices_jumps);
+>  
+>  # Univariate: 
+>  rbpv = rBPCov( rdata = sample_tdata$PRICE, align.by ="minutes", 
++                     align.period =5, makeReturns=TRUE); 
+>  rbpv 
+[1] 0.0004178507
+>  
+>  # Multivariate: 
+>  rbpc = rBPCov( rdata = sample_5minprices_jumps['2010-01-04'], makeReturns=TRUE,makePsd=TRUE); 
+>  rbpc
+             [,1]        [,2]        [,3]        [,4]        [,5]        [,6]
+ [1,] 0.011911028 0.006579688 0.010373523 0.011280509 0.007839027 0.006461952
+ [2,] 0.006579688 0.004716050 0.006529181 0.007013119 0.004892785 0.004147758
+ [3,] 0.010373523 0.006529181 0.011020467 0.011063430 0.007984012 0.006153050
+ [4,] 0.011280509 0.007013119 0.011063430 0.013966799 0.008610967 0.006857461
+ [5,] 0.007839027 0.004892785 0.007984012 0.008610967 0.007366721 0.004960283
+ [6,] 0.006461952 0.004147758 0.006153050 0.006857461 0.004960283 0.004662173
+ [7,] 0.006515773 0.004083339 0.005919085 0.007145569 0.004585945 0.004038282
+ [8,] 0.008391074 0.006054714 0.007655080 0.008889843 0.006682064 0.005650417
+ [9,] 0.007322200 0.004503411 0.007116206 0.007668197 0.005670977 0.004571320
+[10,] 0.007525586 0.004444211 0.007020745 0.007704124 0.005261043 0.004353370
+             [,7]        [,8]        [,9]       [,10]
+ [1,] 0.006515773 0.008391074 0.007322200 0.007525586
+ [2,] 0.004083339 0.006054714 0.004503411 0.004444211
+ [3,] 0.005919085 0.007655080 0.007116206 0.007020745
+ [4,] 0.007145569 0.008889843 0.007668197 0.007704124
+ [5,] 0.004585945 0.006682064 0.005670977 0.005261043
+ [6,] 0.004038282 0.005650417 0.004571320 0.004353370
+ [7,] 0.004674653 0.006295962 0.004716030 0.004318852
+ [8,] 0.006295962 0.010347564 0.006032211 0.006193812
+ [9,] 0.004716030 0.006032211 0.007438345 0.005010901
+[10,] 0.004318852 0.006193812 0.005010901 0.005838879
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:timeDate’
+
+> nameEx("rCov")
+> ### * rCov
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: rCov
+> ### Title: Realized Covariance
+> ### Aliases: rCov
+> ### Keywords: volatility
+> 
+> ### ** Examples
+> 
+>  # Realized Variance/Covariance for CTS aligned   
+>  # at 5 minutes.
+>  data(sample_tdata); 
+>  data(sample_5minprices_jumps);
+>  
+>  # Univariate: 
+>  rv = rCov( rdata = sample_tdata$PRICE, align.by ="minutes", 
++                     align.period =5, makeReturns=TRUE); 
+>  rv 
+[1] 0.0004543674
+>  
+>  # Multivariate: 
+>  rc = rCov( rdata = sample_5minprices_jumps['2010-01-04'], makeReturns=TRUE); 
+>  rc
+             [,1]        [,2]        [,3]        [,4]        [,5]        [,6]
+ [1,] 0.010924507 0.006417440 0.010902222 0.010637283 0.007641477 0.006621664
+ [2,] 0.006417440 0.004854752 0.007497488 0.006908535 0.004988165 0.004459963
+ [3,] 0.010902222 0.007497488 0.025470413 0.013370373 0.008256313 0.007165239
+ [4,] 0.010637283 0.006908535 0.013370373 0.013558307 0.008462553 0.007058942
+ [5,] 0.007641477 0.004988165 0.008256313 0.008462553 0.007135684 0.005222064
+ [6,] 0.006621664 0.004459963 0.007165239 0.007058942 0.005222064 0.005182243
+ [7,] 0.006564232 0.004320079 0.006898855 0.007011920 0.005077752 0.004543131
+ [8,] 0.008844032 0.006354244 0.010140831 0.008384299 0.007287717 0.006212021
+ [9,] 0.005432923 0.003587660 0.006949304 0.005752133 0.004657362 0.004063073
+[10,] 0.007333314 0.004901717 0.008748716 0.007959900 0.005735400 0.004901623
+             [,7]        [,8]        [,9]       [,10]
+ [1,] 0.006564232 0.008844032 0.005432923 0.007333314
+ [2,] 0.004320079 0.006354244 0.003587660 0.004901717
+ [3,] 0.006898855 0.010140831 0.006949304 0.008748716
+ [4,] 0.007011920 0.008384299 0.005752133 0.007959900
+ [5,] 0.005077752 0.007287717 0.004657362 0.005735400
+ [6,] 0.004543131 0.006212021 0.004063073 0.004901623
+ [7,] 0.005057454 0.007206312 0.004114702 0.004916568
+ [8,] 0.007206312 0.025892047 0.006320008 0.007654978
+ [9,] 0.004114702 0.006320008 0.009120387 0.004383184
+[10,] 0.004916568 0.007654978 0.004383184 0.006411112
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:timeDate’
+
+> nameEx("rCumSum")
+> ### * rCumSum
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: rCumSum
+> ### Title: Plot cummulative returns
+> ### Aliases: rCumSum
+> ### Keywords: methods
+> 
+> ### ** Examples
+> 
+> data(sbux.xts)
+> 
+> cumm <- list() 
+> cumm[[1]] <- rCumSum(sbux.xts, period=1, align.by="seconds", align.period=60) 
+xts -> realizedObject [2010-07-01 09:30:00 :: 2010-07-01 16:00:00] 
+xts -> realizedObject [2010-07-01 09:30:00 :: 2010-07-01 16:00:00] 
+> cumm[[2]] <- rCumSum(sbux.xts, period=10, align.by="seconds", align.period=60) 
+xts -> realizedObject [2010-07-01 09:30:00 :: 2010-07-01 16:00:00] 
+xts -> realizedObject [2010-07-01 09:30:00 :: 2010-07-01 16:00:00] 
+> cumm[[3]] <- rCumSum(sbux.xts, period=20, align.by="seconds", align.period=60) 
+xts -> realizedObject [2010-07-01 09:30:00 :: 2010-07-01 16:00:00] 
+xts -> realizedObject [2010-07-01 09:30:00 :: 2010-07-01 16:00:00] 
+> cumm[[4]] <- rCumSum(sbux.xts, period=30, align.by="seconds", align.period=60) 
+xts -> realizedObject [2010-07-01 09:30:00 :: 2010-07-01 16:00:00] 
+xts -> realizedObject [2010-07-01 09:30:00 :: 2010-07-01 16:00:00] 
+> plot(cumm[[1]], xlab="", ylab="Cumulative Ruturns", main="Starbucks (SBUX)", sub='20110701', type="p", col=16, lwd=2) 
+> lines(cumm[[2]], col=2, lwd=2) 
+> lines(cumm[[3]], col=3, lwd=2) 
+> lines(cumm[[4]], col=4, lwd=2)
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:timeDate’
+
+> nameEx("rHYCov")
+> ### * rHYCov
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: rHYCov
+> ### Title: Hayashi-Yoshida Covariance
+> ### Aliases: rHYCov
+> ### Keywords: volatility
+> 
+> ### ** Examples
+> 
+>  # Average Realized Kernel Variance/Covariance for CTS aligned at one minute returns at 
+>  # 5 subgrids (5 minutes).
+>  data(lltc.xts); 
+>  data(sbux.xts); 
+>   # Multivariate:
+>  rHYCov = rHYCov( rdata = list(lltc.xts,sbux.xts), period = 5, align.by ="minutes", 
++                    align.period=5, makeReturns=FALSE); 
+xts -> realizedObject [2010-07-01 09:30:00 :: 2010-07-01 16:00:00] 
+xts -> realizedObject [2010-07-01 09:30:00 :: 2010-07-01 16:00:00] 
+>  rHYCov 
+            [,1]         [,2]
+[1,] 0.000368847 0.0003723690
+[2,] 0.000372369 0.0003759247
+>  #Note: for the diagonal elements the rCov is used.
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:timeDate’
+
+> nameEx("rKernel.available")
+> ### * rKernel.available
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: rKernel.available
+> ### Title: Available Kernels
+> ### Aliases: rKernel.available
+> ### Keywords: volatility
+> 
+> ### ** Examples
+> 
+> rKernel.available()
+ [1] "Rectangular"          "Bartlett"             "Second"              
+ [4] "Epanechnikov"         "Cubic"                "Fifth"               
+ [7] "Sixth"                "Seventh"              "Eighth"              
+[10] "Parzen"               "TukeyHanning"         "ModifiedTukeyHanning"
+> 
+> 
+> 
+> cleanEx()
+> nameEx("rKernelCov")
+> ### * rKernelCov
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: rKernelCov
+> ### Title: Realized Covariance: Kernel
+> ### Aliases: rKernelCov
+> ### Keywords: volatility
+> 
+> ### ** Examples
+>  
+>  # Average Realized Kernel Variance/Covariance for CTS aligned at one minute returns at 
+>  # 5 subgrids (5 minutes).
+>  data(sample_tdata); 
+>  data(lltc.xts); 
+>  data(sbux.xts); 
+>  
+>  # Univariate: 
+>  rvKernel = rKernelCov( rdata = sample_tdata$PRICE, period = 5, align.by ="minutes", 
++                    align.period=5, makeReturns=TRUE); 
+xts -> realizedObject [2008-01-04 09:30:27 :: 2008-01-04 16:00:00] 
+>  rvKernel 
+[1] 0.0005764406
+>  
+>  # Multivariate:
+>  rcKernel = rKernelCov( rdata = list(lltc.xts,sbux.xts), period = 5, align.by ="minutes", 
++                    align.period=5, makeReturns=FALSE); 
+xts -> realizedObject [2010-07-01 09:30:00 :: 2010-07-01 16:00:00] 
+xts -> realizedObject [2010-07-01 09:30:00 :: 2010-07-01 16:00:00] 
+xts -> realizedObject [2010-07-01 09:30:00 :: 2010-07-01 16:00:00] 
+xts -> realizedObject [2010-07-01 09:30:00 :: 2010-07-01 16:00:00] 
+>  rcKernel 
+             [,1]         [,2]
+[1,] 0.0006256143 0.0004603113
+[2,] 0.0004603113 0.0006530940
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:timeDate’
+
+> nameEx("rMarginal")
+> ### * rMarginal
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: rMarginal
+> ### Title: Maginal Contribution to Realized Estimate
+> ### Aliases: rMarginal
+> ### Keywords: methods
+> 
+> ### ** Examples
+> 
+> data(sbux.xts)
+> par(mfrow=c(2,1))
+> plot(rCumSum(sbux.xts, period=10, align.by="seconds", align.period=60), xlab="", ylab="Cumulative Ruturns", main="Starbucks (SBUX)", sub='20110701', type="p")
+xts -> realizedObject [2010-07-01 09:30:00 :: 2010-07-01 16:00:00] 
+xts -> realizedObject [2010-07-01 09:30:00 :: 2010-07-01 16:00:00] 
+> barplot(rMarginal(sbux.xts, period=10, align.by="seconds", align.period=60)$y, main="Marginal Contribution Plot") 
+xts -> realizedObject [2010-07-01 09:30:00 :: 2010-07-01 16:00:00] 
+xts -> realizedObject [2010-07-01 09:30:00 :: 2010-07-01 16:00:00] 
+> 
+> 
+> 
+> graphics::par(get("par.postscript", pos = 'CheckExEnv'))
+> cleanEx()
+
+detaching ‘package:timeDate’
+
+> nameEx("rOWCov")
+> ### * rOWCov
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: rOWCov
+> ### Title: Realized Outlyingness Weighted Covariance
+> ### Aliases: rOWCov
+> ### Keywords: volatility
+> 
+> ### ** Examples
+> 
+>  # Realized Outlyingness Weighted Variance/Covariance for CTS aligned   
+>  # at 5 minutes.
+>  data(sample_tdata); 
+>  data(sample_5minprices_jumps);
+>  
+>  # Univariate: 
+>  rvoutw = rOWCov( rdata = sample_tdata$PRICE, align.by ="minutes", 
++                     align.period =5, makeReturns=TRUE); 
+Loading required package: robustbase
+>  rvoutw 
+[1] 0.0003480817
+>  
+>  # Multivariate: 
+>  rcoutw = rOWCov( rdata = sample_5minprices_jumps['2010-01-04'], makeReturns=TRUE); 
+>  rcoutw
+             [,1]        [,2]        [,3]        [,4]        [,5]        [,6]
+ [1,] 0.010038657 0.005968264 0.008023906 0.009713934 0.006924082 0.006154338
+ [2,] 0.005968264 0.004604317 0.005513601 0.006417037 0.004686064 0.004256534
+ [3,] 0.008023906 0.005513601 0.008358878 0.009072915 0.006321510 0.005509414
+ [4,] 0.009713934 0.006417037 0.009072915 0.012422266 0.007855224 0.006626060
+ [5,] 0.006924082 0.004686064 0.006321510 0.007855224 0.006624526 0.004859874
+ [6,] 0.006154338 0.004256534 0.005509414 0.006626060 0.004859874 0.004990103
+ [7,] 0.006025883 0.004054354 0.005462850 0.006632739 0.004638985 0.004267400
+ [8,] 0.006065529 0.004363713 0.005791448 0.006916376 0.005113093 0.004579928
+ [9,] 0.005788213 0.003820363 0.005175606 0.006491890 0.004698679 0.004069430
+[10,] 0.006789328 0.004545245 0.006191337 0.007387327 0.005359381 0.004625125
+             [,7]        [,8]        [,9]       [,10]
+ [1,] 0.006025883 0.006065529 0.005788213 0.006789328
+ [2,] 0.004054354 0.004363713 0.003820363 0.004545245
+ [3,] 0.005462850 0.005791448 0.005175606 0.006191337
+ [4,] 0.006632739 0.006916376 0.006491890 0.007387327
+ [5,] 0.004638985 0.005113093 0.004698679 0.005359381
+ [6,] 0.004267400 0.004579928 0.004069430 0.004625125
+ [7,] 0.004695507 0.004582978 0.003965988 0.004560814
+ [8,] 0.004582978 0.006174062 0.004421445 0.005031400
+ [9,] 0.003965988 0.004421445 0.004783729 0.004359570
+[10,] 0.004560814 0.005031400 0.004359570 0.005985684
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:robustbase’, ‘package:timeDate’
+
+> nameEx("rRTSCov")
+> ### * rRTSCov
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: rRTSCov
+> ### Title: Robust two time scale covariance estimation
+> ### Aliases: rRTSCov
+> ### Keywords: volatility
+> 
+> ### ** Examples
+>  
+>  # Robust Realized two timescales Variance/Covariance for CTS 
+>  data(sample_tdata); 
+>  data(lltc.xts); 
+>  data(sbux.xts); 
+>  
+>  # Univariate: 
+>  rvRTS = rRTSCov( pdata = sample_tdata$PRICE); 
+>  # Note: Prices as input
+>  rvRTS 
+[1] 0.0003527644
+>  
+>  # Multivariate:
+>  rcRTS = rRTSCov( pdata = list(cumsum(lltc.xts)+100,cumsum(sbux.xts)+100) ); 
+>  # Note: List of prices as input
+>  rcRTS 
+             [,1]         [,2]
+[1,] 6.182927e-08 5.821538e-08
+[2,] 5.821538e-08 6.903139e-08
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:timeDate’
+
+> nameEx("rScatterReturns")
+> ### * rScatterReturns
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: rScatterReturns
+> ### Title: Scatterplot of aligned returns
+> ### Aliases: rScatterReturns
+> ### Keywords: methods
+> 
+> ### ** Examples
+> 
+> data(sbux.xts)
+> data(lltc.xts)
+> par(mfrow=c(2,1))
+> rScatterReturns(sbux.xts,y=lltc.xts, period=1, align.period=20,ylab="LLTC",xlab="SBUX",numbers=FALSE) 
+xts -> realizedObject [2010-07-01 09:30:00 :: 2010-07-01 16:00:00] 
+xts -> realizedObject [2010-07-01 09:30:00 :: 2010-07-01 16:00:00] 
+NULL
+> rScatterReturns(sbux.xts,y=lltc.xts, period=1, align.period=20,ylab="LLTC",xlab="SBUX",numbers=TRUE) 
+xts -> realizedObject [2010-07-01 09:30:00 :: 2010-07-01 16:00:00] 
+xts -> realizedObject [2010-07-01 09:30:00 :: 2010-07-01 16:00:00] 
+NULL
+> 
+> 
+> 
+> graphics::par(get("par.postscript", pos = 'CheckExEnv'))
+> cleanEx()
+
+detaching ‘package:timeDate’
+
+> nameEx("rTSCov")
+> ### * rTSCov
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: rTSCov
+> ### Title: Two time scale covariance estimation
+> ### Aliases: rTSCov
+> ### Keywords: volatility
+> 
+> ### ** Examples
+> 
+>  # Robust Realized two timescales Variance/Covariance for CTS 
+>  data(sample_tdata); 
+>  data(lltc.xts); 
+>  data(sbux.xts); 
+>  
+>  # Univariate: 
+>  rvTS = rTSCov( pdata = sample_tdata$PRICE); 
+>  # Note: Prices as input
+>  rvTS 
+[1] 0.0005276875
+>  
+>  # Multivariate:
+>  rcTS = rTSCov( pdata = list(cumsum(lltc.xts)+100,cumsum(sbux.xts)+100) ); 
+>  # Note: List of prices as input
+>  rcTS 
+             [,1]         [,2]
+[1,] 5.998720e-08 5.704123e-08
+[2,] 5.704123e-08 6.854694e-08
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:timeDate’
+
+> nameEx("rThresholdCov")
+> ### * rThresholdCov
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: rThresholdCov
+> ### Title: Threshold Covariance
+> ### Aliases: rThresholdCov
+> ### Keywords: volatility
+> 
+> ### ** Examples
+> 
+>  # Realized threshold  Variance/Covariance: 
+>  data(lltc.xts); 
+>  data(sbux.xts); 
+>  
+>  # Multivariate:
+>  rcThreshold = rThresholdCov(cbind(lltc.xts,sbux.xts), align.by="minutes",align.period=1); 
+>  rcThreshold  
+             ..1          ..2
+..1 2.872584e-05 4.312195e-06
+..2 4.312195e-06 2.210521e-05
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:timeDate’
+
+> nameEx("rZero")
+> ### * rZero
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: rZero
+> ### Title: Calculates the percentage of co-zero returns at a specified
+> ###   sampling period
+> ### Aliases: rZero
+> ### Keywords: methods
+> 
+> ### ** Examples
+> 
+> data(sbux.xts)
+> data(lltc.xts)
+> rZero( rdata = list(sbux.xts, lltc.xts) , period = 60, align.by ="seconds", align.period=1)
+xts -> realizedObject [2010-07-01 09:30:00 :: 2010-07-01 16:00:00] 
+xts -> realizedObject [2010-07-01 09:30:00 :: 2010-07-01 16:00:00] 
+          [,1]       [,2]
+[1,] 0.1023018 0.16879795
+[2,] 0.1687980 0.07928389
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:timeDate’
+
+> nameEx("refreshTime")
+> ### * refreshTime
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: refreshTime
+> ### Title: Synchronize (multiple) irregular timeseries by refresh time
+> ### Aliases: refreshTime
+> ### Keywords: data manipulation
+> 
+> ### ** Examples
+> 
+> #suppose irregular timepoints:
+> start = as.POSIXct("2010-01-01 09:30:00")
+> ta = start + c(1,2,4,5,9);    	
+> tb = start + c(1,3,6,7,8,9,10,11);
+> 
+> #yielding the following timeseries:
+> a = as.xts(1:length(ta),order.by=ta);
+> b = as.xts(1:length(tb),order.by=tb);
+> 
+> #Calculate the synchronized timeseries:
+> refreshTime(list(a,b))
+Warning: timezone of object (GMT) is different than current timezone ().
+                    [,1] [,2]
+2010-01-01 08:30:01    1    1
+2010-01-01 08:30:03    2    2
+2010-01-01 08:30:06    4    3
+2010-01-01 08:30:09    5    6
+> 
+> 
+> 
+> cleanEx()
+> nameEx("sbux.xts")
+> ### * sbux.xts
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: sbux.xts
+> ### Title: Starbucks Data
+> ### Aliases: sbux.xts
+> ### Keywords: datasets
+> 
+> ### ** Examples
+> 
+> data(sbux.xts)
+> plot(sbux.xts) 
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:timeDate’
+
+> nameEx("spotVol")
+> ### * spotVol
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: spotVol
+> ### Title: Spot volatility estimation
+> ### Aliases: spotVol
+> ### Keywords: volatility
+> 
+> ### ** Examples
+> 
+> data("sample_real5minprices");
+> 
+> # Compute and plot intraday periodicity:
+> out = spotVol(sample_real5minprices,P1=6,P2=4,periodicvol="TML",k=5, dummies=FALSE);
+Loading required package: chron
+> head(out);
+Warning: timezone of object (GMT) is different than current timezone ().
+                          returns         vol    dailyvol periodicvol
+2005-03-04 09:35:00 -0.0010966963 0.004081072 0.001896816    2.151539
+2005-03-04 09:40:00 -0.0005614217 0.003695715 0.001896816    1.948379
+2005-03-04 09:45:00 -0.0026443880 0.003417950 0.001896816    1.801941
+2005-03-04 09:50:00 -0.0010962784 0.003207932 0.001896816    1.691220
+2005-03-04 09:55:00  0.0013687911 0.003039902 0.001896816    1.602635
+2005-03-04 10:00:00 -0.0002903103 0.002897150 0.001896816    1.527376
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:timeDate’, ‘package:chron’
+
+> nameEx("tqLiquidity")
+> ### * tqLiquidity
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: tqLiquidity
+> ### Title: Calculate numerous (23) liquidity measures
+> ### Aliases: tqLiquidity
+> ### Keywords: liquidity
+> 
+> ### ** Examples
+> 
+> #load data samples
+> data("sample_tdata");
+> data("sample_qdata");
+> tdata = sample_tdata;
+> qdata = sample_qdata;
+> #match the trade and quote data
+> tqdata = matchTradesQuotes(tdata,qdata);
+Loading required package: quantmod
+Loading required package: Defaults
+Loading required package: TTR
+> 
+> #calculate the proportional realized spread:
+> prs = tqLiquidity(tqdata,tdata,qdata,type="prs");
+> 
+> #calculate the effective spread:
+> es = tqLiquidity(tqdata,type="es");
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:timeDate’, ‘package:quantmod’, ‘package:TTR’,
+  ‘package:Defaults’
+
+> nameEx("tradesCleanupFinal")
+> ### * tradesCleanupFinal
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: tradesCleanupFinal
+> ### Title: Perform a final cleaning procedure on trade data
+> ### Aliases: tradesCleanupFinal
+> ### Keywords: cleaning
+> 
+> ### ** Examples
+> 
+> #Consider you have raw trade data for 1 stock for 1 day 
+> data("sample_qdata");    #load cleaned quote data
+> data("sample_tdataraw"); #load raw trade data
+> tdata_afterfirstcleaning = tradesCleanup(tdataraw=sample_tdataraw,
++ exchange="N",report=FALSE);
+Loading required package: quantmod
+Loading required package: Defaults
+Loading required package: TTR
+> dim(tdata_afterfirstcleaning);
+[1] 9105    7
+> tdata_afterfinalcleaning = tradesCleanupFinal(qdata=sample_qdata,
++ tdata=tdata_afterfirstcleaning);
+> dim(tdata_afterfinalcleaning);
+[1] 8153    7
+> #In case you have more data it is advised to use the on-disk functionality
+> #via "from","to","datasource",etc. arguments
+> 
+> 
+> 
+> cleanEx()
+
+detaching ‘package:timeDate’, ‘package:quantmod’, ‘package:TTR’,
+  ‘package:Defaults’
+
+> nameEx("tradescleanup")
+> ### * tradescleanup
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: tradesCleanup
+> ### Title: Cleans trade data
+> ### Aliases: tradesCleanup
+> ### Keywords: cleaning
+> 
+> ### ** Examples
+> 
+> #Consider you have raw trade data for 1 stock for 1 day 
+> data("sample_tdataraw");
+> head(sample_tdataraw);
+                    SYMBOL EX  PRICE    SIZE     COND CR  G127
+2008-01-04 09:30:26 "XXX"  "N" "193.76" "345050" "O"  "0" "0" 
+2008-01-04 09:30:27 "XXX"  "N" "193.82" "100"    "E"  "0" "0" 
+2008-01-04 09:30:27 "XXX"  "N" "193.82" "400"    "E"  "0" "0" 
+2008-01-04 09:30:27 "XXX"  "N" "193.82" "50"     "E"  "0" "0" 
+2008-01-04 09:30:27 "XXX"  "N" "193.82" "50"     "E"  "0" "0" 
+2008-01-04 09:30:27 "XXX"  "N" "193.82" "50"     "E"  "0" "0" 
+> dim(sample_tdataraw);
+[1] 48484     7
+> tdata_afterfirstcleaning = tradesCleanup(tdataraw=sample_tdataraw,exchanges="N");
+Loading required package: quantmod
+Loading required package: Defaults
+Loading required package: TTR
+> tdata_afterfirstcleaning$report; 
+      initial number       no zero prices      select exchange 
+               48484                48479                20795 
+     sales condition merge same timestamp 
+               20135                 9105 
+> barplot(tdata_afterfirstcleaning$report);
+> dim(tdata_afterfirstcleaning$tdata);
+[1] 9105    7
+> 
+> #In case you have more data it is advised to use the on-disk functionality
+> #via "from","to","datasource",etc. arguments
+> 
+> 
+> 
+> ### * <FOOTER>
+> ###
+> cat("Time elapsed: ", proc.time() - get("ptime", pos = 'CheckExEnv'),"\n")
+Time elapsed:  22.978 0.628 23.753 0 0 
+> grDevices::dev.off()
+null device 
+          1 
+> ###
+> ### Local variables: ***
+> ### mode: outline-minor ***
+> ### outline-regexp: "\\(> \\)?### [*]+" ***
+> ### End: ***
+> quit('no')

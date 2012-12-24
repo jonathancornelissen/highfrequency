@@ -1,0 +1,24 @@
+* installing *source* package ‘highfrequency’ ...
+** libs
+*** arch - i386
+gcc -arch i386 -std=gnu99 -I/Library/Frameworks/R.framework/Resources/include -I/Library/Frameworks/R.framework/Resources/include/i386 -DNDEBUG  -I/usr/local/include    -fPIC  -g -O2  -c highfrequency.c -o highfrequency.o
+gcc -arch i386 -std=gnu99 -dynamiclib -Wl,-headerpad_max_install_names -undefined dynamic_lookup -single_module -multiply_defined suppress -L/usr/local/lib -o highfrequency.so highfrequency.o -F/Library/Frameworks/R.framework/.. -framework R -Wl,-framework -Wl,CoreFoundation
+installing to /Users/jonathancornelissen/Dropbox/GSoC-RTAQ/highfrequency/highfrequency/pkg/highfrequency.Rcheck/highfrequency/libs/i386
+*** arch - x86_64
+gcc -arch x86_64 -std=gnu99 -I/Library/Frameworks/R.framework/Resources/include -I/Library/Frameworks/R.framework/Resources/include/x86_64 -DNDEBUG  -I/usr/local/include    -fPIC  -g -O2  -c highfrequency.c -o highfrequency.o
+gcc -arch x86_64 -std=gnu99 -dynamiclib -Wl,-headerpad_max_install_names -undefined dynamic_lookup -single_module -multiply_defined suppress -L/usr/local/lib -o highfrequency.so highfrequency.o -F/Library/Frameworks/R.framework/.. -framework R -Wl,-framework -Wl,CoreFoundation
+installing to /Users/jonathancornelissen/Dropbox/GSoC-RTAQ/highfrequency/highfrequency/pkg/highfrequency.Rcheck/highfrequency/libs/x86_64
+** R
+** data
+** inst
+** preparing package for lazy loading
+** help
+*** installing help indices
+** building package indices
+** installing vignettes
+   ‘highfrequency.Rnw’ 
+** testing if installed package can be loaded
+*** arch - i386
+*** arch - x86_64
+
+* DONE (highfrequency)

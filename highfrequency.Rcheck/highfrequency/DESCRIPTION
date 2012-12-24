@@ -1,0 +1,15 @@
+Package: highfrequency
+Version: 0.1
+Date: 2011-04-04
+Title: highfrequency
+Author: Jonathan Cornelissen, Kris Boudt, Scott Payseur 
+Maintainer: Jonathan Cornelissen
+        <Jonathan.cornelissen@econ.kuleuven.be>
+Description: The highfrequency package contains an extensive toolkit for the use of highfrequency financial data in R. It contains functionality to manage, clean and match highfrequency trades and quotes data. Furthermore, it enables users to: calculate easily various liquidity measures, estimate and forecast volatility, and investigate microstructure noise and intraday periodicity. 
+License: GPL (>= 2)
+Depends: R (>= 2.12.0), xts, zoo
+Suggests: realized, robustbase, cubature, mvtnorm, chron, timeDate,
+        quantmod
+LazyLoad: yes
+Built: R 2.15.1; universal-apple-darwin9.8.0; 2012-12-21 11:21:55 UTC; unix
+Archs: i386, x86_64

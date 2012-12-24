@@ -1,0 +1,87 @@
+TAQLoad                 Load trade or quote data into R
+aggregatePrice          Aggregate a time series but keep first and last
+                        observation
+aggregateQuotes         Aggregate an xts object containing quote data
+aggregateTrades         Aggregate an xts object containing trade data
+aggregatets             Aggregate a time series
+autoSelectExchangeQuotes
+                        Retain only data from the stock exchange with
+                        the highest volume
+autoSelectExchangeTrades
+                        Retain only data from the stock exchange with
+                        the highest trading volume
+convert                 Convert trade or quote data into xts object
+                        saved in the RData format
+exchangeHoursOnly       Extract data from an xts object for the
+                        Exchange Hours Only
+getTradeDirection       Get trade direction
+harModel                HAR model estimation (Heterogeneous
+                        Autoregressive model for Realized volatility)
+heavyModel              HEAVY Model estimation
+highfrequency-package   highfrequency: Toolkit for the analysis of
+                        highfrequency financial data in R.
+lltc.xts                LLTC Data
+makePsd                 Returns the positive semidinite projection of a
+                        symmetric matrix using the eigenvalue method
+makeReturns             Compute log returns
+matchTradesQuotes       Match trade and quote data
+medRV                   medRV
+mergeQuotesSameTimestamp
+                        Merge multiple quote entries with the same time
+                        stamp
+mergeTradesSameTimestamp
+                        Merge multiple transactions with the same time
+                        stamp
+minRV                   minRV
+noZeroPrices            Delete the observations where the price is zero
+noZeroQuotes            Delete the observations where the bid or ask is
+                        zero
+previoustick            previoustick (internal function)
+quotesCleanup           Cleans quote data
+rAVGCov                 Realized Covariance: Average Subsample
+rAccumulation           Realized Accumulation Plot
+rBPCov                  Realized BiPower Covariance
+rCov                    Realized Covariance
+rCumSum                 Plot cummulative returns
+rHYCov                  Hayashi-Yoshida Covariance
+rKernel.available       Available Kernels
+rKernelCov              Realized Covariance: Kernel
+rMarginal               Maginal Contribution to Realized Estimate
+rOWCov                  Realized Outlyingness Weighted Covariance
+rRTSCov                 Robust two time scale covariance estimation
+rScatterReturns         Scatterplot of aligned returns
+rTSCov                  Two time scale covariance estimation
+rThresholdCov           Threshold Covariance
+rZero                   Calculates the percentage of co-zero returns at
+                        a specified sampling period
+realized_library        The realized library from the Oxford-Man
+                        Institute of Quantitative Finance
+refreshTime             Synchronize (multiple) irregular timeseries by
+                        refresh time
+rmLargeSpread           Delete entries for which the spread is more
+                        than "maxi" times the median spread
+rmNegativeSpread        Delete entries for which the spread is negative
+rmOutliers              Delete entries for which the mid-quote is
+                        outlying with respect to surrounding entries
+rmTradeOutliers         Delete transactions with unlikely transaction
+                        prices
+salesCondition          Delete entries with abnormal Sale Condition.
+sample_5minprices       Ten artificial time series for the NYSE trading
+                        days during January 2010
+sample_5minprices_jumps
+                        Ten artificial time series (including jumps)
+                        for the NYSE trading days during January 2010
+sample_qdata            Sample of cleaned quotes for stock XXX for 1
+                        day
+sample_qdataraw         Sample of raw quotes for stock XXX for 1 day
+sample_real5minprices   Sample of imaginary price data for 61 days
+sample_tdata            Sample of cleaned trades for stock XXX for 1
+                        day
+sample_tdataraw         Sample of raw trades for stock XXX for 1 day
+sbux.xts                Starbucks Data
+selectExchange          Retain only data from a single stock exchange
+spotVol                 Spot volatility estimation
+tqLiquidity             Calculate numerous (23) liquidity measures
+tradesCleanup           Cleans trade data
+tradesCleanupFinal      Perform a final cleaning procedure on trade
+                        data

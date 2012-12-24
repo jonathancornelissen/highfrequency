@@ -1,0 +1,908 @@
+Hmm ... looks like a package
+
+This is pdfTeX, Version 3.1415926-2.3-1.40.12 (TeX Live 2011)
+ restricted \write18 enabled.
+entering extended mode
+
+(/private/var/folders/70/fxmz1c0n6sjbrqr6tcrfnvv80000gn/T/Rtmpjzo5tc/Rd2pdf9fa5
+34cbf584/Rd2.tex
+LaTeX2e <2009/09/24>
+Babel <v3.8l> and hyphenation patterns for english, dumylang, nohyphenation, ge
+rman-x-2009-06-19, ngerman-x-2009-06-19, afrikaans, ancientgreek, ibycus, arabi
+c, armenian, basque, bulgarian, catalan, pinyin, coptic, croatian, czech, danis
+h, dutch, ukenglish, usenglishmax, esperanto, estonian, ethiopic, farsi, finnis
+h, french, galician, german, ngerman, swissgerman, monogreek, greek, hungarian,
+ icelandic, assamese, bengali, gujarati, hindi, kannada, malayalam, marathi, or
+iya, panjabi, tamil, telugu, indonesian, interlingua, irish, italian, kurmanji,
+ lao, latin, latvian, lithuanian, mongolian, mongolianlmc, bokmal, nynorsk, pol
+ish, portuguese, romanian, russian, sanskrit, serbian, serbianc, slovak, sloven
+ian, spanish, swedish, turkish, turkmen, ukrainian, uppersorbian, welsh, loaded
+.
+
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/book.cls
+Document Class: book 2007/10/19 v1.4h Standard LaTeX document class
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/bk10.clo))
+(/Library/Frameworks/R.framework/Resources/share/texmf/tex/latex/Rd.sty
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/ifthen.sty)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/tools/longtable.sty)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/tools/bm.sty)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/alltt.sty)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/tools/verbatim.sty)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/url/url.sty) NOT loading ae
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/fontenc.sty
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/t1enc.def))
+(/usr/local/texlive/2011/texmf-dist/tex/latex/psnfss/times.sty)
+NOT loading lmodern
+(/usr/local/texlive/2011/texmf-dist/tex/latex/inconsolata/inconsolata.sty
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/textcomp.sty
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/ts1enc.def))
+(/usr/local/texlive/2011/texmf-dist/tex/latex/graphics/keyval.sty))
+(/usr/local/texlive/2011/texmf-dist/tex/latex/graphics/color.sty
+(/usr/local/texlive/2011/texmf-dist/tex/latex/latexconfig/color.cfg)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/pdftex-def/pdftex.def
+(/usr/local/texlive/2011/texmf-dist/tex/generic/oberdiek/infwarerr.sty)
+(/usr/local/texlive/2011/texmf-dist/tex/generic/oberdiek/ltxcmds.sty)))
+(/usr/local/texlive/2011/texmf-dist/tex/latex/hyperref/hyperref.sty
+(/usr/local/texlive/2011/texmf-dist/tex/generic/oberdiek/hobsub-hyperref.sty
+(/usr/local/texlive/2011/texmf-dist/tex/generic/oberdiek/hobsub-generic.sty))
+(/usr/local/texlive/2011/texmf-dist/tex/generic/ifxetex/ifxetex.sty)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/oberdiek/kvoptions.sty)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/hyperref/pd1enc.def)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/latexconfig/hyperref.cfg))
+
+Package hyperref Message: Driver (autodetected): hpdftex.
+
+(/usr/local/texlive/2011/texmf-dist/tex/latex/hyperref/hpdftex.def
+(/usr/local/texlive/2011/texmf-dist/tex/latex/oberdiek/rerunfilecheck.sty))
+
+Package hyperref Warning: Option `hyperindex' has already been used,
+(hyperref)                setting the option has no effect on input line 356.
+
+
+Package hyperref Warning: Option `pagebackref' has already been used,
+(hyperref)                setting the option has no effect on input line 356.
+
+) (/usr/local/texlive/2011/texmf-dist/tex/latex/base/makeidx.sty)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/inputenc.sty
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/t1enc.dfu)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/ot1enc.dfu)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/omsenc.dfu)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/ts1enc.dfu))
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/latin1.def))
+Writing index file Rd2.idx
+No file Rd2.aux.
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/ts1cmr.fd)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/psnfss/t1ptm.fd)
+(/usr/local/texlive/2011/texmf-dist/tex/context/base/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+) (/usr/local/texlive/2011/texmf-dist/tex/latex/hyperref/nameref.sty
+(/usr/local/texlive/2011/texmf-dist/tex/generic/oberdiek/gettitlestring.sty))
+(/usr/local/texlive/2011/texmf-dist/tex/latex/inconsolata/t1fi4.fd)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/psnfss/t1phv.fd)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [1{/usr/local/texl
+ive/2011/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [2]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [3]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [4]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [5]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [6]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/psnfss/ts1ptm.fd)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [7]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+Overfull \hbox (29.79745pt too wide) in paragraph at lines 450--451
+\T1/ptm/m/n/10 "csv". In case your data comes from "www.tickdata.com", set ex-t
+en-sion="tickdatacom". 
+[8]
+Overfull \hbox (27.78088pt too wide) in paragraph at lines 501--501
+ [] \T1/fi4/m/n/9 convert(from=from, to=to, datasource=datasource, datadestinat
+ion=datadestination, trades = T,[] 
+
+Overfull \hbox (32.28088pt too wide) in paragraph at lines 502--502
+ []                       \T1/fi4/m/n/9 quotes = T, ticker="IBM", dir = FALSE, 
+extension = "csv", header = TRUE,[] 
+[9]
+Overfull \hbox (54.78088pt too wide) in paragraph at lines 503--503
+ []                       \T1/fi4/m/n/9 tradecolnames = NULL, quotecolnames = N
+ULL, format = format, onefile = TRUE )[] 
+
+Overfull \hbox (27.78088pt too wide) in paragraph at lines 510--510
+ [] \T1/fi4/m/n/9 convert(from=from, to=to, datasource=datasource, datadestinat
+ion=datadestination, trades = T,[] 
+
+Overfull \hbox (14.28088pt too wide) in paragraph at lines 511--511
+ []            \T1/fi4/m/n/9 quotes = T, ticker="GLP", dir = TRUE, extension = 
+"tickdatacom", header = TRUE,[] 
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [10]
+Overfull \hbox (18.8375pt too wide) in paragraph at lines 588--590
+[]\T1/ptm/m/n/10 NOTE: The value of the first (and sec-ond) ob-ser-va-tion of t
+he out-put should be ig-nored if price==midpoint
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+Overfull \hbox (439.78088pt too wide) in paragraph at lines 615--615
+ [] \T1/fi4/m/n/10 harModel(data, periods = c(1, 5, 22), periodsJ = c(1,5,22), 
+leverage=NULL, RVest = c("rCov", "rBPCov"), type = "HARRV", jumptest = "ABDJump
+test", alpha = 0.05, h = 1,[] 
+[11] [12]
+Overfull \hbox (0.78088pt too wide) in paragraph at lines 673--673
+ [] \T1/fi4/m/n/9 x = harModel(data, periods = c(1,5,10), periodsJ=c(1,5,10), R
+Vest = c("rCov","rBPCov"),[] 
+
+Overfull \hbox (0.78088pt too wide) in paragraph at lines 674--674
+ []              \T1/fi4/m/n/9 type="HARRVCJ",transform="sqrt"); # Estimate the
+ HAR model of type HARRVCJ[] 
+
+Overfull \hbox (59.28088pt too wide) in paragraph at lines 685--685
+ [] \T1/fi4/m/n/9 x = harModel(data=DJI_RV , periods = c(1,5,22), RVest = c("rC
+ov"), type="HARRV",h=1,transform=NULL);[] 
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [13] [14]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [15]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [16]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [17] [18]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [19]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [20]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [21]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [22]
+Overfull \hbox (20.77808pt too wide) in paragraph at lines 1237--1238
+[]\T1/ptm/m/n/10 vector of tick-ers for which the data should be cleaned, e.g. 
+ticker = c("AAPL","AIG"). 
+[23] (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+Overfull \hbox (229.78088pt too wide) in paragraph at lines 1321--1321
+ []\T1/fi4/m/n/10 rAccumulation(x, period = 1, y = NULL, align.by="seconds", al
+ign.period = 1, plotit = FALSE, cts = TRUE, makeReturns = FALSE)[] 
+[24]
+Overfull \hbox (131.28088pt too wide) in paragraph at lines 1375--1375
+ []\T1/fi4/m/n/9 plot(cumm[[1]], xlab="", ylab="Cumulative Ruturns", main="Star
+bucks (SBUX)", sub='20110701', type="p", col=16, lwd=2)[] 
+
+Overfull \hbox (140.28088pt too wide) in paragraph at lines 1379--1379
+ []\T1/fi4/m/n/9 plot(accum[[1]], xlab="", ylab="Realized Accumulation", type="
+l",main="Starbucks (SBUX)", sub='20110701', col=2, lwd=2)[] 
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [25]
+Overfull \hbox (14.28088pt too wide) in paragraph at lines 1434--1434
+ [] \T1/fi4/m/n/9 # Average subsampled realized variance/covariance for CTS ali
+gned at one minute returns at[] 
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [26]
+Overfull \hbox (41.7794pt too wide) detected at line 1471
+[]\OT1/cmr/m/n/10 [\OML/cmm/m/it/10 k; q\OT1/cmr/m/n/10 ][] = [][] [] []  [] []
+  \OMS/cmsy/m/n/10 ^^@ []  [] []\OML/cmm/m/it/10 ;
+[27]
+Overfull \hbox (27.78088pt too wide) in paragraph at lines 1523--1523
+ [] \T1/fi4/m/n/9 rbpc = rBPCov( rdata = sample_5minprices_jumps['2010-01-04'],
+ makeReturns=TRUE,makePsd=TRUE);[] 
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+Overfull \hbox (39.78088pt too wide) in paragraph at lines 1546--1546
+ []\T1/fi4/m/n/10 rCov(rdata,cor = FALSE, align.by = NULL, align.period = NULL,
+ makeReturns = FALSE, ...)[] 
+[28] (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+Overfull \hbox (204.78088pt too wide) in paragraph at lines 1598--1598
+ []\T1/fi4/m/n/10 rCumSum(x, period = 1, align.by="seconds",align.period = 1, p
+lotit = FALSE, type = "l", cts = TRUE, makeReturns = FALSE)[] 
+[29]
+Overfull \hbox (131.28088pt too wide) in paragraph at lines 1634--1634
+ []\T1/fi4/m/n/9 plot(cumm[[1]], xlab="", ylab="Cumulative Ruturns", main="Star
+bucks (SBUX)", sub='20110701', type="p", col=16, lwd=2)[] 
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+Overfull \hbox (60.68895pt too wide) in paragraph at lines 1646--1649
+\T1/ptm/m/n/10 ing from 1996-01-03 up to 2009-03-01 for sev-eral in-dices and e
+x-change rates. Use \T1/fi4/m/n/10 colnames(realized_library)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [30]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [31]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [32]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [33]
+Overfull \hbox (5.28088pt too wide) in paragraph at lines 1886--1886
+ [] \T1/fi4/m/n/9 rcKernel = rKernelCov( rdata = list(lltc.xts,sbux.xts), perio
+d = 5, align.by ="minutes",[] 
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+Overfull \hbox (179.78088pt too wide) in paragraph at lines 1901--1901
+ []\T1/fi4/m/n/10 rMarginal(x, y = NULL, period,align.by="seconds", align.perio
+d = 1, plotit = FALSE, cts = TRUE,makeReturns = FALSE)[] 
+[34]
+Overfull \hbox (315.78088pt too wide) in paragraph at lines 1943--1943
+ []\T1/fi4/m/n/9 plot(rCumSum(sbux.xts, period=10, align.by="seconds", align.pe
+riod=60), xlab="", ylab="Cumulative Ruturns", main="Starbucks (SBUX)", sub='201
+10701', type="p")[] 
+
+Overfull \hbox (113.28088pt too wide) in paragraph at lines 1944--1944
+ []\T1/fi4/m/n/9 barplot(rMarginal(sbux.xts, period=10, align.by="seconds", ali
+gn.period=60)$y, main="Marginal Contribution Plot")[] 
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [35]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [36] [37]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [38] [39]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [40] [41] [42]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+Overfull \hbox (544.78088pt too wide) in paragraph at lines 2347--2347
+ []\T1/fi4/m/n/10 rScatterReturns(x,y, period, align.by="seconds", align.period
+=1,numbers=FALSE,xlim= NULL, ylim=NULL, plotit=TRUE, pch=NULL, cts=TRUE, makeRe
+turns=FALSE, scale.size=0, col.change=FALSE,...)[] 
+[43]
+Overfull \hbox (59.28088pt too wide) in paragraph at lines 2389--2389
+ []\T1/fi4/m/n/9 rScatterReturns(sbux.xts,y=lltc.xts, period=1, align.period=20
+,ylab="LLTC",xlab="SBUX",numbers=FALSE)[] 
+
+Overfull \hbox (54.78088pt too wide) in paragraph at lines 2390--2390
+ []\T1/fi4/m/n/9 rScatterReturns(sbux.xts,y=lltc.xts, period=1, align.period=20
+,ylab="LLTC",xlab="SBUX",numbers=TRUE)[] 
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [44]
+Overfull \hbox (9.78088pt too wide) in paragraph at lines 2462--2462
+ [] \T1/fi4/m/n/9 rcThreshold = rThresholdCov(cbind(lltc.xts,sbux.xts), align.b
+y="minutes",align.period=1);[] 
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [45] [46]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+Overfull \hbox (94.78088pt too wide) in paragraph at lines 2594--2594
+ []\T1/fi4/m/n/10 rZero(rdata, period=1, align.by="seconds", align.period = 1, 
+cts = TRUE, makeReturns = FALSE, ...)[] 
+[47]
+Overfull \hbox (14.28088pt too wide) in paragraph at lines 2627--2627
+ []\T1/fi4/m/n/9 rZero( rdata = list(sbux.xts, lltc.xts) , period = 60, align.b
+y ="seconds", align.period=1)[] 
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [48]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [49]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [50]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [51]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [52]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [53]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [54]
+Overfull \hbox (35.90651pt too wide) in paragraph at lines 2988--2992
+[]\T1/ptm/m/n/10 The func-tion as-sumes that the files are or-dered in fold-ers
+ per day, and the fold-ers con-tain: ticker_trades.RData
+[55] (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [56] [57]
+[58] [59] (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+Overfull \hbox (18.27808pt too wide) in paragraph at lines 3354--3355
+[]\T1/ptm/m/n/10 vector of tick-ers for which the data should be cleaned, e.g. 
+ticker = c("AAPL","AIG") 
+[60] [61] (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [62]
+No file Rd2.ind.
+[63] (./Rd2.aux)
+
+Package rerunfilecheck Warning: File `Rd2.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+ )
+(see the transcript file for additional information)pdfTeX warning (dest): name
+{Rfn.lm} has been referenced but does not exist, replaced by a fixed one
+
+{/usr/local/texlive/2011/texmf-dist/fonts/enc/dvips/base/8r.enc}{/usr/local/tex
+live/2011/texmf-dist/fonts/enc/dvips/inconsolata/fi4-ec.enc}</usr/local/texlive
+/2011/texmf-dist/fonts/type1/public/inconsolata/Inconsolata.pfb></usr/local/tex
+live/2011/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/local/texl
+ive/2011/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/local/texli
+ve/2011/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb></usr/local/texlive
+/2011/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/local/texlive/2
+011/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/201
+1/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/local/texlive/2011/t
+exmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/texlive/2011/texm
+f-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2011/texmf
+-dist/fonts/type1/public/amsfonts/cm/cmsy5.pfb></usr/local/texlive/2011/texmf-d
+ist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/texlive/2011/texmf-dis
+t/fonts/type1/urw/helvetic/uhvr8a.pfb></usr/local/texlive/2011/texmf-dist/fonts
+/type1/urw/times/utmb8a.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/urw
+/times/utmr8a.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/urw/times/utm
+r8a.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
+Output written on Rd2.pdf (63 pages, 306481 bytes).
+Transcript written on Rd2.log.
+This is makeindex, version 2.15 [TeX Live 2011] (kpathsea + Thai support).
+Scanning input file ./Rd2.idx....done (169 entries accepted, 0 rejected).
+Sorting entries....done (1275 comparisons).
+Generating output file ./Rd2.ind....done (208 lines written, 4 warnings).
+Output written in ./Rd2.ind.
+Transcript written in ./Rd2.ilg.
+This is pdfTeX, Version 3.1415926-2.3-1.40.12 (TeX Live 2011)
+ restricted \write18 enabled.
+entering extended mode
+
+(/private/var/folders/70/fxmz1c0n6sjbrqr6tcrfnvv80000gn/T/Rtmpjzo5tc/Rd2pdf9fa5
+34cbf584/Rd2.tex
+LaTeX2e <2009/09/24>
+Babel <v3.8l> and hyphenation patterns for english, dumylang, nohyphenation, ge
+rman-x-2009-06-19, ngerman-x-2009-06-19, afrikaans, ancientgreek, ibycus, arabi
+c, armenian, basque, bulgarian, catalan, pinyin, coptic, croatian, czech, danis
+h, dutch, ukenglish, usenglishmax, esperanto, estonian, ethiopic, farsi, finnis
+h, french, galician, german, ngerman, swissgerman, monogreek, greek, hungarian,
+ icelandic, assamese, bengali, gujarati, hindi, kannada, malayalam, marathi, or
+iya, panjabi, tamil, telugu, indonesian, interlingua, irish, italian, kurmanji,
+ lao, latin, latvian, lithuanian, mongolian, mongolianlmc, bokmal, nynorsk, pol
+ish, portuguese, romanian, russian, sanskrit, serbian, serbianc, slovak, sloven
+ian, spanish, swedish, turkish, turkmen, ukrainian, uppersorbian, welsh, loaded
+.
+
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/book.cls
+Document Class: book 2007/10/19 v1.4h Standard LaTeX document class
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/bk10.clo))
+(/Library/Frameworks/R.framework/Resources/share/texmf/tex/latex/Rd.sty
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/ifthen.sty)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/tools/longtable.sty)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/tools/bm.sty)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/alltt.sty)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/tools/verbatim.sty)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/url/url.sty) NOT loading ae
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/fontenc.sty
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/t1enc.def))
+(/usr/local/texlive/2011/texmf-dist/tex/latex/psnfss/times.sty)
+NOT loading lmodern
+(/usr/local/texlive/2011/texmf-dist/tex/latex/inconsolata/inconsolata.sty
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/textcomp.sty
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/ts1enc.def))
+(/usr/local/texlive/2011/texmf-dist/tex/latex/graphics/keyval.sty))
+(/usr/local/texlive/2011/texmf-dist/tex/latex/graphics/color.sty
+(/usr/local/texlive/2011/texmf-dist/tex/latex/latexconfig/color.cfg)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/pdftex-def/pdftex.def
+(/usr/local/texlive/2011/texmf-dist/tex/generic/oberdiek/infwarerr.sty)
+(/usr/local/texlive/2011/texmf-dist/tex/generic/oberdiek/ltxcmds.sty)))
+(/usr/local/texlive/2011/texmf-dist/tex/latex/hyperref/hyperref.sty
+(/usr/local/texlive/2011/texmf-dist/tex/generic/oberdiek/hobsub-hyperref.sty
+(/usr/local/texlive/2011/texmf-dist/tex/generic/oberdiek/hobsub-generic.sty))
+(/usr/local/texlive/2011/texmf-dist/tex/generic/ifxetex/ifxetex.sty)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/oberdiek/kvoptions.sty)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/hyperref/pd1enc.def)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/latexconfig/hyperref.cfg))
+
+Package hyperref Message: Driver (autodetected): hpdftex.
+
+(/usr/local/texlive/2011/texmf-dist/tex/latex/hyperref/hpdftex.def
+(/usr/local/texlive/2011/texmf-dist/tex/latex/oberdiek/rerunfilecheck.sty))
+
+Package hyperref Warning: Option `hyperindex' has already been used,
+(hyperref)                setting the option has no effect on input line 356.
+
+
+Package hyperref Warning: Option `pagebackref' has already been used,
+(hyperref)                setting the option has no effect on input line 356.
+
+) (/usr/local/texlive/2011/texmf-dist/tex/latex/base/makeidx.sty)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/inputenc.sty
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/t1enc.dfu)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/ot1enc.dfu)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/omsenc.dfu)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/ts1enc.dfu))
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/latin1.def))
+Writing index file Rd2.idx
+(./Rd2.aux) (/usr/local/texlive/2011/texmf-dist/tex/latex/base/ts1cmr.fd)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/psnfss/t1ptm.fd)
+(/usr/local/texlive/2011/texmf-dist/tex/context/base/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+) (/usr/local/texlive/2011/texmf-dist/tex/latex/hyperref/nameref.sty
+(/usr/local/texlive/2011/texmf-dist/tex/generic/oberdiek/gettitlestring.sty))
+(./Rd2.out) (./Rd2.out)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/inconsolata/t1fi4.fd)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/psnfss/t1phv.fd) (./Rd2.toc
+[1{/usr/local/texlive/2011/texmf-var/fonts/map/pdftex/updmap/pdftex.map}])
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [2]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [3]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [4]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [5]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [6]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [7]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/psnfss/ts1ptm.fd)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [8]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [9]
+Overfull \hbox (29.79745pt too wide) in paragraph at lines 450--451
+\T1/ptm/m/n/10 "csv". In case your data comes from "www.tickdata.com", set ex-t
+en-sion="tickdatacom". 
+[10]
+Overfull \hbox (27.78088pt too wide) in paragraph at lines 501--501
+ [] \T1/fi4/m/n/9 convert(from=from, to=to, datasource=datasource, datadestinat
+ion=datadestination, trades = T,[] 
+
+Overfull \hbox (32.28088pt too wide) in paragraph at lines 502--502
+ []                       \T1/fi4/m/n/9 quotes = T, ticker="IBM", dir = FALSE, 
+extension = "csv", header = TRUE,[] 
+
+Overfull \hbox (54.78088pt too wide) in paragraph at lines 503--503
+ []                       \T1/fi4/m/n/9 tradecolnames = NULL, quotecolnames = N
+ULL, format = format, onefile = TRUE )[] 
+
+Overfull \hbox (27.78088pt too wide) in paragraph at lines 510--510
+ [] \T1/fi4/m/n/9 convert(from=from, to=to, datasource=datasource, datadestinat
+ion=datadestination, trades = T,[] 
+
+Overfull \hbox (14.28088pt too wide) in paragraph at lines 511--511
+ []            \T1/fi4/m/n/9 quotes = T, ticker="GLP", dir = TRUE, extension = 
+"tickdatacom", header = TRUE,[] 
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [11]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [12]
+Overfull \hbox (18.8375pt too wide) in paragraph at lines 588--590
+[]\T1/ptm/m/n/10 NOTE: The value of the first (and sec-ond) ob-ser-va-tion of t
+he out-put should be ig-nored if price==midpoint
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+Overfull \hbox (439.78088pt too wide) in paragraph at lines 615--615
+ [] \T1/fi4/m/n/10 harModel(data, periods = c(1, 5, 22), periodsJ = c(1,5,22), 
+leverage=NULL, RVest = c("rCov", "rBPCov"), type = "HARRV", jumptest = "ABDJump
+test", alpha = 0.05, h = 1,[] 
+[13] [14]
+Overfull \hbox (0.78088pt too wide) in paragraph at lines 673--673
+ [] \T1/fi4/m/n/9 x = harModel(data, periods = c(1,5,10), periodsJ=c(1,5,10), R
+Vest = c("rCov","rBPCov"),[] 
+
+Overfull \hbox (0.78088pt too wide) in paragraph at lines 674--674
+ []              \T1/fi4/m/n/9 type="HARRVCJ",transform="sqrt"); # Estimate the
+ HAR model of type HARRVCJ[] 
+
+Overfull \hbox (59.28088pt too wide) in paragraph at lines 685--685
+ [] \T1/fi4/m/n/9 x = harModel(data=DJI_RV , periods = c(1,5,22), RVest = c("rC
+ov"), type="HARRV",h=1,transform=NULL);[] 
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [15]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [16]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [17]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [18]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [19] [20]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [21]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [22]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [23]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [24]
+Overfull \hbox (20.77808pt too wide) in paragraph at lines 1237--1238
+[]\T1/ptm/m/n/10 vector of tick-ers for which the data should be cleaned, e.g. 
+ticker = c("AAPL","AIG"). 
+[25] (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+Overfull \hbox (229.78088pt too wide) in paragraph at lines 1321--1321
+ []\T1/fi4/m/n/10 rAccumulation(x, period = 1, y = NULL, align.by="seconds", al
+ign.period = 1, plotit = FALSE, cts = TRUE, makeReturns = FALSE)[] 
+[26]
+Overfull \hbox (131.28088pt too wide) in paragraph at lines 1375--1375
+ []\T1/fi4/m/n/9 plot(cumm[[1]], xlab="", ylab="Cumulative Ruturns", main="Star
+bucks (SBUX)", sub='20110701', type="p", col=16, lwd=2)[] 
+
+Overfull \hbox (140.28088pt too wide) in paragraph at lines 1379--1379
+ []\T1/fi4/m/n/9 plot(accum[[1]], xlab="", ylab="Realized Accumulation", type="
+l",main="Starbucks (SBUX)", sub='20110701', col=2, lwd=2)[] 
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [27]
+Overfull \hbox (14.28088pt too wide) in paragraph at lines 1434--1434
+ [] \T1/fi4/m/n/9 # Average subsampled realized variance/covariance for CTS ali
+gned at one minute returns at[] 
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [28]
+Overfull \hbox (41.7794pt too wide) detected at line 1471
+[]\OT1/cmr/m/n/10 [\OML/cmm/m/it/10 k; q\OT1/cmr/m/n/10 ][] = [][] [] []  [] []
+  \OMS/cmsy/m/n/10 ^^@ []  [] []\OML/cmm/m/it/10 ;
+[29]
+Overfull \hbox (27.78088pt too wide) in paragraph at lines 1523--1523
+ [] \T1/fi4/m/n/9 rbpc = rBPCov( rdata = sample_5minprices_jumps['2010-01-04'],
+ makeReturns=TRUE,makePsd=TRUE);[] 
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+Overfull \hbox (39.78088pt too wide) in paragraph at lines 1546--1546
+ []\T1/fi4/m/n/10 rCov(rdata,cor = FALSE, align.by = NULL, align.period = NULL,
+ makeReturns = FALSE, ...)[] 
+[30] (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+Overfull \hbox (204.78088pt too wide) in paragraph at lines 1598--1598
+ []\T1/fi4/m/n/10 rCumSum(x, period = 1, align.by="seconds",align.period = 1, p
+lotit = FALSE, type = "l", cts = TRUE, makeReturns = FALSE)[] 
+[31]
+Overfull \hbox (131.28088pt too wide) in paragraph at lines 1634--1634
+ []\T1/fi4/m/n/9 plot(cumm[[1]], xlab="", ylab="Cumulative Ruturns", main="Star
+bucks (SBUX)", sub='20110701', type="p", col=16, lwd=2)[] 
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+Overfull \hbox (60.68895pt too wide) in paragraph at lines 1646--1649
+\T1/ptm/m/n/10 ing from 1996-01-03 up to 2009-03-01 for sev-eral in-dices and e
+x-change rates. Use \T1/fi4/m/n/10 colnames(realized_library)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [32]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [33]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [34]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [35]
+Overfull \hbox (5.28088pt too wide) in paragraph at lines 1886--1886
+ [] \T1/fi4/m/n/9 rcKernel = rKernelCov( rdata = list(lltc.xts,sbux.xts), perio
+d = 5, align.by ="minutes",[] 
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+Overfull \hbox (179.78088pt too wide) in paragraph at lines 1901--1901
+ []\T1/fi4/m/n/10 rMarginal(x, y = NULL, period,align.by="seconds", align.perio
+d = 1, plotit = FALSE, cts = TRUE,makeReturns = FALSE)[] 
+[36]
+Overfull \hbox (315.78088pt too wide) in paragraph at lines 1943--1943
+ []\T1/fi4/m/n/9 plot(rCumSum(sbux.xts, period=10, align.by="seconds", align.pe
+riod=60), xlab="", ylab="Cumulative Ruturns", main="Starbucks (SBUX)", sub='201
+10701', type="p")[] 
+
+Overfull \hbox (113.28088pt too wide) in paragraph at lines 1944--1944
+ []\T1/fi4/m/n/9 barplot(rMarginal(sbux.xts, period=10, align.by="seconds", ali
+gn.period=60)$y, main="Marginal Contribution Plot")[] 
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [37]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [38] [39]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [40] [41]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [42] [43] [44]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+Overfull \hbox (544.78088pt too wide) in paragraph at lines 2347--2347
+ []\T1/fi4/m/n/10 rScatterReturns(x,y, period, align.by="seconds", align.period
+=1,numbers=FALSE,xlim= NULL, ylim=NULL, plotit=TRUE, pch=NULL, cts=TRUE, makeRe
+turns=FALSE, scale.size=0, col.change=FALSE,...)[] 
+[45]
+Overfull \hbox (59.28088pt too wide) in paragraph at lines 2389--2389
+ []\T1/fi4/m/n/9 rScatterReturns(sbux.xts,y=lltc.xts, period=1, align.period=20
+,ylab="LLTC",xlab="SBUX",numbers=FALSE)[] 
+
+Overfull \hbox (54.78088pt too wide) in paragraph at lines 2390--2390
+ []\T1/fi4/m/n/9 rScatterReturns(sbux.xts,y=lltc.xts, period=1, align.period=20
+,ylab="LLTC",xlab="SBUX",numbers=TRUE)[] 
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [46]
+Overfull \hbox (9.78088pt too wide) in paragraph at lines 2462--2462
+ [] \T1/fi4/m/n/9 rcThreshold = rThresholdCov(cbind(lltc.xts,sbux.xts), align.b
+y="minutes",align.period=1);[] 
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [47] [48]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+Overfull \hbox (94.78088pt too wide) in paragraph at lines 2594--2594
+ []\T1/fi4/m/n/10 rZero(rdata, period=1, align.by="seconds", align.period = 1, 
+cts = TRUE, makeReturns = FALSE, ...)[] 
+[49]
+Overfull \hbox (14.28088pt too wide) in paragraph at lines 2627--2627
+ []\T1/fi4/m/n/9 rZero( rdata = list(sbux.xts, lltc.xts) , period = 60, align.b
+y ="seconds", align.period=1)[] 
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [50]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [51]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [52]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [53]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [54]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [55]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [56]
+Overfull \hbox (35.90651pt too wide) in paragraph at lines 2988--2992
+[]\T1/ptm/m/n/10 The func-tion as-sumes that the files are or-dered in fold-ers
+ per day, and the fold-ers con-tain: ticker_trades.RData
+[57] (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [58] [59]
+[60] [61] (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+Overfull \hbox (18.27808pt too wide) in paragraph at lines 3354--3355
+[]\T1/ptm/m/n/10 vector of tick-ers for which the data should be cleaned, e.g. 
+ticker = c("AAPL","AIG") 
+[62] [63] (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [64]
+(./Rd2.ind [65]
+
+LaTeX Font Warning: Font shape `T1/fi4/m/it' undefined
+(Font)              using `T1/fi4/m/n' instead on input line 98.
+
+[66] [67]) (./Rd2.aux)
+
+Package rerunfilecheck Warning: File `Rd2.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+
+LaTeX Font Warning: Some font shapes were not available, defaults substituted.
+
+ )
+(see the transcript file for additional information)pdfTeX warning (dest): name
+{Rfn.lm} has been referenced but does not exist, replaced by a fixed one
+
+{/usr/local/texlive/2011/texmf-dist/fonts/enc/dvips/base/8r.enc}{/usr/local/tex
+live/2011/texmf-dist/fonts/enc/dvips/inconsolata/fi4-ec.enc}</usr/local/texlive
+/2011/texmf-dist/fonts/type1/public/inconsolata/Inconsolata.pfb></usr/local/tex
+live/2011/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/local/texl
+ive/2011/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/local/texli
+ve/2011/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb></usr/local/texlive
+/2011/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/local/texlive/2
+011/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/201
+1/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/local/texlive/2011/t
+exmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/texlive/2011/texm
+f-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2011/texmf
+-dist/fonts/type1/public/amsfonts/cm/cmsy5.pfb></usr/local/texlive/2011/texmf-d
+ist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/texlive/2011/texmf-dis
+t/fonts/type1/urw/helvetic/uhvr8a.pfb></usr/local/texlive/2011/texmf-dist/fonts
+/type1/urw/times/utmb8a.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/urw
+/times/utmr8a.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/urw/times/utm
+r8a.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
+Output written on Rd2.pdf (67 pages, 322188 bytes).
+Transcript written on Rd2.log.
+This is makeindex, version 2.15 [TeX Live 2011] (kpathsea + Thai support).
+Scanning input file ./Rd2.idx....done (169 entries accepted, 0 rejected).
+Sorting entries....done (1275 comparisons).
+Generating output file ./Rd2.ind....done (208 lines written, 4 warnings).
+Output written in ./Rd2.ind.
+Transcript written in ./Rd2.ilg.
+This is pdfTeX, Version 3.1415926-2.3-1.40.12 (TeX Live 2011)
+ restricted \write18 enabled.
+entering extended mode
+
+(/private/var/folders/70/fxmz1c0n6sjbrqr6tcrfnvv80000gn/T/Rtmpjzo5tc/Rd2pdf9fa5
+34cbf584/Rd2.tex
+LaTeX2e <2009/09/24>
+Babel <v3.8l> and hyphenation patterns for english, dumylang, nohyphenation, ge
+rman-x-2009-06-19, ngerman-x-2009-06-19, afrikaans, ancientgreek, ibycus, arabi
+c, armenian, basque, bulgarian, catalan, pinyin, coptic, croatian, czech, danis
+h, dutch, ukenglish, usenglishmax, esperanto, estonian, ethiopic, farsi, finnis
+h, french, galician, german, ngerman, swissgerman, monogreek, greek, hungarian,
+ icelandic, assamese, bengali, gujarati, hindi, kannada, malayalam, marathi, or
+iya, panjabi, tamil, telugu, indonesian, interlingua, irish, italian, kurmanji,
+ lao, latin, latvian, lithuanian, mongolian, mongolianlmc, bokmal, nynorsk, pol
+ish, portuguese, romanian, russian, sanskrit, serbian, serbianc, slovak, sloven
+ian, spanish, swedish, turkish, turkmen, ukrainian, uppersorbian, welsh, loaded
+.
+
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/book.cls
+Document Class: book 2007/10/19 v1.4h Standard LaTeX document class
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/bk10.clo))
+(/Library/Frameworks/R.framework/Resources/share/texmf/tex/latex/Rd.sty
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/ifthen.sty)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/tools/longtable.sty)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/tools/bm.sty)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/alltt.sty)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/tools/verbatim.sty)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/url/url.sty) NOT loading ae
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/fontenc.sty
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/t1enc.def))
+(/usr/local/texlive/2011/texmf-dist/tex/latex/psnfss/times.sty)
+NOT loading lmodern
+(/usr/local/texlive/2011/texmf-dist/tex/latex/inconsolata/inconsolata.sty
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/textcomp.sty
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/ts1enc.def))
+(/usr/local/texlive/2011/texmf-dist/tex/latex/graphics/keyval.sty))
+(/usr/local/texlive/2011/texmf-dist/tex/latex/graphics/color.sty
+(/usr/local/texlive/2011/texmf-dist/tex/latex/latexconfig/color.cfg)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/pdftex-def/pdftex.def
+(/usr/local/texlive/2011/texmf-dist/tex/generic/oberdiek/infwarerr.sty)
+(/usr/local/texlive/2011/texmf-dist/tex/generic/oberdiek/ltxcmds.sty)))
+(/usr/local/texlive/2011/texmf-dist/tex/latex/hyperref/hyperref.sty
+(/usr/local/texlive/2011/texmf-dist/tex/generic/oberdiek/hobsub-hyperref.sty
+(/usr/local/texlive/2011/texmf-dist/tex/generic/oberdiek/hobsub-generic.sty))
+(/usr/local/texlive/2011/texmf-dist/tex/generic/ifxetex/ifxetex.sty)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/oberdiek/kvoptions.sty)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/hyperref/pd1enc.def)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/latexconfig/hyperref.cfg))
+
+Package hyperref Message: Driver (autodetected): hpdftex.
+
+(/usr/local/texlive/2011/texmf-dist/tex/latex/hyperref/hpdftex.def
+(/usr/local/texlive/2011/texmf-dist/tex/latex/oberdiek/rerunfilecheck.sty))
+
+Package hyperref Warning: Option `hyperindex' has already been used,
+(hyperref)                setting the option has no effect on input line 356.
+
+
+Package hyperref Warning: Option `pagebackref' has already been used,
+(hyperref)                setting the option has no effect on input line 356.
+
+) (/usr/local/texlive/2011/texmf-dist/tex/latex/base/makeidx.sty)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/inputenc.sty
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/t1enc.dfu)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/ot1enc.dfu)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/omsenc.dfu)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/ts1enc.dfu))
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/latin1.def))
+Writing index file Rd2.idx
+(./Rd2.aux) (/usr/local/texlive/2011/texmf-dist/tex/latex/base/ts1cmr.fd)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/psnfss/t1ptm.fd)
+(/usr/local/texlive/2011/texmf-dist/tex/context/base/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+) (/usr/local/texlive/2011/texmf-dist/tex/latex/hyperref/nameref.sty
+(/usr/local/texlive/2011/texmf-dist/tex/generic/oberdiek/gettitlestring.sty))
+(./Rd2.out) (./Rd2.out)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/inconsolata/t1fi4.fd)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/psnfss/t1phv.fd) (./Rd2.toc
+[1{/usr/local/texlive/2011/texmf-var/fonts/map/pdftex/updmap/pdftex.map}])
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [2]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [3]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [4]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [5]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [6]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [7]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/psnfss/ts1ptm.fd)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [8]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [9]
+Overfull \hbox (29.79745pt too wide) in paragraph at lines 450--451
+\T1/ptm/m/n/10 "csv". In case your data comes from "www.tickdata.com", set ex-t
+en-sion="tickdatacom". 
+[10]
+Overfull \hbox (27.78088pt too wide) in paragraph at lines 501--501
+ [] \T1/fi4/m/n/9 convert(from=from, to=to, datasource=datasource, datadestinat
+ion=datadestination, trades = T,[] 
+
+Overfull \hbox (32.28088pt too wide) in paragraph at lines 502--502
+ []                       \T1/fi4/m/n/9 quotes = T, ticker="IBM", dir = FALSE, 
+extension = "csv", header = TRUE,[] 
+
+Overfull \hbox (54.78088pt too wide) in paragraph at lines 503--503
+ []                       \T1/fi4/m/n/9 tradecolnames = NULL, quotecolnames = N
+ULL, format = format, onefile = TRUE )[] 
+
+Overfull \hbox (27.78088pt too wide) in paragraph at lines 510--510
+ [] \T1/fi4/m/n/9 convert(from=from, to=to, datasource=datasource, datadestinat
+ion=datadestination, trades = T,[] 
+
+Overfull \hbox (14.28088pt too wide) in paragraph at lines 511--511
+ []            \T1/fi4/m/n/9 quotes = T, ticker="GLP", dir = TRUE, extension = 
+"tickdatacom", header = TRUE,[] 
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [11]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [12]
+Overfull \hbox (18.8375pt too wide) in paragraph at lines 588--590
+[]\T1/ptm/m/n/10 NOTE: The value of the first (and sec-ond) ob-ser-va-tion of t
+he out-put should be ig-nored if price==midpoint
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+Overfull \hbox (439.78088pt too wide) in paragraph at lines 615--615
+ [] \T1/fi4/m/n/10 harModel(data, periods = c(1, 5, 22), periodsJ = c(1,5,22), 
+leverage=NULL, RVest = c("rCov", "rBPCov"), type = "HARRV", jumptest = "ABDJump
+test", alpha = 0.05, h = 1,[] 
+[13] [14]
+Overfull \hbox (0.78088pt too wide) in paragraph at lines 673--673
+ [] \T1/fi4/m/n/9 x = harModel(data, periods = c(1,5,10), periodsJ=c(1,5,10), R
+Vest = c("rCov","rBPCov"),[] 
+
+Overfull \hbox (0.78088pt too wide) in paragraph at lines 674--674
+ []              \T1/fi4/m/n/9 type="HARRVCJ",transform="sqrt"); # Estimate the
+ HAR model of type HARRVCJ[] 
+
+Overfull \hbox (59.28088pt too wide) in paragraph at lines 685--685
+ [] \T1/fi4/m/n/9 x = harModel(data=DJI_RV , periods = c(1,5,22), RVest = c("rC
+ov"), type="HARRV",h=1,transform=NULL);[] 
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [15]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [16]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [17]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [18]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [19] [20]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [21]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [22]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [23]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [24]
+Overfull \hbox (20.77808pt too wide) in paragraph at lines 1237--1238
+[]\T1/ptm/m/n/10 vector of tick-ers for which the data should be cleaned, e.g. 
+ticker = c("AAPL","AIG"). 
+[25] (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+Overfull \hbox (229.78088pt too wide) in paragraph at lines 1321--1321
+ []\T1/fi4/m/n/10 rAccumulation(x, period = 1, y = NULL, align.by="seconds", al
+ign.period = 1, plotit = FALSE, cts = TRUE, makeReturns = FALSE)[] 
+[26]
+Overfull \hbox (131.28088pt too wide) in paragraph at lines 1375--1375
+ []\T1/fi4/m/n/9 plot(cumm[[1]], xlab="", ylab="Cumulative Ruturns", main="Star
+bucks (SBUX)", sub='20110701', type="p", col=16, lwd=2)[] 
+
+Overfull \hbox (140.28088pt too wide) in paragraph at lines 1379--1379
+ []\T1/fi4/m/n/9 plot(accum[[1]], xlab="", ylab="Realized Accumulation", type="
+l",main="Starbucks (SBUX)", sub='20110701', col=2, lwd=2)[] 
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [27]
+Overfull \hbox (14.28088pt too wide) in paragraph at lines 1434--1434
+ [] \T1/fi4/m/n/9 # Average subsampled realized variance/covariance for CTS ali
+gned at one minute returns at[] 
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [28]
+Overfull \hbox (41.7794pt too wide) detected at line 1471
+[]\OT1/cmr/m/n/10 [\OML/cmm/m/it/10 k; q\OT1/cmr/m/n/10 ][] = [][] [] []  [] []
+  \OMS/cmsy/m/n/10 ^^@ []  [] []\OML/cmm/m/it/10 ;
+[29]
+Overfull \hbox (27.78088pt too wide) in paragraph at lines 1523--1523
+ [] \T1/fi4/m/n/9 rbpc = rBPCov( rdata = sample_5minprices_jumps['2010-01-04'],
+ makeReturns=TRUE,makePsd=TRUE);[] 
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+Overfull \hbox (39.78088pt too wide) in paragraph at lines 1546--1546
+ []\T1/fi4/m/n/10 rCov(rdata,cor = FALSE, align.by = NULL, align.period = NULL,
+ makeReturns = FALSE, ...)[] 
+[30] (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+Overfull \hbox (204.78088pt too wide) in paragraph at lines 1598--1598
+ []\T1/fi4/m/n/10 rCumSum(x, period = 1, align.by="seconds",align.period = 1, p
+lotit = FALSE, type = "l", cts = TRUE, makeReturns = FALSE)[] 
+[31]
+Overfull \hbox (131.28088pt too wide) in paragraph at lines 1634--1634
+ []\T1/fi4/m/n/9 plot(cumm[[1]], xlab="", ylab="Cumulative Ruturns", main="Star
+bucks (SBUX)", sub='20110701', type="p", col=16, lwd=2)[] 
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+Overfull \hbox (60.68895pt too wide) in paragraph at lines 1646--1649
+\T1/ptm/m/n/10 ing from 1996-01-03 up to 2009-03-01 for sev-eral in-dices and e
+x-change rates. Use \T1/fi4/m/n/10 colnames(realized_library)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [32]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [33]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [34]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [35]
+Overfull \hbox (5.28088pt too wide) in paragraph at lines 1886--1886
+ [] \T1/fi4/m/n/9 rcKernel = rKernelCov( rdata = list(lltc.xts,sbux.xts), perio
+d = 5, align.by ="minutes",[] 
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+Overfull \hbox (179.78088pt too wide) in paragraph at lines 1901--1901
+ []\T1/fi4/m/n/10 rMarginal(x, y = NULL, period,align.by="seconds", align.perio
+d = 1, plotit = FALSE, cts = TRUE,makeReturns = FALSE)[] 
+[36]
+Overfull \hbox (315.78088pt too wide) in paragraph at lines 1943--1943
+ []\T1/fi4/m/n/9 plot(rCumSum(sbux.xts, period=10, align.by="seconds", align.pe
+riod=60), xlab="", ylab="Cumulative Ruturns", main="Starbucks (SBUX)", sub='201
+10701', type="p")[] 
+
+Overfull \hbox (113.28088pt too wide) in paragraph at lines 1944--1944
+ []\T1/fi4/m/n/9 barplot(rMarginal(sbux.xts, period=10, align.by="seconds", ali
+gn.period=60)$y, main="Marginal Contribution Plot")[] 
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [37]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [38] [39]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [40] [41]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [42] [43] [44]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+Overfull \hbox (544.78088pt too wide) in paragraph at lines 2347--2347
+ []\T1/fi4/m/n/10 rScatterReturns(x,y, period, align.by="seconds", align.period
+=1,numbers=FALSE,xlim= NULL, ylim=NULL, plotit=TRUE, pch=NULL, cts=TRUE, makeRe
+turns=FALSE, scale.size=0, col.change=FALSE,...)[] 
+[45]
+Overfull \hbox (59.28088pt too wide) in paragraph at lines 2389--2389
+ []\T1/fi4/m/n/9 rScatterReturns(sbux.xts,y=lltc.xts, period=1, align.period=20
+,ylab="LLTC",xlab="SBUX",numbers=FALSE)[] 
+
+Overfull \hbox (54.78088pt too wide) in paragraph at lines 2390--2390
+ []\T1/fi4/m/n/9 rScatterReturns(sbux.xts,y=lltc.xts, period=1, align.period=20
+,ylab="LLTC",xlab="SBUX",numbers=TRUE)[] 
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [46]
+Overfull \hbox (9.78088pt too wide) in paragraph at lines 2462--2462
+ [] \T1/fi4/m/n/9 rcThreshold = rThresholdCov(cbind(lltc.xts,sbux.xts), align.b
+y="minutes",align.period=1);[] 
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [47] [48]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+Overfull \hbox (94.78088pt too wide) in paragraph at lines 2594--2594
+ []\T1/fi4/m/n/10 rZero(rdata, period=1, align.by="seconds", align.period = 1, 
+cts = TRUE, makeReturns = FALSE, ...)[] 
+[49]
+Overfull \hbox (14.28088pt too wide) in paragraph at lines 2627--2627
+ []\T1/fi4/m/n/9 rZero( rdata = list(sbux.xts, lltc.xts) , period = 60, align.b
+y ="seconds", align.period=1)[] 
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [50]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [51]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [52]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [53]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [54]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [55]
+(/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [56]
+Overfull \hbox (35.90651pt too wide) in paragraph at lines 2988--2992
+[]\T1/ptm/m/n/10 The func-tion as-sumes that the files are or-dered in fold-ers
+ per day, and the fold-ers con-tain: ticker_trades.RData
+[57] (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [58] [59]
+[60] [61] (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
+Overfull \hbox (18.27808pt too wide) in paragraph at lines 3354--3355
+[]\T1/ptm/m/n/10 vector of tick-ers for which the data should be cleaned, e.g. 
+ticker = c("AAPL","AIG") 
+[62] [63] (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [64]
+(./Rd2.ind [65]
+
+LaTeX Font Warning: Font shape `T1/fi4/m/it' undefined
+(Font)              using `T1/fi4/m/n' instead on input line 98.
+
+[66] [67]) (./Rd2.aux)
+
+LaTeX Font Warning: Some font shapes were not available, defaults substituted.
+
+ )
+(see the transcript file for additional information)pdfTeX warning (dest): name
+{Rfn.lm} has been referenced but does not exist, replaced by a fixed one
+
+{/usr/local/texlive/2011/texmf-dist/fonts/enc/dvips/base/8r.enc}{/usr/local/tex
+live/2011/texmf-dist/fonts/enc/dvips/inconsolata/fi4-ec.enc}</usr/local/texlive
+/2011/texmf-dist/fonts/type1/public/inconsolata/Inconsolata.pfb></usr/local/tex
+live/2011/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/local/texl
+ive/2011/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/local/texli
+ve/2011/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb></usr/local/texlive
+/2011/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/local/texlive/2
+011/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/201
+1/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/local/texlive/2011/t
+exmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/texlive/2011/texm
+f-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2011/texmf
+-dist/fonts/type1/public/amsfonts/cm/cmsy5.pfb></usr/local/texlive/2011/texmf-d
+ist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/texlive/2011/texmf-dis
+t/fonts/type1/urw/helvetic/uhvr8a.pfb></usr/local/texlive/2011/texmf-dist/fonts
+/type1/urw/times/utmb8a.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/urw
+/times/utmr8a.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/urw/times/utm
+r8a.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
+Output written on Rd2.pdf (67 pages, 322492 bytes).
+Transcript written on Rd2.log.
+Saving output to 'highfrequency-manual.pdf' ...
+Done
+You may want to clean up by 'rm -rf /var/folders/70/fxmz1c0n6sjbrqr6tcrfnvv80000gn/T//Rtmpjzo5tc/Rd2pdf9fa534cbf584'
