@@ -4,6 +4,8 @@
 * using session charset: UTF-8
 * checking for file ‘highfrequency/DESCRIPTION’ ... OK
 * this is package ‘highfrequency’ version ‘0.1’
+* checking CRAN incoming feasibility ... NOTE
+New submission
 * checking package namespace information ... OK
 * checking package dependencies ... OK
 * checking if this is a source package ... OK
@@ -17,7 +19,16 @@
 * checking DESCRIPTION meta-information ... OK
 * checking top-level files ... OK
 * checking index information ... OK
-* checking package subdirectories ... OK
+* checking package subdirectories ... WARNING
+Found the following directory(s) with names of version control directories:
+  ./.svn
+  ./R/.svn
+  ./data/.svn
+  ./inst/.svn
+  ./inst/doc/.svn
+  ./man/.svn
+  ./src/.svn
+These should not be in a package tarball.
 * checking R files for non-ASCII characters ... OK
 * checking R files for syntax errors ... OK
 * loading checks for arch ‘i386’
@@ -62,3 +73,8 @@
 * checking running R code from vignettes ... OK
 * checking re-building of vignette PDFs ... OK
 * checking PDF version of manual ... OK
+WARNING: There was 1 warning.
+NOTE: There was 1 note.
+See
+  ‘/Users/jonathancornelissen/Dropbox/GSoC-RTAQ/highfrequency/highfrequency/pkg/highfrequency.Rcheck/00check.log’
+for details.

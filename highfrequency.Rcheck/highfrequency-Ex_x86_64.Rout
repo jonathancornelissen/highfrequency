@@ -545,31 +545,13 @@ detaching ‘package:timeDate’
 > ### ** Examples
 > 
 > #Consider you have raw quote data for 1 stock for 1 day 
-> data("sample_qdataraw");
-> head(sample_qdataraw);
-                    SYMBOL EX  BID      BIDSIZ OFR      OFRSIZ MODE
-2008-01-04 09:30:00 "XXX"  "T" "193.12" "0.5"  "193.94" "0.5"  "12"
-2008-01-04 09:30:26 "XXX"  "P" "193.31" "0.5"  "193.96" "2.5"  "12"
-2008-01-04 09:30:26 "XXX"  "N" "193.18" "2"    "193.82" "10"   "12"
-2008-01-04 09:30:26 "XXX"  "T" "193.52" "0.5"  "193.97" "0.5"  "12"
-2008-01-04 09:30:26 "XXX"  "T" "193.47" "2"    "193.97" "0.5"  "12"
-2008-01-04 09:30:26 "XXX"  "N" "193.5"  "2.5"  "193.96" "1.5"  "12"
-> dim(sample_qdataraw);
-[1] 48380     7
-> qdata_aftercleaning = quotesCleanup(qdataraw=sample_qdataraw,exchanges="N");
-Loading required package: quantmod
-Loading required package: Defaults
-Loading required package: TTR
-> qdata_aftercleaning$report; 
-        initial number         no zero quotes        select exchange 
-                 48380                  48305                   9792 
-remove negative spread    remove large spread   merge same timestamp 
-                  9792                   9792                   7706 
-       remove outliers 
-                  7706 
-> barplot(qdata_aftercleaning$report);
-> dim(qdata_aftercleaning$qdata);
-[1] 7706    7
+> #data("sample_qdataraw");
+> #head(sample_qdataraw);
+> #dim(sample_qdataraw);
+> #qdata_aftercleaning = quotesCleanup(qdataraw=sample_qdataraw,exchanges="N");
+> #qdata_aftercleaning$report; 
+> #barplot(qdata_aftercleaning$report);
+> #dim(qdata_aftercleaning$qdata);
 > 
 > #In case you have more data it is advised to use the on-disk functionality
 > #via "from","to","datasource",etc. arguments
@@ -577,10 +559,6 @@ remove negative spread    remove large spread   merge same timestamp
 > 
 > 
 > cleanEx()
-
-detaching ‘package:quantmod’, ‘package:TTR’, ‘package:Defaults’,
-  ‘package:timeDate’
-
 > nameEx("rAVGCov")
 > ### * rAVGCov
 > 
@@ -1309,29 +1287,20 @@ detaching ‘package:timeDate’, ‘package:quantmod’, ‘package:TTR’,
 > ### ** Examples
 > 
 > #Consider you have raw trade data for 1 stock for 1 day 
-> data("sample_qdata");    #load cleaned quote data
-> data("sample_tdataraw"); #load raw trade data
-> tdata_afterfirstcleaning = tradesCleanup(tdataraw=sample_tdataraw,
-+ exchange="N",report=FALSE);
-Loading required package: quantmod
-Loading required package: Defaults
-Loading required package: TTR
-> dim(tdata_afterfirstcleaning);
-[1] 9105    7
-> tdata_afterfinalcleaning = tradesCleanupFinal(qdata=sample_qdata,
-+ tdata=tdata_afterfirstcleaning);
-> dim(tdata_afterfinalcleaning);
-[1] 8153    7
+> #data("sample_qdata");    #load cleaned quote data
+> #data("sample_tdataraw"); #load raw trade data
+> #tdata_afterfirstcleaning = tradesCleanup(tdataraw=sample_tdataraw,
+> #exchange="N",report=FALSE);
+> #dim(tdata_afterfirstcleaning);
+> #tdata_afterfinalcleaning = tradesCleanupFinal(qdata=sample_qdata,
+> #tdata=tdata_afterfirstcleaning);
+> #dim(tdata_afterfinalcleaning);
 > #In case you have more data it is advised to use the on-disk functionality
 > #via "from","to","datasource",etc. arguments
 > 
 > 
 > 
 > cleanEx()
-
-detaching ‘package:timeDate’, ‘package:quantmod’, ‘package:TTR’,
-  ‘package:Defaults’
-
 > nameEx("tradescleanup")
 > ### * tradescleanup
 > 
@@ -1377,7 +1346,7 @@ Loading required package: TTR
 > ### * <FOOTER>
 > ###
 > cat("Time elapsed: ", proc.time() - get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  23.479 0.9 24.489 0 0 
+Time elapsed:  12.932 0.446 13.472 0 0 
 > grDevices::dev.off()
 null device 
           1 

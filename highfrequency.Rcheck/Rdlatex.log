@@ -4,8 +4,8 @@ This is pdfTeX, Version 3.1415926-2.3-1.40.12 (TeX Live 2011)
  restricted \write18 enabled.
 entering extended mode
 
-(/private/var/folders/70/fxmz1c0n6sjbrqr6tcrfnvv80000gn/T/Rtmpjzo5tc/Rd2pdf9fa5
-34cbf584/Rd2.tex
+(/private/var/folders/70/fxmz1c0n6sjbrqr6tcrfnvv80000gn/T/RtmpqAyd5V/Rd2pdf1d78
+64d88867/Rd2.tex
 LaTeX2e <2009/09/24>
 Babel <v3.8l> and hyphenation patterns for english, dumylang, nohyphenation, ge
 rman-x-2009-06-19, ngerman-x-2009-06-19, afrikaans, ancientgreek, ibycus, arabi
@@ -90,49 +90,49 @@ ive/2011/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
 (/usr/local/texlive/2011/texmf-dist/tex/latex/psnfss/ts1ptm.fd)
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [7]
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
-Overfull \hbox (29.79745pt too wide) in paragraph at lines 450--451
+Overfull \hbox (29.79745pt too wide) in paragraph at lines 449--450
 \T1/ptm/m/n/10 "csv". In case your data comes from "www.tickdata.com", set ex-t
 en-sion="tickdatacom". 
 [8]
-Overfull \hbox (27.78088pt too wide) in paragraph at lines 501--501
+Overfull \hbox (27.78088pt too wide) in paragraph at lines 500--500
  [] \T1/fi4/m/n/9 convert(from=from, to=to, datasource=datasource, datadestinat
 ion=datadestination, trades = T,[] 
 
-Overfull \hbox (32.28088pt too wide) in paragraph at lines 502--502
+Overfull \hbox (32.28088pt too wide) in paragraph at lines 501--501
  []                       \T1/fi4/m/n/9 quotes = T, ticker="IBM", dir = FALSE, 
 extension = "csv", header = TRUE,[] 
 [9]
-Overfull \hbox (54.78088pt too wide) in paragraph at lines 503--503
+Overfull \hbox (54.78088pt too wide) in paragraph at lines 502--502
  []                       \T1/fi4/m/n/9 tradecolnames = NULL, quotecolnames = N
 ULL, format = format, onefile = TRUE )[] 
 
-Overfull \hbox (27.78088pt too wide) in paragraph at lines 510--510
+Overfull \hbox (27.78088pt too wide) in paragraph at lines 509--509
  [] \T1/fi4/m/n/9 convert(from=from, to=to, datasource=datasource, datadestinat
 ion=datadestination, trades = T,[] 
 
-Overfull \hbox (14.28088pt too wide) in paragraph at lines 511--511
+Overfull \hbox (14.28088pt too wide) in paragraph at lines 510--510
  []            \T1/fi4/m/n/9 quotes = T, ticker="GLP", dir = TRUE, extension = 
 "tickdatacom", header = TRUE,[] 
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [10]
-Overfull \hbox (18.8375pt too wide) in paragraph at lines 588--590
+Overfull \hbox (18.8375pt too wide) in paragraph at lines 587--589
 []\T1/ptm/m/n/10 NOTE: The value of the first (and sec-ond) ob-ser-va-tion of t
 he out-put should be ig-nored if price==midpoint
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
-Overfull \hbox (439.78088pt too wide) in paragraph at lines 615--615
+Overfull \hbox (439.78088pt too wide) in paragraph at lines 614--614
  [] \T1/fi4/m/n/10 harModel(data, periods = c(1, 5, 22), periodsJ = c(1,5,22), 
 leverage=NULL, RVest = c("rCov", "rBPCov"), type = "HARRV", jumptest = "ABDJump
 test", alpha = 0.05, h = 1,[] 
 [11] [12]
-Overfull \hbox (0.78088pt too wide) in paragraph at lines 673--673
+Overfull \hbox (0.78088pt too wide) in paragraph at lines 672--672
  [] \T1/fi4/m/n/9 x = harModel(data, periods = c(1,5,10), periodsJ=c(1,5,10), R
 Vest = c("rCov","rBPCov"),[] 
 
-Overfull \hbox (0.78088pt too wide) in paragraph at lines 674--674
+Overfull \hbox (0.78088pt too wide) in paragraph at lines 673--673
  []              \T1/fi4/m/n/9 type="HARRVCJ",transform="sqrt"); # Estimate the
  HAR model of type HARRVCJ[] 
 
-Overfull \hbox (59.28088pt too wide) in paragraph at lines 685--685
+Overfull \hbox (59.28088pt too wide) in paragraph at lines 684--684
  [] \T1/fi4/m/n/9 x = harModel(data=DJI_RV , periods = c(1,5,22), RVest = c("rC
 ov"), type="HARRV",h=1,transform=NULL);[] 
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [13] [14]
@@ -148,67 +148,67 @@ ov"), type="HARRV",h=1,transform=NULL);[]
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [21]
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [22]
-Overfull \hbox (20.77808pt too wide) in paragraph at lines 1237--1238
+Overfull \hbox (20.77808pt too wide) in paragraph at lines 1236--1237
 []\T1/ptm/m/n/10 vector of tick-ers for which the data should be cleaned, e.g. 
 ticker = c("AAPL","AIG"). 
 [23] (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
-Overfull \hbox (229.78088pt too wide) in paragraph at lines 1321--1321
+Overfull \hbox (229.78088pt too wide) in paragraph at lines 1320--1320
  []\T1/fi4/m/n/10 rAccumulation(x, period = 1, y = NULL, align.by="seconds", al
 ign.period = 1, plotit = FALSE, cts = TRUE, makeReturns = FALSE)[] 
 [24]
-Overfull \hbox (131.28088pt too wide) in paragraph at lines 1375--1375
+Overfull \hbox (131.28088pt too wide) in paragraph at lines 1374--1374
  []\T1/fi4/m/n/9 plot(cumm[[1]], xlab="", ylab="Cumulative Ruturns", main="Star
 bucks (SBUX)", sub='20110701', type="p", col=16, lwd=2)[] 
 
-Overfull \hbox (140.28088pt too wide) in paragraph at lines 1379--1379
+Overfull \hbox (140.28088pt too wide) in paragraph at lines 1378--1378
  []\T1/fi4/m/n/9 plot(accum[[1]], xlab="", ylab="Realized Accumulation", type="
 l",main="Starbucks (SBUX)", sub='20110701', col=2, lwd=2)[] 
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [25]
-Overfull \hbox (14.28088pt too wide) in paragraph at lines 1434--1434
+Overfull \hbox (14.28088pt too wide) in paragraph at lines 1433--1433
  [] \T1/fi4/m/n/9 # Average subsampled realized variance/covariance for CTS ali
 gned at one minute returns at[] 
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [26]
-Overfull \hbox (41.7794pt too wide) detected at line 1471
+Overfull \hbox (41.7794pt too wide) detected at line 1470
 []\OT1/cmr/m/n/10 [\OML/cmm/m/it/10 k; q\OT1/cmr/m/n/10 ][] = [][] [] []  [] []
   \OMS/cmsy/m/n/10 ^^@ []  [] []\OML/cmm/m/it/10 ;
 [27]
-Overfull \hbox (27.78088pt too wide) in paragraph at lines 1523--1523
+Overfull \hbox (27.78088pt too wide) in paragraph at lines 1522--1522
  [] \T1/fi4/m/n/9 rbpc = rBPCov( rdata = sample_5minprices_jumps['2010-01-04'],
  makeReturns=TRUE,makePsd=TRUE);[] 
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
-Overfull \hbox (39.78088pt too wide) in paragraph at lines 1546--1546
+Overfull \hbox (39.78088pt too wide) in paragraph at lines 1545--1545
  []\T1/fi4/m/n/10 rCov(rdata,cor = FALSE, align.by = NULL, align.period = NULL,
  makeReturns = FALSE, ...)[] 
 [28] (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
-Overfull \hbox (204.78088pt too wide) in paragraph at lines 1598--1598
+Overfull \hbox (204.78088pt too wide) in paragraph at lines 1597--1597
  []\T1/fi4/m/n/10 rCumSum(x, period = 1, align.by="seconds",align.period = 1, p
 lotit = FALSE, type = "l", cts = TRUE, makeReturns = FALSE)[] 
 [29]
-Overfull \hbox (131.28088pt too wide) in paragraph at lines 1634--1634
+Overfull \hbox (131.28088pt too wide) in paragraph at lines 1633--1633
  []\T1/fi4/m/n/9 plot(cumm[[1]], xlab="", ylab="Cumulative Ruturns", main="Star
 bucks (SBUX)", sub='20110701', type="p", col=16, lwd=2)[] 
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
-Overfull \hbox (60.68895pt too wide) in paragraph at lines 1646--1649
+Overfull \hbox (60.68895pt too wide) in paragraph at lines 1645--1648
 \T1/ptm/m/n/10 ing from 1996-01-03 up to 2009-03-01 for sev-eral in-dices and e
 x-change rates. Use \T1/fi4/m/n/10 colnames(realized_library)
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [30]
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [31]
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [32]
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [33]
-Overfull \hbox (5.28088pt too wide) in paragraph at lines 1886--1886
+Overfull \hbox (5.28088pt too wide) in paragraph at lines 1885--1885
  [] \T1/fi4/m/n/9 rcKernel = rKernelCov( rdata = list(lltc.xts,sbux.xts), perio
 d = 5, align.by ="minutes",[] 
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
-Overfull \hbox (179.78088pt too wide) in paragraph at lines 1901--1901
+Overfull \hbox (179.78088pt too wide) in paragraph at lines 1900--1900
  []\T1/fi4/m/n/10 rMarginal(x, y = NULL, period,align.by="seconds", align.perio
 d = 1, plotit = FALSE, cts = TRUE,makeReturns = FALSE)[] 
 [34]
-Overfull \hbox (315.78088pt too wide) in paragraph at lines 1943--1943
+Overfull \hbox (315.78088pt too wide) in paragraph at lines 1942--1942
  []\T1/fi4/m/n/9 plot(rCumSum(sbux.xts, period=10, align.by="seconds", align.pe
 riod=60), xlab="", ylab="Cumulative Ruturns", main="Starbucks (SBUX)", sub='201
 10701', type="p")[] 
 
-Overfull \hbox (113.28088pt too wide) in paragraph at lines 1944--1944
+Overfull \hbox (113.28088pt too wide) in paragraph at lines 1943--1943
  []\T1/fi4/m/n/9 barplot(rMarginal(sbux.xts, period=10, align.by="seconds", ali
 gn.period=60)$y, main="Marginal Contribution Plot")[] 
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [35]
@@ -218,29 +218,29 @@ gn.period=60)$y, main="Marginal Contribution Plot")[]
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [38] [39]
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [40] [41] [42]
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
-Overfull \hbox (544.78088pt too wide) in paragraph at lines 2347--2347
+Overfull \hbox (544.78088pt too wide) in paragraph at lines 2346--2346
  []\T1/fi4/m/n/10 rScatterReturns(x,y, period, align.by="seconds", align.period
 =1,numbers=FALSE,xlim= NULL, ylim=NULL, plotit=TRUE, pch=NULL, cts=TRUE, makeRe
 turns=FALSE, scale.size=0, col.change=FALSE,...)[] 
 [43]
-Overfull \hbox (59.28088pt too wide) in paragraph at lines 2389--2389
+Overfull \hbox (59.28088pt too wide) in paragraph at lines 2388--2388
  []\T1/fi4/m/n/9 rScatterReturns(sbux.xts,y=lltc.xts, period=1, align.period=20
 ,ylab="LLTC",xlab="SBUX",numbers=FALSE)[] 
 
-Overfull \hbox (54.78088pt too wide) in paragraph at lines 2390--2390
+Overfull \hbox (54.78088pt too wide) in paragraph at lines 2389--2389
  []\T1/fi4/m/n/9 rScatterReturns(sbux.xts,y=lltc.xts, period=1, align.period=20
 ,ylab="LLTC",xlab="SBUX",numbers=TRUE)[] 
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [44]
-Overfull \hbox (9.78088pt too wide) in paragraph at lines 2462--2462
+Overfull \hbox (9.78088pt too wide) in paragraph at lines 2461--2461
  [] \T1/fi4/m/n/9 rcThreshold = rThresholdCov(cbind(lltc.xts,sbux.xts), align.b
 y="minutes",align.period=1);[] 
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [45] [46]
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
-Overfull \hbox (94.78088pt too wide) in paragraph at lines 2594--2594
+Overfull \hbox (94.78088pt too wide) in paragraph at lines 2593--2593
  []\T1/fi4/m/n/10 rZero(rdata, period=1, align.by="seconds", align.period = 1, 
 cts = TRUE, makeReturns = FALSE, ...)[] 
 [47]
-Overfull \hbox (14.28088pt too wide) in paragraph at lines 2627--2627
+Overfull \hbox (14.28088pt too wide) in paragraph at lines 2626--2626
  []\T1/fi4/m/n/9 rZero( rdata = list(sbux.xts, lltc.xts) , period = 60, align.b
 y ="seconds", align.period=1)[] 
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
@@ -255,12 +255,12 @@ y ="seconds", align.period=1)[]
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [52]
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [53]
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [54]
-Overfull \hbox (35.90651pt too wide) in paragraph at lines 2988--2992
+Overfull \hbox (35.90651pt too wide) in paragraph at lines 2987--2991
 []\T1/ptm/m/n/10 The func-tion as-sumes that the files are or-dered in fold-ers
  per day, and the fold-ers con-tain: ticker_trades.RData
 [55] (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [56] [57]
 [58] [59] (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
-Overfull \hbox (18.27808pt too wide) in paragraph at lines 3354--3355
+Overfull \hbox (18.27808pt too wide) in paragraph at lines 3353--3354
 []\T1/ptm/m/n/10 vector of tick-ers for which the data should be cleaned, e.g. 
 ticker = c("AAPL","AIG") 
 [60] [61] (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [62]
@@ -292,7 +292,7 @@ t/fonts/type1/urw/helvetic/uhvr8a.pfb></usr/local/texlive/2011/texmf-dist/fonts
 /type1/urw/times/utmb8a.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/urw
 /times/utmr8a.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/urw/times/utm
 r8a.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on Rd2.pdf (63 pages, 306481 bytes).
+Output written on Rd2.pdf (63 pages, 306471 bytes).
 Transcript written on Rd2.log.
 This is makeindex, version 2.15 [TeX Live 2011] (kpathsea + Thai support).
 Scanning input file ./Rd2.idx....done (169 entries accepted, 0 rejected).
@@ -304,8 +304,8 @@ This is pdfTeX, Version 3.1415926-2.3-1.40.12 (TeX Live 2011)
  restricted \write18 enabled.
 entering extended mode
 
-(/private/var/folders/70/fxmz1c0n6sjbrqr6tcrfnvv80000gn/T/Rtmpjzo5tc/Rd2pdf9fa5
-34cbf584/Rd2.tex
+(/private/var/folders/70/fxmz1c0n6sjbrqr6tcrfnvv80000gn/T/RtmpqAyd5V/Rd2pdf1d78
+64d88867/Rd2.tex
 LaTeX2e <2009/09/24>
 Babel <v3.8l> and hyphenation patterns for english, dumylang, nohyphenation, ge
 rman-x-2009-06-19, ngerman-x-2009-06-19, afrikaans, ancientgreek, ibycus, arabi
@@ -390,49 +390,49 @@ Writing index file Rd2.idx
 (/usr/local/texlive/2011/texmf-dist/tex/latex/psnfss/ts1ptm.fd)
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [8]
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [9]
-Overfull \hbox (29.79745pt too wide) in paragraph at lines 450--451
+Overfull \hbox (29.79745pt too wide) in paragraph at lines 449--450
 \T1/ptm/m/n/10 "csv". In case your data comes from "www.tickdata.com", set ex-t
 en-sion="tickdatacom". 
 [10]
-Overfull \hbox (27.78088pt too wide) in paragraph at lines 501--501
+Overfull \hbox (27.78088pt too wide) in paragraph at lines 500--500
  [] \T1/fi4/m/n/9 convert(from=from, to=to, datasource=datasource, datadestinat
 ion=datadestination, trades = T,[] 
 
-Overfull \hbox (32.28088pt too wide) in paragraph at lines 502--502
+Overfull \hbox (32.28088pt too wide) in paragraph at lines 501--501
  []                       \T1/fi4/m/n/9 quotes = T, ticker="IBM", dir = FALSE, 
 extension = "csv", header = TRUE,[] 
 
-Overfull \hbox (54.78088pt too wide) in paragraph at lines 503--503
+Overfull \hbox (54.78088pt too wide) in paragraph at lines 502--502
  []                       \T1/fi4/m/n/9 tradecolnames = NULL, quotecolnames = N
 ULL, format = format, onefile = TRUE )[] 
 
-Overfull \hbox (27.78088pt too wide) in paragraph at lines 510--510
+Overfull \hbox (27.78088pt too wide) in paragraph at lines 509--509
  [] \T1/fi4/m/n/9 convert(from=from, to=to, datasource=datasource, datadestinat
 ion=datadestination, trades = T,[] 
 
-Overfull \hbox (14.28088pt too wide) in paragraph at lines 511--511
+Overfull \hbox (14.28088pt too wide) in paragraph at lines 510--510
  []            \T1/fi4/m/n/9 quotes = T, ticker="GLP", dir = TRUE, extension = 
 "tickdatacom", header = TRUE,[] 
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [11]
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [12]
-Overfull \hbox (18.8375pt too wide) in paragraph at lines 588--590
+Overfull \hbox (18.8375pt too wide) in paragraph at lines 587--589
 []\T1/ptm/m/n/10 NOTE: The value of the first (and sec-ond) ob-ser-va-tion of t
 he out-put should be ig-nored if price==midpoint
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
-Overfull \hbox (439.78088pt too wide) in paragraph at lines 615--615
+Overfull \hbox (439.78088pt too wide) in paragraph at lines 614--614
  [] \T1/fi4/m/n/10 harModel(data, periods = c(1, 5, 22), periodsJ = c(1,5,22), 
 leverage=NULL, RVest = c("rCov", "rBPCov"), type = "HARRV", jumptest = "ABDJump
 test", alpha = 0.05, h = 1,[] 
 [13] [14]
-Overfull \hbox (0.78088pt too wide) in paragraph at lines 673--673
+Overfull \hbox (0.78088pt too wide) in paragraph at lines 672--672
  [] \T1/fi4/m/n/9 x = harModel(data, periods = c(1,5,10), periodsJ=c(1,5,10), R
 Vest = c("rCov","rBPCov"),[] 
 
-Overfull \hbox (0.78088pt too wide) in paragraph at lines 674--674
+Overfull \hbox (0.78088pt too wide) in paragraph at lines 673--673
  []              \T1/fi4/m/n/9 type="HARRVCJ",transform="sqrt"); # Estimate the
  HAR model of type HARRVCJ[] 
 
-Overfull \hbox (59.28088pt too wide) in paragraph at lines 685--685
+Overfull \hbox (59.28088pt too wide) in paragraph at lines 684--684
  [] \T1/fi4/m/n/9 x = harModel(data=DJI_RV , periods = c(1,5,22), RVest = c("rC
 ov"), type="HARRV",h=1,transform=NULL);[] 
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [15]
@@ -448,67 +448,67 @@ ov"), type="HARRV",h=1,transform=NULL);[]
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [23]
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [24]
-Overfull \hbox (20.77808pt too wide) in paragraph at lines 1237--1238
+Overfull \hbox (20.77808pt too wide) in paragraph at lines 1236--1237
 []\T1/ptm/m/n/10 vector of tick-ers for which the data should be cleaned, e.g. 
 ticker = c("AAPL","AIG"). 
 [25] (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
-Overfull \hbox (229.78088pt too wide) in paragraph at lines 1321--1321
+Overfull \hbox (229.78088pt too wide) in paragraph at lines 1320--1320
  []\T1/fi4/m/n/10 rAccumulation(x, period = 1, y = NULL, align.by="seconds", al
 ign.period = 1, plotit = FALSE, cts = TRUE, makeReturns = FALSE)[] 
 [26]
-Overfull \hbox (131.28088pt too wide) in paragraph at lines 1375--1375
+Overfull \hbox (131.28088pt too wide) in paragraph at lines 1374--1374
  []\T1/fi4/m/n/9 plot(cumm[[1]], xlab="", ylab="Cumulative Ruturns", main="Star
 bucks (SBUX)", sub='20110701', type="p", col=16, lwd=2)[] 
 
-Overfull \hbox (140.28088pt too wide) in paragraph at lines 1379--1379
+Overfull \hbox (140.28088pt too wide) in paragraph at lines 1378--1378
  []\T1/fi4/m/n/9 plot(accum[[1]], xlab="", ylab="Realized Accumulation", type="
 l",main="Starbucks (SBUX)", sub='20110701', col=2, lwd=2)[] 
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [27]
-Overfull \hbox (14.28088pt too wide) in paragraph at lines 1434--1434
+Overfull \hbox (14.28088pt too wide) in paragraph at lines 1433--1433
  [] \T1/fi4/m/n/9 # Average subsampled realized variance/covariance for CTS ali
 gned at one minute returns at[] 
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [28]
-Overfull \hbox (41.7794pt too wide) detected at line 1471
+Overfull \hbox (41.7794pt too wide) detected at line 1470
 []\OT1/cmr/m/n/10 [\OML/cmm/m/it/10 k; q\OT1/cmr/m/n/10 ][] = [][] [] []  [] []
   \OMS/cmsy/m/n/10 ^^@ []  [] []\OML/cmm/m/it/10 ;
 [29]
-Overfull \hbox (27.78088pt too wide) in paragraph at lines 1523--1523
+Overfull \hbox (27.78088pt too wide) in paragraph at lines 1522--1522
  [] \T1/fi4/m/n/9 rbpc = rBPCov( rdata = sample_5minprices_jumps['2010-01-04'],
  makeReturns=TRUE,makePsd=TRUE);[] 
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
-Overfull \hbox (39.78088pt too wide) in paragraph at lines 1546--1546
+Overfull \hbox (39.78088pt too wide) in paragraph at lines 1545--1545
  []\T1/fi4/m/n/10 rCov(rdata,cor = FALSE, align.by = NULL, align.period = NULL,
  makeReturns = FALSE, ...)[] 
 [30] (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
-Overfull \hbox (204.78088pt too wide) in paragraph at lines 1598--1598
+Overfull \hbox (204.78088pt too wide) in paragraph at lines 1597--1597
  []\T1/fi4/m/n/10 rCumSum(x, period = 1, align.by="seconds",align.period = 1, p
 lotit = FALSE, type = "l", cts = TRUE, makeReturns = FALSE)[] 
 [31]
-Overfull \hbox (131.28088pt too wide) in paragraph at lines 1634--1634
+Overfull \hbox (131.28088pt too wide) in paragraph at lines 1633--1633
  []\T1/fi4/m/n/9 plot(cumm[[1]], xlab="", ylab="Cumulative Ruturns", main="Star
 bucks (SBUX)", sub='20110701', type="p", col=16, lwd=2)[] 
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
-Overfull \hbox (60.68895pt too wide) in paragraph at lines 1646--1649
+Overfull \hbox (60.68895pt too wide) in paragraph at lines 1645--1648
 \T1/ptm/m/n/10 ing from 1996-01-03 up to 2009-03-01 for sev-eral in-dices and e
 x-change rates. Use \T1/fi4/m/n/10 colnames(realized_library)
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [32]
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [33]
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [34]
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [35]
-Overfull \hbox (5.28088pt too wide) in paragraph at lines 1886--1886
+Overfull \hbox (5.28088pt too wide) in paragraph at lines 1885--1885
  [] \T1/fi4/m/n/9 rcKernel = rKernelCov( rdata = list(lltc.xts,sbux.xts), perio
 d = 5, align.by ="minutes",[] 
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
-Overfull \hbox (179.78088pt too wide) in paragraph at lines 1901--1901
+Overfull \hbox (179.78088pt too wide) in paragraph at lines 1900--1900
  []\T1/fi4/m/n/10 rMarginal(x, y = NULL, period,align.by="seconds", align.perio
 d = 1, plotit = FALSE, cts = TRUE,makeReturns = FALSE)[] 
 [36]
-Overfull \hbox (315.78088pt too wide) in paragraph at lines 1943--1943
+Overfull \hbox (315.78088pt too wide) in paragraph at lines 1942--1942
  []\T1/fi4/m/n/9 plot(rCumSum(sbux.xts, period=10, align.by="seconds", align.pe
 riod=60), xlab="", ylab="Cumulative Ruturns", main="Starbucks (SBUX)", sub='201
 10701', type="p")[] 
 
-Overfull \hbox (113.28088pt too wide) in paragraph at lines 1944--1944
+Overfull \hbox (113.28088pt too wide) in paragraph at lines 1943--1943
  []\T1/fi4/m/n/9 barplot(rMarginal(sbux.xts, period=10, align.by="seconds", ali
 gn.period=60)$y, main="Marginal Contribution Plot")[] 
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [37]
@@ -518,29 +518,29 @@ gn.period=60)$y, main="Marginal Contribution Plot")[]
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [40] [41]
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [42] [43] [44]
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
-Overfull \hbox (544.78088pt too wide) in paragraph at lines 2347--2347
+Overfull \hbox (544.78088pt too wide) in paragraph at lines 2346--2346
  []\T1/fi4/m/n/10 rScatterReturns(x,y, period, align.by="seconds", align.period
 =1,numbers=FALSE,xlim= NULL, ylim=NULL, plotit=TRUE, pch=NULL, cts=TRUE, makeRe
 turns=FALSE, scale.size=0, col.change=FALSE,...)[] 
 [45]
-Overfull \hbox (59.28088pt too wide) in paragraph at lines 2389--2389
+Overfull \hbox (59.28088pt too wide) in paragraph at lines 2388--2388
  []\T1/fi4/m/n/9 rScatterReturns(sbux.xts,y=lltc.xts, period=1, align.period=20
 ,ylab="LLTC",xlab="SBUX",numbers=FALSE)[] 
 
-Overfull \hbox (54.78088pt too wide) in paragraph at lines 2390--2390
+Overfull \hbox (54.78088pt too wide) in paragraph at lines 2389--2389
  []\T1/fi4/m/n/9 rScatterReturns(sbux.xts,y=lltc.xts, period=1, align.period=20
 ,ylab="LLTC",xlab="SBUX",numbers=TRUE)[] 
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [46]
-Overfull \hbox (9.78088pt too wide) in paragraph at lines 2462--2462
+Overfull \hbox (9.78088pt too wide) in paragraph at lines 2461--2461
  [] \T1/fi4/m/n/9 rcThreshold = rThresholdCov(cbind(lltc.xts,sbux.xts), align.b
 y="minutes",align.period=1);[] 
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [47] [48]
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
-Overfull \hbox (94.78088pt too wide) in paragraph at lines 2594--2594
+Overfull \hbox (94.78088pt too wide) in paragraph at lines 2593--2593
  []\T1/fi4/m/n/10 rZero(rdata, period=1, align.by="seconds", align.period = 1, 
 cts = TRUE, makeReturns = FALSE, ...)[] 
 [49]
-Overfull \hbox (14.28088pt too wide) in paragraph at lines 2627--2627
+Overfull \hbox (14.28088pt too wide) in paragraph at lines 2626--2626
  []\T1/fi4/m/n/9 rZero( rdata = list(sbux.xts, lltc.xts) , period = 60, align.b
 y ="seconds", align.period=1)[] 
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
@@ -555,12 +555,12 @@ y ="seconds", align.period=1)[]
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [54]
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [55]
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [56]
-Overfull \hbox (35.90651pt too wide) in paragraph at lines 2988--2992
+Overfull \hbox (35.90651pt too wide) in paragraph at lines 2987--2991
 []\T1/ptm/m/n/10 The func-tion as-sumes that the files are or-dered in fold-ers
  per day, and the fold-ers con-tain: ticker_trades.RData
 [57] (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [58] [59]
 [60] [61] (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
-Overfull \hbox (18.27808pt too wide) in paragraph at lines 3354--3355
+Overfull \hbox (18.27808pt too wide) in paragraph at lines 3353--3354
 []\T1/ptm/m/n/10 vector of tick-ers for which the data should be cleaned, e.g. 
 ticker = c("AAPL","AIG") 
 [62] [63] (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [64]
@@ -599,7 +599,7 @@ t/fonts/type1/urw/helvetic/uhvr8a.pfb></usr/local/texlive/2011/texmf-dist/fonts
 /type1/urw/times/utmb8a.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/urw
 /times/utmr8a.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/urw/times/utm
 r8a.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on Rd2.pdf (67 pages, 322188 bytes).
+Output written on Rd2.pdf (67 pages, 322183 bytes).
 Transcript written on Rd2.log.
 This is makeindex, version 2.15 [TeX Live 2011] (kpathsea + Thai support).
 Scanning input file ./Rd2.idx....done (169 entries accepted, 0 rejected).
@@ -611,8 +611,8 @@ This is pdfTeX, Version 3.1415926-2.3-1.40.12 (TeX Live 2011)
  restricted \write18 enabled.
 entering extended mode
 
-(/private/var/folders/70/fxmz1c0n6sjbrqr6tcrfnvv80000gn/T/Rtmpjzo5tc/Rd2pdf9fa5
-34cbf584/Rd2.tex
+(/private/var/folders/70/fxmz1c0n6sjbrqr6tcrfnvv80000gn/T/RtmpqAyd5V/Rd2pdf1d78
+64d88867/Rd2.tex
 LaTeX2e <2009/09/24>
 Babel <v3.8l> and hyphenation patterns for english, dumylang, nohyphenation, ge
 rman-x-2009-06-19, ngerman-x-2009-06-19, afrikaans, ancientgreek, ibycus, arabi
@@ -697,49 +697,49 @@ Writing index file Rd2.idx
 (/usr/local/texlive/2011/texmf-dist/tex/latex/psnfss/ts1ptm.fd)
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [8]
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [9]
-Overfull \hbox (29.79745pt too wide) in paragraph at lines 450--451
+Overfull \hbox (29.79745pt too wide) in paragraph at lines 449--450
 \T1/ptm/m/n/10 "csv". In case your data comes from "www.tickdata.com", set ex-t
 en-sion="tickdatacom". 
 [10]
-Overfull \hbox (27.78088pt too wide) in paragraph at lines 501--501
+Overfull \hbox (27.78088pt too wide) in paragraph at lines 500--500
  [] \T1/fi4/m/n/9 convert(from=from, to=to, datasource=datasource, datadestinat
 ion=datadestination, trades = T,[] 
 
-Overfull \hbox (32.28088pt too wide) in paragraph at lines 502--502
+Overfull \hbox (32.28088pt too wide) in paragraph at lines 501--501
  []                       \T1/fi4/m/n/9 quotes = T, ticker="IBM", dir = FALSE, 
 extension = "csv", header = TRUE,[] 
 
-Overfull \hbox (54.78088pt too wide) in paragraph at lines 503--503
+Overfull \hbox (54.78088pt too wide) in paragraph at lines 502--502
  []                       \T1/fi4/m/n/9 tradecolnames = NULL, quotecolnames = N
 ULL, format = format, onefile = TRUE )[] 
 
-Overfull \hbox (27.78088pt too wide) in paragraph at lines 510--510
+Overfull \hbox (27.78088pt too wide) in paragraph at lines 509--509
  [] \T1/fi4/m/n/9 convert(from=from, to=to, datasource=datasource, datadestinat
 ion=datadestination, trades = T,[] 
 
-Overfull \hbox (14.28088pt too wide) in paragraph at lines 511--511
+Overfull \hbox (14.28088pt too wide) in paragraph at lines 510--510
  []            \T1/fi4/m/n/9 quotes = T, ticker="GLP", dir = TRUE, extension = 
 "tickdatacom", header = TRUE,[] 
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [11]
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [12]
-Overfull \hbox (18.8375pt too wide) in paragraph at lines 588--590
+Overfull \hbox (18.8375pt too wide) in paragraph at lines 587--589
 []\T1/ptm/m/n/10 NOTE: The value of the first (and sec-ond) ob-ser-va-tion of t
 he out-put should be ig-nored if price==midpoint
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
-Overfull \hbox (439.78088pt too wide) in paragraph at lines 615--615
+Overfull \hbox (439.78088pt too wide) in paragraph at lines 614--614
  [] \T1/fi4/m/n/10 harModel(data, periods = c(1, 5, 22), periodsJ = c(1,5,22), 
 leverage=NULL, RVest = c("rCov", "rBPCov"), type = "HARRV", jumptest = "ABDJump
 test", alpha = 0.05, h = 1,[] 
 [13] [14]
-Overfull \hbox (0.78088pt too wide) in paragraph at lines 673--673
+Overfull \hbox (0.78088pt too wide) in paragraph at lines 672--672
  [] \T1/fi4/m/n/9 x = harModel(data, periods = c(1,5,10), periodsJ=c(1,5,10), R
 Vest = c("rCov","rBPCov"),[] 
 
-Overfull \hbox (0.78088pt too wide) in paragraph at lines 674--674
+Overfull \hbox (0.78088pt too wide) in paragraph at lines 673--673
  []              \T1/fi4/m/n/9 type="HARRVCJ",transform="sqrt"); # Estimate the
  HAR model of type HARRVCJ[] 
 
-Overfull \hbox (59.28088pt too wide) in paragraph at lines 685--685
+Overfull \hbox (59.28088pt too wide) in paragraph at lines 684--684
  [] \T1/fi4/m/n/9 x = harModel(data=DJI_RV , periods = c(1,5,22), RVest = c("rC
 ov"), type="HARRV",h=1,transform=NULL);[] 
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [15]
@@ -755,67 +755,67 @@ ov"), type="HARRV",h=1,transform=NULL);[]
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [23]
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [24]
-Overfull \hbox (20.77808pt too wide) in paragraph at lines 1237--1238
+Overfull \hbox (20.77808pt too wide) in paragraph at lines 1236--1237
 []\T1/ptm/m/n/10 vector of tick-ers for which the data should be cleaned, e.g. 
 ticker = c("AAPL","AIG"). 
 [25] (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
-Overfull \hbox (229.78088pt too wide) in paragraph at lines 1321--1321
+Overfull \hbox (229.78088pt too wide) in paragraph at lines 1320--1320
  []\T1/fi4/m/n/10 rAccumulation(x, period = 1, y = NULL, align.by="seconds", al
 ign.period = 1, plotit = FALSE, cts = TRUE, makeReturns = FALSE)[] 
 [26]
-Overfull \hbox (131.28088pt too wide) in paragraph at lines 1375--1375
+Overfull \hbox (131.28088pt too wide) in paragraph at lines 1374--1374
  []\T1/fi4/m/n/9 plot(cumm[[1]], xlab="", ylab="Cumulative Ruturns", main="Star
 bucks (SBUX)", sub='20110701', type="p", col=16, lwd=2)[] 
 
-Overfull \hbox (140.28088pt too wide) in paragraph at lines 1379--1379
+Overfull \hbox (140.28088pt too wide) in paragraph at lines 1378--1378
  []\T1/fi4/m/n/9 plot(accum[[1]], xlab="", ylab="Realized Accumulation", type="
 l",main="Starbucks (SBUX)", sub='20110701', col=2, lwd=2)[] 
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [27]
-Overfull \hbox (14.28088pt too wide) in paragraph at lines 1434--1434
+Overfull \hbox (14.28088pt too wide) in paragraph at lines 1433--1433
  [] \T1/fi4/m/n/9 # Average subsampled realized variance/covariance for CTS ali
 gned at one minute returns at[] 
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [28]
-Overfull \hbox (41.7794pt too wide) detected at line 1471
+Overfull \hbox (41.7794pt too wide) detected at line 1470
 []\OT1/cmr/m/n/10 [\OML/cmm/m/it/10 k; q\OT1/cmr/m/n/10 ][] = [][] [] []  [] []
   \OMS/cmsy/m/n/10 ^^@ []  [] []\OML/cmm/m/it/10 ;
 [29]
-Overfull \hbox (27.78088pt too wide) in paragraph at lines 1523--1523
+Overfull \hbox (27.78088pt too wide) in paragraph at lines 1522--1522
  [] \T1/fi4/m/n/9 rbpc = rBPCov( rdata = sample_5minprices_jumps['2010-01-04'],
  makeReturns=TRUE,makePsd=TRUE);[] 
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
-Overfull \hbox (39.78088pt too wide) in paragraph at lines 1546--1546
+Overfull \hbox (39.78088pt too wide) in paragraph at lines 1545--1545
  []\T1/fi4/m/n/10 rCov(rdata,cor = FALSE, align.by = NULL, align.period = NULL,
  makeReturns = FALSE, ...)[] 
 [30] (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
-Overfull \hbox (204.78088pt too wide) in paragraph at lines 1598--1598
+Overfull \hbox (204.78088pt too wide) in paragraph at lines 1597--1597
  []\T1/fi4/m/n/10 rCumSum(x, period = 1, align.by="seconds",align.period = 1, p
 lotit = FALSE, type = "l", cts = TRUE, makeReturns = FALSE)[] 
 [31]
-Overfull \hbox (131.28088pt too wide) in paragraph at lines 1634--1634
+Overfull \hbox (131.28088pt too wide) in paragraph at lines 1633--1633
  []\T1/fi4/m/n/9 plot(cumm[[1]], xlab="", ylab="Cumulative Ruturns", main="Star
 bucks (SBUX)", sub='20110701', type="p", col=16, lwd=2)[] 
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
-Overfull \hbox (60.68895pt too wide) in paragraph at lines 1646--1649
+Overfull \hbox (60.68895pt too wide) in paragraph at lines 1645--1648
 \T1/ptm/m/n/10 ing from 1996-01-03 up to 2009-03-01 for sev-eral in-dices and e
 x-change rates. Use \T1/fi4/m/n/10 colnames(realized_library)
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [32]
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [33]
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [34]
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [35]
-Overfull \hbox (5.28088pt too wide) in paragraph at lines 1886--1886
+Overfull \hbox (5.28088pt too wide) in paragraph at lines 1885--1885
  [] \T1/fi4/m/n/9 rcKernel = rKernelCov( rdata = list(lltc.xts,sbux.xts), perio
 d = 5, align.by ="minutes",[] 
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
-Overfull \hbox (179.78088pt too wide) in paragraph at lines 1901--1901
+Overfull \hbox (179.78088pt too wide) in paragraph at lines 1900--1900
  []\T1/fi4/m/n/10 rMarginal(x, y = NULL, period,align.by="seconds", align.perio
 d = 1, plotit = FALSE, cts = TRUE,makeReturns = FALSE)[] 
 [36]
-Overfull \hbox (315.78088pt too wide) in paragraph at lines 1943--1943
+Overfull \hbox (315.78088pt too wide) in paragraph at lines 1942--1942
  []\T1/fi4/m/n/9 plot(rCumSum(sbux.xts, period=10, align.by="seconds", align.pe
 riod=60), xlab="", ylab="Cumulative Ruturns", main="Starbucks (SBUX)", sub='201
 10701', type="p")[] 
 
-Overfull \hbox (113.28088pt too wide) in paragraph at lines 1944--1944
+Overfull \hbox (113.28088pt too wide) in paragraph at lines 1943--1943
  []\T1/fi4/m/n/9 barplot(rMarginal(sbux.xts, period=10, align.by="seconds", ali
 gn.period=60)$y, main="Marginal Contribution Plot")[] 
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [37]
@@ -825,29 +825,29 @@ gn.period=60)$y, main="Marginal Contribution Plot")[]
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [40] [41]
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [42] [43] [44]
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
-Overfull \hbox (544.78088pt too wide) in paragraph at lines 2347--2347
+Overfull \hbox (544.78088pt too wide) in paragraph at lines 2346--2346
  []\T1/fi4/m/n/10 rScatterReturns(x,y, period, align.by="seconds", align.period
 =1,numbers=FALSE,xlim= NULL, ylim=NULL, plotit=TRUE, pch=NULL, cts=TRUE, makeRe
 turns=FALSE, scale.size=0, col.change=FALSE,...)[] 
 [45]
-Overfull \hbox (59.28088pt too wide) in paragraph at lines 2389--2389
+Overfull \hbox (59.28088pt too wide) in paragraph at lines 2388--2388
  []\T1/fi4/m/n/9 rScatterReturns(sbux.xts,y=lltc.xts, period=1, align.period=20
 ,ylab="LLTC",xlab="SBUX",numbers=FALSE)[] 
 
-Overfull \hbox (54.78088pt too wide) in paragraph at lines 2390--2390
+Overfull \hbox (54.78088pt too wide) in paragraph at lines 2389--2389
  []\T1/fi4/m/n/9 rScatterReturns(sbux.xts,y=lltc.xts, period=1, align.period=20
 ,ylab="LLTC",xlab="SBUX",numbers=TRUE)[] 
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [46]
-Overfull \hbox (9.78088pt too wide) in paragraph at lines 2462--2462
+Overfull \hbox (9.78088pt too wide) in paragraph at lines 2461--2461
  [] \T1/fi4/m/n/9 rcThreshold = rThresholdCov(cbind(lltc.xts,sbux.xts), align.b
 y="minutes",align.period=1);[] 
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [47] [48]
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
-Overfull \hbox (94.78088pt too wide) in paragraph at lines 2594--2594
+Overfull \hbox (94.78088pt too wide) in paragraph at lines 2593--2593
  []\T1/fi4/m/n/10 rZero(rdata, period=1, align.by="seconds", align.period = 1, 
 cts = TRUE, makeReturns = FALSE, ...)[] 
 [49]
-Overfull \hbox (14.28088pt too wide) in paragraph at lines 2627--2627
+Overfull \hbox (14.28088pt too wide) in paragraph at lines 2626--2626
  []\T1/fi4/m/n/9 rZero( rdata = list(sbux.xts, lltc.xts) , period = 60, align.b
 y ="seconds", align.period=1)[] 
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
@@ -862,12 +862,12 @@ y ="seconds", align.period=1)[]
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [54]
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [55]
 (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [56]
-Overfull \hbox (35.90651pt too wide) in paragraph at lines 2988--2992
+Overfull \hbox (35.90651pt too wide) in paragraph at lines 2987--2991
 []\T1/ptm/m/n/10 The func-tion as-sumes that the files are or-dered in fold-ers
  per day, and the fold-ers con-tain: ticker_trades.RData
 [57] (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [58] [59]
 [60] [61] (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def)
-Overfull \hbox (18.27808pt too wide) in paragraph at lines 3354--3355
+Overfull \hbox (18.27808pt too wide) in paragraph at lines 3353--3354
 []\T1/ptm/m/n/10 vector of tick-ers for which the data should be cleaned, e.g. 
 ticker = c("AAPL","AIG") 
 [62] [63] (/usr/local/texlive/2011/texmf-dist/tex/latex/base/utf8.def) [64]
@@ -901,8 +901,8 @@ t/fonts/type1/urw/helvetic/uhvr8a.pfb></usr/local/texlive/2011/texmf-dist/fonts
 /type1/urw/times/utmb8a.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/urw
 /times/utmr8a.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/urw/times/utm
 r8a.pfb></usr/local/texlive/2011/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on Rd2.pdf (67 pages, 322492 bytes).
+Output written on Rd2.pdf (67 pages, 322481 bytes).
 Transcript written on Rd2.log.
 Saving output to 'highfrequency-manual.pdf' ...
 Done
-You may want to clean up by 'rm -rf /var/folders/70/fxmz1c0n6sjbrqr6tcrfnvv80000gn/T//Rtmpjzo5tc/Rd2pdf9fa534cbf584'
+You may want to clean up by 'rm -rf /var/folders/70/fxmz1c0n6sjbrqr6tcrfnvv80000gn/T//RtmpqAyd5V/Rd2pdf1d7864d88867'

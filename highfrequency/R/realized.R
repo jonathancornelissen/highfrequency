@@ -497,7 +497,7 @@ q = NULL,...){                 # Deprectated
 rKernel <- function(x,type=0)
 {
     type <- .kernel.chartoint(type)
-    .C("justKernel", x=as.double(x),type= as.integer(type), ans=as.double(0),PACKAGE="realized")$ans
+    .C("justKernel", x=as.double(x),type= as.integer(type), ans=as.double(0),PACKAGE="highfrequency")$ans
 }
 
 .kernel.chartoint <- function(type)
