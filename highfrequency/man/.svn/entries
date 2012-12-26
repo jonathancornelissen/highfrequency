@@ -436,14 +436,14 @@ jonathan
 
 quotescleanup.Rd
 file
+40
 
 
 
-
-2010-11-27T16:34:55.000000Z
-01f9005c6da2950f60c15ab42abd33da
-2012-07-13T20:44:35.549823Z
-17
+2012-12-26T11:52:57.000000Z
+c9f20b61e8c6ed4ae8952469138e136d
+2012-12-26T12:26:43.017714Z
+40
 jonathan
 
 
@@ -466,7 +466,7 @@ jonathan
 
 
 
-4274
+4184
 
 rmlargespread.Rd
 file
@@ -502,40 +502,6 @@ jonathan
 
 775
 
-tradescleanup.Rd
-file
-
-
-
-
-2010-11-27T16:35:17.000000Z
-f510f84616fe2f48cfadc13a1c96c133
-2012-07-13T20:44:35.549823Z
-17
-jonathan
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-4036
-
 mergequotessametimestamp.Rd
 file
 
@@ -570,16 +536,16 @@ jonathan
 
 1230
 
-rCumSum.Rd
+tradescleanup.Rd
 file
 
 
 
 
-2012-05-18T21:05:29.000000Z
-3f38a8c2db04f1055ab9af1e18137779
-2012-07-08T19:32:48.204656Z
-12
+2010-11-27T16:35:17.000000Z
+f510f84616fe2f48cfadc13a1c96c133
+2012-07-13T20:44:35.549823Z
+17
 jonathan
 
 
@@ -602,7 +568,7 @@ jonathan
 
 
 
-1572
+4036
 
 harModel.Rd
 file
@@ -638,6 +604,40 @@ jonathan
 
 4984
 
+rCumSum.Rd
+file
+
+
+
+
+2012-05-18T21:05:29.000000Z
+3f38a8c2db04f1055ab9af1e18137779
+2012-07-08T19:32:48.204656Z
+12
+jonathan
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1572
+
 sample_5minprices_jumps.Rd
 file
 
@@ -671,40 +671,6 @@ jonathan
 
 
 1590
-
-sample_tdata.Rd
-file
-
-
-
-
-2012-07-07T03:38:31.000000Z
-d7823e08d06d4a6701cc43d99c30b857
-2012-06-04T02:00:07.280989Z
-3
-jonathan
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-435
 
 sbux.xts.Rd
 file
@@ -740,16 +706,16 @@ jonathan
 
 270
 
-rmNegativeSpread.Rd
+sample_tdata.Rd
 file
 
 
 
 
-2010-10-27T18:42:00.000000Z
-68c38207243145a53ff3b0c47fd3bbaf
-2012-07-13T20:44:35.549823Z
-17
+2012-07-07T03:38:31.000000Z
+d7823e08d06d4a6701cc43d99c30b857
+2012-06-04T02:00:07.280989Z
+3
 jonathan
 
 
@@ -772,75 +738,7 @@ jonathan
 
 
 
-442
-
-matchTradesQuotes.Rd
-file
-
-
-
-
-2012-07-13T16:08:19.000000Z
-565635cc50ddd7ca18af024d8229826b
-2012-07-13T17:11:42.941503Z
-16
-jonathan
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-1025
-
-getTradeDirection.Rd
-file
-
-
-
-
-2012-07-13T16:09:26.000000Z
-70091ff5f3f71bcd57bb8329a4a2e5d1
-2012-07-13T17:11:42.941503Z
-16
-jonathan
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-930
+435
 
 makeReturns.Rd
 file
@@ -876,14 +774,82 @@ jonathan
 
 531
 
-ExchangeHoursOnly.Rd
+getTradeDirection.Rd
 file
 
 
 
 
-2010-11-27T15:56:36.000000Z
-b48c56b16f55c97da7a6af3b26020520
+2012-07-13T16:09:26.000000Z
+70091ff5f3f71bcd57bb8329a4a2e5d1
+2012-07-13T17:11:42.941503Z
+16
+jonathan
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+930
+
+matchTradesQuotes.Rd
+file
+
+
+
+
+2012-07-13T16:08:19.000000Z
+565635cc50ddd7ca18af024d8229826b
+2012-07-13T17:11:42.941503Z
+16
+jonathan
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1025
+
+rmNegativeSpread.Rd
+file
+
+
+
+
+2010-10-27T18:42:00.000000Z
+68c38207243145a53ff3b0c47fd3bbaf
 2012-07-13T20:44:35.549823Z
 17
 jonathan
@@ -908,7 +874,7 @@ jonathan
 
 
 
-1159
+442
 
 sample_qdataraw.Rd
 file
@@ -943,6 +909,40 @@ jonathan
 
 
 441
+
+ExchangeHoursOnly.Rd
+file
+
+
+
+
+2010-11-27T15:56:36.000000Z
+b48c56b16f55c97da7a6af3b26020520
+2012-07-13T20:44:35.549823Z
+17
+jonathan
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1159
 
 rAccumulation.Rd
 file
@@ -1820,14 +1820,14 @@ jonathan
 
 tradesCleanupFinal.Rd
 file
+40
 
 
 
-
-2010-11-27T16:30:54.000000Z
-3bdadc4eb3c0073a928c25254fc9b468
-2012-07-13T20:44:35.549823Z
-17
+2012-12-26T11:53:26.000000Z
+6a67a4479e6e8d6016ca38196d3c855e
+2012-12-26T12:26:43.017714Z
+40
 jonathan
 
 
@@ -1850,7 +1850,7 @@ jonathan
 
 
 
-2965
+2908
 
 rmoutliers.Rd
 file
