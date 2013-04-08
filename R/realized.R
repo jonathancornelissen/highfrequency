@@ -968,10 +968,10 @@ makePsd = function(S,method="covariance"){
         tby = paste(3600 * k, "sec", sep = " ");
     } 
     g = base:::seq(start(ts), end(ts), by = tby);
-    rawg = as.numeric(as.POSIXct(g, tz = "GMT"));
+    rawg = as.numeric(as.POSIXct(g));
     newg = rawg + (secs - rawg%%secs);
-    g    = as.POSIXct(newg, origin = "1970-01-01",tz = "GMT");
-    ts3 = na.locf(merge(ts, zoo(, g)))[as.POSIXct(g, tz = "GMT")];
+    g    = as.POSIXct(newg, origin = "1970-01-01");
+    ts3 = na.locf(merge(ts, zoo(, g)))[as.POSIXct(g)];
     return(ts3)
 } #Very fast and elegant way to do previous tick aggregation :D!
 
@@ -998,8 +998,7 @@ refreshTime = function (pdata)
     lengths = cumsum(lengths)
     alltimes = rep(0, lengths[dim + 1])
     for (i in 1:dim) {
-        alltimes[(lengths[i] + 1):lengths[i + 1]] = as.numeric(as.POSIXct(index(pdata[[i]]), 
-        tz = "GMT"))
+        alltimes[(lengths[i] + 1):lengths[i + 1]] = as.numeric(as.POSIXct(index(pdata[[i]])))
     }
     x = .C("refreshpoints", as.integer(alltimes), as.integer(lengths), 
     as.integer(rep(0, minl)), as.integer(dim), as.integer(0), 
@@ -1010,8 +1009,7 @@ refreshTime = function (pdata)
         selection = x[[6]][((i - 1) * minl + 1):(i * minl)]
         pmatrix[, i] = pdata[[i]][selection[1:newlength]]
     }
-    time = as.POSIXct(x[[3]][1:newlength], origin = "1970-01-01", 
-    tz = "GMT")
+    time = as.POSIXct(x[[3]][1:newlength], origin = "1970-01-01")
     resmatrix = xts(pmatrix, order.by = time)
     return(resmatrix)
 }
@@ -2085,7 +2083,7 @@ convert_trades = function (datasource, datadestination, ticker, extension = "txt
       newtime = apply(oldtime, 1, adjtime)
       tdata$TIME = newtime
       rm(oldtime, newtime); 
-      tdobject = as.POSIXct(paste(as.vector(tdata$DATE), as.vector(tdata$TIME)), format=format, tz="GMT")       
+      tdobject = as.POSIXct(paste(as.vector(tdata$DATE), as.vector(tdata$TIME)), format=format)       
       tdata = xts(tdata, order.by = tdobject)
       tdata = tdata[, c("SYMBOL", "EX", "PRICE", "SIZE", 
                         "COND", "CORR", "G127")]
@@ -2140,7 +2138,7 @@ convert_quotes = function (datasource, datadestination, ticker, extension = "txt
       qdata$TIME = newtime
       rm(oldtime, newtime)
       test = paste(as.vector(qdata$DATE), as.vector(qdata$TIME))
-      tdobject = as.POSIXct(test, format=format, tz="GMT")                       
+      tdobject = as.POSIXct(test, format=format)                       
       qdata = xts(qdata, order.by = tdobject)
       qdata = qdata[, c("SYMBOL", "EX", "BID", "BIDSIZ", 
                         "OFR", "OFRSIZ", "MODE")]
@@ -2175,7 +2173,7 @@ makeXtsTrades = function(tdata,format=format){
   newtime = apply(oldtime, 1, adjtime);
   tdata$TIME = newtime;
   rm(oldtime, newtime);
-  tdobject = as.POSIXct(paste(as.vector(tdata$DATE), as.vector(tdata$TIME)), format=format, tz="GMT")       
+  tdobject = as.POSIXct(paste(as.vector(tdata$DATE), as.vector(tdata$TIME)), format=format)       
   tdata  = xts(tdata, order.by = tdobject);
   tdata  = tdata[, c("SYMBOL", "EX", "PRICE", "SIZE","COND", "CORR", "G127")];
   rm(tdobject)
@@ -2197,7 +2195,7 @@ makeXtsQuotes = function( qdata, format = format){
   qdata$TIME = newtime;
   rm(oldtime, newtime);
   test = paste(as.vector(qdata$DATE), as.vector(qdata$TIME))
-  tdobject = as.POSIXct(test, format=format, tz="GMT")
+  tdobject = as.POSIXct(test, format=format)
   qdata = xts(qdata, order.by = tdobject)
   qdata = qdata[, c("SYMBOL", "EX", "BID", "BIDSIZ","OFR", "OFRSIZ", "MODE")];
   rm(tdobject);
@@ -3380,11 +3378,11 @@ exchangeHoursOnly = function(data, daybegin = "09:30:00",dayend="16:00:00")
   gettime = function(z){unlist(strsplit(as.character(z)," "))[2]};
   times1 = as.matrix(as.vector(as.character(index(data))));
   times = apply(times1,1,gettime); 
-  tdtimes = as.POSIXct(times,format = "%H:%M:%S",tz = "GMT");
+  tdtimes = as.POSIXct(times,format = "%H:%M:%S");
   
   #create timeDate begin and end
-  tddaybegin = as.POSIXct( daybegin,format = "%H:%M:%S", tz="GMT");
-  tddayend =   as.POSIXct( dayend,format = "%H:%M:%S",   tz="GMT");
+  tddaybegin = as.POSIXct( daybegin,format = "%H:%M:%S");
+  tddayend =   as.POSIXct( dayend,format = "%H:%M:%S");
   
   #select correct observations
   filteredts = data[tdtimes>=tddaybegin & tdtimes<=tddayend];
@@ -3786,24 +3784,24 @@ aggregatets = function (ts, FUN = "previoustick", on = "minutes", k = 1, weights
         secs = k
       }
       a = .index(ts2) + (secs - .index(ts2)%%secs)
-      ts3 = .xts(ts2, a,tzone="GMT")
+      ts3 = .xts(ts2, a)
     }
     if (on == "hours") {
       secs = 3600
       a = .index(ts2) + (secs - .index(ts2)%%secs)
-      ts3 = .xts(ts2, a,tzone="GMT")
+      ts3 = .xts(ts2, a)
     }
     if (on == "days") {
       secs = 24 * 3600
       a = .index(ts2) + (secs - .index(ts2)%%secs) - (24 * 
         3600)
-      ts3 = .xts(ts2, a,tzone="GMT")
+      ts3 = .xts(ts2, a)
     }
     if (on == "weeks") {
       secs = 24 * 3600 * 7
       a = (.index(ts2) + (secs - (.index(ts2) + (3L * 86400L))%%secs)) - 
         (24 * 3600)
-      ts3 = .xts(ts2, a,tzone="GMT")
+      ts3 = .xts(ts2, a)
     }
     
     if (!dropna) {
@@ -3837,10 +3835,10 @@ aggregatets = function (ts, FUN = "previoustick", on = "minutes", k = 1, weights
     FUN = match.fun(FUN);
     
     g = base:::seq(start(ts), end(ts), by = tby);
-    rawg = as.numeric(as.POSIXct(g,tz="GMT"));
+    rawg = as.numeric(as.POSIXct(g));
     newg = rawg + (secs - rawg%%secs);
-    g    = as.POSIXct(newg,origin="1970-01-01",tz="GMT");
-    ts3  = na.locf(merge(ts, zoo(, g)))[as.POSIXct(g,tz="GMT")]; 
+    g    = as.POSIXct(newg,origin="1970-01-01");
+    ts3  = na.locf(merge(ts, zoo(, g)))[as.POSIXct(g)]; 
     return(ts3) 
   }
 }
@@ -3853,12 +3851,12 @@ aggregatePrice = function (ts, FUN = "previoustick", on = "minutes", k = 1,marke
   date = strsplit(as.character(index(ts)), " ")[[1]][1]
   
   #open
-  a = as.POSIXct(paste(date, marketopen),tz="GMT")
+  a = as.POSIXct(paste(date, marketopen))
   b = as.xts(matrix(as.numeric(ts[1]),nrow=1), a)
   ts3 = c(b, ts2)
   
   #close
-  aa = as.POSIXct(paste(date, marketclose),tz="GMT")
+  aa = as.POSIXct(paste(date, marketclose))
   condition = index(ts3) < aa
   ts3 = ts3[condition]
   bb = as.xts(matrix(as.numeric(last(ts)),nrow=1), aa)
@@ -3876,12 +3874,12 @@ agg_volume= function(ts, FUN = "sumN", on = "minutes", k = 5, includeopen = FALS
   if (includeopen) {
     ts2 = aggregatets(ts, FUN = FUN, on, k)
     date = strsplit(as.character(index(ts)), " ")[[1]][1]
-    a = as.POSIXct(paste(date, marketopen),tz="GMT")
+    a = as.POSIXct(paste(date, marketopen))
     b = as.xts(matrix(as.numeric(ts[1]),nrow=1), a)
     ts3 = c(b, ts2)
   }
   
-  aa = as.POSIXct(paste(date, marketclose),tz="GMT")
+  aa = as.POSIXct(paste(date, marketclose) )
   condition = index(ts3) < aa
   ts4 = ts3[condition]
   
@@ -4024,8 +4022,8 @@ heavyModel = function(data, p=matrix( c(0,0,1,1),ncol=2 ), q=matrix( c(1,0,0,1),
   
   # Add the timestamps and make xts: condvar and likelihoods:
   if( ! is.null(rownames(data)) ){
-    xx$condvar    = xts( t(xx$condvar),  order.by   = as.POSIXct( rownames(data),tz="GMT") );     
-    xx$likelihoods = xts( xx$likelihoods, order.by = as.POSIXct( rownames(data),tz="GMT"));
+    xx$condvar    = xts( t(xx$condvar),  order.by   = as.POSIXct( rownames(data) ) );     
+    xx$likelihoods = xts( xx$likelihoods, order.by = as.POSIXct( rownames(data) ) );
   }
   
   # 
