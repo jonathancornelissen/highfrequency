@@ -17,6 +17,7 @@
     } 
 } 
 
+
 RV = function(rdata,...){
     if(hasArg(data)){ rdata = data }
     returns=as.numeric(rdata);
