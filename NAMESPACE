@@ -54,6 +54,6 @@ previoustick,
 heavyModel
 )#end exported function
 
-S3method(print, harModel);
-S3method(summary, harModel);
-S3method(plot, harModel);
+S3method(print, harModel); 
+S3method(summary, harModel); 
+S3method(plot, harModel); 

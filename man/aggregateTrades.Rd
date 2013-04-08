@@ -50,8 +50,8 @@ An xts object containing the aggregated trade data.
 \keyword{data manipulation}
 
 \examples{
-data("sample_tdata");
+#data("sample_tdata");
 #aggregate trade data to 5 minute frequency
-x = aggregateTrades(sample_tdata,on="minutes",k=5)
-head(x);
+#x = aggregateTrades(sample_tdata,on="minutes",k=5)
+#head(x);
 }

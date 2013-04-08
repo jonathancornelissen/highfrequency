@@ -2393,6 +2393,7 @@ spotVol =  function(pdata, dailyvol = "bipower", periodicvol = "TML", on = "minu
                     marketclose = "16:00:00") 
 {
   require(chron);
+  require(timeDate);
   dates = unique(format(time(pdata), "%Y-%m-%d"))
   cDays = length(dates)
   rdata = mR = c()

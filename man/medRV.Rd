@@ -57,10 +57,10 @@ Journal of Econometrics 159 (2), 276-288.
 
 \author{ Jonathan Cornelissen and Kris Boudt}
 \examples{
- data(sample_tdata);  
- medrv = medRV( rdata = sample_tdata$PRICE, align.by ="minutes", 
-            align.period =5, makeReturns=TRUE); 
- medrv 
+# data(sample_tdata);  
+# medrv = medRV( rdata = sample_tdata$PRICE, align.by ="minutes", 
+#            align.period =5, makeReturns=TRUE); 
+# medrv 
 }
 
 \keyword{volatility}
