@@ -1941,7 +1941,6 @@ aggY = function(RM1,h,maxp){
     return(y);
 }
 
-
 ######################################################################### 
 # Print method for harmodel:  
 print.harModel = function(x, digits = max(3, getOption("digits") - 3), ...){ 
@@ -2672,7 +2671,7 @@ center = function()
  ###### end SPOTVOL FUNCTIONS formerly in periodicityTAQ #########
 
  ###### Liquidity functions formerly in in RTAQ  ######
-.check_data = function(data){ 
+.check_data = function(data){  
   # FUNCTION sets column names according to RTAQ format using quantmod conventions, such that all the other functions find the correct information.
   require('quantmod');
   # First step: assign the xts attributes:
@@ -2696,7 +2695,6 @@ center = function()
   if(any(colnames(data) == "CR")){
     colnames(data)[colnames(data) == "CR"] = "CORR"
   }
-  
   return(data)
 } 
 
@@ -4056,14 +4054,14 @@ transformparams = function( p, q, paramsvector ){
   
   for(i in 1:pmax){    # A will contain a list-item per innovation lag
     end =          start + sum(p>=i) - 1; # How many non-zero params in this loop?
-    A[[i]] =       matrix(rep(0,K^2),ncol=2); 
+    A[[i]] =       matrix(rep(0,K^2),ncol=K); 
     A[[i]][p>=i] = paramsvector[start:end];
     start  = end + 1;   
   }#end loop over number of lags for innovations
   
   for(i in 1:qmax){   # B will contain a list-item per cond var lag
     end   = start + sum(q>=i) -1; # How many non-zero params in this loop?
-    B[[i]] = matrix(rep(0,K^2),ncol=2); 
+    B[[i]] = matrix(rep(0,K^2),ncol=K); 
     B[[i]][q >= i] = paramsvector[start:end];
     start  = end + 1;   
   }#End loop over number of lags for cond variances
