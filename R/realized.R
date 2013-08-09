@@ -3979,8 +3979,8 @@ heavyModel = function(data, p=matrix( c(0,0,1,1),ncol=2 ), q=matrix( c(1,0,0,1),
     start = K+1; end = K+sum(p);
     startingvalues[start:end] = 0.3;
     start = end+1; end = start+sum(q)-1;
-    startingvalues[start:end] = 0.6;}
-  
+    startingvalues[start:end] = 0.6;
+  }  
   # Rescale? (useful to avoid numerical problems: TODO LATER)
   
   # Set backcast if necessary: how to initialize the model?
@@ -3995,29 +3995,19 @@ heavyModel = function(data, p=matrix( c(0,0,1,1),ncol=2 ), q=matrix( c(1,0,0,1),
   ui   = diag(rep(1,KKK)); #All parameters should be larger than zero, add extra constraints with rbind...  
   ci   = rep(0,dim(ui)[2]);  
   
-  x = try(optim( par = startingvalues, fn = heavy_likelihood,
-                 data=data, p=p, q=q,backcast=backcast,UB=UB,LB=LB, lower=LB,upper=UB, compconst = compconst ) ); # ADJUST maxit ?!!
-  
-  #x = try(constrOptim( theta = startingvalues, f = heavy_likelihood, 
-  #                     grad = NULL,
-  #                     ui = ui, 
-  #                     ci = ci, 
-  #                     data=data, p=p, q=q,backcast=backcast,UB=UB,LB=LB, compconst = compconst));
+  x = try(optim( par = startingvalues, fn = heavy_likelihood_c,
+                 data=data, p=p, q=q,backcast=backcast,UB=UB,LB=LB, foroptim=TRUE, compconst = compconst ) ); # ADJUST maxit ?!!
   
   if( class(x) == "try-error" ){
-    print("Error in likelihood optimization")
-    print(x)
-  }else{
-    if(x$convergence != 0){
-      print("Possible problem in likelihood optimization. Check convergence")   }
+    stop("Error in likelihood optimization")
   }
   
   # Get the output: 
-  estparams = x$par; 
+  estparams     = x$par; 
   loglikelihood = x$value; 
   
   # Get the list with: total-log-lik, daily-log-lik, condvars
-  xx = heavy_likelihood(par = estparams, data=data, p=p, q=q, backcast=backcast, LB=LB, UB=UB, foroptim=FALSE, compconst = compconst);
+  xx = heavy_likelihood_c(par = estparams, data=data, p=p, q=q, backcast=backcast, LB=LB, UB=UB, foroptim=FALSE, compconst = compconst);
   
   # Add the timestamps and make xts: condvar and likelihoods:
   if( ! is.null(rownames(data)) ){
@@ -4069,106 +4059,48 @@ transformparams = function( p, q, paramsvector ){
   return( list(O,A,B) ) 
 }  
 
-heavy_likelihood = function( par, data, p, q, backcast, LB, UB, foroptim=TRUE, compconst=FALSE ){ 
+heavy_likelihood_c = function( par, data, p, q, backcast, LB, UB, foroptim=TRUE, compconst=FALSE ){
+  
   # Get the required variables
   # p is Max number of lags for innovations 
   # q is Max number of lags for conditional variances
-  K    = dim(data)[2];  #Number of series to model
-  T    = dim(data)[1];  #Number of time periods
-  lls  = rep(NA,T);     #Vector containing the likelihoods
-  h    = matrix(nrow=K,ncol=T); #Matrix to containing conditional variances
-  maxp = max(p); maxq=max(q);
+  K     = dim(data)[2];  #Number of series to model
+  TT     = dim(data)[1];  #Number of time periods
+  means = colMeans(data); #Means per day for different vol measures
+  lls   = rep(NA,T);     #Vector containing the likelihoods
+  h     = matrix(nrow=K,ncol=T); #Matrix to containing conditional variances
+  maxp  = max(p); maxq=max(q);
+  if(any(UB == Inf)){ UB[UB==Inf] = 10^6 }
   
-  # Get the parameters:
-  x = transformparams( par, p=p, q=q );
-  if( compconst ){ O = x[[1]]; } 
-  A = x[[2]]; B = x[[3]]; 
-  # Compute constant in case it needn't to be optimized:
-  if( !compconst ){ # Don't compute the omega's but do (1-alpha-beta)*unconditional
-    totalA = totalB = matrix( rep(0,K) ,ncol=1,nrow=K);
-    for(j in 1:length(A) ){ totalA = totalA + t(t(rowSums(A[[j]]))); } # Sum over alphas for all models
-    for(j in 1:length(B) ){ totalB = totalB + t(t(rowSums(B[[j]]))); } # Sum over betas for all models
-    O = 1 - totalA - totalB; # The remaing weight after substracting A & B
-    # Calculate the unconditionals ### KRIS FEEDBACK PLEASE ###
-    uncond = t(t(colMeans(data)));
-    O = O*uncond;
-  } #End if close for not optimizing over omega  
+  likelihoodC = .C("heavy_likelihoodR", 
+                   parameters = as.double(par), 
+                   data = as.double(data), 
+                   TT = as.integer(TT), 
+                   K = as.integer(K), 
+                   means = as.double(means),
+                   p = as.integer(p),
+                   q = as.integer(q),
+                   pMax = as.integer(maxp),
+                   qMax = as.integer(maxq),
+                   backcast = as.double(backcast),
+                   LB = as.double(LB), 
+                   UB = as.double(UB), 
+                   compconst = as.integer(compconst),
+                   h = as.double(matrix(rep(0,K*TT),nrow=K,ncol=TT)),
+                   lls = as.double( rep(0, TT) ),
+                   llRM = as.double( rep(0,K ) ),
+                   ll = as.double(0),
+                   PACKAGE="highfrequency"); 
   
-  if( sum(O) < 0 ){ O[O<0] = 10^(-10)} #params here are shouldn't be smaller than zero
-  
-  likConst = K*log(2*pi); #constant for loglikelihood
-  
-  for(t in 1:T){ # Start loop over time periods
-    h[,t] = O;    #Add constant to h
-    
-    for(j in 1:maxp){# Loop over innovation lags
-      if( (t-j) > 0 ){ 
-        h[,t] = h[,t] + t( A[[j]] %*% t(t(data[(t-j),])) ); #Adding innovations to h        
-      }else{ 
-        h[,t] = h[,t] + t( A[[j]] %*% backcast ); #Adding innovations to h          
-      }
-    } #end loop over innovation lags
-    
-    for(j in 1:maxp){# Loop over cond variances lags
-      if( (t-j) > 0 ){ 
-        h[,t] = h[,t] + t( B[[j]] %*% t(t(h[,(t-j)])) ); #Adding cond vars to h 
-      }else{ 
-        h[,t] = h[,t] + t( B[[j]] %*% backcast ); #Adding cond vars to h          
-      }
-    }#End loop over innovation lags
-    
-    if( any( h[,t]>1e3 )){ break ;}
-    # Check whether h's are between LB and UB:      
-    for(j in 1:K){ #Loop over 
-      if( h[j,t] < LB[j] ){  h[j,t] = LB[j]/(1- (h[j,t] - LB[j]) );}
-      if( h[j,t] > UB[j] ){  h[j,t] = UB[j] + log( h[j,t] - UB[j]);}
-    }#end loop over series
-    
-    lls[t] = 0.5*( likConst + sum( log(h[,t]) ) + sum( data[t,] / h[,t] ) );            
-  } #End loop over days
-  ll = sum(lls);
-  
-  if(is.na(ll) || is.infinite(ll) ){  ll = 10^7 } 
-  
-  if(foroptim){   output = ll; return(output); }
+  if(foroptim){   output = likelihoodC$ll; return(output); }
   if(!foroptim){
-    output = list( loglikelihood=ll, likelihoods=lls, condvar = h );
+    output = list( loglikelihood=likelihoodC$ll, 
+                   likelihoods=likelihoodC$lls, 
+                   condvar = matrix(likelihoodC$h,byrow=TRUE,nrow=K) );
     return(output)
     # Output list:
     # (i) total loglikelihood
     # (ii) likelihood parts per time period
     # (iii) matrix with conditional variances    
-  } #end output in case you want params
-}
-
-heavy_likelyhood_c = function( par, data, p, q, backcast, LB, UB, foroptim=TRUE, compconst=FALSE ){
-  # Get the required variables
-  # p is Max number of lags for innovations 
-  # q is Max number of lags for conditional variances
-  K     = dim(data)[2];  #Number of series to model
-  T     = dim(data)[1];  #Number of time periods
-  means = colMeans(data); #Means per day for different vol measures
-  lls   = rep(NA,T);     #Vector containing the likelihoods
-  h     = matrix(nrow=K,ncol=T); #Matrix to containing conditional variances
-  maxp  = max(p); maxq=max(q);
-  
-  test = .C("heavy_likelihoodR", 
-     parameters = as.double(par), 
-     data=as.double(data), 
-     T = as.integer(T), 
-     K = as.integer(K), 
-     means = as.double(means),
-     p = as.integer(p),
-     q = as.integer(q),
-     maxp = as.integer(maxp),
-     maxq = as.integer(maxq),
-     backcast = as.double(backcast),
-     LB = as.double(LB), 
-     UB = as.double(UB), 
-     compconst = as.integer(compconst),
-     h = as.double(0),
-     lls = as.double(0),
-     ll = as.double(0),
-     PACKAGE="highfrequency")  
-  
+  } #end output in case you want params    
 }

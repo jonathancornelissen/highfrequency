@@ -1,0 +1,6 @@
+load("/Users/jonathancornelissen/Dropbox/highfrequency/data/sample_tdata.Rdata")
+ls
+ls()
+library("xts")
+data("sample_tdata")
+head(sample_tdata)
