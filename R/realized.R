@@ -4140,3 +4140,35 @@ heavy_likelihood = function( par, data, p, q, backcast, LB, UB, foroptim=TRUE, c
     # (iii) matrix with conditional variances    
   } #end output in case you want params
 }
+
+heavy_likelyhood_c = function( par, data, p, q, backcast, LB, UB, foroptim=TRUE, compconst=FALSE ){
+  # Get the required variables
+  # p is Max number of lags for innovations 
+  # q is Max number of lags for conditional variances
+  K     = dim(data)[2];  #Number of series to model
+  T     = dim(data)[1];  #Number of time periods
+  means = colMeans(data); #Means per day for different vol measures
+  lls   = rep(NA,T);     #Vector containing the likelihoods
+  h     = matrix(nrow=K,ncol=T); #Matrix to containing conditional variances
+  maxp  = max(p); maxq=max(q);
+  
+  test = .C("heavy_likelihoodR", 
+     parameters = as.double(par), 
+     data=as.double(data), 
+     T = as.integer(T), 
+     K = as.integer(K), 
+     means = as.double(means),
+     p = as.integer(p),
+     q = as.integer(q),
+     maxp = as.integer(maxp),
+     maxq = as.integer(maxq),
+     backcast = as.double(backcast),
+     LB = as.double(LB), 
+     UB = as.double(UB), 
+     compconst = as.integer(compconst),
+     h = as.double(0),
+     lls = as.double(0),
+     ll = as.double(0),
+     PACKAGE="highfrequency")  
+  
+}

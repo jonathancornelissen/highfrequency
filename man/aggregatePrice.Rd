@@ -45,8 +45,8 @@ An xts object containing the aggregated time series.
 \author{ Jonathan Cornelissen and Kris Boudt}
 \keyword{data manipulation}
 
-\examples{
-#load data
+\examples{ 
+#load data 
 data("sample_tdata");
 #aggregate price data to the 30 second frequency
 head(sample_tdata$PRICE)
