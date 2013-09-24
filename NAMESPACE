@@ -51,7 +51,22 @@ aggregateQuotes,
 aggregateTrades,
 aggregatets,
 previoustick,
-heavyModel
+heavyModel, 
+       AJjumptest,
+       BNSjumptest,
+       ivInference,
+       JOjumptest,
+       medRQ,
+       minRQ,
+       MRC,
+       rBeta,
+       rKurt,
+       rMPV,
+       rQPVar,
+       rQuar,
+       rSkew,
+       rSV,
+       rTPVar
 )#end exported function
 
 S3method(print, harModel); 
