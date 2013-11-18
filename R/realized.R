@@ -1,6 +1,6 @@
 # This file contains all realized measures previously implemented in RTAQ and realized
 ######################################################## 
-## Help functions: (not exported) 
+## Help functions: (not exported)
 ######################################################## 
 .multixts <- function( x, y=NULL)
 { 
@@ -16,7 +16,6 @@
         } 
     } 
 } 
-
 
 RV = function(rdata,...){
     if(hasArg(data)){ rdata = data }
@@ -968,10 +967,10 @@ makePsd = function(S,method="covariance"){
         tby = paste(3600 * k, "sec", sep = " ");
     } 
     g = base:::seq(start(ts), end(ts), by = tby);
-    rawg = as.numeric(as.POSIXct(g));
+    rawg = as.numeric(as.POSIXct(g, tz = "GMT"));
     newg = rawg + (secs - rawg%%secs);
-    g    = as.POSIXct(newg, origin = "1970-01-01");
-    ts3 = na.locf(merge(ts, zoo(, g)))[as.POSIXct(g)];
+    g    = as.POSIXct(newg, origin = "1970-01-01",tz = "GMT");
+    ts3 = na.locf(merge(ts, zoo(, g)))[as.POSIXct(g, tz = "GMT")];
     return(ts3)
 } #Very fast and elegant way to do previous tick aggregation :D!
 
@@ -998,7 +997,8 @@ refreshTime = function (pdata)
     lengths = cumsum(lengths)
     alltimes = rep(0, lengths[dim + 1])
     for (i in 1:dim) {
-        alltimes[(lengths[i] + 1):lengths[i + 1]] = as.numeric(as.POSIXct(index(pdata[[i]])))
+        alltimes[(lengths[i] + 1):lengths[i + 1]] = as.numeric(as.POSIXct(index(pdata[[i]]), 
+        tz = "GMT"))
     }
     x = .C("refreshpoints", as.integer(alltimes), as.integer(lengths), 
     as.integer(rep(0, minl)), as.integer(dim), as.integer(0), 
@@ -1009,7 +1009,8 @@ refreshTime = function (pdata)
         selection = x[[6]][((i - 1) * minl + 1):(i * minl)]
         pmatrix[, i] = pdata[[i]][selection[1:newlength]]
     }
-    time = as.POSIXct(x[[3]][1:newlength], origin = "1970-01-01")
+    time = as.POSIXct(x[[3]][1:newlength], origin = "1970-01-01", 
+    tz = "GMT")
     resmatrix = xts(pmatrix, order.by = time)
     return(resmatrix)
 }
@@ -1941,6 +1942,7 @@ aggY = function(RM1,h,maxp){
     return(y);
 }
 
+
 ######################################################################### 
 # Print method for harmodel:  
 print.harModel = function(x, digits = max(3, getOption("digits") - 3), ...){ 
@@ -2082,7 +2084,7 @@ convert_trades = function (datasource, datadestination, ticker, extension = "txt
       newtime = apply(oldtime, 1, adjtime)
       tdata$TIME = newtime
       rm(oldtime, newtime); 
-      tdobject = as.POSIXct(paste(as.vector(tdata$DATE), as.vector(tdata$TIME)), format=format)       
+      tdobject = as.POSIXct(paste(as.vector(tdata$DATE), as.vector(tdata$TIME)), format=format, tz="GMT")       
       tdata = xts(tdata, order.by = tdobject)
       tdata = tdata[, c("SYMBOL", "EX", "PRICE", "SIZE", 
                         "COND", "CORR", "G127")]
@@ -2137,7 +2139,7 @@ convert_quotes = function (datasource, datadestination, ticker, extension = "txt
       qdata$TIME = newtime
       rm(oldtime, newtime)
       test = paste(as.vector(qdata$DATE), as.vector(qdata$TIME))
-      tdobject = as.POSIXct(test, format=format)                       
+      tdobject = as.POSIXct(test, format=format, tz="GMT")                       
       qdata = xts(qdata, order.by = tdobject)
       qdata = qdata[, c("SYMBOL", "EX", "BID", "BIDSIZ", 
                         "OFR", "OFRSIZ", "MODE")]
@@ -2172,7 +2174,7 @@ makeXtsTrades = function(tdata,format=format){
   newtime = apply(oldtime, 1, adjtime);
   tdata$TIME = newtime;
   rm(oldtime, newtime);
-  tdobject = as.POSIXct(paste(as.vector(tdata$DATE), as.vector(tdata$TIME)), format=format)       
+  tdobject = as.POSIXct(paste(as.vector(tdata$DATE), as.vector(tdata$TIME)), format=format, tz="GMT")       
   tdata  = xts(tdata, order.by = tdobject);
   tdata  = tdata[, c("SYMBOL", "EX", "PRICE", "SIZE","COND", "CORR", "G127")];
   rm(tdobject)
@@ -2194,7 +2196,7 @@ makeXtsQuotes = function( qdata, format = format){
   qdata$TIME = newtime;
   rm(oldtime, newtime);
   test = paste(as.vector(qdata$DATE), as.vector(qdata$TIME))
-  tdobject = as.POSIXct(test, format=format)
+  tdobject = as.POSIXct(test, format=format, tz="GMT")
   qdata = xts(qdata, order.by = tdobject)
   qdata = qdata[, c("SYMBOL", "EX", "BID", "BIDSIZ","OFR", "OFRSIZ", "MODE")];
   rm(tdobject);
@@ -2212,7 +2214,7 @@ convert = function(from, to, datasource, datadestination, trades = TRUE,
   if( onefile == FALSE ){
     
     # Create trading dates:
-    dates = timeSequence(from, to, format = "%Y-%m-%d")
+    dates = timeSequence(from, to, format = "%Y-%m-%d", FinCenter = "GMT")
     dates = dates[isBizday(dates, holidays = holidayNYSE(1950:2030))];
     
     # Create folder structure for saving:
@@ -2316,7 +2318,7 @@ TAQLoad = function(tickers,from,to,trades=TRUE,quotes=FALSE,datasource=NULL,vari
 uniTAQload = function(ticker,from,to,trades=TRUE,quotes=FALSE,datasource=NULL,variables=NULL){
   ##Function to load the taq data from a certain stock 
   #From&to (both included) should be in the format "%Y-%m-%d" e.g."2008-11-30"
-  dates = timeSequence(as.character(from),as.character(to), format = "%Y-%m-%d")
+  dates = timeSequence(as.character(from),as.character(to), format = "%Y-%m-%d", FinCenter = "GMT")
   dates = dates[isBizday(dates, holidays = holidayNYSE(1960:2040))];
   
   if(trades){ tdata=NULL;
@@ -2326,8 +2328,8 @@ uniTAQload = function(ticker,from,to,trades=TRUE,quotes=FALSE,datasource=NULL,va
                 
                 ifmissingname = paste(datasourcex,"/missing_",ticker,".RData",sep="");  
                 
-                if(file.exists(ifmissingname)){stop(paste("No trades available on ",dates[i],sep=""))}
-                if(!file.exists(filename)){stop(paste("The file ",filename," does not exist. Please read the documentation.",sep=""))}
+                if(file.exists(ifmissingname)){warning(paste("No trades available on ",dates[i],sep="")); next;}
+                if(!file.exists(filename)){warning(paste("The file ",filename," does not exist. Please read the documentation.",sep="")); next;}
                 if(file.exists(ifmissingname)==FALSE){
                   load(filename);
                   if(i==1)	{
@@ -2355,8 +2357,8 @@ uniTAQload = function(ticker,from,to,trades=TRUE,quotes=FALSE,datasource=NULL,va
                 filename = paste(datasourcex,"/",ticker,"_quotes.RData",sep="");
                 ifmissingname = paste(datasourcex,"/missingquotes_",ticker,".RData",sep="");
                 
-                if(file.exists(ifmissingname)){stop(paste("no quotes available on ",dates[i],sep=""))}
-                if(!file.exists(filename)){stop(paste("The file ",filename," does not exist. Please read the documentation.",sep=""))}
+                if(file.exists(ifmissingname)){warning(paste("no quotes available on ",dates[i],sep="")); next;}
+                if(!file.exists(filename)){warning(paste("The file ",filename," does not exist. Please read the documentation.",sep="")); next;}
                 if(file.exists(ifmissingname)==FALSE){
                   load(filename);
                   
@@ -2392,7 +2394,6 @@ spotVol =  function(pdata, dailyvol = "bipower", periodicvol = "TML", on = "minu
                     marketclose = "16:00:00") 
 {
   require(chron);
-  require(timeDate);
   dates = unique(format(time(pdata), "%Y-%m-%d"))
   cDays = length(dates)
   rdata = mR = c()
@@ -2671,7 +2672,7 @@ center = function()
  ###### end SPOTVOL FUNCTIONS formerly in periodicityTAQ #########
 
  ###### Liquidity functions formerly in in RTAQ  ######
-.check_data = function(data){  
+.check_data = function(data){ 
   # FUNCTION sets column names according to RTAQ format using quantmod conventions, such that all the other functions find the correct information.
   require('quantmod');
   # First step: assign the xts attributes:
@@ -2695,6 +2696,7 @@ center = function()
   if(any(colnames(data) == "CR")){
     colnames(data)[colnames(data) == "CR"] = "CORR"
   }
+  
   return(data)
 } 
 
@@ -3139,8 +3141,8 @@ tradesCleanup = function(from,to,datasource,datadestination,ticker,exchanges,tda
   
   nresult = rep(0,5);
   if(is.null(tdataraw)){
-    dates = timeSequence(from,to, format = "%Y-%m-%d");
-    dates = dates[isBizday(dates, holidays = holidayNYSE(1960:2040))];
+    dates = timeSequence(from,to, format = "%Y-%m-%d", FinCenter = "GMT");
+    dates = dates[isBizday(dates, holidays = holidayNYSE(2004:2010))];
     
     for(j in 1:length(dates)){
       datasourcex = paste(datasource,"/",dates[j],sep="");
@@ -3209,8 +3211,8 @@ tradesCleanup = function(from,to,datasource,datadestination,ticker,exchanges,tda
 quotesCleanup = function(from,to,datasource,datadestination,ticker,exchanges, qdataraw=NULL,report=TRUE,selection="median",maxi=50,window=50,type="advanced",rmoutliersmaxi=10,...){
   nresult = rep(0,7);
   if(is.null(qdataraw)){
-    dates = timeSequence(from,to, format = "%Y-%m-%d");
-    dates = dates[isBizday(dates, holidays = holidayNYSE(1960:2040))];
+    dates = timeSequence(from,to, format = "%Y-%m-%d", FinCenter = "GMT");
+    dates = dates[isBizday(dates, holidays = holidayNYSE(2004:2010))];
     
     for(j in 1:length(dates)){
       datasourcex = paste(datasource,"/",dates[j],sep="");
@@ -3282,8 +3284,8 @@ quotesCleanup = function(from,to,datasource,datadestination,ticker,exchanges, qd
 
 tradesCleanupFinal = function(from,to,datasource,datadestination,ticker,tdata=NULL,qdata=NULL,...){
   if(is.null(tdata)&is.null(qdata)){
-    dates = timeSequence(from,to, format = "%Y-%m-%d");
-    dates = dates[isBizday(dates, holidays = holidayNYSE(1960:2040))];
+    dates = timeSequence(from,to, format = "%Y-%m-%d", FinCenter = "GMT");
+    dates = dates[isBizday(dates, holidays = holidayNYSE(2004:2010))];
     
     for(j in 1:length(dates)){
       datasourcex = paste(datasource,"/",dates[j],sep="");
@@ -3377,11 +3379,11 @@ exchangeHoursOnly = function(data, daybegin = "09:30:00",dayend="16:00:00")
   gettime = function(z){unlist(strsplit(as.character(z)," "))[2]};
   times1 = as.matrix(as.vector(as.character(index(data))));
   times = apply(times1,1,gettime); 
-  tdtimes = as.POSIXct(times,format = "%H:%M:%S");
+  tdtimes = as.POSIXct(times,format = "%H:%M:%S",tz = "GMT");
   
   #create timeDate begin and end
-  tddaybegin = as.POSIXct( daybegin,format = "%H:%M:%S");
-  tddayend =   as.POSIXct( dayend,format = "%H:%M:%S");
+  tddaybegin = as.POSIXct( daybegin,format = "%H:%M:%S", tz="GMT");
+  tddayend =   as.POSIXct( dayend,format = "%H:%M:%S",   tz="GMT");
   
   #select correct observations
   filteredts = data[tdtimes>=tddaybegin & tdtimes<=tddayend];
@@ -3625,10 +3627,10 @@ rmLargeSpread = function(qdata,maxi=50){
   return(qdata[condition])
 }
 
-rmOutliers =  function (qdata, maxi = 10, window = 50, type = "advanced")
+rmOutliers = function (qdata, maxi = 10, window = 50, type = "advanced")
 {
-  qdata = .check_data(qdata)
-  qdatacheck(qdata)
+  qdata = .check_data(qdata);
+  qdatacheck(qdata);
   ##function to remove entries for which the mid-quote deviated by more than 10 median absolute deviations 
   ##from a rolling centered median (excluding the observation under consideration) of 50 observations if type = "standard".
   
@@ -3641,31 +3643,31 @@ rmOutliers =  function (qdata, maxi = 10, window = 50, type = "advanced")
   ##3. Rolling median of the previous "window" observations
   
   ##NOTE: Median Absolute deviation chosen contrary to Barndorff-Nielsen et al.
-  
   window = floor(window/2) * 2
-  condition = c()
-  halfwindow = window/2
-  midquote = as.vector(as.numeric(qdata$BID) + as.numeric(qdata$OFR))/2
-  mad_all = mad(midquote)
-  midquote = xts(midquote, order.by = index(qdata))
+  condition = c();
+  halfwindow = window/2;
+  midquote = as.vector(as.numeric(qdata$BID) + as.numeric(qdata$OFR))/2;
+  mad_all = mad(midquote);
+  
+  midquote = xts(midquote,order.by = index(qdata))
+  
   if (mad_all == 0) {
     m = as.vector(as.numeric(midquote))
-    s = c(TRUE, (m[2:length(m)] - m[1:(length(m) - 1)] !=
-                   0))
+    s = c(TRUE, (m[2:length(m)] - m[1:(length(m) - 1)] != 
+      0))
     mad_all = mad(as.numeric(midquote[s]))
   }
+  
   medianw = function(midquote, n = window) {
     m = floor(n/2) + 1
-    q = median(c(midquote[1:(m - 1)], midquote[(m + 1):(n +
-                                                          1)]))
+    q = median(c(midquote[1:(m - 1)], midquote[(m + 1):(n + 
+      1)]))
     return(q)
   }
+  
   if (type == "standard") {
-    meds = as.numeric(rollapply(midquote, width = (window +
-                                                     1), FUN = medianw, align = "center"))
-    #
-    meds = meds[(halfwindow +
-                   1):(n - halfwindow)]
+    meds = as.numeric(rollapply(midquote, width = (window + 
+      1), FUN = medianw, align = "center"))
   }
   if (type == "advanced") {
     advancedperrow = function(qq) {
@@ -3682,32 +3684,28 @@ rmOutliers =  function (qdata, maxi = 10, window = 50, type = "advanced")
     median2 = function(a) {
       median(a)
     }
-    standardmed = as.numeric(rollapply(midquote, width = (window),
+    standardmed = as.numeric(rollapply(midquote, width = (window), 
                                        FUN = median2, align = "center"))
-    # allmatrix[(halfwindow + 1):(n - halfwindow), 1] = as.numeric(rollapply(midquote,
-    #     width = (window + 1), FUN = medianw, align = "center"))
-    # Rolling centered median (excluding the observation under consideration)
-    allmatrix[, 1] = as.numeric(rollapply(midquote,
-                                          width = (window + 1), FUN = medianw, align = "center"))
-    #Rolling median of the following "window" observations
-    #allmatrix[(1:(n - window)), 2] = standardmed[2:length(standardmed)]
-    allmatrix[(1:(n - 1)), 2] = standardmed[2:length(standardmed)]
-    #Rolling median of the previous "window" observations
-    # allmatrix[(window + 1):(n), 3] = standardmed[1:(length(standardmed) -1)]
-    allmatrix[(1 + 1):(n), 3] = standardmed[1:(length(standardmed) -1)]
+    allmatrix[(halfwindow + 1):(n - halfwindow), 1] = as.numeric(rollapply(midquote, 
+                                                                           width = (window + 1), FUN = medianw, align = "center"))
+    allmatrix[(1:(n - window)), 2] = standardmed[2:length(standardmed)]
+    allmatrix[(window + 1):(n), 3] = standardmed[1:(length(standardmed) - 
+      1)]
     allmatrix[, 4] = midquote
-    meds = apply(allmatrix, 1, advancedperrow)[(halfwindow +
-                                                  1):(n - halfwindow)]
+    meds = apply(allmatrix, 1, advancedperrow)[(halfwindow + 
+      1):(n - halfwindow)]
   }
-  midquote = as.numeric(midquote)
+  
+  midquote = as.numeric(midquote);
   maxcriterion = meds + maxi * mad_all
   mincriterion = meds - maxi * mad_all
-  condition = mincriterion < midquote[(halfwindow + 1):(length(midquote) -
-                                                          halfwindow)] & midquote[(halfwindow + 1):(length(midquote) -
-                                                                                                      halfwindow)] < maxcriterion
-  condition = c(rep(TRUE, halfwindow), condition, rep(TRUE, halfwindow))
   
-  qdata[condition]
+  condition = mincriterion < midquote[(halfwindow + 1):(length(midquote) - 
+    halfwindow)] & midquote[(halfwindow + 1):(length(midquote) - 
+    halfwindow)] < maxcriterion
+  condition = c(rep(TRUE, halfwindow), condition, rep(TRUE, 
+                                                      halfwindow))
+  qdata[condition];
 }
 
 # Zivot : 
@@ -3783,24 +3781,24 @@ aggregatets = function (ts, FUN = "previoustick", on = "minutes", k = 1, weights
         secs = k
       }
       a = .index(ts2) + (secs - .index(ts2)%%secs)
-      ts3 = .xts(ts2, a)
+      ts3 = .xts(ts2, a,tzone="GMT")
     }
     if (on == "hours") {
       secs = 3600
       a = .index(ts2) + (secs - .index(ts2)%%secs)
-      ts3 = .xts(ts2, a)
+      ts3 = .xts(ts2, a,tzone="GMT")
     }
     if (on == "days") {
       secs = 24 * 3600
       a = .index(ts2) + (secs - .index(ts2)%%secs) - (24 * 
         3600)
-      ts3 = .xts(ts2, a)
+      ts3 = .xts(ts2, a,tzone="GMT")
     }
     if (on == "weeks") {
       secs = 24 * 3600 * 7
       a = (.index(ts2) + (secs - (.index(ts2) + (3L * 86400L))%%secs)) - 
         (24 * 3600)
-      ts3 = .xts(ts2, a)
+      ts3 = .xts(ts2, a,tzone="GMT")
     }
     
     if (!dropna) {
@@ -3834,10 +3832,10 @@ aggregatets = function (ts, FUN = "previoustick", on = "minutes", k = 1, weights
     FUN = match.fun(FUN);
     
     g = base:::seq(start(ts), end(ts), by = tby);
-    rawg = as.numeric(as.POSIXct(g));
+    rawg = as.numeric(as.POSIXct(g,tz="GMT"));
     newg = rawg + (secs - rawg%%secs);
-    g    = as.POSIXct(newg,origin="1970-01-01");
-    ts3  = na.locf(merge(ts, zoo(, g)))[as.POSIXct(g)]; 
+    g    = as.POSIXct(newg,origin="1970-01-01",tz="GMT");
+    ts3  = na.locf(merge(ts, zoo(, g)))[as.POSIXct(g,tz="GMT")]; 
     return(ts3) 
   }
 }
@@ -3850,12 +3848,12 @@ aggregatePrice = function (ts, FUN = "previoustick", on = "minutes", k = 1,marke
   date = strsplit(as.character(index(ts)), " ")[[1]][1]
   
   #open
-  a = as.POSIXct(paste(date, marketopen))
+  a = as.POSIXct(paste(date, marketopen),tz="GMT")
   b = as.xts(matrix(as.numeric(ts[1]),nrow=1), a)
   ts3 = c(b, ts2)
   
   #close
-  aa = as.POSIXct(paste(date, marketclose))
+  aa = as.POSIXct(paste(date, marketclose),tz="GMT")
   condition = index(ts3) < aa
   ts3 = ts3[condition]
   bb = as.xts(matrix(as.numeric(last(ts)),nrow=1), aa)
@@ -3873,12 +3871,12 @@ agg_volume= function(ts, FUN = "sumN", on = "minutes", k = 5, includeopen = FALS
   if (includeopen) {
     ts2 = aggregatets(ts, FUN = FUN, on, k)
     date = strsplit(as.character(index(ts)), " ")[[1]][1]
-    a = as.POSIXct(paste(date, marketopen))
+    a = as.POSIXct(paste(date, marketopen),tz="GMT")
     b = as.xts(matrix(as.numeric(ts[1]),nrow=1), a)
     ts3 = c(b, ts2)
   }
   
-  aa = as.POSIXct(paste(date, marketclose) )
+  aa = as.POSIXct(paste(date, marketclose),tz="GMT")
   condition = index(ts3) < aa
   ts4 = ts3[condition]
   
@@ -3979,8 +3977,8 @@ heavyModel = function(data, p=matrix( c(0,0,1,1),ncol=2 ), q=matrix( c(1,0,0,1),
     start = K+1; end = K+sum(p);
     startingvalues[start:end] = 0.3;
     start = end+1; end = start+sum(q)-1;
-    startingvalues[start:end] = 0.6;
-  }  
+    startingvalues[start:end] = 0.6;}
+  
   # Rescale? (useful to avoid numerical problems: TODO LATER)
   
   # Set backcast if necessary: how to initialize the model?
@@ -3995,24 +3993,34 @@ heavyModel = function(data, p=matrix( c(0,0,1,1),ncol=2 ), q=matrix( c(1,0,0,1),
   ui   = diag(rep(1,KKK)); #All parameters should be larger than zero, add extra constraints with rbind...  
   ci   = rep(0,dim(ui)[2]);  
   
-  x = try(optim( par = startingvalues, fn = heavy_likelihood_c,
-                 data=data, p=p, q=q,backcast=backcast,UB=UB,LB=LB, foroptim=TRUE, compconst = compconst ) ); # ADJUST maxit ?!!
+  x = try(optim( par = startingvalues, fn = heavy_likelihood,
+                 data=data, p=p, q=q,backcast=backcast,UB=UB,LB=LB, lower=LB,upper=UB, compconst = compconst ) ); # ADJUST maxit ?!!
+  
+  #x = try(constrOptim( theta = startingvalues, f = heavy_likelihood, 
+  #                     grad = NULL,
+  #                     ui = ui, 
+  #                     ci = ci, 
+  #                     data=data, p=p, q=q,backcast=backcast,UB=UB,LB=LB, compconst = compconst));
   
   if( class(x) == "try-error" ){
-    stop("Error in likelihood optimization")
+    print("Error in likelihood optimization")
+    print(x)
+  }else{
+    if(x$convergence != 0){
+      print("Possible problem in likelihood optimization. Check convergence")   }
   }
   
   # Get the output: 
-  estparams     = x$par; 
+  estparams = x$par; 
   loglikelihood = x$value; 
   
   # Get the list with: total-log-lik, daily-log-lik, condvars
-  xx = heavy_likelihood_c(par = estparams, data=data, p=p, q=q, backcast=backcast, LB=LB, UB=UB, foroptim=FALSE, compconst = compconst);
+  xx = heavy_likelihood(par = estparams, data=data, p=p, q=q, backcast=backcast, LB=LB, UB=UB, foroptim=FALSE, compconst = compconst);
   
   # Add the timestamps and make xts: condvar and likelihoods:
   if( ! is.null(rownames(data)) ){
-    xx$condvar    = xts( t(xx$condvar),  order.by   = as.POSIXct( rownames(data) ) );     
-    xx$likelihoods = xts( xx$likelihoods, order.by = as.POSIXct( rownames(data) ) );
+    xx$condvar    = xts( t(xx$condvar),  order.by   = as.POSIXct( rownames(data),tz="GMT") );     
+    xx$likelihoods = xts( xx$likelihoods, order.by = as.POSIXct( rownames(data),tz="GMT"));
   }
   
   # 
@@ -4059,48 +4067,74 @@ transformparams = function( p, q, paramsvector ){
   return( list(O,A,B) ) 
 }  
 
-heavy_likelihood_c = function( par, data, p, q, backcast, LB, UB, foroptim=TRUE, compconst=FALSE ){
-  
+heavy_likelihood = function( par, data, p, q, backcast, LB, UB, foroptim=TRUE, compconst=FALSE ){ 
   # Get the required variables
   # p is Max number of lags for innovations 
   # q is Max number of lags for conditional variances
-  K     = dim(data)[2];  #Number of series to model
-  TT     = dim(data)[1];  #Number of time periods
-  means = colMeans(data); #Means per day for different vol measures
-  lls   = rep(NA,T);     #Vector containing the likelihoods
-  h     = matrix(nrow=K,ncol=T); #Matrix to containing conditional variances
-  maxp  = max(p); maxq=max(q);
-  if(any(UB == Inf)){ UB[UB==Inf] = 10^6 }
+  K    = dim(data)[2];  #Number of series to model
+  T    = dim(data)[1];  #Number of time periods
+  lls  = rep(NA,T);     #Vector containing the likelihoods
+  h    = matrix(nrow=K,ncol=T); #Matrix to containing conditional variances
+  maxp = max(p); maxq=max(q);
   
-  likelihoodC = .C("heavy_likelihoodR", 
-                   parameters = as.double(par), 
-                   data = as.double(data), 
-                   TT = as.integer(TT), 
-                   K = as.integer(K), 
-                   means = as.double(means),
-                   p = as.integer(p),
-                   q = as.integer(q),
-                   pMax = as.integer(maxp),
-                   qMax = as.integer(maxq),
-                   backcast = as.double(backcast),
-                   LB = as.double(LB), 
-                   UB = as.double(UB), 
-                   compconst = as.integer(compconst),
-                   h = as.double(matrix(rep(0,K*TT),nrow=K,ncol=TT)),
-                   lls = as.double( rep(0, TT) ),
-                   llRM = as.double( rep(0,K ) ),
-                   ll = as.double(0),
-                   PACKAGE="highfrequency"); 
+  # Get the parameters:
+  x = transformparams( par, p=p, q=q );
+  if( compconst ){ O = x[[1]]; } 
+  A = x[[2]]; B = x[[3]]; 
+  # Compute constant in case it needn't to be optimized:
+  if( !compconst ){ # Don't compute the omega's but do (1-alpha-beta)*unconditional
+    totalA = totalB = matrix( rep(0,K) ,ncol=1,nrow=K);
+    for(j in 1:length(A) ){ totalA = totalA + t(t(rowSums(A[[j]]))); } # Sum over alphas for all models
+    for(j in 1:length(B) ){ totalB = totalB + t(t(rowSums(B[[j]]))); } # Sum over betas for all models
+    O = 1 - totalA - totalB; # The remaing weight after substracting A & B
+    # Calculate the unconditionals ### KRIS FEEDBACK PLEASE ###
+    uncond = t(t(colMeans(data)));
+    O = O*uncond;
+  } #End if close for not optimizing over omega  
   
-  if(foroptim){   output = likelihoodC$ll; return(output); }
+  if( sum(O) < 0 ){ O[O<0] = 10^(-10)} #params here are shouldn't be smaller than zero
+  
+  likConst = K*log(2*pi); #constant for loglikelihood
+  
+  for(t in 1:T){ # Start loop over time periods
+    h[,t] = O;    #Add constant to h
+    
+    for(j in 1:maxp){# Loop over innovation lags
+      if( (t-j) > 0 ){ 
+        h[,t] = h[,t] + t( A[[j]] %*% t(t(data[(t-j),])) ); #Adding innovations to h        
+      }else{ 
+        h[,t] = h[,t] + t( A[[j]] %*% backcast ); #Adding innovations to h          
+      }
+    } #end loop over innovation lags
+    
+    for(j in 1:maxq){# Loop over cond variances lags
+      if( (t-j) > 0 ){ 
+        h[,t] = h[,t] + t( B[[j]] %*% t(t(h[,(t-j)])) ); #Adding cond vars to h 
+      }else{ 
+        h[,t] = h[,t] + t( B[[j]] %*% backcast ); #Adding cond vars to h          
+      }
+    }#End loop over innovation lags
+    
+    if( any( h[,t]>1e3 )){ break ;}
+    # Check whether h's are between LB and UB:      
+    for(j in 1:K){ #Loop over 
+      if( h[j,t] < LB[j] ){  h[j,t] = LB[j]/(1- (h[j,t] - LB[j]) );}
+      if( h[j,t] > UB[j] ){  h[j,t] = UB[j] + log( h[j,t] - UB[j]);}
+    }#end loop over series
+    
+    lls[t] = 0.5*( likConst + sum( log(h[,t]) ) + sum( data[t,] / h[,t] ) );            
+  } #End loop over days
+  ll = sum(lls);
+  
+  if(is.na(ll) || is.infinite(ll) ){  ll = 10^7 } 
+  
+  if(foroptim){   output = ll; return(output); }
   if(!foroptim){
-    output = list( loglikelihood=likelihoodC$ll, 
-                   likelihoods=likelihoodC$lls, 
-                   condvar = matrix(likelihoodC$h,byrow=TRUE,nrow=K) );
+    output = list( loglikelihood=ll, likelihoods=lls, condvar = h );
     return(output)
     # Output list:
     # (i) total loglikelihood
     # (ii) likelihood parts per time period
     # (iii) matrix with conditional variances    
-  } #end output in case you want params    
+  } #end output in case you want params
 }

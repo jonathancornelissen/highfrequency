@@ -8,7 +8,7 @@ minRQ = function(rdata,align.by=NULL,align.period = NULL, makeReturns = FALSE,..
   {
     rdata = data
   }
-  multixts = highfrequency:::.multixts(rdata)
+  multixts = .multixts(rdata)
   if (multixts) 
   {
     result = apply.daily(rdata, minRQ, align.by, align.period, makeReturns)
@@ -17,7 +17,7 @@ minRQ = function(rdata,align.by=NULL,align.period = NULL, makeReturns = FALSE,..
   if (!multixts) 
   {
     if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata = highfrequency:::.aggregatets(rdata, on = align.by, k = align.period)
+      rdata = .aggregatets(rdata, on = align.by, k = align.period)
     }
     if(makeReturns)
     {
@@ -41,7 +41,7 @@ medRQ = function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALS
   {
     rdata = data
   }
-  multixts = highfrequency:::.multixts(rdata)
+  multixts = .multixts(rdata)
   if (multixts) 
   {
     result = apply.daily(rdata, medRQ, align.by, align.period, makeReturns) 
@@ -50,7 +50,7 @@ medRQ = function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALS
   if (!multixts) 
   {
     if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata = highfrequency:::.aggregatets(rdata, on = align.by, k = align.period)
+      rdata = .aggregatets(rdata, on = align.by, k = align.period)
     }
     if(makeReturns)
     {
@@ -72,7 +72,7 @@ rQuar = function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALS
   {
     rdata = data
   }
-  multixts = highfrequency:::.multixts(rdata)
+  multixts = .multixts(rdata)
   if (multixts) 
   {
     result = apply.daily(rdata, rQuar, align.by, align.period,
@@ -82,7 +82,7 @@ rQuar = function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALS
   if (!multixts) 
   {
     if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata = highfrequency:::.aggregatets(rdata, on = align.by, k = align.period)
+      rdata = .aggregatets(rdata, on = align.by, k = align.period)
     }
     if (makeReturns) 
     {
@@ -104,7 +104,7 @@ rQPVar = function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
   {
     rdata = data
   }
-  multixts =highfrequency::: .multixts(rdata)
+  multixts = .multixts(rdata)
   if (multixts) 
   {
     result = apply.daily(rdata, rQPVar, align.by, align.period,  ##check FUN
@@ -114,7 +114,7 @@ rQPVar = function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
   if (!multixts) 
   {
     if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata =highfrequency:::.aggregatets(rdata, on = align.by, k = align.period)
+      rdata =.aggregatets(rdata, on = align.by, k = align.period)
     }
     if (makeReturns) 
     {
@@ -137,7 +137,7 @@ rTPVar = function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
   {
     rdata = data
   }
-  multixts = highfrequency:::.multixts(rdata)
+  multixts = .multixts(rdata)
   if (multixts) 
   {
     result = apply.daily(rdata, rTPVar, align.by, align.period,
@@ -147,7 +147,7 @@ rTPVar = function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
   if (!multixts) 
   {
     if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata = highfrequency:::.aggregatets(rdata, on = align.by, k = align.period)
+      rdata = .aggregatets(rdata, on = align.by, k = align.period)
     }
     if (makeReturns) 
     {
@@ -175,7 +175,7 @@ ivInference = function(rdata, IVestimator = "RV", IQestimator = "rQuar", confide
 {
   if (hasArg(data)){ rdata = data  }
   
-  multixts = highfrequency:::.multixts(rdata)
+  multixts = .multixts(rdata)
   if (multixts) 
   {
     result = apply.daily(rdata, ivInference, align.by, align.period,
@@ -184,7 +184,7 @@ ivInference = function(rdata, IVestimator = "RV", IQestimator = "rQuar", confide
   }
   else{
     if((!is.null(align.by)) && (!is.null(align.period))){
-      rdata = highfrequency:::.aggregatets(rdata, on = align.by, k = align.period)
+      rdata = .aggregatets(rdata, on = align.by, k = align.period)
     }
     
     if(makeReturns){  rdata=makeReturns(rdata)  }
@@ -226,7 +226,7 @@ BNSjumptest = function(rdata, IVestimator= "BV", IQestimator= "TP", type= "linea
 {
   if (hasArg(data)){  rdata = data  }
   
-  multixts = highfrequency:::.multixts(rdata)
+  multixts = .multixts(rdata)
   
   if (multixts)
   {
@@ -235,7 +235,7 @@ BNSjumptest = function(rdata, IVestimator= "BV", IQestimator= "TP", type= "linea
     
   }else{
     if((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata = highfrequency:::.aggregatets(rdata, on = align.by, k = align.period)
+      rdata = .aggregatets(rdata, on = align.by, k = align.period)
     }
     
     if(makeReturns){  rdata = makeReturns(rdata) }
@@ -243,7 +243,7 @@ BNSjumptest = function(rdata, IVestimator= "BV", IQestimator= "TP", type= "linea
     N=length(rdata)
     
     ## hatQV
-    hatQV = highfrequency:::RV(rdata)
+    hatQV = RV(rdata)
     
     ## hatIV        
     hatIV = .hativ( rdata, IVestimator, N=N, ... )
@@ -260,13 +260,13 @@ BNSjumptest = function(rdata, IVestimator= "BV", IQestimator= "TP", type= "linea
       ##logtransform
       if(logtransform)
       {
-        hatQV = log(highfrequency:::RV(rdata))
+        hatQV = log(RV(rdata))
         hatIV = log(.hativ(rdata,IVestimator, N, ...))
       }
       
       if(!logtransform)
       {
-        hatQV = highfrequency:::RV(rdata)
+        hatQV = RV(rdata)
         hatIV = .hativ(rdata,IVestimator, N, ...)
       }
       
@@ -301,7 +301,7 @@ BNSjumptest = function(rdata, IVestimator= "BV", IQestimator= "TP", type= "linea
       {
         product = .hatiq(rdata,IQestimator)/.hativ(rdata,IVestimator, N, ...)^2
       }
-      a = sqrt(N)*(1-.hativ(rdata,IVestimator,  N, ...)/highfrequency:::RV(rdata))/sqrt((theta-2)*product)
+      a = sqrt(N)*(1-.hativ(rdata,IVestimator,  N, ...)/RV(rdata))/sqrt((theta-2)*product)
       out                = {}
       out$ztest          = a
       out$critical.value = qnorm(c(0.025,0.975))
@@ -316,19 +316,19 @@ BNSjumptest = function(rdata, IVestimator= "BV", IQestimator= "TP", type= "linea
 
 JOjumptest= function(pdata, power=4,...)
 {
-  R  = .simre(pdata) 
-  r  = makeReturns(pdata)  
+  R  = as.zoo(.simre(pdata));
+  r  = as.zoo(makeReturns(pdata));
   N  = length(pdata)-1
-  bv = highfrequency:::RBPVar(r)
-  rv = highfrequency:::RV(r)
+  bv = RBPVar(r)
+  rv = RV(r)
   
-  SwV = 2*sum(R-r)
+  SwV = 2*sum(R-r,na.rm = TRUE)
   mu1 = 2^(6/2)*gamma(1/2*(6+1))/gamma(1/2)
   
   ##mupower:
   if(power==4)
   {
-    q      = abs(rollapply(r, width = 4, FUN = prod, align = "left"))
+    q      = abs(rollapply(r, width = 4, FUN = prod, align = "left",na.rm = TRUE))
     mu2    = 2^((6/4)/2)*gamma(1/2*(6/4+1))/gamma(1/2)
     av     = mu1/9 * N^3*(mu2)^(-4)/(N-4-1)*sum(q^(6/4),na.rm= TRUE)   ##check formula
     JOtest = N*bv/sqrt(av)*(1- rv/SwV)
@@ -342,7 +342,7 @@ JOjumptest= function(pdata, power=4,...)
   
   if(power==6)
   {
-    q=abs(rollapply(r, width = 6, FUN = prod, align = "left"))
+    q=abs(rollapply(r, width = 6, FUN = prod, align = "left",na.rm = TRUE))
     mu2= 2^((6/6)/2)*gamma(1/2*(6/6+1))/gamma(1/2)
     av=mu1/9 * N^3*(mu2)^(-6)/(N-6-1)*sum(q^(6/6),na.rm= TRUE)   ##check formula
     JOtest= N*bv/sqrt(av)*(1- rv/SwV)
@@ -362,14 +362,14 @@ AJjumptest = function(pdata, p=4 , k=2, align.by= NULL, align.period = NULL, mak
 {
   if (hasArg(data)) {  pdata = data  }
   
-  multixts = highfrequency:::.multixts(pdata)
+  multixts = .multixts(pdata)
   
   if (multixts) 
   {
     result = apply.daily(pdata, AJjumptest, align.by, align.period, makeReturns)
     return(result)
   }else{
-    pdata = highfrequency:::.aggregatets(pdata, on = "seconds", k = 1)
+    pdata = .aggregatets(pdata, on = "seconds", k = 1)
   }
   
   N = length(pdata)-1;
@@ -423,7 +423,7 @@ rSV= function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE,.
     rdata = data
   }
   
-  multixts = highfrequency::: .multixts(rdata)
+  multixts =  .multixts(rdata)
   
   if (multixts) 
   {
@@ -435,7 +435,7 @@ rSV= function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE,.
   if (!multixts) 
   {
     if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata =highfrequency:::.aggregatets(rdata, on = align.by, k = align.period)
+      rdata =.aggregatets(rdata, on = align.by, k = align.period)
     }
     if (makeReturns) 
     {
@@ -468,7 +468,7 @@ rSkew = function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALS
     rdata = data
   }
   
-  multixts =highfrequency::: .multixts(rdata)
+  multixts = .multixts(rdata)
   
   if (multixts) 
   {
@@ -480,7 +480,7 @@ rSkew = function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALS
   if (!multixts) 
   {
     if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata =highfrequency:::.aggregatets(rdata, on = align.by, k = align.period)
+      rdata =.aggregatets(rdata, on = align.by, k = align.period)
     }
     if (makeReturns) 
     {
@@ -490,7 +490,7 @@ rSkew = function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALS
     q=as.numeric(rdata)
     N= length(q)
     
-    rv= highfrequency:::RV(rdata)
+    rv= RV(rdata)
     
     rSkew= sqrt(N)*sum(q^3)/rv^(3/2)
     
@@ -509,7 +509,7 @@ rKurt = function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALS
     rdata = data
   }
   
-  multixts =highfrequency::: .multixts(rdata)
+  multixts = .multixts(rdata)
   
   if (multixts) 
   {
@@ -521,7 +521,7 @@ rKurt = function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALS
   if (!multixts) 
   {
     if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata =highfrequency:::.aggregatets(rdata, on = align.by, k = align.period)
+      rdata =.aggregatets(rdata, on = align.by, k = align.period)
     }
     if (makeReturns) 
     {
@@ -531,7 +531,7 @@ rKurt = function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALS
     q=as.numeric(rdata)
     N= length(q)
     
-    rv= highfrequency:::RV(rdata)
+    rv= RV(rdata)
     
     rkurt= N*sum(q^4)/rv^(2)
     
@@ -549,7 +549,7 @@ rMPV = function(rdata, m= 2, p=2, align.by= NULL, align.period= NULL, makeReturn
     rdata = data
   }
   
-  multixts =highfrequency::: .multixts(rdata)
+  multixts = .multixts(rdata)
   
   if (multixts) 
   {
@@ -560,7 +560,7 @@ rMPV = function(rdata, m= 2, p=2, align.by= NULL, align.period= NULL, makeReturn
   if (!multixts) 
   {
     if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata =highfrequency:::.aggregatets(rdata, on = align.by, k = align.period)
+      rdata =.aggregatets(rdata, on = align.by, k = align.period)
     }
     if (makeReturns) 
     {
@@ -597,13 +597,13 @@ MRC= function(pdata, pairwise = FALSE , makePsd= FALSE,...)
     n = length(pdata)
   }
   if (n == 1) {
-    multixts = highfrequency:::.multixts(pdata); 
+    multixts = .multixts(pdata); 
     if(multixts){ stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input"); }
     mrc = .crv(pdata)
   }  
   
   if (n > 1) {
-    multixts = highfrequency:::.multixts(pdata[[1]]); 
+    multixts = .multixts(pdata[[1]]); 
     if(multixts){ stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input"); }
     
     if(pairwise){
@@ -662,7 +662,7 @@ MRC= function(pdata, pairwise = FALSE , makePsd= FALSE,...)
 
 ####Realized beta####
 
-rBeta = function(rdata, rindex, RCOVestimator= "rCov", RVestimator= "RV", makeReturns= FALSE,...)
+rBeta = function(rdata, rindex, RCOVestimator= "rCov", RVestimator= NULL, makeReturns= FALSE,...)
 {
   if (hasArg(data)) 
   {
@@ -675,7 +675,7 @@ rBeta = function(rdata, rindex, RCOVestimator= "rCov", RVestimator= "RV", makeRe
     rindex= makeReturns(rindex)
   }
   
-  multixts = highfrequency:::.multixts(rdata)
+  multixts = .multixts(rdata)
   
   if (multixts) 
   {
@@ -693,48 +693,53 @@ rBeta = function(rdata, rindex, RCOVestimator= "rCov", RVestimator= "RV", makeRe
         rindex = exp(cumsum(rindex))
       }       
     }
+    
     rcovfun= function(rdata, rindex, RCOVestimator)
     {
       switch(RCOVestimator,
-             rCov= rCov(cbind(rdata,rindex) )[1,2],
-             rAVGCov= rAVGCov(list(rdata, rindex) )[1,2],
-             rBPCov= rBPCov(cbind(rdata, rindex) )[1,2],
-             rHYCov= rHYCov(list(rdata, rindex) )[1,2],
-             rKernelCov= rKernelCov(list(rdata, rindex) )[1,2],
-             rOWCov= rOWCov(cbind(rdata, rindex) )[1,2],
-             rRTSCov= rRTSCov(list(rdata, rindex))[1,2],
-             rThresholdCov= rThresholdCov(cbind(rdata, rindex) )[1,2],
-             rTSCov= rTSCov(list(rdata, rindex))[1,2]
+             rCov= rCov(cbind(rdata,rindex) ),
+             rAVGCov= rAVGCov(list(rdata, rindex) ),
+             rBPCov= rBPCov(cbind(rdata, rindex) ),
+             rHYCov= rHYCov(list(rdata, rindex) ),
+             rKernelCov= rKernelCov(list(rdata, rindex) ),
+             rOWCov= rOWCov(cbind(rdata, rindex) ),
+             rRTSCov= rRTSCov(list(rdata, rindex)),
+             rThresholdCov= rThresholdCov(cbind(rdata, rindex) ),
+             rTSCov= rTSCov(list(rdata, rindex))
       )
       
     }
-    rcov= rcovfun(rdata,rindex,RCOVestimator)
+    rcov= rcovfun(rdata,rindex,RCOVestimator);
     
-    if( is.null(RVestimator) ){ RVestimator = RCOVestimator }  
-    
-    rvfun= function(rindex, RVestimator)
+    if(RVestimator == RCOVestimator || is.null(RVestimator))
     {
+      rbeta = rcov[1,2]/rcov[2,2];
+    }else{
+      rvfun= function(rindex, RVestimator)
+      {
+        
+        switch(RVestimator,
+               RV= RV(rindex),
+               BV= RBPVar(rindex),
+               minRV= minRV(rindex ),
+               medRV= medRV(rindex ),
+               rCov= rCov(rindex ) ,
+               rAVGCov= rAVGCov(rindex ) ,
+               rBPCov= rBPCov(rindex ) ,
+               rHYCov= rHYCov(rindex ) ,
+               rKernelCov= rKernelCov(rindex ) ,
+               rOWCov= rOWCov(rindex ) ,
+               rRTSCov= rRTSCov(rindex) ,
+               rThresholdCov= rThresholdCov(rindex ) ,
+               rTSCov= rTSCov(rindex)
+        )             
+        
+      }
+      rv=rvfun(rindex,RVestimator)
       
-      switch(RVestimator,
-             RV= highfrequency:::RV(rindex),
-             BV= highfrequency:::RBPVar(rindex),
-             minRV= minRV(rindex ),
-             medRV= medRV(rindex ),
-             rCov= rCov(rindex ) ,
-             rAVGCov= rAVGCov(rindex ) ,
-             rBPCov= rBPCov(rindex ) ,
-             rHYCov= rHYCov(rindex ) ,
-             rKernelCov= rKernelCov(rindex ) ,
-             rOWCov= rOWCov(rindex ) ,
-             rRTSCov= rRTSCov(rindex) ,
-             rThresholdCov= rThresholdCov(rindex ) ,
-             rTSCov= rTSCov(rindex)
-      )             
-      
+      rbeta = rcov[1,2]/rv
     }
-    rv=rvfun(rindex,RVestimator)
-    
-    rbeta = rcov/rv
+       
     return(rbeta)
   }
 }
@@ -949,8 +954,8 @@ rBeta = function(rdata, rindex, RCOVestimator= "rCov", RVestimator= "RV", makeRe
 .hativ = function( rdata, IVestimator, startV = NULL, N,...)
 {
   switch(IVestimator,
-         RV     = highfrequency:::RV(rdata),
-         BV     = highfrequency:::RBPVar(rdata),
+         RV     = RV(rdata),
+         BV     = RBPVar(rdata),
          TV     = rTPVar(rdata),         
          minRV  = minRV(rdata),
          medRV  = medRV(rdata),
@@ -965,7 +970,7 @@ rBeta = function(rdata, rindex, RCOVestimator= "rCov", RVestimator= "RV", makeRe
          BV= 2.61,
          minRV= 3.81,
          medRV= 2.96,
-         ROWVar = .thetaROWVar())
+         ROWVar = .thetaROWVar(...))
 }
 
 .thetaROWVar = function( alpha = 0.001 , alphaMCD = 0.5 )
@@ -1005,6 +1010,7 @@ rBeta = function(rdata, rindex, RCOVestimator= "rCov", RVestimator= "RV", makeRe
   x[(2:l), ] = x[(2:l), ]/x[(1:(l - 1)), ]-1
   x[1, ] = rep(0, dim(pdata)[2])
   x = xts(x, order.by = index(pdata))
+  return(x)
 }
 
 
@@ -1012,7 +1018,7 @@ rBeta = function(rdata, rindex, RCOVestimator= "rCov", RVestimator= "RV", makeRe
 ##Preaverage return: 
 .hatreturn= function(pdata,kn)
 {
-  rdata=makeReturns(pdata)
+  rdata= as.zoo(makeReturns(pdata));
   kn=as.numeric(kn)
   if(kn == 1){ hatre = rdata}
   else{
@@ -1101,14 +1107,14 @@ rBeta = function(rdata, rindex, RCOVestimator= "rCov", RVestimator= "RV", makeRe
   
   for(i in 1:pmax){    # A will contain a list-item per innovation lag
     end =          start + sum(p>=i) - 1; # How many non-zero params in this loop?
-    A[[i]] =       matrix(rep(0,K^2),ncol=2); 
+    A[[i]] =       matrix(rep(0,K^2),ncol=K); 
     A[[i]][p>=i] = par[start:end];
     start  = end + 1;   
   }#end loop over number of lags for innovations
   
   for(i in 1:qmax){   # B will contain a list-item per cond var lag
     end   = start + sum(q>=i) -1; # How many non-zero params in this loop?
-    B[[i]] = matrix(rep(0,K^2),ncol=2); 
+    B[[i]] = matrix(rep(0,K^2),ncol=K); 
     B[[i]][q >= i] = par[start:end];
     start  = end + 1;   
   }#End loop over number of lags for cond variances
@@ -1235,11 +1241,14 @@ rBeta = function(rdata, rindex, RCOVestimator= "rCov", RVestimator= "RV", makeRe
   # Get the required variables
   # p is Max number of lags for innovations 
   # q is Max number of lags for conditional variances
+  
   K    = dim(data)[2];  #Number of series to model
   T    = dim(data)[1];  #Number of time periods
   lls  = rep(NA,T);     #Vector containing the likelihoods
   h    = matrix(nrow=K,ncol=T); #Matrix to containing conditional variances
   maxp = max(p); maxq=max(q);
+  
+  if(!(class(data) == "matrix")){data = matrix(data,ncol=K)}
   
   # Get the parameters:
   x = .transformparams( par, p=p, q=q );
@@ -1265,13 +1274,13 @@ rBeta = function(rdata, rindex, RCOVestimator= "rCov", RVestimator= "RV", makeRe
     
     for(j in 1:maxp){# Loop over innovation lags
       if( (t-j) > 0 ){ 
-        h[,t] = h[,t] + t( A[[j]] %*% t(data[(t-j),]) ); #Adding innovations to h        
+        h[,t] = h[,t] + t( A[[j]] %*% t(t(data[(t-j),])) ); #Adding innovations to h        
       }else{ 
         h[,t] = h[,t] + t( A[[j]] %*% backcast ); #Adding innovations to h          
       }
     } #end loop over innovation lags # CHECK: error caution????
     
-    for(j in 1:maxp){# Loop over cond variances lags
+    for(j in 1:maxq){# Loop over cond variances lags
       if( (t-j) > 0 ){ 
         h[,t] = h[,t] + t( B[[j]] %*% t(t(h[,(t-j)])) ); #Adding cond vars to h 
       }else{ 
@@ -1304,16 +1313,103 @@ rBeta = function(rdata, rindex, RCOVestimator= "rCov", RVestimator= "RV", makeRe
 }
 
 
+
 .heavy_likelihood_ll  = function( splittedparams, data, p, q, backcast, LB, UB, compconst=FALSE, ... ){ 
-  par = .transtopar( splittedparams,  p, q )
-  out = .heavy_likelihood( par=par, data, p, q, backcast, LB, UB, foroptim=FALSE, compconst=FALSE )
-  return((-1)*out[[1]])
+  K = ncol(data);
+  TT = nrow(data);
+  means = c(colMeans(data));
+  maxp  = max(p); 
+  maxq = max(q);
+  
+  par = .transtopar( splittedparams,  p, q );
+  
+  
+  out = .C("heavy_likelihoodR", 
+           parameters = as.double(par), 
+           data = as.double(t(data)), 
+           TT = as.integer(TT), 
+           K = as.integer(K), 
+           means = as.double(means),
+           p = as.integer(p),
+           q = as.integer(q),
+           pMax = as.integer(maxp),
+           qMax = as.integer(maxq),
+           backcast = as.double(t(backcast)),
+           LB = as.double(LB), 
+           UB = as.double(UB), 
+           compconst = as.integer(compconst),
+           h = as.double(matrix(rep(0,K*TT),nrow=K,ncol=TT)),
+           lls = as.double( rep(0, TT) ),
+           llRM = as.double( rep(0,K ) ),
+           ll = as.double(0),
+           PACKAGE="highfrequency");
+  
+  return((-1)*out$ll)
+} 
+
+.heavy_likelihood_llC  = function( splittedparams, data, p, q, backcast, LB, UB, compconst=FALSE, ... ){ 
+  K = ncol(data);
+  TT = nrow(data);
+  means = c(colMeans(data));
+  maxp  = max(p); 
+  maxq = max(q);
+  
+  par = .transtopar( splittedparams,  p, q );
+  
+  out = .C("heavy_likelihoodR", 
+           parameters = as.double(par), 
+           data = as.double(t(data)), 
+           TT = as.integer(TT), 
+           K = as.integer(K), 
+           means = as.double(means),
+           p = as.integer(p),
+           q = as.integer(q),
+           pMax = as.integer(maxp),
+           qMax = as.integer(maxq),
+           backcast = as.double(t(backcast)),
+           LB = as.double(LB), 
+           UB = as.double(UB), 
+           compconst = as.integer(compconst),
+           h = as.double(matrix(rep(0,K*TT),nrow=K,ncol=TT)),
+           lls = as.double( rep(0, TT) ),
+           llRM = as.double( rep(0,K ) ),
+           ll = as.double(0),
+           PACKAGE="highfrequency");
+  
+  return(out$ll)
 } 
 
 .heavy_likelihood_lls  = function( splittedparams , data, p, q, backcast, LB, UB, compconst=FALSE,... ){ 
-  par = .transtopar( splittedparams,  p, q )
-  out = .heavy_likelihood( par=par, data, p, q, backcast, LB, UB, foroptim=FALSE, compconst=FALSE )
-  return((-1)*out[[2]])
+  K = ncol(data);
+  TT = nrow(data);
+  means = c(colMeans(data));
+  maxp  = max(p); 
+  maxq = max(q);
+  
+  par = .transtopar( splittedparams,  p, q );
+  
+  
+  out = .C("heavy_likelihoodR", 
+           parameters = as.double(par), 
+           data = as.double(t(data)), 
+           TT = as.integer(TT), 
+           K = as.integer(K), 
+           means = as.double(means),
+           p = as.integer(p),
+           q = as.integer(q),
+           pMax = as.integer(maxp),
+           qMax = as.integer(maxq),
+           backcast = as.double(t(backcast)),
+           LB = as.double(LB), 
+           UB = as.double(UB), 
+           compconst = as.integer(compconst),
+           h = as.double(matrix(rep(0,K*TT),nrow=K,ncol=TT)),
+           lls = as.double( rep(0, TT) ),
+           llRM = as.double( rep(0,K ) ),
+           ll = as.double(0),
+           PACKAGE="highfrequency");
+  
+  return((-1)*out$lls)
 } 
 
 .get_param_names = function( estparams, p, q){
@@ -1481,4 +1577,91 @@ rBeta = function(rdata, rindex, RCOVestimator= "rCov", RVestimator= "RV", makeRe
   rownames(out) = .get_param_names(estparams = paramsvector, p=p, q=q)
   return(out)
   
+}
+
+## Function: heavyModel by applying C code: 
+heavyModelC = function (data, p = matrix(c(0, 0, 1, 1), ncol = 2), q = matrix(c(1, 0, 0, 1), ncol = 2), 
+                        startingvalues = NULL, LB = NULL, UB = NULL, backcast = NULL, compconst = FALSE) 
+{
+  K = ncol(data);
+  TT = nrow(data);
+  means = c(colMeans(data));
+  maxp  = max(p); 
+  maxq = max(q);
+  
+  if (is.null(LB)) {
+    LB = rep(0, K)
+  }
+  
+  if (is.null(UB)) {
+    UB = rep(10^6, K)
+  }
+  
+  if (is.null(startingvalues)) {
+    startingvalues = rep(NA, K + sum(p) + sum(q))
+    startingvalues[1:K] = 0.1
+    start = K + 1
+    end = K + sum(p)
+    startingvalues[start:end] = 0.3
+    start = end + 1
+    end = start + sum(q) - 1
+    startingvalues[start:end] = 0.6
+  }
+  
+  if (is.null(backcast)) {
+    backcast = t(t(colMeans(data)))
+  }
+  
+  KKK = length(startingvalues)
+  ui = diag(rep(1, KKK))
+  ci = rep(0, dim(ui)[2])
+  
+  splittedparams = .transtosplit(startingvalues, p, q)[[1]];
+  
+  x = try(optim( par = splittedparams, fn = .heavy_likelihood_llC,  data=data, p=p, q=q, backcast=backcast, LB=LB, UB=UB, compconst=compconst,                      
+                 method = "L-BFGS-B")); 
+  
+  
+  if (class(x) == "try-error") {
+    print("Error in likelihood optimization")
+    print(x)
+  }
+  else {
+    if (x$convergence != 0) {
+      print("Possible problem in likelihood optimization. Check convergence")
+    }
+  }
+  
+  estparams = x$par
+  
+  loglikelihood = x$value
+  
+  xx = .C("heavy_likelihoodR", 
+          parameters = as.double(estparams), 
+          data = as.double(t(data)), 
+          TT = as.integer(TT), 
+          K = as.integer(K), 
+          means = as.double(means),
+          p = as.integer(p),
+          q = as.integer(q),
+          pMax = as.integer(maxp),
+          qMax = as.integer(maxq),
+          backcast = as.double(t(backcast)),
+          LB = as.double(LB), 
+          UB = as.double(UB), 
+          compconst = as.integer(compconst),
+          h = as.double(matrix(rep(0,K*TT),nrow=K,ncol=TT)),
+          lls = as.double( rep(0, TT) ),
+          llRM = as.double( rep(0,K ) ),
+          ll = as.double(0),
+          PACKAGE="highfrequency");
+  
+  if (!is.null(rownames(data))) {
+    xx$condvar = xts(t(matrix(xx$h,K)), order.by = as.POSIXct(rownames(data)))
+    xx$likelihoods = xts(t(matrix(xx$lls,1)), order.by = as.POSIXct(rownames(data)))
+  }
+  xx$estparams = matrix(estparams, ncol = 1)
+  rownames(xx$estparams) = .get_param_names(estparams, p, q)
+  xx$convergence = x$convergence
+  return(xx)
 }
