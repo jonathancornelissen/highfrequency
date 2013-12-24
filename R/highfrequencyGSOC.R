@@ -669,10 +669,23 @@ rBeta = function(rdata, rindex, RCOVestimator= "rCov", RVestimator= NULL, makeRe
     rdata = data
   }
   
-  if (makeReturns) 
+  if(RCOVestimator!="rRTSCov" & RCOVestimator!="rTSCov" &  makeReturns  ){
+    rdata = makeReturns(rdata);
+    rindex= makeReturns(rindex);  
+  }
+  
+  if(!makeReturns)
   {
-    rdata = makeReturns(rdata)
-    rindex= makeReturns(rindex)
+    if(RCOVestimator=="rRTSCov" || RCOVestimator=="rTSCov"){
+      if( min(rdata) <0 ){
+        print("when using rRTSCov, rTSCov, introduce price data - transformation to price data done")
+        rdata = exp(cumsum(rdata))
+      }
+      if( min(rindex) <0 ){
+        print("when using rRTSCov, rTSCov, introduce price data - transformation to price data done")
+        rindex = exp(cumsum(rindex))
+      }       
+    }
   }
   
   multixts = .multixts(rdata)
@@ -683,16 +696,6 @@ rBeta = function(rdata, rindex, RCOVestimator= "rCov", RVestimator= NULL, makeRe
   }
   if (!multixts) 
   {
-    if(RCOVestimator=="rRTSCov" | RCOVestimator=="rTSCov"){
-      if( min(rdata) <0 ){
-        print("when using rRTSCov, rTSCov, introduce price data - transformation to price data done")
-        rdata = exp(cumsum(rdata))
-      }
-      if( min(rindex) <0 ){
-        print("when using rRTSCov, rTSCov, introduce price data - transformation to price data done")
-        rindex = exp(cumsum(rindex))
-      }       
-    }
     
     rcovfun= function(rdata, rindex, RCOVestimator)
     {
@@ -739,7 +742,7 @@ rBeta = function(rdata, rindex, RCOVestimator= "rCov", RVestimator= NULL, makeRe
       
       rbeta = rcov[1,2]/rv
     }
-       
+    
     return(rbeta)
   }
 }
