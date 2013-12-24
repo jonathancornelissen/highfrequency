@@ -1237,127 +1237,148 @@ rOWCov = function (rdata, cor=FALSE, align.by=NULL,align.period=NULL, makeReturn
 
 ### Two time scale covariance : 
 rTSCov = function (pdata, cor = FALSE, K = 300, J = 1, K_cov = NULL, J_cov = NULL, 
-K_var = NULL, J_var = NULL, makePsd = FALSE) 
+                   K_var = NULL, J_var = NULL, makePsd = FALSE) 
 {
-    if (!is.list(pdata)) {
-        n = 1
-    }
-    else {
-        n = length(pdata)
-        if (n == 1) {
-            pdata = pdata[[1]]
-        }
-    }
+  if (!is.list(pdata)) {
+    n = 1
+  }
+  else {
+    n = length(pdata)
     if (n == 1) {
-        multixts = .multixts(pdata); 
-        if(multixts){ stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input"); }
-        return(TSRV(pdata, K = K, J = J))
+      pdata = pdata[[1]]
     }
-    if (n > 1) {
-        multixts = .multixts(pdata[[1]]); 
-        if(multixts){ stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input"); }
-        
-        
-        cov = matrix(rep(0, n * n), ncol = n)
-        if( is.null(K_cov)){ K_cov = K }
-        if( is.null(J_cov)){ J_cov = J }
-        if( is.null(K_var)){ K_var = rep(K,n) }
-        if( is.null(J_var)){ J_var = rep(J,n) }
-        
-        diagonal = c()
-        for (i in 1:n) {
-            diagonal[i] = TSRV(pdata[[i]], K = K_var[i], J = J_var[i])
+  }
+  
+  
+  if (n == 1) {
+    if ( nrow(pdata) < (10*K) ) {
+      stop("Two time scale estimator uses returns based on prices that are K ticks aways. 
+           Please provide a timeseries of at least 10*K" ) 
+    } 
+    multixts = .multixts(pdata); 
+    if(multixts){ stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input"); }
+    return(TSRV(pdata, K = K, J = J))
+    }
+  if (n > 1) {
+    if ( nrow(pdata[[1]]) < (10*K) ) {
+      stop("Two time scale estimator uses returns based on prices that are K ticks aways. 
+           Please provide a timeseries of at least 10*K" ) 
+    } 
+    multixts = .multixts(pdata[[1]]); 
+    if(multixts){ stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input"); }
+    
+    
+    cov = matrix(rep(0, n * n), ncol = n)
+    if( is.null(K_cov)){ K_cov = K }
+    if( is.null(J_cov)){ J_cov = J }
+    if( is.null(K_var)){ K_var = rep(K,n) }
+    if( is.null(J_var)){ J_var = rep(J,n) }
+    
+    diagonal = c()
+    for (i in 1:n) {
+      diagonal[i] = TSRV(pdata[[i]], K = K_var[i], J = J_var[i])
+    }
+    diag(cov) = diagonal
+    
+    for (i in 2:n) {
+      for (j in 1:(i - 1)) {
+        cov[i, j] = cov[j, i] = TSCov_bi(pdata[[i]], 
+                                         pdata[[j]], K = K_cov, J = J_cov)
+      }
+    }
+    if (cor == FALSE) {
+      if (makePsd == TRUE) {
+        cov = makePsd(cov)
+      }
+      return(cov)
+    }
+    if (cor == TRUE) {
+      invsdmatrix = try(solve(sqrt(diag(diag(cov)))), silent = F)
+      if (!inherits(invsdmatrix, "try-error")) {
+        rcor = invsdmatrix %*% cov %*% invsdmatrix
+        if (makePsd == TRUE) {
+          rcor = makePsd(rcor)
         }
-        diag(cov) = diagonal
-        
-        for (i in 2:n) {
-            for (j in 1:(i - 1)) {
-                cov[i, j] = cov[j, i] = TSCov_bi(pdata[[i]], 
-                pdata[[j]], K = K_cov, J = J_cov)
-            }
-        }
-        if (cor == FALSE) {
-            if (makePsd == TRUE) {
-                cov = makePsd(cov)
-            }
-            return(cov)
-        }
-        if (cor == TRUE) {
-            invsdmatrix = try(solve(sqrt(diag(diag(cov)))), silent = F)
-            if (!inherits(invsdmatrix, "try-error")) {
-                rcor = invsdmatrix %*% cov %*% invsdmatrix
-                if (makePsd == TRUE) {
-                    rcor = makePsd(rcor)
-                }
-                return(rcor)
-            }
-        }
+        return(rcor)
+      }
+    }
     }
 }
 
 ### ROBUST Two time scale covariance : 
 rRTSCov = function (pdata, cor = FALSE, startIV = NULL, noisevar = NULL, 
-K = 300, J = 1, 
-K_cov = NULL , J_cov = NULL,
-K_var = NULL , J_var = NULL , 
-eta = 9, makePsd = FALSE){
-    if (!is.list(pdata)) {
-        n = 1
-    }
-    else {
-        n = length(pdata)
-        if (n == 1) {
-            pdata = pdata[[1]]
-        }
-    }
+                    K = 300, J = 1, 
+                    K_cov = NULL , J_cov = NULL,
+                    K_var = NULL , J_var = NULL , 
+                    eta = 9, makePsd = FALSE){
+  if (!is.list(pdata)) {
+    n = 1
+  }
+  else {
+    n = length(pdata)
     if (n == 1) {
-        multixts = .multixts(pdata); 
-        if(multixts){ stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input"); }    
-        return(RTSRV(pdata, startIV = startIV, noisevar = noisevar, 
-        K = K, J = J, eta = eta))
+      pdata = pdata[[1]]
     }
-    if (n > 1) {
-        multixts = .multixts(pdata[[1]]); 
-        if(multixts){ stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input"); }
-        
-        cov = matrix(rep(0, n * n), ncol = n)
-        diagonal = c()
-        if( is.null(K_cov)){ K_cov = K }
-        if( is.null(J_cov)){ J_cov = J }  
-        if( is.null(K_var)){ K_var = rep(K,n) }
-        if( is.null(J_var)){ J_var = rep(J,n) }        
-        for (i in 1:n){ 
-            diagonal[i] = RTSRV(pdata[[i]], startIV = startIV[i], 
-            noisevar = noisevar[i], K = K_var[i], J = J_var[i], 
-            eta = eta)
+  }
+  
+  
+  
+  if (n == 1) {
+    if ( nrow(pdata) < (10*K) ) {
+      stop("Two time scale estimator uses returns based on prices that are K ticks aways. 
+           Please provide a timeseries of at least 10*K" ) 
+    } 
+    multixts = .multixts(pdata); 
+    if(multixts){ stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input"); }    
+    return(RTSRV(pdata, startIV = startIV, noisevar = noisevar, 
+                 K = K, J = J, eta = eta))
+    }
+  if (n > 1) {
+    if ( nrow(pdata[[1]]) < (10*K) ) {
+      stop("Two time scale estimator uses returns based on prices that are K ticks aways. 
+           Please provide a timeseries of at least 10*K" ) 
+    } 
+    multixts = .multixts(pdata[[1]]); 
+    if(multixts){ stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input"); }
+    
+    cov = matrix(rep(0, n * n), ncol = n)
+    diagonal = c()
+    if( is.null(K_cov)){ K_cov = K }
+    if( is.null(J_cov)){ J_cov = J }  
+    if( is.null(K_var)){ K_var = rep(K,n) }
+    if( is.null(J_var)){ J_var = rep(J,n) }        
+    for (i in 1:n){ 
+      diagonal[i] = RTSRV(pdata[[i]], startIV = startIV[i], 
+                          noisevar = noisevar[i], K = K_var[i], J = J_var[i], 
+                          eta = eta)
+    }
+    diag(cov) = diagonal
+    if( is.null(K_cov)){ K_cov = K }
+    if( is.null(J_cov)){ J_cov = J }                        
+    for (i in 2:n) {
+      for (j in 1:(i - 1)) {
+        cov[i, j] = cov[j, i] = RTSCov_bi(pdata[[i]], 
+                                          pdata[[j]], startIV1 = diagonal[i], startIV2 = diagonal[j], 
+                                          noisevar1 = noisevar[i], noisevar2 = noisevar[j], 
+                                          K = K_cov, J = J_cov, eta = eta)
+      }
+    }
+    if (cor == FALSE) {
+      if (makePsd == TRUE) {
+        cov = makePsd(cov)
+      }
+      return(cov)
+    }
+    if (cor == TRUE) {
+      invsdmatrix = try(solve(sqrt(diag(diag(cov)))), silent = F)
+      if (!inherits(invsdmatrix, "try-error")) {
+        rcor = invsdmatrix %*% cov %*% invsdmatrix
+        if (makePsd == TRUE) {
+          rcor = makePsd(rcor)
         }
-        diag(cov) = diagonal
-        if( is.null(K_cov)){ K_cov = K }
-        if( is.null(J_cov)){ J_cov = J }                        
-        for (i in 2:n) {
-            for (j in 1:(i - 1)) {
-                cov[i, j] = cov[j, i] = RTSCov_bi(pdata[[i]], 
-                pdata[[j]], startIV1 = diagonal[i], startIV2 = diagonal[j], 
-                noisevar1 = noisevar[i], noisevar2 = noisevar[j], 
-                K = K_cov, J = J_cov, eta = eta)
-            }
-        }
-        if (cor == FALSE) {
-            if (makePsd == TRUE) {
-                cov = makePsd(cov)
-            }
-            return(cov)
-        }
-        if (cor == TRUE) {
-            invsdmatrix = try(solve(sqrt(diag(diag(cov)))), silent = F)
-            if (!inherits(invsdmatrix, "try-error")) {
-                rcor = invsdmatrix %*% cov %*% invsdmatrix
-                if (makePsd == TRUE) {
-                    rcor = makePsd(rcor)
-                }
-                return(rcor)
-            }
-        }
+        return(rcor)
+      }
+    }
     }
 }
 
@@ -2322,9 +2343,11 @@ uniTAQload = function(ticker,from,to,trades=TRUE,quotes=FALSE,datasource=NULL,va
   dates = dates[isBizday(dates, holidays = holidayNYSE(1960:2040))];
   
   if(trades){ tdata=NULL;
+              totaldata=NULL;
               for(i in 1:length(dates)){
                 datasourcex = paste(datasource,"/",dates[i],sep="");
                 filename = paste(datasourcex,"/",ticker,"_trades.RData",sep="");
+                
                 
                 ifmissingname = paste(datasourcex,"/missing_",ticker,".RData",sep="");  
                 
@@ -2332,14 +2355,14 @@ uniTAQload = function(ticker,from,to,trades=TRUE,quotes=FALSE,datasource=NULL,va
                 if(!file.exists(filename)){warning(paste("The file ",filename," does not exist. Please read the documentation.",sep="")); next;}
                 if(file.exists(ifmissingname)==FALSE){
                   load(filename);
-                  if(i==1)	{
+                  if(i==1)  { 
                     if( is.null(variables)){totaldata=tdata;
                     }else{
                       allnames=as.vector(colnames(tdata));
                       selection = allnames%in%variables;
                       qq=(1:length(selection))[selection];
                       totaldata=tdata[,qq];
-                    }	  
+                    }    
                   };
                   if(i>1){
                     if( is.null(variables)){totaldata=rbind(totaldata,tdata);
@@ -2352,6 +2375,7 @@ uniTAQload = function(ticker,from,to,trades=TRUE,quotes=FALSE,datasource=NULL,va
   }
   
   if(quotes){ qdata=NULL;
+              totaldataq=NULL;
               for(i in 1:length(dates)){
                 datasourcex = paste(datasource,"/",dates[i],sep="");
                 filename = paste(datasourcex,"/",ticker,"_quotes.RData",sep="");
@@ -2362,7 +2386,7 @@ uniTAQload = function(ticker,from,to,trades=TRUE,quotes=FALSE,datasource=NULL,va
                 if(file.exists(ifmissingname)==FALSE){
                   load(filename);
                   
-                  if(i==1)	{
+                  if(i==1)  {
                     if( is.null(variables)){totaldataq=qdata;
                     }else{
                       allnames=as.vector(colnames(qdata));
@@ -2385,6 +2409,7 @@ uniTAQload = function(ticker,from,to,trades=TRUE,quotes=FALSE,datasource=NULL,va
   if(trades==TRUE & quotes==FALSE){return(totaldata)}
   if(trades==FALSE & quotes==TRUE){return(totaldataq)}
 }
+
 
 ###### start SPOTVOL FUNCTIONS formerly in periodicityTAQ #########
 # Documented function:
