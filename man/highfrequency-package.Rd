@@ -3,24 +3,31 @@
 \alias{highfrequency}
 \docType{package}
 \title{
-highfrequency: Toolkit for the analysis of highfrequency financial data in R.
+Tools For Highfrequency Data Analysis
 }
 \description{
-The highfrequency package contains an extensive toolkit for the use of highfrequency financial data in R. It contains functionality to manage, clean and match highfrequency trades and quotes data. Furthermore, it enables users to: calculate easily various liquidity measures, estimate and forecast volatility, and investigate microstructure noise and intraday periodicity.}
+Provide functionality to manage, clean and match highfrequency
+    trades and quotes data, calculate various liquidity measures, estimate and
+    forecast volatility, and investigate microstructure noise and intraday
+    periodicity.}
 \details{
 \tabular{ll}{
 Package: \tab highfrequency\cr
 Type: \tab Package\cr
-Version: \tab 0.1\cr
-Date: \tab 2012-06-01\cr
-License: \tab \cr
+Version: \tab 0.4\cr
+Date: \tab 2014-08-31\cr
+License: \tab GPL (>= 2) \cr
 }
 }
 
 \author{
-Jonathan Cornelissen, Kris Boudt, Scott Payseur
+Jonathan Cornelissen,  Kris Boudt, Scott Payseur
 
-Maintainer: Jonathan Cornelissen <Jonathan.cornelissen@econ.kuleuven.be>
+Maintainer: Kris Boudt <Kris.Boudt@econ.kuleuven.be>
+
+Contributors: Giang Nguyen, Maarten Schermers.
+
+Thanks: A special thanks for additional contributions from Chris Blakely, Brian Peterson, Eric Zivot and GSoC.
 }
 
 \keyword{ package }

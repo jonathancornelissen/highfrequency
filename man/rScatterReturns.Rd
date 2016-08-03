@@ -6,7 +6,10 @@
 Creates a scatterplot of cross returns.
 }
 \usage{
-rScatterReturns(x,y, period, align.by="seconds", align.period=1,numbers=FALSE,xlim= NULL, ylim=NULL, plotit=TRUE, pch=NULL, cts=TRUE, makeReturns=FALSE, scale.size=0, col.change=FALSE,...)
+rScatterReturns(x,y, period, align.by="seconds", align.period=1,
+   numbers=FALSE,xlim= NULL, ylim=NULL, 
+  plotit=TRUE, pch=NULL, cts=TRUE, makeReturns=FALSE, 
+   scale.size=0, col.change=FALSE,...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -41,7 +44,9 @@ of Washington}, 2007
 data(sbux.xts)
 data(lltc.xts)
 par(mfrow=c(2,1))
-rScatterReturns(sbux.xts,y=lltc.xts, period=1, align.period=20,ylab="LLTC",xlab="SBUX",numbers=FALSE) 
-rScatterReturns(sbux.xts,y=lltc.xts, period=1, align.period=20,ylab="LLTC",xlab="SBUX",numbers=TRUE) 
+rScatterReturns(sbux.xts,y=lltc.xts, period=1, align.period=20,
+    ylab="LLTC",xlab="SBUX",numbers=FALSE) 
+rScatterReturns(sbux.xts,y=lltc.xts, period=1, align.period=20,
+   ylab="LLTC",xlab="SBUX",numbers=TRUE) 
 }
 \keyword{methods}

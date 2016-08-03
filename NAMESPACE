@@ -1,7 +1,6 @@
 useDynLib(highfrequency); 
 import(zoo); 
-import(xts); 
-
+import(xts);
 export(
 minRV,
 medRV,
@@ -26,7 +25,6 @@ refreshTime,
 harModel,
 convert,
 TAQLoad,
-spotVol,
 matchTradesQuotes,
 getTradeDirection,
 tqLiquidity, 
@@ -51,24 +49,29 @@ aggregateQuotes,
 aggregateTrades,
 aggregatets,
 previoustick,
-heavyModel, 
-       AJjumptest,
-       BNSjumptest,
-       ivInference,
-       JOjumptest,
-       medRQ,
-       minRQ,
-       MRC,
-       rBeta,
-       rKurt,
-       rMPV,
-       rQPVar,
-       rQuar,
-       rSkew,
-       rSV,
-       rTPVar
+heavyModel,
+AJjumptest,
+BNSjumptest,
+ivInference,
+JOjumptest,
+medRQ,
+minRQ,
+MRC,
+rBeta,
+rKurt,
+rMPV,
+rQPVar,
+rQuar,
+rSkew,
+rSV,
+rTPVar,
+heavyModelC,
+spotvol,
+getPrice,
+has.Qty
 )#end exported function
 
-S3method(print, harModel); 
-S3method(summary, harModel); 
-S3method(plot, harModel); 
+S3method(print, harModel);
+S3method(summary, harModel);
+S3method(plot, harModel);
+S3method(plot, spotvol)

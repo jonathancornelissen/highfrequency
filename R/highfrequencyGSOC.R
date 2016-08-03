@@ -662,7 +662,7 @@ MRC= function(pdata, pairwise = FALSE , makePsd= FALSE,...)
 
 ####Realized beta####
 
-rBeta = function(rdata, rindex, RCOVestimator= "rCov", RVestimator= NULL, makeReturns= FALSE,...)
+rBeta = function(rdata, rindex, RCOVestimator= "rCov", RVestimator= "RV", makeReturns= FALSE,...)
 {
   if (hasArg(data)) 
   {
@@ -1448,7 +1448,7 @@ rBeta = function(rdata, rindex, RCOVestimator= "rCov", RVestimator= NULL, makeRe
     
     # compute the asymptotic covariance matrix of splittedparamsvector
     
-    mH = hessian (.heavy_likelihood_ll, x= splittedparams, data=data, p=p, q=q, backcast=backcast, LB=LB, UB=UB, compconst=compconst)
+    mH = numDeriv::hessian(.heavy_likelihood_ll, x= splittedparams, data=data, p=p, q=q, backcast=backcast, LB=LB, UB=UB, compconst=compconst)
     
     T        = nrow(data) 
     nm       = length(paramsvector)
@@ -1464,7 +1464,7 @@ rBeta = function(rdata, rindex, RCOVestimator= "rCov", RVestimator= NULL, makeRe
     
     ## Define It
     # jacobian will be T x length of theta 
-    m  = jacobian(.heavy_likelihood_lls, x = splittedparams, data=data, p=p, q=q, backcast=backcast, LB=LB, UB=UB, compconst=compconst) # returns a vector?
+    m  = numDeriv::jacobian(.heavy_likelihood_lls, x = splittedparams, data=data, p=p, q=q, backcast=backcast, LB=LB, UB=UB, compconst=compconst) # returns a vector?
     It = cov(m)
     
   }else{
@@ -1484,7 +1484,7 @@ rBeta = function(rdata, rindex, RCOVestimator= "rCov", RVestimator= NULL, makeRe
     
     # compute the asymptotic covariance matrix of splittedparamsvector
     
-    mH = hessian (.heavy_likelihood_ll, x= splittedparams, data=data, p=p, q=q, backcast=backcast, LB=LB, UB=UB, compconst=compconst)
+    mH = numDeriv::hessian(.heavy_likelihood_ll, x= splittedparams, data=data, p=p, q=q, backcast=backcast, LB=LB, UB=UB, compconst=compconst)
     
     T        = nrow(data) 
     nm       = length(paramsvector)
@@ -1527,7 +1527,7 @@ rBeta = function(rdata, rindex, RCOVestimator= "rCov", RVestimator= NULL, makeRe
     
     ## Define It
     # jacobian will be T x length of theta 
-    m  = jacobian(.heavy_likelihood_lls, x = splittedparams, data=data, p=p, q=q, backcast=backcast, LB=LB, UB=UB, compconst=compconst) # returns a matrix of T by L (length of theta)
+    m  = numDeriv::jacobian(.heavy_likelihood_lls, x = splittedparams, data=data, p=p, q=q, backcast=backcast, LB=LB, UB=UB, compconst=compconst) # returns a matrix of T by L (length of theta)
     
     start = 1;
     for (i in 1:K)
@@ -1541,11 +1541,11 @@ rBeta = function(rdata, rindex, RCOVestimator= "rCov", RVestimator= NULL, makeRe
     
     require(sandwich);
     fm = lm(m ~ 0); 
-    It = try(vcovHAC(fm))
+    It = try(sandwich::vcovHAC(fm))
     
     if(class(It) == "try-error")
     {
-      print("HAC estimator is in error. It is replaced by non HAC estimator.")
+      print("HAC estimator reports an error. It is replaced by non HAC estimator.")
       It = cov(m)
     }
   }
@@ -1558,7 +1558,7 @@ rBeta = function(rdata, rindex, RCOVestimator= "rCov", RVestimator= NULL, makeRe
   if( class(invJ) == "try-error"){
     require("MASS")
     print("-1*Hessian is not invertible - generalized inverse is used")
-    invJ = ginv(Jt)
+    invJ = MASS::ginv(Jt)
   }
   
   

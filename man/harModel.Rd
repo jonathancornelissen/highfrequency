@@ -10,8 +10,9 @@ This model is mainly used to forecast the next days'volatility based on the high
 
 
 \usage{ 
- harModel(data, periods = c(1, 5, 22), periodsJ = c(1,5,22), leverage=NULL, RVest = c("rCov", "rBPCov"), type = "HARRV", jumptest = "ABDJumptest", alpha = 0.05, h = 1, 
-    transform = NULL, ...) }
+ harModel(data, periods = c(1, 5, 22), periodsJ = c(1,5,22), leverage=NULL, 
+  RVest = c("rCov", "rBPCov"), type = "HARRV", jumptest = "ABDJumptest", 
+  alpha = 0.05, h = 1, transform = NULL, ...) }
 
 \arguments{
    \item{data}{ an xts-object containing the intraday (log-)returns.}
@@ -62,7 +63,8 @@ Corsi, F. and Reno R. (2012). Discrete-time volatility forecasting with persiste
  data = makeReturns(data); #Get the high-frequency return data
  
  x = harModel(data, periods = c(1,5,10), periodsJ=c(1,5,10), RVest = c("rCov","rBPCov"), 
-              type="HARRVCJ",transform="sqrt"); # Estimate the HAR model of type HARRVCJ  
+       type="HARRVCJ",transform="sqrt"); 
+ # Estimate the HAR model of type HARRVCJ  
  class(x);
  x 
 
@@ -73,7 +75,8 @@ Corsi, F. and Reno R. (2012). Discrete-time volatility forecasting with persiste
  DJI_RV = DJI_RV[!is.na(DJI_RV)]; #Remove NA's
  DJI_RV = DJI_RV['2008'];
 
- x = harModel(data=DJI_RV , periods = c(1,5,22), RVest = c("rCov"), type="HARRV",h=1,transform=NULL);
+ x = harModel(data=DJI_RV , periods = c(1,5,22), RVest = c("rCov"), 
+    type="HARRV",h=1,transform=NULL);
  class(x); 
  x;
  summary(x);

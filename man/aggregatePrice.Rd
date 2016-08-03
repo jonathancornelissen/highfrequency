@@ -12,7 +12,7 @@ of the result.
 
 \usage{
 aggregatePrice(ts,FUN = previoustick,on="minutes",k=1,
-marketopen,marketclose)
+                 marketopen = "09:30:00", marketclose = "16:00:00", tz = "GMT")
 }
 
 \arguments{
@@ -23,6 +23,7 @@ marketopen,marketclose)
 xts object to the 5 minute frequency set k=5 and on="minutes".}
 \item{marketopen}{the market opening time, by default: marketopen = "09:30:00". }
 \item{marketclose}{the market closing time, by default: marketclose = "16:00:00". }
+\item{tz}{time zone used, by default: tz = "GMT". }
 }
 
 \section{Details}{
@@ -45,8 +46,8 @@ An xts object containing the aggregated time series.
 \author{ Jonathan Cornelissen and Kris Boudt}
 \keyword{data manipulation}
 
-\examples{ 
-#load data 
+\examples{
+#load data
 data("sample_tdata");
 #aggregate price data to the 30 second frequency
 head(sample_tdata$PRICE)

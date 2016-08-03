@@ -12,8 +12,8 @@ Let \eqn{r_{t,i}} be a return (with \eqn{i=1,\ldots,M}) in period \eqn{t}.
 Then, the medRV is given by
 \deqn{
  \mbox{medRV}_{t}=\frac{\pi}{6-4\sqrt{3}+\pi}\left(\frac{M}{M-2}\right) \sum_{i=2}^{M-1} \mbox{med}(|r_{t,i-1}|,|r_{t,i}|, |r_{t,i+1}|)^2
-} 
-} 
+}
+}
 
 \usage{
 medRV(rdata,align.by=NULL,align.period=NULL,makeReturns=FALSE,...)
@@ -57,10 +57,10 @@ Journal of Econometrics 159 (2), 276-288.
 
 \author{ Jonathan Cornelissen and Kris Boudt}
 \examples{
-# data(sample_tdata);  
-# medrv = medRV( rdata = sample_tdata$PRICE, align.by ="minutes", 
-#            align.period =5, makeReturns=TRUE); 
-# medrv 
+ data(sample_tdata);  
+ medrv = medRV( rdata = sample_tdata$PRICE, align.by ="minutes", 
+            align.period =5, makeReturns=TRUE); 
+ medrv 
 }
 
 \keyword{volatility}

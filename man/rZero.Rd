@@ -5,7 +5,8 @@
 Calculates the percentage of co-zero returns at a specified sampling period.
 }
 \usage{
-rZero(rdata, period=1, align.by="seconds", align.period = 1, cts = TRUE, makeReturns = FALSE, ...)
+rZero(rdata, period=1, align.by="seconds", align.period = 1, cts = TRUE, 
+   makeReturns = FALSE, ...)
 }
 
 \arguments{

@@ -106,7 +106,7 @@ ROWVar = function(rdata, seasadjR = NULL, wfunction = "HR" , alphaMCD = 0.75, al
     
     rdata = as.vector(rdata); seasadjR = as.vector(seasadjR);
     intraT = length(rdata); N=1;
-    MCDcov = as.vector(covMcd( rdata , use.correction = FALSE )$raw.cov)
+    MCDcov = as.vector(robustbase::covMcd( rdata , use.correction = FALSE )$raw.cov)
     outlyingness = seasadjR^2/MCDcov    
     k = qchisq(p = 1 - alpha, df = N)
     outlierindic = outlyingness > k
@@ -356,10 +356,10 @@ cfactor_RTSCV = function(eta=9){
     # 
     rho = 0.001
     R = matrix( c(1,rho,rho,1) , ncol = 2 ) 
-    int1 <- function(x) {    dmvnorm(x,sigma=R) }
-    num = adaptIntegrate(int1, c(-3,-3), c(3,3), tol=1e-4)$integral
-    int2 <- function(x) {  x[1]*x[2]*dmvnorm(x,sigma=R) }
-    denom = adaptIntegrate(int2, c(-3,-3), c(3,3), tol=1e-4)$integral
+    int1 <- function(x) {    mvtnorm::dmvnorm(x,sigma=R) }
+    num = cubature::adaptIntegrate(int1, c(-3,-3), c(3,3), tol=1e-4)$integral
+    int2 <- function(x) {  x[1]*x[2]*mvtnorm::dmvnorm(x,sigma=R) }
+    denom = cubature::adaptIntegrate(int2, c(-3,-3), c(3,3), tol=1e-4)$integral
     c2 = rho*num/denom   
     return( (c1+c2)/2 )
 }
@@ -966,7 +966,7 @@ makePsd = function(S,method="covariance"){
         secs = 3600 * k;
         tby = paste(3600 * k, "sec", sep = " ");
     } 
-    g = base:::seq(start(ts), end(ts), by = tby);
+    g = base::seq(start(ts), end(ts), by = tby);
     rawg = as.numeric(as.POSIXct(g, tz = "GMT"));
     newg = rawg + (secs - rawg%%secs);
     g    = as.POSIXct(newg, origin = "1970-01-01",tz = "GMT");
@@ -1196,7 +1196,7 @@ rOWCov = function (rdata, cor=FALSE, align.by=NULL,align.period=NULL, makeReturn
         select = c(1:N)[perczeroes < 0.5]
         seasadjRselect = seasadjR[, select]
         N = ncol(seasadjRselect)
-        MCDobject = try(covMcd(x = seasadjRselect, alpha = alphaMCD))
+        MCDobject = try(robustbase::covMcd(x = seasadjRselect, alpha = alphaMCD))
         if (length(MCDobject$raw.mah) > 1) {
             betaMCD = 1-alphaMCD; asycor = betaMCD/pchisq( qchisq(betaMCD,df=N),df=N+2 )
             MCDcov = (asycor*t(seasadjRselect[MCDobject$best,])%*%seasadjRselect[MCDobject$best,])/length(MCDobject$best);  
@@ -2078,7 +2078,7 @@ convert_trades = function (datasource, datadestination, ticker, extension = "txt
   for (i in 1:length(ticker)) {
     tfile_name = paste(datasource, "/", ticker[i], "_trades", 
                        sep = "")
-    tdata = try(highfrequency:::readdata(path = tfile_name, extension = extension, 
+    tdata = try(readdata(path = tfile_name, extension = extension, 
                                 header = header, dims = 9), silent = TRUE)
     
     error = dim(tdata)[1] == 0
@@ -2235,8 +2235,8 @@ convert = function(from, to, datasource, datadestination, trades = TRUE,
   if( onefile == FALSE ){
     
     # Create trading dates:
-    dates = timeSequence(from, to, format = "%Y-%m-%d", FinCenter = "GMT")
-    dates = dates[isBizday(dates, holidays = holidayNYSE(1950:2030))];
+    dates = timeDate::timeSequence(from, to, format = "%Y-%m-%d", FinCenter = "GMT")
+    dates = dates[timeDate::isBizday(dates, holidays = timeDate::holidayNYSE(1950:2030))];
     
     # Create folder structure for saving:
     if (dir) { dir.create(datadestination); for (i in 1:length(dates)) {dirname = paste(datadestination, "/", as.character(dates[i]), sep = ""); dir.create(dirname)    } }
@@ -2259,7 +2259,7 @@ convert = function(from, to, datasource, datadestination, trades = TRUE,
   if( onefile == TRUE ){
     # Load the data: ############################ This depends on the data provider
     if(trades == TRUE){ 
-      if( extension=="txt"){ dataname = paste(datasource,"/",ticker,"_trades",sep=""); highfrequency:::readdata(path = datasource, extension = "txt", header = FALSE, dims = 0); } 
+      if( extension=="txt"){ dataname = paste(datasource,"/",ticker,"_trades",sep=""); readdata(path = datasource, extension = "txt", header = FALSE, dims = 0); } 
       if( extension=="csv"){ dataname = paste(datasource,"/",ticker,"_trades.csv",sep=""); data = read.csv(dataname);}
       if( extension=="tickdatacom"){ 
         dataname   = paste(datasource,"/",ticker,"_trades.asc",sep="");
@@ -2272,7 +2272,7 @@ convert = function(from, to, datasource, datadestination, trades = TRUE,
       alldata = suppressWarnings(makeXtsTrades(tdata=data,format=format)); 
     }
     if (quotes == TRUE){ 
-      if( extension=="txt"){ dataname = paste(datasource,"/",ticker,"_quotes",sep=""); highfrequency:::readdata(path = datasource, extension = "txt", header = FALSE, dims = 0); } 
+      if( extension=="txt"){ dataname = paste(datasource,"/",ticker,"_quotes",sep=""); readdata(path = datasource, extension = "txt", header = FALSE, dims = 0); } 
       if( extension=="csv"){ dataname = paste(datasource,"/",ticker,"_quotes.csv",sep=""); data = read.csv(dataname);}
       if( extension=="tickdatacom"){ 
         dataname   = paste(datasource,"/",ticker,"_quotes.asc",sep=""); 
@@ -2339,8 +2339,9 @@ TAQLoad = function(tickers,from,to,trades=TRUE,quotes=FALSE,datasource=NULL,vari
 uniTAQload = function(ticker,from,to,trades=TRUE,quotes=FALSE,datasource=NULL,variables=NULL){
   ##Function to load the taq data from a certain stock 
   #From&to (both included) should be in the format "%Y-%m-%d" e.g."2008-11-30"
-  dates = timeSequence(as.character(from),as.character(to), format = "%Y-%m-%d", FinCenter = "GMT")
-  dates = dates[isBizday(dates, holidays = holidayNYSE(1960:2040))];
+  require("timeDate")
+  dates = timeDate::timeSequence(as.character(from),as.character(to), format = "%Y-%m-%d", FinCenter = "GMT")
+  dates = dates[timeDate::isBizday(dates, holidays = timeDate::holidayNYSE(1960:2040))];
   
   if(trades){ tdata=NULL;
               totaldata=NULL;
@@ -2410,72 +2411,6 @@ uniTAQload = function(ticker,from,to,trades=TRUE,quotes=FALSE,datasource=NULL,va
   if(trades==FALSE & quotes==TRUE){return(totaldataq)}
 }
 
-
-###### start SPOTVOL FUNCTIONS formerly in periodicityTAQ #########
-# Documented function:
-
-spotVol =  function(pdata, dailyvol = "bipower", periodicvol = "TML", on = "minutes", 
-                    k = 5, dummies = FALSE, P1 = 4, P2 = 2,  marketopen = "09:30:00", 
-                    marketclose = "16:00:00") 
-{
-  require(chron);
-  dates = unique(format(time(pdata), "%Y-%m-%d"))
-  cDays = length(dates)
-  rdata = mR = c()
-  if(on=="minutes"){
-    intraday = seq(from=times(marketopen), to=times(marketclose), by=times(paste("00:0",k,":00",sep=""))) 
-  }
-  if(tail(intraday,1)!=marketclose){intraday=c(intraday,marketclose)}
-  intraday = intraday[2:length(intraday)];
-  for (d in 1:cDays) {
-    pdatad = pdata[as.character(dates[d])]
-    pdatad = aggregatePrice(pdatad, on = on, k = k , marketopen = marketopen, marketclose = marketclose)
-    z = xts( rep(1,length(intraday)) , order.by = timeDate( paste(dates[d],as.character(intraday),sep="") , format = "%Y-%m-%d %H:%M:%S"))
-    pdatad = merge.xts( z , pdatad )$pdatad
-    pdatad = na.locf(pdatad)
-    rdatad = makeReturns(pdatad)
-    rdatad = rdatad[time(rdatad) > min(time(rdatad))]
-    rdata = rbind(rdata, rdatad)
-    mR = rbind(mR, as.numeric(rdatad))
-  }
-  mR[is.na(mR)]=0
-  M = ncol(mR)
-  if (cDays == 1) {
-    mR = as.numeric(rdata)
-    estimdailyvol = switch(dailyvol, bipower = rBPCov(mR), 
-                           medrv = medRV(mR), rv = RV(mR))
-  }else {
-    estimdailyvol = switch(dailyvol, bipower = apply(mR, 
-                                                     1, "rBPCov"), medrv = apply(mR, 1, "medRV"), rv = apply(mR, 
-                                                                                                             1, "RV"))
-  }
-  if (cDays <= 50) {
-    print("Periodicity estimation requires at least 50 observations. Periodic component set to unity")
-    estimperiodicvol = rep(1, M)
-  }
-  else {
-    mstdR = mR/sqrt(estimdailyvol * (1/M))
-    selection = c(1:M)[ (nrow(mR)-apply(mR,2,'countzeroes')) >=20] 
-    # preferably no na is between
-    selection = c( min(selection) : max(selection) )
-    mstdR = mstdR[,selection]
-    estimperiodicvol_temp = diurnal(stddata = mstdR, method = periodicvol, 
-                                    dummies = dummies, P1 = P1, P2 = P2)[[1]]
-    estimperiodicvol = rep(1,M)
-    estimperiodicvol[selection] = estimperiodicvol_temp
-    mfilteredR = mR/matrix(rep(estimperiodicvol, cDays), 
-                           byrow = T, nrow = cDays)
-    estimdailyvol = switch(dailyvol, bipower = apply(mfilteredR, 
-                                                     1, "rBPCov"), medrv = apply(mfilteredR, 1, "medRV"), 
-                           rv = apply(mfilteredR, 1, "RV"))
-  }
-  out = cbind(rdata, rep(sqrt(estimdailyvol * (1/M)), each = M) * 
-    rep(estimperiodicvol, cDays), rep(sqrt(estimdailyvol * 
-    (1/M)), each = M), rep(estimperiodicvol, cDays))
-  out = xts(out, order.by = time(rdata))
-  names(out) = c("returns", "vol", "dailyvol", "periodicvol")
-  return(out)
-}
 
 
 # internal non documented functions: 
@@ -3162,72 +3097,121 @@ p_return_abs <- function (data)
  matchtq = function(...){matchTradesQuotes(...)};                          
 
 ##################### Total cleanup functions formerly in RTAQ ################################
+
+
 tradesCleanup = function(from,to,datasource,datadestination,ticker,exchanges,tdataraw=NULL,report=TRUE,selection="median",...){
-  
-  nresult = rep(0,5);
-  if(is.null(tdataraw)){
-    dates = timeSequence(from,to, format = "%Y-%m-%d", FinCenter = "GMT");
-    dates = dates[isBizday(dates, holidays = holidayNYSE(2004:2010))];
-    
-    for(j in 1:length(dates)){
-      datasourcex = paste(datasource,"/",dates[j],sep="");
-      datadestinationx = paste(datadestination,"/",dates[j],sep="");
-      
-      for(i in 1:length(ticker)){
-        dataname = paste(ticker[i],"_trades.RData",sep="");
-        load(paste(datasourcex,"/",dataname,sep=""));
-        
-        if(class(tdata)[1]!="try-error"){
-          exchange = exchanges[i];  
+  require('timeDate')
+  nresult = rep(0, 5)
+  if(!is.list(exchanges)){ exchanges = as.list(exchanges)}
+  if (is.null(tdataraw)) {
+    dates = timeDate::timeSequence(from, to, format = "%Y-%m-d")
+    dates = dates[timeDate::isBizday(dates, holidays=timeDate::holidayNYSE(1960:2040))]
+    for (j in 1:length(dates)) {
+      datasourcex = paste(datasource, "/", dates[j], sep = "")
+      datadestinationx = paste(datadestination, "/", dates[j], sep = "")
+      for (i in 1:length(ticker)) {
+        dataname = paste(ticker[i], "_trades.RData", sep = "");
+        if(file.exists(paste(datasourcex, "/", dataname, sep = ""))){
+          load(paste(datasourcex, "/", dataname, sep = ""))
+          if (class(tdata)[1] != "try-error") {            
+            exchange = exchanges[[i]]            
+            if(length(tdata$PRICE)>0){
+              tdata = .check_data(tdata);
+              nresult[1] = nresult[1] + dim(tdata)[1]
+            }else{tdata=NULL;}
+            
+            if(length(tdata$PRICE)>0){
+              tdata = try(nozeroprices(tdata))
+              nresult[2] = nresult[2] + dim(tdata)[1];
+            }else{tdata=NULL;}
+            
+            
+            if(length(tdata$PRICE)>0){
+              tdata = try(selectexchange(tdata, exch = exchange))
+              nresult[3] = nresult[3] + dim(tdata)[1]
+            }else{tdata=NULL;}
+            
+            
+            if(length(tdata$PRICE)>0){
+              tdata = try(salescond(tdata))
+              nresult[4] = nresult[4] + dim(tdata)[1]
+            }else{tdata=NULL;}
+            
+            
+            if(length(tdata$PRICE)>0){
+              tdata = try(mergeTradesSameTimestamp(tdata, selection = selection))
+              nresult[5] = nresult[5] + dim(tdata)[1];
+            }else{tdata=NULL;}
+            
+            
+            
+            save(tdata, file = paste(datadestinationx,"/", dataname, sep = ""))
+          }
+          if (class(tdata) == "try-error") {
+            abc = 1
+            save(abc, file = paste(datadestinationx, "/missing_", 
+                                   ticker[i], ".RData", sep = ""))
+          }
           
-          tdata = .check_data(tdata);  nresult[1]= nresult[1]+dim(tdata)[1];
-          
-          ##actual clean-up: 
-          ##general:
-          tdata = try(nozeroprices(tdata));  nresult[2]= nresult[2]+dim(tdata)[1];
-          tdata = try(selectexchange(tdata,exch=exchange));  nresult[3]= nresult[3]+dim(tdata)[1];
-          
-          ##trade specific:
-          tdata = try(salescond(tdata));   nresult[4] = nresult[4] + dim(tdata)[1];
-          tdata = try(mergeTradesSameTimestamp(tdata,selection=selection));   nresult[5] = nresult[5] + dim(tdata)[1];
-          
-          save(tdata, file = paste(datadestinationx,"/",dataname,sep=""));
+        }else{
+          next;
         }
-        
-        if(class(tdata)=="try-error")  {
-          abc=1;
-          save(abc, file = paste(datadestinationx,"/missing_",ticker[i],".RData",sep=""));
-        }
-      }
+      }   
     }
-    if(report==TRUE){
-      names(nresult) = c("initial number","no zero prices","select exchange",
-                         "sales condition","merge same timestamp");
+    if (report == TRUE) {
+      names(nresult) = c("initial number", "no zero prices", 
+                         "select exchange", "sales condition", "merge same timestamp")
       return(nresult)
     }
   }
-  
-  if(!is.null(tdataraw)){
-    if(class(tdataraw)[1]!="try-error"){
-      if(length(exchanges)>1){print("The argument exchanges contains more than 1 element. Please select a single exchange, in case you provide tdataraw.")}
-      tdata=tdataraw; rm(tdataraw);  
-      tdata = .check_data(tdata);  nresult[1]= nresult[1]+dim(tdata)[1];
-      
-      ##actual clean-up: 
-      ##general:
-      tdata = try(nozeroprices(tdata));  nresult[2]= nresult[2]+dim(tdata)[1];
-      tdata = try(selectexchange(tdata,exch=exchanges));  nresult[3]= nresult[3]+dim(tdata)[1];
-      
-      ##trade specific:
-      tdata = try(salescond(tdata));   nresult[4] = nresult[4] + dim(tdata)[1];
-      tdata = try(mergeTradesSameTimestamp(tdata,selection=selection));   nresult[5] = nresult[5] + dim(tdata)[1];
-      
-      if(report==TRUE){
-        names(nresult) = c("initial number","no zero prices","select exchange",
-                           "sales condition","merge same timestamp");
-        return(list(tdata=tdata,report=nresult))
+  if (!is.null(tdataraw)) {
+    if (class(tdataraw)[1] != "try-error") {
+      if (length(exchanges) > 1) {
+        print("The argument exchanges contains more than 1 element. Please select a single exchange, in case you provide tdataraw.")
       }
-      if(report!=TRUE){return(tdata)}
+      exchange = exchanges[[1]];
+      
+      tdata = tdataraw
+      rm(tdataraw)
+      
+      
+      if(length(tdata)>0){
+        tdata = .check_data(tdata);
+        nresult[1] = nresult[1] + dim(tdata)[1]
+      }else{tdata=NULL;}
+      
+      if(length(tdata)>0){
+        tdata = try(nozeroprices(tdata))
+        nresult[2] = nresult[2] + dim(tdata)[1];
+      }else{tdata=NULL;}
+      
+      
+      if(length(tdata)>0){
+        tdata = try(selectexchange(tdata, exch = exchange))
+        nresult[3] = nresult[3] + dim(tdata)[1]
+      }else{tdata=NULL;}
+      
+      
+      if(length(tdata)>0){
+        tdata = try(salescond(tdata))
+        nresult[4] = nresult[4] + dim(tdata)[1]
+      }else{tdata=NULL;}
+      
+      
+      if(length(tdata)>0){
+        tdata = try(mergeTradesSameTimestamp(tdata, selection = selection))
+        nresult[5] = nresult[5] + dim(tdata)[1];
+      }else{tdata=NULL;}
+      
+      
+      if (report == TRUE) {
+        names(nresult) = c("initial number", "no zero prices", 
+                           "select exchange", "sales condition", "merge same timestamp")
+        return(list(tdata = tdata, report = nresult))
+      }
+      if (report != TRUE) {
+        return(tdata)
+      }
     }
   }
   
@@ -3236,8 +3220,8 @@ tradesCleanup = function(from,to,datasource,datadestination,ticker,exchanges,tda
 quotesCleanup = function(from,to,datasource,datadestination,ticker,exchanges, qdataraw=NULL,report=TRUE,selection="median",maxi=50,window=50,type="advanced",rmoutliersmaxi=10,...){
   nresult = rep(0,7);
   if(is.null(qdataraw)){
-    dates = timeSequence(from,to, format = "%Y-%m-%d", FinCenter = "GMT");
-    dates = dates[isBizday(dates, holidays = holidayNYSE(2004:2010))];
+    dates = timeDate::timeSequence(from,to, format = "%Y-%m-%d", FinCenter = "GMT");
+    dates = dates[timeDate::isBizday(dates, holidays = timeDate::holidayNYSE(2004:2010))];
     
     for(j in 1:length(dates)){
       datasourcex = paste(datasource,"/",dates[j],sep="");
@@ -3309,8 +3293,8 @@ quotesCleanup = function(from,to,datasource,datadestination,ticker,exchanges, qd
 
 tradesCleanupFinal = function(from,to,datasource,datadestination,ticker,tdata=NULL,qdata=NULL,...){
   if(is.null(tdata)&is.null(qdata)){
-    dates = timeSequence(from,to, format = "%Y-%m-%d", FinCenter = "GMT");
-    dates = dates[isBizday(dates, holidays = holidayNYSE(2004:2010))];
+    dates = timeDate::timeSequence(from,to, format = "%Y-%m-%d", FinCenter = "GMT");
+    dates = dates[timeDate::isBizday(dates, holidays = timeDate::holidayNYSE(2004:2010))];
     
     for(j in 1:length(dates)){
       datasourcex = paste(datasource,"/",dates[j],sep="");
@@ -3426,7 +3410,8 @@ noZeroPrices = function(tdata){
 selectExchange = function(data,exch="N"){ 
   data = .check_data(data);
   ###FUNCTION TO SELECT THE OBSERVATIONS OF A SINGLE EXCHANGE: selectexchange
-  filteredts = data[data$EX==exch];
+  #filteredts = data[data$EX==exch];
+  filteredts = data[is.element(data$EX , exch)]
   return(filteredts);
 }
 
@@ -3838,7 +3823,7 @@ aggregatets = function (ts, FUN = "previoustick", on = "minutes", k = 1, weights
           tby = "h"
         }
         by = paste(k, tby, sep = " ")
-        allindex = as.POSIXct(base:::seq(start(ts3), end(ts3), 
+        allindex = as.POSIXct(base::seq(start(ts3), end(ts3), 
                                          by = by))
         xx = xts(rep("1", length(allindex)), order.by = allindex)
         ts3 = merge(ts3, xx)[, (1:dim(ts)[2])]
@@ -3856,7 +3841,7 @@ aggregatets = function (ts, FUN = "previoustick", on = "minutes", k = 1, weights
     
     FUN = match.fun(FUN);
     
-    g = base:::seq(start(ts), end(ts), by = tby);
+    g = base::seq(start(ts), end(ts), by = tby);
     rawg = as.numeric(as.POSIXct(g,tz="GMT"));
     newg = rawg + (secs - rawg%%secs);
     g    = as.POSIXct(newg,origin="1970-01-01",tz="GMT");

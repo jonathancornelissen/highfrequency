@@ -51,12 +51,9 @@ to = "2008-01-03";
 #TAQLoad: load data for stock AAPL
 \dontrun{xx = TAQLoad(tickers="AAPL",from,to,trades=TRUE,quotes=FALSE,
 datasource=datasource,variables=NULL)}
-\dontrun{head(xx);}
 
 #Load only price data for stocks AA and AAPL
 \dontrun{xx = TAQLoad(tickers=c("AA","AAPL"),from,to,trades=TRUE,
-quotes=FALSE,datasource=datasource,variables="PRICE")}
-\dontrun{head(xx);                                                                                                    }
-\dontrun{tail(xx);                                                                                                    }
+quotes=FALSE,datasource=datasource,variables="PRICE")}                                                                                                
 }
 

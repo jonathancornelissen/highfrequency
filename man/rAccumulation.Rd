@@ -6,7 +6,8 @@
 Plots the realized estimate as it accumulates over a time interval.  
 }
 \usage{
-rAccumulation(x, period = 1, y = NULL, align.by="seconds", align.period = 1, plotit = FALSE, cts = TRUE, makeReturns = FALSE)
+rAccumulation(x, period = 1, y = NULL, align.by="seconds", align.period = 1, 
+   plotit = FALSE, cts = TRUE, makeReturns = FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -47,11 +48,13 @@ accum[[2]] <- rAccumulation(sbux.xts, period=20, align.by="seconds", align.perio
 accum[[3]] <- rAccumulation(sbux.xts, period=30, align.by="seconds", align.period=60)
 
 par(mfrow=c(2,1)) 
-plot(cumm[[1]], xlab="", ylab="Cumulative Ruturns", main="Starbucks (SBUX)", sub='20110701', type="p", col=16, lwd=2) 
+plot(cumm[[1]], xlab="", ylab="Cumulative Ruturns", main="Starbucks (SBUX)",
+     sub='20110701', type="p", col=16, lwd=2) 
 lines(cumm[[2]], col=2, lwd=2) 
 lines(cumm[[3]], col=3, lwd=2) 
 lines(cumm[[4]], col=4, lwd=2) 
-plot(accum[[1]], xlab="", ylab="Realized Accumulation", type="l",main="Starbucks (SBUX)", sub='20110701', col=2, lwd=2) 
+plot(accum[[1]], xlab="", ylab="Realized Accumulation", type="l",main="Starbucks (SBUX)", 
+      sub='20110701', col=2, lwd=2) 
 lines(accum[[2]], col=3, lwd=2) 
 lines(accum[[3]], col=4, lwd=2) 
 }

@@ -40,7 +40,7 @@ ivInference (rdata, IVestimator="RV", IQestimator="rQuar", confidence=0.95,
 \arguments{
   \item{rdata}{a zoo/xts object containing all returns in period t for one asset.}
   \item{IVestimator}{can be chosen among integrated variance estimators: RV, BV, minRV or medRV. RV by default.}
-  \item{IQestimator}{can be chosen among integrated quarticity estimators: rQuar, TP, QP, minRQ or medRQ. rQuar by default.}
+  \item{IQestimator}{can be chosen among integrated quarticity estimators: rQuar, realized tri-power quarticity (TPQ), quad-power quarticity (QPQ), minRQ or medRQ. TPQ by default.}
   \item{confidence}{confidence level set by users. 0.95 by default. }
   \item{align.by}{a string, align the tick data to "seconds"|"minutes"|"hours"}
   \item{align.period}{an integer, align the tick data to this many [seconds|minutes|hours].}  

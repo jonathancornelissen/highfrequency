@@ -6,7 +6,8 @@
 Plots the marginal contribution to the realized estimate. 
 }
 \usage{
-rMarginal(x, y = NULL, period,align.by="seconds", align.period = 1, plotit = FALSE, cts = TRUE,makeReturns = FALSE)
+rMarginal(x, y = NULL, period,align.by="seconds", align.period = 1, 
+  plotit = FALSE, cts = TRUE,makeReturns = FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -35,7 +36,10 @@ of Washington}, 2007
 \examples{
 data(sbux.xts)
 par(mfrow=c(2,1))
-plot(rCumSum(sbux.xts, period=10, align.by="seconds", align.period=60), xlab="", ylab="Cumulative Ruturns", main="Starbucks (SBUX)", sub='20110701', type="p")
-barplot(rMarginal(sbux.xts, period=10, align.by="seconds", align.period=60)$y, main="Marginal Contribution Plot") 
+plot(rCumSum(sbux.xts, period=10, align.by="seconds", align.period=60), 
+   xlab="", ylab="Cumulative Ruturns", main="Starbucks (SBUX)",
+    sub='20110701', type="p")
+barplot(rMarginal(sbux.xts, period=10, align.by="seconds", align.period=60)$y,
+    main="Marginal Contribution Plot") 
 }
 \keyword{methods}

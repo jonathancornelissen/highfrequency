@@ -31,8 +31,8 @@ tradesCleanup(from,to,datasource,datadestination,ticker,exchanges,
 \item{datasource}{character indicating the folder in which the original data is stored.}
 \item{datadestination}{character indicating the folder in which the cleaned data is stored.}
 \item{ticker}{vector of tickers for which the data should be cleaned, e.g. ticker = c("AAPL","AIG")}
-\item{exchanges}{vector of stock exchange symbols for all tickers in vector "ticker". It thus should have the same length as the vector ticker.
-Only data from one exchanges will be retained for each stock respectively, e.g. exchanges = c("Q","N")
+\item{exchanges}{list of vectors of stock exchange(s) for all tickers in vector "ticker". It thus should have the same length as the vector ticker.
+E.g. in case of two stocks; exchanges = list("N", c("Q","T")).
 The possible exchange symbols are:
 \itemize{
 \item A: AMEX
@@ -70,7 +70,7 @@ In case you supply the argument "rawtdata", the on-disk functionality is ignored
 data("sample_tdataraw");
 head(sample_tdataraw);
 dim(sample_tdataraw);
-tdata_afterfirstcleaning = tradesCleanup(tdataraw=sample_tdataraw,exchanges="N");
+tdata_afterfirstcleaning = tradesCleanup(tdataraw=sample_tdataraw,exchanges=list("N") );
 tdata_afterfirstcleaning$report; 
 barplot(tdata_afterfirstcleaning$report);
 dim(tdata_afterfirstcleaning$tdata);

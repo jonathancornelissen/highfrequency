@@ -1,7 +1,7 @@
 \name{rTPVar}
 \alias{rTPVar}
 \title{
-Realized tripower variation of highfrequency return series.
+Realized tri-power variation of highfrequency return series.
 }
 \description{
  
@@ -11,7 +11,7 @@ Assume there is \eqn{N} equispaced returns in period \eqn{t}. Let \eqn{r_{t,i}} 
 
 Then, the rTPVar is given by
 \deqn{
-\mbox{rTPVar}_{t}=\frac{N}{N-2} \frac{\Gamma^2 \left(1/2\right)}{4 \Gamma^2 \left(7/6\right)} \sum_{i=3}^{N} \mbox({|r_{t,i}|}^{4/3} {|r_{t,i-1}|}^{4/3} {|r_{t,i-2}|}^{4/3})
+\mbox{rTPVar}_{t}=\frac{N}{N-2} \left( 2^{1/3} \frac{\Gamma \left(5/6\right)}{ \Gamma \left(1/2\right)} \right)^{-3} \sum_{i=3}^{N} \mbox({|r_{t,i}|}^{2/3} {|r_{t,i-1}|}^{2/3} {|r_{t,i-2}|}^{2/3})
 }
 }
 \usage{

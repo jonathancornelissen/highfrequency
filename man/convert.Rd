@@ -71,17 +71,19 @@ convert(from,to,datasource,datadestination,trades=TRUE,
 #The file should be named "IBM_trades.csv" and can be easily converted into xts 
 #and then saved in RData format by:
 
- convert(from=from, to=to, datasource=datasource, datadestination=datadestination, trades = T, 
-                       quotes = T, ticker="IBM", dir = FALSE, extension = "csv", header = TRUE, 
-                       tradecolnames = NULL, quotecolnames = NULL, format = format, onefile = TRUE )  
+convert(from=from, to=to, datasource=datasource, datadestination=datadestination, 
+    trades = T, quotes = T, ticker="IBM", dir = FALSE, extension = "csv", 
+    header = TRUE, tradecolnames = NULL, quotecolnames = NULL, format = format, 
+    onefile = TRUE )  
 
 ####### ASC file from www.tickdata.com
 #Suppose the datasource folder contains asc files for trades and quotes 
 #from "www.tickdata.com" for GLP. 
 #The files "GLP_quotes.asc" and "GLP_trades.asc" should be saved in datasource folder.
 
- convert(from=from, to=to, datasource=datasource, datadestination=datadestination, trades = T, 
-            quotes = T, ticker="GLP", dir = TRUE, extension = "tickdatacom", header = TRUE, 
-            tradecolnames = NULL, quotecolnames = NULL, format = "%d/%m/%Y %H:%M:%OS", onefile = TRUE );  
+ convert(from=from, to=to, datasource=datasource, datadestination=datadestination, 
+    trades = T, quotes = T, ticker="GLP", dir = TRUE, extension = "tickdatacom", 
+    header = TRUE, tradecolnames = NULL, quotecolnames = NULL, format = "%d/%m/%Y %H:%M:%OS", 
+    onefile = TRUE );  
 }
 }

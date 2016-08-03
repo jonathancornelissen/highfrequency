@@ -15,7 +15,7 @@ selectExchange(data,exch="N");
 \arguments{
   \item{data}{ an xts object containing the time series data. 
 The object should have a column "EX", indicating the exchange by its symbol.}
-  \item{exch}{ The symbol of the stock exchange that should be selected. 
+  \item{exch}{ The (vector of) symbol(s) of the stock exchange(s) that should be selected. 
 By default the NYSE is chosen (exch="N"). Other exchange symbols are:
 \itemize{
 \item A: AMEX

@@ -1,17 +1,17 @@
 \name{rQPVar}
 \alias{rQPVar}
 \title{
-Realized quadpower variation of highfrequency return series. 
+Realized quad-power variation of highfrequency return series. 
 }
 \description{
  
-Function returns the rQPVar, defined in Andersen et al. (2012).
+Function returns the realized quad-power variation, defined in Andersen et al. (2012).
 
 Assume there is \eqn{N} equispaced returns in period \eqn{t}. Let \eqn{r_{t,i}} be a return (with \eqn{i=1, \ldots,N}) in period \eqn{t}.
 
 Then, the rQPVar is given by
 \deqn{
-\mbox{rQPVar}_{t}=\frac{N}{N-3} \frac{\pi^2}{4} \sum_{i=4}^{N} \mbox(|r_{t,i}| |r_{t,i-1}| |r_{t,i-2}| |r_{t,i-3}|)
+\mbox{rQPVar}_{t}=\frac{N}{N-3} \left( 2^{1/4} \frac{\Gamma \left(3/4\right)}{ \Gamma \left(1/2\right)} \right)^{-4} \sum_{i=4}^{N} \mbox({|r_{t,i}|}^{1/2} {|r_{t,i-1}|}^{1/2} {|r_{t,i-2}|}^{1/2} {|r_{t,i-3}|}^{1/2})
 }
 }
 \usage{

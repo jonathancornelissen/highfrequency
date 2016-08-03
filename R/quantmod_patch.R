@@ -2,20 +2,7 @@
 # Utility functions for handling price data
 ###############################################################################
 
-#' get price column(s) from a timeseries
-#'
-#' Will attempt to locate price column(s) from a time series with rational defaults.
-#'
-#' May be subset by symbol and preference.
-#' \code{prefer} Preference will be for any commonly used financial time series price description,
-#' e.g. 'trade', 'close', 'bid', 'ask' with specific tests and matching for types and column names
-#' currently supported in R, but a default grep match will be performed if one of the supported types doesn't match.
-#'
-#' @param x A data object with columns containing data to be extracted
-#' @param symbol text string containing the symbol to extract
-#' @param prefer preference for any particular type of price, see Details
-#' @param \dots any other passthrough parameters
-#' @export
+
 getPrice <- function (x, symbol=NULL, prefer=NULL,...)
 {
   # first subset on symbol, if present
@@ -53,7 +40,6 @@ getPrice <- function (x, symbol=NULL, prefer=NULL,...)
   }
 }
 
-#' @export
 is.BBO <- function (x)
 {
   if (all(has.Bid(x), has.Ask(x))) {
@@ -62,7 +48,7 @@ is.BBO <- function (x)
   else FALSE
 }
 
-#' @export
+
 is.TBBO <- function (x)
 {
   if (all(has.Trade(x),has.Qty(x),has.Bid(x), has.Ask(x))) {
@@ -71,7 +57,7 @@ is.TBBO <- function (x)
   else FALSE
 }
 
-#' @export
+
 is.BAM <- function(x) {
   if (all(has.Bid(x), has.Ask(x), has.Mid(x))) {
     TRUE
@@ -79,7 +65,7 @@ is.BAM <- function(x) {
   else FALSE
 }
 
-#' @export
+
 is.BATM <- function(x) {
   if (all(has.Bid(x), has.Ask(x), has.Trade(x), has.Mid(x))) {
     TRUE
@@ -87,7 +73,7 @@ is.BATM <- function(x) {
   else FALSE
 }
 
-#' @export
+
 has.Bid <- function(x, which = FALSE)
 {
   colAttr <- attr(x, "Bid")
@@ -102,7 +88,7 @@ has.Bid <- function(x, which = FALSE)
   } else FALSE
 }
 
-#' @export
+
 has.BidSize <- function(x, which = FALSE)
 {
   colAttr <- attr(x, "BidSize") 
@@ -120,7 +106,7 @@ has.BidSize <- function(x, which = FALSE)
   else FALSE
 }
 
-#' @export
+
 has.Ask <- function(x, which = FALSE)
 {
   colAttr <- attr(x, "Ask") #case sensitive; doesn't work for SYMBOL.Ask :-(
@@ -135,7 +121,7 @@ has.Ask <- function(x, which = FALSE)
   } else FALSE
 }
 
-#' @export
+
 has.AskSize <- function(x, which = FALSE)
 {
   colAttr <- attr(x, "AskSize")
@@ -153,7 +139,7 @@ has.AskSize <- function(x, which = FALSE)
   else FALSE
 }
 
-#' @export
+
 has.Price <- function(x, which = FALSE)
 {
   colAttr <- attr(x, "Price")
@@ -168,7 +154,7 @@ has.Price <- function(x, which = FALSE)
   } else FALSE
 }
 
-#' @export
+
 has.Trade <- function(x, which = FALSE)
 {
   colAttr <- attr(x, "Trade")
@@ -202,32 +188,72 @@ has.Chg <- function(x, which=FALSE) {
   ifelse(which, loc, FALSE)
 }
 
-#has.Un <- function(x, which=FALSE) {
-#	loc <- grep("Unadj", colnames(x), ignore.case = TRUE)
-#    if (!identical(loc, integer(0))) 
-#        return(ifelse(which, loc, TRUE))
-#    ifelse(which, loc, FALSE)
-#}
+has.Cl <- function (x, which = FALSE){
+  colAttr <- attr(x, "Cl")
+  if (!is.null(colAttr)) 
+    return(if (which) colAttr else TRUE)
+  loc <- grep("Close", colnames(x), ignore.case = TRUE)
+  if (!identical(loc, integer(0))) {
+    return(if (which) loc else TRUE)
+  }
+  else FALSE
+}
 
+has.Ad<-function (x, which = FALSE){
+  colAttr <- attr(x, "Ad")
+  if (!is.null(colAttr)) 
+    return(if (which) colAttr else TRUE)
+  loc <- grep("Adjusted", colnames(x), ignore.case = TRUE)
+  if (!identical(loc, integer(0))) {
+    return(if (which) loc else TRUE)
+  }
+  else FALSE
+}
 
+has.Hi<-function (x, which = FALSE) {
+  colAttr <- attr(x, "Hi")
+  if (!is.null(colAttr)) 
+    return(if (which) colAttr else TRUE)
+  loc <- grep("High", colnames(x), ignore.case = TRUE)
+  if (!identical(loc, integer(0))) {
+    return(if (which) loc else TRUE)
+  }
+  else FALSE
+}
 
-#' check for Trade, Bid, and Ask/Offer (BBO/TBBO), Quantity, and Price data
-#'
-#' A set of functions to check for appropriate TBBO/BBO and price column
-#' names within a data object, as well as the availability and
-#' position of those columns.
-#' @param x data object
-#' @param which disply position of match
-#' @aliases
-#' has.Trade
-#' has.Ask
-#' has.AskSize
-#' has.Bid
-#' has.BidSize
-#' has.Price
-#' is.BBO
-#' is.TBBO
-#' @export
+has.Lo<-function (x, which = FALSE){
+  colAttr <- attr(x, "Lo")
+  if (!is.null(colAttr)) 
+    return(if (which) colAttr else TRUE)
+  loc <- grep("Low", colnames(x), ignore.case = TRUE)
+  if (!identical(loc, integer(0))) {
+    return(if (which) loc else TRUE)
+  }
+  else FALSE
+}
+
+has.Op<-function (x, which = FALSE) {
+  colAttr <- attr(x, "Op")
+  if (!is.null(colAttr)) 
+    return(if (which) colAttr else TRUE)
+  loc <- grep("Open", colnames(x), ignore.case = TRUE)
+  if (!identical(loc, integer(0))) {
+    return(if (which) loc else TRUE)
+  }
+  else FALSE
+}
+
+has.Vo<-function (x, which = FALSE){
+  colAttr <- attr(x, "Vo")
+  if (!is.null(colAttr)) 
+    return(if (which) colAttr else TRUE)
+  loc <- grep("Volume", colnames(x), ignore.case = TRUE)
+  if (!identical(loc, integer(0))) {
+    return(if (which) loc else TRUE)
+  }
+  else FALSE
+}
+
 
 has.Qty <- function(x, which = FALSE)
 {

@@ -49,8 +49,8 @@ An xts object containing the aggregated quote data.
 
 \examples{
 #load data
-#data("sample_qdata");
+data("sample_qdata");
 #aggregate quote data to the 30 second frequency
-#xx = aggregateQuotes(sample_qdata,on="seconds",k=30);
-#head(xx);
+xx = aggregateQuotes(sample_qdata,on="seconds",k=30);
+head(xx);
 }
