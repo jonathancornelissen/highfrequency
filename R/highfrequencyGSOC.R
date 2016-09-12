@@ -902,7 +902,8 @@ rBeta = function(rdata, rindex, RCOVestimator= "rCov", RVestimator= "RV", makeRe
 .Npk = function(p,k){
   mup= 2^(p/2)*gamma(1/2*(p+1))/gamma(1/2)
   mu2p= 2^((2*p)/2)*gamma(1/2*((2*p)+1))/gamma(1/2)      
-  npk= (1/mup^2)*(k^(p-2)*(1+k))*mu2p + k^(p-2)*(k-1)*mup^2-2*k^(p/2-1)*.fmupk(p,k)
+  #npk= (1/mup^2)*(k^(p-2)*(1+k))*mu2p + k^(p-2)*(k-1)*mup^2-2*k^(p/2-1)*.fmupk(p,k)
+  npk= (1/mup^2)*(k^(p-2)*(1+k)*mu2p + k^(p-2)*(k-1)*mup^2-2*k^(p/2-1)*.fmupk(p,k))
   return(npk)
 }
 
