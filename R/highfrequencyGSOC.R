@@ -907,15 +907,16 @@ rBeta = function(rdata, rindex, RCOVestimator= "rCov", RVestimator= "RV", makeRe
   return(npk)
 }
 
+
 .V = function(rse,p,k,N){
   mup = 2^(p/2)*gamma(1/2*(p+1))/gamma(1/2)
-  muhalfp = 2^(p/4)*gamma(1/2*(p/2+1))/gamma(1/2)
-  A2p = (1/N)^(1-p/2)/mup*sum(rse^p)
-  Ap = (1/N)^(1-p/4)/muhalfp*sum(rse^(p/2))   ##check formula  
+  mu2p = 2^(p)*gamma(1/2*(2*p+1))/gamma(1/2)
+  Ap = (1/N)^(1-p/2)/mup*sum(rse^p)
+  A2p = (1/N)^(1-p)/mu2p*sum(rse^(2*p))   
   
-  V = .Npk(p,k) *A2p/(N*Ap) ##check formula: A(p), A(2p)
+  V = .Npk(p,k) *A2p/(N*Ap^2) 
   return(V)
-} 
+}
 
 ## BNSJumptest help functions:
 
