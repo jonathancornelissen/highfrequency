@@ -1,3 +1,6 @@
 Changes in version 0.4 (KB)
   o update package code github to version on rforge
   o to do: print more output in tradesCleanup about the different filters
+  o 04-12-2016: correction to implementation AJjumptest by Giang
+
+
