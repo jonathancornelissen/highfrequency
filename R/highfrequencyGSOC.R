@@ -355,10 +355,9 @@ JOjumptest= function(pdata, power=4,...)
   }     
 }  
 
-
 ####AJjumptest:Ait- Sahalia and Jacod tests for the presence of jumps in the price series.####
 
-AJjumptest = function(pdata, p=4 , k=2, align.by= NULL, align.period = NULL, makeReturns= FALSE, ...)
+AJjumptest = function(pdata, p=4 , k=2, align.by= NULL, align.period = NULL,alpha_multiplier=4, makeReturns= FALSE, ...)
 {
   if (hasArg(data)) {  pdata = data  }
   
@@ -376,7 +375,7 @@ AJjumptest = function(pdata, p=4 , k=2, align.by= NULL, align.period = NULL, mak
   p = as.numeric(p);
   k = as.numeric(k);
   
-  alpha = (1-1/p)/2;
+  alpha = alpha_multiplier * sqrt(rCov(pdata, align.by = align.by, align.period = align.period, makeReturns = makeReturns))
   w = 0.47;
   cvalue = alpha*(1/N)^w;
   
@@ -397,7 +396,7 @@ AJjumptest = function(pdata, p=4 , k=2, align.by= NULL, align.period = NULL, mak
   pv1 = sum(r1^p);
   pv2 = sum(r2^p);
   
-  S = pv1/pv2
+  S = pv1/pv2;
   
   ## selection return:
   selection <- abs(r) < cvalue
