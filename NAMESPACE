@@ -71,6 +71,17 @@ getPrice,
 has.Qty
 )#end exported function
 
+importFrom("graphics", "abline", "layout", "legend", "lines",
+             "panel.smooth", "par", "plot", "points", "text", "title")
+importFrom("methods", "hasArg", "is")
+importFrom("stats", "bw.nrd0", "coef", "cov", "dbeta", "density",
+             "dnorm", "end", "formula", "integrate", "lm", "mad",
+             "median", "optim", "optimize", "pchisq", "pnorm", "qchisq",
+             "qnorm", "residuals", "rnorm", "runif", "sd", "start",
+             "summary.lm", "time", "weighted.mean")
+importFrom("utils", "data", "read.csv", "read.delim", "tail")
+importFrom("grDevices", "dev.interactive")
+
 S3method(print, harModel);
 S3method(summary, harModel);
 S3method(plot, harModel);

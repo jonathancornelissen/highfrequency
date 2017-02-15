@@ -3,4 +3,8 @@ Changes in version 0.4 (KB)
   o to do: print more output in tradesCleanup about the different filters
   o 04-12-2016: correction to implementation AJjumptest by Giang
 
+Changes in version 0.5
+ - converted so that it would work with Cran
+ - added missing data files
+ - compressed data files
 

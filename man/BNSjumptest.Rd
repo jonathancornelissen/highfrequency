@@ -26,7 +26,8 @@ in which, \eqn{IVestimator} can be: bipower variance (BV), minRV, medRV.
 (Huang and Tauchen (2005))
 }
 \usage{
-BNSjumptest(rdata, IVestimator= "BV", IQestimator= "TPQ", type= "linear", logtransform= FALSE, 
+BNSjumptest(rdata, IVestimator= "BV", IQestimator= "TP", type= "linear", 
+            logtransform= FALSE, 
             max= FALSE, align.by= NULL, align.period= NULL, makeReturns = FALSE, ...)
 }
 

@@ -55,7 +55,8 @@ in which,
 
 }
 \usage{
-AJjumptest(pdata, p=4 , k=2, align.by= NULL, align.period = NULL, makeReturns= FALSE, ...)
+AJjumptest(pdata, p=4 , k=2, align.by= NULL, align.period = NULL, alpha_multiplier = 4, 
+makeReturns= FALSE, ...)
 }
 
 \arguments{
@@ -63,7 +64,8 @@ AJjumptest(pdata, p=4 , k=2, align.by= NULL, align.period = NULL, makeReturns= F
   \item{p}{can be chosen among 2 or 3 or 4. The author suggests 4. 4 by default.}
   \item{k}{can be chosen among 2 or 3 or 4. The author suggests 2. 2 by default.}
   \item{align.by}{a string, align the tick data to "seconds"|"minutes"|"hours"}
-  \item{align.period}{an integer, align the tick data to this many [seconds|minutes|hours].}  
+  \item{align.period}{an integer, align the tick data to this many [seconds|minutes|hours].} 
+  \item{alpha_multiplier}{alpha multiplier}
   \item{makeReturns}{boolean, should be TRUE when rdata contains prices instead of returns. FALSE by default.} 
   \item{...}{additional arguments.}
 }
