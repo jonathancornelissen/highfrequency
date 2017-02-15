@@ -1002,7 +1002,7 @@ refreshTime = function (pdata)
     }
     x = .C("refreshpoints", as.integer(alltimes), as.integer(lengths), 
     as.integer(rep(0, minl)), as.integer(dim), as.integer(0), 
-    as.integer(rep(0, minl * dim)), as.integer(minl))
+    as.integer(rep(0, minl * dim)), as.integer(minl), PACKAGE="highfrequency")
     newlength = x[[5]]
     pmatrix = matrix(ncol = dim, nrow = newlength)
     for (i in 1:dim) {

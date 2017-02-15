@@ -3,6 +3,38 @@
 #include <R.h> 
 #include "highfrequency.h" 
 #include <math.h> 
+#include <R_ext/Rdynload.h>
+
+static const
+  R_CMethodDef cMethods[] = {
+    {"KK",  (DL_FUNC) &KK, 3},
+    {"justKernel", (DL_FUNC) &justKernel, 3},
+    {"kernel", (DL_FUNC) &kernel, 8},
+    {"kernelEstimator", (DL_FUNC) &kernelEstimator, 9},
+    {"kernel2", (DL_FUNC) &kernel2, 10},
+    {"subsample", (DL_FUNC) &subsample, 10},
+    {"rv", (DL_FUNC) &rv, 9},
+    {"rvperiod", (DL_FUNC) &rvperiod, 9},
+    {"rfourth", (DL_FUNC) &rfourth, 9},
+    {"rfourthlead", (DL_FUNC) &rfourthlead, 9},
+    {"covkernel", (DL_FUNC) &covkernel, 7},
+    {"covcc", (DL_FUNC) &covcc, 8},
+    {"pcovcc", (DL_FUNC) &pcovcc, 12},
+    {"sametime", (DL_FUNC) &sametime, 5},
+    {"tocts", (DL_FUNC) &tocts, 7},
+    {"portfolio", (DL_FUNC) &portfolio, 10},
+    {"refreshpoints", (DL_FUNC) &refreshpoints, 7},
+    {NULL}
+  };
+
+void R_init_highfrequency(DllInfo *info)
+{
+  R_registerRoutines(info,
+                     cMethods, NULL,
+                     NULL, NULL);
+  R_useDynamicSymbols(info, TRUE);
+}
+
 
 
 double KK(double x, int type)
