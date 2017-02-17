@@ -1,6 +1,7 @@
 useDynLib(highfrequency); 
 import(zoo); 
 import(xts);
+
 export(
 minRV,
 medRV,
@@ -69,7 +70,7 @@ heavyModelC,
 spotvol,
 getPrice,
 has.Qty
-)#end exported function
+)
 
 importFrom("graphics", "abline", "layout", "legend", "lines",
              "panel.smooth", "par", "plot", "points", "text", "title")
@@ -82,7 +83,7 @@ importFrom("stats", "bw.nrd0", "coef", "cov", "dbeta", "density",
 importFrom("utils", "data", "read.csv", "read.delim", "tail")
 importFrom("grDevices", "dev.interactive")
 
-S3method(print, harModel);
-S3method(summary, harModel);
-S3method(plot, harModel);
+S3method(print, harModel)
+S3method(summary, harModel)
+S3method(plot, harModel)
 S3method(plot, spotvol)

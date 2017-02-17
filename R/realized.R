@@ -2634,7 +2634,7 @@ center = function()
  ###### Liquidity functions formerly in in RTAQ  ######
 .check_data = function(data){ 
   # FUNCTION sets column names according to RTAQ format using quantmod conventions, such that all the other functions find the correct information.
-  requireNamespace('quantmod');
+#  requireNamespace('quantmod');
   # First step: assign the xts attributes:
   data = set.AllColumns(data);
   
@@ -3104,7 +3104,7 @@ tradesCleanup = function(from,to,datasource,datadestination,ticker,exchanges,tda
   nresult = rep(0, 5)
   if(!is.list(exchanges)){ exchanges = as.list(exchanges)}
   if (is.null(tdataraw)) {
-    dates = timeDate::timeSequence(from, to, format = "%Y-%m-d")
+    dates = timeDate::timeSequence(from, to, format = "%Y-%m-%d")
     dates = dates[timeDate::isBizday(dates, holidays=timeDate::holidayNYSE(1960:2040))]
     for (j in 1:length(dates)) {
       datasourcex = paste(datasource, "/", dates[j], sep = "")
