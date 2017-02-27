@@ -2236,7 +2236,7 @@ convert = function(from, to, datasource, datadestination, trades = TRUE,
     
     # Create trading dates:
     dates = timeDate::timeSequence(from, to, format = "%Y-%m-%d", FinCenter = "GMT")
-    dates = dates[timeDate::isBizday(dates, holidays = timeDate::holidayNYSE(1950:2030))];
+    dates = dates[timeDate::isBizday(dates, holidays = timeDate::holidayNYSE(1960:2050))];
     
     # Create folder structure for saving:
     if (dir) { dir.create(datadestination); for (i in 1:length(dates)) {dirname = paste(datadestination, "/", as.character(dates[i]), sep = ""); dir.create(dirname)    } }
@@ -2341,7 +2341,7 @@ uniTAQload = function(ticker,from,to,trades=TRUE,quotes=FALSE,datasource=NULL,va
   #From&to (both included) should be in the format "%Y-%m-%d" e.g."2008-11-30"
  
   dates = timeDate::timeSequence(as.character(from),as.character(to), format = "%Y-%m-%d", FinCenter = "GMT")
-  dates = dates[timeDate::isBizday(dates, holidays = timeDate::holidayNYSE(1960:2040))];
+  dates = dates[timeDate::isBizday(dates, holidays = timeDate::holidayNYSE(1960:2050))];
   
   if(trades){ tdata=NULL;
               totaldata=NULL;
@@ -3100,12 +3100,12 @@ p_return_abs <- function (data)
 
 
 tradesCleanup = function(from,to,datasource,datadestination,ticker,exchanges,tdataraw=NULL,report=TRUE,selection="median",...){
-  requireNamespace('timeDate')
+  #requireNamespace('timeDate')
   nresult = rep(0, 5)
   if(!is.list(exchanges)){ exchanges = as.list(exchanges)}
   if (is.null(tdataraw)) {
     dates = timeDate::timeSequence(from, to, format = "%Y-%m-%d")
-    dates = dates[timeDate::isBizday(dates, holidays=timeDate::holidayNYSE(1960:2040))]
+    dates = dates[timeDate::isBizday(dates, holidays=timeDate::holidayNYSE(1960:2050))]
     for (j in 1:length(dates)) {
       datasourcex = paste(datasource, "/", dates[j], sep = "")
       datadestinationx = paste(datadestination, "/", dates[j], sep = "")
@@ -3221,7 +3221,7 @@ quotesCleanup = function(from,to,datasource,datadestination,ticker,exchanges, qd
   nresult = rep(0,7);
   if(is.null(qdataraw)){
     dates = timeDate::timeSequence(from,to, format = "%Y-%m-%d", FinCenter = "GMT");
-    dates = dates[timeDate::isBizday(dates, holidays = timeDate::holidayNYSE(2004:2010))];
+    dates = dates[timeDate::isBizday(dates, holidays = timeDate::holidayNYSE(1960:2050))];
     
     for(j in 1:length(dates)){
       datasourcex = paste(datasource,"/",dates[j],sep="");
@@ -3294,7 +3294,7 @@ quotesCleanup = function(from,to,datasource,datadestination,ticker,exchanges, qd
 tradesCleanupFinal = function(from,to,datasource,datadestination,ticker,tdata=NULL,qdata=NULL,...){
   if(is.null(tdata)&is.null(qdata)){
     dates = timeDate::timeSequence(from,to, format = "%Y-%m-%d", FinCenter = "GMT");
-    dates = dates[timeDate::isBizday(dates, holidays = timeDate::holidayNYSE(2004:2010))];
+    dates = dates[timeDate::isBizday(dates, holidays = timeDate::holidayNYSE(1960:2050))];
     
     for(j in 1:length(dates)){
       datasourcex = paste(datasource,"/",dates[j],sep="");
@@ -3690,14 +3690,20 @@ rmOutliers = function (qdata, maxi = 10, window = 50, type = "advanced")
       return(value)
     }
     n = length(midquote)
-    allmatrix = matrix(rep(0, 4 * n), ncol = 4)
-    median2 = function(a) {
+    allmatrix = matrix(rep(0, 4 * (n)), ncol = 4)
+    median2 = function(a){ 
       median(a)
     }
-    standardmed = as.numeric(rollapply(midquote, width = (window), 
+    standardmed = as.numeric(rollapply(midquote, width = c(window), 
                                        FUN = median2, align = "center"))
-    allmatrix[(halfwindow + 1):(n - halfwindow), 1] = as.numeric(rollapply(midquote, 
-                                                                           width = (window + 1), FUN = medianw, align = "center"))
+    standardmed = standardmed[!is.na(standardmed)] 
+     
+    temp <- as.numeric(rollapply(midquote, 
+                                 width = (window + 1), 
+                                 FUN = medianw, 
+                                 align = "center"))
+      
+    allmatrix[(halfwindow + 1):(n - halfwindow), 1] = temp[!is.na(temp)]
     allmatrix[(1:(n - window)), 2] = standardmed[2:length(standardmed)]
     allmatrix[(window + 1):(n), 3] = standardmed[1:(length(standardmed) - 
       1)]
