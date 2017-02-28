@@ -1,3 +1,4 @@
+
 # This file contains all realized measures previously implemented in RTAQ and realized
 ######################################################## 
 ## Help functions: (not exported)
@@ -2035,10 +2036,10 @@ readdata = function(path=NULL, extension="txt",header=FALSE,dims=0){
   #load txt
   if(extension == "txt"){
     fullpath = paste(path,".txt",sep="");
-    data = try(read.delim(fullpath,sep="",header=header,dec=",",col.names=colnames),silent=TRUE);
+    data = try(read.delim(fullpath,sep="",header=header,dec=",",col.names=colnames,colClasses = "character"),silent=TRUE);
     
     if(is.null(dim(data))){
-      data = try(read.delim(fullpath,sep="",header=header,dec=",",col.names=c(colnames,"EXTRA")),silent=TRUE);
+      data = try(read.delim(fullpath,sep="",header=header,dec=",",col.names=c(colnames,"EXTRA"),colClasses = "character"),silent=TRUE);
       if(is.null(dim(data))){data=matrix(nrow=0,ncol=9);
       }else{data=data[,(-dim(data)[2])]}
     }
@@ -2046,10 +2047,10 @@ readdata = function(path=NULL, extension="txt",header=FALSE,dims=0){
   
   if(extension == "csv"){
     fullpath = paste(path,".csv",sep="");
-    data = try(read.delim(fullpath,sep=",",header=header,dec=".",col.names=colnames),silent=TRUE);
+    data = try(read.delim(fullpath,sep=",",header=header,dec=".",col.names=colnames,colClasses = "character"),silent=TRUE);
     
     if(is.null(dim(data))){
-      data = try(read.delim(fullpath,sep=",",header=header,dec=".",col.names=c(colnames,"EXTRA")),silent=TRUE);
+      data = try(read.delim(fullpath,sep=",",header=header,dec=".",col.names=c(colnames,"EXTRA"),colClasses = "character"),silent=TRUE);
       if(is.null(dim(data))){data=matrix(nrow=0,ncol=9);
       }else{data=data[,(-dim(data)[2])]}
     }
@@ -2061,10 +2062,10 @@ readdata = function(path=NULL, extension="txt",header=FALSE,dims=0){
 convert_trades = function (datasource, datadestination, ticker, extension = "txt", 
                            header = FALSE, tradecolnames = NULL, format = "%Y%M%D %H:%M:%S") 
 {  
-  missingt=matrix(ncol=2,nrow=0);
+  missingt=matrix(ncol=2,nrow=0)
   
-  suppressWarnings(dir.create(datadestination));
-  suppressWarnings(dir.create(datasource));
+  dir.create(datadestination, showWarnings = FALSE)
+  dir.create(datasource, showWarnings = FALSE)
   
   setwd(datasource)
   adjtime = function(z) {
@@ -2079,7 +2080,7 @@ convert_trades = function (datasource, datadestination, ticker, extension = "txt
     tfile_name = paste(datasource, "/", ticker[i], "_trades", 
                        sep = "")
     tdata = try(readdata(path = tfile_name, extension = extension, 
-                                header = header, dims = 9), silent = TRUE)
+                                header = header, dims = length(tradecolnames)), silent = TRUE)
     
     error = dim(tdata)[1] == 0
     if (error) {
@@ -2123,8 +2124,8 @@ convert_quotes = function (datasource, datadestination, ticker, extension = "txt
 {
   missingq=matrix(ncol=2,nrow=0);
   
-  suppressWarnings(dir.create(datadestination));
-  suppressWarnings(dir.create(datasource));
+  dir.create(datadestination, showWarnings = FALSE)
+  dir.create(datasource, showWarnings = FALSE)
   
   setwd(datasource)
   adjtime = function(z) {
@@ -2139,7 +2140,7 @@ convert_quotes = function (datasource, datadestination, ticker, extension = "txt
     qfile_name = paste(datasource, "/", ticker[i], "_quotes", 
                        sep = "")
     qdata = try(readdata(path = qfile_name, extension = extension, 
-                         header = header, dims = 9), silent = TRUE)
+                         header = header, dims = length(quotecolnames)), silent = FALSE)
     error = dim(qdata)[1] == 0
     if (error) {
       print(paste("no quotes for stock", ticker[i]))
@@ -2239,7 +2240,7 @@ convert = function(from, to, datasource, datadestination, trades = TRUE,
     dates = dates[timeDate::isBizday(dates, holidays = timeDate::holidayNYSE(1960:2050))];
     
     # Create folder structure for saving:
-    if (dir) { dir.create(datadestination); for (i in 1:length(dates)) {dirname = paste(datadestination, "/", as.character(dates[i]), sep = ""); dir.create(dirname)    } }
+    if (dir) { dir.create(datadestination, showWarnings = FALSE); for (i in 1:length(dates)) {dirname = paste(datadestination, "/", as.character(dates[i]), sep = ""); dir.create(dirname, showWarnings = FALSE)    } }
     for (i in 1:length(dates)){ #Loop over days  
       #Get the day-specific path
       datasourcex = paste(datasource, "/", dates[i], sep = "")
@@ -2292,7 +2293,7 @@ convert = function(from, to, datasource, datadestination, trades = TRUE,
     dates = unique(as.Date(index(alldata)));
     
     # Create folder structure for saving : 
-    suppressWarnings( if (dir){ dir.create(datadestination); for (i in 1:length(dates)) {dirname = paste(datadestination, "/", as.character(dates[i]), sep = ""); dir.create(dirname) } })
+    suppressWarnings( if (dir){ dir.create(datadestination, showWarnings = FALSE); for (i in 1:length(dates)) {dirname = paste(datadestination, "/", as.character(dates[i]), sep = ""); dir.create(dirname, showWarnings = FALSE) } })
     
     for(i in 1:length(dates) ){ # Loop over days
       datadestinationx = paste(datadestination, "/", dates[i], sep = ""); 
