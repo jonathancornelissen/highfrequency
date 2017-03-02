@@ -7,7 +7,8 @@
 { 
     if(is.null(y)){
         test = is.xts(x) && (ndays(x)!=1);
-        return(test);}
+        return(test);
+    }
     if(!is.null(y)){
         test = (is.xts(x) && (ndays(x)!=1)) || ( ndays(y)!=1 && is.xts(y) );
         if( test ){
@@ -2066,6 +2067,7 @@ convert_trades = function (datasource, datadestination, ticker, extension = "txt
   
   dir.create(datadestination, showWarnings = FALSE)
   dir.create(datasource, showWarnings = FALSE)
+  cur.dir <- getwd()
   
   setwd(datasource)
   adjtime = function(z) {
@@ -2116,6 +2118,7 @@ convert_trades = function (datasource, datadestination, ticker, extension = "txt
     setwd(datadestination)
     save(tdata, file = xts_name)
   }
+  setwd(cur.dir)
 }
 
 
@@ -2126,7 +2129,7 @@ convert_quotes = function (datasource, datadestination, ticker, extension = "txt
   
   dir.create(datadestination, showWarnings = FALSE)
   dir.create(datasource, showWarnings = FALSE)
-  
+  cur.dir <- getwd()
   setwd(datasource)
   adjtime = function(z) {
     zz = unlist(strsplit(z, ":"))
@@ -2170,6 +2173,7 @@ convert_quotes = function (datasource, datadestination, ticker, extension = "txt
     setwd(datadestination)
     save(qdata, file = xts_name)
   }
+  setwd(cur.dir)
 }
 
 # NEW CODE GSoC 2012 #
@@ -3455,9 +3459,11 @@ autoSelectExchangeTrades = function(tdata){
 # Zivot
 salesCondition <- function (tdata)
 {
+  trim <- function (x) gsub("^\\s+|\\s+$", "", x)
+  
   tdatacheck(tdata);
-  filteredts = tdata[tdata$COND == "0" | tdata$COND == "E" |
-    tdata$COND == "F" | tdata$COND == "" | tdata$COND == "@F"]
+  filteredts = tdata[trim(tdata$COND) == "0" | trim(tdata$COND) == "E" |
+    trim(tdata$COND) == "F" | trim(tdata$COND) == "" | trim(tdata$COND) == "@F"]
   return(filteredts)
 }
 
