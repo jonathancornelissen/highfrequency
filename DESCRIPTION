@@ -1,6 +1,6 @@
 Package: highfrequency
-Version: 0.51
-Date: 2017-02-15
+Version: 0.5.1
+Date: 2017-03-03
 Title: Tools for Highfrequency Data Analysis
 Authors@R: c(person("Kris", "Boudt", role = c("aut", "cre"),
                      email = "Kris.Boudt@econ.kuleuven.be"),
