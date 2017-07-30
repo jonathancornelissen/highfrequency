@@ -158,6 +158,8 @@ rTPVar = function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
     q      = abs(rollapply(q,width = 3, FUN = prod, align = "left"))
     N      = length(q)+2
     rTPVar = N/(N-2)*gamma(1/2)^2/(4*gamma(7/6)^2)*sum(q^(4/3))
+    
+#    (N^2)/(N - 2) * 2^(2/3)_gamma(7/6)_gamma(1/2)^(-1) * sum(q^(4/3))
     return(rTPVar)
   }
 }

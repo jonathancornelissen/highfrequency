@@ -59,10 +59,10 @@ Corsi, F. and Reno R. (2012). Discrete-time volatility forecasting with persiste
 \examples{ 
  ##### Example 1: HARRVCJ ##### 
  data("sample_5minprices_jumps"); 
- data = sample_5minprices_jumps[,1];
- data = makeReturns(data); #Get the high-frequency return data
+   dat = sample_5minprices_jumps[,1];
+ dat = makeReturns(dat); #Get the high-frequency return data
  
- x = harModel(data, periods = c(1,5,10), periodsJ=c(1,5,10), RVest = c("rCov","rBPCov"), 
+ x = harModel(dat, periods = c(1,5,10), periodsJ=c(1,5,10), RVest = c("rCov","rBPCov"), 
        type="HARRVCJ",transform="sqrt"); 
  # Estimate the HAR model of type HARRVCJ  
  class(x);

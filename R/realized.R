@@ -2020,11 +2020,17 @@ label.pos = c(4, 2), cex.caption = 1){
     g_range[1] = 0.95*g_range[1]; g_range[2]= 1.05 * g_range[2]; 
     #ind = seq(1,length(fitted),length.out=5);
     title = paste("Observed and forecasted RV based on HAR Model:",type);
-    plot.zoo(observed,col="red",lwd=2,main=title, ylim=g_range,xlab="Time",ylab="Realized Volatility"); 
+    plot(cbind(observed, fitted), col=c('red', 'blue'), main=title,ylab="Realized Volatility", lty=c(2,1))
+     #plot.zoo(observed,col="red",lwd=2,main=title, ylim=g_range,xlab="Time",ylab="Realized Volatility"); 
     #  axis(1,time(b)[ind], format(time(b)[ind],), las=2, cex.axis=0.8); not used anymore
     #  axis(2);
-    lines(fitted,col="blue",lwd=2);
-    legend("topleft", c("Observed RV","Forecasted RV"), cex=1.1, col=c("red","blue"),lty=1, lwd=2, bty="n"); 
+    #lines(fitted,col="blue",lwd=2);
+    #legend("topleft", c("Observed RV","Forecasted RV"), cex=1.1, col=c("red","blue"),lty=1, lwd=2, bty="n"); 
+    addLegend("topleft", on=1, 
+                         legend.names = c("Observed RV","Forecasted RV"), 
+                         lty=c(2, 1), lwd=c(2, 2),
+                         col=c("red", "blue"))
+    
 }
 
 ##################################################################################################
