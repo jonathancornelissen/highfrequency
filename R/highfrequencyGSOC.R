@@ -59,7 +59,7 @@ medRQ = function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALS
     q = abs(as.numeric(rdata))
     q = as.numeric(rollmedian(q, k = 3,align="center"))
     N = length(q)+2
-    medRQ = 3*pi*N/(9*pi+72-53*sqrt(3))*(N/(N-2))*sum(q^4)
+    medRQ = 3*pi*N/(9*pi+72-52*sqrt(3))*(N/(N-2))*sum(q^4)
     return(medRQ)
   } 
 }
