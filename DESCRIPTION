@@ -15,7 +15,7 @@ Maintainer: Kris Boudt
     <Kris.Boudt@econ.kuleuven.be>
 Description: Provide functionality to manage, clean and match highfrequency
     trades and quotes data, calculate various liquidity measures, estimate and
-    forecast volatility, and investigate microstructure noise and intraday
+    forecast volatility, detect price jumps and investigate microstructure noise and intraday
     periodicity.
 License: GPL (>= 2)
 Depends:
