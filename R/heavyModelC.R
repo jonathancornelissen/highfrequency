@@ -67,14 +67,15 @@
 
 ### ivInference help functions:
 ##IQ estimator: 
-.hatiq = function(rdata,IQestimator)
+.hatiq = function (rdata, IQestimator) 
 {
-  switch(IQestimator,
-         rQuar  = rQuar (rdata),
-         QP     = rQPVar(rdata),
-         TP     = rTPVar(rdata),
-         minRQ  = minRQ (rdata),
-         medRQ  = medRQ (rdata))
+  switch(IQestimator, 
+         rQuar = rQuar(rdata), 
+         QP = rQPVar(rdata), 
+         TP = rTPVar(rdata), 
+         minRQ = minRQ(rdata), 
+         medRQ = medRQ(rdata),
+         CTTPV = .ctTPV(rdata))
 }
 
 
@@ -172,60 +173,97 @@
 ## BNSJumptest help functions:
 
 ## zgamma function: 
-.zgamma = function(x,y){
-  if(x^2<y)
-  {
-    out = abs(x)
-  }
-  else(out=1.094*sqrt(y))  ##1.094: estimated by the article
+.zgamma=function (x, y, gamma_power) ##gamma_power need to be in number
+{
+  if (x^2 < y) {
+    out = abs(x)^gamma_power;
+  }else{
+    if (gamma_power==1)
+    {out = 1.094 * sqrt(y)}
+    if (gamma_power==2)
+    {out = 1.207 * y}
+    if (gamma_power==4/3)
+    {out = 1.129 * y^(2/3)} }
+  
   return(out)
 }
-
 ##corrected threshold bipower variation: 
-.ctBV = function(rdata, startV = NULL, N){
-  q = as.numeric(rdata)
+.ctBV = function (rdata, startV = NULL) 
+{
+  #q = as.numeric(rdata)
+  N = length(rdata); 
   
-  ## hatV
-  if(is.null(startV))
-  {
+  if (is.null(startV)) {
     hatV = medRV(rdata)
-  }else{ hatV = startV }
-  
-  v  = 3^2*hatV
-  for (i in 2:N)
-  {z1 = rep(0,N-1)
-  z1[i] =  .zgamma(rdata[i],v)  ##check formula TODO
+  }else{
+    hatV = startV
+  }
+  v = 3^2 * hatV
+  z1 = rep(0, N - 1);
+  for (i in 2:N) {
+    z1[i-1] = .zgamma(rdata[i], v, gamma_power = 1)
   }
   
-  for (j in 1:(N-1))
-  {z2 = rep(0,N-1)
-  z2[i] =  .zgamma(rdata[j],v) ##check formula TODO 
+  z2 = rep(0, N - 1);
+  for (j in 1:(N - 1)) {
+    z2[j] = .zgamma(rdata[j], v, gamma_power = 1)
   }
-  ctbv= (pi/2)*sum(z1*z2)
-  
+  ctbv = (pi/2) * sum(z1 * z2)
   return(ctbv)
 }
 
-## hatIV
-.hativ = function( rdata, IVestimator, startV = NULL, N,...)
+
+
+.ctTPV = function (rdata, startV = NULL) ###C-TTriPV
 {
-  switch(IVestimator,
-         RV     = RV(rdata),
-         BV     = RBPVar(rdata),
-         TV     = rTPVar(rdata),         
-         minRV  = minRV(rdata),
-         medRV  = medRV(rdata),
-         ROWvar = rOWCov(rdata,...),
-         CTBV   = .ctBV(rdata, N,...))
+  q = as.numeric(rdata)
+  N = length(rdata); 
+  
+  if (is.null(startV)) {
+    hatV = medRV(rdata)
+  }else{
+    hatV = startV
+  }
+  v = 3^2 * hatV
+  z1 = rep(0, N - 2);
+  for (i in 3:N) {
+    z1[i-2] = .zgamma(rdata[i], v, gamma_power = 4/3)
+  }
+  
+  z2 = rep(0, N - 2);
+  for (j in 2:(N - 1)) {
+    z2[j-1] = .zgamma(rdata[j], v, gamma_power = 4/3)
+  }
+  z3 = rep(0, N - 2);
+  for (l in 1:(N-2)) {
+    z3[l] = .zgamma(rdata[l], v, gamma_power = 4/3)
+  }
+  cttpv = 0.8309^(-3) * sum(z1^(4/3) * z2^(4/3) * z3^(4/3))
+  return(cttpv)
 }
 
 
-.tt = function(IVestimator,...)
+## hatIV
+.hativ=function (rdata, IVestimator, startV = NULL, ...) 
 {
-  switch(IVestimator,
-         BV= 2.61,
-         minRV= 3.81,
-         medRV= 2.96,
+  switch(IVestimator, 
+         RV = RV(rdata), 
+         BV = RBPVar(rdata), 
+         TV = rTPVar(rdata), 
+         minRV = minRV(rdata), 
+         medRV = medRV(rdata), 
+         ROWvar = rOWCov(rdata), 
+         CTBV = .ctBV(rdata, startV = startV))
+}
+
+
+.tt=function (IVestimator, ...) 
+{
+  switch(IVestimator, 
+         BV = pi^2/4+pi-3, 
+         minRV = 3.81, 
+         medRV = 2.96, 
+         CTBV = pi^2/4+pi-3,
          ROWVar = .thetaROWVar(...))
 }
 
