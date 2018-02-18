@@ -1,6 +1,6 @@
 Package: highfrequency
 Version: 0.5.2
-Date: 2017-07-30
+Date: 2018-02-18
 Title: Tools for Highfrequency Data Analysis
 Authors@R: c(person("Kris", "Boudt", role = c("aut", "cre"),
                      email = "Kris.Boudt@econ.kuleuven.be"),
@@ -36,7 +36,7 @@ Imports:
     chron,
     timeDate,
     MASS,
+Suggests:
     FKF,
     BMS,
     rugarch
-
