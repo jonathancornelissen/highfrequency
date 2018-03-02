@@ -80,5 +80,5 @@ Corsi, F. and Reno R. (2012). Discrete-time volatility forecasting with persiste
  class(x); 
  x;
  summary(x);
- plot(x);
+# plot(x);
 }
