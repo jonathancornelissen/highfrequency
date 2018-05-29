@@ -58,7 +58,6 @@ JOjumptest,
 medRQ,
 minRQ,
 MRC,
-predict.harModel,
 rBeta,
 rKurt,
 rMPV,
@@ -70,7 +69,12 @@ rTPVar,
 heavyModelC,
 spotvol,
 getPrice,
-has.Qty
+has.Qty,
+predict.harModel,
+plot.harModel,
+print.harModel,
+summary.harModel,
+plot.spotvol
 )
 
 importFrom("graphics", "abline", "layout", "legend", "lines",
