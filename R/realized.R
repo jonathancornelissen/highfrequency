@@ -774,7 +774,7 @@ rc.zero = function(x, y, period)
             millisend = x$milliseconds[[length(x$milliseconds)]]
         }
         
-        cat(paste("xts -> realizedObject [", as.character(time(xtmp[1])), " :: ", as.character(time(xtmp[length(x$milliseconds)])), "]", sep=""),"\n")
+        # cat(paste("xts -> realizedObject [", as.character(time(xtmp[1])), " :: ", as.character(time(xtmp[length(x$milliseconds)])), "]", sep=""),"\n")
     }
     
     if(is.na(millisstart))
@@ -1861,7 +1861,10 @@ jumptest="ABDJumptest",alpha=0.05,h=1,transform=NULL, ...){
         if(!is.null(transform)){ y = Ftransform(y); x1 = Ftransform(x1) }
         x1 = cbind(x1,rmin);
         model     = estimhar(y=y,x=x1); 
-        model$transform = transform; model$h = h; model$type = "HARRV"; model$dates = alldates[(maxp+h):n];
+        model$transform = transform; model$h = h; model$type = "HARRV"; 
+        model$dates = alldates[(maxp+h):n]; 
+        model$RVest = RVest[1];
+        model$leverage = leverage;
         class(model) = c("harModel","lm"); 
         return( model )
     } #End HAR-RV if cond
@@ -1873,7 +1876,9 @@ jumptest="ABDJumptest",alpha=0.05,h=1,transform=NULL, ...){
         if(!is.null(transform)){ y = Ftransform(y); x = Ftransform(x); }       
         x = cbind(x,rmin);
         model = estimhar(y=y,x=x); 
-        model$transform = transform; model$h = h; model$type = "HARRVJ"; model$dates = alldates[(maxp+h):n];
+        model$transform = transform; model$h = h; model$type = "HARRVJ"; 
+        model$dates = alldates[(maxp+h):n]; model$RVest = RVest;
+        model$leverage = leverage;
         class(model) = c("harModel","lm"); 
         return( model )    
     }#End HAR-RV-J if cond
@@ -1904,7 +1909,11 @@ jumptest="ABDJumptest",alpha=0.05,h=1,transform=NULL, ...){
         if(!is.null(transform)){ y = Ftransform(y); x = Ftransform(x); }  
         x = cbind(x,rmin);
         model = estimhar( y=y, x=x ); 
-        model$transform = transform; model$h = h; model$type = "HARRVCJ"; model$dates = alldates[(maxp+h):n];      
+        model$transform = transform; model$h = h; model$type = "HARRVCJ"; 
+        model$dates = alldates[(maxp+h):n]; model$RVest = RVest;
+        model$leverage = leverage;
+        model$jumptest = jumptest;
+        model$alpha_jumps = alpha;  
         class(model) = c("harModel","lm");
         return(model)
     } 
@@ -2032,6 +2041,183 @@ label.pos = c(4, 2), cex.caption = 1){
                          col=c("red", "blue"))
     
 }
+
+predict.harModel = function(object, newdata = NULL, warnings = TRUE) {
+  # If no new data is provided - just forecast on the last day of your estimation sample
+  # If new data with colnames as in object$model$x is provided, i.e. right measures for that model, just use that data
+  if (is.null(newdata) == TRUE) {
+    if (is.null(object$transform) == TRUE) {
+      return(as.numeric(c(1, xts::last(object$model$x))  %*%  object$coefficients))
+    }
+    if (object$transform == "log") {
+      if (warnings == TRUE) {
+        warning("Due to log-transform, forecast of RV is derived under assumption of log-normality.")
+      }
+      return(as.numeric(exp(c(1, xts::last(object$model$x))  %*%  object$coefficients + 1/2 * var(object$residuals))))
+    }
+    if (object$transform == "sqrt") {
+      if (warnings == TRUE) {
+        warning("Forecast for sqrt(RV) due to transform == \"sqrt\".")
+      }
+      return(as.numeric(c(1, xts::last(object$model$x))  %*%  object$coefficients))
+    }
+  }
+  
+  # Check whether newdata is in right format
+  if (sum(colnames(newdata) == colnames(object$model$x)) == length(colnames(object$model$x))) {
+    if (is.null(object$transform) == TRUE) {
+      return(as.numeric(cbind(1, newdata)  %*%  object$coefficients))
+    }
+    if (object$transform == "log") {
+      warning("Due to log-transform, forecast of RV is derived under assumption of log-normality.")
+      return(as.numeric(exp(cbind(1, newdata)  %*%  object$coefficients + 1/2 * var(object$residuals))))
+    }
+    if (object$transform == "sqrt") {
+      warning("Forecast for sqrt(RV) due to transform == \"sqrt\".")
+      return(as.numeric(cbind(1, newdata)  %*%  object$coefficients))
+    }
+  } else {
+    # Aggregate price data as in harModel function
+    
+    # Extract periods from coefficient names
+    if (object$type == "HARRV") {
+      # RV component
+      periods = as.numeric(substring(names(object$coefficients[-1])[grep("RV", names(object$coefficients[-1]))], first = 4))
+      periodsJ = 0
+    }
+    if (object$type == "HARRVJ") {
+      # RV component
+      periods = as.numeric(substring(names(object$coefficients[-1])[grep("RV", names(object$coefficients[-1]))], first = 4))
+      # Jump components
+      periodsJ = as.numeric(substring(names(object$coefficients[-1])[grep("J", names(object$coefficients[-1]))], first = 3))
+    }
+    if (object$type == "HARRVCJ") {
+      # Continuous component
+      periods = as.numeric(substring(names(object$coefficients[-1])[grep("C", names(object$coefficients[-1]))], first = 3))
+      # Jump component
+      periodsJ = as.numeric(substring(names(object$coefficients[-1])[grep("J", names(object$coefficients[-1]))], first = 3))
+    }
+    
+    RVest = object$RVest
+    
+    nperiods = length(periods)  # Number of periods to aggregate over
+    nest = length(RVest)        # Number of RV estimators
+    if (!is.null(object$transform)) {
+      Ftransform = match.fun(transform)
+    }
+
+    if (sum(newdata < 0) != 0) { #If it are returns as input
+      # Get the daily RMs (in a non-robust and robust way)
+      RV1 = match.fun(RVest[1])
+      RM1 = apply.daily(newdata, RV1)
+      # save dates:
+      alldates = index(RM1)
+      if (nest == 2) {
+        RV2 = match.fun(RVest[2])
+        RM2 = apply.daily(newdata, RV2)
+      }
+    }
+
+    if (sum(newdata < 0) == 0) { #The input is most likely already realized measures
+      stop(paste0(c("If your data is already aggregated, newdata column names should be", colnames(object$model$x), "as harModel-type is", object$type, "."),
+                  collapse = " "))
+    }
+    leverage = object$leverage
+    # Get the matrix for estimation of linear model:
+    maxp      = max(periods,periodsJ); # Max number of aggregation levels
+    if(!is.null(leverage)){ maxp = max(maxp,leverage) }
+    n         = length(RM1);  #Number of Days
+
+    # Aggregate RV:
+    RVmatrix1 = aggRV(RM1,periods);
+    if( nest==2 ){ RVmatrix2 = aggRV(RM2,periods); }  # In case a jumprobust estimator is supplied
+
+    # Only keep useful parts:
+    x1 = RVmatrix1[(maxp:n),];
+    if( nest==2 ){ x2 = RVmatrix2[(maxp:n),]; } # In case a jumprobust estimator is supplied
+
+    # Jumps:
+    if (object$type != "HARRV") { # If model type is as such that you need jump component
+      J = pmax( RM1 - RM2,0 ); # Jump contributions should be positive
+      J = aggJ(J,periodsJ);
+    }
+
+    if( !is.null(leverage) ){
+      if( sum(newdata < 0) == 0 ){
+        warning("You cannot use leverage variables in the model in case your input consists of Realized Measures")
+      }
+      # Get close-to-close returns
+      e = apply.daily(newdata,sum); #Sum logreturns daily
+      # Get the rmins:
+      rmintemp = pmin(e,0);
+      # Aggregate everything:
+      rmin = aggRV(rmintemp,periods=leverage,type="Rmin")
+      # Select:
+      rmin = rmin[(maxp:n),]
+    } else {
+      rmin = matrix(ncol=0,nrow=dim(x1)[1])
+    }
+    
+    if( object$type == "HARRV" ){ 
+      if(!is.null(object$transform)){ x1 = Ftransform(x1) }
+      x = cbind(x1,rmin)
+    }
+    
+    if( object$type == "HARRVJ" ){   
+      if(!is.null(object$transform) && transform=="log"){ J = J + 1; }
+      J = J[(maxp:(n)),]; 
+      x = cbind(x1,J);              # bind jumps to RV data 
+      if(!is.null(transform)){ x = Ftransform(x); }       
+      x = cbind(x,rmin);
+    }
+    
+    if( object$type == "HARRVCJ" ){ 
+      
+      if( object$jumptest=="ABDJumptest" ){ 
+        TQ = apply.daily(newdata, TQfun); 
+        J = J[,1];
+        teststats= ABDJumptest(RV=RM1,BPV=RM2,TQ=TQ ); 
+      }else{ jtest = match.fun(object$jumptest); teststats = jtest(newdata,...) }  
+      Jindicators  = teststats > qnorm(1-object$alpha_jumps); 
+      J[!Jindicators] = 0;
+      
+      # Get continuous components if necessary RV measures if necessary: 
+      Cmatrix = matrix( nrow = dim(RVmatrix1)[1], ncol = 1 );
+      Cmatrix[Jindicators,]    = RVmatrix2[Jindicators,1];      #Fill with robust one in case of jump
+      Cmatrix[(!Jindicators)]  = RVmatrix1[(!Jindicators),1];   #Fill with non-robust one in case of no-jump  
+      # Aggregate again:
+      Cmatrix = aggRV(Cmatrix,periods,type="C");
+      Jmatrix = aggJ(J,periodsJ);
+      # subset again:
+      Cmatrix = Cmatrix[(maxp:(n)),];
+      Jmatrix = Jmatrix[(maxp:(n)),];   
+      if(!is.null(object$transform) && object$transform=="log"){ Jmatrix = Jmatrix + 1 }
+      
+      x = cbind(Cmatrix,Jmatrix);               # bind jumps to RV data      
+      if(!is.null(transform)){ x = Ftransform(x); }  
+      x = cbind(x,rmin);
+
+    }
+    
+    if (is.null(object$transform) == TRUE) {
+      return(as.numeric(as.matrix(cbind(1, x))  %*%  object$coefficients))
+    }
+    if (object$transform == "log") {
+      if (warnings == TRUE) {
+        warning("Due to log-transform, forecast of RV is derived under assumption of log-normality.")
+      }
+      return(as.numeric(exp(as.matrix(cbind(1, x))  %*%  object$coefficients + 1/2 * var(object$residuals))))
+    }
+    if (object$transform == "sqrt") {
+      if (warnings == TRUE) {
+        warning("Forecast for sqrt(RV) due to transform == \"sqrt\".")
+      }
+      return(as.numeric(as.matrix(cbind(1, x))  %*%  object$coefficients))
+    }
+  }
+}
+
+
 
 ##################################################################################################
 ######################################### FORMER RTAQ FUNCTIONS ##################################
