@@ -79,7 +79,7 @@ importFrom("stats", "bw.nrd0", "coef", "cov", "dbeta", "density",
              "dnorm", "end", "formula", "integrate", "lm", "mad",
              "median", "optim", "optimize", "pchisq", "pnorm", "qchisq",
              "qnorm", "residuals", "rnorm", "runif", "sd", "start",
-             "summary.lm", "time", "weighted.mean")
+             "summary.lm", "time", "weighted.mean","var")
 importFrom("utils", "data", "read.csv", "read.delim", "tail")
 importFrom("grDevices", "dev.interactive")
 
