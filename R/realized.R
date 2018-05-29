@@ -2042,7 +2042,7 @@ label.pos = c(4, 2), cex.caption = 1){
     
 }
 
-predict.harModel = function(object, newdata = NULL, warnings = TRUE, ...) {
+predict.harModel = function(object, newdata = NULL, warnings = TRUE) {
   # If no new data is provided - just forecast on the last day of your estimation sample
   # If new data with colnames as in object$model$x is provided, i.e. right measures for that model, just use that data
   if (is.null(newdata) == TRUE) {
