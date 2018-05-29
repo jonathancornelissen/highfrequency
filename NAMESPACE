@@ -69,12 +69,7 @@ rTPVar,
 heavyModelC,
 spotvol,
 getPrice,
-has.Qty,
-predict.harModel,
-plot.harModel,
-print.harModel,
-summary.harModel,
-plot.spotvol
+has.Qty
 )
 
 importFrom("graphics", "abline", "layout", "legend", "lines",
