@@ -61,7 +61,7 @@ where \eqn{D_t} is 1 (-1) if \eqn{trade_t} was buy (sell)
 
 \item{di_diff: depth imbalance (as a difference)}{
 \deqn{
-\mbox{depth imbalace (as difference)}_t =  \frac{D_t *(\mbox{OFRSIZ}_{t}-\mbox{BIDSIZ}_{t})}{(\mbox{OFRSIZ}_{t}+\mbox{BIDSIZ}_{t})},
+\mbox{depth imbalance (as difference)}_t =  \frac{D_t *(\mbox{OFRSIZ}_{t}-\mbox{BIDSIZ}_{t})}{(\mbox{OFRSIZ}_{t}+\mbox{BIDSIZ}_{t})},
 }
 where \eqn{D_t} is 1 (-1) if \eqn{trade_t} was buy (sell) (see Boehmer (2005), Bessembinder (2003)). 
 Note that the input of this function consists of the matched trades and quotes,
@@ -70,7 +70,7 @@ Note that the input of this function consists of the matched trades and quotes,
 
 \item{di_div: depth imbalace (as ratio)}{
 \deqn{
-\mbox{depth imbalace (as ratio)}_t =  (\frac{D_t *\mbox{OFRSIZ}_{t}}{\mbox{BIDSIZ}_{t}})^{D_t},
+\mbox{depth imbalance (as ratio)}_t =  (\frac{\mbox{OFRSIZ}_{t}}{\mbox{BIDSIZ}_{t}})^{D_t},
 }
 where \eqn{D_t} is 1 (-1) if \eqn{trade_t} was buy (sell) (see Boehmer (2005), Bessembinder (2003)). 
 Note that the input of this function consists of the matched trades and quotes,
