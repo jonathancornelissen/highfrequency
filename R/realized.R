@@ -1828,6 +1828,7 @@ harModel = function(data, periods = c(1,5,22), periodsJ = c(1,5,22), periodsQ = 
        if(type == "HARRVQ"){
          RV3 = match.fun( RVest[2]); 
          RM3 = apply.daily( data, RV3 );
+         periodsJ = periods;
        }
         
      }
