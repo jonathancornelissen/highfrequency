@@ -66,28 +66,81 @@ Bollerslev, T., Patton, A., Quaedvlieg, R. 2016,  Exploiting the errors: A simpl
 \keyword{forecasting}
 
 \examples{ 
- ##### Example 1: HARRVCJ ##### 
- data("sample_5minprices_jumps"); 
-   dat = sample_5minprices_jumps[,1];
- dat = makeReturns(dat); #Get the high-frequency return data
- 
- x = harModel(dat, periods = c(1,5,10), periodsJ=c(1,5,10), RVest = c("rCov","rBPCov"), 
-       type="HARRVCJ",transform="sqrt"); 
- # Estimate the HAR model of type HARRVCJ  
- class(x);
- x 
+##### Example 1: HARRVCJ ##### 
+data("sample_5minprices_jumps"); 
+dat = sample_5minprices_jumps[,1];
+dat = makeReturns(dat); #Get the high-frequency return data
 
- ##### Example 2:  ##### 
- # Forecasting daily Realized volatility for DJI 2008 using the basic harModel: HARRV
- data(realized_library); #Get sample daily Realized Volatility data
- DJI_RV = realized_library$Dow.Jones.Industrials.Realized.Variance; #Select DJI
- DJI_RV = DJI_RV[!is.na(DJI_RV)]; #Remove NA's
- DJI_RV = DJI_RV['2008'];
-
- x = harModel(data=DJI_RV , periods = c(1,5,22), RVest = c("rCov"), 
-    type="HARRV",h=1,transform=NULL);
- class(x); 
- x;
- summary(x);
+x = harModel(dat, periods = c(1,5,10), periodsJ=c(1,5,10), RVest = c("rCov","rBPCov"), 
+             type="HARRVCJ",transform="sqrt", inputType = "returns"); 
+# Estimate the HAR model of type HARRVCJ  
+class(x);
+x 
 # plot(x);
+predict(x);
+
+
+##### Example 2: HARRV ##### 
+# Forecasting daily Realized volatility for DJI 2008 using the basic harModel: HARRV
+data(realized_library); #Get sample daily Realized Volatility data
+DJI_RV = realized_library$Dow.Jones.Industrials.Realized.Variance; #Select DJI
+DJI_RV = DJI_RV[!is.na(DJI_RV)]; #Remove NA's
+DJI_RV = DJI_RV['2008'];
+
+x = harModel(data=DJI_RV , periods = c(1,5,22), RVest = c("rCov"), 
+             type="HARRV",h=1,transform=NULL, inputType = "returns");
+class(x); 
+x;
+summary(x);
+# plot(x);
+predict(x);
+
+
+##### Example 3: HARRVQ ##### 
+data("sample_5minprices_jumps"); 
+dat = sample_5minprices_jumps[,1];
+dat = makeReturns(dat); #Get the high-frequency return data
+
+x = harModel(dat, periods = c(1,5,10), periodsJ = c(1,5,10), periodsQ = c(1), RVest = c("rCov", "rQuar"), 
+             type="HARRVQ", inputType = "returns"); 
+# Estimate the HAR model of type HARRVQ 
+class(x);
+x 
+# plot(x);
+predict(x);
+
+
+##### Example 4: HARRVQJ with already computed realized measures ##### 
+data("SP500RM"); 
+dat = cbind(SP500RM$RV, SP500RM$BPV, SP500RM$RQ)
+
+x = harModel(dat, periods = c(1,5,22), periodsJ = c(1), periodsQ = c(1), type="HARRVQJ"); 
+# Estimate the HAR model of type HARRVQJ
+class(x);
+x;
+#plot(x);
+predict(x);
+
+
+##### Example 5: CHARRV with already computed realized measures ##### 
+data("SP500RM"); 
+dat = cbind(SP500RM$RV, SP500RM$BPV)
+
+x = harModel(dat, periods = c(1,5,22), type="CHARRV"); 
+# Estimate the HAR model of type CHARRV 
+class(x);
+x;
+#plot(x);
+predict(x);
+
+##### Example 6: CHARRVQ with already computed realized measures ##### 
+data("SP500RM"); 
+dat = cbind(SP500RM$RV, SP500RM$BPV, SP500RM$RQ)
+
+x = harModel(dat, periods = c(1,5,22), periodsQ = c(1), type="CHARRVQ"); 
+# Estimate the HAR model of type CHARRVQ  
+class(x);
+x;
+#plot(x);
+predict(x);
 }
