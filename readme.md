@@ -1,4 +1,4 @@
-[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/mfGARCH)](https://cran.r-project.org/package=mfGARCH) 
+[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/highfrequency)](https://cran.r-project.org/package=highfrequency) 
 
 The package is still under development and is distributed without warranty.
 
