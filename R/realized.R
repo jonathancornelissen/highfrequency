@@ -1776,7 +1776,7 @@ rScatterReturns <- function(x,y, period, align.by="seconds", align.period=1,numb
 #  jumptest: function to calculate the jump test statistic which determines whether the daily jump contribution is significant
 #  alpha: a value between zero and one to indicate what
 #  h: integer, determining over how many periods the depend variable should be aggregated. The default is 1, i.e. no aggregation is done, just one day. 
-#  TODO ADD extra argument: jump-periods??? for aggregated jumps in the model...
+
 
 # Helpfunctions: 
 TQfun = function(rdata){ #Calculate the realized tripower quarticity
@@ -1794,51 +1794,93 @@ ABDJumptest = function(RV, BPV, TQ){ # Comput jump detection stat mentioned in r
     return(zstat);
 }
 
-harModel = function(data, periods = c(1,5,22), periodsJ = c(1,5,22), leverage=NULL, RVest = c("rCov","rBPCov"), type="HARRV", 
-jumptest="ABDJumptest",alpha=0.05,h=1,transform=NULL, ...){  
+harModel = function(data, periods = c(1,5,22), periodsJ = c(1,5,22), periodsQ = c(1),
+                    leverage=NULL, RVest = c("rCov","rBPCov", "rQuar"), type="HARRV", inputType = "RM",
+                    jumptest="ABDJumptest",alpha=0.05,h=1,transform=NULL, ...){  
     nperiods = length(periods); # Number of periods to aggregate over
     nest = length(RVest);       # Number of RV estimators
+    nperiodsQ = length(periodsQ) #Number of periods to aggregate realized quarticity over
+    jumpModels = c("HARRVJ", "HARRVCJ", "HARRVQJ", "CHARRV", "CHARRVQ")
+    quarticityModels = c("HARRVQ", "HARRVQJ", "CHARRVQ")
+    bpvModels = c("CHARRV", "CHARRVQ")
     if( !is.null(transform) ){ Ftransform = match.fun(transform); }
-    if( !(type %in% c("HARRV","HARRVJ","HARRVCJ"))){ warning("Please provide a valid argument for type, see documentation.")  }    
+    if( !(type %in% c("HARRV", jumpModels, quarticityModels))){ warning("Please provide a valid argument for type, see documentation.")  }    
     
-    if( sum(data<0) != 0 ){ #If it are returns as input
-        # Get the daily RMs (in a non-robust and robust way)
-        RV1 = match.fun(  RVest[1]);
-        RM1 = apply.daily( data, RV1 );
-        # save dates:
-        alldates = index(RM1)
-        if( nest == 2 ){ 
-            RV2 = match.fun( RVest[2]); 
-            RM2 = apply.daily( data, RV2 ); }
+    
+    
+    if( inputType != "RM"){ #If it are returns as input
+     # Get the daily RMs
+     RV1 = match.fun(  RVest[1]);
+     RM1 = apply.daily( data, RV1 );
+     # save dates:
+     alldates = index(RM1)
+     if( type %in% jumpModels ){ 
+       RV2 = match.fun( RVest[2]); 
+       RM2 = apply.daily( data, RV2 );
+      }
+     if( type %in% quarticityModels ){ 
+       if(type %in% c("HARRVQJ","CHARRVQ")){##HARRVQJ and CHARRVQ are the only models that need both BPV and realized quarticity.
+         RV2 = match.fun( RVest[2]); 
+         RM2 = apply.daily( data, RV2 ); 
+         RV3 = match.fun( RVest[3]); 
+         RM3 = apply.daily( data, RV3 );
+       }
+       if(type == "HARRVQ"){
+         RV3 = match.fun( RVest[2]); 
+         RM3 = apply.daily( data, RV3 );
+         periodsJ = periods;
+       }
+        
+     }
     } 
     
-    if( sum(data<0) == 0 ){ #The input is most likely already realized measures
-        dimdata = dim(data)[2]; 
-        alldates = index(data); 
-        RM1 = data[,1]; 
-        if( dimdata > 1 ){ RM2 = data[,2]; } 
-        if( type != "HARRV" ){ warning("Please provide returns as input for the type of model you want to estimate. All your returns are positive which is quite unlikely honestly. Only for the HAR-RV model you can input realized measures.") }
+    if( inputType == "RM" ){ #The input is  already realized measures
+     dimdata = dim(data)[2]; 
+     alldates = index(data); 
+     RM1 = data[,1]; 
+     if( type %in% jumpModels){RM2 = data[,2];}
+     if( type == "HARRVQ"){RM3 = data[,2];}
+     if( type %in% c("HARRVQJ", "CHARRVQ")){RM2 = data[,2]; RM3 = data[,3];} 
     } 
+        
+     
     
     # Get the matrix for estimation of linear model: 
-    maxp      = max(periods,periodsJ); # Max number of aggregation levels
+    maxp      = max(periods,periodsJ,periodsQ); # Max number of aggregation levels
     if(!is.null(leverage)){ maxp = max(maxp,leverage) }
     n         = length(RM1);  #Number of Days
     
     # Aggregate RV: 
-    RVmatrix1 = aggRV(RM1,periods);
-    if( nest==2 ){ RVmatrix2 = aggRV(RM2,periods); }  # In case a jumprobust estimator is supplied
     
+    RVmatrix1 = aggRV(RM1,periods);
     # Aggregate and subselect y:
     y = aggY(RM1,h,maxp);
     
     # Only keep useful parts: 
     x1 = RVmatrix1[(maxp:(n-h)),]; 
-    if( nest==2 ){ x2 = RVmatrix2[(maxp:(n-h)),]; } # In case a jumprobust estimator is supplied 
+    if(type %in% jumpModels ){ 
+      RVmatrix2 = aggJ(RM2,periods);
+      x2 = RVmatrix2[(maxp:(n-h)),]
+      }  # In case a jumprobust estimator is supplied
+    if(type %in% quarticityModels){ #in case realized quarticity estimator is supplied
+      RQmatrix  = aggRQ(RM3,periodsQ)[(maxp:(n-h)),];
+      if(nperiodsQ == 1){
+        RQmatrix = as.matrix(sqrt(RQmatrix) - sqrt(mean(RM3)))
+      }else{
+        RQmatrix = sqrt(RQmatrix) - sqrt(mean(RM3)) #Demeaned realized quarticity estimator as in BPQ(2016) 
+      }
+      
+      
+    } 
     
+
     # Jumps:
-    if(type!="HARRV"){ # If model type is as such that you need jump component 
+    if(type %in% jumpModels && !(type %in% bpvModels)){ # If model type is as such that you need jump component, don't spend time on computing jumps for CHAR.. models
+      if(any(RM2 == 0) && inputType == "RM"){ #The jump contributions were provided
+        J = RM2
+      }else{ #compute jump contributions
         J = pmax( RM1 - RM2,0 ); # Jump contributions should be positive
+      }
         J = aggJ(J,periodsJ);         
     }
     
@@ -1861,7 +1903,7 @@ jumptest="ABDJumptest",alpha=0.05,h=1,transform=NULL, ...){
         if(!is.null(transform)){ y = Ftransform(y); x1 = Ftransform(x1) }
         x1 = cbind(x1,rmin);
         model     = estimhar(y=y,x=x1); 
-        model$transform = transform; model$h = h; model$type = "HARRV"; 
+        model$transform = transform; model$h = h; model$type = "HARRV"; model$inputType = inputType; 
         model$dates = alldates[(maxp+h):n]; 
         model$RVest = RVest[1];
         model$leverage = leverage;
@@ -1870,53 +1912,128 @@ jumptest="ABDJumptest",alpha=0.05,h=1,transform=NULL, ...){
     } #End HAR-RV if cond
     
     if( type == "HARRVJ" ){   
-        if(!is.null(transform) && transform=="log"){ J = J + 1; }
-        J = J[(maxp:(n-h)),]; 
-        x = cbind(x1,J);              # bind jumps to RV data 
-        if(!is.null(transform)){ y = Ftransform(y); x = Ftransform(x); }       
-        x = cbind(x,rmin);
-        model = estimhar(y=y,x=x); 
-        model$transform = transform; model$h = h; model$type = "HARRVJ"; 
-        model$dates = alldates[(maxp+h):n]; model$RVest = RVest;
-        model$leverage = leverage;
-        class(model) = c("harModel","lm"); 
-        return( model )    
+      if(!is.null(transform) && transform=="log"){ J = J + 1; }
+      J = J[(maxp:(n-h)),]; 
+      x = cbind(x1,J);              # bind jumps to RV data 
+      if(!is.null(transform)){ y = Ftransform(y); x = Ftransform(x); }       
+      x = cbind(x,rmin);
+      model = estimhar(y=y,x=x); 
+      model$transform = transform; model$h = h; model$type = "HARRVJ"; model$inputType = inputType;
+      model$dates = alldates[(maxp+h):n]; model$RVest = RVest;
+      model$leverage = leverage;
+      class(model) = c("harModel","lm"); 
+      return( model )    
     }#End HAR-RV-J if cond
     
     if( type == "HARRVCJ" ){ 
-        # Are the jumps significant? if not set to zero:
-        if( jumptest=="ABDJumptest" ){ 
-            TQ = apply.daily(data, TQfun); 
-            J = J[,1];
-            teststats= ABDJumptest(RV=RM1,BPV=RM2,TQ=TQ ); 
-        }else{ jtest = match.fun(jumptest); teststats = jtest(data,...) }  
-        Jindicators  = teststats > qnorm(1-alpha); 
-        J[!Jindicators] = 0;
-        
-        # Get continuus components if necessary RV measures if necessary: 
-        Cmatrix = matrix( nrow = dim(RVmatrix1)[1], ncol = 1 );
-        Cmatrix[Jindicators,]    = RVmatrix2[Jindicators,1];      #Fill with robust one in case of jump
-        Cmatrix[(!Jindicators)]  = RVmatrix1[(!Jindicators),1];   #Fill with non-robust one in case of no-jump  
-        # Aggregate again:
-        Cmatrix <- aggRV(Cmatrix,periods,type="C");
-        Jmatrix <- aggJ(J,periodsJ);
-        # subset again:
-        Cmatrix <- Cmatrix[(maxp:(n-h)),];
-        Jmatrix <- Jmatrix[(maxp:(n-h)),];   
-        if(!is.null(transform) && transform=="log"){ Jmatrix = Jmatrix + 1 }
-        
-        x = cbind(Cmatrix,Jmatrix);               # bind jumps to RV data      
-        if(!is.null(transform)){ y = Ftransform(y); x = Ftransform(x); }  
-        x = cbind(x,rmin);
-        model = estimhar( y=y, x=x ); 
-        model$transform = transform; model$h = h; model$type = "HARRVCJ"; 
-        model$dates = alldates[(maxp+h):n]; model$RVest = RVest;
-        model$leverage = leverage;
-        model$jumptest = jumptest;
-        model$alpha_jumps = alpha;  
-        class(model) = c("harModel","lm");
-        return(model)
+     # Are the jumps significant? if not set to zero:
+     if( jumptest=="ABDJumptest" ){ 
+         TQ = apply.daily(data, TQfun); 
+         J = J[,1];
+         teststats= ABDJumptest(RV=RM1,BPV=RM2,TQ=TQ ); 
+     }else{ jtest = match.fun(jumptest); teststats = jtest(data,...) }  
+     Jindicators  = teststats > qnorm(1-alpha); 
+     J[!Jindicators] = 0;
+     
+     # Get continuus components if necessary RV measures if necessary: 
+     Cmatrix = matrix( nrow = dim(RVmatrix1)[1], ncol = 1 );
+     Cmatrix[Jindicators,]    = RVmatrix2[Jindicators,1];      #Fill with robust one in case of jump
+     Cmatrix[(!Jindicators)]  = RVmatrix1[(!Jindicators),1];   #Fill with non-robust one in case of no-jump  
+     # Aggregate again:
+     Cmatrix <- aggRV(Cmatrix,periods,type="C");
+     Jmatrix <- aggJ(J,periodsJ);
+     # subset again:
+     Cmatrix <- Cmatrix[(maxp:(n-h)),];
+     Jmatrix <- Jmatrix[(maxp:(n-h)),];   
+     if(!is.null(transform) && transform=="log"){ Jmatrix = Jmatrix + 1 }
+     
+     x = cbind(Cmatrix,Jmatrix);               # bind jumps to RV data      
+     if(!is.null(transform)){ y = Ftransform(y); x = Ftransform(x); }  
+     x = cbind(x,rmin);
+     model = estimhar( y=y, x=x ); 
+     model$transform = transform; model$h = h; model$type = "HARRVCJ"; model$inputType = inputType;
+     model$dates = alldates[(maxp+h):n]; model$RVest = RVest;
+     model$leverage = leverage;
+     model$jumptest = jumptest;
+     model$alpha_jumps = alpha;  
+     class(model) = c("harModel","lm");
+     return(model)
     } 
+    
+    if( type == "HARRVQ"){
+      if(!is.null(transform)){
+        y = Ftransform(y); x1 = Ftransform(x1)
+        warning("The realized quarticity is already transformed with sqrt() thus only realized variance is transformed")
+      }
+      x1 = cbind(x1, RQmatrix[,1:nperiodsQ] * x1[,1:nperiodsQ])
+      if(is.null(colnames(RQmatrix))){ #special case for 1 aggregation period of realized quarticity. This appends the RQ1 name
+        colnames(x1) = c(colnames(x1[,1:nperiods]),"RQ1")
+      }
+      x1 = cbind(x1,rmin);
+      model     = estimhar(y=y,x=x1); 
+      model$fitted.values = harInsanityFilter(fittedValues = model$fitted.values, lower = min(RM1), upper = max(RM1), replacement = mean(RM1));
+      model$transform = transform; model$h = h; model$type = "HARRVQ"; model$inputType = inputType;
+      model$dates = alldates[(maxp+h):n]; 
+      model$RVest = RVest[1];
+      model$leverage = leverage;
+      class(model) = c("harModel","lm"); 
+      return( model )
+    }
+    
+    if( type == "HARRVQJ"){
+      if(!is.null(transform) && transform=="log"){ J = J + 1; }
+      J = J[(maxp:(n-h)),]; 
+      if(!is.null(transform)){
+        y = Ftransform(y); x1 = Ftransform(x1)
+        warning("The realized quarticity is already transformed with sqrt() thus only realized variance is transformed")
+      }
+      x1 = cbind(x1, J, RQmatrix[,1:nperiodsQ] * x1[,1:nperiodsQ])
+      if(is.null(colnames(RQmatrix))){ #special case for 1 aggregation period of realized quarticity. This appends the RQ1 name
+        colnames(x1) = c(colnames(x1[,1:(dim(x1)[2]-1)]), "RQ1")
+      }
+      x1 = cbind(x1,rmin);
+      model     = estimhar(y=y,x=x1); 
+      model$fitted.values = harInsanityFilter(fittedValues = model$fitted.values, lower = min(RM1), upper = max(RM1), replacement = mean(RM1));
+      model$transform = transform; model$h = h; model$type = "HARRVQJ"; model$inputType = inputType;
+      model$dates = alldates[(maxp+h):n]; 
+      model$RVest = RVest[1];
+      model$leverage = leverage;
+      class(model) = c("harModel","lm"); 
+      return( model )
+    }
+    
+    if( type == "CHARRV" ){ 
+      if(!is.null(transform)){ y = Ftransform(y); x2 = Ftransform(x2) }
+      x2 = cbind(x2,rmin);
+      model     = estimhar(y=y,x=x2); 
+      model$transform = transform; model$h = h; model$type = "CHARRV"; model$inputType = inputType; 
+      model$dates = alldates[(maxp+h):n]; 
+      model$RVest = RVest[1];
+      model$leverage = leverage;
+      class(model) = c("harModel","lm"); 
+      return( model )
+    } #End CHAR-RV if cond
+    
+    if( type == "CHARRVQ"){
+      if(!is.null(transform)){
+        y = Ftransform(y); x2 = Ftransform(x2)
+        warning("The realized quarticity is already transformed with sqrt() thus only realized variance and bipower variation is transformed")
+      }
+      x2 = cbind(x2, RQmatrix[,1:nperiodsQ] * x2[,1:nperiodsQ])
+      if(is.null(colnames(RQmatrix))){ #special case for 1 aggregation period of realized quarticity. This appends the RQ1 name
+        colnames(x2) = c(colnames(x2[,1:nperiods]),"RQ1")
+      }
+      x2 = cbind(x2,rmin);
+      model     = estimhar(y=y,x=x2); 
+      model$fitted.values = harInsanityFilter(fittedValues = model$fitted.values, lower = min(RM1), upper = max(RM1), replacement = mean(RM1));
+      model$transform = transform; model$h = h; model$type = "CHARRVQ"; model$inputType = inputType;
+      model$dates = alldates[(maxp+h):n]; 
+      model$RVest = RVest[1];
+      model$leverage = leverage;
+      class(model) = c("harModel","lm"); 
+      return( model )
+    } #End CHAR-RVQ if cond
+    
 } #End function harModel
 #################################################################
 estimhar = function(y, x){ #Potentially add stuff here
@@ -1928,8 +2045,7 @@ estimhar = function(y, x){ #Potentially add stuff here
 getHarmodelformula = function(x){
     modelnames = colnames(x$model$x);
     if(!is.null(x$transform)){ 
-        
-        modelnames = paste(x$transform,"(",modelnames,")",sep=""); } #Added visual tingie for plotting transformed RV
+    modelnames = paste(x$transform,"(",modelnames,")",sep=""); } #Added visual tingie for plotting transformed RV
     betas      = paste("beta",(1:length(modelnames)),"",sep="")
     betas2     = paste(" + ",betas,"*")
     rightside  = paste(betas2, modelnames,collapse="");
@@ -1974,6 +2090,18 @@ aggY = function(RM1,h,maxp){
     return(y);
 }
 
+aggRQ <- function(RM3,periods,type="RQ"){
+  n = length(RM3);
+  nperiods = length(periods);
+  RQmatrix = matrix(nrow=n,ncol=nperiods);
+  for(i in 1:nperiods){ 
+    if(periods[i]==1){ RQmatrix[,i] = RM3; 
+    }else{ RQmatrix[(periods[i]:n),i] = rollmean(x=RM3,k=periods[i],align="left")  }
+  } #end loop over periods for standard RV estimator
+  colnames(RQmatrix) = paste(type,periods,sep="");
+  return(RQmatrix);
+}
+
 
 ######################################################################### 
 # Print method for harmodel:  
@@ -2013,7 +2141,7 @@ plot.harModel = function(x, which = c(1L:3L, 5L), caption = list("Residuals vs F
 "Normal Q-Q", "Scale-Location", "Cook's distance", "Residuals vs Leverage", 
 expression("Cook's dist vs Leverage  " * h[ii]/(1 - h[ii]))), 
 panel = if (add.smooth) panel.smooth else points, sub.caption = NULL, 
-main = "", ask = prod(par("mfcol")) < length(which) && dev.interactive(), 
+main = "", ask = prod(par("mfcol")) < length(which) && dev.interactive(), legend.loc = "topleft",
 ..., id.n = 3, labels.id = names(residuals(x)), cex.id = 0.75, 
 qqline = TRUE, cook.levels = c(0.5, 1), add.smooth = getOption("add.smooth"), 
 label.pos = c(4, 2), cex.caption = 1){ 
@@ -2029,22 +2157,32 @@ label.pos = c(4, 2), cex.caption = 1){
     g_range[1] = 0.95*g_range[1]; g_range[2]= 1.05 * g_range[2]; 
     #ind = seq(1,length(fitted),length.out=5);
     title = paste("Observed and forecasted RV based on HAR Model:",type);
-    plot(cbind(observed, fitted), col=c('red', 'blue'), main=title,ylab="Realized Volatility", lty=c(2,1))
-     #plot.zoo(observed,col="red",lwd=2,main=title, ylim=g_range,xlab="Time",ylab="Realized Volatility"); 
+    plot(cbind(fitted,observed), col=c('blue', 'red'), main=title,ylab="Realized Volatility", lty=c(1,2), yaxis.right = FALSE)
+    
+    #plot.zoo(observed,col="red",lwd=2,main=title, ylim=g_range,xlab="Time",ylab="Realized Volatility"); 
     #  axis(1,time(b)[ind], format(time(b)[ind],), las=2, cex.axis=0.8); not used anymore
     #  axis(2);
     #lines(fitted,col="blue",lwd=2);
     #legend("topleft", c("Observed RV","Forecasted RV"), cex=1.1, col=c("red","blue"),lty=1, lwd=2, bty="n"); 
-    addLegend("topleft", on=1, 
-                         legend.names = c("Observed RV","Forecasted RV"), 
-                         lty=c(2, 1), lwd=c(2, 2),
-                         col=c("red", "blue"))
-    
+    addLegend(legend.loc = legend.loc, on=1, 
+                         legend.names = c("Forecasted RV","Observed RV"), 
+                         lty=c(1, 2), lwd=c(2, 2),
+                         col=c("blue", "red"))
 }
 
 predict.harModel = function(object, newdata = NULL, warnings = TRUE) {
   # If no new data is provided - just forecast on the last day of your estimation sample
   # If new data with colnames as in object$model$x is provided, i.e. right measures for that model, just use that data
+  ##### These 4 lines are added to make adding new models (hopefully) easier
+  jumpModels = c("HARRVJ", "HARRVCJ", "HARRVQJ", "CHARRV", "CHARRVQ")
+  quarticityModels = c("HARRVQ", "HARRVQJ", "CHARRVQ")
+  bpvModels = c("CHARRV", "CHARRVQ")  
+  #####
+  #### Initialization
+  type = object$type
+  inputType = object$inputType
+  ####
+  
   if (is.null(newdata) == TRUE) {
     if (is.null(object$transform) == TRUE) {
       return(as.numeric(c(1, xts::last(object$model$x))  %*%  object$coefficients))
@@ -2080,22 +2218,66 @@ predict.harModel = function(object, newdata = NULL, warnings = TRUE) {
     # Aggregate price data as in harModel function
     
     # Extract periods from coefficient names
-    if (object$type == "HARRV") {
+    if (type == "HARRV") {
       # RV component
       periods = as.numeric(substring(names(object$coefficients[-1])[grep("RV", names(object$coefficients[-1]))], first = 4))
       periodsJ = 0
+      periodsQ = 0
+      nperiodsQ = length(periodsQ)
     }
-    if (object$type == "HARRVJ") {
+    if (type == "HARRVJ") {
       # RV component
       periods = as.numeric(substring(names(object$coefficients[-1])[grep("RV", names(object$coefficients[-1]))], first = 4))
       # Jump components
       periodsJ = as.numeric(substring(names(object$coefficients[-1])[grep("J", names(object$coefficients[-1]))], first = 3))
+      # RQ component
+      periodsq = 0
+      nperiodsQ = length(periodsQ)
     }
-    if (object$type == "HARRVCJ") {
+    if (type == "HARRVCJ") {
       # Continuous component
       periods = as.numeric(substring(names(object$coefficients[-1])[grep("C", names(object$coefficients[-1]))], first = 3))
       # Jump component
       periodsJ = as.numeric(substring(names(object$coefficients[-1])[grep("J", names(object$coefficients[-1]))], first = 3))
+      # RQ component
+      periodsQ = 0
+      nperiodsQ = length(periodsQ)
+    }
+    if (type == "HARRVQ"){
+      # RV component
+      periods  = as.numeric(substring(names(object$coefficients[-1])[grep("RV", names(object$coefficients[-1]))], first = 4))
+      # Jump component
+      periodsJ = 0
+      # RQ component
+      periodsQ = as.numeric(substring(names(object$coefficients[-1])[grep("RQ", names(object$coefficients[-1]))], first = 4))
+      nperiodsQ = length(periodsQ)
+    }
+    if (type == "HARRVQJ"){
+      # RV component
+      periods  = as.numeric(substring(names(object$coefficients[-1])[grep("RV", names(object$coefficients[-1]))], first = 4))
+      # Jump component
+      periodsJ = as.numeric(substring(names(object$coefficients[-1])[grep("J", names(object$coefficients[-1]))], first = 3))
+      # RQ component
+      periodsQ = as.numeric(substring(names(object$coefficients[-1])[grep("RQ", names(object$coefficients[-1]))], first = 4))
+      nperiodsQ = length(periodsQ)
+    }
+    if (type == "CHARRV") {
+      # Continuous component
+      periods = as.numeric(substring(names(object$coefficients[-1])[grep("RV", names(object$coefficients[-1]))], first = 4))
+      # Jump component
+      periodsJ = 0
+      # RQ component
+      periodsQ = 0
+      nperiodsQ = length(periodsQ)
+    }
+    if (type == "CHARRVQ"){
+      # Continuous component
+      periods  = as.numeric(substring(names(object$coefficients[-1])[grep("RV", names(object$coefficients[-1]))], first = 4))
+      # Jump component
+      periodsJ = 0
+      # RQ component
+      periodsQ = as.numeric(substring(names(object$coefficients[-1])[grep("RQ", names(object$coefficients[-1]))], first = 4))
+      nperiodsQ = length(periodsQ)
     }
     
     RVest = object$RVest
@@ -2106,44 +2288,76 @@ predict.harModel = function(object, newdata = NULL, warnings = TRUE) {
       Ftransform = match.fun(transform)
     }
 
-    if (sum(newdata < 0) != 0) { #If it are returns as input
-      # Get the daily RMs (in a non-robust and robust way)
-      RV1 = match.fun(RVest[1])
-      RM1 = apply.daily(newdata, RV1)
-      # save dates:
-      alldates = index(RM1)
-      if (nest == 2) {
-        RV2 = match.fun(RVest[2])
-        RM2 = apply.daily(newdata, RV2)
+    if( inputType != "RM"){ #If it are returns as input
+      # Get the daily RMs
+      RV1 = match.fun(  RVest[1]);
+      RM1 = apply.daily( data, RV1 );
+      if( type %in% jumpModels ){ 
+        RV2 = match.fun( RVest[2]); 
+        RM2 = apply.daily( data, RV2 );
       }
-    }
-
-    if (sum(newdata < 0) == 0) { #The input is most likely already realized measures
-      stop(paste0(c("If your data is already aggregated, newdata column names should be", colnames(object$model$x), "as harModel-type is", object$type, "."),
+      if( type %in% quarticityModels ){ 
+        if(type %in% c("HARRVQJ","CHARRVQ")){##HARRVQJ and CHARRVQ are the only models that need both BPV and realized quarticity.
+          RV2 = match.fun( RVest[2]); 
+          RM2 = apply.daily( data, RV2 ); 
+          RV3 = match.fun( RVest[3]); 
+          RM3 = apply.daily( data, RV3 );
+        }
+        if(type == "HARRVQ"){
+          RV3 = match.fun( RVest[2]); 
+          RM3 = apply.daily( data, RV3 );
+        }
+        
+      }
+    } 
+    if ( inputType == "RM") { #The input is most likely already realized measures
+      stop(paste0(c("If your data is already aggregated, newdata column names should be", colnames(object$model$x), "as harModel-type is", type, "."),
                   collapse = " "))
     }
     leverage = object$leverage
-    # Get the matrix for estimation of linear model:
-    maxp      = max(periods,periodsJ); # Max number of aggregation levels
+    
+    maxp      = max(periods,periodsJ,periodsQ); # Max number of aggregation levels
     if(!is.null(leverage)){ maxp = max(maxp,leverage) }
     n         = length(RM1);  #Number of Days
-
-    # Aggregate RV:
+    
+    # Aggregate RV: 
+    h = object$h
     RVmatrix1 = aggRV(RM1,periods);
-    if( nest==2 ){ RVmatrix2 = aggRV(RM2,periods); }  # In case a jumprobust estimator is supplied
-
-    # Only keep useful parts:
-    x1 = RVmatrix1[(maxp:n),];
-    if( nest==2 ){ x2 = RVmatrix2[(maxp:n),]; } # In case a jumprobust estimator is supplied
-
+    # Aggregate and subselect y:
+    y = aggY(RM1,h,maxp);
+    
+    # Only keep useful parts: 
+    x1 = RVmatrix1[(maxp:(n-h)),]; 
+    if(type %in% jumpModels ){ 
+      RVmatrix2 = aggJ(RM2,periods);
+      x2 = RVmatrix2[(maxp:(n-h)),]
+    }  # In case a jumprobust estimator is supplied
+    if(type %in% quarticityModels){ #in case realized quarticity estimator is supplied
+      RQmatrix  = aggRQ(RM3,periodsQ)[(maxp:(n-h)),];
+      if(nperiodsQ == 1){
+        RQmatrix = as.matrix(sqrt(RQmatrix) - sqrt(mean(RM3)))
+      }else{
+        RQmatrix = sqrt(RQmatrix) - sqrt(mean(RM3)) #Demeaned realized quarticity estimator as in BPQ(2016) 
+      }
+      
+      
+    } 
+    
     # Jumps:
-    if (object$type != "HARRV") { # If model type is as such that you need jump component
-      J = pmax( RM1 - RM2,0 ); # Jump contributions should be positive
-      J = aggJ(J,periodsJ);
+    if(type %in% jumpModels && !(type %in% bpvModels)){ # If model type is as such that you need jump component, don't spend time on computing jumps for CHAR.. models
+      if(any(RM2 == 0) && inputType == "RM"){ #The jump contributions were provided
+        J = RM2
+      }else{ #compute jump contributions
+        J = pmax( RM1 - RM2,0 ); # Jump contributions should be positive
+      }
+      J = aggJ(J,periodsJ);         
     }
+    
+    
 
+    
     if( !is.null(leverage) ){
-      if( sum(newdata < 0) == 0 ){
+      if( inputType == "RM" ){
         warning("You cannot use leverage variables in the model in case your input consists of Realized Measures")
       }
       # Get close-to-close returns
@@ -2158,12 +2372,12 @@ predict.harModel = function(object, newdata = NULL, warnings = TRUE) {
       rmin = matrix(ncol=0,nrow=dim(x1)[1])
     }
     
-    if( object$type == "HARRV" ){ 
+    if( type == "HARRV" ){ 
       if(!is.null(object$transform)){ x1 = Ftransform(x1) }
       x = cbind(x1,rmin)
     }
     
-    if( object$type == "HARRVJ" ){   
+    if( type == "HARRVJ" ){   
       if(!is.null(object$transform) && transform=="log"){ J = J + 1; }
       J = J[(maxp:(n)),]; 
       x = cbind(x1,J);              # bind jumps to RV data 
@@ -2171,7 +2385,7 @@ predict.harModel = function(object, newdata = NULL, warnings = TRUE) {
       x = cbind(x,rmin);
     }
     
-    if( object$type == "HARRVCJ" ){ 
+    if( type == "HARRVCJ" ){ 
       
       if( object$jumptest=="ABDJumptest" ){ 
         TQ = apply.daily(newdata, TQfun); 
@@ -2199,6 +2413,49 @@ predict.harModel = function(object, newdata = NULL, warnings = TRUE) {
 
     }
     
+    if( type == "HARRVQ"){
+      if(!is.null(transform)){
+        y = Ftransform(y); x1 = Ftransform(x1)
+        warning("The realized quarticity is already transformed with sqrt() thus only realized variance is transformed")
+      }
+      x1 = cbind(x1, RQmatrix[,1:nperiodsQ] * x1[,1:nperiodsQ])
+      if(is.null(colnames(RQmatrix))){ #special case for 1 aggregation period of realized quarticity. This appends the RQ1 name
+        colnames(x1) = c(colnames(x1[,1:nperiods]),"RQ1")
+      }
+      x = cbind(x1,rmin);
+    }
+    
+    if( type == "HARRVQJ"){
+      if(!is.null(transform) && transform=="log"){ J = J + 1; }
+      J = J[(maxp:(n-h)),]; 
+      if(!is.null(transform)){
+        y = Ftransform(y); x1 = Ftransform(x1)
+        warning("The realized quarticity is already transformed with sqrt() thus only realized variance is transformed")
+      }
+      x1 = cbind(x1, J, RQmatrix[,1:nperiodsQ] * x1[,1:nperiodsQ])
+      if(is.null(colnames(RQmatrix))){ #special case for 1 aggregation period of realized quarticity. This appends the RQ1 name
+        colnames(x1) = c(colnames(x1[,1:(dim(x1)[2]-1)]), "RQ1")
+      }
+      x = cbind(x1,rmin);
+    }
+    
+    if( type == "CHARRV" ){ 
+      if(!is.null(transform)){ y = Ftransform(y); x2 = Ftransform(x2) }
+      x = cbind(x2,rmin);
+    } #End CHAR-RV if cond
+    
+    if( type == "CHARRVQ"){
+      if(!is.null(transform)){
+        y = Ftransform(y); x2 = Ftransform(x2)
+        warning("The realized quarticity is already transformed with sqrt() thus only realized variance and bipower variation is transformed")
+      }
+      x2 = cbind(x2, RQmatrix[,1:nperiodsQ] * x2[,1:nperiodsQ])
+      if(is.null(colnames(RQmatrix))){ #special case for 1 aggregation period of realized quarticity. This appends the RQ1 name
+        colnames(x2) = c(colnames(x2[,1:nperiods]),"RQ1")
+      }
+      x = cbind(x2,rmin);
+    } #End CHAR-RVQ if cond
+    
     if (is.null(object$transform) == TRUE) {
       return(as.numeric(as.matrix(cbind(1, x))  %*%  object$coefficients))
     }
@@ -2216,6 +2473,17 @@ predict.harModel = function(object, newdata = NULL, warnings = TRUE) {
     }
   }
 }
+
+#Insanity filter of BPQ, not exported
+harInsanityFilter = function(fittedValues, lower, upper, replacement){
+  replacementIndices = (fittedValues<lower | fittedValues>upper)
+  fittedValues[replacementIndices] = replacement
+  return(fittedValues)
+  
+}
+
+
+
 
 
 
