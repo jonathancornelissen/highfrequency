@@ -32,37 +32,7 @@ minRQ = function(rdata,align.by=NULL,align.period = NULL, makeReturns = FALSE,..
 }
 
 
-####medRQ: An estimator of integrated quarticity 
-#from applying the median operator on blocks of three returns. 
 
-medRQ = function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE,...)
-{
-  if (hasArg(data)) 
-  {
-    rdata = data
-  }
-  multixts = .multixts(rdata)
-  if (multixts) 
-  {
-    result = apply.daily(rdata, medRQ, align.by, align.period, makeReturns) 
-    return(result)
-  }
-  if (!multixts) 
-  {
-    if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata = .aggregatets(rdata, on = align.by, k = align.period)
-    }
-    if(makeReturns)
-    {
-      rdata = makeReturns(rdata)
-    }
-    q = abs(as.numeric(rdata))
-    q = as.numeric(rollmedian(q, k = 3,align="center"))
-    N = length(q)+2
-    medRQ = 3*pi*N/(9*pi+72-52*sqrt(3))*(N/(N-2))*sum(q^4)
-    return(medRQ)
-  } 
-}
 
 ####Realized quarticity of highfrequency return series.####
 

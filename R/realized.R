@@ -19,13 +19,6 @@
     } 
 } 
 
-RV = function(rdata,...){
-    if(hasArg(data)){ rdata = data }
-    returns=as.numeric(rdata);
-    RV = sum(returns*returns);
-    return(RV);
-}
-
 RBPCov_bi = function(ts1,ts2){
     n = length(ts1);
     a = abs(ts1+ts2);
@@ -200,8 +193,7 @@ eta = 9){
 }
 
 
-RTSCov_bi = 
-function (pdata1, pdata2, startIV1 = NULL, startIV2 = NULL, noisevar1 = NULL, 
+RTSCov_bi <- function (pdata1, pdata2, startIV1 = NULL, startIV2 = NULL, noisevar1 = NULL, 
 noisevar2 = NULL, K = 300, J = 1, 
 K_cov = NULL , J_cov = NULL , 
 K_var1 = NULL , K_var2 = NULL , 
@@ -315,8 +307,7 @@ eta = 9)
     return(RTSCV)
 }
 
-TSCov_bi = function (pdata1, pdata2, K = 300, J = 1) 
-{
+TSCov_bi <- function (pdata1, pdata2, K = 300, J = 1) {
     x = refreshTime(list(pdata1, pdata2))
     newprice1 = x[, 1]
     newprice2 = x[, 2]
@@ -330,7 +321,7 @@ TSCov_bi = function (pdata1, pdata2, K = 300, J = 1)
     adj = n/((K - J) * nbarK)
     
     logreturns_K1 = logreturns_K2 = logreturns_J1 = logreturns_J2 = c()
-    vdelta_K =  vdelta_J = c();
+    vdelta_K =  vdelta_J = c()
     
     for (k in 1:K) {
         sel.avg = seq(k, n, K)
