@@ -3,3 +3,6 @@
 S3method(predict,harModel)
 export(RV)
 export(medRQ)
+export(minRQ)
+export(rQuar)
+export(rSV)

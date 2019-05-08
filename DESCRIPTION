@@ -40,5 +40,6 @@ Imports:
 Suggests:
     FKF,
     BMS,
-    rugarch
+    rugarch,
+    testthat
 RoxygenNote: 6.1.1

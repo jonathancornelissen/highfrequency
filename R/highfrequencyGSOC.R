@@ -1,70 +1,8 @@
 
-####minRQ: An estimator of integrated quarticity 
-#from applying the minimum operator on blocks of two returns.
-
-minRQ = function(rdata,align.by=NULL,align.period = NULL, makeReturns = FALSE,...)
-{
-  if (hasArg(data)) 
-  {
-    rdata = data
-  }
-  multixts = .multixts(rdata)
-  if (multixts) 
-  {
-    result = apply.daily(rdata, minRQ, align.by, align.period, makeReturns)
-    return(result)
-  }
-  if (!multixts) 
-  {
-    if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata = .aggregatets(rdata, on = align.by, k = align.period)
-    }
-    if(makeReturns)
-    {
-      rdata = makeReturns(rdata)
-    }
-    q     = as.zoo(abs(as.numeric(rdata)))
-    q     = as.numeric(rollapply(q, width = 2, FUN = min, by = 1, align = "left"))
-    N     = length(q)+1
-    minRQ = pi*N/(3*pi-8)*(N/(N-1))*sum(q^4)
-    return(minRQ)
-  }
-}
 
 
 
 
-####Realized quarticity of highfrequency return series.####
-
-rQuar = function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE,...)
-{
-  if (hasArg(data)) 
-  {
-    rdata = data
-  }
-  multixts = .multixts(rdata)
-  if (multixts) 
-  {
-    result = apply.daily(rdata, rQuar, align.by, align.period,
-                         makeReturns)
-    return(result)
-  }
-  if (!multixts) 
-  {
-    if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata = .aggregatets(rdata, on = align.by, k = align.period)
-    }
-    if (makeReturns) 
-    {
-      rdata = makeReturns(rdata)
-    }
-    
-    q     = as.numeric(rdata)
-    N     = length(q)+1
-    rQuar = N/3*sum(q^4)
-    return(rQuar)
-  }
-}
 
 ####Realized quadpower variation of highfrequency return series####
 
@@ -101,8 +39,7 @@ rQPVar = function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
 
 ####Realized tripower variation of highfrequency return series.####
 
-rTPVar = function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE,...)
-{
+rTPVar <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE) {
   if (hasArg(data)) 
   {
     rdata = data
@@ -143,8 +80,7 @@ rTPVar = function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
 #2) standard error of IVestimator;
 #3) confidence band of IVestimator. 
 
-ivInference = function(rdata, IVestimator = "RV", IQestimator = "rQuar", confidence = 0.95, align.by = NULL, align.period = NULL, makeReturns = FALSE, ...)
-{
+ivInference <- function(rdata, IVestimator = "RV", IQestimator = "rQuar", confidence = 0.95, align.by = NULL, align.period = NULL, makeReturns = FALSE, ...) {
   if (hasArg(data)){ rdata = data  }
   
   multixts = .multixts(rdata)
@@ -165,12 +101,9 @@ ivInference = function(rdata, IVestimator = "RV", IQestimator = "rQuar", confide
     p      = as.numeric(confidence)
     
     iq     = .hatiq(rdata,IQestimator)
-    
     iv     = .IV(IVestimator,iq)
     
-    
     hatIV  = .hativ(rdata, IVestimator, N,...)
-    
     stderr = 1/sqrt(N)*iv
     
     ##confidence band
@@ -188,58 +121,9 @@ ivInference = function(rdata, IVestimator = "RV", IQestimator = "rQuar", confide
   }
 }
 
-
-
-
-####Realized semivariance####
-
-rSV= function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE,...)
-{
-  if (hasArg(data)) 
-  {
-    rdata = data
-  }
-  
-  multixts =  .multixts(rdata)
-  
-  if (multixts) 
-  {
-    result = apply.daily(rdata, rSV, align.by, align.period,  
-                         makeReturns)
-    return(result)
-  }
-  
-  if (!multixts) 
-  {
-    if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata =.aggregatets(rdata, on = align.by, k = align.period)
-    }
-    if (makeReturns) 
-    {
-      rdata = makeReturns(rdata)
-    }
-    
-    q = as.numeric(rdata)
-    select.down <-rdata <0
-    select.up <- rdata >0
-    
-    rSVd = sum(q[select.down]^2)
-    rSVu = sum(q[select.up]^2)
-    
-    out={}
-    out$rSVdownside = rSVd
-    out$rSVupside = rSVu
-    
-    return(out)
-    
-  }
-}
-
-
 ####Realized skewness####
 
-rSkew = function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE,...)
-{
+rSkew = function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE,...) {
   if (hasArg(data)) 
   {
     rdata = data
@@ -279,7 +163,7 @@ rSkew = function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALS
 
 ####Realized kurtosis####
 
-rKurt = function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE,...)
+rKurt <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE,...)
 {
   if (hasArg(data)) 
   {
@@ -365,8 +249,7 @@ rMPV = function(rdata, m= 2, p=2, align.by= NULL, align.period= NULL, makeReturn
 
 ####Preaveraging estimators (matrix)####
 ##Preaveraging
-MRC= function(pdata, pairwise = FALSE , makePsd= FALSE,...)
-{
+MRC <- function(pdata, pairwise = FALSE , makePsd= FALSE,...) {
   
   if (!is.list(pdata)) {
     n = 1

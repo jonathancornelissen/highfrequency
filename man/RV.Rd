@@ -4,12 +4,10 @@
 \alias{RV}
 \title{An estimator of realized variance.}
 \usage{
-RV(rdata, ...)
+RV(rdata)
 }
 \arguments{
 \item{rdata}{a zoo/xts object containing all returns in period t for one asset.}
-
-\item{...}{additional arguments.}
 }
 \value{
 numeric
