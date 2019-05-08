@@ -24,6 +24,48 @@
   return(ts3)
 } #Very fast and elegant way to do previous tick aggregation :D!
 
+### Do a daily apply but with list as output:
+#' @keywords internal
+.applygetlist <- function(x, FUN, cor = FALSE, align.by = NULL, align.period = NULL, makeReturns = FALSE, makePsd = FALSE,...){
+  on = "days" 
+  k=1
+  x <- try.xts(x, error = FALSE)
+  INDEX <- endpoints(x,on=on,k=k)
+  D <- length(INDEX)-1
+  result <- list()
+  FUN <- match.fun(FUN)
+  for(i in 1:(length(INDEX)-1)){
+    result[[i]] <- FUN(x[(INDEX[i] + 1):INDEX[i + 1]],cor,align.by,align.period,makeReturns,makePsd)
+  }
+  return(result)
+}
+
+#' @keywords internal
+makePsd <- function(S,method="covariance"){
+  if (method=="correlation" & !any(diag(S)<=0) ) {
+    # Fan, J., Y. Li, and K. Yu (2010). Vast volatility matrix estimation using high frequency data for portfolio selection.
+    D <- matrix(diag(S)^(1/2),ncol=1)
+    R <- S / (D%*%t(D))
+    out <- eigen(x=R , symmetric = TRUE)
+    mGamma <- t(out$vectors)
+    vLambda <- out$values
+    vLambda[vLambda<0] = 0
+    Apsd <- t(mGamma)%*%diag(vLambda)%*%mGamma
+    dApsd <- matrix(diag(Apsd)^(1/2),ncol=1)
+    Apsd <- Apsd/(dApsd%*%t(dApsd))
+    D <- diag( as.numeric(D)  , ncol = length(D) )
+    Spos <- D %*% Apsd %*% D
+    return(Spos)
+  }else{
+    # Rousseeuw, P. and G. Molenberghs (1993). Transformation of non positive semidefinite correlation matrices. Communications in Statistics - Theory and Methods 22, 965-984.
+    out <- eigen( x=S , symmetric = TRUE )
+    mGamma <- t(out$vectors)
+    vLambda <- out$values
+    vLambda[vLambda<0] <- 0
+    Apsd <- t(mGamma) %*% diag(vLambda) %*% mGamma
+  }
+}
+
 #' @importFrom xts xts
 #' @importFrom zoo index
 #' @keywords internal
@@ -35,6 +77,8 @@ makeReturns <- function (ts) {
   x <- xts(x, order.by = index(ts))
   return(x)
 }
+
+
 
 #' @importFrom xts is.xts
 #' @importFrom xts ndays

@@ -39,6 +39,7 @@ Imports:
     timeDate,
     MASS
 Suggests:
+    covr,
     FKF,
     BMS,
     rugarch,

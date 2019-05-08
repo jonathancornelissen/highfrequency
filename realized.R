@@ -3,8 +3,41 @@
 ######################################################## 
 ## Help functions: (not exported)
 ######################################################## 
+.multixts <- function( x, y=NULL)
+{ 
+    if(is.null(y)){
+        test = is.xts(x) && (ndays(x)!=1);
+        return(test);
+    }
+    if(!is.null(y)){
+        test = (is.xts(x) && (ndays(x)!=1)) || ( ndays(y)!=1 && is.xts(y) );
+        if( test ){
+            test1 = dim(y) == dim(x);
+            if(!test1){ warning("Please make sure x and y have the same dimensions") }
+            if(test1){  test = list( TRUE, cbind(x,y) ); return(test) }
+        } 
+    } 
+} 
 
+RBPCov_bi = function(ts1,ts2){
+    n = length(ts1);
+    a = abs(ts1+ts2);
+    b = abs(ts1-ts2);  
+    first = as.numeric(a[1:(n-1)])*as.numeric(a[2:n]);
+    last = as.numeric(b[1:(n-1)])*as.numeric(b[2:n]);
+    result =  (pi/8)*sum(first-last);
+    return(result);
+}
 
+#Realized BiPower Variation (RBPVar) (RBPVar)
+RBPVar = function(rdata,...){
+    if(hasArg(data)){ rdata = data }
+    
+    returns = as.vector(as.numeric(rdata));
+    n = length(returns);
+    rbpvar = (pi/2)*sum(abs(returns[1:(n-1)])*abs(returns[2:n]));
+    return(rbpvar);
+}
 
 # Check data:
 rdatacheck = function (rdata, multi = FALSE) 
@@ -514,15 +547,18 @@ rKernel.available <- function()
 
 
 ## REalized Variance: Average subsampled
-rv.avg = function(x, period) { 
+rv.avg = function(x, period)
+{ 
     mean(.rv.subsample(x, period))
 }
 
-rc.avg = function( x, y,  period ) {
+rc.avg = function( x, y,  period )
+{
     mean(.rc.subsample(x, y, period));
 }
 
-.rv.subsample <- function(x, period, cts=TRUE, makeReturns=FALSE,...) {
+.rv.subsample <- function(x, period, cts=TRUE, makeReturns=FALSE,...)
+{
     cdata <- .convertData(x, cts=cts, makeReturns=makeReturns)
     x <- cdata$data
     
@@ -894,7 +930,19 @@ makePsd = function(S,method="covariance"){
     }
 }
 
-
+### Do a daily apply but with list as output:
+.applygetlist = function(x, FUN,cor=FALSE,align.by=NULL,align.period=NULL,makeReturns=FALSE,makePsd=FALSE,...){
+    on="days";k=1;
+    x <- try.xts(x, error = FALSE); 
+    INDEX = endpoints(x,on=on,k=k); 
+    D = length(INDEX)-1; 
+    result = list(); 
+    FUN <- match.fun(FUN);
+    for(i in 1:(length(INDEX)-1)){
+        result[[i]] = FUN(x[(INDEX[i] + 1):INDEX[i + 1]],cor,align.by,align.period,makeReturns,makePsd);
+    }
+    return(result);
+}
 
 # Aggregation function: FAST previous tick aggregation
 .aggregatets = function (ts, on = "minutes", k = 1) 
@@ -1683,7 +1731,7 @@ rScatterReturns <- function(x,y, period, align.by="seconds", align.period=1,numb
 
 
 # Helpfunctions: 
-TQfun <- function(rdata){ #Calculate the realized tripower quarticity
+TQfun = function(rdata){ #Calculate the realized tripower quarticity
     returns = as.vector(as.numeric(rdata));
     n = length(returns);
     mu43 = 0.8308609; #    2^(2/3)*gamma(7/6) *gamma(1/2)^(-1)   
@@ -1691,14 +1739,14 @@ TQfun <- function(rdata){ #Calculate the realized tripower quarticity
     return(tq);
 } 
 
-ABDJumptest <- function(RV, BPV, TQ){ # Comput jump detection stat mentioned in roughing paper
+ABDJumptest = function(RV, BPV, TQ){ # Comput jump detection stat mentioned in roughing paper
     mu1  = sqrt(2/pi);
     n = length(RV);
     zstat = ((1/n)^(-1/2))*((RV-BPV)/RV)*(  (mu1^(-4) + 2*(mu1^(-2))-5) * pmax( 1,TQ*(BPV^(-2)) )   )^(-1/2); 
     return(zstat);
 }
 
-harModel <- function(data, periods = c(1,5,22), periodsJ = c(1,5,22), periodsQ = c(1),
+harModel = function(data, periods = c(1,5,22), periodsJ = c(1,5,22), periodsQ = c(1),
                     leverage=NULL, RVest = c("rCov","rBPCov", "rQuar"), type="HARRV", inputType = "RM",
                     jumptest="ABDJumptest",alpha=0.05,h=1,transform=NULL, ...){  
     nperiods = length(periods); # Number of periods to aggregate over
