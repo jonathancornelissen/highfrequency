@@ -21,10 +21,10 @@ License: GPL (>= 2)
 Encoding: UTF-8
 LazyData: true
 Depends:
-    R (>= 2.12.0),
-    xts,
-    zoo
+    R (>= 2.12.0)
 Imports:
+    xts,
+    zoo,
     graphics,
     methods,
     stats,
@@ -37,7 +37,7 @@ Imports:
     mvtnorm,
     chron,
     timeDate,
-    MASS,
+    MASS
 Suggests:
     FKF,
     BMS,

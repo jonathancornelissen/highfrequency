@@ -18,15 +18,14 @@
 #' 
 #' @examples
 #' \dontrun{
-#' data(sample_tdata)
-#' medRQ(rdata= sample_tdata$PRICE, align.by= "minutes", align.period =5, makeReturns= TRUE)
+#' medRQ(rdata = sample_tdata$PRICE, align.by = "minutes", align.period = 5, makeReturns = TRUE)
 #' medRQ
-#'}
+#' }
 #' @keywords highfrequency medRQ
 #' @references Andersen, T. G., D. Dobrev, and E. Schaumburg (2012). Jump-robust volatility estimation using nearest neighbor truncation. Journal of Econometrics, 169(1), 75- 93.
+#' @importFrom zoo rollmedian
 #' @export
-medRQ <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE,...)
-{
+medRQ <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE) {
   if (hasArg(data)) {
     rdata <- data
   }
@@ -64,20 +63,19 @@ medRQ <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
 #' @param align.by a string, align the tick data to "seconds"|"minutes"|"hours"
 #' @param align.period an integer, align the tick data to this many [seconds|minutes|hours].
 #' @param makeReturns boolean, should be TRUE when rdata contains prices instead of returns. FALSE by  default.
-#' @param ... additional arguments.
 #' 
 #' @return numeric
 #' 
 #' @examples
 #' \dontrun{
-#' data(sample_tdata)
-#'minRQ(rdata= sample_tdata$PRICE, align.by= "minutes", align.period =5, makeReturns= TRUE)
+#' minRQ(rdata = sample_tdata$PRICE, align.by = "minutes", align.period = 5, makeReturns = TRUE)
 #' minRQ
-#'}
+#' }
 #'@references Andersen, T. G., D. Dobrev, and E. Schaumburg (2012). Jump-robust volatility estimation using nearest neighbor truncation. Journal of Econometrics, 169(1), 75- 93.
+#' @importFrom zoo as.zoo
+#' @importFrom zoo rollapply
 #' @export
-minRQ <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE,...)
-{
+minRQ <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE) {
   if (hasArg(data)) {
     rdata = data
   }
@@ -124,7 +122,7 @@ minRQ <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
 #' \dontrun{
 #' data(sample_tdata)
 #' rSV(sample_tdata$PRICE,align.by ="minutes", align.period =5, makeReturns = TRUE)
-#'}
+#' }
 #' @references Barndorff-Nielsen, O.E., Kinnebrock, S. and Shephard N. (2008). Measuring downside risk - realized semivariance. CREATES research paper. p. 3-5.
 #' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
 #' @keywords  highfrequency rSV
@@ -197,10 +195,11 @@ RV <- function(rdata) {
 #'
 #' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
 #' @references  Andersen, T. G., D. Dobrev, and E. Schaumburg (2012). Jump-robust volatility estimation using nearest neighbor truncation. Journal of Econometrics, 169(1), 75- 93.
+#' @examples 
 #' \dontrun{
 #' data(sample_tdata)
 #' rQuar(rdata= sample_tdata$PRICE, align.by= "minutes", align.period =5, makeReturns= TRUE)
-#'}
+#' }
 #' @keywords  highfrequency rQuar
 #' @export
 rQuar <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE) {

@@ -5,7 +5,7 @@
 \title{An estimator of integrated quarticity from applying the median operator on blocks of three returns.}
 \usage{
 medRQ(rdata, align.by = NULL, align.period = NULL,
-  makeReturns = FALSE, ...)
+  makeReturns = FALSE)
 }
 \arguments{
 \item{rdata}{a zoo/xts object containing all returns in period t for one asset.}
@@ -33,8 +33,7 @@ Function returns the medRQ, defined in Andersen et al. (2012).
 }
 \examples{
 \dontrun{
-data(sample_tdata)
-medRQ(rdata= sample_tdata$PRICE, align.by= "minutes", align.period =5, makeReturns= TRUE)
+medRQ(rdata = sample_tdata$PRICE, align.by = "minutes", align.period = 5, makeReturns = TRUE)
 medRQ
 }
 }

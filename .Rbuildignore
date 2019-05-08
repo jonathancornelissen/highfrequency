@@ -3,3 +3,4 @@
 news.txt
 readme.txt
 notes.R
+^\.travis\.yml$
