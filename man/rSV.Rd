@@ -19,9 +19,12 @@ rSV(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE)
 list with to arguments. The realized positive and negative semivariance.
 }
 \description{
-Function returns Realized semivariance, defined in Barndorff-Nielsen et al. (2008).
+Function returns realized semivariances, defined in Barndorff-Nielsen et al. (2008).
+
 Function returns two outcomes: 1.Downside realized semivariance and 2.Upside realized semivariance.
+
 Assume there is \eqn{N} equispaced returns in period \eqn{t}. Let \eqn{r_{t,i}} be a return (with \eqn{i=1, \ldots,N}) in period \eqn{t}.
+
 Then, the rSV is given by
 \deqn{
   \mbox{rSVdownside}_{t}= \sum_{i=1}^{N} (r_{t,i})^2  \ \times \ I [ r_{t,i} <0 ]

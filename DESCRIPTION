@@ -19,6 +19,7 @@ Description: Provide functionality to manage, clean and match highfrequency
     periodicity.
 License: GPL (>= 2)
 Encoding: UTF-8
+LazyData: true
 Depends:
     R (>= 2.12.0),
     xts,

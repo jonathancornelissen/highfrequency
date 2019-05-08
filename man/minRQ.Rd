@@ -23,7 +23,9 @@ numeric
 }
 \description{
 Function returns the minRQ, defined in Andersen et al. (2012).
+
 Assume there is \eqn{N} equispaced returns in period \eqn{t}. Let \eqn{r_{t,i}} be a return (with \eqn{i=1, \ldots,N}) in period \eqn{t}.
+
 Then, the minRQ is given by
 \deqn{
   \mbox{minRQ}_{t}=\frac{\pi N}{3 \pi - 8} \left(\frac{N}{N-1}\right) \sum_{i=1}^{N-1} \mbox{min}(|r_{t,i}| ,|r_{t,i+1}|)^4

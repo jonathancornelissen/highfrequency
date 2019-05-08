@@ -1,15 +1,6 @@
-
-
-
-
-
-
 ####Realized quadpower variation of highfrequency return series####
-
-rQPVar = function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE,...)
-{
-  if (hasArg(data)) 
-  {
+rQPVar = function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE) {
+  if (hasArg(data)) {
     rdata = data
   }
   multixts = .multixts(rdata)
@@ -68,56 +59,6 @@ rTPVar <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FA
     
 #    (N^2)/(N - 2) * 2^(2/3)_gamma(7/6)_gamma(1/2)^(-1) * sum(q^(4/3))
     return(rTPVar)
-  }
-}
-
-
-
-#### Standard error and confidence band of RV measures.####
-# User can choose integrated variance (IV) estimators RV, BV, minRV or medRV; 
-#and integrated quarticity (IQ) estimators: rQuar, TP, QP, minRQ or medRQ.
-# Output: 1)value of IVestimator; 
-#2) standard error of IVestimator;
-#3) confidence band of IVestimator. 
-
-ivInference <- function(rdata, IVestimator = "RV", IQestimator = "rQuar", confidence = 0.95, align.by = NULL, align.period = NULL, makeReturns = FALSE, ...) {
-  if (hasArg(data)){ rdata = data  }
-  
-  multixts = .multixts(rdata)
-  if (multixts) 
-  {
-    result = apply.daily(rdata, ivInference, align.by, align.period,
-                         makeReturns)
-    return(result)
-  }
-  else{
-    if((!is.null(align.by)) && (!is.null(align.period))){
-      rdata = .aggregatets(rdata, on = align.by, k = align.period)
-    }
-    
-    if(makeReturns){  rdata=makeReturns(rdata)  }
-    
-    N      = length(rdata)
-    p      = as.numeric(confidence)
-    
-    iq     = .hatiq(rdata,IQestimator)
-    iv     = .IV(IVestimator,iq)
-    
-    hatIV  = .hativ(rdata, IVestimator, N,...)
-    stderr = 1/sqrt(N)*iv
-    
-    ##confidence band
-    lowband  = as.numeric(hatIV-stderr*qnorm(p))
-    highband = as.numeric(hatIV+stderr*qnorm(p))
-    cb <- c(lowband,highband)
-    
-    ## reports: 
-    out       = {}
-    out$hativ = hatIV
-    out$se    = stderr
-    out$cb    = cb
-    
-    return(out)
   }
 }
 
@@ -253,7 +194,7 @@ MRC <- function(pdata, pairwise = FALSE , makePsd= FALSE,...) {
   
   if (!is.list(pdata)) {
     n = 1
-  }else {
+  } else {
     n = length(pdata)
   }
   if (n == 1) {
@@ -322,8 +263,7 @@ MRC <- function(pdata, pairwise = FALSE , makePsd= FALSE,...) {
 
 ####Realized beta####
 
-rBeta = function(rdata, rindex, RCOVestimator= "rCov", RVestimator= "RV", makeReturns= FALSE,...)
-{
+rBeta = function(rdata, rindex, RCOVestimator= "rCov", RVestimator= "RV", makeReturns= FALSE) {
   if (hasArg(data)) 
   {
     rdata = data
@@ -350,36 +290,31 @@ rBeta = function(rdata, rindex, RCOVestimator= "rCov", RVestimator= "RV", makeRe
   
   multixts = .multixts(rdata)
   
-  if (multixts) 
-  {
+  if (multixts) {
     print("No support for multiple days")
   }
-  if (!multixts) 
-  {
-    
-    rcovfun= function(rdata, rindex, RCOVestimator)
-    {
+  
+  if (!multixts) {
+    rcovfun= function(rdata, rindex, RCOVestimator) {
       switch(RCOVestimator,
-             rCov= rCov(cbind(rdata,rindex) ),
-             rAVGCov= rAVGCov(list(rdata, rindex) ),
-             rBPCov= rBPCov(cbind(rdata, rindex) ),
-             rHYCov= rHYCov(list(rdata, rindex) ),
-             rKernelCov= rKernelCov(list(rdata, rindex) ),
-             rOWCov= rOWCov(cbind(rdata, rindex) ),
-             rRTSCov= rRTSCov(list(rdata, rindex)),
-             rThresholdCov= rThresholdCov(cbind(rdata, rindex) ),
-             rTSCov= rTSCov(list(rdata, rindex))
+             rCov = rCov(cbind(rdata,rindex) ),
+             rAVGCov = rAVGCov(list(rdata, rindex) ),
+             rBPCov = rBPCov(cbind(rdata, rindex) ),
+             rHYCov = rHYCov(list(rdata, rindex) ),
+             rKernelCov = rKernelCov(list(rdata, rindex) ),
+             rOWCov = rOWCov(cbind(rdata, rindex) ),
+             rRTSCov = rRTSCov(list(rdata, rindex)),
+             rThresholdCov = rThresholdCov(cbind(rdata, rindex) ),
+             rTSCov = rTSCov(list(rdata, rindex))
       )
       
     }
     rcov= rcovfun(rdata,rindex,RCOVestimator);
     
-    if(RVestimator == RCOVestimator || is.null(RVestimator))
-    {
-      rbeta = rcov[1,2]/rcov[2,2];
-    }else{
-      rvfun= function(rindex, RVestimator)
-      {
+    if (RVestimator == RCOVestimator || is.null(RVestimator)) {
+      rbeta <- rcov[1,2] / rcov[2,2];
+    } else {
+      rvfun= function(rindex, RVestimator) {
         
         switch(RVestimator,
                RV= RV(rindex),
@@ -398,9 +333,10 @@ rBeta = function(rdata, rindex, RCOVestimator= "rCov", RVestimator= "RV", makeRe
         )             
         
       }
-      rv=rvfun(rindex,RVestimator)
       
-      rbeta = rcov[1,2]/rv
+      rv <- rvfun(rindex,RVestimator)
+      
+      rbeta <- rcov[1,2] / rv
     }
     
     return(rbeta)
