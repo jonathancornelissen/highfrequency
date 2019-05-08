@@ -292,7 +292,7 @@ RBPVar <- function (rdata) {
 #' rc
 #' @keywords volatility
 #' @export
-rCov <- function(rdata, cor = FALSE, align.by=NULL, align.period = NULL, makeReturns = FALSE, ...) {
+rCov <- function(rdata, cor = FALSE, align.by = NULL, align.period = NULL, makeReturns = FALSE, ...) {
   if (hasArg(data)) { 
     rdata <- data
   } 
