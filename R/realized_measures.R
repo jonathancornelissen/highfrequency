@@ -199,7 +199,7 @@ MRC <- function(pdata, pairwise = FALSE, makePsd = FALSE) {
   #   } else {
   #     x     <- refreshTime(pdata)
   #     N     <- nrow(x)
-  #     theta <- 0.8 ##recommendation by Hautsch and Podolskij
+  #     theta <- 0.8 #recommendation by Hautsch and Podolskij
   #     kn    <- floor(theta * sqrt(N))  
   #     
   #     ##psi:
@@ -535,7 +535,7 @@ rKurt <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
 #'   
 #'   in which
 #'   
-#'   \eqn{d_{m,p}= \mu_{p/m}^{-m}}:
+#'   \eqn{d_{m,p} = \mu_{p/m}^{-m}}:
 #'     
 #'     \eqn{m}: the window size of return blocks;
 #'   
@@ -786,7 +786,7 @@ rTPVar <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FA
 #'  
 #'  Then, the rQPVar is given by
 #'  \deqn{
-#'    \mbox{rQPVar}_{t}=\frac{N}{N-3} \left( 2^{1/4} \frac{\Gamma \left(3/4\right)}{ \Gamma \left(1/2\right)} \right)^{-4} \sum_{i=4}^{N} \mbox({|r_{t,i}|}^{1/2} #'{|r_{t,i-1}|}^{1/2} {|r_{t,i-2}|}^{1/2} {|r_{t,i-3}|}^{1/2})
+#'    \mbox{rQPVar}_{t}=\frac{N}{N-3} \left( 2^{1/4} \frac{\Gamma \left(3/4\right)}{ \Gamma \left(1/2\right)} \right)^{-4} \sum_{i=4}^{N} \mbox({|r_{t,i}|}^{1/2} {|r_{t,i-1}|}^{1/2} {|r_{t,i-2}|}^{1/2} {|r_{t,i-3}|}^{1/2})
 #'  }
 #'
 #'@param rdata a zoo/xts object containing all returns in period t for one asset.

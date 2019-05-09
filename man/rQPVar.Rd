@@ -26,7 +26,7 @@ Function returns the realized quad-power variation, defined in Andersen et al. (
  
  Then, the rQPVar is given by
  \deqn{
-   \mbox{rQPVar}_{t}=\frac{N}{N-3} \left( 2^{1/4} \frac{\Gamma \left(3/4\right)}{ \Gamma \left(1/2\right)} \right)^{-4} \sum_{i=4}^{N} \mbox({|r_{t,i}|}^{1/2} #'{|r_{t,i-1}|}^{1/2} {|r_{t,i-2}|}^{1/2} {|r_{t,i-3}|}^{1/2})
+   \mbox{rQPVar}_{t}=\frac{N}{N-3} \left( 2^{1/4} \frac{\Gamma \left(3/4\right)}{ \Gamma \left(1/2\right)} \right)^{-4} \sum_{i=4}^{N} \mbox({|r_{t,i}|}^{1/2} {|r_{t,i-1}|}^{1/2} {|r_{t,i-2}|}^{1/2} {|r_{t,i-3}|}^{1/2})
  }
 }
 \examples{

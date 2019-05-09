@@ -35,7 +35,7 @@ Function returns the rMPV, defined in Andersen et al. (2012).
   
   in which
   
-  \eqn{d_{m,p}= \mu_{p/m}^{-m}}:
+  \eqn{d_{m,p} = \mu_{p/m}^{-m}}:
     
     \eqn{m}: the window size of return blocks;
   
