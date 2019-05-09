@@ -1,7 +1,6 @@
 spotvol <- function(data, method = "detper", ..., on = "minutes", k = 5,
                     marketopen = "09:30:00", marketclose = "16:00:00",
-                    tz = "GMT")  
-{
+                    tz = "GMT") {
   if (on == "seconds" | on == "secs") 
     delta <- k 
   if (on == "minutes" | on == "mins") 
@@ -221,8 +220,7 @@ loglikBM <- function(par_t, yt, days, N = 288, P1 = 5, P2 = 5)
 # 
 # This function creates the state space matrices from the input parameters.
 # The output is in the format used by the FKF package.
-ssmodel <- function(par_t, days, N = 288, P1 = 5, P2 = 5)
-{
+ssmodel <- function(par_t, days, N = 288, P1 = 5, P2 = 5) {
   par <- c(exp(par_t["sigma"]), exp(par_t["sigma_mu"]), exp(par_t["sigma_h"]), 
            exp(par_t["sigma_k"]), exp(par_t["phi"])/(1+exp(par_t["phi"])), 
            exp(par_t["rho"])/(1+exp(par_t["rho"])), par_t[-(1:6)])
@@ -269,8 +267,7 @@ ssmodel <- function(par_t, days, N = 288, P1 = 5, P2 = 5)
 # Kernel estimation method
 # 
 # See Kristensen (2010)
-kernelestim <- function(mR, rdata = NULL, delta = 300, options = list())
-{
+kernelestim <- function(mR, rdata = NULL, delta = 300, options = list()) {
   # default options, replace if user-specified
   op <- list(type = "gaussian", h = NULL, est = "cv", lower = NULL, 
              upper = NULL)
@@ -327,8 +324,7 @@ kernelestim <- function(mR, rdata = NULL, delta = 300, options = list())
 
 # calculate values of certain kernels
 # arguments b and y only needed for type == "beta"
-kernelk <- function(x, type = "gaussian", b = 1, y = 1)
-{
+kernelk <- function(x, type = "gaussian", b = 1, y = 1) {
   if (type == "gaussian") 
     return(dnorm(x))  
   if (type == "epanechnikov") {
@@ -344,8 +340,7 @@ kernelk <- function(x, type = "gaussian", b = 1, y = 1)
 # by default, this is done through crossvalidation (cv)
 # else the formula for h_opt in Kristensen(2010) is approximated
 estbandwidth <- function(x, delta = 300, qmult = 1, type = "gaussian", 
-                         est = "cv", lower = NULL, upper = NULL)
-{
+                         est = "cv", lower = NULL, upper = NULL) {
   N <- length(x)
   S <- N*delta
   default <- bw.nrd0((1:N)*delta)
@@ -372,8 +367,7 @@ estbandwidth <- function(x, delta = 300, qmult = 1, type = "gaussian",
 }
 
 # calculate Integrated Square Error, given bandwidth h
-ISE <- function(h, x, delta = 300, type = "gaussian")
-{
+ISE <- function(h, x, delta = 300, type = "gaussian") {
   N <- length(x)
   t <- (1:N)*delta
   S <- N*delta
@@ -396,8 +390,7 @@ ISE <- function(h, x, delta = 300, type = "gaussian")
 
 # Piecewise constant volatility method
 # See Fried (2012)
-piecewise <- function(mR, rdata = NULL, options = list())
-{
+piecewise <- function(mR, rdata = NULL, options = list()) {
   # default options, replace if user-specified
   op <- list(type = "MDa", m = 40, n = 20, alpha = 0.005, volest = "bipower",
              online = TRUE)
@@ -478,8 +471,7 @@ changePoints <- function(vR, type = "MDa", alpha = 0.005, m = 40, n = 20)
 # Difference of medians test
 # See Fried (2012)
 # Returns TRUE if H0 is rejected
-DMtest <- function(x, y, alpha = 0.005)
-{
+DMtest <- function(x, y, alpha = 0.005) {
   m <- length(x)
   n <- length(y)
   xmed <- median(x)
@@ -498,8 +490,7 @@ DMtest <- function(x, y, alpha = 0.005)
 # Median difference test
 # See Fried (2012)
 # Returns TRUE if H0 is rejected
-MDtest <- function(x, y, alpha = 0.005, type = "MDa")
-{
+MDtest <- function(x, y, alpha = 0.005, type = "MDa") {
   m <- length(x)
   n <- length(y)
   N <- m + n
@@ -530,8 +521,7 @@ MDtest <- function(x, y, alpha = 0.005, type = "MDa")
 }
 
 # GARCH with seasonality (external regressors)
-garch_s <- function(mR, rdata = NULL, options = list())
-{
+garch_s <- function(mR, rdata = NULL, options = list()) {
   # default options, replace if user-specified
   op <- list(model = "eGARCH", order = c(1,1), dist = "norm", P1 = 5, 
              P2 = 5, solver.control = list())
@@ -577,8 +567,7 @@ garch_s <- function(mR, rdata = NULL, options = list())
   return(out)
 }
     
-plot.spotvol <- function(x, ...)
-{
+plot.spotvol <- function(x, ...) {
   options <- list(...)
   plottable <- c("spot", "periodic", "daily")
   elements <- names(x)
@@ -623,8 +612,7 @@ plot.spotvol <- function(x, ...)
 }
 
 intraday_regressors <- function(D, N = 288, order = 1, almond = TRUE, 
-                                dummies = FALSE, P1 = 5, P2 = 5)
-{  
+                                dummies = FALSE, P1 = 5, P2 = 5) {  
   if (order == 1) {
     vi <- rep(c(1:N), each = D)
   } else {
@@ -677,31 +665,27 @@ intraday_regressors <- function(D, N = 288, order = 1, almond = TRUE,
 
 ### auxiliary internal functions copied from highfrequency package
 
-countzeroes = function( series )
-{
+countzeroes <- function(series) {
   return( sum( 1*(series==0) ) )
 }
 
-HRweight = function( d,k){
+HRweight <- function(d, k){
   # Hard rejection weight function
   w = 1*(d<=k); return(w)
 }
 
-shorthscale = function( data )
-{
-  sorteddata = sort(data);
-  n = length(data);
-  h = floor(n/2)+1;
-  M = matrix( rep(0,2*(n-h+1) ) , nrow= 2 );
-  for( i in 1:(n-h+1) ){
-    M[,i] = c( sorteddata[ i ], sorteddata[ i+h-1 ] )
+shorthscale <- function(data) {
+  sorteddata <- sort(data);
+  n <- length(data);
+  h <- floor(n/2)+1;
+  M <- matrix( rep(0,2*(n-h+1) ) , nrow= 2 );
+  for (i in 1:(n-h+1)) {
+    M[,i] = c(sorteddata[ i ], sorteddata[ i+h-1 ])
   }
-  return( 0.7413*min( M[2,]-M[1,] ) );
+  return(0.7413 * min( M[2,] - M[1,]))
 }
 
-diurnal = 
-  function (stddata, method = "TML", dummies = F, P1 = 6, P2 = 4) 
-  {
+diurnal <- function (stddata, method = "TML", dummies = F, P1 = 6, P2 = 4) {
     cDays = dim(stddata)[1]
     intraT = dim(stddata)[2]
     meannozero = function(series) {
@@ -842,15 +826,14 @@ diurnalfit = function( theta , P1 , P2 , intraT , dummies=F )
   return( seas )          
 }
 
-center = function() {
+center <- function() {
   g <- function(y){ return( sqrt(2/pi)*exp(y-exp(2*y)/2)  )}
   f <- function(y){ return( y*g(y)    )  }
   return( integrate(f,-Inf,Inf)$value )
 }
 
 # modified version of 'aggregatePrice' from highfrequency package
-aggregatePrice = function (ts, FUN = "previoustick", on = "minutes", k = 1, marketopen = "09:30:00", marketclose = "16:00:00", tz = "GMT") 
-{
+aggregatePrice <- function (ts, FUN = "previoustick", on = "minutes", k = 1, marketopen = "09:30:00", marketclose = "16:00:00", tz = "GMT") {
   ts2 = aggregatets(ts, FUN = FUN, on, k)
   date = strsplit(as.character(index(ts)), " ")[[1]][1]
   

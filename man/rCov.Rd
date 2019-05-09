@@ -5,7 +5,7 @@
 \title{Realized Covariance}
 \usage{
 rCov(rdata, cor = FALSE, align.by = NULL, align.period = NULL,
-  makeReturns = FALSE, ...)
+  makeReturns = FALSE)
 }
 \arguments{
 \item{rdata}{a \eqn{(M x N)} matrix/zoo/xts object containing the \eqn{N}
@@ -18,8 +18,6 @@ return series over period \eqn{t}, with \eqn{M} observations during \eqn{t}.}
 \item{align.period}{an integer, align the tick data to this many [seconds|minutes|hours].}
 
 \item{makeReturns}{boolean, should be TRUE when rdata contains prices instead of returns. FALSE by default.}
-
-\item{...}{additional arguments.}
 }
 \value{
 an \eqn{N x N} matrix

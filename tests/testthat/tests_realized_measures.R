@@ -46,12 +46,12 @@ expect_equal(
   formatC(rKurt(sample_tdata$PRICE,align.by ="minutes", align.period = 5, makeReturns = TRUE) * 1000000, digits = 20),
   "6830574.3464303314686"
 )
-# 
-# # rMPV
-# expect_equal(
-#   formatC(rMPV(sample_tdata$PRICE,align.by ="minutes", align.period = 5, makeReturns = TRUE) * 1000000, digits = 20),
-#   "423.27734518675470099"
-# )
+
+# rMPV
+expect_equal(
+  formatC(rMPV(sample_tdata$PRICE,align.by ="minutes", align.period = 5, makeReturns = TRUE) * 1000000, digits = 20),
+  "423.27734518675470099"
+)
 
 # rSkew
 expect_equal(
@@ -65,11 +65,11 @@ expect_equal({
   list(rSVdownside = 0.00029125752237359241398, rSVupside = 0.00016310984360246060573)
 )
 
-# # rTPVar
-# expect_equal(
-#   formatC(rTPVar(sample_tdata$PRICE,align.by ="minutes", align.period = 5, makeReturns = TRUE) * 1000000, digits = 20),
-#   "0.0027736636298646998901"
-# )
+# rTPVar
+expect_equal(
+  formatC(rTPVar(sample_tdata$PRICE,align.by ="minutes", align.period = 5, makeReturns = TRUE) * 1000000, digits = 20),
+  "0.0027736636298646998901"
+)
 
 # RV
 expect_equal(
@@ -77,11 +77,11 @@ expect_equal(
   "29766.53635"
 )
 
-# # rQPVar
-# expect_equal(
-#   formatC(rQPVar(sample_tdata$PRICE,align.by ="minutes", align.period = 5, makeReturns = TRUE) * 1000000, digits = 20),
-#   "0.005940444309252677739"
-# )
+# rQPVar
+expect_equal(
+  formatC(rQPVar(sample_tdata$PRICE,align.by ="minutes", align.period = 5, makeReturns = TRUE) * 1000000, digits = 20),
+  "0.005940444309252677739"
+)
 
 # rQuar
 expect_equal(

@@ -12,7 +12,6 @@
 #' @param align.by a string, align the tick data to "seconds"|"minutes"|"hours".
 #' @param align.period an integer, align the tick data to this many [seconds|minutes|hours]. 
 #' @param makeReturns boolean, should be TRUE when rdata contains prices instead of returns. FALSE by  default.
-#' @param ... additional arguments.
 #' 
 #' @return numeric
 #' 
@@ -26,9 +25,7 @@
 #' @importFrom zoo rollmedian
 #' @export
 medRQ <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE) {
-  if (hasArg(data)) {
-    rdata <- data
-  }
+  
   multixts <- .multixts(rdata)
   if (multixts) {
     result <- apply.daily(rdata, medRQ, align.by, align.period, makeReturns) 
@@ -76,10 +73,8 @@ medRQ <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
 #' @importFrom zoo rollapply
 #' @export
 minRQ <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE) {
-  if (hasArg(data)) {
-    rdata = data
-  }
-  multixts = .multixts(rdata)
+  
+  multixts <- .multixts(rdata)
   if (multixts) {
     result <- apply.daily(rdata, minRQ, align.by, align.period, makeReturns)
     return(result)
@@ -98,6 +93,139 @@ minRQ <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
     return(minRQ)
   }
 }
+
+#' Modulated Realized Covariance (MRC): Return univariate or multivariate preaveraged estimator.  
+#' 
+#' @description Function returns univariate or multivariate preaveraged estimator, as defined in Hautsch and Podolskij (2013). 
+#'
+#' @param pdata a list. Each list-item contains an xts object with the intraday price data of a stock.
+#' @param pairwise boolean, should be TRUE when refresh times are based on pairs of assets. FALSE by  default.
+#' @param makePsd boolean, in case it is TRUE, the positive definite version of MRC is returned. FALSE by default.
+#' 
+#' @return an \eqn{d x d} matrix
+#' 
+#' @details 
+#'   In practice, market microstructure noise leads to a departure from the pure semimartingale model. We consider the process \eqn{Y} in period \eqn{\tau}: 
+#'     \deqn{
+#'       \mbox{Y}_{\tau} = X_{\tau} + \epsilon_{\tau}
+#'     }
+#'   where, the observed \eqn{d} dimensional log-prices are the sum of underlying Brownian semimartingale process \eqn{X} and a noise term \eqn{\epsilon_{\tau}}. 
+#'   
+#'   \eqn{\epsilon_{\tau}} is an i.i.d process with \eqn{X}. 
+#'   
+#'   It is intuitive that under mean zero i.i.d. microstructure noise some form of smoothing of the observed log-price should tend to diminish the impact of the noise. Effectively, we are going to approximate a continuous function by an average of observations of Y in a neighborhood, the noise being averaged away. 
+#'   
+#'   Assume there is \eqn{N} equispaced returns in period \eqn{\tau} of a list (after refeshing data). Let \eqn{r_{\tau_i}} be a return (with \eqn{i=1, \ldots,N}) of an asset in period \eqn{\tau}. Assume there is \eqn{d} assets. 
+#'   
+#'   In order to define the univariate pre-averaging estimator, we first define the pre-averaged returns as
+#'   \deqn{
+#'     \bar{r}_{\tau_j}^{(k)}= \sum_{h=1}^{k_N-1}g\left(\frac{h}{k_N}\right)r_{\tau_{j+h}}^{(k)}
+#'   }
+#'   where g is a non-zero real-valued function \eqn{g:[0,1]} \eqn{\rightarrow} \eqn{R} given by \eqn{g(x)} = \eqn{\min(x,1-x)}. \eqn{k_N} is a sequence of integers satisfying  \eqn{\mbox{k}_{N} = \lfloor\theta N^{1/2}\rfloor}. We use \eqn{\theta = 0.8} as recommendations in (Hautsch & Podolskij (2013)). The pre-averaged returns are simply a weighted average over the returns in a local window. This averaging diminishes the influence of the noise. The order of the window size \eqn{k_n} is chosen to lead to optimal convergence rates. The pre-averaging estimator is then simply the analogue of the Realized Variance but based on pre-averaged returns and an additional term to remove bias due to noise
+#'   \deqn{
+#'     \hat{C}= \frac{N^{-1/2}}{\theta \psi_2}\sum_{i=0}^{N-k_N+1}  (\bar{r}_{\tau_i})^2-\frac{\psi_1^{k_N}N^{-1}}{2\theta^2\psi_2^{k_N}}\sum_{i=0}^{N}r_{\tau_i}^2
+#'   }
+#'   with
+#'   \deqn{
+#'     \psi_1^{k_N}= k_N \sum_{j=1}^{k_N}\left(g\left(\frac{j+1}{k_N}\right)-g\left(\frac{j}{k_N}\right)\right)^2,\quad 
+#'   }
+#'   \deqn{
+#'     \psi_2^{k_N}= \frac{1}{k_N}\sum_{j=1}^{k_N-1}g^2\left(\frac{j}{k_N}\right).
+#'   }
+#'   \deqn{
+#'     \psi_2= \frac{1}{12}
+#'   }
+#'   The multivariate counterpart is very similar. The estimator is called the Modulated Realized Covariance (MRC) and is defined as
+#'   \deqn{
+#'     \mbox{MRC}= \frac{N}{N-k_N+2}\frac{1}{\psi_2k_N}\sum_{i=0}^{N-k_N+1}\bar{\boldsymbol{r}}_{\tau_i}\cdot \bar{\boldsymbol{r}}'_{\tau_i} -\frac{\psi_1^{k_N}}{\theta^2\psi_2^{k_N}}\hat{\Psi}
+#' }
+#' where \eqn{\hat{\Psi}_N = \frac{1}{2N}\sum_{i=1}^N \boldsymbol{r}_{\tau_i}(\boldsymbol{r}_{\tau_i})'}. It is a bias correction to make it consistent. However, due to this correction, the estimator is not ensured PSD. An alternative is to slightly enlarge the bandwidth such that \eqn{\mbox{k}_{N} = \lfloor\theta N^{1/2+\delta}\rfloor}. \eqn{\delta = 0.1} results in a consistent estimate without the bias correction and a PSD estimate, in which case:
+#'   \deqn{
+#'     \mbox{MRC}^{\delta}= \frac{N}{N-k_N+2}\frac{1}{\psi_2k_N}\sum_{i=0}^{N-k_N+1}\bar{\boldsymbol{r}}_i\cdot \bar{\boldsymbol{r}}'_i
+#' }
+#' 
+#' @references Hautsch, N., & Podolskij, M. (2013). Preaveraging-Based Estimation of Quadratic Variation in the Presence of Noise and Jumps: Theory, Implementation, and Empirical Evidence. Journal of Business & Economic Statistics, 31(2), 165-183.
+#' 
+#' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
+#' 
+#' @examples data(sample_5minprices_jumps)
+#' a <- list(sample_5minprices_jumps["2010-01-04",1], sample_5minprices_jumps["2010-01-04",2])
+#' MRC(a, pairwise = TRUE, makePsd = TRUE)
+#' 
+#' @keywords highfrequency preaveraging
+#' @export
+MRC <- function(pdata, pairwise = FALSE, makePsd = FALSE) {
+  print("needs further improvement!!!")
+  # 
+  # if (is.list(pdata) == FALSE) {
+  #   n <- 1
+  # } else {
+  #   n <- length(pdata)
+  # }
+  # if (n == 1) {
+  #   multixts = .multixts(pdata); 
+  #   if (multixts == TRUE) { 
+  #     stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")
+  #   }
+  #   mrc <- .crv(pdata)
+  # }  
+  # 
+  # if (n > 1) {
+  #   multixts <- .multixts(pdata[[1]]); 
+  #   if (multixts == TRUE) { 
+  #     stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input") 
+  #   }
+  #   
+  #   if (pairwise == TRUE) {
+  #     cov <- matrix(rep(0, n * n), ncol = n)
+  #     diagonal = c()
+  #     for (i in 1:n) {
+  #       diagonal[i] <- .crv(pdata[[i]])
+  #     }
+  #     diag(cov) <- diagonal
+  #     
+  #     for (i in 2:n) {
+  #       for (j in 1:(i - 1)) {
+  #         cov[i, j] = cov[j, i] = .preav_bi(pdata[[i]], pdata[[j]])
+  #       }
+  #     }
+  #     
+  #     mrc <- cov
+  #     
+  #     if (makePsd == TRUE) {
+  #       mrc <- makePsd(mrc)
+  #     }
+  #     
+  #   } else {
+  #     x     <- refreshTime(pdata)
+  #     N     <- nrow(x)
+  #     theta <- 0.8 ##recommendation by Hautsch and Podolskij
+  #     kn    <- floor(theta * sqrt(N))  
+  #     
+  #     ##psi:
+  #     psi1 <- 1
+  #     psi2 <- 1 / 12
+  #     
+  #     psi1kn <- kn * sum((.gfunction((1:kn)/kn) - .gfunction(((1:kn) - 1) / kn))^2 )
+  #     psi2kn <- 1 / kn * sum(.gfunction((1:kn) / kn)^2)   
+  #     
+  #     preavreturn <- c()
+  #     for (i in 1:ncol(x)) {
+  #       preavreturn <- cbind( preavreturn , .hatreturn(x[,i],kn) )
+  #     }       
+  #     
+  #     S <- rCov(preavreturn)
+  #     
+  #     mrc <- N / (N - kn + 2) * 1/(psi2 * kn) * S
+  #     
+  #     if (makePsd == TRUE) {
+  #       mrc <- makePsd(mrc)
+  #     }
+  #   }
+  # }
+  # return(mrc) 
+  0
+} 
 
 
 
@@ -128,7 +256,6 @@ minRQ <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
 #' @param align.period an integer, align the tick data to this many [seconds|minutes|hours]. 
 #' @param makeReturns boolean, should be TRUE when rdata contains prices instead of returns. FALSE by default.
 #' @param makePsd boolean, in case it is TRUE, the positive definite version of rBPCov is returned. FALSE by default.
-#' @param ... additional arguments.
 #'
 #' @return an \eqn{N x N} matrix
 #' 
@@ -156,10 +283,7 @@ minRQ <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
 #'  
 #' @keywords volatility
 #' @export
-rBPCov <- function(rdata, cor = FALSE, align.by = NULL, align.period = NULL, makeReturns = FALSE, makePsd = FALSE,...) {
-  if (hasArg(data) == TRUE) { 
-    rdata <- data 
-  }
+rBPCov <- function(rdata, cor = FALSE, align.by = NULL, align.period = NULL, makeReturns = FALSE, makePsd = FALSE) {
   
   # Multiday adjustment: 
   multixts <- .multixts(rdata); 
@@ -243,10 +367,8 @@ RBPCov_bi <- function(ts1,ts2) {
 }
 
 #' @keywords internal
-RBPVar <- function (rdata) {
-  if (hasArg(data)) { 
-    rdata <- data 
-  }
+RBPVar <- function(rdata) {
+  
   returns <- as.vector(as.numeric(rdata))
   n <- length(returns)
   rbpvar <- (pi/2) * sum(abs(returns[1:(n-1)]) * abs(returns[2:n]))
@@ -270,7 +392,6 @@ RBPVar <- function (rdata) {
 #' @param align.by a string, align the tick data to "seconds"|"minutes"|"hours".
 #' @param align.period an integer, align the tick data to this many [seconds|minutes|hours].
 #' @param makeReturns boolean, should be TRUE when rdata contains prices instead of returns. FALSE by default.
-#' @param ... additional arguments.
 #' 
 #' @return an \eqn{N x N} matrix
 #' 
@@ -292,29 +413,27 @@ RBPVar <- function (rdata) {
 #' rc
 #' @keywords volatility
 #' @export
-rCov <- function(rdata, cor = FALSE, align.by = NULL, align.period = NULL, makeReturns = FALSE, ...) {
-  if (hasArg(data)) { 
-    rdata <- data
-  } 
+rCov <- function(rdata, cor = FALSE, align.by = NULL, align.period = NULL, makeReturns = FALSE) {
+  
   # Multiday adjustment: 
   multixts <- .multixts(rdata)
   if(multixts){ 
-    if(is.null(dim(rdata))) {  
+    if (is.null(dim(rdata))) {  
       n <- 1
     } else { 
       n <- dim(rdata)[2]
     }
     if (n == 1) { 
-      result <- apply.daily(rdata,rCov,align.by=align.by,align.period=align.period,makeReturns=makeReturns) 
+      result <- apply.daily(rdata, rCov, align.by = align.by, align.period = align.period, makeReturns = makeReturns) 
     }
     if (n > 1) { 
-      result <- .applygetlist(rdata, rCov, cor=cor, align.by=align.by,align.period=align.period,makeReturns=makeReturns) 
+      result <- .applygetlist(rdata, rCov, cor=cor, align.by = align.by, align.period = align.period, makeReturns = makeReturns) 
     }    
     return(result)
   } 
   if(!multixts){ #single day code
     if((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata = .aggregatets(rdata, on=align.by, k=align.period);
+      rdata <- .aggregatets(rdata, on = align.by, k = align.period)
     } 
     if (makeReturns) {  
       rdata <- makeReturns(rdata) 
@@ -329,14 +448,14 @@ rCov <- function(rdata, cor = FALSE, align.by = NULL, align.period = NULL, makeR
     }
     if (n > 1) {
       
-      rdata = as.matrix(rdata)
-      covariance = t(rdata) %*% rdata
+      rdata <- as.matrix(rdata)
+      covariance <- t(rdata) %*% rdata
       if (cor == FALSE) {
         return(covariance)
       }
       if (cor == TRUE){
-        sdmatrix = sqrt(diag(diag(covariance)));
-        rcor = solve(sdmatrix) %*% covariance %*% solve(sdmatrix)
+        sdmatrix <- sqrt(diag(diag(covariance)));
+        rcor <- solve(sdmatrix) %*% covariance %*% solve(sdmatrix)
         return(rcor)
       }
     }
@@ -373,11 +492,8 @@ rCov <- function(rdata, cor = FALSE, align.by = NULL, align.period = NULL, makeR
 #' @keywords highfrequency rKurt
 #' @export
 rKurt <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE) {
-  if (hasArg(data) == TRUE) {
-    rdata = data
-  }
   
-  multixts = .multixts(rdata)
+  multixts <- .multixts(rdata)
   
   if (multixts == TRUE) {
     result = apply.daily(rdata, rKurt, align.by, align.period,
@@ -404,6 +520,81 @@ rKurt <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
     
   }
 }
+
+
+#' Realized multipower variation (MPV), an estimator of integrated power variation. 
+#' 
+#' @description Function returns the rMPV, defined in Andersen et al. (2012).
+#'   
+#'   Assume there is \eqn{N} equispaced returns in period \eqn{t}. Let \eqn{r_{t,i}} be a return (with \eqn{i=1, \ldots,N}) in period \eqn{t}.
+#'   
+#'   Then, the rMPV is given by
+#'   \deqn{
+#'     \mbox{rMPV}_{N}(m,p)= d_{m,p} \frac{N^{p/2}}{N-m+1} \sum_{i=1}^{N-m+1}|r_{t,i}|^{p/m} \ldots |r_{t,i+m-1}|^{p/m}
+#'   }
+#'   
+#'   in which
+#'   
+#'   \eqn{d_{m,p}= \mu_{p/m}^{-m}}:
+#'     
+#'     \eqn{m}: the window size of return blocks;
+#'   
+#'   \eqn{p}: the power of the variation;
+#'   
+#'   and \eqn{m} > \eqn{p/2}.
+#' 
+#' @param rdata a zoo/xts object containing all returns in period t for one asset.
+#' @param m the window size of return blocks. 2 by default.
+#' @param p the power of the variation. 2 by default.
+#' @param align.by a string, align the tick data to "seconds"|"minutes"|"hours".
+#' @param align.period an integer, align the tick data to this many [seconds|minutes|hours].
+#' @param makeReturns boolean, should be TRUE when rdata contains prices instead of returns. FALSE by  default.
+#'
+#' @return numeric
+#' 
+#' @references Andersen, T. G., D. Dobrev, and E. Schaumburg (2012). Jump-robust volatility estimation using nearest neighbor truncation. Journal of Econometrics, 169(1), 75- 93.
+#'
+#' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
+#' 
+#' @examples
+#' data(sample_tdata)
+#' rMPV(sample_tdata$PRICE, m = 2, p = 3, align.by = "minutes", align.period = 5, makeReturns = TRUE)
+#' 
+#' @keywords highfrequency rMPV
+#' @export
+rMPV <- function(rdata, m = 2, p = 2, align.by = NULL, align.period = NULL, makeReturns = FALSE) {
+  
+  multixts <- .multixts(rdata)
+  
+  if (multixts) {
+    result <- apply.daily(rdata, rMPV, align.by, align.period, makeReturns)
+    return(result)
+  } else {
+    if ((!is.null(align.by)) && (!is.null(align.period))) {
+      rdata <-.aggregatets(rdata, on = align.by, k = align.period)
+    }
+    if (makeReturns) {
+      rdata <- makeReturns(rdata)
+    }
+    
+    if (m > p/2) { 
+      m <- as.numeric(m) ##m> p/2
+      p <- as.numeric(p)
+      q <- as.numeric(rdata)
+      q <- abs(rollapply(q,width=m,FUN=prod,align="left"))
+      N <- length(rdata)
+      
+      dmp <- (2^((p/m)/2) * gamma((p/m + 1)/2) / gamma(1/2))^(-m)
+      
+      rmpv <- dmp * N^(p/2) / (N - m + 1) * sum(q^(p/m))
+      return(rmpv)
+    } else{ 
+      warning("Please supply m>p/2 for the arguments m and p")
+    }
+    
+  }
+}  
+
 
 #' Realized skewness of highfrequency return series.
 #'
@@ -437,9 +628,6 @@ rKurt <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
 #' @keywords highfrequency rSkew
 #' @export
 rSkew <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE) {
-  if (hasArg(data)) {
-    rdata <- data
-  }
   
   multixts = .multixts(rdata)
   
@@ -495,18 +683,14 @@ rSkew <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
 #' @keywords  highfrequency rSV
 #' @export
 rSV <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE) {
-  if (hasArg(data)) {
-    rdata = data
-  }
   
-  multixts <-  .multixts(rdata)
+  multixts <- .multixts(rdata)
   
-  if (multixts) {
+  if (multixts == TRUE) {
     result <- apply.daily(rdata, rSV, align.by, align.period, makeReturns)
     return(result)
-  }
-  
-  if (!multixts) {
+  } else {
+    
     if ((!is.null(align.by)) && (!is.null(align.period))) {
       rdata <- .aggregatets(rdata, on = align.by, k = align.period)
     }
@@ -543,6 +727,106 @@ RV <- function(rdata) {
   return(RV)
 }
 
+
+#' Realized tri-power variation of highfrequency return series.
+#' 
+#' @description Function returns the rTPVar, defined in Andersen et al. (2012).
+#'  
+#'  Assume there is \eqn{N} equispaced returns in period \eqn{t}. Let \eqn{r_{t,i}} be a return (with \eqn{i=1, \ldots,N}) in period \eqn{t}.
+#'  
+#'  Then, the rTPVar is given by
+#'  \deqn{
+#'    \mbox{rTPVar}_{t}=\frac{N}{N-2} \left( 2^{1/3} \frac{\Gamma \left(5/6\right)}{ \Gamma \left(1/2\right)} \right)^{-3} \sum_{i=3}^{N} \mbox({|r_{t,i}|}^{2/3} {|r_{t,i-1}|}^{2/3} {|r_{t,i-2}|}^{2/3})
+#'  }
+#'  
+#' @param rdata a zoo/xts object containing all returns in period t for one asset.
+#' @param align.by a string, align the tick data to "seconds"|"minutes"|"hours".
+#' @param align.period an integer, align the tick data to this many [seconds|minutes|hours].  
+#' @param makeReturns boolean, should be TRUE when rdata contains prices instead of returns. FALSE by   default.
+#'  
+#' @return numeric
+#'  
+#' @references Andersen, T. G., D. Dobrev, and E. Schaumburg (2012). Jump-robust volatility estimation using nearest neighbor truncation. Journal of Econometrics, 169(1), 75- 93.
+#'  
+#' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
+#'  
+#' @examples 
+#' data(sample_tdata)
+#' rTPVar(rdata = sample_tdata$PRICE, align.by = "minutes", align.period = 5, makeReturns = TRUE)
+#' rTPVar
+#' 
+#' @keywords highfrequency rTPVar
+#' @export
+rTPVar <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE) {
+  
+  multixts <- .multixts(rdata)
+  if (multixts == TRUE) {
+    result <- apply.daily(rdata, rTPVar, align.by, align.period, makeReturns)
+    return(result)
+  } else {
+    if ((!is.null(align.by)) && (!is.null(align.period))) {
+      rdata <- .aggregatets(rdata, on = align.by, k = align.period)
+    }
+    if (makeReturns) {
+      rdata <- makeReturns(rdata)
+    }
+    
+    q      <- as.numeric(rdata)
+    q      <- abs(rollapply(q,width = 3, FUN = prod, align = "left"))
+    N      <- length(q)+2
+    rTPVar <- N / (N-2) * gamma(1/2)^2/(4*gamma(7/6)^2) * sum(q^(4/3))
+    return(rTPVar)
+  }
+}
+
+#' Realized quad-power variation of highfrequency return series. 
+#' @description Function returns the realized quad-power variation, defined in Andersen et al. (2012).
+#'  
+#'  Assume there is \eqn{N} equispaced returns in period \eqn{t}. Let \eqn{r_{t,i}} be a return (with \eqn{i=1, \ldots,N}) in period \eqn{t}.
+#'  
+#'  Then, the rQPVar is given by
+#'  \deqn{
+#'    \mbox{rQPVar}_{t}=\frac{N}{N-3} \left( 2^{1/4} \frac{\Gamma \left(3/4\right)}{ \Gamma \left(1/2\right)} \right)^{-4} \sum_{i=4}^{N} \mbox({|r_{t,i}|}^{1/2} #'{|r_{t,i-1}|}^{1/2} {|r_{t,i-2}|}^{1/2} {|r_{t,i-3}|}^{1/2})
+#'  }
+#'
+#'@param rdata a zoo/xts object containing all returns in period t for one asset.
+#'@param align.by a string, align the tick data to "seconds"|"minutes"|"hours".
+#'@param align.period an integer, align the tick data to this many [seconds|minutes|hours].  
+#'@param makeReturns boolean, should be TRUE when rdata contains prices instead of returns. FALSE by default.
+#'
+#' @return numeric
+#' 
+#' @references Andersen, T. G., D. Dobrev, and E. Schaumburg (2012). Jump-robust volatility estimation using nearest neighbor truncation. Journal of Econometrics, 169(1), 75- 93.
+#' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
+#' 
+#' @examples 
+#' data(sample_tdata)
+#' rQPVar(rdata= sample_tdata$PRICE, align.by= "minutes", align.period =5, makeReturns= TRUE)
+#' rQPVar
+#' 
+#' @keywords highfrequency rQPVar
+#' @export
+rQPVar <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE) {
+  
+  multixts <- .multixts(rdata)
+  if (multixts) {
+    result <- apply.daily(rdata, rQPVar, align.by, align.period, makeReturns)
+    return(result)
+  } else {
+    if ((!is.null(align.by)) && (!is.null(align.period))) {
+      rdata <-.aggregatets(rdata, on = align.by, k = align.period)
+    }
+    if (makeReturns) {
+      rdata <- makeReturns(rdata)
+    }
+    q      <- as.numeric(rdata)
+    q      <- abs(rollapply(q, width = 4, FUN = prod, align = "left"))
+    N      <- length(q) + 3
+    rQPVar <- N / (N-3) * pi^2 / 4 * sum(q)
+    return(rQPVar)
+  }
+}
+
 #' Realized quarticity of highfrequency return series. 
 #' @description  Function returns the rQuar, defined in Andersen et al. (2012).
 #'
@@ -565,14 +849,12 @@ RV <- function(rdata) {
 #' @examples 
 #' \dontrun{
 #' data(sample_tdata)
-#' rQuar(rdata= sample_tdata$PRICE, align.by= "minutes", align.period =5, makeReturns= TRUE)
+#' rQuar(rdata = sample_tdata$PRICE, align.by = "minutes", align.period = 5, makeReturns = TRUE)
 #' }
 #' @keywords  highfrequency rQuar
 #' @export
 rQuar <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE) {
-  if (hasArg(data)) {
-    rdata <- data
-  }
+  
   multixts = .multixts(rdata)
   if (multixts) {
     result <- apply.daily(rdata, rQuar, align.by, align.period, makeReturns)

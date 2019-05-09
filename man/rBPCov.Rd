@@ -5,7 +5,7 @@
 \title{Realized BiPower Covariance}
 \usage{
 rBPCov(rdata, cor = FALSE, align.by = NULL, align.period = NULL,
-  makeReturns = FALSE, makePsd = FALSE, ...)
+  makeReturns = FALSE, makePsd = FALSE)
 }
 \arguments{
 \item{rdata}{a \eqn{(M x N)} matrix/zoo/xts object containing the \eqn{N}
@@ -20,8 +20,6 @@ return series over period \eqn{t}, with \eqn{M} observations during \eqn{t}.}
 \item{makeReturns}{boolean, should be TRUE when rdata contains prices instead of returns. FALSE by default.}
 
 \item{makePsd}{boolean, in case it is TRUE, the positive definite version of rBPCov is returned. FALSE by default.}
-
-\item{...}{additional arguments.}
 }
 \value{
 an \eqn{N x N} matrix

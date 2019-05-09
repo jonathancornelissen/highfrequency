@@ -27,38 +27,38 @@ conhuber = function(di,alpha=0.05)
     return( di*c2/c1 )
 }
 
-conHR = function(di,alpha=0.05)
-{
+conHR <- function(di, alpha = 0.05) {
     # consistency factor ROWQCov based on hard rejection weight function
-    return( (1-alpha)/pchisq(qchisq(1-alpha,df=di),df=di+2)  )
+    return((1 - alpha) / pchisq(qchisq(1 - alpha, df = di), df = di + 2))
 }
 
-huberweight = function(d,k){
+huberweight <- function(d,k){
     # Huber or soft rejection weight function
-    w = apply( cbind( rep(1,length(d) ) , (k/d) ),1,'min'); return(w);
+    w <- apply(cbind(rep(1,length(d)), (k/d)), 1, 'min') 
+    return(w)
 }
 
-countzeroes = function( series )
-{
-    return( sum( 1*(series==0) ) )
+countzeroes <- function(series) {
+    return(sum(1 * (series == 0)))
 }
 
 #Realized Outlyingness Weighted Variance (ROWVar):
-univariateoutlyingness = function(rdata,...){
-  requireNamespace('robustbase');
-    if(hasArg(data)){ rdata = data }
-    #computes outlyingness of each obs compared to row location and scale
-    location = 0;
-    scale = mad(rdata);
-    if(scale==0){
-        scale = mean(rdata);
-    }
-    d = ((rdata - location)/scale)^2;
+univariateoutlyingness = function(rdata, ...){
+  requireNamespace('robustbase')
+  if (hasArg(data)) { 
+    rdata <- data 
+  }
+  #computes outlyingness of each obs compared to row location and scale
+ location <- 0
+ scale = mad(rdata)
+ if(scale == 0){
+   scale <- mean(rdata)
+ }
+ d = ((rdata - location) / scale)^2
 }
 
 
-ROWVar = function(rdata, seasadjR = NULL, wfunction = "HR" , alphaMCD = 0.75, alpha = 0.001,...) 
-{
+ROWVar <- function(rdata, seasadjR = NULL, wfunction = "HR" , alphaMCD = 0.75, alpha = 0.001,...) {
   
     if(hasArg(data)){ rdata = data }
   
@@ -87,7 +87,7 @@ ROWVar = function(rdata, seasadjR = NULL, wfunction = "HR" , alphaMCD = 0.75, al
 }
 
 #### Two time scale helper functions:
-TSRV = function ( pdata , K=300 , J=1 ) 
+TSRV <- function ( pdata , K=300 , J=1 ) 
 {
     # based on rv.timescale
     logprices = log(as.numeric(pdata))
@@ -108,7 +108,7 @@ TSRV = function ( pdata , K=300 , J=1 )
     return(TSRV)
 }
 
-RTSRV = function (pdata, startIV = NULL, noisevar = NULL, K = 300, J = 1, 
+RTSRV <- function (pdata, startIV = NULL, noisevar = NULL, K = 300, J = 1, 
 eta = 9){
     logprices = log(as.numeric(pdata))
     n = length(logprices)
@@ -867,98 +867,6 @@ ts2realized <- function(x, make.returns=TRUE,millisstart=34200000, millisend=576
 }
 
 
-# Make positive definite
-makePsd = function(S,method="covariance"){
-    if(method=="correlation" & !any(diag(S)<=0) ){
-        # Fan, J., Y. Li, and K. Yu (2010). Vast volatility matrix estimation using high frequency data for portfolio selection.
-        D = matrix(diag(S)^(1/2),ncol=1)
-        R = S/(D%*%t(D))
-        out = eigen( x=R , symmetric = TRUE )
-        mGamma = t(out$vectors)
-        vLambda = out$values
-        vLambda[vLambda<0] = 0
-        Apsd = t(mGamma)%*%diag(vLambda)%*%mGamma
-        dApsd = matrix(diag(Apsd)^(1/2),ncol=1)
-        Apsd = Apsd/(dApsd%*%t(dApsd))
-        D = diag( as.numeric(D)  , ncol = length(D) )
-        Spos = D%*%Apsd%*%D
-        return(Spos)
-        #check:  eigen(Apsd)$values
-    }else{
-        # Rousseeuw, P. and G. Molenberghs (1993). Transformation of non positive semidefinite correlation matrices. Communications in Statistics - Theory and Methods 22, 965-984.
-        out = eigen( x=S , symmetric = TRUE )
-        mGamma = t(out$vectors)
-        vLambda = out$values
-        vLambda[vLambda<0] = 0
-        Apsd = t(mGamma)%*%diag(vLambda)%*%mGamma
-    }
-}
-
-
-
-# Aggregation function: FAST previous tick aggregation
-.aggregatets = function (ts, on = "minutes", k = 1) 
-{
-    if (on == "secs" | on == "seconds") {
-        secs = k
-        tby = paste(k, "sec", sep = " ")
-    } 
-    if (on == "mins" | on == "minutes") {
-        secs = 60 * k
-        tby = paste(60 * k, "sec", sep = " ")
-    } 
-    if (on == "hours"){
-        secs = 3600 * k;
-        tby = paste(3600 * k, "sec", sep = " ");
-    } 
-    g = base::seq(start(ts), end(ts), by = tby);
-    rawg = as.numeric(as.POSIXct(g, tz = "GMT"));
-    newg = rawg + (secs - rawg%%secs);
-    g    = as.POSIXct(newg, origin = "1970-01-01",tz = "GMT");
-    ts3 = na.locf(merge(ts, zoo(, g)))[as.POSIXct(g, tz = "GMT")];
-    return(ts3)
-} #Very fast and elegant way to do previous tick aggregation :D!
-
-#Make Returns: 
-makeReturns <- function (ts) 
-{
-    l <- dim(ts)[1]
-    x <- matrix(as.numeric(ts), nrow = l)
-    x[(2:l), ] <- log(x[(2:l), ]) - log(x[(1:(l - 1)), ])
-    x[1, ] <- rep(0, dim(ts)[2])
-    x <- xts(x, order.by = index(ts))
-    return(x);
-}
-
-#Refresh Time:
-refreshTime = function (pdata) 
-{
-    dim = length(pdata)
-    lengths = rep(0, dim + 1)
-    for (i in 1:dim) {
-        lengths[i + 1] = length(pdata[[i]])
-    }
-    minl = min(lengths[(2:(dim + 1))])
-    lengths = cumsum(lengths)
-    alltimes = rep(0, lengths[dim + 1])
-    for (i in 1:dim) {
-        alltimes[(lengths[i] + 1):lengths[i + 1]] = as.numeric(as.POSIXct(index(pdata[[i]]), 
-        tz = "GMT"))
-    }
-    x = .C("refreshpoints", as.integer(alltimes), as.integer(lengths), 
-    as.integer(rep(0, minl)), as.integer(dim), as.integer(0), 
-    as.integer(rep(0, minl * dim)), as.integer(minl), PACKAGE="highfrequency")
-    newlength = x[[5]]
-    pmatrix = matrix(ncol = dim, nrow = newlength)
-    for (i in 1:dim) {
-        selection = x[[6]][((i - 1) * minl + 1):(i * minl)]
-        pmatrix[, i] = pdata[[i]][selection[1:newlength]]
-    }
-    time = as.POSIXct(x[[3]][1:newlength], origin = "1970-01-01", 
-    tz = "GMT")
-    resmatrix = xts(pmatrix, order.by = time)
-    return(resmatrix)
-}
 
 ########################################################
 # 1 Univariate measures : 
@@ -2032,16 +1940,18 @@ print.harModel = function(x, digits = max(3, getOption("digits") - 3), ...){
     invisible(x)
 } 
 
-summary.harModel = function(object, correlation = FALSE, symbolic.cor = FALSE,...){
-    x=object; 
-    dd = summary.lm(x);
-    formula = getHarmodelformula(x); modeldescription = formula[[1]]; betas = formula[[2]];
-    dd$call = modeldescription;
-    rownames(dd$coefficients) = c("beta0",betas);
+summary.harModel <- function(object, correlation = FALSE, symbolic.cor = FALSE){
+    x <- object
+    dd <- summary.lm(x)
+    formula <- getHarmodelformula(x) 
+    modeldescription = formula[[1]]
+    betas = formula[[2]]
+    dd$call <- modeldescription
+    rownames(dd$coefficients) <- c("beta0", betas)
     return(dd)
 } 
 
-plot.harModel = function(x, which = c(1L:3L, 5L), caption = list("Residuals vs Fitted", 
+plot.harModel <- function(x, which = c(1L:3L, 5L), caption = list("Residuals vs Fitted", 
 "Normal Q-Q", "Scale-Location", "Cook's distance", "Residuals vs Leverage", 
 expression("Cook's dist vs Leverage  " * h[ii]/(1 - h[ii]))), 
 panel = if (add.smooth) panel.smooth else points, sub.caption = NULL, 
@@ -2425,9 +2335,8 @@ readdata = function(path=NULL, extension="txt",header=FALSE,dims=0){
 
 
 convert_trades = function (datasource, datadestination, ticker, extension = "txt", 
-                           header = FALSE, tradecolnames = NULL, format = "%Y%M%D %H:%M:%S") 
-{  
-  missingt=matrix(ncol=2,nrow=0)
+                           header = FALSE, tradecolnames = NULL, format = "%Y%M%D %H:%M:%S") {  
+  missingt <- matrix(ncol=2,nrow=0)
   
   dir.create(datadestination, showWarnings = FALSE)
   dir.create(datasource, showWarnings = FALSE)

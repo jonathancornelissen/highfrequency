@@ -25,6 +25,7 @@ Depends:
 Imports:
     xts,
     zoo,
+    Rcpp,
     graphics,
     methods,
     stats,
@@ -38,6 +39,7 @@ Imports:
     chron,
     timeDate,
     MASS
+LinkingTo: Rcpp
 Suggests:
     covr,
     FKF,
