@@ -3,7 +3,7 @@
 #' @importFrom zoo zoo
 #' @importFrom zoo na.locf
 #' @keywords internal
-.aggregatets = function (ts, on = "minutes", k = 1) {
+aggregatets <- function (ts, on = "minutes", k = 1) {
   if (on == "secs" | on == "seconds") {
     secs <- k
     tby <- paste(k, "sec", sep = " ")
@@ -26,7 +26,7 @@
 
 ### Do a daily apply but with list as output:
 #' @keywords internal
-.applygetlist <- function(x, FUN, cor = FALSE, align.by = NULL, align.period = NULL, makeReturns = FALSE, makePsd = FALSE,...){
+applyGetList <- function(x, FUN, cor = FALSE, align.by = NULL, align.period = NULL, makeReturns = FALSE, makePsd = FALSE,...){
   on <- "days" 
   k <- 1
   x <- try.xts(x, error = FALSE)
@@ -81,8 +81,8 @@ makeReturns <- function (ts) {
 #' @importFrom xts is.xts
 #' @importFrom xts ndays
 #' @keywords internal
-.multixts <- function(x, y = NULL) { 
-  if(is.null(y)){
+multixts <- function(x, y = NULL) { 
+  if (is.null(y) == TRUE) {
     test <- is.xts(x) && (ndays(x)!=1)
     return(test)
   } else {
@@ -97,4 +97,20 @@ makeReturns <- function (ts) {
       }
     } 
   } 
+} 
+
+#' @importFrom xts is.xts
+#' @importFrom xts ndays
+#' @keywords internal
+checkMultiDays <- function(x) { 
+  
+  if (is.xts(x) == FALSE) {
+    error("Please provide xts-object.")
+  }
+  
+  if (is.xts(x) && (ndays(x)!=1)) {
+    TRUE
+  } else {
+    FALSE
+  }
 } 

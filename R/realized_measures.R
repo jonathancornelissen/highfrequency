@@ -26,14 +26,13 @@
 #' @export
 medRQ <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE) {
   
-  multixts <- .multixts(rdata)
-  if (multixts) {
+  # self-reference for multi-day input
+  if (checkMultiDays(rdata) == TRUE) {
     result <- apply.daily(rdata, medRQ, align.by, align.period, makeReturns) 
     return(result)
-  }
-  if (!multixts) {
+  } else {
     if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata <- .aggregatets(rdata, on = align.by, k = align.period)
+      rdata <- aggregatets(rdata, on = align.by, k = align.period)
     }
     if(makeReturns) {
       rdata <- makeReturns(rdata)
@@ -74,14 +73,13 @@ medRQ <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
 #' @export
 minRQ <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE) {
   
-  multixts <- .multixts(rdata)
-  if (multixts) {
+  # self-reference for multi-day input
+  if (checkMultiDays(rdata) == TRUE) {
     result <- apply.daily(rdata, minRQ, align.by, align.period, makeReturns)
     return(result)
-  }
-  if (!multixts) {
+  } else {
     if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata <- .aggregatets(rdata, on = align.by, k = align.period)
+      rdata <- aggregatets(rdata, on = align.by, k = align.period)
     }
     if(makeReturns) {
       rdata = makeReturns(rdata)
@@ -163,7 +161,7 @@ MRC <- function(pdata, pairwise = FALSE, makePsd = FALSE) {
   #   n <- length(pdata)
   # }
   # if (n == 1) {
-  #   multixts = .multixts(pdata); 
+  #   multixts = multixts(pdata); 
   #   if (multixts == TRUE) { 
   #     stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")
   #   }
@@ -171,7 +169,7 @@ MRC <- function(pdata, pairwise = FALSE, makePsd = FALSE) {
   # }  
   # 
   # if (n > 1) {
-  #   multixts <- .multixts(pdata[[1]]); 
+  #   multixts <- multixts(pdata[[1]]); 
   #   if (multixts == TRUE) { 
   #     stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input") 
   #   }
@@ -285,9 +283,8 @@ MRC <- function(pdata, pairwise = FALSE, makePsd = FALSE) {
 #' @export
 rBPCov <- function(rdata, cor = FALSE, align.by = NULL, align.period = NULL, makeReturns = FALSE, makePsd = FALSE) {
   
-  # Multiday adjustment: 
-  multixts <- .multixts(rdata); 
-  if (multixts == TRUE) { 
+  # self-reference for multi-day input
+  if (checkMultiDays(rdata) == TRUE) { 
     if (is.null(dim(rdata))) {  
       n <- 1
     } else { 
@@ -297,14 +294,12 @@ rBPCov <- function(rdata, cor = FALSE, align.by = NULL, align.period = NULL, mak
       result <- apply.daily(rdata, rBPCov, align.by=align.by,align.period=align.period,makeReturns=makeReturns,makePsd) 
     }
     if (n > 1) { 
-      result <- .applygetlist(rdata, rBPCov, cor=cor,align.by=align.by,align.period=align.period,makeReturns=makeReturns,makePsd) 
+      result <- applyGetList(rdata, rBPCov, cor=cor,align.by=align.by,align.period=align.period,makeReturns=makeReturns,makePsd) 
     }    
     return(result)
-  } 
-  
-  if (!multixts) { #single day code
+  } else { #single day code
     if ((!is.null(align.by))&&(!is.null(align.period))) {
-      rdata <- .aggregatets(rdata, on = align.by, k = align.period);
+      rdata <- aggregatets(rdata, on = align.by, k = align.period);
     } 
     if (makeReturns) {  
       rdata <- makeReturns(rdata) 
@@ -321,12 +316,11 @@ rBPCov <- function(rdata, cor = FALSE, align.by = NULL, align.period = NULL, mak
     
     ## ACTUAL RBPCOV calculation:   
     if( n > 1 ){    
-      #    rdatacheck(rdata,multi=TRUE);
       
-      rdata  = as.matrix(rdata);
-      n = dim(rdata)[2]
-      cov = matrix(rep(0, n * n), ncol = n)
-      diagonal = c()
+      rdata  <- as.matrix(rdata);
+      n <- dim(rdata)[2]
+      cov <- matrix(rep(0, n * n), ncol = n)
+      diagonal <- c()
       for (i in 1:n) {
         diagonal[i] <- RBPVar(rdata[, i])
       }
@@ -416,8 +410,7 @@ RBPVar <- function(rdata) {
 rCov <- function(rdata, cor = FALSE, align.by = NULL, align.period = NULL, makeReturns = FALSE) {
   
   # Multiday adjustment: 
-  multixts <- .multixts(rdata)
-  if(multixts){ 
+  if (checkMultiDays(rdata) == TRUE) { 
     if (is.null(dim(rdata))) {  
       n <- 1
     } else { 
@@ -427,13 +420,13 @@ rCov <- function(rdata, cor = FALSE, align.by = NULL, align.period = NULL, makeR
       result <- apply.daily(rdata, rCov, align.by = align.by, align.period = align.period, makeReturns = makeReturns) 
     }
     if (n > 1) { 
-      result <- .applygetlist(rdata, rCov, cor=cor, align.by = align.by, align.period = align.period, makeReturns = makeReturns) 
+      result <- applyGetList(rdata, rCov, cor=cor, align.by = align.by, align.period = align.period, makeReturns = makeReturns) 
     }    
     return(result)
-  } 
-  if(!multixts){ #single day code
+  } else {
+    #single day code
     if((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata <- .aggregatets(rdata, on = align.by, k = align.period)
+      rdata <- aggregatets(rdata, on = align.by, k = align.period)
     } 
     if (makeReturns) {  
       rdata <- makeReturns(rdata) 
@@ -493,17 +486,14 @@ rCov <- function(rdata, cor = FALSE, align.by = NULL, align.period = NULL, makeR
 #' @export
 rKurt <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE) {
   
-  multixts <- .multixts(rdata)
-  
-  if (multixts == TRUE) {
+  # self-reference for multi-day input
+  if (checkMultiDays(rdata) == TRUE) { 
     result = apply.daily(rdata, rKurt, align.by, align.period,
                          makeReturns)
     return(result)
-  }
-  
-  if (!multixts) {
+  } else {
     if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata <- .aggregatets(rdata, on = align.by, k = align.period)
+      rdata <- aggregatets(rdata, on = align.by, k = align.period)
     }
     if (makeReturns == TRUE) {
       rdata <- makeReturns(rdata)
@@ -564,14 +554,13 @@ rKurt <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
 #' @export
 rMPV <- function(rdata, m = 2, p = 2, align.by = NULL, align.period = NULL, makeReturns = FALSE) {
   
-  multixts <- .multixts(rdata)
-  
-  if (multixts) {
+  # self-reference for multi-day input
+  if (checkMultiDays(rdata) == TRUE) { 
     result <- apply.daily(rdata, rMPV, align.by, align.period, makeReturns)
     return(result)
   } else {
     if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata <-.aggregatets(rdata, on = align.by, k = align.period)
+      rdata <-aggregatets(rdata, on = align.by, k = align.period)
     }
     if (makeReturns) {
       rdata <- makeReturns(rdata)
@@ -629,16 +618,13 @@ rMPV <- function(rdata, m = 2, p = 2, align.by = NULL, align.period = NULL, make
 #' @export
 rSkew <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE) {
   
-  multixts = .multixts(rdata)
-  
-  if (multixts) {
+  # self-reference for multi-day input
+  if (checkMultiDays(rdata) == TRUE) { 
     result <- apply.daily(rdata, rSkew, align.by, align.period, makeReturns)
     return(result)
-  }
-  
-  if (!multixts) {
+  } else {
     if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata <- .aggregatets(rdata, on = align.by, k = align.period)
+      rdata <- aggregatets(rdata, on = align.by, k = align.period)
     }
     if (makeReturns) {
       rdata <- makeReturns(rdata)
@@ -684,15 +670,14 @@ rSkew <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
 #' @export
 rSV <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE) {
   
-  multixts <- .multixts(rdata)
-  
-  if (multixts == TRUE) {
+  # self-reference for multi-day input
+  if (checkMultiDays(rdata) == TRUE) {
     result <- apply.daily(rdata, rSV, align.by, align.period, makeReturns)
     return(result)
   } else {
     
     if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata <- .aggregatets(rdata, on = align.by, k = align.period)
+      rdata <- aggregatets(rdata, on = align.by, k = align.period)
     }
     if (makeReturns)  {
       rdata <- makeReturns(rdata)
@@ -719,9 +704,6 @@ rSV <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE
 #' @keywords highfrequency RV
 #' @export
 RV <- function(rdata) {
-  if (hasArg(data)) { 
-    rdata = data 
-  }
   returns <- as.numeric(rdata)
   RV <- sum(returns^2)
   return(RV)
@@ -759,13 +741,13 @@ RV <- function(rdata) {
 #' @export
 rTPVar <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE) {
   
-  multixts <- .multixts(rdata)
-  if (multixts == TRUE) {
+  # self-reference for multi-day input
+  if (checkMultiDays(rdata) == TRUE) { 
     result <- apply.daily(rdata, rTPVar, align.by, align.period, makeReturns)
     return(result)
   } else {
     if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata <- .aggregatets(rdata, on = align.by, k = align.period)
+      rdata <- aggregatets(rdata, on = align.by, k = align.period)
     }
     if (makeReturns) {
       rdata <- makeReturns(rdata)
@@ -808,13 +790,13 @@ rTPVar <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FA
 #' @export
 rQPVar <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE) {
   
-  multixts <- .multixts(rdata)
-  if (multixts) {
+  # self-reference for multi-day input
+  if (checkMultiDays(rdata) == TRUE) { 
     result <- apply.daily(rdata, rQPVar, align.by, align.period, makeReturns)
     return(result)
   } else {
     if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata <-.aggregatets(rdata, on = align.by, k = align.period)
+      rdata <-aggregatets(rdata, on = align.by, k = align.period)
     }
     if (makeReturns) {
       rdata <- makeReturns(rdata)
@@ -855,14 +837,13 @@ rQPVar <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FA
 #' @export
 rQuar <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE) {
   
-  multixts = .multixts(rdata)
-  if (multixts) {
+  # self-reference for multi-day input
+  if (checkMultiDays(rdata) == TRUE) { 
     result <- apply.daily(rdata, rQuar, align.by, align.period, makeReturns)
     return(result)
-  }
-  if (!multixts) {
+  } else {
     if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata <- .aggregatets(rdata, on = align.by, k = align.period)
+      rdata <- aggregatets(rdata, on = align.by, k = align.period)
     }
     if (makeReturns == TRUE) {
       rdata <- makeReturns(rdata)

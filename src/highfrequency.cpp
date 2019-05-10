@@ -2,34 +2,17 @@
 #include <Rcpp.h>
 using namespace Rcpp;
 
-// [[Rcpp::export]]
-NumericVector calculate_g(double omega, double alpha, double beta, double gamma, NumericVector returns, double g0) {
-  int n = returns.size();
-  
-  NumericVector g(n);
-  g[0] = g0;
-  
-  for (int i = 1; i < n; i++) {
-    
-    if (returns[i-1] >= 0) {
-      g[i] = omega + alpha * returns[i-1] * returns[i-1] + beta * g[i-1];
-    } else {
-      g[i] = omega + alpha * returns[i-1] * returns[i-1] + gamma * returns[i-1] * returns[i-1] + beta * g[i-1];
-    }
-  }
-  
-  return g;
-}
+// // [[Rcpp::export]]
+// int nsmaller(NumericVector times, NumericVector lengths, int start, int end, int max) {
+//   int i = 0;
+//   while ( (i < (lengths[end] - lengths[start])) && ((times + (lengths[start]+i)) <= max)) {
+//     i++;
+//   }
+//   return i;
+// }
 
 
-// [[Rcpp::export]]
-int nsmaller(NumericVector times, NumericVector lengths, int start, int end, int max) {
-  int i = 0;
-  while ( (i < (lengths[end] - lengths[start]))) {// && (*(times+ (lengths[start]+i)) <= max)) {
-    i++;
-  }
-  return i;
-}
+
 
 // // [[Rcpp::export]]
 // void refreshpoints( int *times, int *lengths, int *ttau, int *dim, int *aa, int *indices, int *lindex){

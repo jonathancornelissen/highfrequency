@@ -39,7 +39,7 @@ Imports:
     chron,
     timeDate,
     MASS
-LinkingTo: Rcpp
+LinkingTo: Rcpp, RcppArmadillo
 Suggests:
     covr,
     FKF,
