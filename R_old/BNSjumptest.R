@@ -6,23 +6,16 @@
 
 BNSjumptest <- function (rdata, IVestimator = "BV", IQestimator = "TP", type = "linear",
                        logtransform = FALSE, max = FALSE, align.by = NULL, align.period = NULL,
-                       makeReturns = FALSE, ...)
-{
-  if (hasArg(data)) {
-    rdata = data
-  }
-  multixts = .multixts(rdata)
-  if (multixts) {
-    result = apply.daily(rdata, BNSjumptest, align.by, align.period,
-                         makeReturns)
+                       makeReturns = FALSE, ...) {
+  if (checkMultiDays(pdata) == TRUE) { 
+    result = apply.daily(rdata, BNSjumptest, align.by, align.period, makeReturns)
     return(result)
-  }
-  else {
+  } else {
     if ((!is.null(align.by)) && (!is.null(align.period))) {
       rdata = .aggregatets(rdata, on = align.by, k = align.period)
     }
-    if (makeReturns) {
-      rdata = makeReturns(rdata)
+    if (makeReturns == TRUE) {
+      rdata <- makeReturns(rdata)
     }
     N = length(rdata)
     hatQV = RV(rdata)

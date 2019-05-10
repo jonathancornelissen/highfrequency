@@ -1599,12 +1599,7 @@ TQfun <- function(rdata){ #Calculate the realized tripower quarticity
     return(tq);
 } 
 
-ABDJumptest <- function(RV, BPV, TQ){ # Comput jump detection stat mentioned in roughing paper
-    mu1  = sqrt(2/pi);
-    n = length(RV);
-    zstat = ((1/n)^(-1/2))*((RV-BPV)/RV)*(  (mu1^(-4) + 2*(mu1^(-2))-5) * pmax( 1,TQ*(BPV^(-2)) )   )^(-1/2); 
-    return(zstat);
-}
+
 
 harModel <- function(data, periods = c(1,5,22), periodsJ = c(1,5,22), periodsQ = c(1),
                     leverage=NULL, RVest = c("rCov","rBPCov", "rQuar"), type="HARRV", inputType = "RM",
@@ -2995,7 +2990,7 @@ matchTradesQuotes = function(tdata,qdata,adjustment=2){ ##FAST VERSION
   return(merged)
 }
 
-getTradeDirection = function(tqdata,...){
+getTradeDirection <- function(tqdata,...){
   if(hasArg(data)){ tqdata = data; rm(data) }
   tqdata = .check_data(tqdata);
   tqdatacheck(tqdata); 
@@ -3034,13 +3029,13 @@ es = function(data){
   return(es);
 }
 
-rs = function(data,tdata,qdata){
-  data  =  .check_data(data);
-  qdata =  .check_data(qdata);
-  tdata =  .check_data(tdata);
+rs <- function(data,tdata,qdata){
+  data  <-  .check_data(data)
+  qdata <-  .check_data(qdata)
+  tdata <-  .check_data(tdata)
   
   ###Function returns the realized spread as an xts object
-  #Please note that the returned object can contain less observations that the original "data"
+  #Please note that the returned object can contain less observations than the original "data"
   #because of the need to find quotes that match the trades 5 min ahead
   
   #arguments
@@ -3048,28 +3043,28 @@ rs = function(data,tdata,qdata){
   #tdata and qdata, the xts object containing the trades and quotes respectively
   
   ##First part solves the problem that unequal number of obs (in data and data2) is possible when computing the RS
-  data2 = matchtq(tdata,qdata,adjustment =300);
-  if(dim(data2)[1]>dim(data)[1]){
-    condition = as.vector(as.character(index(data2)))%in%as.vector(as.character(index(data)));
-    data2 = subset(data2,condition,select=1:(dim(data)[2]));
-    data = subset(data,as.vector(as.character(index(data)))%in%as.vector(as.character(index(data2))),select=1:(dim(data2)[2]));
+  data2 = matchtq(tdata, qdata, adjustment = 300)
+  if (dim(data2)[1]>dim(data)[1]) {
+    condition = as.vector(as.character(index(data2)))%in%as.vector(as.character(index(data)))
+    data2 = subset(data2,condition,select=1:(dim(data)[2]))
+    data = subset(data,as.vector(as.character(index(data)))%in%as.vector(as.character(index(data2))),select=1:(dim(data2)[2]))
   }
   
   if(dim(data2)[1]<dim(data)[1]){
-    condition = as.vector(as.character(index(data)))%in%as.vector(as.character(index(data2)));
-    data = subset(data,condition,select=1:(dim(data2)[2]));
-    data2 = subset(data2,as.vector(as.character(index(data2)))%in%as.vector(as.character(index(data))),select=1:(dim(data)[2]));
+    condition = as.vector(as.character(index(data)))%in%as.vector(as.character(index(data2)))
+    data = subset(data,condition,select=1:(dim(data2)[2]))
+    data2 = subset(data2,as.vector(as.character(index(data2)))%in%as.vector(as.character(index(data))),select=1:(dim(data)[2]))
   }
   
-  bid = as.numeric(data2$BID);
-  offer = as.numeric(data2$OFR);
-  midpoints = (bid + offer)/2;
-  price = as.numeric(data$PRICE);
-  d = gettradedir(data);
-  rs = 2*d*(price-midpoints);
+  bid = as.numeric(data2$BID)
+  offer = as.numeric(data2$OFR)
+  midpoints = (bid + offer)/2
+  price = as.numeric(data$PRICE)
+  d = gettradedir(data)
+  rs = 2*d*(price-midpoints)
   
-  rs_xts = xts(rs,order.by=index(data));
-  return(rs_xts);
+  rs_xts = xts(rs,order.by=index(data))
+  return(rs_xts)
 }
 
 value_trade = function(data){
@@ -3359,8 +3354,7 @@ mq_return = function(data){
   return(mq_return_xts);
 }
 
-p_return_abs <- function (data)
-{
+p_return_abs <- function (data) {
   price = as.numeric(data$PRICE)
   return = c(0, log(price[2:length(price)]) - log(price[1:length(price) -
     1]))
@@ -3371,8 +3365,12 @@ p_return_abs <- function (data)
 
 
 ### Backwards compatibility for RTAQ functions ####
- gettradedir = function(...){getTradeDirection(...)};                      
- matchtq = function(...){matchTradesQuotes(...)};                          
+gettradedir <- function(...) {
+  getTradeDirection(...)
+}                    
+matchtq <- function(...) {
+  matchTradesQuotes(...)
+}                          
 
 ##################### Total cleanup functions formerly in RTAQ ################################
 
