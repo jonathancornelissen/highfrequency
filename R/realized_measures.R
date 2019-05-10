@@ -255,7 +255,7 @@ MRC <- function(pdata, pairwise = FALSE, makePsd = FALSE) {
 #' @param makeReturns boolean, should be TRUE when rdata contains prices instead of returns. FALSE by default.
 #' @param makePsd boolean, in case it is TRUE, the positive definite version of rBPCov is returned. FALSE by default.
 #'
-#' @return an \eqn{N x N} matrix
+#' @return an \eqn{N x N} matrix or a list of matrices if the time period spans multiple days
 #' 
 #' @references 
 #' Barndorff-Nielsen, O. and N. Shephard (2004). Measuring the impact of
@@ -271,12 +271,12 @@ MRC <- function(pdata, pairwise = FALSE, makePsd = FALSE) {
 #' data(sample_5minprices_jumps);
 #'  
 #' # Univariate: 
-#' rbpv = rBPCov( rdata = sample_tdata$PRICE, align.by ="minutes", 
+#' rbpv = rBPCov(rdata = sample_tdata$PRICE, align.by ="minutes", 
 #'                 align.period =5, makeReturns=TRUE); 
 #' rbpv 
 #'  
 #' # Multivariate: 
-#' rbpc = rBPCov( rdata = sample_5minprices_jumps['2010-01-04'], makeReturns=TRUE,makePsd=TRUE); 
+#' rbpc = rBPCov(rdata = sample_5minprices_jumps['2010-01-04'], makeReturns=TRUE, makePsd = TRUE)
 #' rbpc
 #'  
 #' @keywords volatility
@@ -291,10 +291,10 @@ rBPCov <- function(rdata, cor = FALSE, align.by = NULL, align.period = NULL, mak
       n <- dim(rdata)[2] 
     }
     if (n == 1){ 
-      result <- apply.daily(rdata, rBPCov, align.by=align.by,align.period=align.period,makeReturns=makeReturns,makePsd) 
+      result <- apply.daily(rdata, rBPCov, align.by=align.by,align.period=align.period,makeReturns=makeReturns, makePsd) 
     }
     if (n > 1) { 
-      result <- applyGetList(rdata, rBPCov, cor=cor,align.by=align.by,align.period=align.period,makeReturns=makeReturns,makePsd) 
+      result <- applyGetList(rdata, rBPCov, cor=cor,align.by=align.by,align.period=align.period, makeReturns = makeReturns, makePsd) 
     }    
     return(result)
   } else { #single day code
@@ -349,26 +349,6 @@ rBPCov <- function(rdata, cor = FALSE, align.by = NULL, align.period = NULL, mak
   } 
 }
 
-#' @keywords internal
-RBPCov_bi <- function(ts1,ts2) {
-  n <- length(ts1)
-  a <- abs(ts1+ts2)
-  b <- abs(ts1-ts2)
-  first <- as.numeric(a[1:(n-1)])*as.numeric(a[2:n])
-  last <- as.numeric(b[1:(n-1)])*as.numeric(b[2:n])
-  result <-  (pi/8)*sum(first-last)
-  return(result)
-}
-
-#' @keywords internal
-RBPVar <- function(rdata) {
-  
-  returns <- as.vector(as.numeric(rdata))
-  n <- length(returns)
-  rbpvar <- (pi/2) * sum(abs(returns[1:(n-1)]) * abs(returns[2:n]))
-  return(rbpvar)
-}
-
 #' Realized Covariance
 #' 
 #' @description Function returns the Realized Covariation (rCov).
@@ -398,7 +378,7 @@ RBPVar <- function(rdata) {
 #' data(sample_5minprices_jumps)
 #' 
 #' # Univariate: 
-#' rv = rCov( rdata = sample_tdata$PRICE, align.by ="minutes", 
+#' rv = rCov(rdata = sample_tdata$PRICE, align.by ="minutes", 
 #'                    align.period =5, makeReturns=TRUE)
 #' rv 
 #' 
@@ -483,13 +463,13 @@ rCov <- function(rdata, cor = FALSE, align.by = NULL, align.period = NULL, makeR
 #' rKurt(sample_tdata$PRICE,align.by ="minutes", align.period =5, makeReturns = TRUE)
 #' 
 #' @keywords highfrequency rKurt
+#' @importFrom xts apply.daily
 #' @export
 rKurt <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE) {
   
   # self-reference for multi-day input
   if (checkMultiDays(rdata) == TRUE) { 
-    result = apply.daily(rdata, rKurt, align.by, align.period,
-                         makeReturns)
+    result <- apply.daily(rdata, rKurt, align.by, align.period, makeReturns)
     return(result)
   } else {
     if ((!is.null(align.by)) && (!is.null(align.period))) {

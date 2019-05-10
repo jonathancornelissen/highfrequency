@@ -26,3 +26,23 @@ refreshTime <- function (pdata) {
   resmatrix <- xts(pmatrix, order.by = time)
   return(resmatrix)
 }
+
+#' @keywords internal
+RBPCov_bi <- function(ts1, ts2) {
+  n <- length(ts1)
+  a <- abs(ts1 + ts2)
+  b <- abs(ts1 - ts2)
+  first <- as.numeric(a[1:(n-1)]) * as.numeric(a[2:n])
+  last <- as.numeric(b[1:(n-1)]) * as.numeric(b[2:n])
+  result <-  (pi/8)*sum(first-last)
+  return(result)
+}
+
+#' @keywords internal
+RBPVar <- function(rdata) {
+  
+  returns <- as.vector(as.numeric(rdata))
+  n <- length(returns)
+  rbpvar <- (pi/2) * sum(abs(returns[1:(n-1)]) * abs(returns[2:n]))
+  return(rbpvar)
+}

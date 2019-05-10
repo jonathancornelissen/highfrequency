@@ -3753,23 +3753,22 @@ medianN = function(a){
 }
 
 maxvol = function(a){
-  p = as.numeric(a[,1]);
-  s = as.numeric(a[,2]);
+  p <- as.numeric(a[,1])
+  s <- as.numeric(a[,2])
   
-  b = median(p[s == max(s)]);
-  return(b);
+  b <- median(p[s == max(s)])
+  return(b)
 }
 
-waverage = function(a){
-  p = as.numeric(a[,1]);
-  s = as.numeric(a[,2]);
+waverage <- function(a) {
+  p <- as.numeric(a[,1])
+  s <- as.numeric(a[,2])
   
-  b = sum(p*s/sum(s));
-  return(b);
+  b <- sum(p * s / sum(s))
+  return(b)
 }
 
-mergeTradesSameTimestamp = function (tdata, selection = "median") 
-{
+mergeTradesSameTimestamp <- function (tdata, selection = "median") {
   tdata = .check_data(tdata)
   tdatacheck(tdata)
   ep = endpoints(tdata, "secs")

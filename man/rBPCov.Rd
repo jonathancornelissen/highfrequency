@@ -22,7 +22,7 @@ return series over period \eqn{t}, with \eqn{M} observations during \eqn{t}.}
 \item{makePsd}{boolean, in case it is TRUE, the positive definite version of rBPCov is returned. FALSE by default.}
 }
 \value{
-an \eqn{N x N} matrix
+an \eqn{N x N} matrix or a list of matrices if the time period spans multiple days
 }
 \description{
 Function returns the Realized BiPower Covariance (rBPCov), 
@@ -50,12 +50,12 @@ data(sample_tdata);
 data(sample_5minprices_jumps);
  
 # Univariate: 
-rbpv = rBPCov( rdata = sample_tdata$PRICE, align.by ="minutes", 
+rbpv = rBPCov(rdata = sample_tdata$PRICE, align.by ="minutes", 
                 align.period =5, makeReturns=TRUE); 
 rbpv 
  
 # Multivariate: 
-rbpc = rBPCov( rdata = sample_5minprices_jumps['2010-01-04'], makeReturns=TRUE,makePsd=TRUE); 
+rbpc = rBPCov(rdata = sample_5minprices_jumps['2010-01-04'], makeReturns=TRUE, makePsd = TRUE)
 rbpc
  
 }

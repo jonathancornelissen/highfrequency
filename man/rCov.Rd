@@ -39,7 +39,7 @@ data(sample_tdata)
 data(sample_5minprices_jumps)
 
 # Univariate: 
-rv = rCov( rdata = sample_tdata$PRICE, align.by ="minutes", 
+rv = rCov(rdata = sample_tdata$PRICE, align.by ="minutes", 
                    align.period =5, makeReturns=TRUE)
 rv 
 

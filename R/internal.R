@@ -2,6 +2,8 @@
 # Aggregation function: FAST previous tick aggregation
 #' @importFrom zoo zoo
 #' @importFrom zoo na.locf
+#' @importFrom stats start
+#' @importFrom stats end
 #' @keywords internal
 aggregatets <- function (ts, on = "minutes", k = 1) {
   if (on == "secs" | on == "seconds") {
@@ -25,17 +27,24 @@ aggregatets <- function (ts, on = "minutes", k = 1) {
 } #Very fast and elegant way to do previous tick aggregation :D!
 
 ### Do a daily apply but with list as output:
+#' @importFrom xts try.xts
+#' @importFrom xts endpoints
 #' @keywords internal
-applyGetList <- function(x, FUN, cor = FALSE, align.by = NULL, align.period = NULL, makeReturns = FALSE, makePsd = FALSE,...){
+applyGetList <- function(x, FUN, cor = FALSE, align.by = NULL, align.period = NULL, makeReturns = FALSE, makePsd = NULL,...){
   on <- "days" 
   k <- 1
   x <- try.xts(x, error = FALSE)
-  INDEX <- endpoints(x,on=on,k=k)
+  INDEX <- endpoints(x, on = on, k = k)
   D <- length(INDEX)-1
   result <- list()
   FUN <- match.fun(FUN)
   for(i in 1:(length(INDEX)-1)){
-    result[[i]] <- FUN(x[(INDEX[i] + 1):INDEX[i + 1]], cor, align.by, align.period, makeReturns, makePsd)
+    if (is.null(makePsd) == TRUE) {
+      result[[i]] <- FUN(x[(INDEX[i] + 1):INDEX[i + 1]], cor, align.by, align.period, makeReturns)
+    } else {
+      result[[i]] <- FUN(x[(INDEX[i] + 1):INDEX[i + 1]], cor, align.by, align.period, makeReturns, makePsd)
+    }
+    
   }
   return(result)
 }
@@ -105,7 +114,7 @@ multixts <- function(x, y = NULL) {
 checkMultiDays <- function(x) { 
   
   if (is.xts(x) == FALSE) {
-    error("Please provide xts-object.")
+    stop("Please provide xts-object.")
   }
   
   if (is.xts(x) && (ndays(x)!=1)) {
