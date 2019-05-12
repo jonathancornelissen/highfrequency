@@ -17,7 +17,7 @@ minRV(rdata, align.by = NULL, align.period = NULL,
 \item{makeReturns}{boolean, should be TRUE when rdata contains prices instead of returns. FALSE by default.}
 }
 \value{
-numeric
+list
 }
 \description{
 Function returns the minRV, defined in Andersen et al. (2009).

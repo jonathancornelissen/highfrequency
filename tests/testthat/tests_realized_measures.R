@@ -30,8 +30,8 @@ expect_equal(
 )
 # minRV
 expect_equal(
-  formatC(as.numeric(minRV(sample_5minprices_jumps[c('2010-01-04', '2010-01-05'), 1], align.by = "minutes", align.period = 5, makeReturns = TRUE)[1]), digits = 20),
-  "0.013259308626346031496"
+  formatC(as.numeric(minRV(sample_5minprices_jumps[c('2010-01-04', '2010-01-05'), 1:2], align.by = "minutes", align.period = 5, makeReturns = TRUE)[1,1]), digits = 20),
+  "0.013257184077615644796"
 )
 
 # rBPCov

@@ -260,19 +260,19 @@ minRV <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
   
   # self-reference for multi-day input
   if (checkMultiDays(rdata) == TRUE) {
-    result <- apply.daily(rdata,minRV,align.by,align.period,makeReturns)
+    result <- apply.daily(rdata, minRV, align.by, align.period, makeReturns)
     return(result)
   } else {
     if ((!is.null(align.by))&&(!is.null(align.period))) {
       rdata <- aggregatets(rdata, on = align.by, k = align.period)
     } 
     if (makeReturns) {
-      rdata = makeReturns(rdata)
+      rdata <- makeReturns(rdata)
     }  
-    q <- as.zoo(abs(as.numeric(rdata))) #absolute value
-    q <- as.numeric(rollapply(q, width = 2, FUN = min, by = 1, align = "left"))
-    N <- length(q) + 1 #number of obs
-    minrv <- (pi/(pi - 2)) * (N/(N - 1)) * sum(q^2)
+    q <- abs(rdata)#as.zoo(abs(as.numeric(rdata))) #absolute value
+    q <- rollapply(q, width = 2, FUN = min, by = 1, align = "left", by.column = TRUE)
+    N <- dim(q)[1] + 1 #number of obs
+    minrv <- (pi/(pi - 2)) * (N/(N - 1)) * colSums(q^2, na.rm = TRUE)
     return(minrv) 
   }  
 }  
