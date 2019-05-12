@@ -7,17 +7,17 @@
 
 
 # Check data:
-rdatacheck = function (rdata, multi = FALSE) 
-{
-    if ((dim(rdata)[2] < 2) & (multi)) {
-        stop("Your rdata object should have at least 2 columns")
-    }
+rdatacheck = function (rdata, multi = FALSE) {
+  if ((dim(rdata)[2] < 2) & (multi)) {
+    stop("Your rdata object should have at least 2 columns")
+  }
 }
 
 ######## rowcov helper functions:
 #Realized Outlyingness Weighted Quadratic Covariation (ROWQCov)
-conhuber = function(di,alpha=0.05)
-{# consistency factor ROWQCov based on Huber weight function
+
+# consistency factor ROWQCov based on Huber weight function
+conhuber <- function(di,alpha = 0.05) {   
     c = qchisq(p=1-alpha,df=di)
     fw2 = function(t){
         z=t^2; return(  huberweight(z,c)*( t^(di-1) )*exp(-z/2)    ) }
@@ -28,39 +28,34 @@ conhuber = function(di,alpha=0.05)
 }
 
 conHR <- function(di, alpha = 0.05) {
-    # consistency factor ROWQCov based on hard rejection weight function
-    return((1 - alpha) / pchisq(qchisq(1 - alpha, df = di), df = di + 2))
+  # consistency factor ROWQCov based on hard rejection weight function
+  return((1 - alpha) / pchisq(qchisq(1 - alpha, df = di), df = di + 2))
 }
 
-huberweight <- function(d,k){
-    # Huber or soft rejection weight function
-    w <- apply(cbind(rep(1,length(d)), (k/d)), 1, 'min') 
-    return(w)
+huberweight <- function(d,k) {
+  # Huber or soft rejection weight function
+  w <- apply(cbind(rep(1,length(d)), (k/d)), 1, 'min')
+  return(w)
 }
 
-countzeroes <- function(series) {
-    return(sum(1 * (series == 0)))
+countZeroes <- function(series) {
+  return(sum(1 * (series == 0)))
 }
 
 #Realized Outlyingness Weighted Variance (ROWVar):
-univariateoutlyingness = function(rdata, ...){
+univariateoutlyingness <- function(rdata, ...) {
   requireNamespace('robustbase')
-  if (hasArg(data)) { 
-    rdata <- data 
-  }
   #computes outlyingness of each obs compared to row location and scale
- location <- 0
- scale = mad(rdata)
- if(scale == 0){
-   scale <- mean(rdata)
- }
- d = ((rdata - location) / scale)^2
+  location <- 0
+  scale = mad(rdata)
+  if(scale == 0){
+    scale <- mean(rdata)
+  }
+  d = ((rdata - location) / scale)^2
 }
 
 
 ROWVar <- function(rdata, seasadjR = NULL, wfunction = "HR" , alphaMCD = 0.75, alpha = 0.001,...) {
-  
-    if(hasArg(data)){ rdata = data }
   
     if (is.null(seasadjR)) {
         seasadjR = rdata;
@@ -87,29 +82,27 @@ ROWVar <- function(rdata, seasadjR = NULL, wfunction = "HR" , alphaMCD = 0.75, a
 }
 
 #### Two time scale helper functions:
-TSRV <- function ( pdata , K=300 , J=1 ) 
-{
-    # based on rv.timescale
-    logprices = log(as.numeric(pdata))
-    n = length(logprices) ;
-    nbarK = (n - K + 1)/(K) # average number of obs in 1 K-grid
-    nbarJ = (n - J + 1)/(J)
-    adj = (1 - (nbarK/nbarJ))^-1 
-    logreturns_K = logreturns_J = c();
-    for( k in 1:K){
-        sel =  seq(k,n,K)  
-        logreturns_K = c( logreturns_K , diff( logprices[sel] ) )
-    }
-    for( j in 1:J){
-        sel =  seq(j,n,J)  
-        logreturns_J = c( logreturns_J , diff( logprices[sel] ) )
-    }
-    TSRV = adj * ( (1/K)*sum(logreturns_K^2) - ((nbarK/nbarJ) *(1/J)*sum(logreturns_J^2)))
-    return(TSRV)
+TSRV <- function(pdata , K = 300 , J = 1) {
+  # based on rv.timescale
+  logprices <- log(as.numeric(pdata))
+  n <- length(logprices) 
+  nbarK <- (n - K + 1)/(K) # average number of obs in 1 K-grid
+  nbarJ <- (n - J + 1)/(J)
+  adj <- (1 - (nbarK/nbarJ))^-1 
+  logreturns_K = logreturns_J = c()
+  for (k in 1:K) {
+    sel <- seq(k,n,K)  
+    logreturns_K <- c(logreturns_K, diff( logprices[sel]))
+  }
+  for (j in 1:J) {
+    sel <-  seq(j,n,J)
+    logreturns_J <- c(logreturns_J, diff( logprices[sel]))
+  }
+  TSRV <- adj * ( (1/K)*sum(logreturns_K^2) - ((nbarK/nbarJ) *(1/J)*sum(logreturns_J^2)))
+  return(TSRV)
 }
 
-RTSRV <- function (pdata, startIV = NULL, noisevar = NULL, K = 300, J = 1, 
-eta = 9){
+RTSRV <- function(pdata, startIV = NULL, noisevar = NULL, K = 300, J = 1, eta = 9) {
     logprices = log(as.numeric(pdata))
     n = length(logprices)
     nbarK = (n - K + 1)/(K)
@@ -161,58 +154,59 @@ eta = 9){
 
 
 RTSCov_bi <- function (pdata1, pdata2, startIV1 = NULL, startIV2 = NULL, noisevar1 = NULL, 
-noisevar2 = NULL, K = 300, J = 1, 
-K_cov = NULL , J_cov = NULL , 
-K_var1 = NULL , K_var2 = NULL , 
-J_var1 = NULL , J_var2 = NULL ,       
-eta = 9) 
-{
-    if( is.null(K_cov)){ K_cov = K }   ;   if( is.null(J_cov)){ J_cov = J } 
-    if( is.null(K_var1)){ K_var1 = K } ;   if( is.null(K_var2)){ K_var2 = K }   
-    if( is.null(J_var1)){ J_var1 = J } ;   if( is.null(J_var2)){ J_var2 = J }
+                       noisevar2 = NULL, K = 300, J = 1,
+                       K_cov = NULL, J_cov = NULL,
+                       K_var1 = NULL, K_var2 = NULL,
+                       J_var1 = NULL, J_var2 = NULL, 
+                       eta = 9) {
+  
+  if( is.null(K_cov)){ K_cov = K }
+  if( is.null(J_cov)){ J_cov = J }
+  if( is.null(K_var1)){ K_var1 = K }
+  if( is.null(K_var2)){ K_var2 = K }   
+  if( is.null(J_var1)){ J_var1 = J } 
+  if( is.null(J_var2)){ J_var2 = J }
+  
+  # Calculation of the noise variance and TSRV for the truncation
+  
+  if (is.null(noisevar1) == TRUE) {
+    logprices1 = log(as.numeric(pdata1))
+    n_var1 = length(logprices1)
+    nbarK_var1 = (n_var1 - K_var1 + 1)/(K_var1)
+    nbarJ_var1 = (n_var1 - J_var1 + 1)/(J_var1)
+    adj_var1 = n_var1/((K_var1 - J_var1) * nbarK_var1) 
     
-    # Calculation of the noise variance and TSRV for the truncation
-    
-    
-    
-    if (   is.null(noisevar1)   ) {
-        logprices1 = log(as.numeric(pdata1))     
-        n_var1 = length(logprices1)
-        nbarK_var1 = (n_var1 - K_var1 + 1)/(K_var1) ;
-        nbarJ_var1 = (n_var1 - J_var1 + 1)/(J_var1)
-        adj_var1 = n_var1/((K_var1 - J_var1) * nbarK_var1) 
-        
-        logreturns_K1 = logreturns_J1 = c()
-        for (k in 1:K_var1) {
-            sel.avg = seq(k, n_var1, K_var1)
-            logreturns_K1 = c(logreturns_K1, diff(logprices1[sel.avg]))
-        }
-        for (j in 1:J_var1) {
-            sel.avg = seq(j, n_var1, J_var1)
-            logreturns_J1 = c(logreturns_J1, diff(logprices1[sel.avg]))
-        }   
-        if(  is.null(noisevar1)  ){
-            noisevar1 = max(0,1/(2 * nbarJ_var1) * (sum(logreturns_J1^2)/J_var1 - TSRV(pdata1,K=K_var1,J=J_var1)))
-        }
+    logreturns_K1 = logreturns_J1 = c()
+    for (k in 1:K_var1) {
+        sel.avg = seq(k, n_var1, K_var1)
+        logreturns_K1 = c(logreturns_K1, diff(logprices1[sel.avg]))
     }
-    if (is.null(noisevar2)) {
-        logprices2 = log(as.numeric(pdata2))
-        n_var2 = length(logprices2)
-        nbarK_var2 = (n_var2 - K_var2 + 1)/(K_var2) ;
-        nbarJ_var2 = (n_var2 - J_var2 + 1)/(J_var2)
-        adj_var2 = n_var2/((K_var2 - J_var2) * nbarK_var2)    
-        
-        logreturns_K2 = logreturns_J2 = c()
-        for (k in 1:K_var2) {
-            sel.avg = seq(k, n_var2, K_var2)
-            logreturns_K2 = c(logreturns_K2, diff(logprices2[sel.avg]))
-        }
-        for (j in 1:J_var2) {
-            sel.avg = seq(j, n_var2, J_var2)
-            logreturns_J2 = c(logreturns_J2, diff(logprices2[sel.avg]))
-        }        
-        noisevar2 = max(0,1/(2 * nbarJ_var2) * (sum(logreturns_J2^2)/J_var2 - TSRV(pdata2,K=K_var2,J=J_var2)))
-    }    
+    for (j in 1:J_var1) {
+      sel.avg <- seq(j, n_var1, J_var1)
+      logreturns_J1 <- c(logreturns_J1, diff(logprices1[sel.avg]))
+    }   
+    if (is.null(noisevar1)) {
+      noisevar1 <- max(0,1/(2 * nbarJ_var1) * (sum(logreturns_J1^2)/J_var1 - TSRV(pdata1,K=K_var1,J=J_var1)))
+    }
+  }
+  if (is.null(noisevar2)) {
+    logprices2 = log(as.numeric(pdata2))
+    n_var2 = length(logprices2)
+    nbarK_var2 = (n_var2 - K_var2 + 1)/(K_var2)
+    nbarJ_var2 = (n_var2 - J_var2 + 1)/(J_var2)
+    adj_var2 = n_var2/((K_var2 - J_var2) * nbarK_var2)   
+    
+    logreturns_K2 = logreturns_J2 = c()
+    for (k in 1:K_var2) {
+      sel.avg = seq(k, n_var2, K_var2)
+      logreturns_K2 = c(logreturns_K2, diff(logprices2[sel.avg]))
+    }
+    for (j in 1:J_var2) {
+      sel.avg = seq(j, n_var2, J_var2)
+      logreturns_J2 = c(logreturns_J2, diff(logprices2[sel.avg]))
+    }        
+    noisevar2 = max(0,1/(2 * nbarJ_var2) * (sum(logreturns_J2^2)/J_var2 - TSRV(pdata2,K=K_var2,J=J_var2)))
+  }    
     
     if (!is.null(startIV1)) {
         RTSRV1 = startIV1
@@ -309,7 +303,7 @@ TSCov_bi <- function (pdata1, pdata2, K = 300, J = 1) {
     return(TSCOV)
 }
 
-cfactor_RTSCV = function(eta=9){
+cfactor_RTSCV <- function(eta = 9) {
  
     # rho = 1
     c1 = pchisq(eta,df=1)/pchisq(eta,df=3) 
@@ -325,8 +319,7 @@ cfactor_RTSCV = function(eta=9){
 }
 
 # Hayashi-Yoshida helper function:
-rc.hy <- function(x,y, period=1,align.by="seconds", align.period =1, cts = TRUE, makeReturns=FALSE, ...)
-{
+rc.hy <- function(x, y, period = 1,align.by = "seconds", align.period = 1, cts = TRUE, makeReturns = FALSE, ...) {
     align.period = .getAlignPeriod(align.period, align.by)
     cdata <- .convertData(x, cts=cts, makeReturns=makeReturns)
     x <- cdata$data
@@ -496,8 +489,7 @@ rKernel <- function(x,type=0)
     }
 }
 
-rKernel.available <- function()
-{
+rKernel.available <- function() {
     c("Rectangular", 
     "Bartlett",
     "Second",
@@ -522,7 +514,7 @@ rc.avg = function( x, y,  period ) {
     mean(.rc.subsample(x, y, period));
 }
 
-.rv.subsample <- function(x, period, cts=TRUE, makeReturns=FALSE,...) {
+.rv.subsample <- function(x, period, cts = TRUE, makeReturns = FALSE, ...) {
     cdata <- .convertData(x, cts=cts, makeReturns=makeReturns)
     x <- cdata$data
     
@@ -542,8 +534,7 @@ rc.avg = function( x, y,  period ) {
 }
 
 
-.rc.subsample <- function(x, y, period, cts=TRUE, makeReturns=FALSE, ... )
-{
+.rc.subsample <- function(x, y, period, cts=TRUE, makeReturns=FALSE, ... ) {
     cdata <- .convertData(x, cts=cts, makeReturns=makeReturns)
     x <- cdata$data
     
@@ -574,14 +565,12 @@ rc.avg = function( x, y,  period ) {
     return(L);
 }
 
-rv.zero = function(x, period)
-{  
+rv.zero = function(x, period) {  
     ac <- .accum.naive(x=x,y=x,period=period)
     sum((ac*ac)==0)/length(ac)
 }  
 
-rc.zero = function(x, y, period)
-{  
+rc.zero = function(x, y, period) {  
     acy <- .accum.naive(x=y,y=y,period=period)
     acx <- .accum.naive(x=x,y=x,period=period)
     sum((acx*acy)==0)/length(acy)
@@ -592,8 +581,7 @@ rc.zero = function(x, y, period)
 # Utility Functions from realized package Scott Payseur
 #
 #########################################################################
-.alignedAccum <- function(x,y, period, cum=TRUE, makeReturns...)
-{
+.alignedAccum <- function(x, y, period, cum = TRUE, makeReturns...) {
     x<-.accum.naive(x,x, period)
     y<-.accum.naive(y,y, period)
     if(cum)
@@ -608,8 +596,7 @@ rc.zero = function(x, y, period)
 }
 
 
-.accum.naive <- function(x,y, period, ...)
-{
+.accum.naive <- function(x,y, period, ...) {
     .C("rv", 
     as.double(x), #a
     as.double(y), #b
@@ -624,8 +611,7 @@ rc.zero = function(x, y, period)
 }
 
 
-.alignReturns <- function(x, period, ...)
-{
+.alignReturns <- function(x, period, ...) {
     .C("rv", 
     as.double(x), #a
     as.double(x), #b
@@ -639,8 +625,7 @@ rc.zero = function(x, y, period)
     PACKAGE="highfrequency")$tmpa     
 }
 
-.getAlignPeriod <- function(align.period, align.by)
-{   
+.getAlignPeriod <- function(align.period, align.by) {   
     align.by <- gsub("(^ +)|( +$)", "",align.by) # Trim White
     
     if(casefold(align.by)=="min" || casefold(align.by)=="mins" ||casefold(align.by)=="minute"||casefold(align.by)=="minutes"||casefold(align.by)=="m"){
@@ -656,8 +641,7 @@ rc.zero = function(x, y, period)
 }
 
 
-.alignIndices <- function(x, period, ...)
-{
+.alignIndices <- function(x, period, ...) {
     .C("rvperiod", 
     as.double(x), #a
     as.double(x), #b
@@ -671,8 +655,7 @@ rc.zero = function(x, y, period)
     PACKAGE="highfrequency")$tmpa     
 }
 
-.multixts <- function( x, y=NULL)
-{ 
+.multixts <- function(x, y = NULL) { 
     if(is.null(y)){
         test = is.xts(x) && (ndays(x)!=1);
         return(test);}
@@ -686,8 +669,7 @@ rc.zero = function(x, y, period)
     }
 }      
 
-.convertData <- function(x, cts = TRUE, millisstart=NA, millisend=NA, makeReturns=FALSE)
-{
+.convertData <- function(x, cts = TRUE, millisstart = NA, millisend = NA, makeReturns = FALSE) {
     if(is.null(x))
     {
         return(NULL)
@@ -796,15 +778,13 @@ rc.zero = function(x, y, period)
     return(list(milliseconds = 1:dim(as.matrix(x))[[1]], data = as.matrix(x)))  # not an object, fake the milliseconds and return
 }
 
-.getReturns <- function(x)
-{
+.getReturns <- function(x) {
     x <- as.numeric(x)
     n <- length(x)[[1]]
     return(log(x[2:n]) - log(x[1:(n-1)]))
 }
 
-.sameTime <- function(x, millis)
-{
+.sameTime <- function(x, millis) {
     .C("sametime", 
     as.double(x), #a
     as.integer(length(x)), #na
@@ -815,13 +795,11 @@ rc.zero = function(x, y, period)
 }
 
 
-data.toCts <- function(x, millis, millisstart=34200000, millisend=57600000)
-{
+data.toCts <- function(x, millis, millisstart=34200000, millisend=57600000) {
     .toCts(x=x, millis=millis, millisstart=millisstart, millisend=millisend)
 }
 
-.toCts <- function(x, millis, millisstart=34200000, millisend=57600000)
-{
+.toCts <- function(x, millis, millisstart=34200000, millisend=57600000) {
     .C("tocts", 
     as.double(x), #a
     as.integer(length(x)),
@@ -833,87 +811,18 @@ data.toCts <- function(x, millis, millisstart=34200000, millisend=57600000)
     PACKAGE="highfrequency")$ans
 }
 
-data.toReturns <- function(x)
-{
+data.toReturns <- function(x) {
     x <- as.numeric(x)   
     n <- length(x)
     log(x[2:n]) - log(x[1:(n-1)])
 }
 
-ts2realized <- function(x, make.returns=TRUE,millisstart=34200000, millisend=57600000)
-{
+ts2realized <- function(x, make.returns = TRUE, millisstart=34200000, millisend = 57600000) {
     warning("SPLUS is no longer supported.")
-    #     thedata <- data.sameTime(as.numeric(as.matrix(x@data)), .ts2millis(x))
-    
-    #    if(make.returns)
-    #    {
-    
-    #          thedata <- .getReturns(thedata)
-    
-    #          tts <- list(data=as.numeric(thedata), milliseconds=intersect(.ts2millis(x),.ts2millis(x))[-1])
-    #          cts <- list(data=.toCts(x=as.numeric(thedata), millis=intersect(.ts2millis(x),.ts2millis(x)), millisstart=millisstart, millisend=millisend),
-    #               milliseconds=(((millisstart/1000)+1):(millisend/1000))*1000)
-    #    }
-    #    else
-    #    {
-    #          tts <- list(data=as.numeric(thedata), milliseconds=intersect(.ts2millis(x),.ts2millis(x)))
-    #          cts <- list(data=.toCts(x=as.numeric(thedata), millis=intersect(.ts2millis(x),.ts2millis(x)), millisstart=millisstart, millisend=millisend),
-    #               milliseconds=(((millisstart/1000)+1):(millisend/1000))*1000)
-    
-    
-    #    }
-    #     ans <- list(tts=tts, cts=cts)     
-    #     ans
 }
 
 
 
-########################################################
-# 1 Univariate measures : 
-########################################################
-# MinRV : 
-minRV <- function(rdata,align.by=NULL,align.period=NULL,makeReturns=FALSE,...){
-    if(hasArg(data)){ rdata = data }
-    
-    # Multiday adjustment: 
-    multixts = .multixts(rdata); 
-    if(multixts){ 
-        result = apply.daily(rdata,minRV,align.by,align.period,makeReturns); 
-        return(result)} 
-    if(!multixts){
-        if((!is.null(align.by))&&(!is.null(align.period))){
-            rdata = .aggregatets(rdata, on=align.by, k=align.period);
-        } 
-        if(makeReturns){  rdata = makeReturns(rdata) }  
-        q = as.zoo(abs(as.numeric(rdata))); #absolute value
-        q = as.numeric(rollapply(q, width=2, FUN=min,by = 1, align="left"));
-        N = length(q)+1; #number of obs
-        minrv = (pi/(pi-2))*(N/(N-1))*sum(q^2);
-        return(minrv) 
-    }  
-}  
-
-# MedRV
-medRV <- function(rdata,align.by=NULL,align.period=NULL,makeReturns=FALSE,...){
-    if(hasArg(data)){ rdata = data }
-    
-    # Multiday adjustment: 
-    multixts = .multixts(rdata); 
-    if(multixts){ 
-        result = apply.daily(rdata,medRV,align.by,align.period,makeReturns); 
-        return(result)} 
-    if(!multixts){
-        if((!is.null(align.by))&&(!is.null(align.period))){
-            rdata = .aggregatets(rdata, on=align.by, k=align.period);
-        } 
-        if(makeReturns){  rdata = makeReturns(rdata) }  
-        q = abs(as.numeric(rdata)); #absolute value
-        q = as.numeric(rollmedian(q, k=3, align="center"));
-        N = length(q) + 2;
-        medrv = (pi/(6-4*sqrt(3)+pi))*(N/(N-2))*sum(q^2);
-        return(medrv)
-    }
-}
 
 
 ########################################################
@@ -924,13 +833,12 @@ medRV <- function(rdata,align.by=NULL,align.period=NULL,makeReturns=FALSE,...){
 
 # Realized Bi-power covariance:
 # Realized BiPower Covariation (RBPCov)
-rBPCov = function( rdata, cor=FALSE, align.by=NULL,align.period=NULL, makeReturns = FALSE, makePsd=FALSE,...) 
-{
+rBPCov <- function(rdata, cor = FALSE, align.by = NULL, align.period = NULL, makeReturns = FALSE, makePsd = FALSE,...) {
     if(hasArg(data)){ rdata = data }
     
     # Multiday adjustment: 
     multixts = .multixts(rdata); 
-    if(multixts){ 
+    if (multixts) { 
         if(is.null(dim(rdata))){  n = 1
         }else{ n = dim(rdata)[2] }
         if( n==1 ){ result = apply.daily(rdata,rBPCov,align.by=align.by,align.period=align.period,makeReturns=makeReturns,makePsd) }
@@ -1000,13 +908,13 @@ rOWCov = function (rdata, cor=FALSE, align.by=NULL,align.period=NULL, makeReturn
     if( n == 1 ){ return( ROWVar( rdata , seasadjR = seasadjR , wfunction = wfunction , alphaMCD = alphaMCD , alpha = alpha ))}
     
     if( n > 1 ){ 
-        rdatacheck(rdata,multi=TRUE);
+        rdatacheck(rdata, multi = TRUE)
         
       
         rdata = as.matrix(rdata); seasadjR = as.matrix(seasadjR);
         intraT = nrow(rdata)
         N = ncol(rdata)
-        perczeroes = apply(seasadjR, 2, countzeroes)/intraT
+        perczeroes <- apply(seasadjR, 2, countZeroes) / intraT
         select = c(1:N)[perczeroes < 0.5]
         seasadjRselect = seasadjR[, select]
         N = ncol(seasadjRselect)
@@ -2905,28 +2813,28 @@ center = function()
  ###### end SPOTVOL FUNCTIONS formerly in periodicityTAQ #########
 
  ###### Liquidity functions formerly in in RTAQ  ######
-.check_data = function(data){ 
+.check_data <- function(data){ 
   # FUNCTION sets column names according to RTAQ format using quantmod conventions, such that all the other functions find the correct information.
-#  requireNamespace('quantmod');
+  # requireNamespace('quantmod');
   # First step: assign the xts attributes:
-  data = set.AllColumns(data);
+  data <- set.AllColumns(data)
   
   # Change column names to previous RTAQ format! 
   # Adjust price col naming:  
-  try( (colnames(data)[xtsAttributes(data)[['Price']]] = 'PRICE') );
+  try((colnames(data)[xtsAttributes(data)[['Price']]] = 'PRICE'))
   # Adjust Bid col naming:    
-  try( (colnames(data)[xtsAttributes(data)[['Bid']]] = 'BID') );
+  try((colnames(data)[xtsAttributes(data)[['Bid']]] = 'BID'))
   # Adjust Ask col naming:    
-  try( (colnames(data)[xtsAttributes(data)[['Ask']]] = 'OFR') );
+  try((colnames(data)[xtsAttributes(data)[['Ask']]] = 'OFR'))
   
   # Adjust Ask size col naming:
-  try( (colnames(data)[xtsAttributes(data)[['BidSize']]] = 'BIDSIZ') );
+  try((colnames(data)[xtsAttributes(data)[['BidSize']]] = 'BIDSIZ'))
   
   # Adjust Bid size col naming:    
-  try( (colnames(data)[xtsAttributes(data)[['AskSize']]] = 'OFRSIZ') );
+  try((colnames(data)[xtsAttributes(data)[['AskSize']]] = 'OFRSIZ'))
   
   # Adjust correction column, if necessary:
-  if(any(colnames(data) == "CR")){
+  if (any(colnames(data) == "CR")) {
     colnames(data)[colnames(data) == "CR"] = "CORR"
   }
   
@@ -2957,10 +2865,10 @@ rdatacheck = function(rdata,multi=FALSE){
 }
 
 matchTradesQuotes = function(tdata,qdata,adjustment=2){ ##FAST VERSION
-  tdata = .check_data(tdata);
-  qdata = .check_data(qdata);
-  qdatacheck(qdata);
-  tdatacheck(tdata);
+  tdata = .check_data(tdata)
+  qdata = .check_data(qdata)
+  qdatacheck(qdata)
+  tdatacheck(tdata)
   
   tt = dim(tdata)[2];  
   index(qdata) = index(qdata) + adjustment;
@@ -2990,8 +2898,11 @@ matchTradesQuotes = function(tdata,qdata,adjustment=2){ ##FAST VERSION
   return(merged)
 }
 
-getTradeDirection <- function(tqdata,...){
-  if(hasArg(data)){ tqdata = data; rm(data) }
+getTradeDirection <- function(tqdata,...) {
+  if (hasArg(data) == TRUE) { 
+    tqdata = data
+    rm(data) 
+  }
   tqdata = .check_data(tqdata);
   tqdatacheck(tqdata); 
   
@@ -3029,10 +2940,10 @@ es = function(data){
   return(es);
 }
 
-rs <- function(data,tdata,qdata){
-  data  <-  .check_data(data)
-  qdata <-  .check_data(qdata)
-  tdata <-  .check_data(tdata)
+rs <- function(data, tdata, qdata) {
+  data  <- .check_data(data)
+  qdata <- .check_data(qdata)
+  tdata <- .check_data(tdata)
   
   ###Function returns the realized spread as an xts object
   #Please note that the returned object can contain less observations than the original "data"
@@ -3043,7 +2954,7 @@ rs <- function(data,tdata,qdata){
   #tdata and qdata, the xts object containing the trades and quotes respectively
   
   ##First part solves the problem that unequal number of obs (in data and data2) is possible when computing the RS
-  data2 = matchtq(tdata, qdata, adjustment = 300)
+  data2 <- matchtq(tdata, qdata, adjustment = 300)
   if (dim(data2)[1]>dim(data)[1]) {
     condition = as.vector(as.character(index(data2)))%in%as.vector(as.character(index(data)))
     data2 = subset(data2,condition,select=1:(dim(data)[2]))
@@ -3067,24 +2978,24 @@ rs <- function(data,tdata,qdata){
   return(rs_xts)
 }
 
-value_trade = function(data){
-  data = .check_data(data);
+value_trade = function(data) {
+  data = .check_data(data)
   #returns the trade value as xts object
-  price = as.numeric(data$PRICE);
-  size = as.numeric(data$SIZE);
+  price = as.numeric(data$PRICE)
+  size = as.numeric(data$SIZE)
   
-  value = xts(price*size,order.by=index(data));
-  return(value);
+  value = xts(price*size,order.by=index(data))
+  return(value)
 }
 
-signed_value_trade = function(data){
-  data = .check_data(data);
+signedValueTrade <- function(data){
+  data <- .check_data(data);
   #returns the signed trade value as xts object
-  price = as.numeric(data$PRICE);
-  size = as.numeric(data$SIZE);
-  d = gettradedir(data);
+  price <- as.numeric(data$PRICE)
+  size <- as.numeric(data$SIZE)
+  d <- gettradedir(data)
   
-  value = xts(d*price*size,order.by=index(data));
+  value = xts(d*price*size,order.by=index(data))
   return(value);
 }
 
@@ -3316,7 +3227,7 @@ tqLiquidity <- function(tqdata=NULL,tdata=NULL,qdata=NULL,type,...) {
                 es = es(tqdata),
                 rs = rs(tqdata,tdata,qdata),
                 value_trade = value_trade(tqdata),
-                signed_value_trade = signed_value_trade(tqdata),
+                signed_value_trade = signedValueTrade(tqdata),
                 di_diff = di_diff(tqdata),
                 pes = pes(tqdata),
                 prs = prs(tqdata,tdata,qdata),
@@ -4135,8 +4046,7 @@ aggregatets = function (ts, FUN = "previoustick", on = "minutes", k = 1, weights
 
 #PRICE (specificity: opening price and previoustick)
 
-aggregatePrice = function (ts, FUN = "previoustick", on = "minutes", k = 1,marketopen="09:30:00",marketclose = "16:00:00") 
-{
+aggregatePrice = function (ts, FUN = "previoustick", on = "minutes", k = 1, marketopen = "09:30:00", marketclose = "16:00:00") {
   ts2 = aggregatets(ts, FUN = FUN, on, k)
   date = strsplit(as.character(index(ts)), " ")[[1]][1]
   
@@ -4156,74 +4066,71 @@ aggregatePrice = function (ts, FUN = "previoustick", on = "minutes", k = 1,marke
 }
 
 #VOLUME: (specificity: always sum)
-agg_volume= function(ts, FUN = "sumN", on = "minutes", k = 5, includeopen = FALSE,marketopen="09:30:00",marketclose="16:00:00") 
-{
-  if (!includeopen) {
-    ts3 = aggregatets(ts, FUN = FUN, on, k)
-  }
-  if (includeopen) {
-    ts2 = aggregatets(ts, FUN = FUN, on, k)
-    date = strsplit(as.character(index(ts)), " ")[[1]][1]
-    a = as.POSIXct(paste(date, marketopen),tz="GMT")
-    b = as.xts(matrix(as.numeric(ts[1]),nrow=1), a)
-    ts3 = c(b, ts2)
+aggVolume <- function(ts, FUN = "sumN", on = "minutes", k = 5, includeopen = FALSE, marketopen = "09:30:00", marketclose = "16:00:00") {
+  if (includeopen == FALSE) {
+    ts3 <- aggregatets(ts, FUN = FUN, on, k)
+  } else {
+    ts2 <- aggregatets(ts, FUN = FUN, on, k)
+    date <- strsplit(as.character(index(ts)), " ")[[1]][1]
+    a <- as.POSIXct(paste(date, marketopen), tz = "GMT")
+    b <- as.xts(matrix(as.numeric(ts[1]),nrow=1), a)
+    ts3 <- c(b, ts2)
   }
   
-  aa = as.POSIXct(paste(date, marketclose),tz="GMT")
-  condition = index(ts3) < aa
-  ts4 = ts3[condition]
+  aa <- as.POSIXct(paste(date, marketclose),tz="GMT")
+  condition <- {index(ts3) < aa}
+  ts4 <- ts3[condition]
   
-  lastinterval = matrix(colSums(matrix(ts3[!condition],ncol=dim(ts3)[2])),ncol=dim(ts3)[2])
-  bb = xts(lastinterval, aa)
-  ts4 = c(ts4, bb)
+  lastinterval <- matrix(colSums(matrix(ts3[!condition],ncol=dim(ts3)[2])),ncol=dim(ts3)[2])
+  bb <- xts(lastinterval, aa)
+  ts4 <- c(ts4, bb)
   
   return(ts4)
 }
 
-aggregateTrades =  function (tdata, on = "minutes", k = 5,marketopen="09:30:00",marketclose="16:00:00") 
-{
-  tdata = .check_data(tdata)
+aggregateTrades <- function (tdata, on = "minutes", k = 5, marketopen = "09:30:00", marketclose = "16:00:00") {
+  tdata <- .check_data(tdata)
   tdatacheck(tdata)
   ## Aggregates an entire trades xts object (tdata) over a "k"-minute interval.
   ## Returned xts-object contains: SYMBOL,EX,PRICE,SIZE.
   ## Variables COND, CORR, G127 are dropped because aggregating them makes no sense.
   ## NOTE: first observation (opening price) always included.
   
-  selection = colnames(tdata)%in%c("PRICE","EX","SYMBOL");
-  tdata1 = tdata[,selection];
-  PRICE = aggregatePrice(tdata$PRICE,on=on,k=k,marketopen=marketopen,marketclose=marketclose);
-  SIZE = agg_volume(tdata$SIZE, on = on, k = k, includeopen = TRUE,marketopen=marketopen,marketclose=marketclose)
+  selection <- colnames(tdata)%in%c("PRICE","EX","SYMBOL")
+  tdata1 <- tdata[,selection]
+  PRICE <- aggregatePrice(tdata$PRICE, on = on, k = k, marketopen = marketopen, marketclose = marketclose)
+  SIZE <- aggVolume(tdata$SIZE, on = on, k = k, includeopen = TRUE, marketopen = marketopen, marketclose = marketclose)
   
-  EX = rep(tdata$EX[1], length(PRICE));
-  SYMBOL = rep(tdata$SYMBOL[1], length(PRICE));
+  EX <- rep(tdata$EX[1], length(PRICE))
+  SYMBOL <- rep(tdata$SYMBOL[1], length(PRICE))
   
-  all = data.frame(SYMBOL, EX, PRICE, SIZE);
-  colnames(all) = c("SYMBOL", "EX", "PRICE", "SIZE");
-  ts = xts(all, index(SIZE));
-  return(ts);
+  all <- data.frame(SYMBOL, EX, PRICE, SIZE)
+  colnames(all) <- c("SYMBOL", "EX", "PRICE", "SIZE")
+  ts <- xts(all, index(SIZE))
+  return(ts)
 }
 
 ###QUOTES AGGREGATION:
-aggregateQuotes = function(qdata,on="minutes",k=5,marketopen="09:30:00",marketclose="16:00:00"){
-  qdata = .check_data(qdata);
-  qdatacheck(qdata);
+aggregateQuotes <- function(qdata, on = "minutes", k = 5, marketopen = "09:30:00", marketclose = "16:00:00") {
+  qdata <- .check_data(qdata)
+  qdatacheck(qdata)
   
   ## Aggregates an entire quotes xts object (qdata) object over a "k"-minute interval.
   ## Returned xts-object contains: SYMBOL,EX,BID,BIDSIZ,OFR,OFRSIZ.
   ## Variable MODE is dropped because aggregation makes no sense.
   ## "includeopen" determines whether to include the exact opening quotes.
   
-  BIDOFR = aggregatePrice(cbind(qdata$BID,qdata$OFR),on=on,k=k,marketopen=marketopen,marketclose=marketclose);
-  BIDOFRSIZ = agg_volume(cbind(qdata$BIDSIZ,qdata$OFRSIZ),on=on,k=k,includeopen=TRUE,marketopen=marketopen,marketclose=marketclose);
+  BIDOFR <- aggregatePrice(cbind(qdata$BID,qdata$OFR),on=on,k=k,marketopen=marketopen,marketclose=marketclose)
+  BIDOFRSIZ <- aggVolume(cbind(qdata$BIDSIZ,qdata$OFRSIZ),on=on,k=k,includeopen=TRUE,marketopen=marketopen,marketclose=marketclose)
   
-  EX = rep(qdata$EX[1],dim(BIDOFR)[1]);
-  SYMBOL = rep(qdata$SYMBOL[1],dim(BIDOFR)[1]);
+  EX <- rep(qdata$EX[1],dim(BIDOFR)[1])
+  SYMBOL <- rep(qdata$SYMBOL[1],dim(BIDOFR)[1])
   
-  all = data.frame(SYMBOL,EX,BIDOFR[,1],BIDOFRSIZ[,1],BIDOFR[,2],BIDOFRSIZ[,2]);
-  colnames(all) =c("SYMBOL","EX","BID","BIDSIZ","OFR","OFRSIZ");
+  all <- data.frame(SYMBOL,EX,BIDOFR[,1],BIDOFRSIZ[,1],BIDOFR[,2],BIDOFRSIZ[,2])
+  colnames(all) <- c("SYMBOL","EX","BID","BIDSIZ","OFR","OFRSIZ")
   
-  ts = xts(all,index(BIDOFR));
-  return(ts);
+  ts <- xts(all,index(BIDOFR))
+  return(ts)
 }
 
 ###########
@@ -4254,10 +4161,10 @@ aggregateQuotes = function(qdata,on="minutes",k=5,marketopen="09:30:00",marketcl
 #NOTE # the parameter list has three items: O, A and B
 # O is a matrix (K by 1), A and B items are (K by K) matrices
 
-heavyModel = function(data, p=matrix( c(0,0,1,1),ncol=2 ), q=matrix( c(1,0,0,1),ncol=2 ), 
+heavyModel <- function(data, p = matrix(c(0,0,1,1), ncol=2), q = matrix( c(1,0,0,1), ncol = 2), 
                       startingvalues = NULL, LB = NULL, UB = NULL, 
                       backcast = NULL, compconst = FALSE){
-  K = dim(p)[2];
+  K <- dim(p)[2]
   
   # Set lower and upper-bound if not specified:
   if( is.null(LB) ){ LB = rep(0,K)   }

@@ -107,29 +107,31 @@
 ## BNSJumptest help functions:
 
 ## zgamma function:
-.zgamma=function (x, y, gamma_power) ##gamma_power need to be in number
-{
+.zgamma <- function (x, y, gamma_power) {##gamma_power need to be in number 
   if (x^2 < y) {
-    out = abs(x)^gamma_power;
-  }else{
-    if (gamma_power==1)
-    {out = 1.094 * sqrt(y)}
-    if (gamma_power==2)
-    {out = 1.207 * y}
-    if (gamma_power==4/3)
-    {out = 1.129 * y^(2/3)} }
-
+    out <- abs(x)^gamma_power
+  } else {
+    if (gamma_power == 1) {
+      out <- 1.094 * sqrt(y)
+    }
+    if (gamma_power == 2) {
+      out <- 1.207 * y
+    }
+    if (gamma_power == 4/3) {
+      out <- 1.129 * y^(2/3)
+    } 
+  }
+  
   return(out)
 }
 ##corrected threshold bipower variation:
-.ctBV = function (rdata, startV = NULL)
-{
+.ctBV = function(rdata, startV = NULL) {
   #q = as.numeric(rdata)
   N = length(rdata);
 
   if (is.null(startV)) {
     hatV = medRV(rdata)
-  }else{
+  } else {
     hatV = startV
   }
   v = 3^2 * hatV
@@ -147,9 +149,8 @@
 }
 
 
-
-.ctTPV = function (rdata, startV = NULL) ###C-TTriPV
-{
+###C-TTriPV
+.ctTPV = function (rdata, startV = NULL){
   q = as.numeric(rdata)
   N = length(rdata);
 
@@ -178,8 +179,7 @@
 
 
 ## hatIV
-.hativ=function (rdata, IVestimator, startV = NULL, ...)
-{
+.hativ <- function(rdata, IVestimator, startV = NULL, ...) {
   switch(IVestimator,
          RV = RV(rdata),
          BV = RBPVar(rdata),
@@ -191,8 +191,7 @@
 }
 
 
-.tt=function (IVestimator, ...)
-{
+.tt <- function(IVestimator, ...) {
   switch(IVestimator,
          BV = pi^2/4+pi-3,
          minRV = 3.81,
@@ -201,33 +200,33 @@
          ROWVar = .thetaROWVar(...))
 }
 
-.thetaROWVar = function( alpha = 0.001 , alphaMCD = 0.5 )
-{
-  N = 1;
-  q_alpha = qchisq( 1-alpha , df = N );
-  c_alpha = (1-alpha)/pchisq( q_alpha , df = N+2 );
-  a_alpha = -2*sqrt(q_alpha)*dnorm(sqrt(q_alpha))+1-alpha;
-  b_alpha = -2*q_alpha^(3/2)*dnorm(sqrt(q_alpha))+3*a_alpha;
+.thetaROWVar <- function(alpha = 0.001 , alphaMCD = 0.5) {
+  N = 1
+  q_alpha = qchisq(1-alpha , df = N)
+  c_alpha = (1-alpha) / pchisq(q_alpha , df = N+2)
+  a_alpha = -2 * sqrt(q_alpha) * dnorm(sqrt(q_alpha)) + 1 - alpha
+  b_alpha = -2 * q_alpha^(3/2) * dnorm(sqrt(q_alpha)) + 3 * a_alpha
 
-  k = qchisq(1-alpha, df= 1); #TODO GIANG ## suggestion in the article.
-  halfk = sqrt(k); halfq = sqrt(q_alpha)
+  k = qchisq(1 - alpha, df = 1); #TODO GIANG ## suggestion in the article.
+  halfk = sqrt(k) 
+  halfq = sqrt(q_alpha)
 
-  Ewu2   = 2*pnorm(halfk)-1;
-  Ewu2u2 = -2*halfk*dnorm(halfk)+Ewu2;
-  Ewu2u4 = -2*(k^(3/2))*dnorm(halfk)+3*Ewu2u2;
+  Ewu2   = 2 * pnorm(halfk)-1
+  Ewu2u2 = -2 * halfk * dnorm(halfk) + Ewu2
+  Ewu2u4 = -2 * (k^(3/2)) * dnorm(halfk)+3 * Ewu2u2
 
   Ewu2u2IF = (-1+c_alpha*q_alpha-(c_alpha*q_alpha)/(1-alpha))*a_alpha+c_alpha*b_alpha/(1-alpha)
   Ewu2u2IF = Ewu2u2IF + 2*(1-c_alpha*q_alpha)*(
     halfk*dnorm(halfk)-halfq*dnorm(halfq) + 1 - alpha/2 - pnorm(halfk)   )
   Ewu2IF = (alpha-1-c_alpha*q_alpha*alpha) + c_alpha*a_alpha/(1-alpha) + 2*(c_alpha*q_alpha-1)*( pnorm(halfk)-(1-alpha/2))
-  Ederwu2u4 = -k^(3/2)*dnorm(halfk);
-  Ederwu2u2 = -halfk*dnorm(halfk);
+  Ederwu2u4 = -k^(3/2)*dnorm(halfk)
+  Ederwu2u2 = -halfk*dnorm(halfk)
   c1 = 1/Ewu2u2;   c2 = 1/Ewu2;   c3 = c2*Ederwu2u2-c1*Ederwu2u4
   Avar0 = .avar_MCD(alpha)
-  theta = c3^2*Avar0 + c1^2*Ewu2u4 + c2^2*Ewu2 - 2*c1*c2*Ewu2u2;
-  theta = theta + 2*c3*( c1*Ewu2u2IF-c2*Ewu2IF );
+  theta = c3^2*Avar0 + c1^2*Ewu2u4 + c2^2*Ewu2 - 2*c1*c2*Ewu2u2
+  theta = theta + 2*c3*( c1*Ewu2u2IF-c2*Ewu2IF )
 
-  return( theta );
+  return(theta)
 }
 
 
@@ -239,7 +238,7 @@
 ## OUTPUT: standard error of parameters calculated from log-likelihood heavyModel.
 
 
-.transformparams = function( p, q, par ){
+.transformparams <- function( p, q, par ) {
   K = dim(p)[1];
   pmax = max(p); qmax = max(q); # Max number of lags for innovations and cond vars
 
@@ -379,7 +378,7 @@
 
 }
 
-.heavy_likelihood = function( par, data, p, q, backcast, LB, UB, foroptim=TRUE, compconst=FALSE ){
+.heavy_likelihood <- function( par, data, p, q, backcast, LB, UB, foroptim=TRUE, compconst=FALSE ){
   # Get the required variables
   # p is Max number of lags for innovations
   # q is Max number of lags for conditional variances
@@ -456,7 +455,7 @@
 
 
 
-.heavy_likelihood_ll  = function( splittedparams, data, p, q, backcast, LB, UB, compconst=FALSE, ... ){
+.heavy_likelihood_ll  <- function( splittedparams, data, p, q, backcast, LB, UB, compconst=FALSE, ... ){
   K = ncol(data);
   TT = nrow(data);
   means = c(colMeans(data));
@@ -566,16 +565,19 @@
 }
 
 
-.SEheavyModel = function( paramsvector, data, p, q, backcast, LB, UB, compconst=FALSE, ...)
-{
+.SEheavyModel <- function( paramsvector, data, p, q, backcast, LB, UB, compconst=FALSE, ...) {
 
-  K    = ncol(data);  #Number of series to model
+  K <- ncol(data);  #Number of series to model
 
   # Set lower and upper-bound if not specified:
-  if( is.null(LB) ){ LB = rep(0,K)   }
-  if( is.null(UB) ){ UB = rep(Inf,K) }
+  if (is.null(LB) == TRUE){ 
+    LB = rep(0,K)   
+  }
+  if (is.null(UB) == TRUE){ 
+    UB = rep(Inf, K) 
+  }
 
-  if(!compconst){
+  if (compconst == FALSE) {
     # based on p and q, map heavy paramsvector into splitted params vector called theta
 
     out = .transtosplit ( paramsvector=paramsvector,  p=p, q=q)
@@ -606,7 +608,7 @@
     m  = numDeriv::jacobian(.heavy_likelihood_lls, x = splittedparams, data=data, p=p, q=q, backcast=backcast, LB=LB, UB=UB, compconst=compconst) # returns a vector?
     It = cov(m)
 
-  }else{
+  } else {
 
     # Change value of mu:
     paramsvector[1:K]  = colMeans(data)
@@ -682,20 +684,19 @@
     fm = lm(m ~ 0);
     It = try(sandwich::vcovHAC(fm))
 
-    if(class(It) == "try-error")
-    {
-      print("HAC estimator reports an error. It is replaced by non HAC estimator.")
+    if(class(It) == "try-error") {
+      print("HAC estimator reports an error. It is replaced by non-HAC estimator.")
       It = cov(m)
     }
   }
 
   ## Jt matrix
-  Jt = -1/T * Jmatrix
+  Jt = - 1/T * Jmatrix
   ## J-1 (inverse matrix of J):
 
-  invJ = try(solve(Jt))
-  if( class(invJ) == "try-error"){
-    print("-1*Hessian is not invertible - generalized inverse is used")
+  invJ <- try(solve(Jt))
+  if (class(invJ) == "try-error") {
+    print("-1 * Hessian is not invertible - generalized inverse is used")
     invJ = MASS::ginv(Jt)
   }
 
@@ -721,9 +722,8 @@
 }
 
 ## Function: heavyModel by applying C code:
-heavyModelC = function (data, p = matrix(c(0, 0, 1, 1), ncol = 2), q = matrix(c(1, 0, 0, 1), ncol = 2),
-                        startingvalues = NULL, LB = NULL, UB = NULL, backcast = NULL, compconst = FALSE)
-{
+heavyModelC <- function (data, p = matrix(c(0, 0, 1, 1), ncol = 2), q = matrix(c(1, 0, 0, 1), ncol = 2),
+                        startingvalues = NULL, LB = NULL, UB = NULL, backcast = NULL, compconst = FALSE) {
   K = ncol(data);
   TT = nrow(data);
   means = c(colMeans(data));

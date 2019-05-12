@@ -34,7 +34,7 @@ medRQ <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
     if ((!is.null(align.by)) && (!is.null(align.period))) {
       rdata <- aggregatets(rdata, on = align.by, k = align.period)
     }
-    if(makeReturns) {
+    if (makeReturns == TRUE) {
       rdata <- makeReturns(rdata)
     }
     q <- abs(as.numeric(rdata))
@@ -81,7 +81,7 @@ minRQ <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
     if ((!is.null(align.by)) && (!is.null(align.period))) {
       rdata <- aggregatets(rdata, on = align.by, k = align.period)
     }
-    if(makeReturns) {
+    if (makeReturns == TRUE) {
       rdata = makeReturns(rdata)
     }
     q     <- as.zoo(abs(as.numeric(rdata)))
@@ -225,6 +225,124 @@ MRC <- function(pdata, pairwise = FALSE, makePsd = FALSE) {
   0
 } 
 
+#' minRV
+#' 
+#' @description Function returns the minRV, defined in Andersen et al. (2009).
+#' 
+#' Let \eqn{r_{t,i}} be a return (with \eqn{i=1,\ldots,M}) in period \eqn{t}.
+#' 
+#' Then, the minRV is given by
+#' \deqn{
+#' \mbox{minRV}_{t}=\frac{\pi}{\pi - 2}\left(\frac{M}{M-1}\right) \sum_{i=1}^{M-1} \mbox{min}(|r_{t,i}| ,|r_{t,i+1}|)^2
+#' }
+#' 
+#' @param rdata a zoo/xts object containing all returns in period t for one asset.
+#' @param align.by a string, align the tick data to "seconds"|"minutes"|"hours".
+#' @param align.period an integer, align the tick data to this many [seconds|minutes|hours].
+#' @param makeReturns boolean, should be TRUE when rdata contains prices instead of returns. FALSE by default.
+#' 
+#' @return numeric
+#' 
+#' @references 
+#' Andersen, T. G., D. Dobrev, and E. Schaumburg (2012). Jump-robust volatility estimation using nearest neighbor truncation. Journal of Econometrics, 169 (1), 75-93.
+#' 
+#' @author Jonathan Cornelissen and Kris Boudt
+#' 
+#' @examples
+#' data(sample_tdata)
+#' minrv <- minRV(rdata = sample_tdata$PRICE, align.by = "minutes",
+#'                align.period = 5, makeReturns = TRUE)
+#' minrv 
+#' 
+#' @keywords volatility
+#' @export
+minRV <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE){
+  
+  # self-reference for multi-day input
+  if (checkMultiDays(rdata) == TRUE) {
+    result <- apply.daily(rdata,minRV,align.by,align.period,makeReturns)
+    return(result)
+  } else {
+    if ((!is.null(align.by))&&(!is.null(align.period))) {
+      rdata <- aggregatets(rdata, on = align.by, k = align.period)
+    } 
+    if (makeReturns) {
+      rdata = makeReturns(rdata)
+    }  
+    q <- as.zoo(abs(as.numeric(rdata))) #absolute value
+    q <- as.numeric(rollapply(q, width = 2, FUN = min, by = 1, align = "left"))
+    N <- length(q) + 1 #number of obs
+    minrv <- (pi/(pi - 2)) * (N/(N - 1)) * sum(q^2)
+    return(minrv) 
+  }  
+}  
+
+#' medRV
+#' 
+#' @description 
+#' Function returns the medRV, defined in Andersen et al. (2009).
+#' 
+#' Let \eqn{r_{t,i}} be a return (with \eqn{i=1,\ldots,M}) in period \eqn{t}.
+#' 
+#' Then, the medRV is given by
+#' \deqn{
+#'  \mbox{medRV}_{t}=\frac{\pi}{6-4\sqrt{3}+\pi}\left(\frac{M}{M-2}\right) \sum_{i=2}^{M-1} \mbox{med}(|r_{t,i-1}|,|r_{t,i}|, |r_{t,i+1}|)^2
+#' }
+#'  
+#' @param rdata a zoo/xts object containing all returns in period t for one asset.
+#' @param align.by a string, align the tick data to "seconds"|"minutes"|"hours".
+#' @param align.period an integer, align the tick data to this many [seconds|minutes|hours].
+#' @param makeReturns boolean, should be TRUE when rdata contains prices instead of returns. FALSE by   default.
+#'  
+#' @details
+#' The medRV belongs to the class of realized volatility measures in this package
+#' that use the series of high-frequency returns \eqn{r_{t,i}} of a day \eqn{t} 
+#' to produce an ex post estimate of the realized volatility of that day \eqn{t}. 
+#' medRV is designed to be robust to price jumps. 
+#' The difference between RV and medRV is an estimate of the realized jump 
+#' variability. Disentangling the continuous and jump components in RV 
+#' can lead to more precise volatility forecasts, 
+#' as shown in Andersen et al. (2007) and Corsi et al. (2010).
+#' 
+#' @return numeric
+#' 
+#' @references Andersen, T. G., D. Dobrev, and E. Schaumburg (2012). Jump-robust volatility estimation using nearest neighbor truncation. Journal of Econometrics, 169 (1), 75-93.
+#' 
+#' Andersen, T.G., T. Bollerslev, and F. Diebold (2007). Roughing it up: including jump components in the measurement, modelling and forecasting of return volatility. The Review of Economics and Statistics 89 (4), 701-720.
+#' 
+#' Corsi, F., D. Pirino, and R. Reno (2010). Threshold Bipower Variation and the Impact of Jumps on Volatility Forecasting. Journal of Econometrics 159 (2), 276-288.
+#' 
+#' @author Jonathan Cornelissen and Kris Boudt
+#' 
+#' @examples 
+#' data(sample_tdata);
+#' medrv <- medRV(rdata = sample_tdata$PRICE, align.by = "minutes", 
+#'                align.period = 5, makeReturns = TRUE)
+#' medrv 
+#'  
+#' @keywords volatility
+#' @export
+medRV <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE){
+  
+  # self-reference for multi-day input
+  if (checkMultiDays(rdata) == TRUE) {
+    result <- apply.daily(rdata, medRV, align.by, align.period, makeReturns)
+    return(result)
+  } else {
+    if ((!is.null(align.by)) && (!is.null(align.period))) {
+      rdata <- aggregatets(rdata, on = align.by, k = align.period)
+    }
+    if (makeReturns == TRUE) {
+      rdata <- makeReturns(rdata)
+    }
+    
+    q <- abs(as.numeric(rdata)); #absolute value
+    q <- as.numeric(rollmedian(q, k=3, align="center"))
+    N <- length(q) + 2
+    medrv <- (pi / (6 - 4 * sqrt(3) + pi)) * (N/(N - 2)) * sum(q^2)
+    return(medrv)
+  }
+}
 
 
 #' Realized BiPower Covariance

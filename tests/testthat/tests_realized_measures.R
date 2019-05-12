@@ -23,6 +23,17 @@ expect_equal(
 #   "1.4318182315337431021"
 # )
 
+# medRV
+expect_equal(
+  formatC(as.numeric(medRV(sample_5minprices_jumps[c('2010-01-04', '2010-01-05'), 1], align.by = "minutes", align.period = 5, makeReturns = TRUE)[1]), digits = 20),
+  "0.013105073468934913539"
+)
+# minRV
+expect_equal(
+  formatC(as.numeric(minRV(sample_5minprices_jumps[c('2010-01-04', '2010-01-05'), 1], align.by = "minutes", align.period = 5, makeReturns = TRUE)[1]), digits = 20),
+  "0.013259308626346031496"
+)
+
 # rBPCov
 expect_equal(
   formatC(sum(rBPCov(rdata = sample_5minprices_jumps[c('2010-01-04', '2010-01-05'), 1:2], makeReturns=TRUE)[[1]][1:2,1:2]) * 1000000, digits = 20),

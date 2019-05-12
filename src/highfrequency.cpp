@@ -2,17 +2,14 @@
 #include <Rcpp.h>
 using namespace Rcpp;
 
-// // [[Rcpp::export]]
-// int nsmaller(NumericVector times, NumericVector lengths, int start, int end, int max) {
-//   int i = 0;
-//   while ( (i < (lengths[end] - lengths[start])) && ((times + (lengths[start]+i)) <= max)) {
-//     i++;
-//   }
-//   return i;
-// }
-
-
-
+// [[Rcpp::export]]
+int nsmaller(IntegerVector times, IntegerVector lengths, int start, int end, int max) {
+  int i = 0;
+  while ( (i < (lengths[end] - lengths[start])) && (times[(lengths[start]+i)] <= max)) {
+    i++;
+  }
+  return i;
+}
 
 // // [[Rcpp::export]]
 // void refreshpoints( int *times, int *lengths, int *ttau, int *dim, int *aa, int *indices, int *lindex){
