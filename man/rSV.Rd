@@ -36,7 +36,7 @@ Then, the rSV is given by
 \examples{
 \dontrun{
 data(sample_tdata)
-rSV(sample_tdata$PRICE,align.by ="minutes", align.period =5, makeReturns = TRUE)
+rSV(sample_tdata$PRICE, align.by = "minutes", align.period = 5, makeReturns = TRUE)
 }
 }
 \references{

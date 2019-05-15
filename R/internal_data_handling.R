@@ -1,4 +1,33 @@
 #' @keywords internal
+.check_data <- function(data){ 
+  # FUNCTION sets column names according to RTAQ format using quantmod conventions, such that all the other functions find the correct information.
+  # requireNamespace('quantmod');
+  # First step: assign the xts attributes:
+  data <- set.AllColumns(data)
+  
+  # Change column names to previous RTAQ format! 
+  # Adjust price col naming:  
+  try((colnames(data)[xtsAttributes(data)[['Price']]] = 'PRICE'))
+  # Adjust Bid col naming:    
+  try((colnames(data)[xtsAttributes(data)[['Bid']]] = 'BID'))
+  # Adjust Ask col naming:    
+  try((colnames(data)[xtsAttributes(data)[['Ask']]] = 'OFR'))
+  
+  # Adjust Ask size col naming:
+  try((colnames(data)[xtsAttributes(data)[['BidSize']]] = 'BIDSIZ'))
+  
+  # Adjust Bid size col naming:    
+  try((colnames(data)[xtsAttributes(data)[['AskSize']]] = 'OFRSIZ'))
+  
+  # Adjust correction column, if necessary:
+  if (any(colnames(data) == "CR")) {
+    colnames(data)[colnames(data) == "CR"] = "CORR"
+  }
+  
+  return(data)
+} 
+
+#' @keywords internal
 is.BBO <- function (x) {
   if (all(has.Bid(x), has.Ask(x))) {
     TRUE
@@ -229,6 +258,19 @@ has.Qty <- function(x, which = FALSE)
   if (!identical(loc, integer(0))) {
     return(if(which) loc else TRUE)
   } else FALSE
+}
+
+#' @keywords internal
+qdatacheck <- function(qdata) {
+  if (is.xts(qdata) == FALSE) {
+    stop("The argument qdata should be an xts object")
+  }
+  if (any(colnames(qdata)=="BID") == FALSE) {
+    stop("The argument qdata should have a column containing the BID. Could not find that column")
+  }
+  if (any(colnames(qdata)=="OFR") == FALSE) {
+    stop("The argument qdata should have a column containing the ASK / OFR. Could not find that column")
+  }
 }
 
 # Column setting functions

@@ -1,3 +1,44 @@
+#' @importFrom stats qchisq
+#' @importFrom stats pchisq
+#' @keywords internal
+conHR <- function(di, alpha = 0.05) {
+# consistency factor ROWQCov based on hard rejection weight function
+  return((1 - alpha) / pchisq(qchisq(1 - alpha, df = di), df = di + 2))
+}
+
+#' @importFrom stats qchisq
+#' @importFrom stats integrate
+#' @keywords internal
+conhuber <- function(di, alpha = 0.05) {   
+  c <- qchisq(p = 1 - alpha, df = di)
+  fw2 <- function(t) {
+    z <- t^2
+    return(huberweight(z,c) * (t^(di - 1)) * exp(-z/2)) 
+  }
+  fw1 <- function(t) {
+    z <- t^2
+    return(huberweight(z,c) * (t^(di + 1)) * exp(-z/2))
+  }
+  c2 <- integrate(fw2, 0, Inf)$value
+  c1 <- integrate(fw1, 0, Inf)$value
+  return(di * c2/c1)
+}
+
+#' @keywords internal
+huberweight <- function(d,k) {
+  # Huber or soft rejection weight function
+  w <- apply(cbind(rep(1, length(d)), (k/d)), 1, 'min')
+  return(w)
+}
+
+# Check data:
+#' @keywords internal
+rdatacheck = function (rdata, multi = FALSE) {
+  if ((dim(rdata)[2] < 2) & (multi)) {
+    stop("Your rdata object should have at least 2 columns")
+  }
+}
+
 #' @keywords internal
 refreshTime <- function (pdata) {
   dim <- length(pdata)
@@ -45,4 +86,32 @@ RBPVar <- function(rdata) {
   n <- length(returns)
   rbpvar <- (pi/2) * sum(abs(returns[1:(n-1)]) * abs(returns[2:n]))
   return(rbpvar)
+}
+
+#' @keywords internal
+ROWVar <- function(rdata, seasadjR = NULL, wfunction = "HR" , alphaMCD = 0.75, alpha = 0.001,...) {
+  
+  if (is.null(seasadjR)) {
+    seasadjR = rdata
+  }
+  
+  rdata <- as.vector(rdata)
+  seasadjR <- as.vector(seasadjR)
+  intraT <- length(rdata); N=1
+  MCDcov <- as.vector(robustbase::covMcd( rdata , use.correction = FALSE )$raw.cov)
+  outlyingness <- seasadjR^2/MCDcov    
+  k <- qchisq(p = 1 - alpha, df = N)
+  outlierindic <- outlyingness > k
+  weights <- rep(1, intraT)
+  if( wfunction == "HR" ){
+    weights[outlierindic] <- 0
+    wR <- sqrt(weights) * rdata
+    return((conHR(di = N, alpha = alpha) * sum(wR^2)) / mean(weights))
+  }
+  if (wfunction == "SR") {
+    weights[outlierindic] <- k/outlyingness[outlierindic]
+    wR <- sqrt(weights) * rdata
+    return((conhuber(di = N, alpha = alpha) * sum(wR^2)) / mean(weights))
+  }
+  
 }

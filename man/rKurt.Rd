@@ -33,7 +33,7 @@ Then, the rKurt is given by
 }
 \examples{
 data(sample_tdata)
-rKurt(sample_tdata$PRICE,align.by ="minutes", align.period =5, makeReturns = TRUE)
+rKurt(sample_tdata$PRICE, align.by = "minutes", align.period = 5, makeReturns = TRUE)
 
 }
 \references{

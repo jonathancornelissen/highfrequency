@@ -65,6 +65,12 @@ expect_equal(
   "423.27734518675470099"
 )
 
+# rOWCov
+expect_equal(
+  formatC(rOWCov(rdata = sample_5minprices_jumps['2010-01-04'], makeReturns = TRUE, wfunction = "SR")[1,1] * 1000000, digits = 20),
+  "10138.583710269167568"
+)
+
 # rSkew
 expect_equal(
   formatC(as.numeric(rSkew(sample_5minprices_jumps[c('2010-01-04', '2010-01-05'), 1], align.by ="minutes", align.period = 5, makeReturns = TRUE))[1] * 1000000, digits = 20),

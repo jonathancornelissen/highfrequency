@@ -6,41 +6,16 @@
 
 
 
-# Check data:
-rdatacheck = function (rdata, multi = FALSE) {
-  if ((dim(rdata)[2] < 2) & (multi)) {
-    stop("Your rdata object should have at least 2 columns")
-  }
-}
 
 ######## rowcov helper functions:
 #Realized Outlyingness Weighted Quadratic Covariation (ROWQCov)
 
-# consistency factor ROWQCov based on Huber weight function
-conhuber <- function(di,alpha = 0.05) {   
-    c = qchisq(p=1-alpha,df=di)
-    fw2 = function(t){
-        z=t^2; return(  huberweight(z,c)*( t^(di-1) )*exp(-z/2)    ) }
-    fw1 = function(t){
-        z=t^2; return(  huberweight(z,c)*( t^(di+1) )*exp(-z/2)   )}
-    c2 = integrate(fw2,0,Inf)$value;  c1 = integrate(fw1,0,Inf)$value;
-    return( di*c2/c1 )
-}
 
-conHR <- function(di, alpha = 0.05) {
-  # consistency factor ROWQCov based on hard rejection weight function
-  return((1 - alpha) / pchisq(qchisq(1 - alpha, df = di), df = di + 2))
-}
 
-huberweight <- function(d,k) {
-  # Huber or soft rejection weight function
-  w <- apply(cbind(rep(1,length(d)), (k/d)), 1, 'min')
-  return(w)
-}
-
-countZeroes <- function(series) {
-  return(sum(1 * (series == 0)))
-}
+# 
+# countZeroes <- function(series) {
+#   return(sum(1 * (series == 0)))
+# }
 
 #Realized Outlyingness Weighted Variance (ROWVar):
 univariateoutlyingness <- function(rdata, ...) {
@@ -54,32 +29,6 @@ univariateoutlyingness <- function(rdata, ...) {
   d = ((rdata - location) / scale)^2
 }
 
-
-ROWVar <- function(rdata, seasadjR = NULL, wfunction = "HR" , alphaMCD = 0.75, alpha = 0.001,...) {
-  
-    if (is.null(seasadjR)) {
-        seasadjR = rdata;
-    }
-    
-    rdata = as.vector(rdata); seasadjR = as.vector(seasadjR);
-    intraT = length(rdata); N=1;
-    MCDcov = as.vector(robustbase::covMcd( rdata , use.correction = FALSE )$raw.cov)
-    outlyingness = seasadjR^2/MCDcov    
-    k = qchisq(p = 1 - alpha, df = N)
-    outlierindic = outlyingness > k
-    weights = rep(1, intraT)
-    if( wfunction == "HR" ){
-        weights[outlierindic] = 0
-        wR = sqrt(weights) * rdata
-        return((conHR(di = N, alpha = alpha) * sum(wR^2))/mean(weights))
-    }
-    if( wfunction == "SR" ){
-        weights[outlierindic] = k/outlyingness[outlierindic]
-        wR = sqrt(weights) * rdata
-        return((conhuber(di = N, alpha = alpha) * sum(wR^2))/mean(weights))
-    }
-    
-}
 
 #### Two time scale helper functions:
 TSRV <- function(pdata , K = 300 , J = 1) {
@@ -355,16 +304,14 @@ rc.hy <- function(x, y, period = 1,align.by = "seconds", align.period = 1, cts =
 # Realized variance calculation using a kernel estimator.
 #
 rv.kernel <- function(x,                             # Tick Data
-kernel.type = "rectangular",   # Kernel name (or number)
-kernel.param = 1,              # Kernel parameter (usually lags)
-kernel.dofadj = TRUE,          # Kernel Degree of freedom adjustment
-align.by="seconds",            # Align the tick data to [seconds|minutes|hours]
-align.period = 1,              # Align the tick data to this many [seconds|minutes|hours]
-cts = TRUE,                    # Calendar Time Sampling is used
-makeReturns = FALSE,            # Convert to Returns 
-type = NULL,                   # Deprectated
-adj = NULL,                    # Deprectated
-q = NULL, ...){                     # Deprectated
+                      kernel.type = "rectangular",   # Kernel name (or number)
+                      kernel.param = 1,              # Kernel parameter (usually lags)
+                      kernel.dofadj = TRUE,          # Kernel Degree of freedom adjustment
+                      align.by="seconds",            # Align the tick data to [seconds|minutes|hours]
+                      align.period = 1,              # Align the tick data to this many [seconds|minutes|hours]
+                      type = NULL,                   # Deprectated
+                      adj = NULL,                    # Deprectated
+                      q = NULL, ...){                     # Deprectated
     # Multiday adjustment: 
     multixts = .multixts(x);
     if(multixts){
@@ -447,44 +394,37 @@ q = NULL,...){                 # Deprectated
     ans=double(1),PACKAGE="highfrequency")$ans
 }
 
-rKernel <- function(x,type=0)
-{
+rKernel <- function(x,type=0) {
     type <- .kernel.chartoint(type)
-    .C("justKernel", x=as.double(x),type= as.integer(type), ans=as.double(0),PACKAGE="highfrequency")$ans
+    .C("justKernel", x = as.double(x), type = as.integer(type), ans = as.double(0), PACKAGE="highfrequency")$ans
 }
 
-.kernel.chartoint <- function(type)
-{
-    if(is.character(type))
-    {
+.kernel.chartoint <- function(type) {
+    if (is.character(type) == TRUE) {
         ans <- switch(casefold(type), 
-        rectangular=0,
-        bartlett=1,
-        second=2,
-        epanechnikov=3,
-        cubic=4,
-        fifth=5,
-        sixth=6,
-        seventh=7,
-        eighth=8,
-        parzen=9,
-        th=10,
-        mth=11,
-        tukeyhanning=10,
-        modifiedtukeyhanning=11,
-        -99)
-        if(ans==-99)
-        { 
+                      rectangular=0,
+                      bartlett=1,
+                      second=2,
+                      epanechnikov=3,
+                      cubic=4,
+                      fifth=5,
+                      sixth=6,
+                      seventh=7,
+                      eighth=8,
+                      parzen=9,
+                      th=10,
+                      mth=11,
+                      tukeyhanning=10,
+                      modifiedtukeyhanning=11,
+                      -99)
+        
+        if(ans==-99) { 
             warning("Invalid Kernel, using Bartlet")
             1
-        }
-        else
-        {
+        } else {
             ans     
         }
-    }
-    else
-    {
+    } else {
         type
     }
 }
@@ -506,11 +446,11 @@ rKernel.available <- function() {
 
 
 ## REalized Variance: Average subsampled
-rv.avg = function(x, period) { 
+rv.avg <- function(x, period) { 
     mean(.rv.subsample(x, period))
 }
 
-rc.avg = function( x, y,  period ) {
+rc.avg <- function( x, y,  period ) {
     mean(.rc.subsample(x, y, period));
 }
 
@@ -887,75 +827,7 @@ rBPCov <- function(rdata, cor = FALSE, align.by = NULL, align.period = NULL, mak
     } 
 }
 
-# rOWCov: Realized Outlyingness Covariation : 
-# NOT YET IMPLEMENTED: MULTIDAY XTS SUPPORT...
-rOWCov = function (rdata, cor=FALSE, align.by=NULL,align.period=NULL, makeReturns = FALSE, seasadjR = NULL, wfunction = "HR" , alphaMCD = 0.75, alpha = 0.001,...){
-    if(hasArg(data)){ rdata = data }
-    if(is.null(seasadjR)) { seasadjR = rdata }
-    multixts = .multixts(rdata); 
-    if(multixts){ stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input"); }
-    
-    # Aggregate:
-    if((!is.null(align.by))&&(!is.null(align.period))){
-        rdata = .aggregatets(rdata, on=align.by, k=align.period);
-        seasadjR = .aggregatets(seasadjR, on=align.by, k=align.period);
-    }     
-    if( makeReturns ){ rdata = makeReturns(rdata); 
-        if( !is.null(seasadjR) ){ seasadjR = makeReturns(seasadjR)} }
-    
-    if(is.null(dim(rdata))){ n=1 }else{ n = dim(rdata)[2]}        
-    
-    if( n == 1 ){ return( ROWVar( rdata , seasadjR = seasadjR , wfunction = wfunction , alphaMCD = alphaMCD , alpha = alpha ))}
-    
-    if( n > 1 ){ 
-        rdatacheck(rdata, multi = TRUE)
-        
-      
-        rdata = as.matrix(rdata); seasadjR = as.matrix(seasadjR);
-        intraT = nrow(rdata)
-        N = ncol(rdata)
-        perczeroes <- apply(seasadjR, 2, countZeroes) / intraT
-        select = c(1:N)[perczeroes < 0.5]
-        seasadjRselect = seasadjR[, select]
-        N = ncol(seasadjRselect)
-        MCDobject = try(robustbase::covMcd(x = seasadjRselect, alpha = alphaMCD))
-        if (length(MCDobject$raw.mah) > 1) {
-            betaMCD = 1-alphaMCD; asycor = betaMCD/pchisq( qchisq(betaMCD,df=N),df=N+2 )
-            MCDcov = (asycor*t(seasadjRselect[MCDobject$best,])%*%seasadjRselect[MCDobject$best,])/length(MCDobject$best);  
-            invMCDcov = solve(MCDcov) ; outlyingness = rep(0,intraT);
-            for( i in 1:intraT ){ 
-                outlyingness[i] = matrix(seasadjRselect[i,],ncol=N)%*%invMCDcov%*%matrix(seasadjRselect[i,],nrow=N)    }
-        }
-        else {
-            print(c("MCD cannot be calculated")); stop();
-        }
-        k = qchisq(p = 1 - alpha, df = N)
-        outlierindic = outlyingness > k
-        weights = rep(1, intraT)
-        if( wfunction == "HR" ){
-            weights[outlierindic] = 0
-            wR = sqrt(weights) * rdata
-            covariance = (conHR(di = N, alpha = alpha) * t(wR) %*% wR)/mean(weights);
-            if(cor==FALSE){return(covariance)}
-            if(cor==TRUE){
-                sdmatrix = sqrt(diag(diag(covariance)));
-                rcor = solve(sdmatrix)%*%covariance%*%solve(sdmatrix);
-                return(rcor)
-            }
-        }
-        if( wfunction == "SR" ){
-            weights[outlierindic] = k/outlyingness[outlierindic]
-            wR = sqrt(weights) * rdata
-            covariance = (conhuber(di = N, alpha = alpha) * t(wR) %*% wR)/mean(weights);
-            if(cor==FALSE){return(covariance)}
-            if(cor==TRUE){
-                sdmatrix = sqrt(diag(diag(covariance)));
-                rcor = solve(sdmatrix)%*%covariance%*%solve(sdmatrix);
-                return(rcor)
-            } 
-        } 
-    } 
-} 
+
 
 ### Two time scale covariance : 
 rTSCov = function (pdata, cor = FALSE, K = 300, J = 1, K_cov = NULL, J_cov = NULL, 
@@ -2813,39 +2685,7 @@ center = function()
  ###### end SPOTVOL FUNCTIONS formerly in periodicityTAQ #########
 
  ###### Liquidity functions formerly in in RTAQ  ######
-.check_data <- function(data){ 
-  # FUNCTION sets column names according to RTAQ format using quantmod conventions, such that all the other functions find the correct information.
-  # requireNamespace('quantmod');
-  # First step: assign the xts attributes:
-  data <- set.AllColumns(data)
-  
-  # Change column names to previous RTAQ format! 
-  # Adjust price col naming:  
-  try((colnames(data)[xtsAttributes(data)[['Price']]] = 'PRICE'))
-  # Adjust Bid col naming:    
-  try((colnames(data)[xtsAttributes(data)[['Bid']]] = 'BID'))
-  # Adjust Ask col naming:    
-  try((colnames(data)[xtsAttributes(data)[['Ask']]] = 'OFR'))
-  
-  # Adjust Ask size col naming:
-  try((colnames(data)[xtsAttributes(data)[['BidSize']]] = 'BIDSIZ'))
-  
-  # Adjust Bid size col naming:    
-  try((colnames(data)[xtsAttributes(data)[['AskSize']]] = 'OFRSIZ'))
-  
-  # Adjust correction column, if necessary:
-  if (any(colnames(data) == "CR")) {
-    colnames(data)[colnames(data) == "CR"] = "CORR"
-  }
-  
-  return(data)
-} 
 
-qdatacheck = function(qdata){
-  if(!is.xts(qdata)){stop("The argument qdata should be an xts object")}
-  if(!any(colnames(qdata)=="BID")){stop("The argument qdata should have a column containing the BID. Could not find that column")}
-  if(!any(colnames(qdata)=="OFR")){stop("The argument qdata should have a column containing the ASK / OFR. Could not find that column")}
-}
 
 tdatacheck = function(tdata){ 
   if(!is.xts(tdata)){stop("The argument tdata should be an xts object")}
@@ -3404,11 +3244,11 @@ tradesCleanup = function(from,to,datasource,datadestination,ticker,exchanges,tda
   
 }
 
-quotesCleanup = function(from,to,datasource,datadestination,ticker,exchanges, qdataraw=NULL,report=TRUE,selection="median",maxi=50,window=50,type="advanced",rmoutliersmaxi=10,...){
-  nresult = rep(0,7);
+quotesCleanup <- function(from,to,datasource,datadestination,ticker,exchanges, qdataraw=NULL,report=TRUE,selection="median",maxi=50,window=50,type="advanced",rmoutliersmaxi=10, ...) {
+  nresult = rep(0,7)
   if(is.null(qdataraw)){
-    dates = timeDate::timeSequence(from,to, format = "%Y-%m-%d", FinCenter = "GMT");
-    dates = dates[timeDate::isBizday(dates, holidays = timeDate::holidayNYSE(1960:2050))];
+    dates = timeDate::timeSequence(from,to, format = "%Y-%m-%d", FinCenter = "GMT")
+    dates = dates[timeDate::isBizday(dates, holidays = timeDate::holidayNYSE(1960:2050))]
     
     for(j in 1:length(dates)){
       datasourcex = paste(datasource,"/",dates[j],sep="");
@@ -3425,14 +3265,15 @@ quotesCleanup = function(from,to,datasource,datadestination,ticker,exchanges, qd
           qdata = .check_data(qdata); nresult[1] = nresult[1]+dim(qdata)[1];
           ##actual clean-up:
           ##general:
-          qdata = try(nozeroquotes(qdata)); nresult[2] = nresult[2]+dim(qdata)[1];
-          qdata = try(selectexchange(qdata,exch=exchange)); nresult[3] = nresult[3]+dim(qdata)[1];
+          qdata = try(nozeroquotes(qdata)); nresult[2] = nresult[2]+dim(qdata)[1]
+          qdata = try(selectexchange(qdata,exch=exchange)); nresult[3] = nresult[3]+dim(qdata)[1]
           
           ##quote specific:
-          qdata = try(rmnegspread(qdata)); nresult[4] = nresult[4]+dim(qdata)[1];
-          qdata = try(rmlargespread(qdata,maxi=maxi)); nresult[5] = nresult[5]+dim(qdata)[1];
+          qdata = try(rmnegspread(qdata)); nresult[4] = nresult[4]+dim(qdata)[1]
+          qdata = try(rmlargespread(qdata,maxi=maxi)); nresult[5] = nresult[5]+dim(qdata)[1]
           
-          qdata = try(mergequotessametimestamp(qdata,selection=selection)); nresult[6] = nresult[6]+dim(qdata)[1];
+          qdata = try(mergequotessametimestamp(qdata,selection=selection))
+          nresult[6] = nresult[6] + dim(qdata)[1]
           qdata = try(rmoutliers(qdata,maxi=rmoutliersmaxi,window=window,type=type)); nresult[7] = nresult[7]+dim(qdata)[1];
           
           save(qdata, file = paste(datadestinationx,"/",dataname,sep=""));
@@ -3823,93 +3664,6 @@ rmLargeSpread = function(qdata,maxi=50){
   spread = as.numeric(qdata$OFR)-as.numeric(qdata$BID);
   condition = ((maxi*median(spread))>spread);
   return(qdata[condition])
-}
-
-rmOutliers = function (qdata, maxi = 10, window = 50, type = "advanced")
-{
-  qdata = .check_data(qdata);
-  qdatacheck(qdata);
-  ##function to remove entries for which the mid-quote deviated by more than 10 median absolute deviations 
-  ##from a rolling centered median (excluding the observation under consideration) of 50 observations if type = "standard".
-  
-  ##if type="advanced":
-  ##function removes entries for which the mid-quote deviates by more than 10 median absolute deviations
-  ##from the variable "mediani".
-  ##mediani is defined as the value closest to the midquote of these three options:
-  ##1. Rolling centered median (excluding the observation under consideration)
-  ##2. Rolling median of the following "window" observations
-  ##3. Rolling median of the previous "window" observations
-  
-  ##NOTE: Median Absolute deviation chosen contrary to Barndorff-Nielsen et al.
-  window = floor(window/2) * 2
-  condition = c();
-  halfwindow = window/2;
-  midquote = as.vector(as.numeric(qdata$BID) + as.numeric(qdata$OFR))/2;
-  mad_all = mad(midquote);
-  
-  midquote = xts(midquote,order.by = index(qdata))
-  
-  if (mad_all == 0) {
-    m = as.vector(as.numeric(midquote))
-    s = c(TRUE, (m[2:length(m)] - m[1:(length(m) - 1)] != 
-      0))
-    mad_all = mad(as.numeric(midquote[s]))
-  }
-  
-  medianw = function(midquote, n = window) {
-    m = floor(n/2) + 1
-    q = median(c(midquote[1:(m - 1)], midquote[(m + 1):(n + 
-      1)]))
-    return(q)
-  }
-  
-  if (type == "standard") {
-    meds = as.numeric(rollapply(midquote, width = (window + 
-      1), FUN = medianw, align = "center"))
-  }
-  if (type == "advanced") {
-    advancedperrow = function(qq) {
-      diff = abs(qq[1:3] - qq[4])
-      select = min(diff) == diff
-      value = qq[select]
-      if (length(value) > 1) {
-        value = median(value)
-      }
-      return(value)
-    }
-    n = length(midquote)
-    allmatrix = matrix(rep(0, 4 * (n)), ncol = 4)
-    median2 = function(a){ 
-      median(a)
-    }
-    standardmed = as.numeric(rollapply(midquote, width = c(window), 
-                                       FUN = median2, align = "center"))
-    standardmed = standardmed[!is.na(standardmed)] 
-     
-    temp <- as.numeric(rollapply(midquote, 
-                                 width = (window + 1), 
-                                 FUN = medianw, 
-                                 align = "center"))
-      
-    allmatrix[(halfwindow + 1):(n - halfwindow), 1] = temp[!is.na(temp)]
-    allmatrix[(1:(n - window)), 2] = standardmed[2:length(standardmed)]
-    allmatrix[(window + 1):(n), 3] = standardmed[1:(length(standardmed) - 
-      1)]
-    allmatrix[, 4] = midquote
-    meds = apply(allmatrix, 1, advancedperrow)[(halfwindow + 
-      1):(n - halfwindow)]
-  }
-  
-  midquote = as.numeric(midquote);
-  maxcriterion = meds + maxi * mad_all
-  mincriterion = meds - maxi * mad_all
-  
-  condition = mincriterion < midquote[(halfwindow + 1):(length(midquote) - 
-    halfwindow)] & midquote[(halfwindow + 1):(length(midquote) - 
-    halfwindow)] < maxcriterion
-  condition = c(rep(TRUE, halfwindow), condition, rep(TRUE, 
-                                                      halfwindow))
-  qdata[condition];
 }
 
 # Zivot : 

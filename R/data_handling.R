@@ -50,3 +50,124 @@ getPrice <- function (x, symbol = NULL, prefer = NULL, ...) {
     }
   }
 }
+
+#' Delete entries for which the mid-quote is outlying with respect to surrounding entries
+#' 
+#' @description If type = "standard": Function deletes entries for which the mid-quote deviated by more than "maxi"
+#' median absolute deviations from a rolling centered median (excluding
+#' the observation under consideration) of "window" observations.
+#' 
+#' If type = "advanced":  Function deletes entries for which the mid-quote deviates by more than "maxi"
+#' median absolute deviations from the value closest to the mid-quote of
+#' these three options:
+#' \enumerate{
+#'  \item Rolling centered median (excluding the observation under consideration)
+#'  \item Rolling median of the following "window" observations
+#'  \item Rolling median of the previous "window" observations
+#' }
+#'  
+#' The advantage of this procedure compared to the "standard" proposed
+#' by Barndorff-Nielsen et al. (2010) is that it will not incorrectly remove
+#' large price jumps. Therefore this procedure has been set as the default
+#' for removing outliers. 
+#' 
+#'   Note that the median absolute deviation is taken over the entire
+#'   sample. In case it is zero (which can happen if mid-quotes don't change much), 
+#' the median absolute deviation is taken over a subsample without constant mid-quotes.
+#' 
+#' @param qdata an xts object at least containing the columns "BID" and "OFR".
+#' @param maxi an integer, indicating the maximum number of median absolute deviations allowed.
+#' @param window an integer, indicating the time window for which the "outlyingness" is considered.
+#' @param type should be "standard" or "advanced" (see description).
+#' 
+#' @details NOTE: This function works only correct if supplied input data consists of 1 day.
+#' 
+#' @return xts object
+#' 
+#' @references Barndorff-Nielsen, O. E., P. R. Hansen, A. Lunde, and N. Shephard (2009). Realized kernels in practice: Trades and quotes. Econometrics Journal 12, C1-C32.
+#' 
+#' Brownlees, C.T. and Gallo, G.M. (2006). Financial econometric analysis at ultra-high frequency: Data handling concerns. Computational Statistics & Data Analysis, 51, pages 2232-2245.
+#' 
+#' @author Jonathan Cornelissen and Kris Boudt
+#' 
+#' @keywords cleaning
+#' @importFrom stats mad median
+#' @export
+rmOutliers <- function (qdata, maxi = 10, window = 50, type = "advanced") {
+  qdata <- .check_data(qdata)
+  qdatacheck(qdata)
+  ##function to remove entries for which the mid-quote deviated by more than 10 median absolute deviations 
+  ##from a rolling centered median (excluding the observation under consideration) of 50 observations if type = "standard".
+  
+  ##if type = "advanced":
+  ##function removes entries for which the mid-quote deviates by more than 10 median absolute deviations
+  ##from the variable "mediani".
+  ##mediani is defined as the value closest to the midquote of these three options:
+  ##1. Rolling centered median (excluding the observation under consideration)
+  ##2. Rolling median of the following "window" observations
+  ##3. Rolling median of the previous "window" observations
+  
+  ##NOTE: Median Absolute deviation chosen contrary to Barndorff-Nielsen et al.
+  window <- floor(window/2) * 2
+  condition <- c()
+  halfwindow <- window/2
+  midquote <- as.vector(as.numeric(qdata$BID) + as.numeric(qdata$OFR))/2
+  mad_all <- mad(midquote)
+  
+  midquote <- xts(midquote,order.by = index(qdata))
+  
+  if (mad_all == 0) {
+    m <- as.vector(as.numeric(midquote))
+    s <- c(TRUE, (m[2:length(m)] - m[1:(length(m) - 1)] != 0))
+    mad_all <- mad(as.numeric(midquote[s]))
+  }
+  
+  medianw <- function(midquote, n = window) {
+    m <- floor(n/2) + 1
+    q <- median(c(midquote[1:(m - 1)], midquote[(m + 1):(n + 1)]))
+    return(q)
+  }
+  
+  if (type == "standard") {
+    meds <- as.numeric(rollapply(midquote, width = (window + 1), FUN = medianw, align = "center"))
+  }
+  if (type == "advanced") {
+    advancedperrow <- function(qq) {
+      diff <- abs(qq[1:3] - qq[4])
+      select <- min(diff) == diff
+      value <- qq[select]
+      if (length(value) > 1) {
+        value <- median(value)
+      }
+      return(value)
+    }
+    n <- length(midquote)
+    allmatrix <- matrix(rep(0, 4 * (n)), ncol = 4)
+    median2 <- function(a){ 
+      median(a)
+    }
+    standardmed <- as.numeric(rollapply(midquote, width = c(window), 
+                                        FUN = median2, align = "center"))
+    standardmed <- standardmed[!is.na(standardmed)] 
+    
+    temp <- as.numeric(rollapply(midquote, 
+                                 width = (window + 1), 
+                                 FUN = medianw, 
+                                 align = "center"))
+    
+    allmatrix[(halfwindow + 1):(n - halfwindow), 1] = temp[!is.na(temp)]
+    allmatrix[(1:(n - window)), 2] <- standardmed[2:length(standardmed)]
+    allmatrix[(window + 1):(n), 3] <- standardmed[1:(length(standardmed) - 1)]
+    allmatrix[, 4] <- midquote
+    meds <- apply(allmatrix, 1, advancedperrow)[(halfwindow + 
+                                                  1):(n - halfwindow)]
+  }
+  
+  midquote <- as.numeric(midquote);
+  maxcriterion <- meds + maxi * mad_all
+  mincriterion <- meds - maxi * mad_all
+  
+  condition <- mincriterion < midquote[(halfwindow + 1):(length(midquote) - halfwindow)] & midquote[(halfwindow + 1):(length(midquote) - halfwindow)] < maxcriterion
+  condition <- c(rep(TRUE, halfwindow), condition, rep(TRUE, halfwindow))
+  qdata[condition]
+}

@@ -8,20 +8,20 @@ BNSjumptest <- function (rdata, IVestimator = "BV", IQestimator = "TP", type = "
                        logtransform = FALSE, max = FALSE, align.by = NULL, align.period = NULL,
                        makeReturns = FALSE, ...) {
   if (checkMultiDays(pdata) == TRUE) { 
-    result = apply.daily(rdata, BNSjumptest, align.by, align.period, makeReturns)
+    result <- apply.daily(rdata, BNSjumptest, align.by, align.period, makeReturns)
     return(result)
   } else {
     if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata = .aggregatets(rdata, on = align.by, k = align.period)
+      rdata = aggregatets(rdata, on = align.by, k = align.period)
     }
     if (makeReturns == TRUE) {
       rdata <- makeReturns(rdata)
     }
-    N = length(rdata)
-    hatQV = RV(rdata)
-    hatIV = .hativ(rdata, IVestimator)
-    theta = .tt(IVestimator)
-    hatIQ = .hatiq(rdata, IQestimator)
+    N <- length(rdata)
+    hatQV <- RV(rdata)
+    hatIV <- .hativ(rdata, IVestimator)
+    theta <- .tt(IVestimator)
+    hatIQ <- .hatiq(rdata, IQestimator)
     if (type == "linear") {
       if (logtransform) {
         hatQV = log(RV(rdata))

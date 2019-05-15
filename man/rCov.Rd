@@ -39,12 +39,12 @@ data(sample_tdata)
 data(sample_5minprices_jumps)
 
 # Univariate: 
-rv = rCov(rdata = sample_tdata$PRICE, align.by ="minutes", 
-                   align.period =5, makeReturns=TRUE)
+rv = rCov(rdata = sample_tdata$PRICE, align.by = "minutes", 
+                   align.period = 5, makeReturns = TRUE)
 rv 
 
 # Multivariate: 
-rc = rCov( rdata = sample_5minprices_jumps['2010-01-04'], makeReturns=TRUE)
+rc = rCov(rdata = sample_5minprices_jumps['2010-01-04'], makeReturns=TRUE)
 rc
 }
 \author{

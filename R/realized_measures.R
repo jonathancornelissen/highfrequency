@@ -119,7 +119,7 @@ minRQ <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
 #'   \deqn{
 #'     \bar{r}_{\tau_j}^{(k)}= \sum_{h=1}^{k_N-1}g\left(\frac{h}{k_N}\right)r_{\tau_{j+h}}^{(k)}
 #'   }
-#'   where g is a non-zero real-valued function \eqn{g:[0,1]} \eqn{\rightarrow} \eqn{R} given by \eqn{g(x)} = \eqn{\min(x,1-x)}. \eqn{k_N} is a sequence of integers satisfying  \eqn{\mbox{k}_{N} = \lfloor\theta N^{1/2}\rfloor}. We use \eqn{\theta = 0.8} as recommendations in (Hautsch & Podolskij (2013)). The pre-averaged returns are simply a weighted average over the returns in a local window. This averaging diminishes the influence of the noise. The order of the window size \eqn{k_n} is chosen to lead to optimal convergence rates. The pre-averaging estimator is then simply the analogue of the Realized Variance but based on pre-averaged returns and an additional term to remove bias due to noise
+#'   where g is a non-zero real-valued function \eqn{g:[0,1]} \eqn{\rightarrow} \eqn{R} given by \eqn{g(x)} = \eqn{\min(x,1-x)}. \eqn{k_N} is a sequence of integers satisfying  \eqn{\mbox{k}_{N} = \lfloor\theta N^{1/2}\rfloor}. We use \eqn{\theta = 0.8} as recommended in Hautsch & Podolskij (2013). The pre-averaged returns are simply a weighted average over the returns in a local window. This averaging diminishes the influence of the noise. The order of the window size \eqn{k_n} is chosen to lead to optimal convergence rates. The pre-averaging estimator is then simply the analogue of the Realized Variance but based on pre-averaged returns and an additional term to remove bias due to noise
 #'   \deqn{
 #'     \hat{C}= \frac{N^{-1/2}}{\theta \psi_2}\sum_{i=0}^{N-k_N+1}  (\bar{r}_{\tau_i})^2-\frac{\psi_1^{k_N}N^{-1}}{2\theta^2\psi_2^{k_N}}\sum_{i=0}^{N}r_{\tau_i}^2
 #'   }
@@ -263,7 +263,7 @@ minRV <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
     result <- apply.daily(rdata, minRV, align.by, align.period, makeReturns)
     return(result)
   } else {
-    if ((!is.null(align.by))&&(!is.null(align.period))) {
+    if ((!is.null(align.by)) && (!is.null(align.period))) {
       rdata <- aggregatets(rdata, on = align.by, k = align.period)
     } 
     if (makeReturns) {
@@ -496,12 +496,12 @@ rBPCov <- function(rdata, cor = FALSE, align.by = NULL, align.period = NULL, mak
 #' data(sample_5minprices_jumps)
 #' 
 #' # Univariate: 
-#' rv = rCov(rdata = sample_tdata$PRICE, align.by ="minutes", 
-#'                    align.period =5, makeReturns=TRUE)
+#' rv = rCov(rdata = sample_tdata$PRICE, align.by = "minutes", 
+#'                    align.period = 5, makeReturns = TRUE)
 #' rv 
 #' 
 #' # Multivariate: 
-#' rc = rCov( rdata = sample_5minprices_jumps['2010-01-04'], makeReturns=TRUE)
+#' rc = rCov(rdata = sample_5minprices_jumps['2010-01-04'], makeReturns=TRUE)
 #' rc
 #' @keywords volatility
 #' @export
@@ -578,7 +578,7 @@ rCov <- function(rdata, cor = FALSE, align.by = NULL, align.period = NULL, makeR
 #' 
 #' @examples 
 #' data(sample_tdata)
-#' rKurt(sample_tdata$PRICE,align.by ="minutes", align.period =5, makeReturns = TRUE)
+#' rKurt(sample_tdata$PRICE, align.by = "minutes", align.period = 5, makeReturns = TRUE)
 #' 
 #' @keywords highfrequency rKurt
 #' @importFrom xts apply.daily
@@ -682,6 +682,173 @@ rMPV <- function(rdata, m = 2, p = 2, align.by = NULL, align.period = NULL, make
   }
 }  
 
+#' Realized Outlyingness Weighted Covariance
+#' 
+#' @description Function returns the Realized Outlyingness Weighted Covariance, defined in Boudt et al. (2008).
+#' 
+#' Let \eqn{r_{t,i}}, for \eqn{i=1,...,M} be a sample
+#' of \eqn{M} high-frequency \eqn{(N x 1)} return vectors and \eqn{d_{t,i}}
+#' their outlyingness given by the squared Mahalanobis distance between
+#' the return vector and zero in terms of the reweighted MCD covariance
+#' estimate based on these returns.
+#' 
+#' Then, the rOWCov is given by
+#' \deqn{
+#' \mbox{rOWCov}_{t}=c_{w}\frac{\sum_{i=1}^{M}w(d_{t,i})r_{t,i}r'_{t,i}}{\frac{1}{M}\sum_{i=1}^{M}w(d_{t,i})},
+#' }
+#' The weight  \eqn{w_{i,\Delta}} is one if the multivariate jump test statistic for \eqn{r_{i,\Delta}} in Boudt et al. (2008) is less
+#' than the 99.9\% percentile of the chi-square distribution with \eqn{N} degrees of freedom and zero otherwise. 
+#' The scalar \eqn{c_{w}} is a correction factor ensuring consistency of the rOWCov for the Integrated Covariance, 
+#' under the Brownian Semimartingale with Finite Activity Jumps model. 
+#' 
+#' @param rdata a \eqn{(M x N)} matrix/zoo/xts object containing the \eqn{N}
+#' return series over period \eqn{t}, with \eqn{M} observations during \eqn{t}.
+#' @param cor boolean, in case it is TRUE, the correlation is returned. FALSE by default.
+#' @param align.by a string, align the tick data to "seconds"|"minutes"|"hours".
+#' @param align.period an integer, align the tick data to this many [seconds|minutes|hours]. 
+#' @param makeReturns boolean, should be TRUE when rdata contains prices instead of returns. FALSE by default.
+#' @param seasadjR a \eqn{(M x N)} matrix/zoo/xts object containing 
+#' the seasonaly adjusted returns. This is an optional argument.
+#' @param wfunction determines whether 
+#' a zero-one weight function (one if no jump is detected based on \eqn{d_{t,i}} and 0 otherwise)
+#' or 
+#' Soft Rejection ("SR") weight function is to be used.
+#' By default a zero-one weight function (wfunction = "HR") is used.
+#' @param alphaMCD a numeric parameter, controlling the size of 
+#' the subsets over which the determinant is minimized. 
+#' Allowed values are between 0.5 and 1 and 
+#'the default is 0.75. See Boudt et al. (2008) or the \code{covMcd} function in the
+#'robustbase package.
+#' @param alpha is a parameter between 0 en 0.5, 
+#'that determines the rejection threshold value 
+#'(see Boudt et al. (2008) for details).
+#' @param ... additional arguments.
+#' 
+#' @return an \eqn{N x N} matrix
+#' 
+#' @details 
+#' Advantages of the rOWCov compared to the \code{\link{rBPCov}} include a higher statistical efficiency, positive semidefiniteness and affine equivariance.
+#' However, the rOWCov suffers from a curse of dimensionality.
+#' Indeed, the rOWCov gives a zero weight to a return vector
+#' if at least one of the components is affected by a jump.
+#' In the case of independent jump occurrences, the average proportion of observations
+#' with at least one component being affected by jumps increases fast with the dimension
+#' of the series. This means that a potentially large proportion of the returns receives
+#' a zero weight, due to which the rOWCov can have a low finite sample efficiency in higher dimensions
+#' 
+#' @references Boudt, K., C. Croux, and S. Laurent (2008). Outlyingness weighted covariation. Mimeo.
+#' 
+#' @author Jonathan Cornelissen and Kris Boudt
+#' 
+#' @examples 
+#' # Realized Outlyingness Weighted Variance/Covariance for CTS aligned   
+#' # at 5 minutes.
+#' data(sample_tdata)
+#' data(sample_5minprices_jumps)
+#' 
+#' # Univariate: 
+#' rvoutw <- rOWCov(rdata = sample_tdata$PRICE, align.by = "minutes",
+#'                    align.period = 5, makeReturns = TRUE)
+#' rvoutw 
+#' 
+#' # Multivariate: 
+#' rcoutw <- rOWCov(rdata = sample_5minprices_jumps['2010-01-04'], makeReturns = TRUE)
+#' rcoutw
+#' 
+#' @keywords volatility
+#' @export
+rOWCov <- function (rdata, cor = FALSE, align.by = NULL, align.period = NULL, makeReturns = FALSE, seasadjR = NULL, wfunction = "HR" , alphaMCD = 0.75, alpha = 0.001, ...){
+  
+  if (is.null(seasadjR) == TRUE) { 
+    seasadjR <- rdata 
+  }
+  multixts <- multixts(rdata)
+  if (multixts == TRUE) { 
+    stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")
+  }
+  
+  # Aggregate:
+  if((!is.null(align.by))&&(!is.null(align.period))){
+    rdata <- aggregatets(rdata, on = align.by, k = align.period)
+    seasadjR <- aggregatets(seasadjR, on = align.by, k = align.period)
+  }     
+  if (makeReturns == TRUE) { 
+    rdata <- makeReturns(rdata)
+    if (is.null(seasadjR) == FALSE) { 
+      seasadjR <- makeReturns(seasadjR)
+    } 
+  }
+  
+  if (is.null(dim(rdata)) == TRUE) { 
+    n <- 1 
+  } else { 
+    n <- dim(rdata)[2]
+  }        
+  
+  if (n == 1) { 
+    return(ROWVar(rdata, seasadjR = seasadjR, wfunction = wfunction, alphaMCD = alphaMCD, alpha = alpha ))
+  }
+  
+  if (n > 1) { 
+    if ((dim(rdata)[2] < 2)) {
+      stop("Your rdata object should have at least 2 columns")
+    }
+    
+    rdata <- as.matrix(rdata)
+    seasadjR <- as.matrix(seasadjR)
+    intraT <- nrow(rdata)
+    N <- ncol(rdata)
+    perczeroes <- apply(seasadjR, 2, function(x) sum(1 * (x == 0))) / intraT
+    select <- c(1:N)[perczeroes < 0.5]
+    seasadjRselect <- seasadjR[, select]
+    N <- ncol(seasadjRselect)
+    MCDobject <- try(robustbase::covMcd(x = seasadjRselect, alpha = alphaMCD))
+    if (length(MCDobject$raw.mah) > 1) {
+      betaMCD  <- 1-alphaMCD
+      asycor   <- betaMCD / pchisq(qchisq(betaMCD, df = N), df = N+2)
+      MCDcov   <- (asycor * t(seasadjRselect[MCDobject$best,]) %*% seasadjRselect[MCDobject$best,]) / length(MCDobject$best)
+      invMCDcov <- solve(MCDcov) 
+      outlyingness <- rep(0,intraT)
+      for (i in 1:intraT) { 
+        outlyingness[i] = matrix(seasadjRselect[i,], ncol = N) %*% invMCDcov %*% matrix(seasadjRselect[i,],nrow=N)    
+      }
+    }
+    else {
+      print(c("MCD cannot be calculated")); stop();
+    }
+    k <- qchisq(p = 1 - alpha, df = N)
+    outlierindic <- outlyingness > k
+    weights <- rep(1, intraT)
+    
+    if (wfunction == "HR") {
+      weights[outlierindic] = 0
+      wR <- sqrt(weights) * rdata
+      covariance <- (conHR(di = N, alpha = alpha) * t(wR) %*% wR) / mean(weights)
+      if (cor == FALSE) {
+        return(covariance)
+      }
+      if (cor == TRUE) {
+        sdmatrix = sqrt(diag(diag(covariance)))
+        inv_matrix <- solve(sdmatrix)
+        rcor <- inv_matrix %*% covariance %*% inv_matrix
+        return(rcor)
+      }
+    }
+    if (wfunction == "SR") {
+      weights[outlierindic] <- k/outlyingness[outlierindic]
+      wR <- sqrt(weights) * rdata
+      covariance <- (conhuber(di = N, alpha = alpha) * t(wR) %*% wR) / mean(weights)
+      if (cor == FALSE) {
+        return(covariance)
+      }
+      if(cor==TRUE){
+        sdmatrix <- sqrt(diag(diag(covariance)))
+        rcor <- solve(sdmatrix) %*% covariance %*% solve(sdmatrix)
+        return(rcor)
+      } 
+    } 
+  } 
+} 
 
 #' Realized skewness of highfrequency return series.
 #'
@@ -760,7 +927,7 @@ rSkew <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
 #' @examples 
 #' \dontrun{
 #' data(sample_tdata)
-#' rSV(sample_tdata$PRICE,align.by ="minutes", align.period =5, makeReturns = TRUE)
+#' rSV(sample_tdata$PRICE, align.by = "minutes", align.period = 5, makeReturns = TRUE)
 #' }
 #' @references Barndorff-Nielsen, O.E., Kinnebrock, S. and Shephard N. (2008). Measuring downside risk - realized semivariance. CREATES research paper. p. 3-5.
 #' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
@@ -835,6 +1002,7 @@ RV <- function(rdata) {
 #' rTPVar(rdata = sample_tdata$PRICE, align.by = "minutes", align.period = 5, makeReturns = TRUE)
 #' rTPVar
 #' 
+#' @importFrom zoo rollapply
 #' @keywords highfrequency rTPVar
 #' @export
 rTPVar <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE) {
@@ -852,7 +1020,7 @@ rTPVar <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FA
     }
     
     q      <- as.numeric(rdata)
-    q      <- abs(rollapply(q,width = 3, FUN = prod, align = "left"))
+    q      <- abs(rollapply(q, width = 3, FUN = prod, align = "left"))
     N      <- length(q)+2
     rTPVar <- N / (N-2) * gamma(1/2)^2/(4*gamma(7/6)^2) * sum(q^(4/3))
     return(rTPVar)
