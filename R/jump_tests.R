@@ -3,7 +3,7 @@
 ABDJumptest <- function(RV, BPV, TQ) { # Comput jump detection stat mentioned in roughing paper
   mu1  <- sqrt(2 / pi)
   n <- length(RV)
-  zstat <- ((1/n)^(-1/2))*((RV-BPV)/RV)*(  (mu1^(-4) + 2*(mu1^(-2))-5) * pmax( 1,TQ*(BPV^(-2))))^(-1/2)
+  zstat <- ((1/n)^(-1/2)) * ((RV-BPV)/RV)*(  (mu1^(-4) + 2 * (mu1^(-2))-5) * pmax(1, TQ * (BPV^(-2))))^(-1/2)
   return(zstat)
 }
 
