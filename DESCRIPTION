@@ -38,7 +38,8 @@ Imports:
     mvtnorm,
     chron,
     timeDate,
-    MASS
+    MASS,
+    data.table
 LinkingTo: Rcpp, RcppArmadillo
 Suggests:
     covr,

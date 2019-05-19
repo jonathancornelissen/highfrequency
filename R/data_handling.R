@@ -71,8 +71,8 @@ getPrice <- function (x, symbol = NULL, prefer = NULL, ...) {
 #' large price jumps. Therefore this procedure has been set as the default
 #' for removing outliers. 
 #' 
-#'   Note that the median absolute deviation is taken over the entire
-#'   sample. In case it is zero (which can happen if mid-quotes don't change much), 
+#' Note that the median absolute deviation is taken over the entire
+#' sample. In case it is zero (which can happen if mid-quotes don't change much), 
 #' the median absolute deviation is taken over a subsample without constant mid-quotes.
 #' 
 #' @param qdata an xts object at least containing the columns "BID" and "OFR".
@@ -96,16 +96,16 @@ getPrice <- function (x, symbol = NULL, prefer = NULL, ...) {
 rmOutliers <- function (qdata, maxi = 10, window = 50, type = "advanced") {
   qdata <- .check_data(qdata)
   qdatacheck(qdata)
-  ##function to remove entries for which the mid-quote deviated by more than 10 median absolute deviations 
-  ##from a rolling centered median (excluding the observation under consideration) of 50 observations if type = "standard".
+  ## function to remove entries for which the mid-quote deviated by more than 10 median absolute deviations 
+  ## from a rolling centered median (excluding the observation under consideration) of 50 observations if type = "standard".
   
-  ##if type = "advanced":
-  ##function removes entries for which the mid-quote deviates by more than 10 median absolute deviations
-  ##from the variable "mediani".
-  ##mediani is defined as the value closest to the midquote of these three options:
-  ##1. Rolling centered median (excluding the observation under consideration)
-  ##2. Rolling median of the following "window" observations
-  ##3. Rolling median of the previous "window" observations
+  ## if type = "advanced":
+  ## function removes entries for which the mid-quote deviates by more than 10 median absolute deviations
+  ## from the variable "mediani".
+  ## mediani is defined as the value closest to the midquote of these three options:
+  ## 1. Rolling centered median (excluding the observation under consideration)
+  ## 2. Rolling median of the following "window" observations
+  ## 3. Rolling median of the previous "window" observations
   
   ##NOTE: Median Absolute deviation chosen contrary to Barndorff-Nielsen et al.
   window <- floor(window/2) * 2
@@ -159,8 +159,7 @@ rmOutliers <- function (qdata, maxi = 10, window = 50, type = "advanced") {
     allmatrix[(1:(n - window)), 2] <- standardmed[2:length(standardmed)]
     allmatrix[(window + 1):(n), 3] <- standardmed[1:(length(standardmed) - 1)]
     allmatrix[, 4] <- midquote
-    meds <- apply(allmatrix, 1, advancedperrow)[(halfwindow + 
-                                                  1):(n - halfwindow)]
+    meds <- apply(allmatrix, 1, advancedperrow)[(halfwindow + 1):(n - halfwindow)]
   }
   
   midquote <- as.numeric(midquote);
@@ -171,3 +170,112 @@ rmOutliers <- function (qdata, maxi = 10, window = 50, type = "advanced") {
   condition <- c(rep(TRUE, halfwindow), condition, rep(TRUE, halfwindow))
   qdata[condition]
 }
+
+#' @importFrom data.table as.data.table
+#' @export
+rmOutliersDataTable <- function (qdata, maxi = 10, window = 50, type = "advanced") {
+  ##NOTE: Median Absolute deviation chosen contrary to Barndorff-Nielsen et al.
+  
+  if ((window %% 2) != 0) {
+    stop("Window size can't be an odd integer.")
+  }
+  
+  dummy_was_xts <- FALSE
+  if (is.data.table(qdata) == FALSE) {
+    if (is.xts(qdata) == TRUE) {
+      # qdata <- .check_data(qdata)
+      # qdatacheck(qdata)
+      qdata <- setnames(as.data.table(qdata)[, BID := as.numeric(as.character(BID))][, OFR := as.numeric(as.character(OFR))], old = "index", new = "DT")
+      dummy_was_xts <- TRUE
+    } else {
+      stop("Input has to be data.table or xts.")
+    }
+  } else {
+    if (("DT" %in% colnames(qdata)) == FALSE) {
+      stop("Data.table neeeds DT column.")
+    }
+  }
+  
+  if (length(unique(qdata$SYMBOL)) > 1) {
+    stop("Please only one symbol at a time.")
+  }
+  
+  if ((type %in% c("standard", "advanced")) == FALSE) {
+    stop("type has to be \"standard\" or \"advanced\".")
+  }
+  
+  # weights_med_center_incl <- rep(1, times = window + 1)
+  weights_med_center_excl <- c(rep(1, times = window / 2), 0, rep(1, times = window / 2))
+  weights_med_follow  <- c(0 , rep(1, times = window))
+  weights_med_trail    <- c(rep(1, times = window), 0)
+  
+  halfwindow <- window / 2
+  
+  # Function for calculating three different measures:
+  # 1. Rolling centered median (excluding the observation under consideration)
+  # 2. Rolling median of the following "window" observations
+  # 3. Rolling median of the previous "window" observations
+  rolling_median_incl_ends <- function(x, weights, direction = "center") {
+    
+    length_median_vec <- length(x)
+    median_vec <- rep(NA, times = length_median_vec)
+    
+    if (direction == "center") {
+      median_vec[(halfwindow + 1):(length(x) - halfwindow)] <- roll_median(x, weights = weights, fill = numeric(0))
+      
+      # We have to add the "end"-values manually as currently roll_median does not support the increasing windows specified 
+      # at the ends of the time series
+      for (ii in 1:halfwindow) {
+        median_vec[ii] <- median(c(x[0:(ii - 1)], x[(ii + 1):(ii + halfwindow)]))
+        median_vec[length_median_vec - ii + 1] <- 
+          median(c(x[(length_median_vec - ii + 1 - halfwindow):(length_median_vec - ii)], 
+                   x[(length_median_vec - ii + 2):(length_median_vec + 1)]), na.rm = TRUE)
+      }
+    }
+    if (direction == "left") {
+      median_vec[(window + 1):length(x)] <- roll_median(x, weights = weights, fill = numeric(0))
+      for (ii in 2:window) {
+        median_vec[ii] <- median(x[0:(ii - 1)])
+      }
+    }
+    if (direction == "right") {
+      median_vec[1:(length(x) - window)] <- roll_median(x, weights = weights, fill = numeric(0))
+      for (ii in 2:window) {
+        median_vec[length_median_vec - ii + 1] <-
+          median(x[(length_median_vec - ii + 1 - window):length_median_vec])
+      }
+    }
+    
+    median_vec
+  }
+  
+  qdata <- qdata[, MIDQUOTE := (BID + OFR) / 2][, DATE := as.Date(DT)][, MADALL := mad(MIDQUOTE), by = .(DATE)]
+  
+  if (type == "standard") {
+    qdata <- qdata[ , CRITERION := abs(MIDQUOTE - rolling_median_incl_ends(MIDQUOTE, weights = weights_med_center_excl))][
+      CRITERION < maxi * MADALL]
+    
+  }
+  if (type == "advanced") {
+    qdata <- qdata[, CRITERION := pmin(abs(MIDQUOTE - rolling_median_incl_ends(MIDQUOTE, weights = weights_med_center_excl, direction = "center")),
+                                       abs(MIDQUOTE - rolling_median_incl_ends(MIDQUOTE, weights = weights_med_trail, direction = "left")),
+                                       abs(MIDQUOTE - rolling_median_incl_ends(MIDQUOTE, weights = weights_med_follow, direction = "right")),
+                                       na.rm = TRUE)][
+                                         CRITERION < maxi * MADALL]
+  }
+  
+  if (dummy_was_xts == TRUE) {
+    return(xts(as.matrix(qdata[, -c("DT", "DATE", "MADALL", "CRITERION", "MIDQUOTE")]), order.by = qdata$DT))
+  } else {
+    qdata[, -c("MADALL", "CRITERION")]
+  }
+  
+}
+
+microbenchmark::microbenchmark(xts_old <- rmOutliers(qdata = sample_qdataraw), times = 10, unit = "s")
+microbenchmark::microbenchmark(xts_new <- rmOutliersDataTable(qdata = setnames(as.data.table(sample_qdataraw)[, BID := as.numeric(as.character(BID))][, OFR := as.numeric(as.character(OFR))], old = "index", new = "DT")), times = 10, unit = "s")
+
+xts_old <- rmOutliers(qdata = sample_qdataraw)
+xts_new <- rmOutliersDataTable(qdata = sample_qdataraw)
+
+

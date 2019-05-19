@@ -11,3 +11,8 @@ notes.R
 man/.Rapp.history
 .Rbuildignore
 _man/*.Rd
+
+taqdata/*
+speed_comparison.html
+speed_comparison.Rmd
+playground.R

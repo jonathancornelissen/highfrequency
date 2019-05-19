@@ -37,8 +37,8 @@ by Barndorff-Nielsen et al. (2010) is that it will not incorrectly remove
 large price jumps. Therefore this procedure has been set as the default
 for removing outliers. 
 
-  Note that the median absolute deviation is taken over the entire
-  sample. In case it is zero (which can happen if mid-quotes don't change much), 
+Note that the median absolute deviation is taken over the entire
+sample. In case it is zero (which can happen if mid-quotes don't change much), 
 the median absolute deviation is taken over a subsample without constant mid-quotes.
 }
 \details{

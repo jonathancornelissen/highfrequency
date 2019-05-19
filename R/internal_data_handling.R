@@ -262,8 +262,8 @@ has.Qty <- function(x, which = FALSE)
 
 #' @keywords internal
 qdatacheck <- function(qdata) {
-  if (is.xts(qdata) == FALSE) {
-    stop("The argument qdata should be an xts object")
+  if (is.xts(qdata) == FALSE & is.data.frame(qdata) == FALSE) {
+    stop("The argument qdata should be an data.table or xts object")
   }
   if (any(colnames(qdata)=="BID") == FALSE) {
     stop("The argument qdata should have a column containing the BID. Could not find that column")
