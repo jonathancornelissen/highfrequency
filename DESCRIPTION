@@ -39,7 +39,8 @@ Imports:
     chron,
     timeDate,
     MASS,
-    data.table
+    data.table,
+    RcppRoll
 LinkingTo: Rcpp, RcppArmadillo
 Suggests:
     covr,

@@ -3126,10 +3126,12 @@ matchtq <- function(...) {
 ##################### Total cleanup functions formerly in RTAQ ################################
 
 
-tradesCleanup = function(from,to,datasource,datadestination,ticker,exchanges,tdataraw=NULL,report=TRUE,selection="median",...){
+tradesCleanup <- function(from, to, datasource, datadestination, ticker, exchanges, tdataraw = NULL, report = TRUE, selection = "median") {
   #requireNamespace('timeDate')
   nresult = rep(0, 5)
-  if(!is.list(exchanges)){ exchanges = as.list(exchanges)}
+  if (!is.list(exchanges)) { 
+    exchanges = as.list(exchanges)
+  }
   if (is.null(tdataraw)) {
     dates = timeDate::timeSequence(from, to, format = "%Y-%m-%d")
     dates = dates[timeDate::isBizday(dates, holidays=timeDate::holidayNYSE(1960:2050))]
@@ -3191,7 +3193,7 @@ tradesCleanup = function(from,to,datasource,datadestination,ticker,exchanges,tda
       return(nresult)
     }
   }
-  if (!is.null(tdataraw)) {
+  if (is.null(tdataraw) == FALSE) {
     if (class(tdataraw)[1] != "try-error") {
       if (length(exchanges) > 1) {
         print("The argument exchanges contains more than 1 element. Please select a single exchange, in case you provide tdataraw.")
@@ -3401,8 +3403,7 @@ period.apply3 = function (x, INDEX, FUN, ...)
 ########## DATA CLEAN-UP: FOR ALL DATA #####################
 
 ####FUNCTION TO FILTER EXCHANGE HOURS ONLY: ExchangeHoursOnly
-exchangeHoursOnly = function(data, daybegin = "09:30:00",dayend="16:00:00")
-{
+exchangeHoursOnly <- function(data, daybegin = "09:30:00", dayend = "16:00:00") {
   data = .check_data(data);
   # a function to excerpt data within exchange trading hours
   # daybegin and dayend: two characters in the format of "HH:MM:SS",
@@ -3428,14 +3429,14 @@ exchangeHoursOnly = function(data, daybegin = "09:30:00",dayend="16:00:00")
 }
 
 noZeroPrices = function(tdata){
-  tdata = .check_data(tdata);
-  tdatacheck(tdata);
+  tdata = .check_data(tdata)
+  tdatacheck(tdata)
   ####FUNCTION TO DELETE ZERO PRICES: nozeroprices
-  filteredts = tdata[as.numeric(tdata$PRICE)!= 0];
-  return(filteredts);
+  filteredts = tdata[as.numeric(tdata$PRICE)!= 0]
+  return(filteredts)
 }
 
-selectExchange = function(data,exch="N"){ 
+selectExchange = function(data, exch = "N"){ 
   data = .check_data(data);
   ###FUNCTION TO SELECT THE OBSERVATIONS OF A SINGLE EXCHANGE: selectexchange
   #filteredts = data[data$EX==exch];

@@ -1,9 +1,7 @@
 
 # Aggregation function: FAST previous tick aggregation
-#' @importFrom zoo zoo
-#' @importFrom zoo na.locf
-#' @importFrom stats start
-#' @importFrom stats end
+#' @importFrom zoo zoo na.locf
+#' @importFrom stats start end
 #' @keywords internal
 aggregatets <- function (ts, on = "minutes", k = 1) {
   if (on == "secs" | on == "seconds") {

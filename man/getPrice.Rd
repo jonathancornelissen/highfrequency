@@ -4,7 +4,7 @@
 \alias{getPrice}
 \title{Get price column(s) from a timeseries}
 \usage{
-getPrice(x, symbol = NULL, prefer = NULL, ...)
+getPrice(x, symbol = NULL, prefer = NULL)
 }
 \arguments{
 \item{x}{A data object with columns containing data to be extracted}
@@ -12,8 +12,6 @@ getPrice(x, symbol = NULL, prefer = NULL, ...)
 \item{symbol}{text string containing the symbol to extract}
 
 \item{prefer}{preference for any particular type of price, see Details}
-
-\item{\dots}{any other passthrough parameters}
 }
 \description{
 Will attempt to locate price column(s) from a time series with rational defaults.

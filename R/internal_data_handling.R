@@ -1,5 +1,12 @@
+
 #' @keywords internal
-.check_data <- function(data){ 
+`:=` <- function(...) {
+  NULL
+}
+
+#' @importFrom xts xtsAttributes
+#' @keywords internal
+checkColumnNames <- function(data) { 
   # FUNCTION sets column names according to RTAQ format using quantmod conventions, such that all the other functions find the correct information.
   # requireNamespace('quantmod');
   # First step: assign the xts attributes:
@@ -260,16 +267,18 @@ has.Qty <- function(x, which = FALSE)
   } else FALSE
 }
 
+#' @importFrom data.table is.data.table
+#' @importFrom xts is.xts
 #' @keywords internal
-qdatacheck <- function(qdata) {
-  if (is.xts(qdata) == FALSE & is.data.frame(qdata) == FALSE) {
-    stop("The argument qdata should be an data.table or xts object")
+checkQdata <- function(qdata) {
+  if (is.xts(qdata) == FALSE & is.data.table(qdata) == FALSE) {
+    stop("The argument qdata should be an data.table or xts object.")
   }
   if (any(colnames(qdata)=="BID") == FALSE) {
-    stop("The argument qdata should have a column containing the BID. Could not find that column")
+    stop("The argument qdata should have a column containing the BID. Could not find that column.")
   }
   if (any(colnames(qdata)=="OFR") == FALSE) {
-    stop("The argument qdata should have a column containing the ASK / OFR. Could not find that column")
+    stop("The argument qdata should have a column containing the ASK / OFR. Could not find that column.")
   }
 }
 

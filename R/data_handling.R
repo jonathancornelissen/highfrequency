@@ -4,7 +4,6 @@
 #' @param x A data object with columns containing data to be extracted
 #' @param symbol text string containing the symbol to extract
 #' @param prefer preference for any particular type of price, see Details
-#' @param \dots any other passthrough parameters
 #' 
 #' @details  May be subset by symbol and preference.
 #'  \code{prefer} Preference will be for any commonly used financial time series price description,
@@ -12,7 +11,7 @@
 #'  currently supported in R, but a default grep match will be performed if one of the supported types doesn't match.
 #'
 #' The functionality was taken from the quantmod-package
-getPrice <- function (x, symbol = NULL, prefer = NULL, ...) {
+getPrice <- function (x, symbol = NULL, prefer = NULL) {
   # first subset on symbol, if present
   if (is.null(symbol) == FALSE) {
     loc <- grep(symbol, colnames(x))
@@ -92,99 +91,25 @@ getPrice <- function (x, symbol = NULL, prefer = NULL, ...) {
 #' 
 #' @keywords cleaning
 #' @importFrom stats mad median
+#' @importFrom data.table as.data.table is.data.table setnames
+#' @importFrom xts is.xts as.xts
+#' @importFrom RcppRoll roll_median
 #' @export
 rmOutliers <- function (qdata, maxi = 10, window = 50, type = "advanced") {
-  qdata <- .check_data(qdata)
-  qdatacheck(qdata)
-  ## function to remove entries for which the mid-quote deviated by more than 10 median absolute deviations 
-  ## from a rolling centered median (excluding the observation under consideration) of 50 observations if type = "standard".
-  
-  ## if type = "advanced":
-  ## function removes entries for which the mid-quote deviates by more than 10 median absolute deviations
-  ## from the variable "mediani".
-  ## mediani is defined as the value closest to the midquote of these three options:
-  ## 1. Rolling centered median (excluding the observation under consideration)
-  ## 2. Rolling median of the following "window" observations
-  ## 3. Rolling median of the previous "window" observations
-  
-  ##NOTE: Median Absolute deviation chosen contrary to Barndorff-Nielsen et al.
-  window <- floor(window/2) * 2
-  condition <- c()
-  halfwindow <- window/2
-  midquote <- as.vector(as.numeric(qdata$BID) + as.numeric(qdata$OFR))/2
-  mad_all <- mad(midquote)
-  
-  midquote <- xts(midquote,order.by = index(qdata))
-  
-  if (mad_all == 0) {
-    m <- as.vector(as.numeric(midquote))
-    s <- c(TRUE, (m[2:length(m)] - m[1:(length(m) - 1)] != 0))
-    mad_all <- mad(as.numeric(midquote[s]))
-  }
-  
-  medianw <- function(midquote, n = window) {
-    m <- floor(n/2) + 1
-    q <- median(c(midquote[1:(m - 1)], midquote[(m + 1):(n + 1)]))
-    return(q)
-  }
-  
-  if (type == "standard") {
-    meds <- as.numeric(rollapply(midquote, width = (window + 1), FUN = medianw, align = "center"))
-  }
-  if (type == "advanced") {
-    advancedperrow <- function(qq) {
-      diff <- abs(qq[1:3] - qq[4])
-      select <- min(diff) == diff
-      value <- qq[select]
-      if (length(value) > 1) {
-        value <- median(value)
-      }
-      return(value)
-    }
-    n <- length(midquote)
-    allmatrix <- matrix(rep(0, 4 * (n)), ncol = 4)
-    median2 <- function(a){ 
-      median(a)
-    }
-    standardmed <- as.numeric(rollapply(midquote, width = c(window), 
-                                        FUN = median2, align = "center"))
-    standardmed <- standardmed[!is.na(standardmed)] 
-    
-    temp <- as.numeric(rollapply(midquote, 
-                                 width = (window + 1), 
-                                 FUN = medianw, 
-                                 align = "center"))
-    
-    allmatrix[(halfwindow + 1):(n - halfwindow), 1] = temp[!is.na(temp)]
-    allmatrix[(1:(n - window)), 2] <- standardmed[2:length(standardmed)]
-    allmatrix[(window + 1):(n), 3] <- standardmed[1:(length(standardmed) - 1)]
-    allmatrix[, 4] <- midquote
-    meds <- apply(allmatrix, 1, advancedperrow)[(halfwindow + 1):(n - halfwindow)]
-  }
-  
-  midquote <- as.numeric(midquote);
-  maxcriterion <- meds + maxi * mad_all
-  mincriterion <- meds - maxi * mad_all
-  
-  condition <- mincriterion < midquote[(halfwindow + 1):(length(midquote) - halfwindow)] & midquote[(halfwindow + 1):(length(midquote) - halfwindow)] < maxcriterion
-  condition <- c(rep(TRUE, halfwindow), condition, rep(TRUE, halfwindow))
-  qdata[condition]
-}
-
-#' @importFrom data.table as.data.table
-#' @export
-rmOutliersDataTable <- function (qdata, maxi = 10, window = 50, type = "advanced") {
-  ##NOTE: Median Absolute deviation chosen contrary to Barndorff-Nielsen et al.
-  
+  # NOTE: Median Absolute deviation chosen contrary to Barndorff-Nielsen et al.
+  # Setting those variables equal NULL is for suppressing NOTES in devtools::check
+  # References inside data.table-operations throw "no visible binding for global variable ..." error
+  BID = OFR = MIDQUOTE = DATE = DT = MADALL = CRITERION = NULL
   if ((window %% 2) != 0) {
-    stop("Window size can't be an odd integer.")
+    stop("Window size can't be odd.")
   }
+  
+  checkQdata(qdata)
+  qdata <- checkColumnNames(qdata)
   
   dummy_was_xts <- FALSE
   if (is.data.table(qdata) == FALSE) {
     if (is.xts(qdata) == TRUE) {
-      # qdata <- .check_data(qdata)
-      # qdatacheck(qdata)
       qdata <- setnames(as.data.table(qdata)[, BID := as.numeric(as.character(BID))][, OFR := as.numeric(as.character(OFR))], old = "index", new = "DT")
       dummy_was_xts <- TRUE
     } else {
@@ -249,7 +174,7 @@ rmOutliersDataTable <- function (qdata, maxi = 10, window = 50, type = "advanced
     median_vec
   }
   
-  qdata <- qdata[, MIDQUOTE := (BID + OFR) / 2][, DATE := as.Date(DT)][, MADALL := mad(MIDQUOTE), by = .(DATE)]
+  qdata <- qdata[, MIDQUOTE := (BID + OFR) / 2][, DATE := as.Date(DT)][, MADALL := mad(MIDQUOTE), by = "DATE"]
   
   if (type == "standard") {
     qdata <- qdata[ , CRITERION := abs(MIDQUOTE - rolling_median_incl_ends(MIDQUOTE, weights = weights_med_center_excl))][
@@ -272,10 +197,81 @@ rmOutliersDataTable <- function (qdata, maxi = 10, window = 50, type = "advanced
   
 }
 
-microbenchmark::microbenchmark(xts_old <- rmOutliers(qdata = sample_qdataraw), times = 10, unit = "s")
-microbenchmark::microbenchmark(xts_new <- rmOutliersDataTable(qdata = setnames(as.data.table(sample_qdataraw)[, BID := as.numeric(as.character(BID))][, OFR := as.numeric(as.character(OFR))], old = "index", new = "DT")), times = 10, unit = "s")
-
-xts_old <- rmOutliers(qdata = sample_qdataraw)
-xts_new <- rmOutliersDataTable(qdata = sample_qdataraw)
-
+# rmOutliersOld <- function (qdata, maxi = 10, window = 50, type = "advanced") {
+#   qdata <- checkColumnNames(qdata)
+#   checkQdata(qdata)
+#   ## function to remove entries for which the mid-quote deviated by more than 10 median absolute deviations 
+#   ## from a rolling centered median (excluding the observation under consideration) of 50 observations if type = "standard".
+#   
+#   ## if type = "advanced":
+#   ## function removes entries for which the mid-quote deviates by more than 10 median absolute deviations
+#   ## from the variable "mediani".
+#   ## mediani is defined as the value closest to the midquote of these three options:
+#   ## 1. Rolling centered median (excluding the observation under consideration)
+#   ## 2. Rolling median of the following "window" observations
+#   ## 3. Rolling median of the previous "window" observations
+#   
+#   ##NOTE: Median Absolute deviation chosen contrary to Barndorff-Nielsen et al.
+#   window <- floor(window/2) * 2
+#   condition <- c()
+#   halfwindow <- window/2
+#   midquote <- as.vector(as.numeric(qdata$BID) + as.numeric(qdata$OFR))/2
+#   mad_all <- mad(midquote)
+#   
+#   midquote <- xts(midquote,order.by = index(qdata))
+#   
+#   if (mad_all == 0) {
+#     m <- as.vector(as.numeric(midquote))
+#     s <- c(TRUE, (m[2:length(m)] - m[1:(length(m) - 1)] != 0))
+#     mad_all <- mad(as.numeric(midquote[s]))
+#   }
+#   
+#   medianw <- function(midquote, n = window) {
+#     m <- floor(n/2) + 1
+#     q <- median(c(midquote[1:(m - 1)], midquote[(m + 1):(n + 1)]))
+#     return(q)
+#   }
+#   
+#   if (type == "standard") {
+#     meds <- as.numeric(rollapply(midquote, width = (window + 1), FUN = medianw, align = "center"))
+#   }
+#   if (type == "advanced") {
+#     advancedperrow <- function(qq) {
+#       diff <- abs(qq[1:3] - qq[4])
+#       select <- min(diff) == diff
+#       value <- qq[select]
+#       if (length(value) > 1) {
+#         value <- median(value)
+#       }
+#       return(value)
+#     }
+#     n <- length(midquote)
+#     allmatrix <- matrix(rep(0, 4 * (n)), ncol = 4)
+#     median2 <- function(a){ 
+#       median(a)
+#     }
+#     standardmed <- as.numeric(rollapply(midquote, width = c(window), 
+#                                         FUN = median2, align = "center"))
+#     standardmed <- standardmed[!is.na(standardmed)] 
+#     
+#     temp <- as.numeric(rollapply(midquote, 
+#                                  width = (window + 1), 
+#                                  FUN = medianw, 
+#                                  align = "center"))
+#     
+#     allmatrix[(halfwindow + 1):(n - halfwindow), 1] = temp[!is.na(temp)]
+#     allmatrix[(1:(n - window)), 2] <- standardmed[2:length(standardmed)]
+#     allmatrix[(window + 1):(n), 3] <- standardmed[1:(length(standardmed) - 1)]
+#     allmatrix[, 4] <- midquote
+#     meds <- apply(allmatrix, 1, advancedperrow)[(halfwindow + 1):(n - halfwindow)]
+#   }
+#   
+#   midquote <- as.numeric(midquote);
+#   maxcriterion <- meds + maxi * mad_all
+#   mincriterion <- meds - maxi * mad_all
+#   
+#   condition <- mincriterion < midquote[(halfwindow + 1):(length(midquote) - halfwindow)] & midquote[(halfwindow + 1):(length(midquote) - halfwindow)] < maxcriterion
+#   condition <- c(rep(TRUE, halfwindow), condition, rep(TRUE, halfwindow))
+#   qdata[condition]
+# }
 

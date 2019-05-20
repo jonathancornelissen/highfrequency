@@ -69,5 +69,11 @@ data("sample_qdata")
 highfrequency::rmOutliers(sample_qdataraw)
 
 
+# 
+# microbenchmark::microbenchmark(xts_old <- rmOutliers(qdata = sample_qdataraw), times = 10, unit = "s")
+# microbenchmark::microbenchmark(xts_new <- rmOutliersDataTable(qdata = setnames(as.data.table(sample_qdataraw)[, BID := as.numeric(as.character(BID))][, OFR := as.numeric(as.character(OFR))], old = "index", new = "DT")), times = 10, unit = "s")
+# 
+# xts_old <- rmOutliers(qdata = sample_qdataraw)
+# xts_new <- rmOutliersDataTable(qdata = sample_qdataraw)
 
 
