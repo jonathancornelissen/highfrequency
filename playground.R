@@ -68,7 +68,7 @@ data("sample_qdata")
 
 highfrequency::rmOutliers(sample_qdataraw)
 
-
+list.files("taqdata")
 # 
 # microbenchmark::microbenchmark(xts_old <- rmOutliers(qdata = sample_qdataraw), times = 10, unit = "s")
 # microbenchmark::microbenchmark(xts_new <- rmOutliersDataTable(qdata = setnames(as.data.table(sample_qdataraw)[, BID := as.numeric(as.character(BID))][, OFR := as.numeric(as.character(OFR))], old = "index", new = "DT")), times = 10, unit = "s")
@@ -76,4 +76,20 @@ highfrequency::rmOutliers(sample_qdataraw)
 # xts_old <- rmOutliers(qdata = sample_qdataraw)
 # xts_new <- rmOutliersDataTable(qdata = sample_qdataraw)
 
+
+unique(sapply(list.files("taqdata"), FUN = function(x) substring(x, nchar(x) - 2, nchar(x)))) == "zip"
+
+list.files("taqdata")
+
+for (ii in list.files("taqdata", recursive = TRUE)) {
+  print(ii)
+  df_test <- fread(cmd = paste0("unzip -p ", "taqdata/", ii))
+  pryr::object_size(df_test)
+  df_test <- df_test[PRICE != 0 & EX == "N" & TR_SCOND %in% c("E", "F")]
+  
+  df_test <- df_test[, DT := as.POSIXct(substring(paste(as.character(DATE), TIME_M, sep = " "), 1, 20), tz = "EST", format = "%Y%m%d %H:%M:%OS")][
+    , lapply(.SD, median), by = .(DT, SYMBOL), .SDcols = c("PRICE")]
+  
+  df_test[PRICE != 0 & EX == "N" & TR_SCOND %in% c("E", "F")]
+}
 

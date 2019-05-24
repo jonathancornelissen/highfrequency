@@ -2272,27 +2272,32 @@ makeXtsQuotes = function( qdata, format = format){
   test = paste(as.vector(qdata$DATE), as.vector(qdata$TIME))
   tdobject = as.POSIXct(test, format=format, tz="GMT")
   qdata = xts(qdata, order.by = tdobject)
-  qdata = qdata[, c("SYMBOL", "EX", "BID", "BIDSIZ","OFR", "OFRSIZ", "MODE")];
-  rm(tdobject);
-  return(qdata);
+  qdata = qdata[, c("SYMBOL", "EX", "BID", "BIDSIZ","OFR", "OFRSIZ", "MODE")]
+  rm(tdobject)
+  return(qdata)
 }
 
 ################ The real conversion starts here ;)
 
-convert = function(from, to, datasource, datadestination, trades = TRUE, 
+convert <- function(from, to, datasource, datadestination, trades = TRUE, 
                    quotes = TRUE, ticker, dir = FALSE, extension = "txt", header = FALSE, 
-                   tradecolnames = NULL, quotecolnames = NULL, format = "%Y%m%d %H:%M:%S", onefile=FALSE){  
+                   tradecolnames = NULL, quotecolnames = NULL, format = "%Y%m%d %H:%M:%S", onefile = FALSE) {  
 
-  
   #############  1.A the data is in the "RTAQ folder" sturcture ##############
-  if( onefile == FALSE ){
+  if (onefile == FALSE) {
     
     # Create trading dates:
     dates = timeDate::timeSequence(from, to, format = "%Y-%m-%d", FinCenter = "GMT")
     dates = dates[timeDate::isBizday(dates, holidays = timeDate::holidayNYSE(1960:2050))];
     
     # Create folder structure for saving:
-    if (dir) { dir.create(datadestination, showWarnings = FALSE); for (i in 1:length(dates)) {dirname = paste(datadestination, "/", as.character(dates[i]), sep = ""); dir.create(dirname, showWarnings = FALSE)    } }
+    if (dir == TRUE) { 
+      dir.create(datadestination, showWarnings = FALSE) 
+      for (i in 1:length(dates)) {
+        dirname = paste(datadestination, "/", as.character(dates[i]), sep = "")
+        dir.create(dirname, showWarnings = FALSE)    
+      } 
+    }
     for (i in 1:length(dates)){ #Loop over days  
       #Get the day-specific path
       datasourcex = paste(datasource, "/", dates[i], sep = "")
@@ -2312,45 +2317,66 @@ convert = function(from, to, datasource, datadestination, trades = TRUE,
   if( onefile == TRUE ){
     # Load the data: ############################ This depends on the data provider
     if(trades == TRUE){ 
-      if( extension=="txt"){ dataname = paste(datasource,"/",ticker,"_trades",sep=""); readdata(path = datasource, extension = "txt", header = FALSE, dims = 0); } 
-      if( extension=="csv"){ dataname = paste(datasource,"/",ticker,"_trades.csv",sep=""); data = read.csv(dataname);}
-      if( extension=="tickdatacom"){ 
-        dataname   = paste(datasource,"/",ticker,"_trades.asc",sep="");
-        colnames   = c("DATE","TIME","PRICE","SIZE","EX","COND","CORR","SEQN","SOURCE","TSTOP","G127","EXCL","FPRICE");
-        alldata    = read.delim(dataname, header=F, sep=",",dec=".",col.names=colnames); 
-        taqnames   = c("DATE","EX","TIME","PRICE","SIZE","COND","CORR","G127"); 
-        data = alldata[,taqnames]; 
-        data = cbind(rep(ticker,dim(data)[1]),data); colnames(data)[1] = "SYMBOL"; 
+      if( extension == "txt"){ 
+        dataname = paste(datasource,"/",ticker,"_trades",sep="") 
+        readdata(path = datasource, extension = "txt", header = FALSE, dims = 0)
+      } 
+      if (extension == "csv"){ 
+        dataname = paste(datasource,"/",ticker,"_trades.csv",sep="") 
+        data = read.csv(dataname)
       }
-      alldata = suppressWarnings(makeXtsTrades(tdata=data,format=format)); 
+      if (extension=="tickdatacom") { 
+        dataname   = paste(datasource,"/",ticker,"_trades.asc",sep="")
+        colnames   = c("DATE","TIME","PRICE","SIZE","EX","COND","CORR","SEQN","SOURCE","TSTOP","G127","EXCL","FPRICE")
+        alldata    = read.delim(dataname, header=F, sep=",",dec=".",col.names=colnames)
+        taqnames   = c("DATE","EX","TIME","PRICE","SIZE","COND","CORR","G127")
+        data = alldata[,taqnames]
+        data = cbind(rep(ticker,dim(data)[1]),data); colnames(data)[1] = "SYMBOL"
+      }
+      alldata = suppressWarnings(makeXtsTrades(tdata=data,format=format))
     }
+    
     if (quotes == TRUE){ 
-      if( extension=="txt"){ dataname = paste(datasource,"/",ticker,"_quotes",sep=""); readdata(path = datasource, extension = "txt", header = FALSE, dims = 0); } 
-      if( extension=="csv"){ dataname = paste(datasource,"/",ticker,"_quotes.csv",sep=""); data = read.csv(dataname);}
+      if( extension=="txt"){ 
+        dataname = paste(datasource,"/",ticker,"_quotes",sep="") 
+        readdata(path = datasource, extension = "txt", header = FALSE, dims = 0)
+      } 
+      if( extension=="csv"){ 
+        dataname = paste(datasource,"/",ticker,"_quotes.csv",sep="") 
+        data = read.csv(dataname)
+      }
       if( extension=="tickdatacom"){ 
-        dataname   = paste(datasource,"/",ticker,"_quotes.asc",sep=""); 
-        colnames   = c("DATE","TIME","EX","BID","OFR","BIDSIZ","OFRSIZ","MODE","MMID","SEQN","EXB", "EXO","NBBOID","NBBOID","CORR","QSO"); 
-        alldata    = read.delim(dataname, header=F, sep=",",dec=".",col.names=colnames); 
-        taqnames   = c("DATE","TIME","EX","BID","BIDSIZ","OFR","OFRSIZ","MODE"); 
-        data = alldata[,taqnames]; 
-        data = cbind(rep(ticker,dim(data)[1]),data); colnames(data)[1] = "SYMBOL"; 
+        dataname   = paste(datasource,"/",ticker,"_quotes.asc",sep="")
+        colnames   = c("DATE","TIME","EX","BID","OFR","BIDSIZ","OFRSIZ","MODE","MMID","SEQN","EXB", "EXO","NBBOID","NBBOID","CORR","QSO")
+        alldata    = read.delim(dataname, header=F, sep=",",dec=".",col.names=colnames)
+        taqnames   = c("DATE","TIME","EX","BID","BIDSIZ","OFR","OFRSIZ","MODE")
+        data = alldata[,taqnames]
+        data = cbind(rep(ticker,dim(data)[1]),data)
+        colnames(data)[1] = "SYMBOL"
         format = "%d/%m/%Y %H:%M:%S"; # Tickdata always has this format
       } 
-      alldata = suppressWarnings( makeXtsQuotes( qdata=data, format=format) );
+      alldata <- suppressWarnings(makeXtsQuotes(qdata = data, format = format))
     }
     
     # Save the data: ############################ This is the same irrespective of the data provider
     # Create trading dates: 
     
-    dates = unique(as.Date(index(alldata)));
+    dates <- unique(as.Date(index(alldata)));
     
     # Create folder structure for saving : 
-    suppressWarnings( if (dir){ dir.create(datadestination, showWarnings = FALSE); for (i in 1:length(dates)) {dirname = paste(datadestination, "/", as.character(dates[i]), sep = ""); dir.create(dirname, showWarnings = FALSE) } })
+    suppressWarnings( 
+      if (dir == TRUE) { 
+        dir.create(datadestination, showWarnings = FALSE)
+        for (i in 1:length(dates)) {
+          dirname = paste(datadestination, "/", as.character(dates[i]), sep = "") 
+          dir.create(dirname, showWarnings = FALSE) 
+        }
+      })
     
     for(i in 1:length(dates) ){ # Loop over days
       datadestinationx = paste(datadestination, "/", dates[i], sep = ""); 
       
-      if( trades == TRUE ){ 
+      if (trades == TRUE) { 
         tdata        = alldata[as.character(dates[i])];
         xts_name     = paste(ticker, "_trades.RData", sep = "")
         destfullname = paste(datadestinationx,"/",xts_name,sep="");          
@@ -2369,63 +2395,66 @@ convert = function(from, to, datasource, datadestination, trades = TRUE,
 
 ### Manipulation functions:
 #MANIPULATION FUNCTIONS:
-TAQLoad = function(tickers,from,to,trades=TRUE,quotes=FALSE,datasource=NULL,variables=NULL){ 
-  if( is.null(datasource)){print("Please provide the argument 'datasource' to indicate in which folder your data is stored")}
-  
-  if(!(trades&quotes)){#not both trades and quotes demanded
-    for( ticker in tickers ){
-      out = uniTAQload( ticker = ticker , from = from, to = to , trades=trades,quotes=quotes,datasource = datasource,variables=variables);
-      if( ticker == tickers[1] ){ totalout = out 
-      }else{ 
-        totalout = merge(totalout,out) }
-    }
+TAQLoad <- function(tickers, from, to, trades = TRUE, quotes = FALSE, datasource = NULL, variables = NULL){ 
+  if (is.null(datasource) == TRUE) {
+    print("Please provide the argument 'datasource' to indicate in which folder your data is stored")
   }
   
-  if((trades&quotes)){#in case both trades and quotes
-    totalout=list();
-    totalout[[1]] = TAQLoad( tickers = tickers , from = from, to = to , trades=TRUE,quotes=FALSE,datasource = datasource,variables=variables);
-    totalout[[2]] = TAQLoad( tickers = tickers , from = from, to = to , trades=FALSE,quotes=TRUE,datasource = datasource,variables=variables);
+  if ((trades&quotes) == FALSE) {#not both trades and quotes demanded
+    for (ticker in tickers) {
+      out <- uniTAQload( ticker = ticker , from = from, to = to , trades=trades,quotes=quotes,datasource = datasource,variables=variables);
+      if (ticker == tickers[1]){ 
+        totalout <- out 
+      } else { 
+        totalout <- merge(totalout,out) }
+    }
+  } else {#in case both trades and quotes
+    totalout <- list()
+    totalout[[1]] = TAQLoad( tickers = tickers , from = from, to = to , trades=TRUE, quotes=FALSE, datasource = datasource,variables=variables);
+    totalout[[2]] = TAQLoad( tickers = tickers , from = from, to = to , trades=FALSE, quotes=TRUE, datasource = datasource,variables=variables);
   }
   return(totalout);
 }
 
-uniTAQload = function(ticker,from,to,trades=TRUE,quotes=FALSE,datasource=NULL,variables=NULL){
+uniTAQload <- function(ticker,from,to,trades=TRUE,quotes=FALSE,datasource=NULL,variables=NULL){
   ##Function to load the taq data from a certain stock 
   #From&to (both included) should be in the format "%Y-%m-%d" e.g."2008-11-30"
  
   dates = timeDate::timeSequence(as.character(from),as.character(to), format = "%Y-%m-%d", FinCenter = "GMT")
   dates = dates[timeDate::isBizday(dates, holidays = timeDate::holidayNYSE(1960:2050))];
   
-  if(trades){ tdata=NULL;
-              totaldata=NULL;
-              for(i in 1:length(dates)){
-                datasourcex = paste(datasource,"/",dates[i],sep="");
-                filename = paste(datasourcex,"/",ticker,"_trades.RData",sep="");
-                
-                
-                ifmissingname = paste(datasourcex,"/missing_",ticker,".RData",sep="");  
-                
-                if(file.exists(ifmissingname)){warning(paste("No trades available on ",dates[i],sep="")); next;}
-                if(!file.exists(filename)){warning(paste("The file ",filename," does not exist. Please read the documentation.",sep="")); next;}
-                if(file.exists(ifmissingname)==FALSE){
-                  load(filename);
-                  if(i==1)  { 
-                    if( is.null(variables)){totaldata=tdata;
-                    }else{
-                      allnames=as.vector(colnames(tdata));
-                      selection = allnames%in%variables;
-                      qq=(1:length(selection))[selection];
-                      totaldata=tdata[,qq];
-                    }    
-                  };
-                  if(i>1){
-                    if( is.null(variables)){totaldata=rbind(totaldata,tdata);
-                    }else{
-                      totaldata=rbind(totaldata,tdata[,qq])};
-                  }
-                  rm(tdata);
-                }
-              }
+  if (trades) { 
+    tdata <- NULL
+    totaldata <-NULL;
+    for(i in 1:length(dates)){
+      datasourcex = paste(datasource,"/",dates[i],sep="");
+      filename = paste(datasourcex,"/",ticker,"_trades.RData",sep="");
+      
+      
+      ifmissingname = paste(datasourcex,"/missing_",ticker,".RData",sep="");  
+      
+      if(file.exists(ifmissingname)){warning(paste("No trades available on ",dates[i],sep="")); next;}
+      if(!file.exists(filename)){warning(paste("The file ",filename," does not exist. Please read the documentation.",sep="")); next;}
+      if(file.exists(ifmissingname)==FALSE){
+        load(filename);
+        if(i==1)  { 
+          if (is.null(variables)) {
+            totaldata=tdata
+          } else {
+            allnames <- as.vector(colnames(tdata))
+            selection <- allnames%in%variables
+            qq <- (1:length(selection))[selection]
+            totaldata <- tdata[,qq]
+          }    
+        };
+        if(i>1){
+          if( is.null(variables)){totaldata=rbind(totaldata,tdata)
+          }else{
+            totaldata=rbind(totaldata,tdata[,qq])}
+        }
+        rm(tdata)
+      }
+    }
   }
   
   if(quotes){ qdata=NULL;
@@ -3126,127 +3155,10 @@ matchtq <- function(...) {
 ##################### Total cleanup functions formerly in RTAQ ################################
 
 
-tradesCleanup <- function(from, to, datasource, datadestination, ticker, exchanges, tdataraw = NULL, report = TRUE, selection = "median") {
-  #requireNamespace('timeDate')
-  nresult = rep(0, 5)
-  if (!is.list(exchanges)) { 
-    exchanges = as.list(exchanges)
-  }
-  if (is.null(tdataraw)) {
-    dates = timeDate::timeSequence(from, to, format = "%Y-%m-%d")
-    dates = dates[timeDate::isBizday(dates, holidays=timeDate::holidayNYSE(1960:2050))]
-    for (j in 1:length(dates)) {
-      datasourcex = paste(datasource, "/", dates[j], sep = "")
-      datadestinationx = paste(datadestination, "/", dates[j], sep = "")
-      for (i in 1:length(ticker)) {
-        dataname = paste(ticker[i], "_trades.RData", sep = "");
-        if(file.exists(paste(datasourcex, "/", dataname, sep = ""))){
-          load(paste(datasourcex, "/", dataname, sep = ""))
-          if (class(tdata)[1] != "try-error") {            
-            exchange = exchanges[[i]]            
-            if(length(tdata$PRICE)>0){
-              tdata = .check_data(tdata);
-              nresult[1] = nresult[1] + dim(tdata)[1]
-            }else{tdata=NULL;}
-            
-            if(length(tdata$PRICE)>0){
-              tdata = try(nozeroprices(tdata))
-              nresult[2] = nresult[2] + dim(tdata)[1];
-            }else{tdata=NULL;}
-            
-            
-            if(length(tdata$PRICE)>0){
-              tdata = try(selectexchange(tdata, exch = exchange))
-              nresult[3] = nresult[3] + dim(tdata)[1]
-            }else{tdata=NULL;}
-            
-            
-            if(length(tdata$PRICE)>0){
-              tdata = try(salescond(tdata))
-              nresult[4] = nresult[4] + dim(tdata)[1]
-            }else{tdata=NULL;}
-            
-            
-            if(length(tdata$PRICE)>0){
-              tdata = try(mergeTradesSameTimestamp(tdata, selection = selection))
-              nresult[5] = nresult[5] + dim(tdata)[1];
-            }else{tdata=NULL;}
-            
-            
-            
-            save(tdata, file = paste(datadestinationx,"/", dataname, sep = ""))
-          }
-          if (class(tdata) == "try-error") {
-            abc = 1
-            save(abc, file = paste(datadestinationx, "/missing_", 
-                                   ticker[i], ".RData", sep = ""))
-          }
-          
-        }else{
-          next;
-        }
-      }   
-    }
-    if (report == TRUE) {
-      names(nresult) = c("initial number", "no zero prices", 
-                         "select exchange", "sales condition", "merge same timestamp")
-      return(nresult)
-    }
-  }
-  if (is.null(tdataraw) == FALSE) {
-    if (class(tdataraw)[1] != "try-error") {
-      if (length(exchanges) > 1) {
-        print("The argument exchanges contains more than 1 element. Please select a single exchange, in case you provide tdataraw.")
-      }
-      exchange = exchanges[[1]];
-      
-      tdata = tdataraw
-      rm(tdataraw)
-      
-      
-      if(length(tdata)>0){
-        tdata = .check_data(tdata);
-        nresult[1] = nresult[1] + dim(tdata)[1]
-      }else{tdata=NULL;}
-      
-      if(length(tdata)>0){
-        tdata = try(nozeroprices(tdata))
-        nresult[2] = nresult[2] + dim(tdata)[1];
-      }else{tdata=NULL;}
-      
-      
-      if(length(tdata)>0){
-        tdata = try(selectexchange(tdata, exch = exchange))
-        nresult[3] = nresult[3] + dim(tdata)[1]
-      }else{tdata=NULL;}
-      
-      
-      if(length(tdata)>0){
-        tdata = try(salescond(tdata))
-        nresult[4] = nresult[4] + dim(tdata)[1]
-      }else{tdata=NULL;}
-      
-      
-      if(length(tdata)>0){
-        tdata = try(mergeTradesSameTimestamp(tdata, selection = selection))
-        nresult[5] = nresult[5] + dim(tdata)[1];
-      }else{tdata=NULL;}
-      
-      
-      if (report == TRUE) {
-        names(nresult) = c("initial number", "no zero prices", 
-                           "select exchange", "sales condition", "merge same timestamp")
-        return(list(tdata = tdata, report = nresult))
-      }
-      if (report != TRUE) {
-        return(tdata)
-      }
-    }
-  }
-  
-}
 
-quotesCleanup <- function(from,to,datasource,datadestination,ticker,exchanges, qdataraw=NULL,report=TRUE,selection="median",maxi=50,window=50,type="advanced",rmoutliersmaxi=10, ...) {
+
+quotesCleanup <- function(from, to, datasource, datadestination, ticker, exchanges, qdataraw = NULL, report = TRUE, 
+                          selection="median", maxi = 50, window = 50, type = "advanced", rmoutliersmaxi = 10, ...) {
   nresult = rep(0,7)
   if(is.null(qdataraw)){
     dates = timeDate::timeSequence(from,to, format = "%Y-%m-%d", FinCenter = "GMT")

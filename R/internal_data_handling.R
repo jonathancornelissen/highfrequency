@@ -1,4 +1,5 @@
 
+# Necessary for check-package not throwing errors
 #' @keywords internal
 `:=` <- function(...) {
   NULL
@@ -38,8 +39,9 @@ checkColumnNames <- function(data) {
 is.BBO <- function (x) {
   if (all(has.Bid(x), has.Ask(x))) {
     TRUE
+  } else {
+    FALSE
   }
-  else FALSE
 }
 
 #' @keywords internal

@@ -7,7 +7,7 @@
 rmOutliers(qdata, maxi = 10, window = 50, type = "advanced")
 }
 \arguments{
-\item{qdata}{an xts object at least containing the columns "BID" and "OFR".}
+\item{qdata}{an data.table or xts object at least containing the columns "BID" and "OFR".}
 
 \item{maxi}{an integer, indicating the maximum number of median absolute deviations allowed.}
 
@@ -16,7 +16,7 @@ rmOutliers(qdata, maxi = 10, window = 50, type = "advanced")
 \item{type}{should be "standard" or "advanced" (see description).}
 }
 \value{
-xts object
+xts object or data.table depending on type of input
 }
 \description{
 If type = "standard": Function deletes entries for which the mid-quote deviated by more than "maxi"

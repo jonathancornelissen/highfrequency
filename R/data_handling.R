@@ -18,7 +18,7 @@ getPrice <- function (x, symbol = NULL, prefer = NULL) {
     if (identical(loc, integer(0)) == FALSE) {
       x<-x[, loc]
     } else {
-      stop(paste("subscript out of bounds: no column name containing ",symbol,"."))
+      stop(paste("Subscript out of bounds: no column name containing ",symbol,"."))
     }
   }
   if (is.null(prefer) == TRUE) {
@@ -26,7 +26,7 @@ getPrice <- function (x, symbol = NULL, prefer = NULL) {
     if(has.Price(x)) prefer = 'price'
     else if(has.Trade(x)) prefer = 'trade'
     else if(has.Cl(x))    prefer = 'close'
-    else stop("subscript out of bounds, no price was discernible from the data.")
+    else stop("Subscript out of bounds, no price was discernible from the data.")
   }
   if (is.null(prefer) == FALSE) {
     loc <- NULL
@@ -42,10 +42,10 @@ getPrice <- function (x, symbol = NULL, prefer = NULL) {
            Price =, price = { loc <- has.Price(x,which=TRUE) },
            {loc <- grep(prefer,colnames(x))}
     )
-    if (!identical(loc, integer(0))) {
+    if (identical(loc, integer(0)) == FALSE) {
       return(x[, loc])
     } else {
-      stop("subscript out of bounds, no price was discernible from the data.")
+      stop("Subscript out of bounds, no price was discernible from the data.")
     }
   }
 }
@@ -74,14 +74,14 @@ getPrice <- function (x, symbol = NULL, prefer = NULL) {
 #' sample. In case it is zero (which can happen if mid-quotes don't change much), 
 #' the median absolute deviation is taken over a subsample without constant mid-quotes.
 #' 
-#' @param qdata an xts object at least containing the columns "BID" and "OFR".
+#' @param qdata an data.table or xts object at least containing the columns "BID" and "OFR".
 #' @param maxi an integer, indicating the maximum number of median absolute deviations allowed.
 #' @param window an integer, indicating the time window for which the "outlyingness" is considered.
 #' @param type should be "standard" or "advanced" (see description).
 #' 
 #' @details NOTE: This function works only correct if supplied input data consists of 1 day.
 #' 
-#' @return xts object
+#' @return xts object or data.table depending on type of input
 #' 
 #' @references Barndorff-Nielsen, O. E., P. R. Hansen, A. Lunde, and N. Shephard (2009). Realized kernels in practice: Trades and quotes. Econometrics Journal 12, C1-C32.
 #' 
@@ -193,6 +193,137 @@ rmOutliers <- function (qdata, maxi = 10, window = 50, type = "advanced") {
     return(xts(as.matrix(qdata[, -c("DT", "DATE", "MADALL", "CRITERION", "MIDQUOTE")]), order.by = qdata$DT))
   } else {
     qdata[, -c("MADALL", "CRITERION")]
+  }
+  
+}
+
+
+tradesCleanup <- function(from, to, datasource, datadestination, ticker, exchanges, tdataraw = NULL, report = TRUE, selection = "median") {
+  #requireNamespace('timeDate')
+  nresult <- rep(0, 5)
+  if (is.list(exchanges) == FALSE) { 
+    exchanges <- as.list(exchanges)
+  }
+  
+  if (is.null(tdataraw) == TRUE) {
+    dates = timeDate::timeSequence(from, to, format = "%Y-%m-%d")
+    dates = dates[timeDate::isBizday(dates, holidays = timeDate::holidayNYSE(1960:2050))]
+    for (j in 1:length(dates)) {
+      datasourcex = paste(datasource, "/", dates[j], sep = "")
+      datadestinationx = paste(datadestination, "/", dates[j], sep = "")
+      for (i in 1:length(ticker)) {
+        dataname = paste(ticker[i], "_trades.RData", sep = "")
+        if (file.exists(paste(datasourcex, "/", dataname, sep = ""))) {
+          load(paste(datasourcex, "/", dataname, sep = ""))
+          if (class(tdata)[1] != "try-error") {            
+            exchange = exchanges[[i]]            
+            if (length(tdata$PRICE) > 0) {
+              tdata <- checkColumnNames(tdata);
+              nresult[1] <- nresult[1] + dim(tdata)[1]
+            } else {
+              tdata <- NULL
+            }
+            
+            if (length(tdata$PRICE) > 0) {
+              tdata <- try(nozeroprices(tdata))
+              nresult[2] <- nresult[2] + dim(tdata)[1]
+            } else {
+              tdata <- NULL
+            }
+            
+            if (length(tdata$PRICE) > 0) {
+              tdata <- try(selectexchange(tdata, exch = exchange))
+              nresult[3] <- nresult[3] + dim(tdata)[1]
+            } else {
+              tdata <- NULL
+            }
+            
+            if (length(tdata$PRICE) > 0) {
+              tdata <- try(salescond(tdata))
+              nresult[4] <- nresult[4] + dim(tdata)[1]
+            } else {
+              tdata <- NULL
+            }
+            
+            if (length(tdata$PRICE) > 0) {
+              tdata <- try(mergeTradesSameTimestamp(tdata, selection = selection))
+              nresult[5] <- nresult[5] + dim(tdata)[1]
+            } else {
+              tdata <-NULL
+            }
+            save(tdata, file = paste(datadestinationx,"/", dataname, sep = ""))
+          }
+          if (class(tdata) == "try-error") {
+            abc = 1
+            save(abc, file = paste(datadestinationx, "/missing_", 
+                                   ticker[i], ".RData", sep = ""))
+          }
+          
+        }else{
+          next;
+        }
+      }   
+    }
+    if (report == TRUE) {
+      names(nresult) = c("initial number", "no zero prices", 
+                         "select exchange", "sales condition", "merge same timestamp")
+      return(nresult)
+    }
+  }
+  
+  if (is.null(tdataraw) == FALSE) {
+    if (class(tdataraw)[1] != "try-error") {
+      if (length(exchanges) > 1) {
+        print("The argument exchanges contains more than 1 element. Please select a single exchange, in case you provide tdataraw.")
+      }
+      exchange <- exchanges[[1]]
+      tdata <- tdataraw
+      rm(tdataraw)
+      
+      if (length(tdata) > 0) {
+        tdata <- checkColumnNames(tdata)
+        nresult[1] <- nresult[1] + dim(tdata)[1]
+      } else {
+        tdata <- NULL
+      }
+      
+      if(length(tdata)>0){
+        tdata = try(nozeroprices(tdata))
+        nresult[2] = nresult[2] + dim(tdata)[1]
+      } else {
+        tdata <- NULL
+      }
+      
+      if (length(tdata) > 0) {
+        tdata = try(selectexchange(tdata, exch = exchange))
+        nresult[3] = nresult[3] + dim(tdata)[1]
+      } else {
+        tdata <- NULL
+      }
+      
+      if (length(tdata) > 0) {
+        tdata = try(salescond(tdata))
+        nresult[4] = nresult[4] + dim(tdata)[1]
+      } else {
+        tdata <- NULL
+      }
+      
+      if (length(tdata) > 0) {
+        tdata <- try(mergeTradesSameTimestamp(tdata, selection = selection))
+        nresult[5] <- nresult[5] + dim(tdata)[1]
+      } else {
+        tdata <- NULL
+      }
+      
+      if (report == TRUE) {
+        names(nresult) = c("initial number", "no zero prices", 
+                           "select exchange", "sales condition", "merge same timestamp")
+        return(list(tdata = tdata, report = nresult))
+      }
+      if (report != TRUE) {
+        return(tdata)
+      }
+    }
   }
   
 }
