@@ -1,6 +1,6 @@
 Package: highfrequency
 Version: 0.5.3
-Date: 2018-03-03
+Date: 2019-05-24
 Title: Tools for Highfrequency Data Analysis
 Authors@R: c(person("Kris", "Boudt", role = c("aut", "cre"),
                      email = "Kris.Boudt@econ.kuleuven.be"),
@@ -21,7 +21,7 @@ License: GPL (>= 2)
 Encoding: UTF-8
 LazyData: true
 Depends:
-    R (>= 2.12.0)
+    R (>= 3.4.0)
 Imports:
     xts,
     zoo,

@@ -1283,8 +1283,7 @@ rCumSum <- function(x, period = 1, align.by="seconds", align.period=1, plotit=FA
 } 
 
 #Scatter returns:
-rScatterReturns <- function(x,y, period, align.by="seconds", align.period=1,numbers=FALSE,xlim= NULL, ylim=NULL, plotit=TRUE, pch=NULL, cts=TRUE, makeReturns=FALSE, scale.size=0, col.change=FALSE,...)
-{
+rScatterReturns <- function(x,y, period, align.by="seconds", align.period=1,numbers=FALSE,xlim= NULL, ylim=NULL, plotit=TRUE, pch=NULL, cts=TRUE, makeReturns=FALSE, scale.size=0, col.change=FALSE,...) {
   multixts = .multixts(x) || .multixts(y);
   if( multixts ){ stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")}     
   
@@ -1371,261 +1370,288 @@ rScatterReturns <- function(x,y, period, align.by="seconds", align.period=1,numb
 
 
 # Helpfunctions: 
-TQfun <- function(rdata){ #Calculate the realized tripower quarticity
-    returns = as.vector(as.numeric(rdata));
-    n = length(returns);
-    mu43 = 0.8308609; #    2^(2/3)*gamma(7/6) *gamma(1/2)^(-1)   
-    tq = n * ((mu43)^(-3)) *  sum( abs(returns[1:(n - 2)])^(4/3) *abs(returns[2:(n-1)])^(4/3) *abs(returns[3:n])^(4/3) );
-    return(tq);
+TQfun <- function(rdata) { #Calculate the realized tripower quarticity
+    returns <- as.vector(as.numeric(rdata))
+    n <- length(returns)
+    tq <- n * ((2^(2/3)*gamma(7/6) *gamma(1/2)^(-1))^(-3)) *  sum(abs(returns[1:(n - 2)])^(4/3) * abs(returns[2:(n-1)])^(4/3) * abs(returns[3:n])^(4/3))
+    return(tq)
 } 
-
-
 
 harModel <- function(data, periods = c(1,5,22), periodsJ = c(1,5,22), periodsQ = c(1),
                     leverage=NULL, RVest = c("rCov","rBPCov", "rQuar"), type="HARRV", inputType = "RM",
                     jumptest="ABDJumptest",alpha=0.05,h=1,transform=NULL, ...){  
-    nperiods = length(periods); # Number of periods to aggregate over
-    nest = length(RVest);       # Number of RV estimators
-    nperiodsQ = length(periodsQ) #Number of periods to aggregate realized quarticity over
-    jumpModels = c("HARRVJ", "HARRVCJ", "HARRVQJ", "CHARRV", "CHARRVQ")
-    quarticityModels = c("HARRVQ", "HARRVQJ", "CHARRVQ")
-    bpvModels = c("CHARRV", "CHARRVQ")
-    if( !is.null(transform) ){ Ftransform = match.fun(transform); }
-    if( !(type %in% c("HARRV", jumpModels, quarticityModels))){ warning("Please provide a valid argument for type, see documentation.")  }    
-    
-    
-    
-    if( inputType != "RM"){ #If it are returns as input
-     # Get the daily RMs
-     RV1 = match.fun(  RVest[1]);
-     RM1 = apply.daily( data, RV1 );
-     # save dates:
-     alldates = index(RM1)
-     if( type %in% jumpModels ){ 
-       RV2 = match.fun( RVest[2]); 
-       RM2 = apply.daily( data, RV2 );
+  
+  nperiods <- length(periods) # Number of periods to aggregate over
+  nest <- length(RVest)      # Number of RV estimators
+  nperiodsQ <- length(periodsQ) #Number of periods to aggregate realized quarticity over
+  jumpModels <- c("HARRVJ", "HARRVCJ", "HARRVQJ", "CHARRV", "CHARRVQ")
+  quarticityModels <- c("HARRVQ", "HARRVQJ", "CHARRVQ")
+  bpvModels <- c("CHARRV", "CHARRVQ")
+  
+  if (is.null(transform) == FALSE) { 
+    Ftransform = match.fun(transform) 
+  }
+  if (!(type %in% c("HARRV", jumpModels, quarticityModels))) { 
+    warning("Please provide a valid argument for type, see documentation.")  
+  }    
+  
+  if (inputType != "RM") { #If it are returns as input
+    # Get the daily RMs
+    RV1 <- match.fun(RVest[1])
+    RM1 <- apply.daily(data, RV1 )
+    # save dates:
+    alldates = index(RM1)
+    if (type %in% jumpModels ) { 
+      RV2 <- match.fun( RVest[2])
+      RM2 <- apply.daily(data, RV2)
+    }
+    if( type %in% quarticityModels ) { 
+      if(type %in% c("HARRVQJ","CHARRVQ")){##HARRVQJ and CHARRVQ are the only models that need both BPV and realized quarticity.
+        RV2 <- match.fun(RVest[2])
+        RM2 <- apply.daily(data, RV2)
+        RV3 <- match.fun(RVest[3])
+        RM3 <- apply.daily(data, RV3)
       }
-     if( type %in% quarticityModels ){ 
-       if(type %in% c("HARRVQJ","CHARRVQ")){##HARRVQJ and CHARRVQ are the only models that need both BPV and realized quarticity.
-         RV2 = match.fun( RVest[2]); 
-         RM2 = apply.daily( data, RV2 ); 
-         RV3 = match.fun( RVest[3]); 
-         RM3 = apply.daily( data, RV3 );
-       }
-       if(type == "HARRVQ"){
-         RV3 = match.fun( RVest[2]); 
-         RM3 = apply.daily( data, RV3 );
-         periodsJ = periods;
-       }
-        
-     }
-    } 
-    
-    if( inputType == "RM" ){ #The input is  already realized measures
-     dimdata = dim(data)[2]; 
-     alldates = index(data); 
-     RM1 = data[,1]; 
-     if( type %in% jumpModels){RM2 = data[,2];}
-     if( type == "HARRVQ"){RM3 = data[,2];}
-     if( type %in% c("HARRVQJ", "CHARRVQ")){RM2 = data[,2]; RM3 = data[,3];} 
-    } 
-        
-     
-    
-    # Get the matrix for estimation of linear model: 
-    maxp      = max(periods,periodsJ,periodsQ); # Max number of aggregation levels
-    if(!is.null(leverage)){ maxp = max(maxp,leverage) }
-    n         = length(RM1);  #Number of Days
-    
-    # Aggregate RV: 
-    
-    RVmatrix1 = aggRV(RM1,periods);
-    # Aggregate and subselect y:
-    y = aggY(RM1,h,maxp);
-    
-    # Only keep useful parts: 
-    x1 = RVmatrix1[(maxp:(n-h)),]; 
-    if(type %in% jumpModels ){ 
-      RVmatrix2 = aggJ(RM2,periods);
-      x2 = RVmatrix2[(maxp:(n-h)),]
-      }  # In case a jumprobust estimator is supplied
-    if(type %in% quarticityModels){ #in case realized quarticity estimator is supplied
-      RQmatrix  = aggRQ(RM3,periodsQ)[(maxp:(n-h)),];
-      if(nperiodsQ == 1){
-        RQmatrix = as.matrix(sqrt(RQmatrix) - sqrt(mean(RM3)))
-      }else{
-        RQmatrix = sqrt(RQmatrix) - sqrt(mean(RM3)) #Demeaned realized quarticity estimator as in BPQ(2016) 
+      if(type == "HARRVQ"){
+        RV3 <- match.fun( RVest[2])
+        RM3 <- apply.daily( data, RV3 )
+        periodsJ <- periods
       }
-      
-      
+    }
+  } 
+  
+  if (inputType == "RM") { #The input is  already realized measures
+    dimdata <- dim(data)[2]
+    alldates <- index(data)
+    RM1 <- data[,1]
+    if (type %in% jumpModels) {
+      RM2 <- data[,2]
+    }
+    if (type == "HARRVQ") {
+      RM3 <- data[,2]
+    }
+    if (type %in% c("HARRVQJ", "CHARRVQ")) {
+      RM2 <- data[, 2] 
+      RM3 <- data[, 3]
     } 
-    
-
-    # Jumps:
-    if(type %in% jumpModels && !(type %in% bpvModels)){ # If model type is as such that you need jump component, don't spend time on computing jumps for CHAR.. models
-      if(any(RM2 == 0) && inputType == "RM"){ #The jump contributions were provided
-        J = RM2
-      }else{ #compute jump contributions
-        J = pmax( RM1 - RM2,0 ); # Jump contributions should be positive
-      }
-        J = aggJ(J,periodsJ);         
+  }
+  
+  # Get the matrix for estimation of linear model: 
+  maxp <- max(periods,periodsJ,periodsQ) # Max number of aggregation levels
+  
+  if (is.null(leverage) == FALSE) { 
+    maxp <- max(maxp,leverage) 
+  }
+  n <- length(RM1)  #Number of Days
+  
+  # Aggregate RV: 
+  
+  RVmatrix1 <- aggRV(RM1,periods)
+  # Aggregate and subselect y:
+  y <- aggY(RM1,h,maxp)
+  
+  # Only keep useful parts: 
+  x1 <- RVmatrix1[(maxp:(n-h)), ]
+  if (type %in% jumpModels) { 
+    RVmatrix2 <- aggJ(RM2,periods)
+    x2 <- RVmatrix2[(maxp:(n-h)),]
+  }  # In case a jumprobust estimator is supplied
+  if (type %in% quarticityModels) { #in case realized quarticity estimator is supplied
+    RQmatrix  = aggRQ(RM3,periodsQ)[(maxp:(n-h)),];
+    if(nperiodsQ == 1){
+      RQmatrix = as.matrix(sqrt(RQmatrix) - sqrt(mean(RM3)))
+    }else{
+      RQmatrix = sqrt(RQmatrix) - sqrt(mean(RM3)) #Demeaned realized quarticity estimator as in BPQ(2016) 
+    }
+  } 
+  
+  # Jumps:
+  if (type %in% jumpModels && !(type %in% bpvModels)) { # If model type is as such that you need jump component, don't spend time on computing jumps for CHAR.. models
+    if (any(RM2 == 0) && inputType == "RM") { #The jump contributions were provided
+      J <- RM2
+    } else { #compute jump contributions
+      J <- pmax(RM1 - RM2, 0) # Jump contributions should be positive
+    }
+    J <- aggJ(J, periodsJ)
+  }
+  
+  if (is.null(leverage) == FALSE) { 
+    if (sum(data < 0) == 0) { 
+      warning("You cannot use leverage variables in the model in case your input consists of Realized Measures") 
     }
     
-    if( !is.null(leverage) ){ 
-        if( sum(data<0) == 0 ){ warning("You cannot use leverage variables in the model in case your input consists of Realized Measures") }
-        # Get close-to-close returns
-        e = apply.daily(data,sum); #Sum logreturns daily     
-        # Get the rmins:
-        rmintemp = pmin(e,0);    
-        # Aggregate everything:
-        rmin = aggRV(rmintemp,periods=leverage,type="Rmin"); 
-        # Select:
-        rmin = rmin[(maxp:(n-h)),];
-    }else{ rmin = matrix(ncol=0,nrow=dim(x1)[1]) }
+    # Get close-to-close returns
+    e <- apply.daily(data,sum) #Sum logreturns daily     
+    # Get the rmins:
+    rmintemp <- pmin(e,0)
+    # Aggregate everything:
+    rmin <- aggRV(rmintemp, periods = leverage, type = "Rmin")
+    # Select:
+    rmin <- rmin[(maxp:(n-h)),]
+  } else { 
+    rmin <- matrix(ncol=0,nrow=dim(x1)[1]) 
+  }
+  
+  ###############################
+  # Estimate the model parameters, according to type of model : 
+  # First model type: traditional HAR-RV: 
+  if (type == "HARRV") { 
+    if (is.null(transform) == FALSE) { 
+      y  <- Ftransform(y) 
+      x1 <- Ftransform(x1) 
+    }
+    x1 <- cbind(x1,rmin)
+    model <- estimhar(y = y, x = x1)
+    model$type <- "HARRV"
+    model$dates <- alldates[(maxp+h):n]
+    model$RVest <- RVest[1]
     
-    ###############################
-    # Estimate the model parameters, according to type of model : 
-    # First model type: traditional HAR-RV: 
-    if( type == "HARRV" ){ 
-        if(!is.null(transform)){ y = Ftransform(y); x1 = Ftransform(x1) }
-        x1 = cbind(x1,rmin);
-        model     = estimhar(y=y,x=x1); 
-        model$transform = transform; model$h = h; model$type = "HARRV"; model$inputType = inputType; 
-        model$dates = alldates[(maxp+h):n]; 
-        model$RVest = RVest[1];
-        model$leverage = leverage;
-        class(model) = c("harModel","lm"); 
-        return( model )
-    } #End HAR-RV if cond
+  } #End HAR-RV if cond
+  
+  if (type == "HARRVJ") {   
+    if (!is.null(transform) && transform == "log") { 
+      J <- J + 1 
+    }
+    J <- J[(maxp:(n-h)),]
+    x <- cbind(x1,J)         # bind jumps to RV data 
+    if (is.null(transform) == FALSE) { 
+      y <- Ftransform(y)
+      x <- Ftransform(x)
+    }       
+    x <- cbind(x, rmin)
+    model <- estimhar(y = y, x = x) 
+    model$type = "HARRVJ"
+    model$dates <- alldates[(maxp+h):n]
+    model$RVest <- RVest
+  }#End HAR-RV-J if cond
+  
+  if (type == "HARRVCJ") { 
+    # Are the jumps significant? if not set to zero:
+    if (jumptest == "ABDJumptest" ) { 
+      TQ <- apply.daily(data, TQfun)
+      J <- J[,1]
+      teststats <- ABDJumptest(RV=RM1,BPV=RM2,TQ=TQ )
+    } else { 
+      jtest <- match.fun(jumptest)
+      teststats <- jtest(data,...) 
+    }  
+    Jindicators  = teststats > qnorm(1-alpha)
+    J[!Jindicators] = 0
     
-    if( type == "HARRVJ" ){   
-      if(!is.null(transform) && transform=="log"){ J = J + 1; }
-      J = J[(maxp:(n-h)),]; 
-      x = cbind(x1,J);              # bind jumps to RV data 
-      if(!is.null(transform)){ y = Ftransform(y); x = Ftransform(x); }       
-      x = cbind(x,rmin);
-      model = estimhar(y=y,x=x); 
-      model$transform = transform; model$h = h; model$type = "HARRVJ"; model$inputType = inputType;
-      model$dates = alldates[(maxp+h):n]; model$RVest = RVest;
-      model$leverage = leverage;
-      class(model) = c("harModel","lm"); 
-      return( model )    
-    }#End HAR-RV-J if cond
-    
-    if( type == "HARRVCJ" ){ 
-     # Are the jumps significant? if not set to zero:
-     if( jumptest=="ABDJumptest" ){ 
-         TQ = apply.daily(data, TQfun); 
-         J = J[,1];
-         teststats= ABDJumptest(RV=RM1,BPV=RM2,TQ=TQ ); 
-     }else{ jtest = match.fun(jumptest); teststats = jtest(data,...) }  
-     Jindicators  = teststats > qnorm(1-alpha); 
-     J[!Jindicators] = 0;
-     
-     # Get continuus components if necessary RV measures if necessary: 
-     Cmatrix = matrix( nrow = dim(RVmatrix1)[1], ncol = 1 );
-     Cmatrix[Jindicators,]    = RVmatrix2[Jindicators,1];      #Fill with robust one in case of jump
-     Cmatrix[(!Jindicators)]  = RVmatrix1[(!Jindicators),1];   #Fill with non-robust one in case of no-jump  
-     # Aggregate again:
-     Cmatrix <- aggRV(Cmatrix,periods,type="C");
-     Jmatrix <- aggJ(J,periodsJ);
-     # subset again:
-     Cmatrix <- Cmatrix[(maxp:(n-h)),];
-     Jmatrix <- Jmatrix[(maxp:(n-h)),];   
-     if(!is.null(transform) && transform=="log"){ Jmatrix = Jmatrix + 1 }
-     
-     x = cbind(Cmatrix,Jmatrix);               # bind jumps to RV data      
-     if(!is.null(transform)){ y = Ftransform(y); x = Ftransform(x); }  
-     x = cbind(x,rmin);
-     model = estimhar( y=y, x=x ); 
-     model$transform = transform; model$h = h; model$type = "HARRVCJ"; model$inputType = inputType;
-     model$dates = alldates[(maxp+h):n]; model$RVest = RVest;
-     model$leverage = leverage;
-     model$jumptest = jumptest;
-     model$alpha_jumps = alpha;  
-     class(model) = c("harModel","lm");
-     return(model)
-    } 
-    
-    if( type == "HARRVQ"){
-      if(!is.null(transform)){
-        y = Ftransform(y); x1 = Ftransform(x1)
-        warning("The realized quarticity is already transformed with sqrt() thus only realized variance is transformed")
-      }
-      x1 = cbind(x1, RQmatrix[,1:nperiodsQ] * x1[,1:nperiodsQ])
-      if(is.null(colnames(RQmatrix))){ #special case for 1 aggregation period of realized quarticity. This appends the RQ1 name
-        colnames(x1) = c(colnames(x1[,1:nperiods]),"RQ1")
-      }
-      x1 = cbind(x1,rmin);
-      model     = estimhar(y=y,x=x1); 
-      model$fitted.values = harInsanityFilter(fittedValues = model$fitted.values, lower = min(RM1), upper = max(RM1), replacement = mean(RM1));
-      model$transform = transform; model$h = h; model$type = "HARRVQ"; model$inputType = inputType;
-      model$dates = alldates[(maxp+h):n]; 
-      model$RVest = RVest[1];
-      model$leverage = leverage;
-      class(model) = c("harModel","lm"); 
-      return( model )
+    # Get continuus components if necessary RV measures if necessary: 
+    Cmatrix <- matrix(nrow = dim(RVmatrix1)[1], ncol = 1)
+    Cmatrix[Jindicators,]    <- RVmatrix2[Jindicators, 1]   #Fill with robust one in case of jump
+    Cmatrix[(!Jindicators)]  <- RVmatrix1[(!Jindicators), 1] #Fill with non-robust one in case of no-jump  
+    # Aggregate again:
+    Cmatrix <- aggRV(Cmatrix, periods, type="C")
+    Jmatrix <- aggJ(J, periodsJ)
+    # subset again:
+    Cmatrix <- Cmatrix[(maxp:(n-h)), ]
+    Jmatrix <- Jmatrix[(maxp:(n-h)), ]   
+    if (!is.null(transform) && transform=="log") { 
+      Jmatrix <- Jmatrix + 1 
     }
     
-    if( type == "HARRVQJ"){
-      if(!is.null(transform) && transform=="log"){ J = J + 1; }
-      J = J[(maxp:(n-h)),]; 
-      if(!is.null(transform)){
-        y = Ftransform(y); x1 = Ftransform(x1)
-        warning("The realized quarticity is already transformed with sqrt() thus only realized variance is transformed")
-      }
-      x1 = cbind(x1, J, RQmatrix[,1:nperiodsQ] * x1[,1:nperiodsQ])
-      if(is.null(colnames(RQmatrix))){ #special case for 1 aggregation period of realized quarticity. This appends the RQ1 name
-        colnames(x1) = c(colnames(x1[,1:(dim(x1)[2]-1)]), "RQ1")
-      }
-      x1 = cbind(x1,rmin);
-      model     = estimhar(y=y,x=x1); 
-      model$fitted.values = harInsanityFilter(fittedValues = model$fitted.values, lower = min(RM1), upper = max(RM1), replacement = mean(RM1));
-      model$transform = transform; model$h = h; model$type = "HARRVQJ"; model$inputType = inputType;
-      model$dates = alldates[(maxp+h):n]; 
-      model$RVest = RVest[1];
-      model$leverage = leverage;
-      class(model) = c("harModel","lm"); 
-      return( model )
+    x <- cbind(Cmatrix, Jmatrix)              # bind jumps to RV data      
+    if (is.null(transform) == FALSE) { 
+      y <- Ftransform(y) 
+      x <- Ftransform(x)
+    }  
+    x <- cbind(x,rmin);
+    model <- estimhar(y = y, 
+                      x = x)
+    model$type = "HARRVCJ"
+    model$dates <- alldates[(maxp+h):n]
+    model$RVest <- RVest
+    model$jumptest <- jumptest
+    model$alpha_jumps <- alpha
+  } 
+  
+  if (type == "HARRVQ") {
+    if (is.null(transform) == FALSE) {
+      y  <- Ftransform(y)
+      x1 <- Ftransform(x1)
+      warning("The realized quarticity is already transformed with sqrt() thus only realized variance is transformed")
     }
     
-    if( type == "CHARRV" ){ 
-      if(!is.null(transform)){ y = Ftransform(y); x2 = Ftransform(x2) }
-      x2 = cbind(x2,rmin);
-      model     = estimhar(y=y,x=x2); 
-      model$transform = transform; model$h = h; model$type = "CHARRV"; model$inputType = inputType; 
-      model$dates = alldates[(maxp+h):n]; 
-      model$RVest = RVest[1];
-      model$leverage = leverage;
-      class(model) = c("harModel","lm"); 
-      return( model )
-    } #End CHAR-RV if cond
+    x1 <- cbind(x1, RQmatrix[,1:nperiodsQ] * x1[,1:nperiodsQ])
+    if (is.null(colnames(RQmatrix))) { #special case for 1 aggregation period of realized quarticity. This appends the RQ1 name
+      colnames(x1) <- c(colnames(x1[,1:nperiods]),"RQ1")
+    }
+    x1 <- cbind(x1,rmin)
+    model <- estimhar(y=y,x=x1)
+    model$fitted.values <- harInsanityFilter(fittedValues = model$fitted.values, lower = min(RM1), upper = max(RM1), replacement = mean(RM1))
+    model$type = "HARRVQ"
+    model$dates <- alldates[(maxp+h):n]
+    model$RVest <- RVest[1]
+  }
+  
+  if (type == "HARRVQJ") {
+    if (!is.null(transform) && transform == "log") {
+      J <- J + 1
+    }
+    J <- J[(maxp:(n-h)),] 
+    if (is.null(transform) == FALSE) {
+      y <- Ftransform(y); x1 = Ftransform(x1)
+      warning("The realized quarticity is already transformed with sqrt() thus only realized variance is transformed")
+    }
+    x1 <- cbind(x1, J, RQmatrix[,1:nperiodsQ] * x1[,1:nperiodsQ])
+    if(is.null(colnames(RQmatrix))){ #special case for 1 aggregation period of realized quarticity. This appends the RQ1 name
+      colnames(x1) <- c(colnames(x1[,1:(dim(x1)[2]-1)]), "RQ1")
+    }
+    x1 <- cbind(x1,rmin);
+    model <-  estimhar(y = y, x = x1) 
+    model$fitted.values <- harInsanityFilter(fittedValues = model$fitted.values, lower = min(RM1), upper = max(RM1), replacement = mean(RM1))
+    model$type <- "HARRVQJ"
+    model$dates <- alldates[(maxp+h):n]
+    model$RVest <- RVest[1]
+  }
+  
+  if (type == "CHARRV") { 
+    if (is.null(transform) == FALSE) { 
+      y  <- Ftransform(y)
+      x2 <- Ftransform(x2) 
+    }
+    x2 <- cbind(x2,rmin);
+    model <- estimhar(y=y,x=x2)
+    model$transform <- transform
+    model$type <- "CHARRV"
+    model$dates < alldates[(maxp+h):n]
+    model$RVest < RVest[1]
+  } #End CHAR-RV if cond
+  
+  if (type == "CHARRVQ") {
+    if (is.null(transform) == FALSE) {
+      y  <- Ftransform(y)
+      x2 <- Ftransform(x2)
+      warning("The realized quarticity is already transformed with sqrt() thus only realized variance and bipower variation is transformed")
+    }
+    x2 <- cbind(x2, RQmatrix[,1:nperiodsQ] * x2[,1:nperiodsQ])
     
-    if( type == "CHARRVQ"){
-      if(!is.null(transform)){
-        y = Ftransform(y); x2 = Ftransform(x2)
-        warning("The realized quarticity is already transformed with sqrt() thus only realized variance and bipower variation is transformed")
-      }
-      x2 = cbind(x2, RQmatrix[,1:nperiodsQ] * x2[,1:nperiodsQ])
-      if(is.null(colnames(RQmatrix))){ #special case for 1 aggregation period of realized quarticity. This appends the RQ1 name
-        colnames(x2) = c(colnames(x2[,1:nperiods]),"RQ1")
-      }
-      x2 = cbind(x2,rmin);
-      model     = estimhar(y=y,x=x2); 
-      model$fitted.values = harInsanityFilter(fittedValues = model$fitted.values, lower = min(RM1), upper = max(RM1), replacement = mean(RM1));
-      model$transform = transform; model$h = h; model$type = "CHARRVQ"; model$inputType = inputType;
-      model$dates = alldates[(maxp+h):n]; 
-      model$RVest = RVest[1];
-      model$leverage = leverage;
-      class(model) = c("harModel","lm"); 
-      return( model )
-    } #End CHAR-RVQ if cond
+    if (is.null(colnames(RQmatrix))) { #special case for 1 aggregation period of realized quarticity. This appends the RQ1 name
+      colnames(x2) <- c(colnames(x2[,1:nperiods]), "RQ1")
+    }
+    x2 <- cbind(x2,rmin)
+    model <- estimhar(y = y, x = x2)
+    model$fitted.values <- harInsanityFilter(fittedValues = model$fitted.values, lower = min(RM1), upper = max(RM1), replacement = mean(RM1))
+    model$type = "CHARRVQ"
+    model$dates < alldates[(maxp+h):n]
+    model$RVest <- RVest[1]
+    
+  } #End CHAR-RVQ if cond
+  
+  model$transform <- transform
+  model$inputType <- inputType
+  model$h <- h
+  model$leverage <- leverage
+  class(model) <- c("harModel","lm")
+  return (model)
     
 } #End function harModel
 #################################################################
-estimhar = function(y, x){ #Potentially add stuff here
-    colnames(y)="y";
-    output = lm( formula(y~x), data=cbind(y,x));
+estimhar <- function(y, x){ #Potentially add stuff here
+    colnames(y) = "y"
+    output = lm(formula(y ~ x), data = cbind(y, x))
 }
 
 # Help function to get nicely formatted formula's for print/summary methods..
