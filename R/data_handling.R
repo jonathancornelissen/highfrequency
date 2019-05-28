@@ -63,9 +63,9 @@ getPrice <- function (x, symbol = NULL, prefer = NULL) {
 #' should be calculated in case of multiple observation for a certain time
 #' stamp. By default, selection = "median", and the median price is taken. Alternatively:
 #' \itemize{
-#' \item selection = "maxvolume": use the (bid/ask) price of the entry with
+#' \item selection = "max.volume": use the (bid/ask) price of the entry with
 #' largest (bid/ask) volume.
-#' \item selection = "weightedaverage": take the weighted average of all bid (ask) prices,
+#' \item selection = "weighted.average": take the weighted average of all bid (ask) prices,
 #' weighted by "BIDSIZ" ("OFRSIZ").
 #' }
 #' 
@@ -75,19 +75,21 @@ getPrice <- function (x, symbol = NULL, prefer = NULL) {
 #' @keywords cleaning 
 #' @export
 mergeQuotesSameTimestamp <- function(qdata, selection = "median") {
-  BID = OFR = DT = SYMBOL = .SD = NULL 
-  checkQdata(qdata)
+  BID = OFR = DT = SYMBOL = .SD = BIDSIZ = OFRSIZ = MAXBID = MAXOFR = NULL 
   qdata <- checkColumnNames(qdata)
+  checkQdata(qdata)
   
-  condition <- selection == "median" | selection == "maxvolume" | selection == "weightedaverage"
+  condition <- selection == "median" | selection == "max.volume" | selection == "weighted.average"
   if (condition == FALSE) {
-    stop(paste("Selection has to be \"median\", \"maxvolume\" or \"weightedaverage\" "))
+    stop(paste("Selection has to be \"median\", \"max.volume\" or \"weighted.average\" "))
   }
   
   dummy_was_xts <- FALSE
   if (is.data.table(qdata) == FALSE) {
     if (is.xts(qdata) == TRUE) {
-      qdata <- setnames(as.data.table(qdata)[, BID := as.numeric(as.character(BID))][, OFR := as.numeric(as.character(OFR))], old = "index", new = "DT")
+      qdata <- setnames(as.data.table(qdata)[, BID := as.numeric(as.character(BID))][, OFR := as.numeric(as.character(OFR))]
+                        [, BIDSIZ := as.numeric(as.character(BIDSIZ))][, OFRSIZ := as.numeric(as.character(OFRSIZ))], 
+                        old = "index", new = "DT")
       dummy_was_xts <- TRUE
     } else {
       stop("Input has to be data.table or xts.")
@@ -101,46 +103,29 @@ mergeQuotesSameTimestamp <- function(qdata, selection = "median") {
   if (selection == "median") {
     qdata <- qdata[,  lapply(.SD, median), by = list(DT, SYMBOL), .SDcols = c("BID", "OFR")]
   }
-  if (selection == "maxvolume") {
-    
-  }
-  if (selection == "weightedaverage") {
-    
-  }
   
+  if (selection == "max.volume") {
+    qdata <- qdata[, MAXBID := max(BIDSIZ), by = "DT"][, MAXOFR := max(OFRSIZ), by = "DT"][
+      , BIDSIZ := ifelse(BIDSIZ == MAXBID, 1, 0)][
+      , OFRSIZ := ifelse(OFRSIZ == MAXOFR, 1, 0)][
+      , BID := BID * BIDSIZ][
+      , OFR := OFR * OFRSIZ][
+      , BID := max(BID), by = "DT"][, OFR := max(OFR), by = "DT"][, -c("MODE", "MAXBID", "MAXOFR", "BIDSIZ", "OFRSIZ")][
+      , lapply(.SD, unique), by = list(DT, SYMBOL), .SDcols = c("BID", "OFR")]
+  }
+  if (selection == "weighted.average") {
+    qdata <- qdata[, `:=` (BIDSIZ = BIDSIZ / sum(BIDSIZ), OFRSIZ = OFRSIZ / sum(OFRSIZ)), by = "DT"][
+        , `:=` (BID = sum(BID * BIDSIZ), OFR = sum(OFR * OFRSIZ)), by = "DT"][, -c("MODE", "BIDSIZ", "OFRSIZ")][
+        , lapply(.SD, unique), by = list(DT, SYMBOL), .SDcols = c("BID", "OFR")]
+  }
   if (dummy_was_xts == TRUE) {
     return(xts(as.matrix(qdata[, -c("DT")]), order.by = qdata$DT))
   } else {
     return(qdata)
   }
-  # 
-  # ep = endpoints(qdata, "secs")
-  # bidsize = period.apply(qdata$BIDSIZ, ep, sumN)
-  # offersize = period.apply(qdata$OFRSIZ, ep, sumN)
-  # if (selection == "median") {
-  #   bid = period.apply(qdata$BID, ep, medianN)
-  #   offer = period.apply(qdata$OFR, ep, medianN)
-  # }
-  # if (selection == "maxvolume") {
-  #   bid = period.apply3(cbind(qdata$BID, qdata$BIDSIZ), ep, 
-  #                       maxvol)
-  #   offer = period.apply3(cbind(qdata$OFR, qdata$OFRSIZ), 
-  #                         ep, maxvol)
-  # }
-  # if (selection == "weightedaverage") {
-  #   bid = period.apply3(cbind(qdata$BID, qdata$BIDSIZ), ep, 
-  #                       waverage)
-  #   offer = period.apply3(cbind(qdata$OFR, qdata$OFRSIZ), 
-  #                         ep, waverage)
-  # }
-  # selection = ep[2:length(ep)]
-  # ts2 = qdata[selection]
-  # ts2$BID = bid
-  # ts2$OFR = offer
-  # ts2$BIDSIZ = bidsize
-  # ts2$OFRSIZ = offersize
-  # return(ts2)
 }
+# microbenchmark::microbenchmark(quotesCleanup(qdataraw = sample_qdataraw, exchanges = "N", selection = "max.volume"), times = 10, unit = "s")
+# microbenchmark::microbenchmark(quotesCleanup(qdataraw = sample_qdataraw, exchanges = "N", selection = "maxvolume"), times = 10, unit = "s")
 
 #' Delete the observations where the bid or ask is zero
 #' @description Function deletes the observations where the bid or ask is zero.
@@ -154,8 +139,8 @@ mergeQuotesSameTimestamp <- function(qdata, selection = "median") {
 #' @export
 noZeroQuotes <- function(qdata) {
   BID = OFR = DT = NULL
-  checkQdata(qdata)
   qdata <- checkColumnNames(qdata)
+  checkQdata(qdata)
   
   dummy_was_xts <- FALSE
   if (is.data.table(qdata) == FALSE) {
@@ -191,7 +176,7 @@ noZeroQuotes <- function(qdata) {
 #' 
 #' The following cleaning steps are performed sequentially:
 #' \code{\link{noZeroQuotes}}, \code{\link{selectExchange}}, rmLargeSpread,
-#' \code{\link{mergeQuotesSameTimestamp}}, \code{\link{rmOutliers}}.
+#' \code{\link{mergeQuotesSameTimestamp}}, \code{\link{rmOutliersQuotes}}.
 #' @param from character indicating first date to clean, e.g. "2008-01-30".
 #' @param to character indicating last date to clean, e.g. "2008-01-31".
 #' @param datasource character indicating the folder in which the original data is stored.
@@ -219,9 +204,9 @@ noZeroQuotes <- function(qdata) {
 #' @param report boolean and TRUE by default. In case it is true the function returns (also) a vector indicating how many quotes remained after each cleaning step.
 #' @param selection argument to be passed on to the cleaning routine \code{\link{mergeQuotesSameTimestamp}}. The default is "median".
 #' @param maxi spreads which are greater than median(spreads of day) times maxi are excluded.
-#' @param window argument to be passed on to the cleaning routine \code{\link{rmOutliers}}. 
-#' @param type argument to be passed on to the cleaning routine \code{\link{rmOutliers}}.
-#' @param rmoutliersmaxi argument to be passed on to the cleaning routine \code{\link{rmOutliers}}.
+#' @param window argument to be passed on to the cleaning routine \code{\link{rmOutliersQuotes}}. 
+#' @param type argument to be passed on to the cleaning routine \code{\link{rmOutliersQuotes}}.
+#' @param rmoutliersmaxi argument to be passed on to the cleaning routine \code{\link{rmOutliersQuotes}}.
 #' 
 #' @return For each day an xts object is saved into the folder of that date, containing the cleaned data.
 #' This procedure is performed for each stock in "ticker".
@@ -252,7 +237,7 @@ noZeroQuotes <- function(qdata) {
 #' @keywords cleaning
 quotesCleanup <- function(from, to, datasource, datadestination, ticker, exchanges, qdataraw = NULL, report = TRUE, 
                           selection = "median", maxi = 50, window = 50, type = "advanced", rmoutliersmaxi = 10) {
-  BID = OFR = DT = SPREAD = SPREAD_MEDIAN = EX = DATE = NULL
+  BID = OFR = DT = SPREAD = SPREAD_MEDIAN = EX = DATE = BIDSIZ = OFRSIZ = NULL
   nresult <- c(initial_number = 0,
                no_zero_quotes = 0,
                select_exchange = 0,
@@ -261,13 +246,14 @@ quotesCleanup <- function(from, to, datasource, datadestination, ticker, exchang
                merge_same_timestamp = 0,
                remove_outliers = 0)
   
-  checkQdata(qdataraw)
   qdataraw <- checkColumnNames(qdataraw)
+  checkQdata(qdataraw)
   
   dummy_was_xts <- FALSE
   if (is.data.table(qdataraw) == FALSE) {
     if (is.xts(qdataraw) == TRUE) {
-      qdataraw <- setnames(as.data.table(qdataraw)[, BID := as.numeric(as.character(BID))][, OFR := as.numeric(as.character(OFR))], old = "index", new = "DT")
+      qdataraw <- setnames(as.data.table(qdataraw)[, BID := as.numeric(as.character(BID))][, OFR := as.numeric(as.character(OFR))]
+                           [, BIDSIZ := as.numeric(as.character(BIDSIZ))][, OFRSIZ := as.numeric(as.character(OFRSIZ))], old = "index", new = "DT")
       dummy_was_xts <- TRUE
     } else {
       stop("Input has to be data.table or xts.")
@@ -290,7 +276,7 @@ quotesCleanup <- function(from, to, datasource, datadestination, ticker, exchang
   qdataraw <- mergeQuotesSameTimestamp(qdata = qdataraw, selection = selection)
   nresult[6] <- dim(qdataraw)[1]
   
-  qdataraw <- rmOutliers(qdataraw, window = window, type = "advanced", maxi = rmoutliersmaxi)
+  qdataraw <- rmOutliersQuotes(qdataraw, window = window, type = "advanced", maxi = rmoutliersmaxi)
   nresult[7] <- dim(qdataraw)[1]
   if (dummy_was_xts == TRUE) {
     df_result <- xts(as.matrix(qdataraw[, -c("DT",  "DATE")]), order.by = qdataraw$DT)
@@ -320,8 +306,8 @@ quotesCleanup <- function(from, to, datasource, datadestination, ticker, exchang
 #' @keywords cleaning
 rmLargeSpread <- function(qdata, maxi = 50) {
   BID = OFR = DATE = DT = SPREAD = SPREAD_MEDIAN = NULL
-  checkQdata(qdata)
   qdataraw <- checkColumnNames(qdata)
+  checkQdata(qdata)
   dummy_was_xts <- FALSE
   if (is.data.table(qdata) == FALSE) {
     if (is.xts(qdata) == TRUE) {
@@ -338,6 +324,111 @@ rmLargeSpread <- function(qdata, maxi = 50) {
     return(xts(as.matrix(qdata[, -c("DATE")]), order.by = qdata$DT))
   } else {
     return(qdata[, -c("DATE")])
+  }
+}
+
+#' Delete entries for which the transaction price is outlying with respect to surrounding entries
+#' 
+#' @description If type = "standard": Function deletes entries for which the price deviated by more than "maxi"
+#' median absolute deviations from a rolling centered median (excluding
+#' the observation under consideration) of "window" observations.
+#' 
+#' If type = "advanced": Function deletes entries for which the price deviates by more than "maxi"
+#' median absolute deviations from the value closest to the price of
+#' these three options:
+#' \enumerate{
+#'  \item Rolling centered median (excluding the observation under consideration)
+#'  \item Rolling median of the following "window" observations
+#'  \item Rolling median of the previous "window" observations
+#' }
+#'  
+#' The advantage of this procedure compared to the "standard" proposed
+#' by Barndorff-Nielsen et al. (2010) is that it will not incorrectly remove
+#' large price jumps. Therefore this procedure has been set as the default
+#' for removing outliers. 
+#' 
+#' Note that the median absolute deviation is taken over the entire
+#' day. In case it is zero (which can happen if mid-quotes don't change much), 
+#' the median absolute deviation is taken over a subsample without constant mid-quotes.
+#' 
+#' @param pdata an data.table or xts object at least containing the columns "BID" and "OFR".
+#' @param maxi an integer, indicating the maximum number of median absolute deviations allowed.
+#' @param window an integer, indicating the time window for which the "outlyingness" is considered.
+#' @param type should be "standard" or "advanced" (see description).
+#' 
+#' @details NOTE: This function works only correct if supplied input data consists of 1 day.
+#' 
+#' @return xts object or data.table depending on type of input
+#' 
+#' @references Barndorff-Nielsen, O. E., P. R. Hansen, A. Lunde, and N. Shephard (2009). Realized kernels in practice: Trades and quotes. Econometrics Journal 12, C1-C32.
+#' 
+#' Brownlees, C.T. and Gallo, G.M. (2006). Financial econometric analysis at ultra-high frequency: Data handling concerns. Computational Statistics & Data Analysis, 51, pages 2232-2245.
+#' 
+#' @author Onno Kleen
+#' 
+#' @keywords cleaning
+#' @importFrom stats mad median
+#' @importFrom data.table as.data.table is.data.table setnames
+#' @importFrom xts is.xts as.xts
+#' @importFrom RcppRoll roll_median
+#' @export
+rmOutliersTrades <- function(pdata, maxi = 10, window = 50, type = "advanced") {
+  # NOTE: Median Absolute deviation chosen contrary to Barndorff-Nielsen et al.
+  # Setting those variables equal NULL is for suppressing NOTES in devtools::check
+  # References inside data.table-operations throw "no visible binding for global variable ..." error
+  BID = OFR = MIDQUOTE = DATE = DT = MADALL = CRITERION = PRICE = NULL
+  if ((window %% 2) != 0) {
+    stop("Window size can't be odd.")
+  }
+  
+  # 
+  qdata <- checkColumnNames(pdata)
+  checkQdata(qdata)
+  
+  dummy_was_xts <- FALSE
+  if (is.data.table(pdata) == FALSE) {
+    if (is.xts(pdata) == TRUE) {
+      pdata <- setnames(as.data.table(pdata)[, PRICE := as.numeric(as.character(PRICE))], old = "index", new = "DT")
+      dummy_was_xts <- TRUE
+    } else {
+      stop("Input has to be data.table or xts.")
+    }
+  } else {
+    if (("DT" %in% colnames(pdata)) == FALSE) {
+      stop("Data.table neeeds DT column.")
+    }
+  }
+  
+  if (length(unique(pdata$SYMBOL)) > 1) {
+    stop("Please provide only one symbol at a time.")
+  }
+  
+  if ((type %in% c("standard", "advanced")) == FALSE) {
+    stop("type has to be \"standard\" or \"advanced\".")
+  }
+  
+  # weights_med_center_incl <- rep(1, times = window + 1)
+  weights_med_center_excl <- c(rep(1, times = window / 2), 0, rep(1, times = window / 2))
+  weights_med_follow  <- c(0 , rep(1, times = window))
+  weights_med_trail    <- c(rep(1, times = window), 0)
+  
+  pdata <- pdata[, DATE := as.Date(DT)][, MADALL := mad(PRICE), by = "DATE"]
+  
+  if (type == "standard") {
+    pdata <- pdata[ , CRITERION := abs(PRICE - rolling_median_incl_ends(PRICE, window = window, weights = weights_med_center_excl))][
+      CRITERION < maxi * MADALL]
+  }
+  if (type == "advanced") {
+    pdata <- pdata[, CRITERION := pmin(abs(PRICE - rolling_median_incl_ends(PRICE, window = window, weights = weights_med_center_excl, direction = "center")),
+                                       abs(PRICE - rolling_median_incl_ends(PRICE, window = window, weights = weights_med_trail, direction = "left")),
+                                       abs(PRICE - rolling_median_incl_ends(PRICE, window = window, weights = weights_med_follow, direction = "right")),
+                                       na.rm = TRUE)][
+                                         CRITERION < maxi * MADALL]
+  }
+  if (dummy_was_xts == TRUE) {
+    return(xts(as.matrix(pdata[, -c("DT", "DATE", "MADALL", "CRITERION")]), order.by = pdata$DT))
+  } else {
+    return(pdata[, -c("MADALL", "CRITERION")])
   }
 }
 
@@ -362,7 +453,7 @@ rmLargeSpread <- function(qdata, maxi = 50) {
 #' for removing outliers. 
 #' 
 #' Note that the median absolute deviation is taken over the entire
-#' sample. In case it is zero (which can happen if mid-quotes don't change much), 
+#' day. In case it is zero (which can happen if mid-quotes don't change much), 
 #' the median absolute deviation is taken over a subsample without constant mid-quotes.
 #' 
 #' @param qdata an data.table or xts object at least containing the columns "BID" and "OFR".
@@ -386,7 +477,7 @@ rmLargeSpread <- function(qdata, maxi = 50) {
 #' @importFrom xts is.xts as.xts
 #' @importFrom RcppRoll roll_median
 #' @export
-rmOutliers <- function (qdata, maxi = 10, window = 50, type = "advanced") {
+rmOutliersQuotes <- function (qdata, maxi = 10, window = 50, type = "advanced") {
   # NOTE: Median Absolute deviation chosen contrary to Barndorff-Nielsen et al.
   # Setting those variables equal NULL is for suppressing NOTES in devtools::check
   # References inside data.table-operations throw "no visible binding for global variable ..." error
@@ -395,8 +486,8 @@ rmOutliers <- function (qdata, maxi = 10, window = 50, type = "advanced") {
     stop("Window size can't be odd.")
   }
   
-  checkQdata(qdata)
   qdata <- checkColumnNames(qdata)
+  checkQdata(qdata)
   
   dummy_was_xts <- FALSE
   if (is.data.table(qdata) == FALSE) {
@@ -425,57 +516,17 @@ rmOutliers <- function (qdata, maxi = 10, window = 50, type = "advanced") {
   weights_med_follow  <- c(0 , rep(1, times = window))
   weights_med_trail    <- c(rep(1, times = window), 0)
   
-  halfwindow <- window / 2
-  
-  # Function for calculating three different measures:
-  # 1. Rolling centered median (excluding the observation under consideration)
-  # 2. Rolling median of the following "window" observations
-  # 3. Rolling median of the previous "window" observations
-  rolling_median_incl_ends <- function(x, weights, direction = "center") {
-    
-    length_median_vec <- length(x)
-    median_vec <- rep(NA, times = length_median_vec)
-    
-    if (direction == "center") {
-      median_vec[(halfwindow + 1):(length(x) - halfwindow)] <- roll_median(x, weights = weights, fill = numeric(0))
-      
-      # We have to add the "end"-values manually as currently roll_median does not support the increasing windows specified 
-      # at the ends of the time series
-      for (ii in 1:halfwindow) {
-        median_vec[ii] <- median(c(x[0:(ii - 1)], x[(ii + 1):(ii + halfwindow)]))
-        median_vec[length_median_vec - ii + 1] <- 
-          median(c(x[(length_median_vec - ii + 1 - halfwindow):(length_median_vec - ii)], 
-                   x[(length_median_vec - ii + 2):(length_median_vec + 1)]), na.rm = TRUE)
-      }
-    }
-    if (direction == "left") {
-      median_vec[(window + 1):length(x)] <- roll_median(x, weights = weights, fill = numeric(0))
-      for (ii in 2:window) {
-        median_vec[ii] <- median(x[0:(ii - 1)])
-      }
-    }
-    if (direction == "right") {
-      median_vec[1:(length(x) - window)] <- roll_median(x, weights = weights, fill = numeric(0))
-      for (ii in 2:window) {
-        median_vec[length_median_vec - ii + 1] <-
-          median(x[(length_median_vec - ii + 1 - window):length_median_vec])
-      }
-    }
-    
-    median_vec
-  }
-  
   qdata <- qdata[, MIDQUOTE := (BID + OFR) / 2][, DATE := as.Date(DT)][, MADALL := mad(MIDQUOTE), by = "DATE"]
   
   if (type == "standard") {
-    qdata <- qdata[ , CRITERION := abs(MIDQUOTE - rolling_median_incl_ends(MIDQUOTE, weights = weights_med_center_excl))][
+    qdata <- qdata[ , CRITERION := abs(MIDQUOTE - rolling_median_incl_ends(MIDQUOTE, window = window, weights = weights_med_center_excl))][
       CRITERION < maxi * MADALL]
     
   }
   if (type == "advanced") {
-    qdata <- qdata[, CRITERION := pmin(abs(MIDQUOTE - rolling_median_incl_ends(MIDQUOTE, weights = weights_med_center_excl, direction = "center")),
-                                       abs(MIDQUOTE - rolling_median_incl_ends(MIDQUOTE, weights = weights_med_trail, direction = "left")),
-                                       abs(MIDQUOTE - rolling_median_incl_ends(MIDQUOTE, weights = weights_med_follow, direction = "right")),
+    qdata <- qdata[, CRITERION := pmin(abs(MIDQUOTE - rolling_median_incl_ends(MIDQUOTE, window = window, weights = weights_med_center_excl, direction = "center")),
+                                       abs(MIDQUOTE - rolling_median_incl_ends(MIDQUOTE, window = window, weights = weights_med_trail, direction = "left")),
+                                       abs(MIDQUOTE - rolling_median_incl_ends(MIDQUOTE, window = window, weights = weights_med_follow, direction = "right")),
                                        na.rm = TRUE)][
                                          CRITERION < maxi * MADALL]
   }
@@ -514,8 +565,8 @@ rmOutliers <- function (qdata, maxi = 10, window = 50, type = "advanced") {
 #' @export
 selectExchange <- function(data, exch = "N") { 
   EX = NULL
-  checkQdata(data)
   data <- checkColumnNames(data)
+  checkQdata(data)
   
   if (is.data.table(data) == FALSE) {
     if (is.xts(data) == TRUE) {
@@ -530,7 +581,6 @@ selectExchange <- function(data, exch = "N") {
     }
     return(data[EX %in% exch])
   }
-  
 }
 
 tradesCleanup <- function(from, to, datasource, datadestination, ticker, exchanges, tdataraw = NULL, report = TRUE, selection = "median") {

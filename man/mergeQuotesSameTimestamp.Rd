@@ -16,9 +16,9 @@ prices. For data.table an additional column "DT" is necessary that stores the da
 should be calculated in case of multiple observation for a certain time
 stamp. By default, selection = "median", and the median price is taken. Alternatively:
 \itemize{
-\item selection = "maxvolume": use the (bid/ask) price of the entry with
+\item selection = "max.volume": use the (bid/ask) price of the entry with
 largest (bid/ask) volume.
-\item selection = "weightedaverage": take the weighted average of all bid (ask) prices,
+\item selection = "weighted.average": take the weighted average of all bid (ask) prices,
 weighted by "BIDSIZ" ("OFRSIZ").
 }}
 }

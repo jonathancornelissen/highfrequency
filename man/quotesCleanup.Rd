@@ -46,11 +46,11 @@ from, to, datasource and datadestination will be ignored. (only advisable for sm
 
 \item{maxi}{spreads which are greater than median(spreads of day) times maxi are excluded.}
 
-\item{window}{argument to be passed on to the cleaning routine \code{\link{rmOutliers}}.}
+\item{window}{argument to be passed on to the cleaning routine \code{\link{rmOutliersQuotes}}.}
 
-\item{type}{argument to be passed on to the cleaning routine \code{\link{rmOutliers}}.}
+\item{type}{argument to be passed on to the cleaning routine \code{\link{rmOutliersQuotes}}.}
 
-\item{rmoutliersmaxi}{argument to be passed on to the cleaning routine \code{\link{rmOutliers}}.}
+\item{rmoutliersmaxi}{argument to be passed on to the cleaning routine \code{\link{rmOutliersQuotes}}.}
 }
 \value{
 For each day an xts object is saved into the folder of that date, containing the cleaned data.
@@ -69,7 +69,7 @@ and the function returns a list with the cleaned quotes as xts object (see examp
 
 The following cleaning steps are performed sequentially:
 \code{\link{noZeroQuotes}}, \code{\link{selectExchange}}, rmLargeSpread,
-\code{\link{mergeQuotesSameTimestamp}}, \code{\link{rmOutliers}}.
+\code{\link{mergeQuotesSameTimestamp}}, \code{\link{rmOutliersQuotes}}.
 }
 \examples{
 # Consider you have raw quote data for 1 stock for 1 day 

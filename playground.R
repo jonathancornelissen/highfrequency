@@ -32,6 +32,8 @@ test_df[, lapply(.SD, mean), by = "low_freq"]
 test_taq <- fread("unzip -p taqdata/CAT/CATjan2018.zip")
 test_taq_quotes <- fread("unzip -p taqdata/CAT/CATjan2018quotes.zip")
 
+blub <- test_taq_quotes[DATE == 20180102][, DT := as.POSIXct(substring(paste(as.character(DATE), TIME_M, sep = " "), 1, 20), tz = "EST", format = "%Y%m%d %H:%M:%OS")]
+
 test_taq_nyse <- test_taq[PRICE != 0 & EX == "N"]
 test_taq_nyse_quotes <- test_taq_quotes[BID != 0 & ASK != 0 & EX == "N"][ ,
   DT := as.POSIXct(substring(paste(as.character(DATE), TIME_M, sep = " "), 1, 20), tz = "EST", format = "%Y%m%d %H:%M:%OS")]

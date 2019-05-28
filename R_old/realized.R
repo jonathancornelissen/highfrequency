@@ -3545,24 +3545,14 @@ autoSelectExchangeQuotes = function(qdata){
 
 
 
-rmNegativeSpread = function(qdata){
-  qdata = .check_data(qdata);
-  qdatacheck(qdata);
-  ##function to remove observations with negative spread
-  condition = as.numeric(qdata$OFR)>as.numeric(qdata$BID);
-  qdata[condition];
-}
-
-
-# rmLargeSpread = function(qdata,maxi=50){
-#   qdata = .check_data(qdata);  
+# rmNegativeSpread = function(qdata){
+#   qdata = .check_data(qdata);
 #   qdatacheck(qdata);
-#   ##function to remove observations with a spread larger than 50 times the median spread that day
-#   ###WATCH OUT: works only correct if supplied input data consists of 1 day...
-#   spread = as.numeric(qdata$OFR)-as.numeric(qdata$BID);
-#   condition = ((maxi*median(spread))>spread);
-#   return(qdata[condition])
+#   ##function to remove observations with negative spread
+#   condition = as.numeric(qdata$OFR)>as.numeric(qdata$BID);
+#   qdata[condition];
 # }
+
 
 # Zivot : 
 correctedTrades <- function (tdata){ 

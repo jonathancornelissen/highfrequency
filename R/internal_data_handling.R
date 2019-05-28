@@ -20,6 +20,8 @@ checkColumnNames <- function(data) {
   try((colnames(data)[xtsAttributes(data)[['Bid']]] = 'BID'))
   # Adjust Ask col naming:    
   try((colnames(data)[xtsAttributes(data)[['Ask']]] = 'OFR'))
+  # Adjust SYMBOL col naming:    
+  try((colnames(data)[xtsAttributes(data)[['SYM_ROOT']]] = 'SYMBOL'))
   
   # Adjust Ask size col naming:
   try((colnames(data)[xtsAttributes(data)[['BidSize']]] = 'BIDSIZ'))
@@ -295,6 +297,46 @@ checkQdata <- function(qdata) {
       stop("Column OFR should be of type double.")
     }
   }
+}
+
+# Function for calculating three different measures:
+# 1. Rolling centered median (excluding the observation under consideration)
+# 2. Rolling median of the following "window" observations
+# 3. Rolling median of the previous "window" observations
+#' @keywords internal
+rolling_median_incl_ends <- function(x, weights, window, direction = "center") {
+  
+  length_median_vec <- length(x)
+  median_vec <- rep(NA, times = length_median_vec)
+  halfwindow <- window / 2
+  
+  if (direction == "center") {
+    median_vec[(halfwindow + 1):(length(x) - halfwindow)] <- roll_median(x, weights = weights, fill = numeric(0))
+    
+    # We have to add the "end"-values manually as currently roll_median does not support the increasing windows specified 
+    # at the ends of the time series
+    for (ii in 1:halfwindow) {
+      median_vec[ii] <- median(c(x[0:(ii - 1)], x[(ii + 1):(ii + halfwindow)]))
+      median_vec[length_median_vec - ii + 1] <- 
+        median(c(x[(length_median_vec - ii + 1 - halfwindow):(length_median_vec - ii)], 
+                 x[(length_median_vec - ii + 2):(length_median_vec + 1)]), na.rm = TRUE)
+    }
+  }
+  if (direction == "left") {
+    median_vec[(window + 1):length(x)] <- roll_median(x, weights = weights, fill = numeric(0))
+    for (ii in 2:window) {
+      median_vec[ii] <- median(x[0:(ii - 1)])
+    }
+  }
+  if (direction == "right") {
+    median_vec[1:(length(x) - window)] <- roll_median(x, weights = weights, fill = numeric(0))
+    for (ii in 2:window) {
+      median_vec[length_median_vec - ii + 1] <-
+        median(x[(length_median_vec - ii + 1 - window):length_median_vec])
+    }
+  }
+  
+  median_vec
 }
 
 # Column setting functions
