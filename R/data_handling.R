@@ -318,6 +318,7 @@ quotesCleanup <- function(from, to, datasource, datadestination, ticker, exchang
 #' @author Jonathan Cornelissen and Kris Boudt
 #' @keywords cleaning
 rmLargeSpread <- function(qdata, maxi = 50) {
+  BID = OFR = DATE = DT = SPREAD = SPREAD_MEDIAN = NULL
   checkQdata(qdata)
   qdataraw <- checkColumnNames(qdata)
   dummy_was_xts <- FALSE
@@ -510,10 +511,10 @@ rmOutliers <- function (qdata, maxi = 10, window = 50, type = "advanced") {
 #' @author Jonathan Cornelissen and Kris Boudt
 #' @keywords cleaning
 #' @export
-selectExchange <- function(data, exch = "N") { 
-  
+selectExchange <- function(qdata, exch = "N") { 
+  EX = NULL
   checkQdata(qdata)
-  qdataraw <- checkColumnNames(qdata)
+  qdata <- checkColumnNames(qdata)
   
   if (is.data.table(qdata) == FALSE) {
     if (is.xts(qdata) == TRUE) {
