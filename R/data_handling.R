@@ -188,8 +188,8 @@ noZeroQuotes <- function(qdata) {
 #' In case you supply the argument "rawqdata", the on-disk functionality is ignored
 #' and the function returns a list with the cleaned quotes as xts object (see examples).
 #' 
-#' The following cleaning functions are performed sequentially:
-#' \code{\link{noZeroQuotes}}, \code{\link{selectExchange}}, \code{\link{rmLargeSpread}},
+#' The following cleaning steps are performed sequentially:
+#' \code{\link{noZeroQuotes}}, \code{\link{selectExchange}}, rmLargeSpread,
 #' \code{\link{mergeQuotesSameTimestamp}}, \code{\link{rmOutliers}}.
 #' @param from character indicating first date to clean, e.g. "2008-01-30".
 #' @param to character indicating last date to clean, e.g. "2008-01-31".
@@ -217,7 +217,7 @@ noZeroQuotes <- function(qdata) {
 #' from, to, datasource and datadestination will be ignored. (only advisable for small chunks of data)
 #' @param report boolean and TRUE by default. In case it is true the function returns (also) a vector indicating how many quotes remained after each cleaning step.
 #' @param selection argument to be passed on to the cleaning routine \code{\link{mergeQuotesSameTimestamp}}. The default is "median".
-#' @param maxi argument to be passed on to the cleaning routine \code{\link{rmLargeSpread}}. 
+#' @param maxi spreads which are greater than median(spreads of day) times maxi are excluded.
 #' @param window argument to be passed on to the cleaning routine \code{\link{rmOutliers}}. 
 #' @param type argument to be passed on to the cleaning routine \code{\link{rmOutliers}}.
 #' @param rmoutliersmaxi argument to be passed on to the cleaning routine \code{\link{rmOutliers}}.
@@ -301,6 +301,41 @@ quotesCleanup <- function(from, to, datasource, datadestination, ticker, exchang
     return(list(qdata = df_result, report = nresult))
   } else {
     return(df_result)
+  }
+}
+
+#' Delete entries for which the spread is more than "maxi" times the median spread
+#' 
+#' @description Function deletes entries for which the spread is more than "maxi" times the median
+#' spread on that day.
+#' 
+#' @param qdata an xts or data.table object at least containing the columns "BID" and "OFR".
+#' @param maxi an integer. By default maxi = "50", which means that entries are deleted 
+#' if the spread is more than 50 times the median spread on that day.
+#' 
+#' @return xts or data.table object depending on input.
+#' 
+#' @author Jonathan Cornelissen and Kris Boudt
+#' @keywords cleaning
+rmLargeSpread <- function(qdata, maxi = 50) {
+  checkQdata(qdata)
+  qdataraw <- checkColumnNames(qdata)
+  dummy_was_xts <- FALSE
+  if (is.data.table(qdata) == FALSE) {
+    if (is.xts(qdata) == TRUE) {
+      qdata <- setnames(as.data.table(qdata)[, BID := as.numeric(as.character(BID))][, OFR := as.numeric(as.character(OFR))], old = "index", new = "DT")
+      dummy_was_xts <- TRUE
+    } else {
+      stop("Input has to be data.table or xts.")
+    }
+  } 
+  
+  qdataraw <- qdataraw[, DATE := as.Date(DT)][, SPREAD_MEDIAN := median(SPREAD), by = "DATE"][SPREAD < (SPREAD_MEDIAN * maxi)]
+  
+  if (dummy_was_xts == TRUE) {
+    return(xts(as.matrix(qdata[, -c("DATE")]), order.by = qdata$DT))
+  } else {
+    return(qdata[, -c("DATE")])
   }
 }
 
@@ -449,6 +484,52 @@ rmOutliers <- function (qdata, maxi = 10, window = 50, type = "advanced") {
   }
 }
 
+#' Retain only data from a single stock exchange
+#' @description Function returns an xts object containing the data of only 1 stock exchange.
+#' 
+#' @param data an xts or data.table object containing the time series data. 
+#' The object should have a column "EX", indicating the exchange by its symbol.
+#' @param exch The (vector of) symbol(s) of the stock exchange(s) that should be selected.
+#' By default the NYSE is chosen (exch="N"). Other exchange symbols are:
+#' \itemize{
+#' \item A: AMEX
+#' \item N: NYSE
+#' \item B: Boston
+#' \item P: Arca
+#' \item C: NSX
+#' \item T/Q: NASDAQ
+#' \item D: NASD ADF and TRF
+#' \item X: Philadelphia
+#' \item I: ISE
+#' \item M: Chicago
+#' \item W: CBOE
+#' \item Z: BATS
+#' }
+#' @return xts or data.table object depending on input
+#' 
+#' @author Jonathan Cornelissen and Kris Boudt
+#' @keywords cleaning
+#' @export
+selectExchange <- function(data, exch = "N") { 
+  
+  checkQdata(qdata)
+  qdataraw <- checkColumnNames(qdata)
+  
+  if (is.data.table(qdata) == FALSE) {
+    if (is.xts(qdata) == TRUE) {
+      filteredts <- data[is.element(data$EX , exch)]
+      return(filteredts)
+    } else {
+      stop("Input has to be data.table or xts.")
+    }
+  } else {
+    if (("DT" %in% colnames(qdata)) == FALSE) {
+      stop("Data.table neeeds DT column.")
+    }
+    return(qdata[EX %in% exch])
+  }
+  
+}
 
 tradesCleanup <- function(from, to, datasource, datadestination, ticker, exchanges, tdataraw = NULL, report = TRUE, selection = "median") {
   #requireNamespace('timeDate')

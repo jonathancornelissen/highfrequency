@@ -4,16 +4,20 @@
 \alias{quotesCleanup}
 \title{Cleans quote data}
 \usage{
-quotesCleanup(qdataraw = NULL, report = TRUE, selection = "median",
-  exchanges = NULL, maxi = 50, window = 50)
+quotesCleanup(from, to, datasource, datadestination, ticker, exchanges,
+  qdataraw = NULL, report = TRUE, selection = "median", maxi = 50,
+  window = 50, type = "advanced", rmoutliersmaxi = 10)
 }
 \arguments{
-\item{qdataraw}{xts or data.table object containing (ONE stock only) raw quote data. This argument is NULL by default. Enabling it means the arguments
-from, to, datasource and datadestination will be ignored. (only advisable for small chunks of data)}
+\item{from}{character indicating first date to clean, e.g. "2008-01-30".}
 
-\item{report}{boolean and TRUE by default. In case it is true the function returns (also) a vector indicating how many quotes remained after each cleaning step.}
+\item{to}{character indicating last date to clean, e.g. "2008-01-31".}
 
-\item{selection}{argument to be passed on to the cleaning routine \code{\link{mergeQuotesSameTimestamp}}. The default is "median".}
+\item{datasource}{character indicating the folder in which the original data is stored.}
+
+\item{datadestination}{character indicating the folder in which the cleaned data is stored.}
+
+\item{ticker}{vector of tickers for which the data should be cleaned, e.g. ticker = c("AAPL","AIG").}
 
 \item{exchanges}{vector of stock exchange symbols for all tickers in vector "ticker". It thus should have the same length as the vector ticker.
 Only data from one single exchange will be retained for each stock respectively, e.g. exchanges = c("T","N").
@@ -33,19 +37,16 @@ The possible exchange symbols are:
 \item Z: BATS
 }}
 
-\item{maxi}{argument to be passed on to the cleaning routine \code{\link{rmLargeSpread}}.}
+\item{qdataraw}{xts or data.table object containing (ONE stock only) raw quote data. This argument is NULL by default. Enabling it means the arguments
+from, to, datasource and datadestination will be ignored. (only advisable for small chunks of data)}
+
+\item{report}{boolean and TRUE by default. In case it is true the function returns (also) a vector indicating how many quotes remained after each cleaning step.}
+
+\item{selection}{argument to be passed on to the cleaning routine \code{\link{mergeQuotesSameTimestamp}}. The default is "median".}
+
+\item{maxi}{spreads which are greater than median(spreads of day) times maxi are excluded.}
 
 \item{window}{argument to be passed on to the cleaning routine \code{\link{rmOutliers}}.}
-
-\item{from}{character indicating first date to clean, e.g. "2008-01-30".}
-
-\item{to}{character indicating last date to clean, e.g. "2008-01-31".}
-
-\item{datasource}{character indicating the folder in which the original data is stored.}
-
-\item{datadestination}{character indicating the folder in which the cleaned data is stored.}
-
-\item{ticker}{vector of tickers for which the data should be cleaned, e.g. ticker = c("AAPL","AIG").}
 
 \item{type}{argument to be passed on to the cleaning routine \code{\link{rmOutliers}}.}
 
@@ -66,8 +67,8 @@ The result is saved in the folder datadestination.
 In case you supply the argument "rawqdata", the on-disk functionality is ignored
 and the function returns a list with the cleaned quotes as xts object (see examples).
 
-The following cleaning functions are performed sequentially:
-\code{\link{noZeroQuotes}}, \code{\link{selectExchange}}, \code{\link{rmLargeSpread}},
+The following cleaning steps are performed sequentially:
+\code{\link{noZeroQuotes}}, \code{\link{selectExchange}}, rmLargeSpread,
 \code{\link{mergeQuotesSameTimestamp}}, \code{\link{rmOutliers}}.
 }
 \examples{

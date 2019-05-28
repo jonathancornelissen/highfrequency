@@ -3367,21 +3367,15 @@ exchangeHoursOnly <- function(data, daybegin = "09:30:00", dayend = "16:00:00") 
   return(filteredts);
 }
 
-noZeroPrices = function(tdata){
-  tdata = .check_data(tdata)
-  tdatacheck(tdata)
-  ####FUNCTION TO DELETE ZERO PRICES: nozeroprices
-  filteredts = tdata[as.numeric(tdata$PRICE)!= 0]
-  return(filteredts)
-}
+# noZeroPrices = function(tdata){
+#   tdata = .check_data(tdata)
+#   tdatacheck(tdata)
+#   ####FUNCTION TO DELETE ZERO PRICES: nozeroprices
+#   filteredts = tdata[as.numeric(tdata$PRICE)!= 0]
+#   return(filteredts)
+# }
 
-selectExchange = function(data, exch = "N"){ 
-  data = .check_data(data);
-  ###FUNCTION TO SELECT THE OBSERVATIONS OF A SINGLE EXCHANGE: selectexchange
-  #filteredts = data[data$EX==exch];
-  filteredts = data[is.element(data$EX , exch)]
-  return(filteredts);
-}
+
 
 autoSelectExchangeTrades = function(tdata){
   tdata = .check_data(tdata);
@@ -3560,15 +3554,15 @@ rmNegativeSpread = function(qdata){
 }
 
 
-rmLargeSpread = function(qdata,maxi=50){
-  qdata = .check_data(qdata);  
-  qdatacheck(qdata);
-  ##function to remove observations with a spread larger than 50 times the median spread that day
-  ###WATCH OUT: works only correct if supplied input data consists of 1 day...
-  spread = as.numeric(qdata$OFR)-as.numeric(qdata$BID);
-  condition = ((maxi*median(spread))>spread);
-  return(qdata[condition])
-}
+# rmLargeSpread = function(qdata,maxi=50){
+#   qdata = .check_data(qdata);  
+#   qdatacheck(qdata);
+#   ##function to remove observations with a spread larger than 50 times the median spread that day
+#   ###WATCH OUT: works only correct if supplied input data consists of 1 day...
+#   spread = as.numeric(qdata$OFR)-as.numeric(qdata$BID);
+#   condition = ((maxi*median(spread))>spread);
+#   return(qdata[condition])
+# }
 
 # Zivot : 
 correctedTrades <- function (tdata){ 

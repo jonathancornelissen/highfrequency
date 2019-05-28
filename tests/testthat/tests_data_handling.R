@@ -1,4 +1,6 @@
+
+
 expect_equal(
-  formatC(JOjumptest(sample_5minprices_jumps[,1], power = 6)$ztest, digits = 10),
-  "8.998787842"
+  quotesCleanup(qdataraw = sample_qdataraw, exchanges = "N")$report["remove_outliers"],
+  c(remove_outliers = 7706)
 )
