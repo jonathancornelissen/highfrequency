@@ -276,11 +276,24 @@ checkQdata <- function(qdata) {
   if (is.xts(qdata) == FALSE & is.data.table(qdata) == FALSE) {
     stop("The argument qdata should be an data.table or xts object.")
   }
-  if (any(colnames(qdata)=="BID") == FALSE) {
+  
+  if (any(colnames(qdata) == "BID") == FALSE) {
     stop("The argument qdata should have a column containing the BID. Could not find that column.")
   }
-  if (any(colnames(qdata)=="OFR") == FALSE) {
+  if (any(colnames(qdata) == "OFR") == FALSE) {
     stop("The argument qdata should have a column containing the ASK / OFR. Could not find that column.")
+  }
+  if (any(colnames(qdata) == "SYMBOL") == FALSE) {
+    stop("The argument qdata should have a column containing SYMBOL. Could not find that column.")
+  }
+  
+  if (is.data.table(qdata) == TRUE) {
+    if (typeof(qdata$BID) != "double") {
+      stop("Column BID should be of type double.")
+    }
+    if (typeof(qdata$OFR) != "double") {
+      stop("Column OFR should be of type double.")
+    }
   }
 }
 

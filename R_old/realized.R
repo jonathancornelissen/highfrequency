@@ -1283,8 +1283,9 @@ rCumSum <- function(x, period = 1, align.by="seconds", align.period=1, plotit=FA
 } 
 
 #Scatter returns:
-rScatterReturns <- function(x,y, period, align.by="seconds", align.period=1,numbers=FALSE,xlim= NULL, ylim=NULL, plotit=TRUE, pch=NULL, cts=TRUE, makeReturns=FALSE, scale.size=0, col.change=FALSE,...) {
-  multixts = .multixts(x) || .multixts(y);
+rScatterReturns <- function(x, y, period, align.by = "seconds", align.period = 1, numbers = FALSE, xlim = NULL, ylim = NULL, 
+                            plotit = TRUE, pch = NULL, cts = TRUE, makeReturns = FALSE, scale.size = 0, col.change = FALSE,...) {
+  multixts = .multixts(x) || .multixts(y)
   if( multixts ){ stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")}     
   
     align.period = .getAlignPeriod(align.period, align.by) 
@@ -3508,7 +3509,7 @@ noZeroQuotes = function(qdata){
   qdata = .check_data(qdata);  
   qdatacheck(qdata);
   ####FUNCTION TO DELETE ZERO QUOTES: nozeroquotes
-  filteredts = qdata[as.numeric(qdata$BID)!= 0& as.numeric(qdata$OFR)!= 0];
+  filteredts = qdata[as.numeric(qdata$BID)!= 0 & as.numeric(qdata$OFR)!= 0];
   return(filteredts);
 }
 
@@ -3547,43 +3548,7 @@ autoSelectExchangeQuotes = function(qdata){
 }
 
 
-mergeQuotesSameTimestamp = function (qdata, selection = "median") 
-{
-  qdata = .check_data(qdata)
-  qdatacheck(qdata)
-  condition = selection == "median" | selection == "maxvolume" | 
-    selection == "weightedaverage"
-  if (!condition) {
-    print(paste("WARNING:The result will be corrupted. Check whether", 
-                selection, "is an existing option for the attribute selection."))
-  }
-  ep = endpoints(qdata, "secs")
-  bidsize = period.apply(qdata$BIDSIZ, ep, sumN)
-  offersize = period.apply(qdata$OFRSIZ, ep, sumN)
-  if (selection == "median") {
-    bid = period.apply(qdata$BID, ep, medianN)
-    offer = period.apply(qdata$OFR, ep, medianN)
-  }
-  if (selection == "maxvolume") {
-    bid = period.apply3(cbind(qdata$BID, qdata$BIDSIZ), ep, 
-                        maxvol)
-    offer = period.apply3(cbind(qdata$OFR, qdata$OFRSIZ), 
-                          ep, maxvol)
-  }
-  if (selection == "weightedaverage") {
-    bid = period.apply3(cbind(qdata$BID, qdata$BIDSIZ), ep, 
-                        waverage)
-    offer = period.apply3(cbind(qdata$OFR, qdata$OFRSIZ), 
-                          ep, waverage)
-  }
-  selection = ep[2:length(ep)]
-  ts2 = qdata[selection]
-  ts2$BID = bid
-  ts2$OFR = offer
-  ts2$BIDSIZ = bidsize
-  ts2$OFRSIZ = offersize
-  return(ts2)
-}
+
 
 
 rmNegativeSpread = function(qdata){
@@ -3652,8 +3617,7 @@ period.apply2 = function (x, INDEX, FUN2, ...)
 }
 
 ## AGGREGATION;
-aggregatets = function (ts, FUN = "previoustick", on = "minutes", k = 1, weights = NULL,dropna=FALSE) 
-{
+aggregatets = function (ts, FUN = "previoustick", on = "minutes", k = 1, weights = NULL,dropna=FALSE) {
   makethispartbetter = ((!is.null(weights))| on=="days"|on=="weeks"| (FUN!="previoustick")|dropna);
   if(makethispartbetter)  {
     

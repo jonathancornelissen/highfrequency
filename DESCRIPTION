@@ -40,7 +40,8 @@ Imports:
     timeDate,
     MASS,
     data.table,
-    RcppRoll
+    RcppRoll,
+    bit64
 LinkingTo: Rcpp, RcppArmadillo
 Suggests:
     covr,

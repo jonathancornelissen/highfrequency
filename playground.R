@@ -29,13 +29,16 @@ test_df[, lapply(.SD, mean), by = "low_freq"]
 
 ?highfrequency::tradesCleanup
 
-test_taq <- fread("unzip -p taqdata/CATjan2018.zip")
+test_taq <- fread("unzip -p taqdata/CAT/CATjan2018.zip")
+test_taq_quotes <- fread("unzip -p taqdata/CAT/CATjan2018quotes.zip")
 
 test_taq_nyse <- test_taq[PRICE != 0 & EX == "N"]
+test_taq_nyse_quotes <- test_taq_quotes[BID != 0 & ASK != 0 & EX == "N"][ ,
+  DT := as.POSIXct(substring(paste(as.character(DATE), TIME_M, sep = " "), 1, 20), tz = "EST", format = "%Y%m%d %H:%M:%OS")]
 
-test_taq_nyse[, DT := as_date(DA)] %>% print()
+test_taq_nyse[, DT := as_date(DATE)] %>% print()
 
-blub2 <- test_taq_nyse[, DT := paste(as_datetime(as.character(DATE), format = "%Y%m%d"), TIME_M, sep = "T")]
+# blub2 <- test_taq_nyse[, DT := paste(as_datetime(as.character(DATE), format = "%Y%m%d"), TIME_M, sep = "T")]
 
 
 
@@ -45,6 +48,13 @@ blub2[, lapply(.SD, median), by = .(DT, SYM_ROOT), .SDcols = c("PRICE")]
 
 # blub2[, .(median(PRICE)), .keyby = .(DT, SYM_ROOT)]
 
+dt_sample_qdataraw <- setnames(as.data.table(sample_qdataraw), old = "index", new = "DT")
+
+microbenchmark::microbenchmark(noZeroQuotes(dt_sample_qdataraw), times = 10, unit = "s")
+
+microbenchmark::microbenchmark(xts_cleaned <- {tdata_afterfirstcleaning <- highfrequency::tradesCleanup(tdataraw = sample_tdataraw, exchanges = list("N"))}$tdata, times = 10, unit = "s")
+
+microbenchmark::microbenchmark({dt_cleaned <- dt_sample_tdataraw[PRICE != 0 & EX == "N" & COND %in% c("E", "F")][,  lapply(.SD, median), by = .(index, SYMBOL), .SDcols = c("PRICE")]}, times = 10, unit = "s")
 
 # Check speed!
 
