@@ -105,6 +105,7 @@ mergeQuotesSameTimestamp <- function(qdata, selection = "median") {
     
   }
   if (selection == "weightedaverage") {
+    
   }
   
   if (dummy_was_xts == TRUE) {
@@ -511,23 +512,23 @@ rmOutliers <- function (qdata, maxi = 10, window = 50, type = "advanced") {
 #' @author Jonathan Cornelissen and Kris Boudt
 #' @keywords cleaning
 #' @export
-selectExchange <- function(qdata, exch = "N") { 
+selectExchange <- function(data, exch = "N") { 
   EX = NULL
-  checkQdata(qdata)
-  qdata <- checkColumnNames(qdata)
+  checkQdata(data)
+  data <- checkColumnNames(data)
   
-  if (is.data.table(qdata) == FALSE) {
-    if (is.xts(qdata) == TRUE) {
+  if (is.data.table(data) == FALSE) {
+    if (is.xts(data) == TRUE) {
       filteredts <- data[is.element(data$EX , exch)]
       return(filteredts)
     } else {
       stop("Input has to be data.table or xts.")
     }
   } else {
-    if (("DT" %in% colnames(qdata)) == FALSE) {
+    if (("DT" %in% colnames(data)) == FALSE) {
       stop("Data.table neeeds DT column.")
     }
-    return(qdata[EX %in% exch])
+    return(data[EX %in% exch])
   }
   
 }
