@@ -73,20 +73,6 @@ makePsd <- function(S, method = "covariance") {
   }
 }
 
-#' @importFrom xts xts
-#' @importFrom zoo index
-#' @keywords internal
-makeReturns <- function (ts) {
-  l <- dim(ts)[1]
-  col_names <- names(ts)
-  x <- matrix(as.numeric(ts), nrow = l)
-  x[(2:l), ] <- log(x[(2:l), ]) - log(x[(1:(l - 1)), ])
-  x[1, ] <- rep(0, dim(ts)[2])
-  x <- xts(x, order.by = index(ts))
-  names(x) <- col_names
-  return(x)
-}
-
 #' @importFrom xts is.xts
 #' @importFrom xts ndays
 #' @keywords internal

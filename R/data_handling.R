@@ -50,6 +50,34 @@ getPrice <- function (x, symbol = NULL, prefer = NULL) {
   }
 }
 
+#' Compute log returns
+#' @description Function returns an xts object with the log returns as xts object.
+#' 
+#' \deqn{
+#' \mbox{log return}_t =  (\log(\mbox{PRICE}_{t})-\log(\mbox{PRICE}_{t-1})).
+#' }
+#' 
+#' @param ts xts object
+#' 
+#' @return an xts object containing the log returns.
+#' 
+#' @details Note: the first (row of) observation(s) is set to zero.
+#' 
+#' @author Jonathan Cornelissen and Kris Boudt
+#' @importFrom xts xts 
+#' @importFrom zoo index
+#' @export
+makeReturns <- function(ts) {
+  l <- dim(ts)[1]
+  col_names <- names(ts)
+  x <- matrix(as.numeric(ts), nrow = l)
+  x[(2:l), ] <- log(x[(2:l), ]) - log(x[(1:(l - 1)), ])
+  x[1, ] <- rep(0, dim(ts)[2])
+  x <- xts(x, order.by = index(ts))
+  names(x) <- col_names
+  return(x)
+}
+
 #' Merge multiple quote entries with the same time stamp
 #' 
 #' @description Function replaces multiple quote entries that have the same time stamp 

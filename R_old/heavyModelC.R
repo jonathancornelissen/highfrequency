@@ -65,33 +65,7 @@
 # }
 # 
 # 
-# ### ivInference help functions:
-# ##IQ estimator:
-# .hatiq = function (rdata, IQestimator)
-# {
-#   switch(IQestimator,
-#          rQuar = rQuar(rdata),
-#          QP = rQPVar(rdata),
-#          TP = rTPVar(rdata),
-#          minRQ = minRQ(rdata),
-#          medRQ = medRQ(rdata),
-#          CTTPV = .ctTPV(rdata))
-# }
-# 
-# 
-# ##Standard error of IVestimator:
-# # Reference can be found at: Andersen, T. G., D. Dobrev, and E. Schaumburg (2012).
-# #Jump-robust volatility estimation using nearest neighbor truncation. Journal of Econometrics, 169(1), 75- 93.
-# 
-# .IV=function(IVestimator,iq)
-# {
-#   switch(IVestimator,
-#          RV= sqrt(2*iq),
-#          BV= sqrt(2.61*iq),
-#          TV= sqrt(3.06*iq),
-#          minRV= sqrt(3.81*iq),
-#          medRV= sqrt(2.96*iq))
-# }
+
 # 
 # 
 # 
@@ -178,27 +152,8 @@
 # }
 # 
 # 
-# ## hatIV
-# .hativ <- function(rdata, IVestimator, startV = NULL, ...) {
-#   switch(IVestimator,
-#          RV = RV(rdata),
-#          BV = RBPVar(rdata),
-#          TV = rTPVar(rdata),
-#          minRV = minRV(rdata),
-#          medRV = medRV(rdata),
-#          ROWvar = rOWCov(rdata),
-#          CTBV = .ctBV(rdata, startV = startV))
-# }
-# 
-# 
-# .tt <- function(IVestimator, ...) {
-#   switch(IVestimator,
-#          BV = pi^2/4+pi-3,
-#          minRV = 3.81,
-#          medRV = 2.96,
-#          CTBV = pi^2/4+pi-3,
-#          ROWVar = .thetaROWVar(...))
-# }
+
+
 # 
 # .thetaROWVar <- function(alpha = 0.001 , alphaMCD = 0.5) {
 #   N = 1

@@ -1027,6 +1027,21 @@ rTPVar <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FA
   }
 }
 
+#' Calculate the realized tripower quarticity
+#' 
+#' @param rdata a zoo/xts object containing all returns in period t for one asset.
+#' 
+#' @return numeric
+#' 
+#' @export
+RTQ <- function(rdata) { 
+  returns <- as.vector(as.numeric(rdata))
+  n <- length(returns)
+  tq <- n * ((2^(2/3) * gamma(7/6) * gamma(1/2)^(-1))^(-3)) *  sum(abs(returns[1:(n - 2)])^(4/3) * abs(returns[2:(n-1)])^(4/3) * abs(returns[3:n])^(4/3))
+  return(tq)
+} 
+
+
 #' Realized quad-power variation of highfrequency return series. 
 #' @description Function returns the realized quad-power variation, defined in Andersen et al. (2012).
 #'  
@@ -1037,10 +1052,10 @@ rTPVar <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FA
 #'    \mbox{rQPVar}_{t}=\frac{N}{N-3} \left( 2^{1/4} \frac{\Gamma \left(3/4\right)}{ \Gamma \left(1/2\right)} \right)^{-4} \sum_{i=4}^{N} \mbox({|r_{t,i}|}^{1/2} {|r_{t,i-1}|}^{1/2} {|r_{t,i-2}|}^{1/2} {|r_{t,i-3}|}^{1/2})
 #'  }
 #'
-#'@param rdata a zoo/xts object containing all returns in period t for one asset.
-#'@param align.by a string, align the tick data to "seconds"|"minutes"|"hours".
-#'@param align.period an integer, align the tick data to this many [seconds|minutes|hours].  
-#'@param makeReturns boolean, should be TRUE when rdata contains prices instead of returns. FALSE by default.
+#' @param rdata a zoo/xts object containing all returns in period t for one asset.
+#' @param align.by a string, align the tick data to "seconds"|"minutes"|"hours".
+#' @param align.period an integer, align the tick data to this many [seconds|minutes|hours].  
+#' @param makeReturns boolean, should be TRUE when rdata contains prices instead of returns. FALSE by default.
 #'
 #' @return numeric
 #' 
