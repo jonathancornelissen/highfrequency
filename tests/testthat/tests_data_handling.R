@@ -35,3 +35,8 @@ expect_equal(
   c(7707, 3)
 )
 
+expect_equal(
+  dim(noZeroQuotes(selectExchange(sample_qdataraw, "N"))),
+  c(9792, 7)
+)
+
