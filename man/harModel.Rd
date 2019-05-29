@@ -51,7 +51,6 @@ for Realized volatility discussed in Andersen et al. (2007) and Corsi (2009).
 This model is mainly used to forecast the next days'volatility based on the high-frequency returns of the past. Consult the vignette for more information.
 }
 \examples{
-\dontrun{
 ##### Example 1: HARRVCJ ##### 
 data("sample_5minprices_jumps")
 dat <- sample_5minprices_jumps[, 1]
@@ -128,7 +127,7 @@ class(x)
 x
 #plot(x)
 predict(x)
-}
+
 }
 \references{
 Andersen, T. G., T. Bollerslev, and F. Diebold (2007). Roughing it up: including jump components in the measurement, modelling and forecasting of return volatility. The Review of Economics and Statistics 89, 701-720.
