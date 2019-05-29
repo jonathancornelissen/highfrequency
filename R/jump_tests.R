@@ -132,7 +132,7 @@ AJjumptest <- function(pdata, p = 4 , k = 2, align.by = NULL, align.period = NUL
   pv1 <- sum(r1^p)
   pv2 <- sum(r2^p)
   
-  S <- pv1/pv2
+  S <- pv2 /pv1
   
   ## selection return:
   selection <- abs(r) < cvalue
