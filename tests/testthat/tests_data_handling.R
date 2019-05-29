@@ -12,7 +12,7 @@ expect_equal(
 
 expect_equal(
   dim(rmOutliersQuotes(selectExchange(sample_qdataraw, "W"))),
-  c(4394, 7)
+  dim(rmOutliersQuotes(selectExchange(sample_qdataraw, "W"), type = "standard"))
 )
 
 expect_equal(
