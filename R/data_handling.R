@@ -334,7 +334,7 @@ quotesCleanup <- function(from, to, datasource, datadestination, ticker, exchang
 #' @keywords cleaning
 rmLargeSpread <- function(qdata, maxi = 50) {
   BID = OFR = DATE = DT = SPREAD = SPREAD_MEDIAN = NULL
-  qdataraw <- checkColumnNames(qdata)
+  qdata <- checkColumnNames(qdata)
   checkQdata(qdata)
   dummy_was_xts <- FALSE
   if (is.data.table(qdata) == FALSE) {
@@ -346,7 +346,7 @@ rmLargeSpread <- function(qdata, maxi = 50) {
     }
   } 
   
-  qdataraw <- qdataraw[, DATE := as.Date(DT)][, SPREAD_MEDIAN := median(SPREAD), by = "DATE"][SPREAD < (SPREAD_MEDIAN * maxi)]
+  qdata <- qdata[, DATE := as.Date(DT)][, SPREAD := OFR - BID][, SPREAD_MEDIAN := median(SPREAD), by = "DATE"][SPREAD < (SPREAD_MEDIAN * maxi)]
   
   if (dummy_was_xts == TRUE) {
     return(xts(as.matrix(qdata[, -c("DATE")]), order.by = qdata$DT))
@@ -409,9 +409,8 @@ rmOutliersTrades <- function(pdata, maxi = 10, window = 50, type = "advanced") {
     stop("Window size can't be odd.")
   }
   
-  # 
-  qdata <- checkColumnNames(pdata)
-  checkQdata(qdata)
+  pdata <- checkColumnNames(pdata)
+  # checkQdata(qdata)
   
   dummy_was_xts <- FALSE
   if (is.data.table(pdata) == FALSE) {
@@ -594,7 +593,7 @@ rmOutliersQuotes <- function (qdata, maxi = 10, window = 50, type = "advanced") 
 selectExchange <- function(data, exch = "N") { 
   EX = NULL
   data <- checkColumnNames(data)
-  checkQdata(data)
+  # checkQdata(data)
   
   if (is.data.table(data) == FALSE) {
     if (is.xts(data) == TRUE) {
