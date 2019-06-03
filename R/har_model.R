@@ -486,6 +486,7 @@ harModel <- function(data, periods = c(1,5,22), periodsJ = c(1,5,22), periodsQ =
   return (model)
 }
 
+#' @importFrom grDevices dev.interactive
 #' @importFrom graphics plot panel.smooth points par
 #' @importFrom stats residuals
 #' @importFrom xts addLegend
@@ -645,21 +646,21 @@ predict.harModel <- function(object, newdata = NULL, warnings = TRUE, ...) {
     if (inputType != "RM") { #If it are returns as input
       # Get the daily RMs
       RV1 <- match.fun(RVest[1])
-      RM1 <- apply.daily(data, RV1)
+      RM1 <- apply.daily(newdata, RV1)
       if (type %in% jumpModels) { 
         RV2 <- match.fun(RVest[2])
-        RM2 < apply.daily(data, RV2)
+        RM2 < apply.daily(newdata, RV2)
       }
       if (type %in% quarticityModels ) { 
         if(type %in% c("HARRVQJ","CHARRVQ")){##HARRVQJ and CHARRVQ are the only models that need both BPV and realized quarticity.
           RV2 <- match.fun( RVest[2])
-          RM2 <- apply.daily( data, RV2 )
+          RM2 <- apply.daily(newdata, RV2 )
           RV3 <- match.fun( RVest[3])
-          RM3 <- apply.daily( data, RV3 )
+          RM3 <- apply.daily(newdata, RV3 )
         }
         if(type == "HARRVQ"){
-          RV3 <- match.fun( RVest[2])
-          RM3 <- apply.daily(data, RV3)
+          RV3 <- match.fun(RVest[2])
+          RM3 <- apply.daily(newdata, RV3)
         }
       }
     } 
@@ -671,8 +672,8 @@ predict.harModel <- function(object, newdata = NULL, warnings = TRUE, ...) {
     leverage <- object$leverage
     
     maxp <- max(periods,periodsJ,periodsQ); # Max number of aggregation levels
-    if (!is.null(leverage)) { 
-      maxp = max(maxp,leverage) 
+    if (is.null(leverage) == FALSE) { 
+      maxp <- max(maxp,leverage) 
     }
     n <- length(RM1)  #Number of Days
     
@@ -683,38 +684,38 @@ predict.harModel <- function(object, newdata = NULL, warnings = TRUE, ...) {
     y <- aggY(RM1, h, maxp)
     
     # Only keep useful parts: 
-    x1 = RVmatrix1[(maxp:(n-h)),]; 
-    if(type %in% jumpModels ){ 
-      RVmatrix2 = aggJ(RM2,periods);
-      x2 = RVmatrix2[(maxp:(n-h)),]
+    x1 <- RVmatrix1[(maxp:(n-h)), ]
+    if (type %in% jumpModels ){ 
+      RVmatrix2 <- aggJ(RM2,periods)
+      x2 <- RVmatrix2[(maxp:(n-h)), ]
     }  # In case a jumprobust estimator is supplied
-    if(type %in% quarticityModels){ #in case realized quarticity estimator is supplied
-      RQmatrix  = aggRQ(RM3,periodsQ)[(maxp:(n-h)),];
+    if (type %in% quarticityModels) { #in case realized quarticity estimator is supplied
+      RQmatrix <- aggRQ(RM3,periodsQ)[(maxp:(n - h)), ]
       if(nperiodsQ == 1){
-        RQmatrix = as.matrix(sqrt(RQmatrix) - sqrt(mean(RM3)))
-      }else{
-        RQmatrix = sqrt(RQmatrix) - sqrt(mean(RM3)) #Demeaned realized quarticity estimator as in BPQ(2016) 
+        RQmatrix <- as.matrix(sqrt(RQmatrix) - sqrt(mean(RM3)))
+      } else {
+        RQmatrix <- sqrt(RQmatrix) - sqrt(mean(RM3)) #Demeaned realized quarticity estimator as in BPQ(2016) 
       }
     } 
     
     # Jumps:
-    if(type %in% jumpModels && !(type %in% bpvModels)){ # If model type is as such that you need jump component, don't spend time on computing jumps for CHAR.. models
-      if(any(RM2 == 0) && inputType == "RM"){ #The jump contributions were provided
-        J = RM2
+    if (type %in% jumpModels && !(type %in% bpvModels)) { # If model type is as such that you need jump component, don't spend time on computing jumps for CHAR.. models
+      if(any(RM2 == 0) && inputType == "RM") { #The jump contributions were provided
+        J <- RM2
       }else{ #compute jump contributions
-        J = pmax( RM1 - RM2,0 ); # Jump contributions should be positive
+        J <- pmax(RM1 - RM2, 0) # Jump contributions should be positive
       }
-      J = aggJ(J,periodsJ);         
+      J <- aggJ(J, periodsJ)       
     }
     
-    if (!is.null(leverage)) {
+    if (is.null(leverage) == FALSE) {
       if (inputType == "RM") {
         warning("You cannot use leverage variables in the model in case your input consists of Realized Measures")
       }
       # Get close-to-close returns
       e <- apply.daily(newdata, sum) #Sum logreturns daily
       # Get the rmins:
-      rmintemp <- pmin(e,0)
+      rmintemp <- pmin(e, 0)
       # Aggregate everything:
       rmin <- aggRV(rmintemp, periods = leverage, type = "Rmin")
       # Select:
@@ -730,20 +731,25 @@ predict.harModel <- function(object, newdata = NULL, warnings = TRUE, ...) {
       x <- cbind(x1, rmin)
     }
     
-    if( type == "HARRVJ" ){   
-      if(!is.null(object$transform) && transform=="log"){ J = J + 1; }
-      J = J[(maxp:(n)),]; 
-      x = cbind(x1,J);              # bind jumps to RV data 
-      if(!is.null(transform)){ x = Ftransform(x); }       
-      x = cbind(x,rmin);
+    if (type == "HARRVJ") {
+      
+      if (!is.null(object$transform) && transform=="log") { 
+        J <- J + 1
+      }
+      J <- J[(maxp:(n)),]
+      x <- cbind(x1,J)         # bind jumps to RV data 
+      if (is.null(transform) == FALSE) { 
+        x <- Ftransform(x) 
+      }       
+      x <- cbind(x,rmin)
     }
     
-    if( type == "HARRVCJ" ){ 
+    if (type == "HARRVCJ") { 
       
-      if( object$jumptest=="ABDJumptest" ){ 
-        TQ = apply.daily(newdata, TQfun); 
-        J = J[,1];
-        teststats= ABDJumptest(RV=RM1,BPV=RM2,TQ=TQ )
+      if (object$jumptest=="ABDJumptest") { 
+        TQ <- apply.daily(newdata, TQfun)
+        J <- J[, 1]
+        teststats <- ABDJumptest(RV = RM1, BPV = RM2,TQ = TQ)
       } else { 
         jtest <- match.fun(object$jumptest)
         teststats <- jtest(newdata, ...) 
@@ -752,46 +758,47 @@ predict.harModel <- function(object, newdata = NULL, warnings = TRUE, ...) {
       J[!Jindicators] <- 0
       
       # Get continuous components if necessary RV measures if necessary: 
-      Cmatrix = matrix( nrow = dim(RVmatrix1)[1], ncol = 1 )
-      Cmatrix[Jindicators,]    = RVmatrix2[Jindicators,1]      #Fill with robust one in case of jump
-      Cmatrix[(!Jindicators)]  = RVmatrix1[(!Jindicators),1]   #Fill with non-robust one in case of no-jump  
+      Cmatrix <- matrix(nrow = dim(RVmatrix1)[1], ncol = 1)
+      Cmatrix[Jindicators,]    <- RVmatrix2[Jindicators, 1]      #Fill with robust one in case of jump
+      Cmatrix[(!Jindicators)]  <- RVmatrix1[(!Jindicators), 1]   #Fill with non-robust one in case of no-jump  
       # Aggregate again:
-      Cmatrix = aggRV(Cmatrix,periods,type="C")
-      Jmatrix = aggJ(J,periodsJ)
+      Cmatrix <- aggRV(Cmatrix,periods, type = "C")
+      Jmatrix <- aggJ(J, periodsJ)
       # subset again:
-      Cmatrix = Cmatrix[(maxp:(n)),]
-      Jmatrix = Jmatrix[(maxp:(n)),]  
-      if(!is.null(object$transform) && object$transform=="log"){ 
-        Jmatrix = Jmatrix + 1 
+      Cmatrix <- Cmatrix[(maxp:(n)),]
+      Jmatrix <- Jmatrix[(maxp:(n)),]  
+      if (!is.null(object$transform) && object$transform == "log") { 
+        Jmatrix <- Jmatrix + 1 
       }
       
-      x = cbind(Cmatrix,Jmatrix)               # bind jumps to RV data      
-      if (!is.null(transform)) { 
-        x = Ftransform(x)
+      x <- cbind(Cmatrix, Jmatrix)               # bind jumps to RV data      
+      if (is.null(transform) == FALSE) { 
+        x <- Ftransform(x)
       }  
-      x = cbind(x, rmin)
+      x <- cbind(x, rmin)
     }
     
-    if( type == "HARRVQ"){
-      if(!is.null(transform)){
-        y = Ftransform(y); x1 = Ftransform(x1)
+    if (type == "HARRVQ") {
+      if (is.null(transform) == FASLE) {
+        y  <- Ftransform(y)
+        x1 <- Ftransform(x1)
         warning("The realized quarticity is already transformed with sqrt() thus only realized variance is transformed")
       }
-      x1 = cbind(x1, RQmatrix[,1:nperiodsQ] * x1[,1:nperiodsQ])
-      if(is.null(colnames(RQmatrix))){ #special case for 1 aggregation period of realized quarticity. This appends the RQ1 name
-        colnames(x1) = c(colnames(x1[,1:nperiods]),"RQ1")
+      x1 <- cbind(x1, RQmatrix[,1:nperiodsQ] * x1[,1:nperiodsQ])
+      if (is.null(colnames(RQmatrix)) == TRUE) { #special case for 1 aggregation period of realized quarticity. This appends the RQ1 name
+        colnames(x1) <- c(colnames(x1[, 1:nperiods]),"RQ1")
       }
-      x = cbind(x1,rmin);
+      x <- cbind(x1,rmin)
     }
     
     if (type == "HARRVQJ") {
       if (!is.null(transform) && transform=="log") { 
-        J = J + 1 
+        J <- J + 1 
       }
-      J = J[(maxp:(n-h)),]
-      if(!is.null(transform)) {
-        y = Ftransform(y)
-        x1 = Ftransform(x1)
+      J <- J[(maxp:(n-h)), ]
+      if (is.null(transform) == FALSE) {
+        y  <- Ftransform(y)
+        x1 <- Ftransform(x1)
         warning("The realized quarticity is already transformed with sqrt() thus only realized variance is transformed")
       }
       x1 <- cbind(x1, J, RQmatrix[,1:nperiodsQ] * x1[,1:nperiodsQ])
