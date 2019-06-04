@@ -63,8 +63,7 @@ The theoretical framework underlying jump test is that the logarithmic price pro
  The Jiang and Oomen test is that: in the absence of jumps, the accumulated difference between the simple return and the log return captures one half of the integrated variance.(Theodosiou& Zikes(2009))
 }
 \examples{
-data(sample_5minprices_jumps)
-JOjumptest(sample_5minprices_jumps[,1], power = 6)
+JOjumptest(sample_5minprices_jumps$stock1, power = 6)
 
 }
 \references{

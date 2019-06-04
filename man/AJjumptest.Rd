@@ -91,7 +91,6 @@ The theoretical framework underlying jump test is that the logarithmic price pro
  The Ait-Sahalia and Jacod test is that: Using the convergence properties of power variation and its dependence on the time scale on which it is measured, Ait-Sahalia and Jacod (2009) define a new variable which converges to 1 in the presence of jumps in the underlying return series, or to another deterministic and known number in the absence of jumps. (Theodosiou& Zikes(2009))
 }
 \examples{
-data(sample_tdata)
 AJjumptest(sample_tdata$PRICE, p = 2, k = 3, align.by = "seconds", 
   align.period = 5, makeReturns = TRUE)
 

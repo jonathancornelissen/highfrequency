@@ -52,12 +52,11 @@ This model is mainly used to forecast the next days'volatility based on the high
 }
 \examples{
 ##### Example 1: HARRVCJ ##### 
-data("sample_5minprices_jumps")
-dat <- sample_5minprices_jumps[, 1]
+dat <- sample_5minprices_jumps$stock1
 dat <- makeReturns(dat) #Get the high-frequency return data
 
 x <- harModel(dat, periods = c(1,5,10), periodsJ = c(1,5,10), 
-             RVest = c("rCov","rBPCov"), 
+             RVest = c("rCov","rBPCov"),
              type = "HARRVCJ",transform = "sqrt", inputType = "returns")
 # Estimate the HAR model of type HARRVCJ  
 class(x)
@@ -68,7 +67,6 @@ predict(x)
 
 ##### Example 2: HARRV ##### 
 # Forecasting daily Realized volatility for DJI 2008 using the basic harModel: HARRV
-data(realized_library) #Get sample daily Realized Volatility data
 DJI_RV <- realized_library$Dow.Jones.Industrials.Realized.Variance #Select DJI
 DJI_RV <- DJI_RV[!is.na(DJI_RV)] #Remove NA's
 DJI_RV <- DJI_RV['2008']
@@ -82,8 +80,7 @@ plot(x)
 predict(x)
 
 ##### Example 3: HARRVQ #####
-data("sample_5minprices_jumps")
-dat <- sample_5minprices_jumps[, 1]
+dat <- sample_5minprices_jumps$stock1
 dat <- makeReturns(dat) #Get the high-frequency return data
 
 x <- harModel(dat, periods = c(1,5,10), periodsJ = c(1,5,10),
@@ -96,8 +93,7 @@ x
 predict(x)
 
 ##### Example 4: HARRVQJ with already computed realized measures #####
-data("SP500RM")
-dat <- cbind(SP500RM$RV, SP500RM$BPV, SP500RM$RQ)
+dat <- SP500RM[, c("RV", "BPV", "RQ")] 
 x <- harModel(dat, periods = c(1,5,22), periodsJ = c(1), 
              periodsQ = c(1), type = "HARRVQJ")
 # Estimate the HAR model of type HARRVQJ
@@ -107,8 +103,7 @@ x
 predict(x)
 
 ##### Example 5: CHARRV with already computed realized measures ##### 
-data("SP500RM"); 
-dat <- cbind(SP500RM$RV, SP500RM$BPV)
+dat <- SP500RM[, c("RV", "BPV")]
 
 x <- harModel(dat, periods = c(1, 5, 22), type = "CHARRV")
 # Estimate the HAR model of type CHARRV 
@@ -118,7 +113,6 @@ x
 predict(x)
 
 ##### Example 6: CHARRVQ with already computed realized measures ##### 
-data("SP500RM")
 dat <- cbind(SP500RM$RV, SP500RM$BPV, SP500RM$RQ)
 
 x <- harModel(dat, periods = c(1,5,22), periodsQ = c(1), type = "CHARRVQ")
