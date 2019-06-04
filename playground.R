@@ -32,7 +32,7 @@ test_df[, lapply(.SD, mean), by = "low_freq"]
 test_taq <- fread("unzip -p taqdata/CAT/CATjan2018.zip")
 test_taq_quotes <- fread("unzip -p taqdata/CAT/CATjan2018quotes.zip")
 
-blub <- test_taq_quotes[DATE == 20180102][, DT := as.POSIXct(substring(paste(as.character(DATE), TIME_M, sep = " "), 1, 20), tz = "EST", format = "%Y%m%d %H:%M:%OS")]
+blub <- test_taq_quotes[DATE %in% c(20180102, 20180103)][, DT := as.POSIXct(substring(paste(as.character(DATE), TIME_M, sep = " "), 1, 20), tz = "EST", format = "%Y%m%d %H:%M:%OS")]
 
 test_taq_nyse <- test_taq[PRICE != 0 & EX == "N"]
 test_taq_nyse_quotes <- test_taq_quotes[BID != 0 & ASK != 0 & EX == "N"][ ,
@@ -40,8 +40,17 @@ test_taq_nyse_quotes <- test_taq_quotes[BID != 0 & ASK != 0 & EX == "N"][ ,
 
 test_taq_nyse[, DT := as_date(DATE)] %>% print()
 
+save(blub, file = "data/sample_qdataraw_microseconds.rda")
+
 # blub2 <- test_taq_nyse[, DT := paste(as_datetime(as.character(DATE), format = "%Y%m%d"), TIME_M, sep = "T")]
 
+quotesCleanup(blub)
+
+setcolorder(blub, c("DT", "EX", "BID", "BIDSIZ", "ASK", "ASKSIZ", "QU_COND", "QU_SEQNUM", "NATBBO_IND","QU_CANCEL", "QU_SOURCE", "SYM_ROOT", "SYM_SUFFIX"))
+
+save
+
+quotesCleanup(qdataraw = blub, exchanges = "N")
 
 
 blub2 <- test_taq_nyse[, DT := as.POSIXct(substring(paste(as.character(DATE), TIME_M, sep = " "), 1, 20), tz = "EST", format = "%Y%m%d %H:%M:%OS")]

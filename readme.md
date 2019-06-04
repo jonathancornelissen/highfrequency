@@ -7,7 +7,28 @@ The package is still under development and is distributed without warranty.
 
 Thanks to report bugs or make suggestions to <kris.boudt@kuleuven.be>
 
+## Installation
+CRAN:
+```r
+install.packages("highfrequency")
+```
+Development version:
+```r
+# Install package via devtools
+# install.packages("devtools")
+library(devtools)
+install_github("xxx")
+```
 
-### Special thanks
+## Example
+```r
+library(highfrquency)
+# Print raw quotes data to console
+sample_qdataraw_microseconds
+# Cleanup quotes leaves 46566 out of 464221 observations.
+quotesCleanup(qdataraw = sample_qdataraw_microseconds, exchanges = "N")
+```
+
+## Special thanks
 
 We would like to thank [Dirk Eddelbuettel](https://github.com/eddelbuettel) for his extraordinary support as a mentor during the Google Summmer of Code 2019. Moreover, we thank [Emil Sjørup](https://github.com/emilsjoerup) for implementing additional options in the harModel function.

@@ -96,7 +96,7 @@
 
 #' Sample of cleaned quotes for stock XXX for 1 day
 #' 
-#' @description An xts object containing the raw quotes for the imaginary stock XXX for 1 day, in the typical   NYSE TAQ database format. This is the cleaned version of the data sample \code{\link{sample_qdataraw}}, using \code{quotesCleanup}.
+#' @description An xts object containing the raw quotes for the imaginary stock XXX for 1 day, in the typical NYSE TAQ database format. This is the cleaned version of the data sample \code{\link{sample_qdataraw}}, using \code{quotesCleanup}.
 #' 
 #' @format xts object
 #' 
@@ -104,18 +104,35 @@
 "sample_qdata"
 
 #' Sample of raw quotes for stock XXX for 1 day
-#' 
 #' @description  An imaginary xts object containing the raw quotes for stock XXX for 1 day, in the typical NYSE TAQ database format.
-#' This is the cleaned version of the data sample \code{\link{sample_tdataraw}}, using \code{tradesCleanup}.
 #' 
 #' @format xts object
 #' 
 #' @keywords datasets
 "sample_qdataraw"
 
+#' Sample of cleaned quotes for stock XXX for 2 days measured in microseconds
+#' 
+#' @description A data.table object containing the raw quotes for the imaginary stock XXX for 2 days. This is the cleaned version of the data sample \code{\link{sample_qdataraw_microseconds}}, using \code{quotesCleanup}.
+#' 
+#' @format data.table object
+#' 
+#' @keywords datasets
+"sample_qdata_microseconds"
+
+#' Sample of raw quotes for stock XXX for 2 days measured in microseconds
+#' @description  An imaginary xts object containing the raw quotes for stock XXX for 2 days, in the typical NYSE TAQ database format.
+#' 
+#' @format data.table object
+#' 
+#' @keywords datasets
+"sample_qdataraw_microseconds"
+
 #' Sample returns data
 #' 
 #' @description  EUR/USD returns from January to September 2004
+#' 
+#' @docType data
 #' 
 #' @format A large \code{xts} object.
 #' 
@@ -126,6 +143,8 @@
 #' 
 #' @description An xts object containing the trades for the imaginary stock XXX for 1 day, in the typical NYSE TAQ database format.
 #' This is the cleaned version of the data sample \code{\link{sample_tdataraw}}, using \code{tradesCleanup}.
+#' 
+#' @docType data
 #'
 #' @format A large \code{xts} object.
 #' 
@@ -137,6 +156,8 @@
 #' @description An imaginary xts object containing the raw trades for stock XXX for 1 day, in the typical NYSE TAQ database format.
 #' This is the cleaned version of the data sample \code{\link{sample_tdataraw}}, using \code{tradesCleanup}.
 #' 
+#' @docType data
+#' 
 #' @format A large \code{xts} object.
 #' 
 #' @keywords datasets
@@ -145,6 +166,8 @@
 #' Starbucks Data
 #' 
 #' @description Tick data for Starbucks 2011/07/01, cleaned with \code{tradesCleanup}.
+#' 
+#' @docType data
 #' 
 #' @examples
 #' data(sbux)
