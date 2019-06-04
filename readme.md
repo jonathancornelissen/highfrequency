@@ -10,4 +10,4 @@ Thanks to report bugs or make suggestions to <kris.boudt@kuleuven.be>
 
 ### Special thanks
 
-We would like to thank Dirk Eddelbuettel for his extraordinary support as a mentor during the Google Summmer of Code 2019. Moreover, we thank Emil Sjørup for implementing additional options in the harModel function.
+We would like to thank [Dirk Eddelbuettel](https://github.com/eddelbuettel) for his extraordinary support as a mentor during the Google Summmer of Code 2019. Moreover, we thank [Emil Sjørup](https://github.com/emilsjoerup) for implementing additional options in the harModel function.
