@@ -4,10 +4,10 @@
 \alias{rmOutliersTrades}
 \title{Delete entries for which the transaction price is outlying with respect to surrounding entries}
 \usage{
-rmOutliersTrades(pdata, maxi = 10, window = 50, type = "advanced")
+rmOutliersTrades(tdata, maxi = 10, window = 50, type = "advanced")
 }
 \arguments{
-\item{pdata}{an data.table or xts object at least containing the columns "BID" and "OFR".}
+\item{tdata}{an data.table or xts object at least containing the columns "PRICE".}
 
 \item{maxi}{an integer, indicating the maximum number of median absolute deviations allowed.}
 

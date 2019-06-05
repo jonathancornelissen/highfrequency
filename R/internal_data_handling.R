@@ -9,25 +9,33 @@
 #' @keywords internal
 checkColumnNames <- function(data) { 
   # FUNCTION sets column names according to RTAQ format using quantmod conventions, such that all the other functions find the correct information.
-  # requireNamespace('quantmod');
   # First step: assign the xts attributes:
   data <- set.AllColumns(data)
   
   # Change column names to previous RTAQ format! 
   # Adjust price col naming:  
   try((colnames(data)[xtsAttributes(data)[['Price']]] = 'PRICE'))
+  try(setnames(data, "Price", "PRICE", skip_absent = TRUE), silent = TRUE)
   # Adjust Bid col naming:    
   try((colnames(data)[xtsAttributes(data)[['Bid']]] = 'BID'))
+  try(setnames(data, "Bid", "BID", skip_absent = TRUE), silent = TRUE)
   # Adjust Ask col naming:    
   try((colnames(data)[xtsAttributes(data)[['Ask']]] = 'OFR'))
+  try(setnames(data, "Ask", "OFR", skip_absent = TRUE), silent = TRUE)
   # Adjust SYMBOL col naming:    
   try((colnames(data)[xtsAttributes(data)[['SYM_ROOT']]] = 'SYMBOL'))
+  try(setnames(data, "SYM_ROOT", "SYMBOL", skip_absent = TRUE), silent = TRUE)
   
   # Adjust Ask size col naming:
   try((colnames(data)[xtsAttributes(data)[['BidSize']]] = 'BIDSIZ'))
+  try(setnames(data, "BidSize", "BIDSIZ", skip_absent = TRUE), silent = TRUE)
   
   # Adjust Bid size col naming:    
   try((colnames(data)[xtsAttributes(data)[['AskSize']]] = 'OFRSIZ'))
+  try(setnames(data, "AskSize", "OFRSIZ", skip_absent = TRUE), silent = TRUE)
+  
+  try(setnames(data, "TR_SCOND", "COND", skip_absent = TRUE), silent = TRUE)
+  
   
   # Adjust correction column, if necessary:
   if (any(colnames(data) == "CR")) {
@@ -274,11 +282,37 @@ has.Qty <- function(x, which = FALSE)
 #' @importFrom data.table is.data.table
 #' @importFrom xts is.xts
 #' @keywords internal
-checkQdata <- function(qdata) {
+checktdata <- function(tdata) {
+  if (is.xts(tdata) == FALSE & is.data.table(tdata) == FALSE) {
+    stop("The argument tdata should be an data.table or xts object.")
+  }
+  if (any(colnames(tdata) == "PRICE") == FALSE) {
+    stop("The argument tdata should have a column containing the PRICE. Could not find that column.")
+  }
+  if (any(colnames(tdata) == "SYMBOL") == FALSE) {
+    stop("The argument tdata should have a column containing SYMBOL. Could not find that column.")
+  }
+  if (any(colnames(tdata) == "COND") == FALSE) {
+    stop("The argument tdata should have a column containing sales conditions named COND. Could not find that column.")
+  }
+  if (any(colnames(tdata) == "SIZE") == FALSE) {
+    stop("The argument tdata should have a column SIZE indicating the number of shares traded. Could not find that column.")
+  }
+  
+  if (is.data.table(tdata) == TRUE) {
+    if (typeof(tdata$PRICE) != "double") {
+      stop("Column PRICE should be of type double.")
+    }
+  }
+}
+
+#' @importFrom data.table is.data.table
+#' @importFrom xts is.xts
+#' @keywords internal
+checkqdata <- function(qdata) {
   if (is.xts(qdata) == FALSE & is.data.table(qdata) == FALSE) {
     stop("The argument qdata should be an data.table or xts object.")
   }
-  
   if (any(colnames(qdata) == "BID") == FALSE) {
     stop("The argument qdata should have a column containing the BID. Could not find that column.")
   }
@@ -288,7 +322,6 @@ checkQdata <- function(qdata) {
   if (any(colnames(qdata) == "SYMBOL") == FALSE) {
     stop("The argument qdata should have a column containing SYMBOL. Could not find that column.")
   }
-  
   if (is.data.table(qdata) == TRUE) {
     if (typeof(qdata$BID) != "double") {
       stop("Column BID should be of type double.")
@@ -345,27 +378,27 @@ set.AllColumns <- function(x) {
   cols <- c("Op","Hi","Lo","Cl","Vo","Ad","Price","Trade","Qty",
             "Bid","BidSize","Ask","AskSize","Mid","Chg")
   for(col in cols) {
-    try(x <- do.call(paste("set",col,sep="."), list(x)), silent=TRUE )
+    try(x <- do.call(paste("set", col, sep = "."), list(x)), silent = TRUE)
   }
   return(x)
 }
 
 #' @keywords internal
-set.Chg <- function(x, error=TRUE) {
-  if(has.Chg(x))
-    attr(x,"Chg") <- has.Chg(x, which=TRUE)
+set.Chg <- function(x, error = TRUE) {
+  if (has.Chg(x))
+    attr(x,"Chg") <- has.Chg(x, which = TRUE)
   return(x)
 }
 
 #' @keywords internal
-set.Mid <- function(x, error=TRUE) {
+set.Mid <- function(x, error = TRUE) {
   if(has.Mid(x))
     attr(x,"Mid") <- has.Mid(x, which=TRUE)
   return(x)
 }
 
 #' @keywords internal
-set.Ad <- function(x, error=TRUE) {
+set.Ad <- function(x, error = TRUE) {
   if(has.Ad(x))
     attr(x,"Ad") <- has.Ad(x, which=TRUE)
   return(x)

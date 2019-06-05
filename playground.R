@@ -32,6 +32,7 @@ test_df[, lapply(.SD, mean), by = "low_freq"]
 test_taq <- fread("unzip -p taqdata/CAT/CATjan2018.zip")
 test_taq_quotes <- fread("unzip -p taqdata/CAT/CATjan2018quotes.zip")
 
+blub2 <- test_taq[DATE %in% c(20180102, 20180103)][, DT := as.POSIXct(substring(paste(as.character(DATE), TIME_M, sep = " "), 1, 20), tz = "EST", format = "%Y%m%d %H:%M:%OS")]
 blub <- test_taq_quotes[DATE %in% c(20180102, 20180103)][, DT := as.POSIXct(substring(paste(as.character(DATE), TIME_M, sep = " "), 1, 20), tz = "EST", format = "%Y%m%d %H:%M:%OS")]
 
 test_taq_nyse <- test_taq[PRICE != 0 & EX == "N"]
@@ -45,6 +46,8 @@ save(blub, file = "data/sample_qdataraw_microseconds.rda")
 # blub2 <- test_taq_nyse[, DT := paste(as_datetime(as.character(DATE), format = "%Y%m%d"), TIME_M, sep = "T")]
 
 quotesCleanup(blub)
+
+setcolorder(blub2, c("DT", "EX", "SYM_ROOT", "SYM_SUFFIX", "TR_SCOND", "SIZE", "PRICE", "TR_CORR", "TR_SEQNUM", "TR_SOURCE", "TR_RF"))
 
 setcolorder(blub, c("DT", "EX", "BID", "BIDSIZ", "ASK", "ASKSIZ", "QU_COND", "QU_SEQNUM", "NATBBO_IND","QU_CANCEL", "QU_SOURCE", "SYM_ROOT", "SYM_SUFFIX"))
 

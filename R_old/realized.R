@@ -1987,11 +1987,14 @@ LeeMyklandCV = function( beta = 0.999 , M = 78 )
   return( -log(-log(beta))*b(M) + a(M)     )
 }
 
-center = function()
-{
-  g=function(y){ return( sqrt(2/pi)*exp(y-exp(2*y)/2)  )}
-  f=function(y){ return( y*g(y)    )  }
-  return( integrate(f,-Inf,Inf)$value )
+center <-  function() {
+  g <- function(y){ 
+    return(sqrt(2/pi) * exp(y-exp(2*y)/2))
+  }
+  f <- function(y) { 
+    return(y * g(y))  
+  }
+  return(integrate(f,-Inf,Inf)$value)
 }
 
  ###### end SPOTVOL FUNCTIONS formerly in periodicityTAQ #########
@@ -2620,16 +2623,8 @@ exchangeHoursOnly <- function(data, daybegin = "09:30:00", dayend = "16:00:00") 
   
   #select correct observations
   filteredts = data[tdtimes>=tddaybegin & tdtimes<=tddayend];
-  return(filteredts);
+  return(filteredts)
 }
-
-# noZeroPrices = function(tdata){
-#   tdata = .check_data(tdata)
-#   tdatacheck(tdata)
-#   ####FUNCTION TO DELETE ZERO PRICES: nozeroprices
-#   filteredts = tdata[as.numeric(tdata$PRICE)!= 0]
-#   return(filteredts)
-# }
 
 
 
@@ -2670,8 +2665,7 @@ autoSelectExchangeTrades = function(tdata){
 ##### TRADE DATA SPECIFIC FUNCTIONS: ###################################
 
 # Zivot
-salesCondition <- function (tdata)
-{
+salesCondition <- function (tdata) {
   trim <- function (x) gsub("^\\s+|\\s+$", "", x)
   
   tdatacheck(tdata);
@@ -2706,29 +2700,6 @@ waverage <- function(a) {
   
   b <- sum(p * s / sum(s))
   return(b)
-}
-
-mergeTradesSameTimestamp <- function (tdata, selection = "median") {
-  tdata = .check_data(tdata)
-  tdatacheck(tdata)
-  ep = endpoints(tdata, "secs")
-  size = period.apply(tdata$SIZE, ep, sumN)
-  if (selection == "median") {
-    price = period.apply3(tdata$PRICE, ep, medianN)
-  }
-  if (selection == "maxvolume") {
-    price = period.apply3(cbind(tdata$PRICE, tdata$SIZE), 
-                          ep, maxvol)
-  }
-  if (selection == "weightedaverage") {
-    price = period.apply3(cbind(tdata$PRICE, tdata$SIZE), 
-                          ep, waverage)
-  }
-  selection = ep[2:length(ep)]
-  tdata2 = tdata[selection]
-  tdata2$PRICE = price
-  tdata2$SIZE = size
-  return(tdata2)
 }
 
 rmTradeOutliers = function(tdata,qdata){

@@ -65,20 +65,19 @@ This is a wrapper function for cleaning the quote data of all stocks in "ticker"
 The result is saved in the folder datadestination. 
 
 In case you supply the argument "rawqdata", the on-disk functionality is ignored
-and the function returns a list with the cleaned quotes as xts object (see examples).
+and the function returns the cleaned quotes as xts or data.table object (see examples).
 
 The following cleaning steps are performed sequentially:
 \code{\link{noZeroQuotes}}, \code{\link{selectExchange}}, rmLargeSpread,
 \code{\link{mergeQuotesSameTimestamp}}, \code{\link{rmOutliersQuotes}}.
 }
 \examples{
-# Consider you have raw quote data for 1 stock for 1 day 
-# head(sample_qdataraw)
-# dim(sample_qdataraw)
-# qdata_aftercleaning = quotesCleanup(qdataraw = sample_qdataraw, exchanges = "N")
-# qdata_aftercleaning$report
-# barplot(qdata_aftercleaning$report)
-# dim(qdata_aftercleaning$qdata)
+# Consider you have raw quote data for 1 stock for 2 days
+head(sample_qdataraw_microseconds)
+dim(sample_qdataraw_microseconds)
+qdata_aftercleaning <- quotesCleanup(qdataraw = sample_qdataraw_microseconds, exchanges = "N")
+qdata_aftercleaning$report
+dim(qdata_aftercleaning$qdata)
 
 # In case you have more data it is advised to use the on-disk functionality
 # via "from","to","datasource",etc. arguments
