@@ -10,6 +10,5 @@ sample_tdataraw
 }
 \description{
 An imaginary xts object containing the raw trades for stock XXX for 1 day, in the typical NYSE TAQ database format.
-This is the cleaned version of the data sample \code{\link{sample_tdataraw}}, using \code{tradesCleanup}.
 }
 \keyword{datasets}

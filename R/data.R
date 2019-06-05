@@ -154,7 +154,6 @@
 #' Sample of raw trades for stock XXX for 1 day
 #' 
 #' @description An imaginary xts object containing the raw trades for stock XXX for 1 day, in the typical NYSE TAQ database format.
-#' This is the cleaned version of the data sample \code{\link{sample_tdataraw}}, using \code{tradesCleanup}.
 #' 
 #' @docType data
 #' 
@@ -162,6 +161,17 @@
 #' 
 #' @keywords datasets
 "sample_tdataraw"
+
+#' Sample of raw trades for stock XXX for 2 days
+#' 
+#' @description An imaginary data.table object containing the raw trades for stock XXX for 2 days, in the typical NYSE TAQ database format.
+#' 
+#' @docType data
+#' 
+#' @format A data.table object.
+#' 
+#' @keywords datasets
+"sample_tdataraw_microseconds"
 
 #' Starbucks Data
 #' 

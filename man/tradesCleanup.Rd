@@ -63,12 +63,12 @@ The following cleaning functions are performed sequentially:
 \code{\link{noZeroPrices}}, \code{\link{selectExchange}}, \code{\link{salesCondition}},
 \code{\link{mergeTradesSameTimestamp}}.
 
-Since the function \code{\link{rmTradeOutliers}}
+Since the function \code{\link{rmOutliersTrades}}
 also requires cleaned quote data as input, it is not incorporated here and
-there is a seperate wrapper called \code{\link{tradesCleanupFinal}}.
+there is a seperate wrapper called tradesCleanupFinal.
 }
 \examples{
-Consider you have raw trade data for 1 stock for 1 day 
+# Consider you have raw trade data for 1 stock for 2 days 
 head(sample_tdataraw_microseconds)
 dim(sample_tdataraw_microseconds)
 tdata_afterfirstcleaning <- tradesCleanup(tdataraw = sample_tdataraw, exchanges = list("N"))

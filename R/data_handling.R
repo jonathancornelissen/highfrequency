@@ -778,9 +778,9 @@ selectExchange <- function(data, exch = "N") {
 #' \code{\link{noZeroPrices}}, \code{\link{selectExchange}}, \code{\link{salesCondition}},
 #' \code{\link{mergeTradesSameTimestamp}}.
 #' 
-#' Since the function \code{\link{rmTradeOutliers}}
+#' Since the function \code{\link{rmOutliersTrades}}
 #' also requires cleaned quote data as input, it is not incorporated here and
-#' there is a seperate wrapper called \code{\link{tradesCleanupFinal}}.
+#' there is a seperate wrapper called tradesCleanupFinal.
 #' 
 #' @param from character indicating first date to clean, e.g. "2008-01-30".
 #' @param to character indicating last date to clean, e.g. "2008-01-31".
@@ -818,7 +818,7 @@ selectExchange <- function(data, exch = "N") {
 #' and the function returns a list with the cleaned trades as xts object (see examples).
 #' 
 #' @examples 
-#' Consider you have raw trade data for 1 stock for 1 day 
+#' # Consider you have raw trade data for 1 stock for 2 days 
 #' head(sample_tdataraw_microseconds)
 #' dim(sample_tdataraw_microseconds)
 #' tdata_afterfirstcleaning <- tradesCleanup(tdataraw = sample_tdataraw, exchanges = list("N"))
@@ -875,7 +875,7 @@ tradesCleanup <- function(from, to, datasource, datadestination, ticker, exchang
     nresult[5] <- dim(tdataraw)[1] 
     
     if (dummy_was_xts == TRUE) {
-      df_result <- xts(as.matrix(tdataraw[, -c("DT",  "DATE")]), order.by = tdataraw$DT)
+      df_result <- xts(as.matrix(tdataraw[, -c("DT")]), order.by = tdataraw$DT)
     } else {
       df_result <- tdataraw[, -c( "DATE")]
     }
