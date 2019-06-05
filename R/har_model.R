@@ -199,7 +199,7 @@ harInsanityFilter <- function(fittedValues, lower, upper, replacement) {
 #' predict(x)
 #' 
 #' ##### Example 6: CHARRVQ with already computed realized measures ##### 
-#' dat <- cbind(SP500RM$RV, SP500RM$BPV, SP500RM$RQ)
+#' dat <- SP500RM[, c("RV", "BPV", "RQ")] 
 #' 
 #' x <- harModel(dat, periods = c(1,5,22), periodsQ = c(1), type = "CHARRVQ")
 #' # Estimate the HAR model of type CHARRVQ  
