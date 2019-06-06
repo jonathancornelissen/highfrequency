@@ -18,7 +18,7 @@ tradesCleanupUsingQuotes(from, to, datasource, datadestination, ticker,
 
 \item{ticker}{vector of tickers for which the data should be cleaned.}
 
-\item{tdata}{xts object containing (ONE day and for ONE stock only) trade data cleaned by \code{\link{tradesCleanup}}. This argument is NULL by default. Enabling it, means the arguments
+\item{tdata}{data.table or xts object containing (ONE day and for ONE stock only) trade data cleaned by \code{\link{tradesCleanup}}. This argument is NULL by default. Enabling it, means the arguments
 from, to, datasource and datadestination will be ignored. (only advisable for small chunks of data)}
 
 \item{qdata}{xts object containing (ONE day and for ONE stock only) cleaned quote data. This argument is NULL by default. Enabling it means the arguments

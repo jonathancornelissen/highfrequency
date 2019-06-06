@@ -481,8 +481,8 @@ rmLargeSpread <- function(qdata, maxi = 50) {
 #' @description Function deletes entries with prices that are above the ask plus the bid-ask spread.
 #' Similar for entries with prices below the bid minus the bid-ask spread.
 #' 
-#' @param tdata a data.table or xts object containing the time series data, with at least the column "PRICE", containing the transaction price.
-#' @param qdata a data.table or xts object containing the time series data with at least the columns "BID" and "OFR", containing the bid and ask prices.
+#' @param tdata a data.table or xts object containing the time series data, with at least the column "PRICE", containing the transaction price (ONE DAY ONLY).
+#' @param qdata a data.table or xts object containing the time series data with at least the columns "BID" and "OFR", containing the bid and ask prices (ONE DAY ONLY).
 #' 
 #' @details Note: in order to work correctly, the input data of this function should be
 #' cleaned trade (tdata) and quote (qdata) data respectively.
@@ -519,6 +519,10 @@ rmOutliersTrades <- function(tdata, qdata) {
     if (("DT" %in% colnames(tdata)) == FALSE) {
       stop("tdata neeeds DT column.")
     }
+  }
+  
+  if (length(unique(as.Date(tdata$DT))) > 1) {
+    stop("Both data sets should only include data for one day.")
   }
   
   qdata <- qdata[, DT := DT + 2]
@@ -1006,7 +1010,7 @@ tradesCleanupUsingQuotes <- function(from, to, datasource, datadestination, tick
 #' @param datasource character indicating the folder in which the original data is stored.
 #' @param datadestination character indicating the folder in which the cleaned data is stored.
 #' @param ticker vector of tickers for which the data should be cleaned.
-#' @param tdata xts object containing (ONE day and for ONE stock only) trade data cleaned by \code{\link{tradesCleanup}}. This argument is NULL by default. Enabling it, means the arguments
+#' @param tdata data.table or xts object containing (ONE day and for ONE stock only) trade data cleaned by \code{\link{tradesCleanup}}. This argument is NULL by default. Enabling it, means the arguments
 #' from, to, datasource and datadestination will be ignored. (only advisable for small chunks of data)
 #' @param qdata xts object containing (ONE day and for ONE stock only) cleaned quote data. This argument is NULL by default. Enabling it means the arguments
 #' from, to, datasource, datadestination will be ignored. (only advisable for small chunks of data)
