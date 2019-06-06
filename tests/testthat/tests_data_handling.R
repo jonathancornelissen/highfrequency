@@ -16,8 +16,8 @@ expect_equal(
 )
 
 expect_equal(
-  dim(rmOutliersTrades(selectExchange(sample_tdataraw, "W"))),
-  c(190, 7)
+  dim(rmOutliersTrades(selectExchange(sample_tdataraw, "W"), selectExchange(sample_qdataraw, "W"))),
+  c(203, 8)
 )
 
 expect_equal(
@@ -39,4 +39,17 @@ expect_equal(
   dim(noZeroQuotes(selectExchange(sample_qdataraw, "N"))),
   c(9792, 7)
 )
+
+expect_equal(
+  dim(tradesCleanupUsingQuotes(tdata = sample_tdata, qdata = sample_qdata)),
+  c(8153, 8)
+)
+
+expect_equal(
+  dim(tradesCleanup(tdataraw = sample_tdataraw, exchanges = "N", report = FALSE)),
+  c(9104, 2)
+)
+
+
+
 

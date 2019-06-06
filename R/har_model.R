@@ -773,7 +773,7 @@ predict.harModel <- function(object, newdata = NULL, warnings = TRUE, ...) {
     }
     
     if (type == "HARRVQ") {
-      if (is.null(transform) == FASLE) {
+      if (is.null(transform) == FALSE) {
         y  <- Ftransform(y)
         x1 <- Ftransform(x1)
         warning("The realized quarticity is already transformed with sqrt() thus only realized variance is transformed")

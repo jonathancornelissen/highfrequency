@@ -292,12 +292,6 @@ checktdata <- function(tdata) {
   if (any(colnames(tdata) == "SYMBOL") == FALSE) {
     stop("The argument tdata should have a column containing SYMBOL. Could not find that column.")
   }
-  if (any(colnames(tdata) == "COND") == FALSE) {
-    stop("The argument tdata should have a column containing sales conditions named COND. Could not find that column.")
-  }
-  if (any(colnames(tdata) == "SIZE") == FALSE) {
-    stop("The argument tdata should have a column SIZE indicating the number of shares traded. Could not find that column.")
-  }
   
   if (is.data.table(tdata) == TRUE) {
     if (typeof(tdata$PRICE) != "double") {

@@ -2019,25 +2019,25 @@ rdatacheck = function(rdata,multi=FALSE){
   if((dim(rdata)[2] < 2) & (multi)){stop("Your rdata object should have at least 2 columns")}
 }
 
-matchTradesQuotes = function(tdata,qdata,adjustment=2){ ##FAST VERSION
+matchTradesQuotes <- function(tdata, qdata, adjustment = 2){ ##FAST VERSION
   tdata = .check_data(tdata)
   qdata = .check_data(qdata)
   qdatacheck(qdata)
   tdatacheck(tdata)
   
-  tt = dim(tdata)[2];  
-  index(qdata) = index(qdata) + adjustment;
+  tt = dim(tdata)[2]
+  index(qdata) = index(qdata) + adjustment
   
   #merge:
-  merged = merge(tdata,qdata);
+  merged = merge(tdata, qdata)
   
   ##fill NA's:
-  merged[,((tt+1):dim(merged)[2])] = na.locf(as.zoo(merged[,((tt+1):dim(merged)[2])]), na.rm=FALSE);
+  merged[, ((tt + 1):dim(merged)[2])] = na.locf(as.zoo(merged[, ((tt+1):dim(merged)[2])]), na.rm = FALSE)
   
   #Select trades:
-  index(tdata)=  as.POSIXct(index(tdata));
-  index(merged)= as.POSIXct(index(merged));  
-  merged = merged[index(tdata)];
+  index(tdata)  = as.POSIXct(index(tdata))
+  index(merged) = as.POSIXct(index(merged))
+  merged = merged[index(tdata)]
   
   #return useful parts:
   #remove duplicated SYMBOL & EX (new)
@@ -2569,8 +2569,8 @@ tradesCleanupFinal = function(from,to,datasource,datadestination,ticker,tdata=NU
     qdata = .check_data(qdata);
     
     #1 cleaning procedure that needs cleaned trades and quotes
-    tdata = try(rmtradeoutliers(tdata,qdata));
-    return(tdata);
+    tdata = try(rmtradeoutliers(tdata, qdata))
+    return(tdata)
   }
 }
 

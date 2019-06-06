@@ -177,9 +177,13 @@ mergeQuotesSameTimestamp <- function(qdata, selection = "median") {
 #' @keywords cleaning
 #' @export
 mergeTradesSameTimestamp <- function(tdata, selection = "median") {
+  SIZE = MAXSIZE = PRICE = DT = SYMBOL = .SD = NULL
+  
   tdata <- checkColumnNames(tdata)
   checktdata(tdata)
-  SIZE = MAXSIZE = PRICE = NULL
+  if (any(colnames(tdata) == "SIZE") == FALSE) {
+    stop("The argument tdata should have a column SIZE indicating the number of shares traded. Could not find that column.")
+  }
   
   condition <- selection == "median" | selection == "max.volume" | selection == "weighted.average"
   if (condition == FALSE) {
@@ -472,107 +476,69 @@ rmLargeSpread <- function(qdata, maxi = 50) {
 }
 
 
-#' Delete entries for which the transaction price is outlying with respect to surrounding entries
+#' Delete transactions with unlikely transaction prices
 #' 
-#' @description If type = "standard": Function deletes entries for which the price deviated by more than "maxi"
-#' median absolute deviations from a rolling centered median (excluding
-#' the observation under consideration) of "window" observations.
+#' @description Function deletes entries with prices that are above the ask plus the bid-ask spread.
+#' Similar for entries with prices below the bid minus the bid-ask spread.
 #' 
-#' If type = "advanced": Function deletes entries for which the price deviates by more than "maxi"
-#' median absolute deviations from the value closest to the price of
-#' these three options:
-#' \enumerate{
-#'  \item Rolling centered median (excluding the observation under consideration)
-#'  \item Rolling median of the following "window" observations
-#'  \item Rolling median of the previous "window" observations
-#' }
-#'  
-#' The advantage of this procedure compared to the "standard" proposed
-#' by Barndorff-Nielsen et al. (2010) is that it will not incorrectly remove
-#' large price jumps. Therefore this procedure has been set as the default
-#' for removing outliers. 
+#' @param tdata a data.table or xts object containing the time series data, with at least the column "PRICE", containing the transaction price.
+#' @param qdata a data.table or xts object containing the time series data with at least the columns "BID" and "OFR", containing the bid and ask prices.
 #' 
-#' Note that the median absolute deviation is taken over the entire
-#' day. In case it is zero (which can happen if mid-quotes don't change much), 
-#' the median absolute deviation is taken over a subsample without constant mid-quotes.
+#' @details Note: in order to work correctly, the input data of this function should be
+#' cleaned trade (tdata) and quote (qdata) data respectively.
 #' 
-#' @param tdata an data.table or xts object at least containing the columns "PRICE".
-#' @param maxi an integer, indicating the maximum number of median absolute deviations allowed.
-#' @param window an integer, indicating the time window for which the "outlyingness" is considered.
-#' @param type should be "standard" or "advanced" (see description).
+#' @return xts or data.table object depending on input
 #' 
-#' @details NOTE: This function works only correct if supplied input data consists of 1 day.
-#' 
-#' @return xts object or data.table depending on type of input
-#' 
-#' @references Barndorff-Nielsen, O. E., P. R. Hansen, A. Lunde, and N. Shephard (2009). Realized kernels in practice: Trades and quotes. Econometrics Journal 12, C1-C32.
-#' 
-#' Brownlees, C.T. and Gallo, G.M. (2006). Financial econometric analysis at ultra-high frequency: Data handling concerns. Computational Statistics & Data Analysis, 51, pages 2232-2245.
-#' 
-#' @author Onno Kleen
-#' 
+#' @author Jonathan Cornelissen and Kris Boudt
 #' @keywords cleaning
-#' @importFrom stats mad median
-#' @importFrom data.table as.data.table is.data.table setnames
-#' @importFrom xts is.xts as.xts
-#' @importFrom RcppRoll roll_median
+#' @importFrom data.table setkey
 #' @export
-rmOutliersTrades <- function(tdata, maxi = 10, window = 50, type = "advanced") {
-  # NOTE: Median Absolute deviation chosen contrary to Barndorff-Nielsen et al.
-  # Setting those variables equal NULL is for suppressing NOTES in devtools::check
-  # References inside data.table-operations throw "no visible binding for global variable ..." error
-  BID = OFR = MIDQUOTE = DATE = DT = MADALL = CRITERION = PRICE = NULL
-  if ((window %% 2) != 0) {
-    stop("Window size can't be odd.")
-  }
-  
+rmOutliersTrades <- function(tdata, qdata) {
+  SPREAD = DT = PRICE = BID = OFR = 0
   tdata <- checkColumnNames(tdata)
-  # checkqdata(qdata)
+  qdata <- checkColumnNames(qdata)
+  checkqdata(qdata)
+  checktdata(tdata)
+  
+  if (any(class(tdata) != class(qdata))) {
+    stop("tdata and qdata should be of the same data type, either xts or data.table.")
+  }
   
   dummy_was_xts <- FALSE
   if (is.data.table(tdata) == FALSE) {
     if (is.xts(tdata) == TRUE) {
-      tdata <- setnames(as.data.table(tdata)[, PRICE := as.numeric(as.character(PRICE))], old = "index", new = "DT")
+      tdata <- setnames(as.data.table(tdata)[, PRICE := as.numeric(as.character(PRICE))], 
+                        old = "index", new = "DT")
+      qdata <- setnames(as.data.table(qdata)[, BID := as.numeric(as.character(BID))][, OFR := as.numeric(as.character(OFR))], 
+                        old = "index", new = "DT")
       dummy_was_xts <- TRUE
     } else {
       stop("Input has to be data.table or xts.")
     }
   } else {
     if (("DT" %in% colnames(tdata)) == FALSE) {
-      stop("Data.table neeeds DT column.")
+      stop("tdata neeeds DT column.")
     }
   }
   
-  if (length(unique(tdata$SYMBOL)) > 1) {
-    stop("Please provide only one symbol at a time.")
-  }
+  qdata <- qdata[, DT := DT + 2]
   
-  if ((type %in% c("standard", "advanced")) == FALSE) {
-    stop("type has to be \"standard\" or \"advanced\".")
-  }
+  setkey(tdata, SYMBOL, DT)
+  setkey(qdata, SYMBOL, DT)
   
-  # weights_med_center_incl <- rep(1, times = window + 1)
-  weights_med_center_excl <- c(rep(1, times = window / 2), 0, rep(1, times = window / 2))
-  weights_med_follow  <- c(0 , rep(1, times = window))
-  weights_med_trail    <- c(rep(1, times = window), 0)
+  tdata <- tdata[, c("DT", "SYMBOL", "PRICE")]
   
-  tdata <- tdata[, DATE := as.Date(DT)][, MADALL := mad(PRICE), by = "DATE"]
+  tdata <- qdata[tdata, roll = TRUE, on = c("SYMBOL", "DT")]
   
-  if (type == "standard") {
-    tdata <- tdata[ , CRITERION := abs(PRICE - rolling_median_incl_ends(PRICE, window = window, weights = weights_med_center_excl))][
-      CRITERION < maxi * MADALL]
-  }
-  if (type == "advanced") {
-    tdata <- tdata[, CRITERION := pmin(abs(PRICE - rolling_median_incl_ends(PRICE, window = window, weights = weights_med_center_excl, direction = "center")),
-                                       abs(PRICE - rolling_median_incl_ends(PRICE, window = window, weights = weights_med_trail, direction = "left")),
-                                       abs(PRICE - rolling_median_incl_ends(PRICE, window = window, weights = weights_med_follow, direction = "right")),
-                                       na.rm = TRUE)][
-                                         CRITERION < maxi * MADALL]
-  }
+  tdata[is.na(BID)][, "BID"] <- tdata$BID[min(which(is.na(tdata$BID) == FALSE))]
+  tdata[is.na(OFR)][, "OFR"] <- tdata$OFR[min(which(is.na(tdata$OFR) == FALSE))]
+  
+  tdata <- tdata[, SPREAD := OFR - BID][PRICE <= OFR + SPREAD][PRICE >= BID - SPREAD]
+  
   if (dummy_was_xts == TRUE) {
-    return(xts(as.matrix(tdata[, -c("DT", "DATE", "MADALL", "CRITERION")]), order.by = tdata$DT))
+    return(xts(as.matrix(tdata[, -c("DT", "SPREAD")]), order.by = tdata$DT))
   } else {
-    return(tdata[, -c("MADALL", "CRITERION")])
+    return(tdata[, -c("SPREAD")])
   }
 }
 
@@ -697,8 +663,13 @@ rmOutliersQuotes <- function (qdata, maxi = 10, window = 50, type = "advanced") 
 #' @keywords leaning
 #' @export
 salesCondition <- function(tdata) {
+  COND = NULL
   tdata <- checkColumnNames(tdata)
   checktdata(tdata)
+  
+  if (any(colnames(tdata) == "COND") == FALSE) {
+    stop("The argument tdata should have a column containing sales conditions named COND. Could not find that column.")
+  }
   
   dummy_was_xts <- FALSE
   if (is.data.table(tdata) == FALSE) {
@@ -780,7 +751,7 @@ selectExchange <- function(data, exch = "N") {
 #' 
 #' Since the function \code{\link{rmOutliersTrades}}
 #' also requires cleaned quote data as input, it is not incorporated here and
-#' there is a seperate wrapper called tradesCleanupFinal.
+#' there is a seperate wrapper called \code{\link{tradesCleanupUsingQuotes}}.
 #' 
 #' @param from character indicating first date to clean, e.g. "2008-01-30".
 #' @param to character indicating last date to clean, e.g. "2008-01-31".
@@ -836,7 +807,7 @@ selectExchange <- function(data, exch = "N") {
 #' @keywords cleaning
 #' @export
 tradesCleanup <- function(from, to, datasource, datadestination, ticker, exchanges, tdataraw = NULL, report = TRUE, selection = "median") {
-  
+  PRICE = EX = COND = NULL
   if (is.null(tdataraw) == TRUE) {
     stop("On-disk functionality has to be added once again!")
   }
@@ -877,7 +848,7 @@ tradesCleanup <- function(from, to, datasource, datadestination, ticker, exchang
     if (dummy_was_xts == TRUE) {
       df_result <- xts(as.matrix(tdataraw[, -c("DT")]), order.by = tdataraw$DT)
     } else {
-      df_result <- tdataraw[, -c( "DATE")]
+      df_result <- tdataraw
     }
     
     if (report == TRUE) {
@@ -1013,4 +984,65 @@ tradesCleanup <- function(from, to, datasource, datadestination, ticker, exchang
   #     }
   #   }
   # }
+}
+
+#' @export
+tradesCleanupUsingQuotes <- function(from, to, datasource, datadestination, ticker, tdata = NULL, qdata = NULL) {
+  warning("Please use tradesCleanupUsingQuotes instead of tradesCleanupFinal.")
+  tradesCleanupFinal(from, to, datasource, datadestination, ticker, tdata = NULL, qdata = NULL)
+}
+
+#' Perform a final cleaning procedure on trade data
+#' 
+#' @description Function performs cleaning procedure \code{\link{rmOutliersTrades}} 
+#' for the trades of all stocks in "ticker" over the interval 
+#' [from,to] and saves the result in "datadestination". 
+#' Note that preferably the input data for this function 
+#' is trade and quote data cleaned by respectively e.g. \code{\link{tradesCleanup}}
+#' and \code{\link{quotesCleanup}}.
+#' 
+#' @param from character indicating first date to clean, e.g. "2008-01-30".
+#' @param to character indicating last date to clean, e.g. "2008-01-31".
+#' @param datasource character indicating the folder in which the original data is stored.
+#' @param datadestination character indicating the folder in which the cleaned data is stored.
+#' @param ticker vector of tickers for which the data should be cleaned.
+#' @param tdata xts object containing (ONE day and for ONE stock only) trade data cleaned by \code{\link{tradesCleanup}}. This argument is NULL by default. Enabling it, means the arguments
+#' from, to, datasource and datadestination will be ignored. (only advisable for small chunks of data)
+#' @param qdata xts object containing (ONE day and for ONE stock only) cleaned quote data. This argument is NULL by default. Enabling it means the arguments
+#' from, to, datasource, datadestination will be ignored. (only advisable for small chunks of data)
+#' 
+#' @return For each day an xts object is saved into the folder of that date, containing the cleaned data.
+#' This procedure is performed for each stock in "ticker".
+#' 
+#' In case you supply the arguments "tdata" and "qdata", the on-disk functionality is ignored
+#' and the function returns a list with the cleaned trades as xts object (see examples).
+#' 
+#' @references Barndorff-Nielsen, O. E., P. R. Hansen, A. Lunde, and N. Shephard (2009). Realized kernels in practice: Trades and quotes. Econometrics Journal 12, C1-C32.
+#' 
+#' Brownlees, C.T. and Gallo, G.M. (2006). Financial econometric analysis at ultra-high frequency: Data handling concerns. Computational Statistics & Data Analysis, 51, pages 2232-2245.
+#' 
+#' @author Jonathan Cornelissen and Kris Boudt.
+#' 
+#' @examples 
+#' # Consider you have raw trade data for 1 stock for 2 days 
+#' tdata_afterfirstcleaning <- tradesCleanup(tdataraw = sample_tdataraw, 
+#'                            exchange = "N", report = FALSE)
+#' dim(tdata_afterfirstcleaning)
+#' tdata_afterfinalcleaning <- tradesCleanupUsingQuotes(qdata = sample_qdata,
+#'                                           tdata = tdata_afterfirstcleaning)
+#' dim(tdata_afterfinalcleaning);
+#' #In case you have more data it is advised to use the on-disk functionality
+#' #via "from","to","datasource", etc. arguments
+#' @keywords cleaning
+#' @export
+tradesCleanupUsingQuotes <- function(from, to, datasource, datadestination, ticker, tdata = NULL, qdata = NULL) {
+  
+  if ((!is.null(tdata)) & (!is.null(qdata))) {
+    tdata <- checkColumnNames(tdata)
+    qdata <- checkColumnNames(qdata)
+    
+    #1 cleaning procedure that needs cleaned trades and quotes
+    tdata <- rmOutliersTrades(tdata, qdata)
+    return(tdata)
+  }
 }

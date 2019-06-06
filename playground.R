@@ -70,6 +70,9 @@ microbenchmark::microbenchmark(xts_cleaned <- {tdata_afterfirstcleaning <- highf
 
 microbenchmark::microbenchmark({dt_cleaned <- dt_sample_tdataraw[PRICE != 0 & EX == "N" & COND %in% c("E", "F")][,  lapply(.SD, median), by = .(index, SYMBOL), .SDcols = c("PRICE")]}, times = 10, unit = "s")
 
+microbenchmark::microbenchmark(rmOutliersTrades(sample_tdata, sample_qdata), times = 10, unit = "s")
+
+
 # Check speed!
 
 data("sample_tdataraw")

@@ -2,54 +2,27 @@
 % Please edit documentation in R/data_handling.R
 \name{rmOutliersTrades}
 \alias{rmOutliersTrades}
-\title{Delete entries for which the transaction price is outlying with respect to surrounding entries}
+\title{Delete transactions with unlikely transaction prices}
 \usage{
-rmOutliersTrades(tdata, maxi = 10, window = 50, type = "advanced")
+rmOutliersTrades(tdata, qdata)
 }
 \arguments{
-\item{tdata}{an data.table or xts object at least containing the columns "PRICE".}
+\item{tdata}{a data.table or xts object containing the time series data, with at least the column "PRICE", containing the transaction price.}
 
-\item{maxi}{an integer, indicating the maximum number of median absolute deviations allowed.}
-
-\item{window}{an integer, indicating the time window for which the "outlyingness" is considered.}
-
-\item{type}{should be "standard" or "advanced" (see description).}
+\item{qdata}{a data.table or xts object containing the time series data with at least the columns "BID" and "OFR", containing the bid and ask prices.}
 }
 \value{
-xts object or data.table depending on type of input
+xts or data.table object depending on input
 }
 \description{
-If type = "standard": Function deletes entries for which the price deviated by more than "maxi"
-median absolute deviations from a rolling centered median (excluding
-the observation under consideration) of "window" observations.
-
-If type = "advanced": Function deletes entries for which the price deviates by more than "maxi"
-median absolute deviations from the value closest to the price of
-these three options:
-\enumerate{
- \item Rolling centered median (excluding the observation under consideration)
- \item Rolling median of the following "window" observations
- \item Rolling median of the previous "window" observations
-}
- 
-The advantage of this procedure compared to the "standard" proposed
-by Barndorff-Nielsen et al. (2010) is that it will not incorrectly remove
-large price jumps. Therefore this procedure has been set as the default
-for removing outliers. 
-
-Note that the median absolute deviation is taken over the entire
-day. In case it is zero (which can happen if mid-quotes don't change much), 
-the median absolute deviation is taken over a subsample without constant mid-quotes.
+Function deletes entries with prices that are above the ask plus the bid-ask spread.
+Similar for entries with prices below the bid minus the bid-ask spread.
 }
 \details{
-NOTE: This function works only correct if supplied input data consists of 1 day.
-}
-\references{
-Barndorff-Nielsen, O. E., P. R. Hansen, A. Lunde, and N. Shephard (2009). Realized kernels in practice: Trades and quotes. Econometrics Journal 12, C1-C32.
-
-Brownlees, C.T. and Gallo, G.M. (2006). Financial econometric analysis at ultra-high frequency: Data handling concerns. Computational Statistics & Data Analysis, 51, pages 2232-2245.
+Note: in order to work correctly, the input data of this function should be
+cleaned trade (tdata) and quote (qdata) data respectively.
 }
 \author{
-Onno Kleen
+Jonathan Cornelissen and Kris Boudt
 }
 \keyword{cleaning}

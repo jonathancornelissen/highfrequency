@@ -4,9 +4,9 @@ spotvol <- function(data, method = "detper", ..., on = "minutes", k = 5,
   if (on == "seconds" | on == "secs") 
     delta <- k 
   if (on == "minutes" | on == "mins") 
-    delta <- k*60  
+    delta <- k * 60  
   if (on == "hours") 
-    delta <- k*3600 
+    delta <- k * 3600 
   
   if (inherits(data, what = "xts")) {
     data <- xts(data, order.by = as.POSIXct(time(data), tz = tz), tzone = tz)
@@ -58,8 +58,7 @@ spotvol <- function(data, method = "detper", ..., on = "minutes", k = 5,
 # Deterministic periodicity model
 # 
 # Modified spotVol function from highfrequency package
-detper <- function(mR, rdata = NULL, options = list()) 
-{
+detper <- function(mR, rdata = NULL, options = list()) {
   # default options, replace if user-specified
   op <- list(dailyvol = "bipower", periodicvol = "TML", dummies = FALSE, 
              P1 = 5, P2 = 5)
@@ -207,8 +206,7 @@ stochper <- function(mR, rdata = NULL, options = list())
 # 
 # This function returns the average log likehood value of the stochastic 
 # periodicity model, given the input parameters.
-loglikBM <- function(par_t, yt, days, N = 288, P1 = 5, P2 = 5)
-{
+loglikBM <- function(par_t, yt, days, N = 288, P1 = 5, P2 = 5) {
   ss <- ssmodel(par_t, days, N, P1 = P1, P2 = P2)
   yt <- matrix(yt, ncol = length(yt))
   kf <- FKF::fkf(a0 = ss$a0, P0 = ss$P0, dt = ss$dt, ct = ss$ct, Tt = ss$Tt, 
