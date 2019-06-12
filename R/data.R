@@ -14,19 +14,17 @@
 
 #' The realized library from the Oxford-Man Institute of Quantitative Finance
 #' 
-#' @description An xts object containing the daily returns, daily Realized Variance and daily Realized Kernels ranging from 1996-01-03 up to 2009-03-01 for several indices and exchange rates. 
-#'  Use \code{colnames(realized_library)} to see which assets are included. 
-#'  The full library of the Oxford-Man Institute of Quantitative Finance can be found on their website: \url{http://realized.oxford-man.ox.ac.uk}.
+#' @description A data.frame object containing the daily open-close returns, daily realized variances based on 
+#' five-minute intraday returns and daily realized kernels ranging from 2000-01-03 up to 2019-06-10 for the S&P 500. 
+#' Use \code{colnames(realized_library)} to see which realized measures. 
+#' The full library of the Oxford-Man Institute of Quantitative Finance can be found on their website: \url{http://realized.oxford-man.ox.ac.uk}.
 #'  
 #' @references  
-#'  Gerd Heber, Asger Lunde, Neil Shephard, and Kevin Sheppard (2009)
-#'  "Oxford-Man Institute's realized library, version 0.1", Oxford-Man
-#'  Institute, University of Oxford. 
-#'  
-#'  Shephard, N. and K. Sheppard (2010). Realising the future: forecasting with high 
-#'  frequency based volatility (heavy) models. Journal of Applied Econometrics 25, 
-#'  197-231.
-#' @format xts object
+#' Gerd Heber, Asger Lunde, Neil Shephard, and Kevin Sheppard (2009)
+#' "Oxford-Man Institute's realized library, version 0.3", Oxford-Man
+#' Institute, University of Oxford. 
+#' 
+#' @format data.frame
 #' @keywords datasets
 "realized_library"
 
@@ -48,10 +46,10 @@
 #' @format xts object
 #' 
 #' @references 
-#' Barndorff-Nielsen, O. E., P. R. Hansen, A. Lunde and N. Shephard (2009). 
+#' Barndorff-Nielsen, O. E., P. R. Hansen, A. Lunde and N. Shephard (2011). 
 #' Multivariate realised kernels: consistent positive semi-definite
 #' estimators of the covariation of equity prices with noise and non-synchronous
-#' trading. Journal of Econometrics, forthcoming.
+#' trading. Journal of Econometrics, 162, 149-169.
 #' 
 #' @keywords datasets        
 "sample_5minprices"
@@ -74,10 +72,10 @@
 #' @format xts object
 #' 
 #' @references 
-#' Barndorff-Nielsen, O. E., P. R. Hansen, A. Lunde and N. Shephard (2009). 
+#' Barndorff-Nielsen, O. E., P. R. Hansen, A. Lunde and N. Shephard (2011). 
 #' Multivariate realised kernels: consistent positive semi-definite
 #' estimators of the covariation of equity prices with noise and non-synchronous
-#' trading. Journal of Econometrics, forthcoming.
+#' trading. Journal of Econometrics, 162, 149-169.
 #' 
 #' Boudt, K., C. Croux, and S. Laurent (2008). Outlyingness weighted covariation. Mimeo.
 #' 
