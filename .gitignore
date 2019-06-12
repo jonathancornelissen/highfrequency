@@ -16,3 +16,4 @@ taqdata/*
 speed_comparison.html
 speed_comparison.Rmd
 playground.R
+tests/testthat/Rplots.pdf
