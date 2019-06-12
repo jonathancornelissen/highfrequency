@@ -494,7 +494,7 @@ rmLargeSpread <- function(qdata, maxi = 50) {
 #' @importFrom data.table setkey
 #' @export
 rmOutliersTrades <- function(tdata, qdata) {
-  SPREAD = DT = PRICE = BID = OFR = 0
+  SPREAD = DT = PRICE = BID = OFR = SYMBOL = 0
   tdata <- checkColumnNames(tdata)
   qdata <- checkColumnNames(qdata)
   checkqdata(qdata)
