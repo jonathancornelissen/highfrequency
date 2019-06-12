@@ -153,7 +153,7 @@ harInsanityFilter <- function(fittedValues, lower, upper, replacement) {
 #' 
 #' ##### Example 2: HARRV ##### 
 #' # Forecasting daily Realized volatility for the S&P 500 using the basic harModel: HARRV
-#' libary(xts)
+#' library(xts)
 #' RV_SP500 <- as.xts(realized_library$rv5, order.by = realized_library$date)
 #' 
 #' x <- harModel(data = RV_SP500 , periods = c(1,5,22), RVest = c("rCov"), 
