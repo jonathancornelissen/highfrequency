@@ -22,9 +22,9 @@ which we keep constant over time. This means we expect one transaction every ten
 In a final step, the time series were aggregated to the 5-minute frequency by previous tick aggregation.
 }
 \references{
-Barndorff-Nielsen, O. E., P. R. Hansen, A. Lunde and N. Shephard (2009). 
+Barndorff-Nielsen, O. E., P. R. Hansen, A. Lunde and N. Shephard (2011). 
 Multivariate realised kernels: consistent positive semi-definite
 estimators of the covariation of equity prices with noise and non-synchronous
-trading. Journal of Econometrics, forthcoming.
+trading. Journal of Econometrics, 162, 149-169.
 }
 \keyword{datasets}
