@@ -152,12 +152,11 @@ harInsanityFilter <- function(fittedValues, lower, upper, replacement) {
 #' 
 #' 
 #' ##### Example 2: HARRV ##### 
-#' # Forecasting daily Realized volatility for DJI 2008 using the basic harModel: HARRV
-#' DJI_RV <- realized_library$Dow.Jones.Industrials.Realized.Variance #Select DJI
-#' DJI_RV <- DJI_RV[!is.na(DJI_RV)] #Remove NA's
-#' DJI_RV <- DJI_RV['2008']
+#' # Forecasting daily Realized volatility for the S&P 500 using the basic harModel: HARRV
+#' libary(xts)
+#' RV_SP500 <- as.xts(realized_library$rv5, order.by = realized_library$date)
 #' 
-#' x <- harModel(data = DJI_RV , periods = c(1,5,22), RVest = c("rCov"), 
+#' x <- harModel(data = RV_SP500 , periods = c(1,5,22), RVest = c("rCov"), 
 #'               type = "HARRV", h = 1, transform = NULL, inputType = "returns")
 #' class(x)
 #' x
