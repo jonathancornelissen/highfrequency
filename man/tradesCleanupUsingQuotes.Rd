@@ -47,8 +47,9 @@ tdata_afterfirstcleaning <- tradesCleanup(tdataraw = sample_tdataraw_microsecond
 qdata <- quotesCleanup(qdataraw = sample_qdataraw_microseconds, 
                        exchanges = "N", report = FALSE)
 dim(tdata_afterfirstcleaning)
-tdata_afterfinalcleaning <- tradesCleanupUsingQuotes(qdata = qdata[as.Date(DT) == "2018-01-02"],
-                                          tdata = tdata_afterfirstcleaning[as.Date(DT) == "2018-01-02"])
+tdata_afterfinalcleaning <- 
+  tradesCleanupUsingQuotes(qdata = qdata[as.Date(DT) == "2018-01-02"],
+                           tdata = tdata_afterfirstcleaning[as.Date(DT) == "2018-01-02"])
 dim(tdata_afterfinalcleaning)
 #In case you have more data it is advised to use the on-disk functionality
 #via "from","to","datasource", etc. arguments
