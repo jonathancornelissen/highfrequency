@@ -72,6 +72,7 @@
 #'                       
 #' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt and Onno Kleen.
 # ## Function: heavyModel by applying C code:
+#' @importFrom stats optim
 #' @export
 heavyModel = function (data, p = matrix(c(0, 0, 1, 1), ncol = 2), q = matrix(c(1, 0, 0, 1), ncol = 2), 
                           startingvalues = NULL, LB = NULL, UB = NULL, backcast = NULL, compconst = FALSE) {
