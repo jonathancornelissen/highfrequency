@@ -43,7 +43,7 @@ Imports:
     data.table,
     RcppRoll,
     bit64
-LinkingTo: Rcpp, RcppArmadillo
+LinkingTo: Rcpp
 Suggests:
     covr,
     FKF,
