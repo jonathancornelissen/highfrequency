@@ -84,7 +84,7 @@ startvalues <- c(0.004, 0.02, 0.44, 0.4, 0.41, 0.74, 0.56) # Initial values;
 p <- matrix(c(2, 0, 0, 1), ncol = 2)
 q <- matrix(c(1, 0, 0, 1), ncol = 2)
 
-heavy_model <- heavyModelC(data = as.matrix(data, ncol = 2), p = p, q = q, compconst = FALSE, 
+heavy_model <- heavyModel(data = as.matrix(data, ncol = 2), p = p, q = q, compconst = FALSE, 
                       startingvalues = startvalues, backcast = backcast)
                       
 }
