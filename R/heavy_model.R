@@ -67,7 +67,7 @@
 #' p <- matrix(c(2, 0, 0, 1), ncol = 2)
 #' q <- matrix(c(1, 0, 0, 1), ncol = 2)
 #' 
-#' heavy_model <- heavyModelC(data = as.matrix(data, ncol = 2), p = p, q = q, compconst = FALSE, 
+#' heavy_model <- heavyModel(data = as.matrix(data, ncol = 2), p = p, q = q, compconst = FALSE, 
 #'                       startingvalues = startvalues, backcast = backcast)
 #'                       
 #' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt and Onno Kleen.
