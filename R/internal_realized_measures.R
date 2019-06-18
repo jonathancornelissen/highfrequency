@@ -31,6 +31,27 @@ huberweight <- function(d,k) {
   return(w)
 }
 
+#' @keywords internal
+multixts <- function(x, y = NULL) { 
+  if (is.null(y)) {
+    test <- is.xts(x) && (ndays(x)!=1)
+    return(test)
+  }
+  if(!is.null(y)){
+    test <- (is.xts(x) && (ndays(x)!=1)) || ( ndays(y)!=1 && is.xts(y) );
+    if (test) {
+      test1 <- (dim(y) == dim(x))
+      if (!test1) { 
+        warning("Please make sure x and y have the same dimensions")
+      }
+      if (test1) {
+        test <- list(TRUE, cbind(x,y))
+        return(test) 
+      }
+    }
+  }
+}      
+
 # Check data:
 #' @keywords internal
 rdatacheck = function (rdata, multi = FALSE) {
@@ -52,11 +73,10 @@ refreshTime <- function (pdata) {
   for (i in 1:dim) {
     alltimes[(lengths[i] + 1):lengths[i + 1]] <- as.numeric(as.POSIXct(index(pdata[[i]]), tz = "GMT"))
   }
-  # x <- .C("refreshpoints", as.integer(alltimes), as.integer(lengths),
-  #        as.integer(rep(0, minl)), as.integer(dim), as.integer(0),
-  #        as.integer(rep(0, minl * dim)), as.integer(minl), PACKAGE="highfrequency")
-  print("not correct yet - look out!!!")
-  x <- c(1:100)
+  x <- .C("refreshpoints", as.integer(alltimes), as.integer(lengths),
+         as.integer(rep(0, minl)), as.integer(dim), as.integer(0),
+         as.integer(rep(0, minl * dim)), as.integer(minl), PACKAGE = "highfrequency")
+  
   newlength <- x[[5]]
   pmatrix <- matrix(ncol = dim, nrow = newlength)
   for (i in 1:dim) {

@@ -146,83 +146,81 @@ minRQ <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
 #' 
 #' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
 #' 
-#' @examples data(sample_5minprices_jumps)
+#' @examples 
 #' a <- list(sample_5minprices_jumps["2010-01-04",1], sample_5minprices_jumps["2010-01-04",2])
 #' MRC(a, pairwise = TRUE, makePsd = TRUE)
 #' 
 #' @keywords highfrequency preaveraging
 #' @export
 MRC <- function(pdata, pairwise = FALSE, makePsd = FALSE) {
-  print("needs further improvement!!!")
-  # 
-  # if (is.list(pdata) == FALSE) {
-  #   n <- 1
-  # } else {
-  #   n <- length(pdata)
-  # }
-  # if (n == 1) {
-  #   multixts = multixts(pdata); 
-  #   if (multixts == TRUE) { 
-  #     stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")
-  #   }
-  #   mrc <- .crv(pdata)
-  # }  
-  # 
-  # if (n > 1) {
-  #   multixts <- multixts(pdata[[1]]); 
-  #   if (multixts == TRUE) { 
-  #     stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input") 
-  #   }
-  #   
-  #   if (pairwise == TRUE) {
-  #     cov <- matrix(rep(0, n * n), ncol = n)
-  #     diagonal = c()
-  #     for (i in 1:n) {
-  #       diagonal[i] <- .crv(pdata[[i]])
-  #     }
-  #     diag(cov) <- diagonal
-  #     
-  #     for (i in 2:n) {
-  #       for (j in 1:(i - 1)) {
-  #         cov[i, j] = cov[j, i] = .preav_bi(pdata[[i]], pdata[[j]])
-  #       }
-  #     }
-  #     
-  #     mrc <- cov
-  #     
-  #     if (makePsd == TRUE) {
-  #       mrc <- makePsd(mrc)
-  #     }
-  #     
-  #   } else {
-  #     x     <- refreshTime(pdata)
-  #     N     <- nrow(x)
-  #     theta <- 0.8 #recommendation by Hautsch and Podolskij
-  #     kn    <- floor(theta * sqrt(N))  
-  #     
-  #     ##psi:
-  #     psi1 <- 1
-  #     psi2 <- 1 / 12
-  #     
-  #     psi1kn <- kn * sum((.gfunction((1:kn)/kn) - .gfunction(((1:kn) - 1) / kn))^2 )
-  #     psi2kn <- 1 / kn * sum(.gfunction((1:kn) / kn)^2)   
-  #     
-  #     preavreturn <- c()
-  #     for (i in 1:ncol(x)) {
-  #       preavreturn <- cbind( preavreturn , .hatreturn(x[,i],kn) )
-  #     }       
-  #     
-  #     S <- rCov(preavreturn)
-  #     
-  #     mrc <- N / (N - kn + 2) * 1/(psi2 * kn) * S
-  #     
-  #     if (makePsd == TRUE) {
-  #       mrc <- makePsd(mrc)
-  #     }
-  #   }
-  # }
-  # return(mrc) 
-  0
+
+  if (is.list(pdata) == FALSE) {
+    n <- 1
+  } else {
+    n <- length(pdata)
+  }
+  if (n == 1) {
+    multixts = multixts(pdata);
+    if (multixts == TRUE) {
+      stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")
+    }
+    mrc <- .crv(pdata)
+  }
+
+  if (n > 1) {
+    multixts <- multixts(pdata[[1]]);
+    if (multixts == TRUE) {
+      stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")
+    }
+
+    if (pairwise == TRUE) {
+      cov <- matrix(rep(0, n * n), ncol = n)
+      diagonal = c()
+      for (i in 1:n) {
+        diagonal[i] <- .crv(pdata[[i]])
+      }
+      diag(cov) <- diagonal
+
+      for (i in 2:n) {
+        for (j in 1:(i - 1)) {
+          cov[i, j] = cov[j, i] = .preav_bi(pdata[[i]], pdata[[j]])
+        }
+      }
+
+      mrc <- cov
+
+      if (makePsd == TRUE) {
+        mrc <- makePsd(mrc)
+      }
+
+    } else {
+      x     <- refreshTime(pdata)
+      N     <- nrow(x)
+      theta <- 0.8 #recommendation by Hautsch and Podolskij
+      kn    <- floor(theta * sqrt(N))
+
+      ##psi:
+      psi1 <- 1
+      psi2 <- 1 / 12
+
+      psi1kn <- kn * sum((.gfunction((1:kn)/kn) - .gfunction(((1:kn) - 1) / kn))^2 )
+      psi2kn <- 1 / kn * sum(.gfunction((1:kn) / kn)^2)
+
+      preavreturn <- c()
+      for (i in 1:ncol(x)) {
+        preavreturn <- cbind(preavreturn , .hatreturn(x[,i],kn) )
+      }
+
+      S <- rCov(preavreturn)
+
+      mrc <- N / (N - kn + 2) * 1/(psi2 * kn) * S
+
+      if (makePsd == TRUE) {
+        mrc <- makePsd(mrc)
+      }
+    }
+  }
+  return(mrc)
 } 
 
 #' minRV
@@ -270,8 +268,8 @@ minRV <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
       rdata <- makeReturns(rdata)
     }  
     q <- abs(rdata)#as.zoo(abs(as.numeric(rdata))) #absolute value
-    q <- rollapply(q, width = 2, FUN = min, by = 1, align = "left", by.column = TRUE)
-    N <- dim(q)[1] + 1 #number of obs
+    q <- rollapply(q, width = 2, FUN = min, by = 1, align = "left", by.column = TRUE, fill = NULL)
+    N <- dim(q)[1] + 1 #number of obs because of fill = NULL
     minrv <- (pi/(pi - 2)) * (N/(N - 1)) * colSums(q^2, na.rm = TRUE)
     return(minrv) 
   }  
@@ -336,13 +334,137 @@ medRV <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
       rdata <- makeReturns(rdata)
     }
     
-    q <- abs(as.numeric(rdata)); #absolute value
+    q <- abs(as.numeric(rdata)) #absolute value
     q <- as.numeric(rollmedian(q, k=3, align="center"))
     N <- length(q) + 2
     medrv <- (pi / (6 - 4 * sqrt(3) + pi)) * (N/(N - 2)) * sum(q^2)
     return(medrv)
   }
 }
+
+#' Realized beta: a tool in measuring risk with respect to the market. 
+#' 
+#' @description Depending on users' choices of estimator (realized covariance (RCOVestimator) and realized variance (RVestimator)), the function returns the realized beta, defined as the ratio between both.
+#' 
+#' The realized beta is given by
+#' \deqn{
+#' \beta_{jm} = \frac {RCOVestimator_{jm}}{RVestimator_{m}}
+#' }
+#' 
+#' in which
+#' 
+#' \eqn{RCOVestimator:} Realized covariance of asset j and market index m.
+#' 
+#' \eqn{RVestimator:} Realized variance of market index m. 
+#' 
+#' @param rdata a zoo/xts object containing all returns in period t for one asset.
+#' @param rindex a zoo/xts object containing return in period t for an index.
+#' @param RCOVestimator can be chosen among realized covariance estimators: rCov, rAVGCov, rBPCov, rHYCov, rKernelCov, rOWCov, rRTSCov, rThresholdCov and rTSCov. rCov by default.
+#' @param RVestimator can be chosen among realized variance estimators: RV, minRV and medRV. RV by default. In case of missing RVestimator, RCOVestimator function applying for rindex will be used.
+#' @param makeReturns boolean, should be TRUE when rdata contains prices instead of returns. FALSE by  default.
+#' 
+#' @return numeric
+#' 
+#' @details 
+#' Suppose there are \eqn{N} equispaced returns on day \eqn{t} for the asset j and the index m. Denote \eqn{r_{(j)i,t}}, \eqn{r_{(m)i,t}} as the \eqn{i}th return on day \eqn{t} for asset \eqn{j} and index \eqn{m} (with \eqn{i=1, \ldots,N}).
+#' 
+#' By default, the RCov is used and the realized beta coefficient is computed as:  
+#' \deqn{
+#' \hat{\beta}_{(jm)t}= \frac{\sum_{i=1}^{N} r_{(j)i,t} r_{(m)i,t}}{\sum_{i=1}^{N} r_{(m)i,t}^2}
+#' }
+#'  
+#' (Barndorff & Shephard (2004)).
+#' 
+#' Note: It is worth to note that the function does not support to calculate for data of multiple days. 
+#' 
+#' @references 
+#' Barndorff-Nielsen, O. E., & Shephard, N. (2004). Econometric analysis of realized covariation: High frequency based covariance, regression, and correlation in 
+#' #' financial economics. Econometrica, 72(3), 885-925.
+#' 
+#' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
+#' 
+#' @examples 
+#' a <- sample_5minprices_jumps['2010-01-04', 1]
+#' b <- sample_5minprices_jumps['2010-01-04', 2]
+#' rBeta(a, b, RCOVestimator = "rBPCov", RVestimator = "minRV", makeReturns = TRUE)
+#' 
+#' @keywords highfrequency rBeta
+#' @importFrom methods hasArg
+#' @importFrom utils data
+#' @export
+rBeta <- function(rdata, rindex, RCOVestimator = "rCov", RVestimator = "RV", makeReturns = FALSE) {
+  if (hasArg(data)) {
+    rdata <- data
+  }
+  
+  if (RCOVestimator != "rRTSCov" & RCOVestimator != "rTSCov" &  makeReturns) {
+    rdata <- makeReturns(rdata)
+    rindex <- makeReturns(rindex)
+  }
+  
+  if(!makeReturns) {
+    if (RCOVestimator == "rRTSCov" || RCOVestimator == "rTSCov"){
+      if (min(rdata) < 0) {
+        print("when using rRTSCov, rTSCov, introduce price data - transformation to price data done")
+        rdata <- exp(cumsum(rdata))
+      }
+      if( min(rindex) <0 ){
+        print("when using rRTSCov, rTSCov, introduce price data - transformation to price data done")
+        rindex <- exp(cumsum(rindex))
+      }       
+    }
+  }
+  
+  multixts <- multixts(rdata)
+  
+  if (multixts) {
+    print("No support for multiple days")
+  }
+  
+  if (!multixts) {
+    rcovfun <- function(rdata, rindex, RCOVestimator) {
+      
+      switch(RCOVestimator,
+             rCov = rCov(cbind(rdata,rindex) ),
+             rAVGCov = rAVGCov(list(rdata, rindex) ),
+             rBPCov = rBPCov(cbind(rdata, rindex) ),
+             rHYCov = rHYCov(list(rdata, rindex) ),
+             rKernelCov = rKernelCov(list(rdata, rindex) ),
+             rOWCov = rOWCov(cbind(rdata, rindex) ),
+             rRTSCov = rRTSCov(list(rdata, rindex)),
+             rThresholdCov = rThresholdCov(cbind(rdata, rindex) ),
+             rTSCov = rTSCov(list(rdata, rindex)))
+    }
+    
+    rcov <- rcovfun(rdata,rindex,RCOVestimator)
+    
+    if (RVestimator == RCOVestimator || is.null(RVestimator)) {
+      rbeta <- rcov[1,2] / rcov[2,2]
+    } else {
+      rvfun <- function(rindex, RVestimator) {
+        
+        switch(RVestimator,
+               rCov = rCov(rindex ) ,
+               RV = RV(rindex),
+               BV = RBPVar(rindex),
+               minRV = minRV(rindex ),
+               medRV = medRV(rindex ),
+               rAVGCov = rAVGCov(rindex ) ,
+               rBPCov = rBPCov(rindex ) ,
+               rHYCov = rHYCov(rindex ) ,
+               rKernelCov = rKernelCov(rindex ) ,
+               rOWCov = rOWCov(rindex ) ,
+               rRTSCov = rRTSCov(rindex) ,
+               rThresholdCov = rThresholdCov(rindex ) ,
+               rTSCov = rTSCov(rindex))
+      }
+      rv <- rvfun(rindex,RVestimator)
+      rbeta <- rcov[1,2] / rv
+    }
+    return(rbeta)
+  }
+}
+
 
 
 #' Realized BiPower Covariance
@@ -394,7 +516,7 @@ medRV <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
 #' rbpv 
 #'  
 #' # Multivariate: 
-#' rbpc = rBPCov(rdata = sample_5minprices_jumps['2010-01-04'], makeReturns=TRUE, makePsd = TRUE)
+#' rbpc = rBPCov(rdata = sample_5minprices_jumps['2010-01-04'], makeReturns = TRUE, makePsd = TRUE)
 #' rbpc
 #'  
 #' @keywords volatility

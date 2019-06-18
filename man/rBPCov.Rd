@@ -55,7 +55,7 @@ rbpv = rBPCov(rdata = sample_tdata$PRICE, align.by ="minutes",
 rbpv 
  
 # Multivariate: 
-rbpc = rBPCov(rdata = sample_5minprices_jumps['2010-01-04'], makeReturns=TRUE, makePsd = TRUE)
+rbpc = rBPCov(rdata = sample_5minprices_jumps['2010-01-04'], makeReturns = TRUE, makePsd = TRUE)
 rbpc
  
 }

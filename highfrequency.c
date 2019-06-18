@@ -1,7 +1,8 @@
 #include <stdio.h> 
 #include <stdlib.h> 
 #include <R.h> 
-#include "highfrequency.h" 
+#include "realized_measures.h"
+#include "heavy_model.h"
 #include <math.h> 
 #include <R_ext/Rdynload.h>
 
@@ -27,8 +28,7 @@ static const
     {NULL}
   };
 
-void R_init_highfrequency(DllInfo *info)
-{
+void R_init_highfrequency(DllInfo *info) {
   R_registerRoutines(info,
                      cMethods, NULL,
                      NULL, NULL);
@@ -37,72 +37,7 @@ void R_init_highfrequency(DllInfo *info)
 
 
 
-double KK(double x, int type)
-{
-//    double thex = x[0];
-    double thex = x;
-  switch(type)
-  {
-      case 0:  // Rectangular
-         return(1);
-         break;
-
-	  case 1: // Bartlett
-	    return(1-thex);
-	    break;
-
-	  case 2: //2nd Order
-	    return(1-2*thex+thex*thex);
-	    break;
-
-	  case 3: //Epanechnikov
-	    return(1-thex*thex);
-	    break;
-
-	  case 4: //Cubic
-	    return(1-3*thex*thex+2*thex*thex*thex);
-	    break;
-
-	  case 5: //5th Order
-	    return(1-10*thex*thex*thex + 15*thex*thex*thex*thex - 6*thex*thex*thex*thex*thex);
-	    break;
-
-	  case 6: //6th Order
-	    return(1 - 15*thex*thex*thex*thex + 24*thex*thex*thex*thex*thex - 10*thex*thex*thex*thex*thex*thex);
-	    break;
-
-	  case 7: //7th Order
-	    return(1 - 21*thex*thex*thex*thex*thex + 35*thex*thex*thex*thex*thex*thex - 15*thex*thex*thex*thex*thex*thex*thex);
-	    break;
-
-	  case 8: //8th Order
-	    return(1 - 28*thex*thex*thex*thex*thex*thex + 48*thex*thex*thex*thex*thex*thex*thex - 21*thex*thex*thex*thex*thex*thex*thex*thex);
-	    break;
-
-	  case 9: //Parzen
-	    if(thex > .5)
-	    {
-	        return( 2*(1-thex)*(1-thex)*(1-thex));
-	    }
-	    else
-	    {
-	    	return(1- 6*thex*thex +6*thex*thex*thex);
-	    }
-	    break;
-
-	  case 10: //Tukey-Hanning
-	    return((1 + sin(M_PI_2 - M_PI * thex))/2);
-	    break;
-
-	  case 11: //Modified Tukey-Hanning
-	    return((1 - sin(M_PI_2 - M_PI *(1 - thex) *(1 - thex)) )/2);
-	    break;
-	}
-	return(-999);
-}
-
-void justKernel(double *x, int *type, double *ans)
-{
+void justKernel(double *x, int *type, double *ans) {
     ans[0] = KK(x[0], type[0]);
 
 }
@@ -478,58 +413,14 @@ void portfolio(double *a, double *b, int *na, int *nb, int *millisa, int *millis
     }
  }
 
-int nsmaller(int *times, int *lengths, int start, int end, int max)
-{
-int i=0;
-while ( (i < (lengths[end] - lengths[start])) && (*(times+ (lengths[start]+i)) <= max)){
-i++;
-}
-return i;
-}
-
-void refreshpoints( int *times, int *lengths, int *ttau, int *dim, int *aa, int *indices, int *lindex){
-  //my first C program, so probably improvable..
-  //length start with all starting points: from zero and upto last endpoint +1
-  // getting variables declared
-int  t_max=0, i, j,a,b;;
-int condition = 1;
-int Ntau[*dim];
-int tnext[*dim];
-  //int xx tau[*lindex];
-  // getting starting values before looping
- *ttau = 0;
- for(i = 0; i<*dim ; i++){
-     if( *ttau < *(times + lengths[i]) )
-     { *ttau = *(times + lengths[i] ); }
-     }
-
- for(i = 0; i < *dim; i++){
-    Ntau[i] = nsmaller(times, lengths, i, (i+1), *ttau);
-    *(indices + i * (*lindex))  = Ntau[i];}
- j=0;
- // start the loop over all observations
-while( condition >= 1 ){
-
- for(i = 0; i<*dim; i++){
-    tnext[i] = *(times + Ntau[i] + lengths[i]);
-    if( tnext[i] > t_max ){ t_max = tnext[i]; }
-    }
-    j++;
-    *(ttau+j) = t_max;
- for(i = 0; i<*dim; i++){
-    Ntau[i] = nsmaller(times, lengths, i, (i+1), *(ttau+j));
-    *(indices + i* (*lindex) + j)  = Ntau[i];
-    a = lengths[i+1];
-    b =  (Ntau[i] + lengths[i]);
-    if( a <= b ){ condition = 0; }
-    }
-    t_max = 0;
-
- }
- *aa = j+1;
-}
-
-
+//int nsmaller(int *times, int *lengths, int start, int end, int max)
+//{
+//int i=0;
+//while ( (i < (lengths[end] - lengths[start])) && (*(times+ (lengths[start]+i)) <= max)){
+//i++;
+//}
+//return i;
+//‚}
 
 
   

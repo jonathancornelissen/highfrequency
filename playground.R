@@ -1,3 +1,9 @@
+
+Rcpp::compileAttributes()
+pkgbuild::compile_dll()
+document()
+load_all()
+
 library(magrittr)
 library(pryr)
 library(data.table)

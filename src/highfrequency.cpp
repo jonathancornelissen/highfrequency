@@ -1,14 +1,14 @@
 #include <Rcpp.h>
 using namespace Rcpp;
 
-// [[Rcpp::export]]
-int nsmaller(IntegerVector times, IntegerVector lengths, int start, int end, int max) {
-  int i = 0;
-  while ( (i < (lengths[end] - lengths[start])) && (times[(lengths[start]+i)] <= max)) {
-    i++;
-  }
-  return i;
-}
+// // [[Rcpp::export]]
+// int nsmaller(IntegerVector times, IntegerVector lengths, int start, int end, int max) {
+//   int i = 0;
+//   while ( (i < (lengths[end] - lengths[start])) && (times[(lengths[start]+i)] <= max)) {
+//     i++;
+//   }
+//   return i;
+// }
 
 // // 
 // // // \\ [[Rcpp::export]]

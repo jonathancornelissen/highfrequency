@@ -53,7 +53,7 @@
 
   N <- nrow(x)
   theta <- 0.8 ##recommendation by Hautsch and Podolskij
-  kn <- floor(theta*sqrt(N))
+  kn <- floor(theta * sqrt(N))
 
   ##psi:
   psi1 <- 1

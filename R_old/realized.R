@@ -313,7 +313,7 @@ rv.kernel <- function(x,                             # Tick Data
                       adj = NULL,                    # Deprectated
                       q = NULL, ...){                     # Deprectated
     # Multiday adjustment: 
-    multixts = .multixts(x);
+    multixts = multixts(x);
     if(multixts){
         result = apply.daily(x,rv.kernel,kernel.type,kernel.param,kernel.dofadj,
         align.by,align.period,cts,makeReturns,type,adj,q);
@@ -595,7 +595,7 @@ rc.zero = function(x, y, period) {
     PACKAGE="highfrequency")$tmpa     
 }
 
-.multixts <- function(x, y = NULL) { 
+multixts <- function(x, y = NULL) { 
     if(is.null(y)){
         test = is.xts(x) && (ndays(x)!=1);
         return(test);}
@@ -779,7 +779,7 @@ rBPCov <- function(rdata, cor = FALSE, align.by = NULL, align.period = NULL, mak
   }
   
   # Multiday adjustment: 
-  multixts <- .multixts(rdata); 
+  multixts <- multixts(rdata); 
     if (multixts) { 
         if(is.null(dim(rdata))){  n = 1
         }else{ n = dim(rdata)[2] }
@@ -850,7 +850,7 @@ rTSCov = function (pdata, cor = FALSE, K = 300, J = 1, K_cov = NULL, J_cov = NUL
       stop("Two time scale estimator uses returns based on prices that are K ticks aways. 
            Please provide a timeseries of at least 10*K" ) 
     } 
-    multixts = .multixts(pdata); 
+    multixts = multixts(pdata); 
     if(multixts){ stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input"); }
     return(TSRV(pdata, K = K, J = J))
     }
@@ -859,7 +859,7 @@ rTSCov = function (pdata, cor = FALSE, K = 300, J = 1, K_cov = NULL, J_cov = NUL
       stop("Two time scale estimator uses returns based on prices that are K ticks aways. 
            Please provide a timeseries of at least 10*K" ) 
     } 
-    multixts = .multixts(pdata[[1]]); 
+    multixts = multixts(pdata[[1]]); 
     if(multixts){ stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input"); }
     
     
@@ -923,7 +923,7 @@ rRTSCov = function (pdata, cor = FALSE, startIV = NULL, noisevar = NULL,
       stop("Two time scale estimator uses returns based on prices that are K ticks aways. 
            Please provide a timeseries of at least 10*K" ) 
     } 
-    multixts = .multixts(pdata); 
+    multixts = multixts(pdata); 
     if(multixts){ stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input"); }    
     return(RTSRV(pdata, startIV = startIV, noisevar = noisevar, 
                  K = K, J = J, eta = eta))
@@ -933,7 +933,7 @@ rRTSCov = function (pdata, cor = FALSE, startIV = NULL, noisevar = NULL,
       stop("Two time scale estimator uses returns based on prices that are K ticks aways. 
            Please provide a timeseries of at least 10*K" ) 
     } 
-    multixts = .multixts(pdata[[1]]); 
+    multixts = multixts(pdata[[1]]); 
     if(multixts){ stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input"); }
     
     cov = matrix(rep(0, n * n), ncol = n)
@@ -983,8 +983,8 @@ rThresholdCov = function( rdata, cor=FALSE, align.by=NULL, align.period=NULL, ma
     rdatacheck(rdata,multi=TRUE); 
     
     # Multiday adjustment: 
-    multixts = .multixts(rdata); 
-    multixts = .multixts(rdata); 
+    multixts = multixts(rdata); 
+    multixts = multixts(rdata); 
     if(multixts){ 
         if(is.null(dim(rdata))){  n = 1
         }else{ n = dim(rdata)[2] }
@@ -1016,8 +1016,7 @@ rThresholdCov = function( rdata, cor=FALSE, align.by=NULL, align.period=NULL, ma
 } 
 
 ## Hayashi Yoshida covariance estimator
-rHYCov = function(rdata, cor = FALSE, period = 1, align.by = "seconds", align.period = 1, cts = TRUE, makeReturns = FALSE, makePsd=TRUE, ...) 
-{
+rHYCov = function(rdata, cor = FALSE, period = 1, align.by = "seconds", align.period = 1, cts = TRUE, makeReturns = FALSE, makePsd=TRUE, ...) {
     if (!is.list(rdata)){
         stop('The rdata input is not a list. Please provide a list as input for this function. Each list-item should contain the series for one asset.')
     }else{
@@ -1026,7 +1025,7 @@ rHYCov = function(rdata, cor = FALSE, period = 1, align.by = "seconds", align.pe
             stop('Please provide a list with multiple list-items as input. You cannot compute covariance from a single price series.')      
         }
     }  
-    multixts = .multixts(rdata[[1]]); 
+    multixts = multixts(rdata[[1]]); 
     if(multixts){ stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")}
     
     cov = matrix(rep(0, n * n), ncol = n);
@@ -1084,7 +1083,7 @@ q = NULL, ...)
         }
         if( n>1 ){
             
-            multixts = .multixts(rdata[[1]]); 
+            multixts = multixts(rdata[[1]]); 
             if(multixts){ stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")}
             
             cov = matrix(rep(0, n * n), ncol = n);
@@ -1121,7 +1120,7 @@ q = NULL, ...)
 ## Average subsample estimator: 
 rAVGCov = function( rdata, cor = FALSE, period = 1, align.by = "seconds", align.period = 1, cts = TRUE, makeReturns = FALSE, ...){
     if (!is.list(rdata)){
-        multixts = .multixts(rdata); 
+        multixts = multixts(rdata); 
         if(multixts){ stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")}
         
         if(is.null(dim(rdata))){  n = 1
@@ -1134,7 +1133,7 @@ rAVGCov = function( rdata, cor = FALSE, period = 1, align.by = "seconds", align.
     }
     if(is.list(rdata)){
         n = length(rdata)
-        multixts = .multixts(rdata[[1]]); 
+        multixts = multixts(rdata[[1]]); 
         if(multixts){ stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")}
         
         if( n == 1 ){ 
@@ -1177,7 +1176,7 @@ rAVGCov = function( rdata, cor = FALSE, period = 1, align.by = "seconds", align.
 ## Percentage of zero's for given time aggregation calculator:
 rZero = function( rdata, period = 1, align.by = "seconds", align.period = 1, cts = TRUE, makeReturns = FALSE, ...){
     if (!is.list(rdata)){
-        multixts = .multixts(rdata);  
+        multixts = multixts(rdata);  
         if(multixts){ stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")}     
         if(is.null(dim(rdata))){  n = 1
         }else{ n = dim(rdata)[2] }
@@ -1188,7 +1187,7 @@ rZero = function( rdata, period = 1, align.by = "seconds", align.period = 1, cts
         if( n >  1 ){ stop('The rdata input is not a list. Please provide a list as input for this function. Each list-item should contain the series for one asset.') }
     }
     if(is.list(rdata)){
-        multixts = .multixts(rdata[[1]]);  
+        multixts = multixts(rdata[[1]]);  
         if(multixts){ stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")}
         n = length(rdata)
         if( n == 1 ){ 
@@ -1217,7 +1216,7 @@ rZero = function( rdata, period = 1, align.by = "seconds", align.period = 1, cts
 # Accumulation:
 rAccumulation <- function(x, period=1, y=NULL, align.by="seconds",align.period=1, plotit=FALSE, cts=TRUE, makeReturns=FALSE)
 {
-  multixts = .multixts(x) || .multixts(y);
+  multixts = multixts(x) || multixts(y);
   if( multixts ){ stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")}     
     
     align.period = .getAlignPeriod(align.period, align.by)   
@@ -1238,7 +1237,7 @@ rAccumulation <- function(x, period=1, y=NULL, align.by="seconds",align.period=1
 # Marginal distribution:
 rMarginal <- function(x, y=NULL, period, align.by="seconds", align.period=1, plotit=FALSE, cts=TRUE, makeReturns=FALSE)
 {
-  multixts = .multixts(x) || .multixts(y);
+  multixts = multixts(x) || multixts(y);
   if( multixts ){ stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")}     
   
     align.period = .getAlignPeriod(align.period, align.by)   
@@ -1263,7 +1262,7 @@ rMarginal <- function(x, y=NULL, period, align.by="seconds", align.period=1, plo
 # Cumulative sum of returns:
 rCumSum <- function(x, period = 1, align.by="seconds", align.period=1, plotit=FALSE, type='l', cts = TRUE, makeReturns=FALSE)
 {
-  multixts = .multixts(x);
+  multixts = multixts(x);
   if( multixts ){ stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")}     
 
     align.period = .getAlignPeriod(align.period, align.by)   
@@ -1286,7 +1285,7 @@ rCumSum <- function(x, period = 1, align.by="seconds", align.period=1, plotit=FA
 #Scatter returns:
 rScatterReturns <- function(x, y, period, align.by = "seconds", align.period = 1, numbers = FALSE, xlim = NULL, ylim = NULL, 
                             plotit = TRUE, pch = NULL, cts = TRUE, makeReturns = FALSE, scale.size = 0, col.change = FALSE,...) {
-  multixts = .multixts(x) || .multixts(y)
+  multixts = multixts(x) || multixts(y)
   if( multixts ){ stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")}     
   
     align.period = .getAlignPeriod(align.period, align.by) 
