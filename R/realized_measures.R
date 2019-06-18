@@ -92,137 +92,6 @@ minRQ <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
   }
 }
 
-#' Modulated Realized Covariance (MRC): Return univariate or multivariate preaveraged estimator.  
-#' 
-#' @description Function returns univariate or multivariate preaveraged estimator, as defined in Hautsch and Podolskij (2013). 
-#'
-#' @param pdata a list. Each list-item contains an xts object with the intraday price data of a stock.
-#' @param pairwise boolean, should be TRUE when refresh times are based on pairs of assets. FALSE by  default.
-#' @param makePsd boolean, in case it is TRUE, the positive definite version of MRC is returned. FALSE by default.
-#' 
-#' @return an \eqn{d x d} matrix
-#' 
-#' @details 
-#'   In practice, market microstructure noise leads to a departure from the pure semimartingale model. We consider the process \eqn{Y} in period \eqn{\tau}: 
-#'     \deqn{
-#'       \mbox{Y}_{\tau} = X_{\tau} + \epsilon_{\tau}
-#'     }
-#'   where, the observed \eqn{d} dimensional log-prices are the sum of underlying Brownian semimartingale process \eqn{X} and a noise term \eqn{\epsilon_{\tau}}. 
-#'   
-#'   \eqn{\epsilon_{\tau}} is an i.i.d process with \eqn{X}. 
-#'   
-#'   It is intuitive that under mean zero i.i.d. microstructure noise some form of smoothing of the observed log-price should tend to diminish the impact of the noise. Effectively, we are going to approximate a continuous function by an average of observations of Y in a neighborhood, the noise being averaged away. 
-#'   
-#'   Assume there is \eqn{N} equispaced returns in period \eqn{\tau} of a list (after refeshing data). Let \eqn{r_{\tau_i}} be a return (with \eqn{i=1, \ldots,N}) of an asset in period \eqn{\tau}. Assume there is \eqn{d} assets. 
-#'   
-#'   In order to define the univariate pre-averaging estimator, we first define the pre-averaged returns as
-#'   \deqn{
-#'     \bar{r}_{\tau_j}^{(k)}= \sum_{h=1}^{k_N-1}g\left(\frac{h}{k_N}\right)r_{\tau_{j+h}}^{(k)}
-#'   }
-#'   where g is a non-zero real-valued function \eqn{g:[0,1]} \eqn{\rightarrow} \eqn{R} given by \eqn{g(x)} = \eqn{\min(x,1-x)}. \eqn{k_N} is a sequence of integers satisfying  \eqn{\mbox{k}_{N} = \lfloor\theta N^{1/2}\rfloor}. We use \eqn{\theta = 0.8} as recommended in Hautsch & Podolskij (2013). The pre-averaged returns are simply a weighted average over the returns in a local window. This averaging diminishes the influence of the noise. The order of the window size \eqn{k_n} is chosen to lead to optimal convergence rates. The pre-averaging estimator is then simply the analogue of the Realized Variance but based on pre-averaged returns and an additional term to remove bias due to noise
-#'   \deqn{
-#'     \hat{C}= \frac{N^{-1/2}}{\theta \psi_2}\sum_{i=0}^{N-k_N+1}  (\bar{r}_{\tau_i})^2-\frac{\psi_1^{k_N}N^{-1}}{2\theta^2\psi_2^{k_N}}\sum_{i=0}^{N}r_{\tau_i}^2
-#'   }
-#'   with
-#'   \deqn{
-#'     \psi_1^{k_N}= k_N \sum_{j=1}^{k_N}\left(g\left(\frac{j+1}{k_N}\right)-g\left(\frac{j}{k_N}\right)\right)^2,\quad 
-#'   }
-#'   \deqn{
-#'     \psi_2^{k_N}= \frac{1}{k_N}\sum_{j=1}^{k_N-1}g^2\left(\frac{j}{k_N}\right).
-#'   }
-#'   \deqn{
-#'     \psi_2= \frac{1}{12}
-#'   }
-#'   The multivariate counterpart is very similar. The estimator is called the Modulated Realized Covariance (MRC) and is defined as
-#'   \deqn{
-#'     \mbox{MRC}= \frac{N}{N-k_N+2}\frac{1}{\psi_2k_N}\sum_{i=0}^{N-k_N+1}\bar{\boldsymbol{r}}_{\tau_i}\cdot \bar{\boldsymbol{r}}'_{\tau_i} -\frac{\psi_1^{k_N}}{\theta^2\psi_2^{k_N}}\hat{\Psi}
-#' }
-#' where \eqn{\hat{\Psi}_N = \frac{1}{2N}\sum_{i=1}^N \boldsymbol{r}_{\tau_i}(\boldsymbol{r}_{\tau_i})'}. It is a bias correction to make it consistent. However, due to this correction, the estimator is not ensured PSD. An alternative is to slightly enlarge the bandwidth such that \eqn{\mbox{k}_{N} = \lfloor\theta N^{1/2+\delta}\rfloor}. \eqn{\delta = 0.1} results in a consistent estimate without the bias correction and a PSD estimate, in which case:
-#'   \deqn{
-#'     \mbox{MRC}^{\delta}= \frac{N}{N-k_N+2}\frac{1}{\psi_2k_N}\sum_{i=0}^{N-k_N+1}\bar{\boldsymbol{r}}_i\cdot \bar{\boldsymbol{r}}'_i
-#' }
-#' 
-#' @references Hautsch, N., & Podolskij, M. (2013). Preaveraging-Based Estimation of Quadratic Variation in the Presence of Noise and Jumps: Theory, Implementation, and Empirical Evidence. Journal of Business & Economic Statistics, 31(2), 165-183.
-#' 
-#' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
-#' 
-#' @examples 
-#' a <- list(sample_5minprices_jumps["2010-01-04",1], sample_5minprices_jumps["2010-01-04",2])
-#' MRC(a, pairwise = TRUE, makePsd = TRUE)
-#' 
-#' @keywords highfrequency preaveraging
-#' @export
-MRC <- function(pdata, pairwise = FALSE, makePsd = FALSE) {
-
-  if (is.list(pdata) == FALSE) {
-    n <- 1
-  } else {
-    n <- length(pdata)
-  }
-  if (n == 1) {
-    multixts = multixts(pdata);
-    if (multixts == TRUE) {
-      stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")
-    }
-    mrc <- .crv(pdata)
-  }
-
-  if (n > 1) {
-    multixts <- multixts(pdata[[1]]);
-    if (multixts == TRUE) {
-      stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")
-    }
-
-    if (pairwise == TRUE) {
-      cov <- matrix(rep(0, n * n), ncol = n)
-      diagonal = c()
-      for (i in 1:n) {
-        diagonal[i] <- .crv(pdata[[i]])
-      }
-      diag(cov) <- diagonal
-
-      for (i in 2:n) {
-        for (j in 1:(i - 1)) {
-          cov[i, j] = cov[j, i] = .preav_bi(pdata[[i]], pdata[[j]])
-        }
-      }
-
-      mrc <- cov
-
-      if (makePsd == TRUE) {
-        mrc <- makePsd(mrc)
-      }
-
-    } else {
-      x     <- refreshTime(pdata)
-      N     <- nrow(x)
-      theta <- 0.8 #recommendation by Hautsch and Podolskij
-      kn    <- floor(theta * sqrt(N))
-
-      ##psi:
-      psi1 <- 1
-      psi2 <- 1 / 12
-
-      psi1kn <- kn * sum((.gfunction((1:kn)/kn) - .gfunction(((1:kn) - 1) / kn))^2 )
-      psi2kn <- 1 / kn * sum(.gfunction((1:kn) / kn)^2)
-
-      preavreturn <- c()
-      for (i in 1:ncol(x)) {
-        preavreturn <- cbind(preavreturn , .hatreturn(x[,i],kn) )
-      }
-
-      S <- rCov(preavreturn)
-
-      mrc <- N / (N - kn + 2) * 1/(psi2 * kn) * S
-
-      if (makePsd == TRUE) {
-        mrc <- makePsd(mrc)
-      }
-    }
-  }
-  return(mrc)
-} 
-
 #' minRV
 #' 
 #' @description Function returns the minRV, defined in Andersen et al. (2009).
@@ -341,6 +210,137 @@ medRV <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
     return(medrv)
   }
 }
+
+#' Modulated Realized Covariance (MRC): Return univariate or multivariate preaveraged estimator.  
+#' 
+#' @description Function returns univariate or multivariate preaveraged estimator, as defined in Hautsch and Podolskij (2013). 
+#'
+#' @param pdata a list. Each list-item contains an xts object with the intraday price data of a stock.
+#' @param pairwise boolean, should be TRUE when refresh times are based on pairs of assets. FALSE by default.
+#' @param makePsd boolean, in case it is TRUE, the positive definite version of MRC is returned. FALSE by default.
+#' 
+#' @return an \eqn{d x d} matrix
+#' 
+#' @details 
+#'   In practice, market microstructure noise leads to a departure from the pure semimartingale model. We consider the process \eqn{Y} in period \eqn{\tau}: 
+#'     \deqn{
+#'       \mbox{Y}_{\tau} = X_{\tau} + \epsilon_{\tau}
+#'     }
+#'   where, the observed \eqn{d} dimensional log-prices are the sum of underlying Brownian semimartingale process \eqn{X} and a noise term \eqn{\epsilon_{\tau}}. 
+#'   
+#'   \eqn{\epsilon_{\tau}} is an i.i.d process with \eqn{X}. 
+#'   
+#'   It is intuitive that under mean zero i.i.d. microstructure noise some form of smoothing of the observed log-price should tend to diminish the impact of the noise. Effectively, we are going to approximate a continuous function by an average of observations of Y in a neighborhood, the noise being averaged away. 
+#'   
+#'   Assume there is \eqn{N} equispaced returns in period \eqn{\tau} of a list (after refeshing data). Let \eqn{r_{\tau_i}} be a return (with \eqn{i=1, \ldots,N}) of an asset in period \eqn{\tau}. Assume there is \eqn{d} assets. 
+#'   
+#'   In order to define the univariate pre-averaging estimator, we first define the pre-averaged returns as
+#'   \deqn{
+#'     \bar{r}_{\tau_j}^{(k)}= \sum_{h=1}^{k_N-1}g\left(\frac{h}{k_N}\right)r_{\tau_{j+h}}^{(k)}
+#'   }
+#'   where g is a non-zero real-valued function \eqn{g:[0,1]} \eqn{\rightarrow} \eqn{R} given by \eqn{g(x)} = \eqn{\min(x,1-x)}. \eqn{k_N} is a sequence of integers satisfying  \eqn{\mbox{k}_{N} = \lfloor\theta N^{1/2}\rfloor}. We use \eqn{\theta = 0.8} as recommended in Hautsch & Podolskij (2013). The pre-averaged returns are simply a weighted average over the returns in a local window. This averaging diminishes the influence of the noise. The order of the window size \eqn{k_n} is chosen to lead to optimal convergence rates. The pre-averaging estimator is then simply the analogue of the Realized Variance but based on pre-averaged returns and an additional term to remove bias due to noise
+#'   \deqn{
+#'     \hat{C}= \frac{N^{-1/2}}{\theta \psi_2}\sum_{i=0}^{N-k_N+1}  (\bar{r}_{\tau_i})^2-\frac{\psi_1^{k_N}N^{-1}}{2\theta^2\psi_2^{k_N}}\sum_{i=0}^{N}r_{\tau_i}^2
+#'   }
+#'   with
+#'   \deqn{
+#'     \psi_1^{k_N}= k_N \sum_{j=1}^{k_N}\left(g\left(\frac{j+1}{k_N}\right)-g\left(\frac{j}{k_N}\right)\right)^2,\quad 
+#'   }
+#'   \deqn{
+#'     \psi_2^{k_N}= \frac{1}{k_N}\sum_{j=1}^{k_N-1}g^2\left(\frac{j}{k_N}\right).
+#'   }
+#'   \deqn{
+#'     \psi_2= \frac{1}{12}
+#'   }
+#'   The multivariate counterpart is very similar. The estimator is called the Modulated Realized Covariance (MRC) and is defined as
+#'   \deqn{
+#'     \mbox{MRC}= \frac{N}{N-k_N+2}\frac{1}{\psi_2k_N}\sum_{i=0}^{N-k_N+1}\bar{\boldsymbol{r}}_{\tau_i}\cdot \bar{\boldsymbol{r}}'_{\tau_i} -\frac{\psi_1^{k_N}}{\theta^2\psi_2^{k_N}}\hat{\Psi}
+#' }
+#' where \eqn{\hat{\Psi}_N = \frac{1}{2N}\sum_{i=1}^N \boldsymbol{r}_{\tau_i}(\boldsymbol{r}_{\tau_i})'}. It is a bias correction to make it consistent. However, due to this correction, the estimator is not ensured PSD. An alternative is to slightly enlarge the bandwidth such that \eqn{\mbox{k}_{N} = \lfloor\theta N^{1/2+\delta}\rfloor}. \eqn{\delta = 0.1} results in a consistent estimate without the bias correction and a PSD estimate, in which case:
+#'   \deqn{
+#'     \mbox{MRC}^{\delta}= \frac{N}{N-k_N+2}\frac{1}{\psi_2k_N}\sum_{i=0}^{N-k_N+1}\bar{\boldsymbol{r}}_i\cdot \bar{\boldsymbol{r}}'_i
+#' }
+#' 
+#' @references Hautsch, N., & Podolskij, M. (2013). Preaveraging-Based Estimation of Quadratic Variation in the Presence of Noise and Jumps: Theory, Implementation, and Empirical Evidence. Journal of Business & Economic Statistics, 31(2), 165-183.
+#' 
+#' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
+#' 
+#' @examples 
+#' a <- list(sample_5minprices_jumps["2010-01-04",1], sample_5minprices_jumps["2010-01-04",2])
+#' MRC(a, pairwise = TRUE, makePsd = TRUE)
+#' 
+#' @keywords highfrequency preaveraging
+#' @export
+MRC <- function(pdata, pairwise = FALSE, makePsd = FALSE) {
+  
+  if (is.list(pdata) == FALSE) {
+    n <- 1
+  } else {
+    n <- length(pdata)
+  }
+  if (n == 1) {
+    multixts = multixts(pdata);
+    if (multixts == TRUE) {
+      stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")
+    }
+    mrc <- .crv(pdata)
+  }
+  
+  if (n > 1) {
+    multixts <- multixts(pdata[[1]]);
+    if (multixts == TRUE) {
+      stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")
+    }
+    
+    if (pairwise == TRUE) {
+      cov <- matrix(rep(0, n * n), ncol = n)
+      diagonal = c()
+      for (i in 1:n) {
+        diagonal[i] <- .crv(pdata[[i]])
+      }
+      diag(cov) <- diagonal
+      
+      for (i in 2:n) {
+        for (j in 1:(i - 1)) {
+          cov[i, j] = cov[j, i] = .preav_bi(pdata[[i]], pdata[[j]])
+        }
+      }
+      
+      mrc <- cov
+      
+      if (makePsd == TRUE) {
+        mrc <- makePsd(mrc)
+      }
+      
+    } else {
+      x     <- refreshTime(pdata)
+      N     <- nrow(x)
+      theta <- 0.8 #recommendation by Hautsch and Podolskij
+      kn    <- floor(theta * sqrt(N))
+      
+      ##psi:
+      psi1 <- 1
+      psi2 <- 1 / 12
+      
+      psi1kn <- kn * sum((.gfunction((1:kn)/kn) - .gfunction(((1:kn) - 1) / kn))^2 )
+      psi2kn <- 1 / kn * sum(.gfunction((1:kn) / kn)^2)
+      
+      preavreturn <- c()
+      for (i in 1:ncol(x)) {
+        preavreturn <- cbind(preavreturn , .hatreturn(x[,i],kn) )
+      }
+      
+      S <- rCov(preavreturn)
+      
+      mrc <- N / (N - kn + 2) * 1/(psi2 * kn) * S
+      
+      if (makePsd == TRUE) {
+        mrc <- makePsd(mrc)
+      }
+    }
+  }
+  return(mrc)
+} 
 
 #' Realized beta: a tool in measuring risk with respect to the market. 
 #' 

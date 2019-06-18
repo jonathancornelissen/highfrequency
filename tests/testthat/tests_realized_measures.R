@@ -27,6 +27,14 @@ expect_equal({
   },
   c(stock2 = "1.431818232" )
 )
+expect_equal({
+  a <- sample_5minprices_jumps['2010-01-04', 1]
+  b <- sample_5minprices_jumps['2010-01-04', 2]
+  formatC(rBeta(a,b, RCOVestimator = "rOWCov", RVestimator = "medRV", makeReturns = TRUE), digits = 10)},
+  c("1.288476938")
+)
+
+
 
 # medRV
 expect_equal(
