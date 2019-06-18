@@ -977,43 +977,7 @@ rRTSCov = function (pdata, cor = FALSE, startIV = NULL, noisevar = NULL,
     }
 }
 
-## Threshold covariance: 
-rThresholdCov = function( rdata, cor=FALSE, align.by=NULL, align.period=NULL, makeReturns=FALSE,...){
-    if(hasArg(data)){ rdata = data } 
-    rdatacheck(rdata,multi=TRUE); 
-    
-    # Multiday adjustment: 
-    multixts = multixts(rdata); 
-    multixts = multixts(rdata); 
-    if(multixts){ 
-        if(is.null(dim(rdata))){  n = 1
-        }else{ n = dim(rdata)[2] }
-        if( n==1 ){ result = apply.daily(rdata,rThresholdCov,cor=cor,align.by=align.by,align.period=align.period,makeReturns=makeReturns) }
-        if( n >1 ){ result = .applygetlist(rdata,rThresholdCov,cor=cor,align.by=align.by,align.period=align.period,makeReturns=makeReturns) }    
-        return(result)} 
-    if( !multixts ){ #single day code
-        if((!is.null(align.by))&&(!is.null(align.period))){
-            rdata = .aggregatets(rdata, on=align.by, k=align.period);
-        } 
-        if(makeReturns){ rdata = makeReturns(rdata) }  
-        
-        rdata=as.matrix(rdata);
-        n=dim(rdata)[1];						                  # number of observations
-        delta = 1/n;
-        rbpvars = apply(rdata,2,FUN=RBPVar);		      # bipower variation per stock
-        tresholds = 3*sqrt(rbpvars)*(delta^(0.49));	  # treshold per stock
-        tresmatrix = matrix(rep(tresholds,n),ncol=length(tresholds),nrow=n,byrow=TRUE); 
-        condition = abs(rdata) > tresmatrix;
-        rdata[condition] = 0;
-        covariance = rCov(rdata);
-        
-        if(cor==FALSE){ return(covariance) }
-        if(cor==TRUE){
-            sdmatrix = sqrt(diag(diag(covariance)));
-            rcor = solve(sdmatrix)%*%covariance%*%solve(sdmatrix);
-            return(rcor)}
-    } 
-} 
+
 
 ## Hayashi Yoshida covariance estimator
 rHYCov = function(rdata, cor = FALSE, period = 1, align.by = "seconds", align.period = 1, cts = TRUE, makeReturns = FALSE, makePsd=TRUE, ...) {
@@ -1061,10 +1025,9 @@ rHYCov = function(rdata, cor = FALSE, period = 1, align.by = "seconds", align.pe
 
 ## Kernel Covariance Estimator: 
 rKernelCov = function( rdata, cor=FALSE, kernel.type = "rectangular", kernel.param = 1, 
-kernel.dofadj = TRUE, align.by = "seconds", align.period = 1, 
-cts = TRUE, makeReturns = FALSE, type = NULL, adj = NULL, 
-q = NULL, ...)
-{
+                       kernel.dofadj = TRUE, align.by = "seconds", align.period = 1, 
+                       cts = TRUE, makeReturns = FALSE, type = NULL, adj = NULL, 
+                       q = NULL, ...) {
     if(!is.list(rdata)){ # In case of only one stock this makes sense
         if(is.null(dim(rdata))){  n = 1
         }else{ n = dim(rdata)[2] }
@@ -1214,142 +1177,136 @@ rZero = function( rdata, period = 1, align.by = "seconds", align.period = 1, cts
 }   #end rAVGCov
 
 # Accumulation:
-rAccumulation <- function(x, period=1, y=NULL, align.by="seconds",align.period=1, plotit=FALSE, cts=TRUE, makeReturns=FALSE)
-{
-  multixts = multixts(x) || multixts(y);
+rAccumulation <- function(x, period = 1, y = NULL, align.by = "seconds",align.period = 1, plotit = FALSE, cts=TRUE, makeReturns = FALSE) {
+  multixts = multixts(x) || multixts(y)
   if( multixts ){ stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")}     
-    
-    align.period = .getAlignPeriod(align.period, align.by)   
-    ans <- list(x=NULL, y=NULL)
-    ans$y <- cumsum(rMarginal(x=x, y=y, period=period, align.period=align.period, cts=cts, makeReturns=makeReturns)$y)
-    #    ans$x <- .alignIndices(1:length(x), align.period)
-    #    ans$x <- .alignIndices(ans$x, period)
-    ans$x <- rCumSum(x=x, period=period, align.period=align.period, cts=cts, makeReturns=makeReturns)$x
-    #ans$x <- ans$x[-length(ans$x)]
-    if(plotit)
-    {
-        plot(ans, xlab="", ylab="Realized Accumulation")
-        return(NULL)
-    }
-    ans
+  
+  align.period = .getAlignPeriod(align.period, align.by)   
+  ans <- list(x=NULL, y=NULL)
+  ans$y <- cumsum(rMarginal(x=x, y=y, period=period, align.period=align.period, cts=cts, makeReturns=makeReturns)$y)
+  #    ans$x <- .alignIndices(1:length(x), align.period)
+  #    ans$x <- .alignIndices(ans$x, period)
+  ans$x <- rCumSum(x=x, period=period, align.period=align.period, cts=cts, makeReturns=makeReturns)$x
+  #ans$x <- ans$x[-length(ans$x)]
+  if(plotit)
+  {
+    plot(ans, xlab="", ylab="Realized Accumulation")
+    return(NULL)
+  }
+  ans
 } 
 
 # Marginal distribution:
-rMarginal <- function(x, y=NULL, period, align.by="seconds", align.period=1, plotit=FALSE, cts=TRUE, makeReturns=FALSE)
-{
+rMarginal <- function(x, y=NULL, period, align.by="seconds", align.period=1, plotit=FALSE, cts=TRUE, makeReturns=FALSE) {
   multixts = multixts(x) || multixts(y);
   if( multixts ){ stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")}     
   
-    align.period = .getAlignPeriod(align.period, align.by)   
-    ans <- list(x = NULL, y = NULL)
-    ans$x <- .alignIndices(1:length(x), align.period)
-    ans$x <- .alignIndices(ans$x, period)
-    
-    if(is.null(y))
+  align.period = .getAlignPeriod(align.period, align.by)   
+  ans <- list(x = NULL, y = NULL)
+  ans$x <- .alignIndices(1:length(x), align.period)
+  ans$x <- .alignIndices(ans$x, period)
+  
+  if (is.null(y))
     y <- x   
-    x<- .alignReturns(.convertData(x, cts=cts, makeReturns=makeReturns)$data, align.period)
-    y<- .alignReturns(.convertData(y, cts=cts, makeReturns=makeReturns)$data, align.period)
-    ans$y <- .alignedAccum(x=x, y=y, period=period, cum=FALSE)
-    
-    if(plotit)
-    {
-        plot(ans, xlab="", ylab="Realized Marginals")
-        return(NULL)
-    }
-    ans
+  x <- .alignReturns(.convertData(x, cts=cts, makeReturns=makeReturns)$data, align.period)
+  y <- .alignReturns(.convertData(y, cts=cts, makeReturns=makeReturns)$data, align.period)
+  ans$y <- .alignedAccum(x=x, y=y, period=period, cum=FALSE)
+  
+  if (plotit) {
+    plot(ans, xlab="", ylab="Realized Marginals")
+    return(NULL)
+  }
+  ans
 }
 
 # Cumulative sum of returns:
-rCumSum <- function(x, period = 1, align.by="seconds", align.period=1, plotit=FALSE, type='l', cts = TRUE, makeReturns=FALSE)
-{
+rCumSum <- function(x, period = 1, align.by = "seconds", align.period = 1, plotit = FALSE, type='l', cts = TRUE, makeReturns = FALSE) {
   multixts = multixts(x);
-  if( multixts ){ stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")}     
-
-    align.period = .getAlignPeriod(align.period, align.by)   
-    ans <- list(x = NULL, y = NULL)
-    ans$x <- .alignIndices(1:length(.convertData(x, cts=cts, makeReturns=makeReturns)$data), align.period)
-    ans$x <- .alignIndices(ans$x, period)
-    
-    x<- .alignReturns(.convertData(x, cts=cts, makeReturns=makeReturns)$data, align.period)
-    x<- .alignReturns(.convertData(x, cts=cts, makeReturns=makeReturns)$data, period)
-    
-    ans$y <- cumsum(x)
-    if(plotit)
-    {
-        plot(cumsum(x), xlab="Time", ylab="Cummulative Returns", type=type)
-        return(NULL)
-    }
-    ans
+  if( multixts ){ 
+    stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")
+  }     
+  
+  align.period = .getAlignPeriod(align.period, align.by)   
+  ans <- list(x = NULL, y = NULL)
+  ans$x <- .alignIndices(1:length(.convertData(x, cts=cts, makeReturns=makeReturns)$data), align.period)
+  ans$x <- .alignIndices(ans$x, period)
+  
+  x<- .alignReturns(.convertData(x, cts=cts, makeReturns=makeReturns)$data, align.period)
+  x<- .alignReturns(.convertData(x, cts=cts, makeReturns=makeReturns)$data, period)
+  
+  ans$y <- cumsum(x)
+  if (plotit) {
+    plot(cumsum(x), xlab="Time", ylab="Cummulative Returns", type=type)
+    return(NULL)
+  }
+  ans
 } 
 
 #Scatter returns:
 rScatterReturns <- function(x, y, period, align.by = "seconds", align.period = 1, numbers = FALSE, xlim = NULL, ylim = NULL, 
                             plotit = TRUE, pch = NULL, cts = TRUE, makeReturns = FALSE, scale.size = 0, col.change = FALSE,...) {
   multixts = multixts(x) || multixts(y)
-  if( multixts ){ stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")}     
+  if (multixts == TRUE) { 
+    stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")
+  }     
   
-    align.period = .getAlignPeriod(align.period, align.by) 
-    y<- .alignReturns(.convertData(y, cts=cts, makeReturns=makeReturns)$data, align.period)
-    x<- .alignReturns(.convertData(x, cts=cts, makeReturns=makeReturns)$data, align.period)
+  align.period = .getAlignPeriod(align.period, align.by) 
+  y <- .alignReturns(.convertData(y, cts=cts, makeReturns=makeReturns)$data, align.period)
+  x <- .alignReturns(.convertData(x, cts=cts, makeReturns=makeReturns)$data, align.period)
+  
+  x <- .accum.naive(x, x, period)
+  y <- .accum.naive(y, y, period)
+  if (is.null(pch)) {
+    pch <- 1
+  }
+  
+  it <- table(round(x,4),round(y,4))
+  xs <- as.numeric(dimnames(it)[[1]])
+  ys <- as.numeric(dimnames(it)[[2]])
+  
+  if (is.null(ylim) == TRUE) {
+    ylim <- c(min(ys), max(ys))
+  }
     
-    x<-.accum.naive(x, x, period)
-    y<-.accum.naive(y, y, period)
-    if(is.null(pch))
-    pch=1
+  if (is.null(xlim)) {
+    xlim <- c(min(xs), max(xs))
+  }
+  
+  mat <- matrix(it, nrow=length(xs), ncol=length(ys))
+  
+  if (plotit == TRUE) {
+    plot(0,0, xlim=xlim, ylim=ylim , type='n',...)
+    lines(c(0,0), c(-1,2), col="grey", lty=3, lwd=2)
+    lines(c(-1,2), c(0,0), col="grey", lty=3, lwd=2)
     
-    it <- table(round(x,4),round(y,4))
-    xs <- as.numeric(dimnames(it)[[1]])
-    ys <- as.numeric(dimnames(it)[[2]])
+    maxed <- max(mat)
     
-    if(is.null(ylim))
-    ylim=c(min(ys), max(ys))
-    if(is.null(xlim))
-    xlim=c(min(xs), max(xs))
-    
-    mat <- matrix(it, nrow=length(xs), ncol=length(ys))
-    
-    if(plotit)
-    {
-        plot(0,0, xlim=xlim, ylim=ylim , type='n',...)
-        lines(c(0,0), c(-1,2), col="grey", lty=3, lwd=2)
-        lines(c(-1,2), c(0,0), col="grey", lty=3, lwd=2)
-        
-        maxed <- max(mat)
-        
-        for(i in 1:length(xs))
-        {
-            for(j in 1:length(ys))
-            {
-                if(mat[i,j]!=0)
-                {
-                    if(col.change)
-                    thecol <- round(runif(1)*100,0)
-                    else
-                    thecol = 1
-                    
-                    if(numbers)
-                    {
-                        
-                        if(scale.size ==0)
-                        text(xs[i], ys[j],as.character(mat[i,j]), cex=.7, col=thecol)         
-                        else
-                        text(xs[i], ys[j], as.character(mat[i,j]), cex = (mat[i,j]/maxed) * scale.size, col=thecol)
-                    }
-                    else
-                    {
-                        if(scale.size ==0)
-                        points(xs[i], ys[j], pch=pch, cex=.7, col=thecol)         
-                        else
-                        points(xs[i], ys[j], pch=pch, cex = (mat[i,j]/maxed) * scale.size, col=thecol)
-                    }
-                }
-                
-            }
+    for (i in 1:length(xs)) {
+      for(j in 1:length(ys)) {
+        if(mat[i,j]!=0) {
+          if(col.change) {
+            thecol <- round(runif(1)*100,0)
+          } else {
+            thecol = 1
+          }
+          if(numbers) {
+            if(scale.size ==0)
+              text(xs[i], ys[j],as.character(mat[i,j]), cex=.7, col=thecol)         
+            else
+              text(xs[i], ys[j], as.character(mat[i,j]), cex = (mat[i,j]/maxed) * scale.size, col=thecol)
+          } else {
+            if(scale.size ==0)
+              points(xs[i], ys[j], pch=pch, cex=.7, col=thecol)         
+            else
+              points(xs[i], ys[j], pch=pch, cex = (mat[i,j]/maxed) * scale.size, col=thecol)
+          }
         }
-        return(NULL)
         
-    }     
-    mat
+      }
+    }
+    return(NULL)
+  }     
+  mat
 }
 
 

@@ -99,6 +99,10 @@ multixts <- function(x, y = NULL) {
 #' @keywords internal
 checkMultiDays <- function(x) { 
   
+  if (is.matrix(x) != is.xts(x)) {
+    return(FALSE)
+  }
+  
   if (is.xts(x) == FALSE) {
     stop("Please provide xts-object.")
   }

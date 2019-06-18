@@ -9,7 +9,8 @@ rCov(rdata, cor = FALSE, align.by = NULL, align.period = NULL,
 }
 \arguments{
 \item{rdata}{a \eqn{(M x N)} matrix/zoo/xts object containing the \eqn{N}
-return series over period \eqn{t}, with \eqn{M} observations during \eqn{t}.}
+return series over period \eqn{t}, with \eqn{M} observations during \eqn{t}.
+In case of a matrix, no multi-day adjustment is possible.}
 
 \item{cor}{boolean, in case it is TRUE, the correlation is returned. FALSE by default.}
 

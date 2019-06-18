@@ -1,11 +1,22 @@
 
-
+# medRV
+expect_equal(
+  formatC(as.numeric(medRV(sample_5minprices_jumps[c('2010-01-04', '2010-01-05'), 1], align.by = "minutes", align.period = 5, makeReturns = TRUE)[1]), digits = 20),
+  "0.013105073468934913539"
+)
 
 # medRQ
 expect_equal(
   formatC(medRQ(sample_tdata$PRICE,align.by = "minutes", align.period = 5, makeReturns = TRUE) * 1000000, digits = 20),
   "0.23645192756991520455"
 )
+
+# minRV
+expect_equal(
+  formatC(as.numeric(minRV(sample_5minprices_jumps[c('2010-01-04', '2010-01-05'), 1:2], align.by = "minutes", align.period = 5, makeReturns = TRUE)[1,1]), digits = 20),
+  "0.013259308626346031496"
+)
+
 # minRQ
 expect_equal(
   minRQ(sample_tdata$PRICE, align.by = "minutes", align.period = 5, makeReturns = TRUE) * 1000000,
@@ -32,19 +43,6 @@ expect_equal({
   b <- sample_5minprices_jumps['2010-01-04', 2]
   formatC(rBeta(a,b, RCOVestimator = "rOWCov", RVestimator = "medRV", makeReturns = TRUE), digits = 10)},
   c("1.288476938")
-)
-
-
-
-# medRV
-expect_equal(
-  formatC(as.numeric(medRV(sample_5minprices_jumps[c('2010-01-04', '2010-01-05'), 1], align.by = "minutes", align.period = 5, makeReturns = TRUE)[1]), digits = 20),
-  "0.013105073468934913539"
-)
-# minRV
-expect_equal(
-  formatC(as.numeric(minRV(sample_5minprices_jumps[c('2010-01-04', '2010-01-05'), 1:2], align.by = "minutes", align.period = 5, makeReturns = TRUE)[1,1]), digits = 20),
-  "0.013259308626346031496"
 )
 
 # rBPCov
@@ -94,6 +92,12 @@ expect_equal(
 expect_equal({
   rSV(sample_tdata$PRICE,align.by ="minutes", align.period = 5, makeReturns = TRUE)},
   list(rSVdownside = 0.00029125752237359241398, rSVupside = 0.00016310984360246060573)
+)
+
+# rThresholdCov
+expect_equal(
+  formatC(sum(rThresholdCov(cbind(lltc, sbux), align.by = "minutes", align.period = 1)) * 10000, digits = 20),
+  "0.5945544397569668682"
 )
 
 # rTPVar

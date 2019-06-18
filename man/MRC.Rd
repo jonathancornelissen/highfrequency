@@ -9,7 +9,7 @@ MRC(pdata, pairwise = FALSE, makePsd = FALSE)
 \arguments{
 \item{pdata}{a list. Each list-item contains an xts object with the intraday price data of a stock.}
 
-\item{pairwise}{boolean, should be TRUE when refresh times are based on pairs of assets. FALSE by  default.}
+\item{pairwise}{boolean, should be TRUE when refresh times are based on pairs of assets. FALSE by default.}
 
 \item{makePsd}{boolean, in case it is TRUE, the positive definite version of MRC is returned. FALSE by default.}
 }
