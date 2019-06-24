@@ -1,6 +1,6 @@
 Package: highfrequency
 Version: 0.5.3
-Date: 2018-03-03
+Date: 2019-05-24
 Title: Tools for Highfrequency Data Analysis
 Authors@R: c(person("Kris", "Boudt", role = c("aut", "cre"),
                      email = "Kris.Boudt@econ.kuleuven.be"),
@@ -8,9 +8,10 @@ Authors@R: c(person("Kris", "Boudt", role = c("aut", "cre"),
              person("Scott", "Payseur", role = c("aut"),
                     email = "Scott.Payseur@gmail.com"),
              person("Giang", "Nguyen", role = c("ctb")),
-             person("Maarten", "Schermer", role = c("ctb")))
+             person("Maarten", "Schermer", role = c("ctb")),
+             person("Onno", "Kleen", role = c("ctb"), comment = c(ORCID = "0000-0003-4731-4640")))
 Author: Kris Boudt [aut, cre], Jonathan Cornelissen [aut], Scott Payseur [aut],
-    Giang Nguyen [ctb], Maarten Schermer [ctb]
+    Giang Nguyen [ctb], Maarten Schermer [ctb], Onno Kleen [ctb]
 Maintainer: Kris Boudt
     <Kris.Boudt@econ.kuleuven.be>
 Description: Provide functionality to manage, clean and match highfrequency
@@ -18,11 +19,14 @@ Description: Provide functionality to manage, clean and match highfrequency
     forecast volatility, detect price jumps and investigate microstructure noise and intraday
     periodicity.
 License: GPL (>= 2)
+Encoding: UTF-8
+LazyData: true
 Depends:
-    R (>= 2.12.0),
-    xts,
-    zoo
+    R (>= 3.5.0)
 Imports:
+    xts,
+    zoo,
+    Rcpp,
     graphics,
     methods,
     stats,
@@ -36,7 +40,14 @@ Imports:
     chron,
     timeDate,
     MASS,
+    data.table,
+    RcppRoll,
+    bit64
+LinkingTo: Rcpp
 Suggests:
+    covr,
     FKF,
     BMS,
-    rugarch
+    rugarch,
+    testthat
+RoxygenNote: 6.1.1
