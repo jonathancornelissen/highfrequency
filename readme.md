@@ -3,7 +3,9 @@
 [![Codecov test coverage](https://codecov.io/gh/onnokleen/highfrequency/branch/master/graph/badge.svg)](https://codecov.io/gh/onnokleen/highfrequency?branch=master)
 [![Downloads](https://cranlogs.r-pkg.org/badges/highfrequency)](https://cranlogs.r-pkg.org/badges/highfrequency)
 
-The package is still under development and is distributed without warranty.
+## Disclaimer: Please use the current release version from CRAN
+
+The package is still under development and is distributed without warranty. Currently, it undergoes a major overhaul.
 
 Thanks to report bugs or make suggestions to <kris.boudt@kuleuven.be>
 
@@ -17,7 +19,7 @@ Development version:
 # Install package via devtools
 # install.packages("devtools")
 library(devtools)
-install_github("xxx")
+install_github("https://github.com/jonathancornelissen/highfrequency")
 ```
 
 ## Example

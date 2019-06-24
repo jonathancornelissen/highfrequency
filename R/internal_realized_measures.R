@@ -80,7 +80,7 @@ refreshTime <- function (pdata) {
   newlength <- x[[5]]
   pmatrix <- matrix(ncol = dim, nrow = newlength)
   for (i in 1:dim) {
-    selection <- x[[6]][((i - 1) * minl + 1):(i * minl)]
+    selection    <- x[[6]][((i - 1) * minl + 1):(i * minl)]
     pmatrix[, i] <- pdata[[i]][selection[1:newlength]]
   }
   time <- as.POSIXct(x[[3]][1:newlength], origin = "1970-01-01", tz = "GMT")
