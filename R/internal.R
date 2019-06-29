@@ -3,7 +3,7 @@
 #' @importFrom zoo zoo na.locf
 #' @importFrom stats start end
 #' @keywords internal
-aggregatets <- function (ts, on = "minutes", k = 1) {
+aggregatets <- function (ts, on = "minutes", k = 1, tz = "GMT") {
   if (on == "secs" | on == "seconds") {
     secs <- k
     tby <- paste(k, "sec", sep = " ")
@@ -17,10 +17,10 @@ aggregatets <- function (ts, on = "minutes", k = 1) {
     tby <- paste(3600 * k, "sec", sep = " ")
   } 
   g <- base::seq(start(ts), end(ts), by = tby)
-  rawg <- as.numeric(as.POSIXct(g, tz = "GMT"))
+  rawg <- as.numeric(as.POSIXct(g, tz = tz))
   newg <- rawg + (secs - rawg%%secs)
-  g    <- as.POSIXct(newg, origin = "1970-01-01", tz = "GMT")
-  ts3 <- na.locf(merge(ts, zoo(NULL, g)))[as.POSIXct(g, tz = "GMT")]
+  g    <- as.POSIXct(newg, origin = "1970-01-01", tz = tz)
+  ts3 <- na.locf(merge(ts, zoo(NULL, g)))[as.POSIXct(g, tz = tz)]
   return(ts3)
 } #Very fast and elegant way to do previous tick aggregation :D!
 
