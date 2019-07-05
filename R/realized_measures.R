@@ -845,7 +845,6 @@ rMPV <- function(rdata, m = 2, p = 2, align.by = NULL, align.period = NULL, make
 #' @param alpha is a parameter between 0 en 0.5, 
 #'that determines the rejection threshold value 
 #'(see Boudt et al. (2008) for details).
-#' @param ... additional arguments.
 #' 
 #' @return an \eqn{N x N} matrix
 #' 
@@ -880,7 +879,7 @@ rMPV <- function(rdata, m = 2, p = 2, align.by = NULL, align.period = NULL, make
 #' 
 #' @keywords volatility
 #' @export
-rOWCov <- function (rdata, cor = FALSE, align.by = NULL, align.period = NULL, makeReturns = FALSE, seasadjR = NULL, wfunction = "HR" , alphaMCD = 0.75, alpha = 0.001, ...){
+rOWCov <- function (rdata, cor = FALSE, align.by = NULL, align.period = NULL, makeReturns = FALSE, seasadjR = NULL, wfunction = "HR" , alphaMCD = 0.75, alpha = 0.001){
   
   if (is.null(seasadjR) == TRUE) { 
     seasadjR <- rdata 
@@ -891,7 +890,7 @@ rOWCov <- function (rdata, cor = FALSE, align.by = NULL, align.period = NULL, ma
   }
   
   # Aggregate:
-  if((!is.null(align.by))&&(!is.null(align.period))){
+  if ((!is.null(align.by))&&(!is.null(align.period))) {
     rdata <- aggregatets(rdata, on = align.by, k = align.period)
     seasadjR <- aggregatets(seasadjR, on = align.by, k = align.period)
   }     
@@ -926,6 +925,7 @@ rOWCov <- function (rdata, cor = FALSE, align.by = NULL, align.period = NULL, ma
     seasadjRselect <- seasadjR[, select]
     N <- ncol(seasadjRselect)
     MCDobject <- try(robustbase::covMcd(x = seasadjRselect, alpha = alphaMCD))
+    
     if (length(MCDobject$raw.mah) > 1) {
       betaMCD  <- 1-alphaMCD
       asycor   <- betaMCD / pchisq(qchisq(betaMCD, df = N), df = N+2)
@@ -935,8 +935,7 @@ rOWCov <- function (rdata, cor = FALSE, align.by = NULL, align.period = NULL, ma
       for (i in 1:intraT) { 
         outlyingness[i] = matrix(seasadjRselect[i,], ncol = N) %*% invMCDcov %*% matrix(seasadjRselect[i,],nrow=N)    
       }
-    }
-    else {
+    } else {
       print(c("MCD cannot be calculated")); stop();
     }
     k <- qchisq(p = 1 - alpha, df = N)
@@ -949,8 +948,7 @@ rOWCov <- function (rdata, cor = FALSE, align.by = NULL, align.period = NULL, ma
       covariance <- (conHR(di = N, alpha = alpha) * t(wR) %*% wR) / mean(weights)
       if (cor == FALSE) {
         return(covariance)
-      }
-      if (cor == TRUE) {
+      } else {
         sdmatrix = sqrt(diag(diag(covariance)))
         inv_matrix <- solve(sdmatrix)
         rcor <- inv_matrix %*% covariance %*% inv_matrix
@@ -963,8 +961,7 @@ rOWCov <- function (rdata, cor = FALSE, align.by = NULL, align.period = NULL, ma
       covariance <- (conhuber(di = N, alpha = alpha) * t(wR) %*% wR) / mean(weights)
       if (cor == FALSE) {
         return(covariance)
-      }
-      if(cor==TRUE){
+      } else {
         sdmatrix <- sqrt(diag(diag(covariance)))
         rcor <- solve(sdmatrix) %*% covariance %*% solve(sdmatrix)
         return(rcor)

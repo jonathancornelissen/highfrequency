@@ -1,3 +1,31 @@
+
+exchangeHoursOnly <- function(data, daybegin = "09:30:00", dayend = "16:00:00") {
+  data = checkColumnNames(data)
+  # a function to excerpt data within exchange trading hours
+  # daybegin and dayend: two characters in the format of "HH:MM:SS",
+  #                specifying the starting hour and minute and sec of an exhange
+  #               trading day and the closing hour and minute and sec
+  #                   of the trading day repectively
+  
+  if(is(data, "xts") == FALSE) {
+    stop("data must be an xts object")
+  }
+  
+  
+  gettime <- function(z){unlist(strsplit(as.character(z)," "))[2]};
+  times1 <- as.matrix(as.vector(as.character(index(data))));
+  times <- apply(times1,1,gettime); 
+  tdtimes <- as.POSIXct(times,format = "%H:%M:%S",tz = "GMT");
+  
+  #create timeDate begin and end
+  tddaybegin <- as.POSIXct( daybegin,format = "%H:%M:%S", tz="GMT");
+  tddayend   <- as.POSIXct( dayend,format = "%H:%M:%S",   tz="GMT");
+  
+  #select correct observations
+  filteredts <- data[tdtimes>=tddaybegin & tdtimes<=tddayend];
+  return(filteredts)
+}
+
 #' Get price column(s) from a timeseries
 #' @description Will attempt to locate price column(s) from a time series with rational defaults.
 #' 

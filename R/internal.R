@@ -63,7 +63,7 @@ makePsd <- function(S, method = "covariance") {
     D     <- diag( as.numeric(D)  , ncol = length(D) )
     Spos  <- D %*% Apsd %*% D
     return(Spos)
-  }else{
+  } else {
     # Rousseeuw, P. and G. Molenberghs (1993). Transformation of non positive semidefinite correlation matrices. Communications in Statistics - Theory and Methods 22, 965-984.
     out     <- eigen(x = S , symmetric = TRUE)
     mGamma  <- t(out$vectors)
@@ -77,12 +77,13 @@ makePsd <- function(S, method = "covariance") {
 #' @importFrom xts ndays
 #' @keywords internal
 multixts <- function(x, y = NULL) { 
+  
   if (is.null(y) == TRUE) {
     test <- is.xts(x) && (ndays(x)!=1)
     return(test)
   } else {
     test <- (is.xts(x) && (ndays(x)!=1)) || (ndays(y)!=1 && is.xts(y))
-    if (test == TRUE){
+    if (test == TRUE) {
       equal_dimension <- (dim(y) == dim(x))
       if (equal_dimension == FALSE) { 
         warning("Please make sure x and y have the same dimensions")

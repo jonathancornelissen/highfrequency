@@ -27,7 +27,7 @@ heavyModel(data, p = matrix(c(0, 0, 1, 1), ncol = 2), q = matrix(c(1,
 }
 \value{
 A list with the following values:
-(i) loglikelihood: The log likelihood evaluated at the parameter estimates.
+(i) loglikelihood: the log likelihood evaluated at the parameter estimates.
 (ii) likelihoods: an xts object of length T containing the log likelihoods per day.
 (iii) condvar: a (T x K) xts object containing the conditional variances
 (iv) estparams: a vector with the parameter estimates. The order in which the

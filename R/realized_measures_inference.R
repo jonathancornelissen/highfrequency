@@ -7,7 +7,7 @@
 
 ## hatIV
 #' @keywords internal
-.hativ <- function(rdata, IVestimator, startV = NULL, ...) {
+hatIV <- function(rdata, IVestimator, startV = NULL) {
   switch(IVestimator,
          RV = RV(rdata),
          BV = RBPVar(rdata),
@@ -21,7 +21,7 @@
 ### ivInference help functions:
 ##IQ estimator:
 #' @keywords internal
-.hatiq = function (rdata, IQestimator) {
+hatIQ <- function (rdata, IQestimator) {
   switch(IQestimator,
          rQuar = rQuar(rdata),
          QP = rQPVar(rdata),
@@ -37,7 +37,7 @@
 #Jump-robust volatility estimation using nearest neighbor truncation. Journal of Econometrics, 169(1), 75- 93.
 
 #' @keywords internal
-.IV <- function(IVestimator, iq) {
+IV <- function(IVestimator, iq) {
   switch(IVestimator,
          RV = sqrt(2*iq),
          BV = sqrt(2.61*iq),
@@ -63,10 +63,10 @@ ivInference <- function(rdata, IVestimator = "RV", IQestimator = "rQuar", confid
     N <- length(rdata)
     p <- as.numeric(confidence)
     
-    iq <- .hatiq(rdata,IQestimator)
-    iv <- .IV(IVestimator,iq)
+    iq <- hatIQ(rdata,IQestimator)
+    iv <- IV(IVestimator, iq)
     
-    hatIV  <- .hativ(rdata, IVestimator, N, ...)
+    hatIV  <- hatIV(rdata, IVestimator, N)
     stderr <- 1 / sqrt(N) * iv
     
     ##confidence band

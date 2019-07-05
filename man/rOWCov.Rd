@@ -6,7 +6,7 @@
 \usage{
 rOWCov(rdata, cor = FALSE, align.by = NULL, align.period = NULL,
   makeReturns = FALSE, seasadjR = NULL, wfunction = "HR",
-  alphaMCD = 0.75, alpha = 0.001, ...)
+  alphaMCD = 0.75, alpha = 0.001)
 }
 \arguments{
 \item{rdata}{a \eqn{(M x N)} matrix/zoo/xts object containing the \eqn{N}
@@ -38,8 +38,6 @@ robustbase package.}
 \item{alpha}{is a parameter between 0 en 0.5, 
 that determines the rejection threshold value 
 (see Boudt et al. (2008) for details).}
-
-\item{...}{additional arguments.}
 }
 \value{
 an \eqn{N x N} matrix

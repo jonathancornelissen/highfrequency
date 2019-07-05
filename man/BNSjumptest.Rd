@@ -6,7 +6,7 @@
 \usage{
 BNSjumptest(rdata, IVestimator = "BV", IQestimator = "TP",
   type = "linear", logtransform = FALSE, max = FALSE,
-  align.by = NULL, align.period = NULL, makeReturns = FALSE, ...)
+  align.by = NULL, align.period = NULL, makeReturns = FALSE)
 }
 \arguments{
 \item{rdata}{a zoo/xts object containing all returns in period t for one asset.}
@@ -26,8 +26,6 @@ BNSjumptest(rdata, IVestimator = "BV", IQestimator = "TP",
 \item{align.period}{an integer, align the tick data to this many [seconds|minutes|hours].}
 
 \item{makeReturns}{boolean, should be TRUE when rdata contains prices instead of returns. FALSE by default.}
-
-\item{...}{additional arguments.}
 }
 \value{
 list
