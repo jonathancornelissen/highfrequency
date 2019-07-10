@@ -1023,6 +1023,8 @@ shorthscale <- function(data) {
   return(0.7413 * min( M[2,] - M[1,]))
 }
 
+
+
 diurnal <- function (stddata, method = "TML", dummies = F, P1 = 6, P2 = 4) {
     cDays = dim(stddata)[1]
     intraT = dim(stddata)[2]
@@ -1124,8 +1126,7 @@ diurnal <- function (stddata, method = "TML", dummies = F, P1 = 6, P2 = 4) {
     }
   }
 
-diurnalfit = function( theta , P1 , P2 , intraT , dummies=F )
-{
+diurnalfit <- function( theta , P1 , P2 , intraT , dummies=F ) {
   vi = c(1:intraT) ;  
   M1 = (intraT+1)/2 ; M2 = (2*intraT^2 + 3*intraT + 1)/6;
   

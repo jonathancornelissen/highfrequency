@@ -331,7 +331,7 @@ checkqdata <- function(qdata) {
 # 2. Rolling median of the following "window" observations
 # 3. Rolling median of the previous "window" observations
 #' @keywords internal
-rolling_median_incl_ends <- function(x, weights, window, direction = "center") {
+rollingMedianInclEnds <- function(x, weights, window, direction = "center") {
   
   length_median_vec <- length(x)
   median_vec <- rep(NA, times = length_median_vec)

@@ -1,14 +1,80 @@
+#' Aggregate a time series but keep first and last observation
+#' 
+#' @description Function returns new time series as xts object where first observation is always the opening price
+#' and subsequent observations are the closing prices over the interval with as endpoint the timestamp 
+#' of the result.
+#' 
+#' @param tdata data.table or xts object to be aggregated, containing the intraday price series of a stock for possibly multiple days.
+#' @param on character, indicating the time scale in which "k" is expressed. Possible values are: "secs", "seconds", "mins", "minutes", "hours".
+#' @param k positive integer, indicating the number of periods to aggregate over. E.g. to aggregate a 
+#' xts object to the 5 minute frequency set k=5 and on="minutes".
+#' @param marketopen the market opening time, by default: marketopen = "09:30:00".
+#' @param marketclose the market closing time, by default: marketclose = "16:00:00".
+#' @param tz time zone used, by default: tz = "GMT".
+#' 
+#' @param The timestamps of the new time series are the closing times and/or days of the intervals. 
+#' 
+#' In case of previous tick aggregation or on = "seconds"/"minutes"/"hours",
+#' the element of the returned series with e.g. timestamp 09:35:00 contains 
+#' the last observation up to that point, including the value at 09:35:00 itself.
+#' 
+#' @return An data.table or xts object containing the aggregated time series.
+#' 
+#' @author Jonathan Cornelissen, Kris Boudt and Onno Kleen.
+#' @keywords data manipulation
+#' 
+#' @examples 
+#' #load data
+#' sample_tdataraw"
+#' #aggregate trades data to the 30 second frequency
+#' head(aggregateTrades(sample_tdataraw_microseconds, on = "secs", k = 30))
+#' @export
+aggregateTrades <- function(tdata, on = "minutes", k = 5, marketopen = "09:30:00", marketclose = "16:00:00") {
+  DT = FIRST_DT = DT_ROUND = LAST_DT = SYMBOL = PRICE = NULL
+  tdata <- checkColumnNames(tdata)
+  checktdata(tdata)
+  
+  dummy_was_xts <- FALSE
+  if (is.data.table(tdata) == FALSE) {
+    if (is.xts(tdata) == TRUE) {
+      tdata <- setnames(as.data.table(tdata)[, SIZE := as.numeric(as.character(SIZE))][, PRICE := as.numeric(as.character(PRICE))], 
+                        old = "index", new = "DT")
+      dummy_was_xts <- TRUE
+    } else {
+      stop("Input has to be data.table or xts.")
+    }
+  } else {
+    if (("DT" %in% colnames(tdata)) == FALSE) {
+      stop("Data.table neeeds DT column (date-time ).")
+    }
+  }
+  
+  tdata[]
+  
+  # tdata <- sample_tdata_microseconds
+  tdata[, DATE := as.Date(DT)][
+    , FIRST_DT := min(DT), by = "DATE"][
+          , DT_ROUND := ifelse(DT == FIRST_DT,
+                               floor_date(ymd_hms(DT), unit = paste(k, on)),
+                               ceiling_date(ymd_hms(DT), unit = paste(k, on), change_on_boundary = FALSE))][
+                                 , DT_ROUND := as_datetime(DT_ROUND)][
+                                   , LAST_DT := max(DT), by = "DT_ROUND"]
+  
+  tdata <- tdata[DT == LAST_DT][, DT := DT_ROUND][, c("DT", "SYMBOL", "PRICE")]
+  
+  if (dummy_was_xts == TRUE) {
+    return(xts(as.matrix(tdata[, -c("DT")]), order.by = tdata$DT))
+  } else {
+    return(tdata)
+  }
+}
+
 
 exchangeHoursOnly <- function(data, daybegin = "09:30:00", dayend = "16:00:00") {
-  data = checkColumnNames(data)
-  # a function to excerpt data within exchange trading hours
-  # daybegin and dayend: two characters in the format of "HH:MM:SS",
-  #                specifying the starting hour and minute and sec of an exhange
-  #               trading day and the closing hour and minute and sec
-  #                   of the trading day repectively
+  data <- checkColumnNames(data)
   
   if(is(data, "xts") == FALSE) {
-    stop("data must be an xts object")
+    stop("data must be an xts object.")
   }
   
   
@@ -18,11 +84,11 @@ exchangeHoursOnly <- function(data, daybegin = "09:30:00", dayend = "16:00:00") 
   tdtimes <- as.POSIXct(times,format = "%H:%M:%S",tz = "GMT");
   
   #create timeDate begin and end
-  tddaybegin <- as.POSIXct( daybegin,format = "%H:%M:%S", tz="GMT");
-  tddayend   <- as.POSIXct( dayend,format = "%H:%M:%S",   tz="GMT");
+  tddaybegin <- as.POSIXct(daybegin,format = "%H:%M:%S", tz = "GMT")
+  tddayend   <- as.POSIXct(dayend,format = "%H:%M:%S",   tz = "GMT")
   
   #select correct observations
-  filteredts <- data[tdtimes>=tddaybegin & tdtimes<=tddayend];
+  filteredts <- data[tdtimes>=tddaybegin & tdtimes<=tddayend]
   return(filteredts)
 }
 
@@ -44,7 +110,7 @@ getPrice <- function (x, symbol = NULL, prefer = NULL) {
   if (is.null(symbol) == FALSE) {
     loc <- grep(symbol, colnames(x))
     if (identical(loc, integer(0)) == FALSE) {
-      x<-x[, loc]
+      x <- x[, loc]
     } else {
       stop(paste("Subscript out of bounds: no column name containing ",symbol,"."))
     }
@@ -171,7 +237,8 @@ mergeQuotesSameTimestamp <- function(qdata, selection = "median") {
   }
   if (selection == "weighted.average") {
     qdata <- qdata[, `:=` (BIDSIZ = BIDSIZ / sum(BIDSIZ), OFRSIZ = OFRSIZ / sum(OFRSIZ)), by = list(DT, SYMBOL)][
-        , `:=` (BID = sum(BID * BIDSIZ), OFR = sum(OFR * OFRSIZ)), by = list(DT, SYMBOL)][, -c("BIDSIZ", "OFRSIZ")][
+      , `:=` (BID = sum(BID * BIDSIZ), OFR = sum(OFR * OFRSIZ)), by = list(DT, SYMBOL)][
+        , -c("BIDSIZ", "OFRSIZ")][
         , lapply(.SD, unique), by = list(DT, SYMBOL), .SDcols = c("BID", "OFR")]
   }
   if (dummy_was_xts == TRUE) {
@@ -494,7 +561,9 @@ rmLargeSpread <- function(qdata, maxi = 50) {
     }
   } 
   
-  qdata <- qdata[, DATE := as.Date(DT)][, SPREAD := OFR - BID][, SPREAD_MEDIAN := median(SPREAD), by = "DATE"][SPREAD < (SPREAD_MEDIAN * maxi)]
+  qdata <- qdata[, DATE := as.Date(DT)][
+    , SPREAD := OFR - BID][
+    , SPREAD_MEDIAN := median(SPREAD), by = "DATE"][SPREAD < (SPREAD_MEDIAN * maxi)]
   
   if (dummy_was_xts == TRUE) {
     return(xts(as.matrix(qdata[, -c("DATE")]), order.by = qdata$DT))
@@ -661,14 +730,14 @@ rmOutliersQuotes <- function (qdata, maxi = 10, window = 50, type = "advanced") 
   qdata <- qdata[, MIDQUOTE := (BID + OFR) / 2][, DATE := as.Date(DT)][, MADALL := mad(MIDQUOTE), by = "DATE"]
   
   if (type == "standard") {
-    qdata <- qdata[ , CRITERION := abs(MIDQUOTE - rolling_median_incl_ends(MIDQUOTE, window = window, weights = weights_med_center_excl))][
+    qdata <- qdata[ , CRITERION := abs(MIDQUOTE - rollingMedianInclEnds(MIDQUOTE, window = window, weights = weights_med_center_excl))][
       CRITERION < maxi * MADALL]
     
   }
   if (type == "advanced") {
-    qdata <- qdata[, CRITERION := pmin(abs(MIDQUOTE - rolling_median_incl_ends(MIDQUOTE, window = window, weights = weights_med_center_excl, direction = "center")),
-                                       abs(MIDQUOTE - rolling_median_incl_ends(MIDQUOTE, window = window, weights = weights_med_trail, direction = "left")),
-                                       abs(MIDQUOTE - rolling_median_incl_ends(MIDQUOTE, window = window, weights = weights_med_follow, direction = "right")),
+    qdata <- qdata[, CRITERION := pmin(abs(MIDQUOTE - rollingMedianInclEnds(MIDQUOTE, window = window, weights = weights_med_center_excl, direction = "center")),
+                                       abs(MIDQUOTE - rollingMedianInclEnds(MIDQUOTE, window = window, weights = weights_med_trail, direction = "left")),
+                                       abs(MIDQUOTE - rollingMedianInclEnds(MIDQUOTE, window = window, weights = weights_med_follow, direction = "right")),
                                        na.rm = TRUE)][
                                          CRITERION < maxi * MADALL]
   }

@@ -38,12 +38,14 @@ hatIQ <- function (rdata, IQestimator) {
 
 #' @keywords internal
 IV <- function(IVestimator, iq) {
-  switch(IVestimator,
-         RV = sqrt(2*iq),
-         BV = sqrt(2.61*iq),
-         TV = sqrt(3.06*iq),
-         minRV = sqrt(3.81*iq),
-         medRV = sqrt(2.96*iq))
+  
+  switch(IVestimator, 
+         RV = sqrt(2 * iq), 
+         BV = sqrt(2.61 * iq),
+         TV = sqrt(3.06 * iq), 
+         minRV = sqrt(3.81 * iq), 
+         medRV = sqrt(2.96 * iq), 
+         ROWVar = sqrt(.thetaROWVar(alpha , alphaMCD) * iq))
 }
 
 ivInference <- function(rdata, IVestimator = "RV", IQestimator = "rQuar", confidence = 0.95, align.by = NULL, align.period = NULL, makeReturns = FALSE, ...) {

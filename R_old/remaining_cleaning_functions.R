@@ -1,18 +1,5 @@
 
-# This file contains all realized measures previously implemented in RTAQ and realized
-######################################################## 
-## Help functions: (not exported)
-######################################################## 
 
-
-
-
-
-
-# 
-# countZeroes <- function(series) {
-#   return(sum(1 * (series == 0)))
-# }
 
 #########################################################################
 #
@@ -288,139 +275,139 @@ rZero = function( rdata, period = 1, align.by = "seconds", align.period = 1, cts
         }  #List-length > 1
     }  #If-list condition
 }   #end rAVGCov
+# 
+# # Accumulation:
+# rAccumulation <- function(x, period = 1, y = NULL, align.by = "seconds",align.period = 1, plotit = FALSE, cts=TRUE, makeReturns = FALSE) {
+#   multixts = multixts(x) || multixts(y)
+#   if( multixts ){ stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")}     
+#   
+#   align.period = .getAlignPeriod(align.period, align.by)   
+#   ans <- list(x=NULL, y=NULL)
+#   ans$y <- cumsum(rMarginal(x=x, y=y, period=period, align.period=align.period, cts=cts, makeReturns=makeReturns)$y)
+#   #    ans$x <- .alignIndices(1:length(x), align.period)
+#   #    ans$x <- .alignIndices(ans$x, period)
+#   ans$x <- rCumSum(x=x, period=period, align.period=align.period, cts=cts, makeReturns=makeReturns)$x
+#   #ans$x <- ans$x[-length(ans$x)]
+#   if(plotit)
+#   {
+#     plot(ans, xlab="", ylab="Realized Accumulation")
+#     return(NULL)
+#   }
+#   ans
+# } 
+# 
+# # Marginal distribution:
+# rMarginal <- function(x, y = NULL, period, align.by = "seconds", align.period = 1, plotit=FALSE, cts=TRUE, makeReturns=FALSE) {
+#   multixts = multixts(x) || multixts(y);
+#   if( multixts ){ stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")}     
+#   
+#   align.period = .getAlignPeriod(align.period, align.by)   
+#   ans <- list(x = NULL, y = NULL)
+#   ans$x <- .alignIndices(1:length(x), align.period)
+#   ans$x <- .alignIndices(ans$x, period)
+#   
+#   if (is.null(y))
+#     y <- x   
+#   x <- alignReturns(.convertData(x, cts=cts, makeReturns=makeReturns)$data, align.period)
+#   y <- alignReturns(.convertData(y, cts=cts, makeReturns=makeReturns)$data, align.period)
+#   ans$y <- .alignedAccum(x=x, y=y, period=period, cum=FALSE)
+#   
+#   if (plotit) {
+#     plot(ans, xlab="", ylab="Realized Marginals")
+#     return(NULL)
+#   }
+#   ans
+# }
 
-# Accumulation:
-rAccumulation <- function(x, period = 1, y = NULL, align.by = "seconds",align.period = 1, plotit = FALSE, cts=TRUE, makeReturns = FALSE) {
-  multixts = multixts(x) || multixts(y)
-  if( multixts ){ stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")}     
-  
-  align.period = .getAlignPeriod(align.period, align.by)   
-  ans <- list(x=NULL, y=NULL)
-  ans$y <- cumsum(rMarginal(x=x, y=y, period=period, align.period=align.period, cts=cts, makeReturns=makeReturns)$y)
-  #    ans$x <- .alignIndices(1:length(x), align.period)
-  #    ans$x <- .alignIndices(ans$x, period)
-  ans$x <- rCumSum(x=x, period=period, align.period=align.period, cts=cts, makeReturns=makeReturns)$x
-  #ans$x <- ans$x[-length(ans$x)]
-  if(plotit)
-  {
-    plot(ans, xlab="", ylab="Realized Accumulation")
-    return(NULL)
-  }
-  ans
-} 
+# # Cumulative sum of returns:
+# rCumSum <- function(x, period = 1, align.by = "seconds", align.period = 1, plotit = FALSE, type='l', cts = TRUE, makeReturns = FALSE) {
+#   multixts = multixts(x);
+#   if( multixts ){ 
+#     stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")
+#   }     
+#   
+#   align.period = .getAlignPeriod(align.period, align.by)   
+#   ans <- list(x = NULL, y = NULL)
+#   ans$x <- .alignIndices(1:length(.convertData(x, cts=cts, makeReturns=makeReturns)$data), align.period)
+#   ans$x <- .alignIndices(ans$x, period)
+#   
+#   x<- alignReturns(.convertData(x, cts=cts, makeReturns=makeReturns)$data, align.period)
+#   x<- alignReturns(.convertData(x, cts=cts, makeReturns=makeReturns)$data, period)
+#   
+#   ans$y <- cumsum(x)
+#   if (plotit) {
+#     plot(cumsum(x), xlab="Time", ylab="Cummulative Returns", type=type)
+#     return(NULL)
+#   }
+#   ans
+# } 
 
-# Marginal distribution:
-rMarginal <- function(x, y = NULL, period, align.by = "seconds", align.period = 1, plotit=FALSE, cts=TRUE, makeReturns=FALSE) {
-  multixts = multixts(x) || multixts(y);
-  if( multixts ){ stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")}     
-  
-  align.period = .getAlignPeriod(align.period, align.by)   
-  ans <- list(x = NULL, y = NULL)
-  ans$x <- .alignIndices(1:length(x), align.period)
-  ans$x <- .alignIndices(ans$x, period)
-  
-  if (is.null(y))
-    y <- x   
-  x <- alignReturns(.convertData(x, cts=cts, makeReturns=makeReturns)$data, align.period)
-  y <- alignReturns(.convertData(y, cts=cts, makeReturns=makeReturns)$data, align.period)
-  ans$y <- .alignedAccum(x=x, y=y, period=period, cum=FALSE)
-  
-  if (plotit) {
-    plot(ans, xlab="", ylab="Realized Marginals")
-    return(NULL)
-  }
-  ans
-}
-
-# Cumulative sum of returns:
-rCumSum <- function(x, period = 1, align.by = "seconds", align.period = 1, plotit = FALSE, type='l', cts = TRUE, makeReturns = FALSE) {
-  multixts = multixts(x);
-  if( multixts ){ 
-    stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")
-  }     
-  
-  align.period = .getAlignPeriod(align.period, align.by)   
-  ans <- list(x = NULL, y = NULL)
-  ans$x <- .alignIndices(1:length(.convertData(x, cts=cts, makeReturns=makeReturns)$data), align.period)
-  ans$x <- .alignIndices(ans$x, period)
-  
-  x<- alignReturns(.convertData(x, cts=cts, makeReturns=makeReturns)$data, align.period)
-  x<- alignReturns(.convertData(x, cts=cts, makeReturns=makeReturns)$data, period)
-  
-  ans$y <- cumsum(x)
-  if (plotit) {
-    plot(cumsum(x), xlab="Time", ylab="Cummulative Returns", type=type)
-    return(NULL)
-  }
-  ans
-} 
-
-#Scatter returns:
-rScatterReturns <- function(x, y, period, align.by = "seconds", align.period = 1, numbers = FALSE, xlim = NULL, ylim = NULL, 
-                            plotit = TRUE, pch = NULL, cts = TRUE, makeReturns = FALSE, scale.size = 0, col.change = FALSE,...) {
-  multixts = multixts(x) || multixts(y)
-  if (multixts == TRUE) { 
-    stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")
-  }     
-  
-  align.period = .getAlignPeriod(align.period, align.by) 
-  y <- alignReturns(.convertData(y, cts=cts, makeReturns=makeReturns)$data, align.period)
-  x <- alignReturns(.convertData(x, cts=cts, makeReturns=makeReturns)$data, align.period)
-  
-  x <- .accum.naive(x, x, period)
-  y <- .accum.naive(y, y, period)
-  if (is.null(pch)) {
-    pch <- 1
-  }
-  
-  it <- table(round(x,4),round(y,4))
-  xs <- as.numeric(dimnames(it)[[1]])
-  ys <- as.numeric(dimnames(it)[[2]])
-  
-  if (is.null(ylim) == TRUE) {
-    ylim <- c(min(ys), max(ys))
-  }
-    
-  if (is.null(xlim)) {
-    xlim <- c(min(xs), max(xs))
-  }
-  
-  mat <- matrix(it, nrow=length(xs), ncol=length(ys))
-  
-  if (plotit == TRUE) {
-    plot(0,0, xlim=xlim, ylim=ylim , type='n',...)
-    lines(c(0,0), c(-1,2), col="grey", lty=3, lwd=2)
-    lines(c(-1,2), c(0,0), col="grey", lty=3, lwd=2)
-    
-    maxed <- max(mat)
-    
-    for (i in 1:length(xs)) {
-      for(j in 1:length(ys)) {
-        if(mat[i,j]!=0) {
-          if(col.change) {
-            thecol <- round(runif(1)*100,0)
-          } else {
-            thecol = 1
-          }
-          if(numbers) {
-            if(scale.size ==0)
-              text(xs[i], ys[j],as.character(mat[i,j]), cex=.7, col=thecol)         
-            else
-              text(xs[i], ys[j], as.character(mat[i,j]), cex = (mat[i,j]/maxed) * scale.size, col=thecol)
-          } else {
-            if(scale.size ==0)
-              points(xs[i], ys[j], pch=pch, cex=.7, col=thecol)         
-            else
-              points(xs[i], ys[j], pch=pch, cex = (mat[i,j]/maxed) * scale.size, col=thecol)
-          }
-        }
-        
-      }
-    }
-    return(NULL)
-  }     
-  mat
-}
+# #Scatter returns:
+# rScatterReturns <- function(x, y, period, align.by = "seconds", align.period = 1, numbers = FALSE, xlim = NULL, ylim = NULL, 
+#                             plotit = TRUE, pch = NULL, cts = TRUE, makeReturns = FALSE, scale.size = 0, col.change = FALSE,...) {
+#   multixts = multixts(x) || multixts(y)
+#   if (multixts == TRUE) { 
+#     stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")
+#   }     
+#   
+#   align.period = .getAlignPeriod(align.period, align.by) 
+#   y <- alignReturns(.convertData(y, cts=cts, makeReturns=makeReturns)$data, align.period)
+#   x <- alignReturns(.convertData(x, cts=cts, makeReturns=makeReturns)$data, align.period)
+#   
+#   x <- .accum.naive(x, x, period)
+#   y <- .accum.naive(y, y, period)
+#   if (is.null(pch)) {
+#     pch <- 1
+#   }
+#   
+#   it <- table(round(x,4),round(y,4))
+#   xs <- as.numeric(dimnames(it)[[1]])
+#   ys <- as.numeric(dimnames(it)[[2]])
+#   
+#   if (is.null(ylim) == TRUE) {
+#     ylim <- c(min(ys), max(ys))
+#   }
+#     
+#   if (is.null(xlim)) {
+#     xlim <- c(min(xs), max(xs))
+#   }
+#   
+#   mat <- matrix(it, nrow=length(xs), ncol=length(ys))
+#   
+#   if (plotit == TRUE) {
+#     plot(0,0, xlim=xlim, ylim=ylim , type='n',...)
+#     lines(c(0,0), c(-1,2), col="grey", lty=3, lwd=2)
+#     lines(c(-1,2), c(0,0), col="grey", lty=3, lwd=2)
+#     
+#     maxed <- max(mat)
+#     
+#     for (i in 1:length(xs)) {
+#       for(j in 1:length(ys)) {
+#         if(mat[i,j]!=0) {
+#           if(col.change) {
+#             thecol <- round(runif(1)*100,0)
+#           } else {
+#             thecol = 1
+#           }
+#           if(numbers) {
+#             if(scale.size ==0)
+#               text(xs[i], ys[j],as.character(mat[i,j]), cex=.7, col=thecol)         
+#             else
+#               text(xs[i], ys[j], as.character(mat[i,j]), cex = (mat[i,j]/maxed) * scale.size, col=thecol)
+#           } else {
+#             if(scale.size ==0)
+#               points(xs[i], ys[j], pch=pch, cex=.7, col=thecol)         
+#             else
+#               points(xs[i], ys[j], pch=pch, cex = (mat[i,j]/maxed) * scale.size, col=thecol)
+#           }
+#         }
+#         
+#       }
+#     }
+#     return(NULL)
+#   }     
+#   mat
+# }
 
 
 
@@ -852,220 +839,14 @@ uniTAQload <- function(ticker,from,to,trades=TRUE,quotes=FALSE,datasource=NULL,v
 
 
 
-# internal non documented functions: 
-HRweight = function( d,k){
-  # Hard rejection weight function
-  w = 1*(d<=k); return(w)
-}
 
-shorthscale <- function (data) {
-  sorteddata = sort(data);
-  n = length(data);
-  h = floor(n/2)+1;
-  M = matrix( rep(0,2*(n-h+1) ) , nrow= 2 );
-  for( i in 1:(n-h+1) ){
-    M[,i] = c( sorteddata[ i ], sorteddata[ i+h-1 ] )
-  }
-  return( 0.7413*min( M[2,]-M[1,] ) );
-}
 
-diurnal = function (stddata, method = "TML", dummies = F, P1 = 6, P2 = 4) {
-    cDays = dim(stddata)[1]
-    intraT = dim(stddata)[2]
-    meannozero = function(series) {
-      return(mean(series[series != 0]))
-    }
-    shorthscalenozero = function(series) {
-      return(shorthscale(series[series != 0]))
-    }
-    WSDnozero = function(weights, series) {
-      out = sum((weights * series^2)[series != 0])/sum(weights[series != 
-        0])
-      return(sqrt(1.081 * out))
-    }
-    if (method == "SD" | method == "OLS") {
-      seas = sqrt(apply(stddata^2, 2, "meannozero"))
-    }
-    if (method == "WSD" | method == "TML") {
-      seas = apply(stddata, 2, "shorthscalenozero")
-      shorthseas = seas/sqrt(mean(seas^2))
-      shorthseas[shorthseas == 0] = 1
-      weights = matrix(HRweight(as.vector(t(stddata^2)/rep(shorthseas, 
-                                                           cDays)^2), qchisq(0.99, df = 1)), ncol = dim(stddata)[2], 
-                       byrow = T)
-      for (c in 1:intraT) {
-        seas[c] = WSDnozero(weights[, c], stddata[, c])
-      }
-    }
-    seas = na.locf(seas,na.rm=F) #do not remove leading NA
-    seas = na.locf(seas,fromLast=T)
-    seas = seas/sqrt(mean(seas^2))
-    if (method == "OLS" | method == "TML") {
-      c = center()
-      vstddata = as.vector(stddata)
-      nobs = length(vstddata)
-      vi = rep(c(1:intraT), each = cDays)
-      if (method == "TML") {
-        if( length(vstddata)!= length(seas)*cDays ){ print(length(vstddata)); print(length(seas)); print(cDays)}
-        firststepresids = log(abs(vstddata)) - c - log(rep(seas, 
-                                                           each = cDays))
-      }
-      X = c()
-      if (!dummies) {
-        if (P1 > 0) {
-          for (j in 1:P1) {
-            X = cbind(X, cos(2 * pi * j * vi/intraT))
-          }
-        }
-        M1 = (intraT + 1)/2
-        M2 = (2 * intraT^2 + 3 * intraT + 1)/6
-        ADD = (vi/M1)
-        X = cbind(X, ADD)
-        ADD = (vi^2/M2)
-        X = cbind(X, ADD)
-        if (P2 > 0) {
-          ADD = c()
-          for (j in 1:P2) {
-            ADD = cbind(ADD, sin(2 * pi * j * vi/intraT))
-          }
-        }
-        X = cbind(X, ADD)
-        opening = vi - 0
-        stdopening = (vi - 0)/80
-        almond1_opening = (1 - (stdopening)^3)
-        almond2_opening = (1 - (stdopening)^2) * (opening)
-        almond3_opening = (1 - (stdopening)) * (opening^2)
-        X = cbind(X, almond1_opening, almond2_opening, almond3_opening)
-        closing = max(vi) - vi
-        stdclosing = (max(vi) - vi)/max(vi)
-        almond1_closing = (1 - (stdclosing)^3)
-        almond2_closing = (1 - (stdclosing)^2) * (closing)
-        almond3_closing = (1 - (stdclosing)) * (closing^2)
-        X = cbind(X, almond1_closing, almond2_closing, almond3_closing)
-      }
-      else {
-        for (d in 1:intraT) {
-          dummy = rep(0, intraT)
-          dummy[d] = 1
-          dummy = rep(dummy, each = cDays)
-          X = cbind(X, dummy)
-        }
-      }
-      selection = c(1:nobs)[vstddata != 0]
-      vstddata = vstddata[selection]
-      X = X[selection, ]
-      if (method == "TML") {
-        firststepresids = firststepresids[selection]
-      }
-      vy = matrix(log(abs(vstddata)), ncol = 1) - c
-      if (method == "OLS") {
-        Z = try(solve(t(X) %*% X), silent = T)
-        if (inherits(Z, "try-error")) {
-          print("X'X is not invertible. Switch to TML")
-        }
-        else {
-          theta = solve(t(X) %*% X) %*% t(X) %*% vy
-          rm(X)
-          rm(vy)
-        }
-      }
-      if (method == "TML") {
-        inittheta = rep(0, dim(X)[2])
-        l = -2.272
-        u = 1.6675
-        nonoutliers = c(1:length(vy))[(firststepresids > 
-          l) & (firststepresids < u)]
-        truncvy = vy[nonoutliers]
-        rm(vy)
-        truncX = X[nonoutliers, ]
-        rm(X)
-        negtruncLLH = function(theta) {
-          res = truncvy - truncX %*% matrix(theta, ncol = 1)
-          return(mean(-res - c + exp(2 * (res + c))/2))
-        }
-        grnegtruncLLH = function(theta) {
-          res = truncvy - truncX %*% matrix(theta, ncol = 1)
-          dres = -truncX
-          return(apply(-dres + as.vector(exp(2 * (res + 
-            c))) * dres, 2, "mean"))
-        }
-        est = optim(par = inittheta, fn = negtruncLLH, gr = grnegtruncLLH, 
-                    method = "BFGS")
-        theta = est$par
-        rm(truncX)
-        rm(truncvy)
-      }
-      plot(seas, main = "Non-parametric and parametric periodicity estimates", 
-           xlab = "intraday period", type = "l", lty = 3)
-      legend("topright", c("Parametric", "Non-parametric"), cex = 1.1,
-             lty = c(1,3), lwd = 1, bty = "n")
-      seas = highfrequency:::diurnalfit(theta = theta, P1 = P1, P2 = P2, intraT = intraT, 
-                               dummies = dummies)
-      lines(seas, lty = 1)
-      return(list(seas, theta))
-    }
-    else {
-      return(list(seas))
-    }
-  }
-
-diurnalfit = function( theta , P1 , P2 , intraT , dummies=F )
-{
-  vi = c(1:intraT) ;  
-  M1 = (intraT+1)/2 ; M2 = (2*intraT^2 + 3*intraT + 1)/6;
-  
-  # Regressors that do not depend on Day of Week:
-  X = c()
-  if(!dummies){
-    if ( P1 > 0 ){ for( j in 1:P1 ){ X = cbind( X , cos(2*pi*j*vi/intraT) )   }  } 
-    
-    ADD = (vi/M1 ) ; X = cbind(X,ADD);
-    ADD = (vi^2/M2); X = cbind(X,ADD);
-    if ( P2 > 0 ){ ADD= c(); for( j in 1:P2 ){  ADD = cbind( ADD , sin(2*pi*j*vi/intraT)  ) }}; X = cbind( X , ADD ) ; 
-    
-    #openingeffect
-    opening = vi-0 ; stdopening = (vi-0)/80 ;
-    almond1_opening   = ( 1 - (stdopening)^3 );
-    almond2_opening   = ( 1 - (stdopening)^2 )*( opening);
-    almond3_opening   = ( 1 - (stdopening)   )*( opening^2);   
-    X = cbind(  X, almond1_opening , almond2_opening , almond3_opening   )  ;
-    
-    #closing effect
-    closing = max(vi)-vi ; stdclosing = (max(vi)-vi)/max(vi) ;
-    almond1_closing   = ( 1 - (stdclosing)^3 );
-    almond2_closing   = ( 1 - (stdclosing)^2 )*( closing);
-    almond3_closing   = ( 1 - (stdclosing)   )*( closing^2);   
-    X = cbind(  X, almond1_closing , almond2_closing , almond3_closing   )  ;
-    
-  }else{
-    for( d in 1:intraT){
-      dummy = rep(0,intraT); dummy[d]=1; 
-      X = cbind(X,dummy); 
-    }
-  }
-  # Compute fit
-  seas = exp( X%*%matrix(theta,ncol=1) );
-  seas = seas/sqrt(mean( seas^2) )    
-  return( seas )          
-}
-
-LeeMyklandCV = function( beta = 0.999 , M = 78 )
-{
+LeeMyklandCV = function( beta = 0.999 , M = 78 ) {
   # Critical value for Lee-Mykland jump test statistic
   # Based on distribution of Maximum of M absolute normal random variables
   a = function(n){ a1=sqrt(2*log(n)) ; a2= (log(pi)+log(log(n))  )/( 2*sqrt(2*log(n))   ); return(a1-a2)             };
   b = function(n){ return( 1/sqrt(2*log(n) )  ) ; return(b)} ;
   return( -log(-log(beta))*b(M) + a(M)     )
-}
-
-center <-  function() {
-  g <- function(y){ 
-    return(sqrt(2/pi) * exp(y-exp(2*y)/2))
-  }
-  f <- function(y) { 
-    return(y * g(y))  
-  }
-  return(integrate(f,-Inf,Inf)$value)
 }
 
  ###### end SPOTVOL FUNCTIONS formerly in periodicityTAQ #########
@@ -1510,10 +1291,6 @@ p_return_abs <- function (data) {
              
 
 ##################### Total cleanup functions formerly in RTAQ ################################
-
-
-
-
 quotesCleanup <- function(from, to, datasource, datadestination, ticker, exchanges, qdataraw = NULL, report = TRUE, 
                           selection="median", maxi = 50, window = 50, type = "advanced", rmoutliersmaxi = 10, ...) {
   nresult = rep(0,7)
@@ -1691,16 +1468,6 @@ autoSelectExchangeTrades = function(tdata){
 
 
 ##### TRADE DATA SPECIFIC FUNCTIONS: ###################################
-
-# Zivot
-salesCondition <- function (tdata) {
-  trim <- function (x) gsub("^\\s+|\\s+$", "", x)
-  
-  tdatacheck(tdata);
-  filteredts = tdata[trim(tdata$COND) == "0" | trim(tdata$COND) == "E" |
-    trim(tdata$COND) == "F" | trim(tdata$COND) == "" | trim(tdata$COND) == "@F"]
-  return(filteredts)
-}
 
 
 ##Merge same timestamp:
