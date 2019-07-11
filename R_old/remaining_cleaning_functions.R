@@ -275,6 +275,7 @@ rZero = function( rdata, period = 1, align.by = "seconds", align.period = 1, cts
         }  #List-length > 1
     }  #If-list condition
 }   #end rAVGCov
+
 # 
 # # Accumulation:
 # rAccumulation <- function(x, period = 1, y = NULL, align.by = "seconds",align.period = 1, plotit = FALSE, cts=TRUE, makeReturns = FALSE) {
@@ -871,39 +872,6 @@ rdatacheck = function(rdata,multi=FALSE){
   if((dim(rdata)[2] < 2) & (multi)){stop("Your rdata object should have at least 2 columns")}
 }
 
-matchTradesQuotes <- function(tdata, qdata, adjustment = 2){ ##FAST VERSION
-  tdata = .check_data(tdata)
-  qdata = .check_data(qdata)
-  qdatacheck(qdata)
-  tdatacheck(tdata)
-  
-  tt = dim(tdata)[2]
-  index(qdata) = index(qdata) + adjustment
-  
-  #merge:
-  merged = merge(tdata, qdata)
-  
-  ##fill NA's:
-  merged[, ((tt + 1):dim(merged)[2])] = na.locf(as.zoo(merged[, ((tt+1):dim(merged)[2])]), na.rm = FALSE)
-  
-  #Select trades:
-  index(tdata)  = as.POSIXct(index(tdata))
-  index(merged) = as.POSIXct(index(merged))
-  merged = merged[index(tdata)]
-  
-  #return useful parts:
-  #remove duplicated SYMBOL & EX (new)
-  eff =  colnames(merged);
-  realnames = c("SYMBOL","EX","PRICE","SIZE","COND","CORR","G127","BID","BIDSIZ","OFR","OFRSIZ","MODE");
-  condition = (1:length(eff))[eff%in%realnames];
-  merged = merged[,condition];
-  
-  ##a bit rough but otherwise opening price disappears...
-  merged = as.xts(na.locf(as.zoo(merged),fromLast=TRUE));
-  
-  index(merged) = as.POSIXct(index(merged));
-  return(merged)
-}
 
 getTradeDirection <- function(tqdata,...) {
   if (hasArg(data) == TRUE) { 
@@ -1224,7 +1192,7 @@ mq_return_abs = function(data){
   return(mq_return_abs_xts);
 }
 
-tqLiquidity <- function(tqdata=NULL,tdata=NULL,qdata=NULL,type,...) {
+tqLiquidity <- function(tqdata=NULL, tdata = NULL, qdata = NULL, type, ...) {
   if (hasArg(data)){ 
     tqdata = data 
   }

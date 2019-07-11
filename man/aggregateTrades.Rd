@@ -36,6 +36,8 @@ The output "PRICE" column is constructed using previous tick aggregation.
 
 The variable "SIZE" is aggregated by taking the sum over each interval.
 
+The variable "VWPRICE" is the aggregated price weighted by volume.
+
 The timestamps of the new time series are the closing times of the intervals. 
 
 In case of previous tick aggregation or on = "seconds"/"minutes"/"hours",

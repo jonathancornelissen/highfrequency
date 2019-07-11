@@ -142,15 +142,15 @@ aggregateQuotes <- function(qdata, on = "minutes", k = 5, marketopen = "09:30:00
   
   
   # tdata <- sample_tdata_microseconds
-  qdata[, DATE := as.Date(DT)][
-    , FIRST_DT := min(DT), by = "DATE"][
-      , DT_ROUND := ifelse(DT == FIRST_DT,
-                           floor_date(ymd_hms(DT), unit = paste(k, on)),
-                           ceiling_date(ymd_hms(DT), unit = paste(k, on), change_on_boundary = FALSE))][
-                             , DT_ROUND := as_datetime(DT_ROUND)][
-                               , LAST_DT := max(DT), by = "DT_ROUND"][
-                                 , OFRSIZ := sum(OFRSIZ), by = "DT_ROUND"][
-                                   , BIDSIZ := sum(BIDSIZ), by = "DT_ROUND"]
+  qdata[, DATE := as.Date(DT)]
+  qdata[, FIRST_DT := min(DT), by = "DATE"]
+  qdata[, DT_ROUND := ifelse(DT == FIRST_DT,
+                             floor_date(ymd_hms(DT), unit = paste(k, on)),
+                             ceiling_date(ymd_hms(DT), unit = paste(k, on), change_on_boundary = FALSE))]
+  qdata[, DT_ROUND := as_datetime(DT_ROUND)]
+  qdata[, LAST_DT := max(DT), by = "DT_ROUND"]
+  qdata[, OFRSIZ := sum(OFRSIZ), by = "DT_ROUND"]
+  qdata[, BIDSIZ := sum(BIDSIZ), by = "DT_ROUND"]
   
   qdata <- qdata[DT == LAST_DT][, DT := DT_ROUND][, c("DT", "SYMBOL", "BID", "BIDSIZ", "OFR", "OFRSIZ")]
   
@@ -260,6 +260,80 @@ makeReturns <- function(ts) {
   x <- xts(x, order.by = index(ts))
   names(x) <- col_names
   return(x)
+}
+
+#' Match trade and quote data
+#' @description Function matches the trades and quotes and returns an xts-object containing both.
+#' 
+#' @param tdata data.table or xts-object containing the trade data (multiple days possible).
+#' @param qdata data.table or xts-object containing the quote data (multiple days possible).
+#' @param adjustment numeric, number of seconds the quotes are registered faster than
+#' the trades (should be round and positive). Based on the research of
+#' Vergote (2005), we set 2 seconds as the default.
+#' 
+#' @return data.table or xts-object containing the matched trade and quote data
+#' 
+#' @references  Vergote, O. (2005). How to match trades and quotes for NYSE stocks?
+#' K.U.Leuven working paper.
+#' 
+#' @author Jonathan Cornelissen, Kris Boudt and Onno Kleen
+#' 
+#' @keywords data manipulation
+#' 
+#' @examples 
+#' # match the trade and quote data
+#' tqdata <- matchTradesQuotes(sample_tdata, sample_qdata)
+#' head(tqdata)
+#' # multi-day input allowed
+#' tqdata <- matchTradesQuotes(sample_tdata_microseconds, sample_qdata_microseconds)
+#' @importFrom lubridate seconds
+#' @export
+matchTradesQuotes <- function(tdata, qdata, adjustment = 2){
+  
+  tdata <- checkColumnNames(tdata)
+  qdata <- checkColumnNames(qdata)
+  checkqdata(qdata)
+  checktdata(tdata)
+  
+  if (any(class(tdata) != class(qdata))) {
+    stop("tdata and qdata should be of the same data type, either xts or data.table.")
+  }
+  
+  dummy_was_xts <- FALSE
+  if (is.data.table(tdata) == FALSE) {
+    if (is.xts(tdata) == TRUE) {
+      tdata <- setnames(as.data.table(tdata)[, PRICE := as.numeric(as.character(PRICE))], 
+                        old = "index", new = "DT")
+      qdata <- setnames(as.data.table(qdata)[, BID := as.numeric(as.character(BID))][, OFR := as.numeric(as.character(OFR))], 
+                        old = "index", new = "DT")
+      dummy_was_xts <- TRUE
+    } else {
+      stop("Input has to be data.table or xts.")
+    }
+  } else {
+    if (("DT" %in% colnames(tdata)) == FALSE) {
+      stop("tdata neeeds DT column.")
+    }
+  }
+  
+  qdata[, DATE := as.Date(DT)]
+  qdata[, FIRST_DT := min(DT), by = "DATE"]
+  qdata[, DT_ROUND := ifelse(DT == FIRST_DT, ymd_hms(DT), ymd_hms(DT) + seconds(2))]
+  
+  qdata <- qdata[, DT := ifelse(DT != min(DT), DT + seconds(2), DT)] 
+  qdata <- qdata[, DT := as_datetime(DT_ROUND)][, -c("FIRST_DT", "DT_ROUND", "DATE")]
+  
+  setkey(tdata, SYMBOL, DT)
+  setkey(qdata, SYMBOL, DT)
+  
+  tdata <- tdata[, c("DT", "SYMBOL", "PRICE", "SIZE")]
+  tqdata <- qdata[tdata, roll = TRUE, on = c("SYMBOL", "DT")]
+  
+  if (dummy_was_xts == TRUE) {
+    return(xts(as.matrix(tqdata[, -c("DT")]), order.by = tqdata$DT))
+  } else {
+    return(tqdata)
+  }
 }
 
 #' Merge multiple quote entries with the same time stamp
@@ -386,26 +460,36 @@ mergeTradesSameTimestamp <- function(tdata, selection = "median") {
     }
   } else {
     if (("DT" %in% colnames(tdata)) == FALSE) {
+      tdata <- tdata[, SIZE := as.numeric(as.character(SIZE))][, PRICE := as.numeric(as.character(PRICE))]
       stop("Data.table neeeds DT column (date-time ).")
     }
   }
   
   if (selection == "median") {
-    tdata <- tdata[,  lapply(.SD, median), by = list(DT, SYMBOL), .SDcols = c("PRICE")]
+    tdata[, PRICE := median(PRICE), by = list(DT, SYMBOL)]
+    #If there is more than one observation at median price, take the average volume.
+    tdata[, SIZE := as.numeric(SIZE)]
+    tdata[, SIZE := mean(SIZE), by = list(DT, SYMBOL)] 
+    tdata <- unique(tdata[, c("DT", "SYMBOL", "PRICE", "SIZE")])
   }
   
   if (selection == "max.volume") {
-    tdata <- tdata[, MAXSIZE := max(SIZE), by = list(DT, SYMBOL)][
-      , SIZE := ifelse(SIZE == MAXSIZE, 1, 0)][
-          , PRICE := PRICE * SIZE][
-              , PRICE := max(PRICE), by = "DT"][
-                , -c("MAXSIZE")][
-                  , lapply(.SD, unique), by = list(DT, SYMBOL), .SDcols = c("PRICE")]
+    tdata[, SIZE := as.numeric(SIZE)]
+    tdata <- tdata[, MAXSIZE := max(SIZE), by = list(DT, SYMBOL)]
+    tdata[, SIZE := ifelse(SIZE == MAXSIZE, 1, 0)]
+    tdata[, PRICE := PRICE * SIZE]
+    tdata[, PRICE := max(PRICE), by = "DT"]
+    tdata[, SIZE := MAXSIZE]
+    tdata[, -c("MAXSIZE")]
+    tdata <- unique(tdata[, c("DT", "SYMBOL", "PRICE", "SIZE")])
   }
   if (selection == "weighted.average") {
-    tdata <- tdata[, `:=` (SIZE = SIZE / sum(SIZE)), by = list(DT, SYMBOL)][
-      , `:=` (PRICE = sum(PRICE * SIZE)), by = list(DT, SYMBOL)][, -c("SIZE")][
-        , lapply(.SD, unique), by = list(DT, SYMBOL), .SDcols = c("PRICE")]
+    tdata <- tdatabackup
+    tdata[, SIZE := as.numeric(SIZE)]
+    tdata <- tdata[, `:=` (SIZE_WEIGHT = SIZE / sum(SIZE)), by = list(DT, SYMBOL)]
+    tdata[, `:=` (PRICE = sum(PRICE * SIZE_WEIGHT)), by = list(DT, SYMBOL)]
+    tdata[, SIZE := mean(SIZE), by = list(DT, SYMBOL)]
+    tdata <- unique(tdata[, c("DT", "SYMBOL", "PRICE", "SIZE")])
   }
   
   if (dummy_was_xts == TRUE) {

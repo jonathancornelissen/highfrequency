@@ -47,7 +47,7 @@ expect_equal(
 
 expect_equal(
   dim(tradesCleanup(tdataraw = sample_tdataraw, exchanges = "N", report = FALSE)),
-  c(9104, 2)
+  c(9104, 3)
 )
 
 

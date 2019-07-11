@@ -14,7 +14,7 @@ checkColumnNames <- function(data) {
   
   # Change column names to previous RTAQ format! 
   # Adjust price col naming:  
-  try((colnames(data)[xtsAttributes(data)[['Price']]] = 'PRICE'))
+  try((colnames(data)[xtsAttributes(data)[['Price']]] = 'PRICE'), silent = TRUE)
   try(setnames(data, "Price", "PRICE", skip_absent = TRUE), silent = TRUE)
   # Adjust Bid col naming:    
   try((colnames(data)[xtsAttributes(data)[['Bid']]] = 'BID'))
