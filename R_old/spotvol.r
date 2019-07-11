@@ -325,7 +325,7 @@
     plot(as.numeric(t(vol7$spot)), type = "l")
     lines(as.numeric(t(vol8$spot)), col = "red")
     legend("topleft", c("GARCH", "eGARCH"), col = c("black", "red"), lty=1)}
-}
+#' 
 #' @references Andersen, T. G. and T. Bollerslev (1997). Intraday periodicity and volatility persistence in financial markets. Journal of Empirical Finance 4, 115-158.
 #' 
 #' Beltratti, A. and C. Morana (2001). Deterministic and stochastic methods for estimation of intraday seasonal components with high frequency data. Economic Notes 30, 205-234.

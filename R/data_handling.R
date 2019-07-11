@@ -17,6 +17,8 @@
 #' 
 #' The variable "SIZE" is aggregated by taking the sum over each interval.
 #' 
+#' The variable "VWPRICE" is the aggregated price weighted by volume.
+#' 
 #' The timestamps of the new time series are the closing times of the intervals. 
 #' 
 #' In case of previous tick aggregation or on = "seconds"/"minutes"/"hours",
@@ -38,7 +40,7 @@
 #' @importFrom lubridate as_datetime
 #' @export
 aggregateTrades <- function(tdata, on = "minutes", k = 5, marketopen = "09:30:00", marketclose = "16:00:00", tz = "GMT") {
-  DATE = SIZE = DT = FIRST_DT = DT_ROUND = LAST_DT = SYMBOL = PRICE = NULL
+  DATE = SIZE = DT = FIRST_DT = DT_ROUND = LAST_DT = SYMBOL = PRICE = VWPRICE = NULL
   tdata <- checkColumnNames(tdata)
   checktdata(tdata)
   
@@ -57,16 +59,18 @@ aggregateTrades <- function(tdata, on = "minutes", k = 5, marketopen = "09:30:00
     }
   }
   
-  tdata[, DATE := as.Date(DT)][
-    , FIRST_DT := min(DT), by = "DATE"][
-          , DT_ROUND := ifelse(DT == FIRST_DT,
-                               floor_date(ymd_hms(DT), unit = paste(k, on)),
-                               ceiling_date(ymd_hms(DT), unit = paste(k, on), change_on_boundary = FALSE))][
-                                 , DT_ROUND := as_datetime(DT_ROUND)][
-                                   , LAST_DT := max(DT), by = "DT_ROUND"][
-                                     , SIZE := sum(SIZE), by = "DT_ROUND"]
+  tdata[, DATE := as.Date(DT)]
+  tdata[, FIRST_DT := min(DT), by = "DATE"]
+  tdata[, DT_ROUND := ifelse(DT == FIRST_DT,
+                             floor_date(ymd_hms(DT), unit = paste(k, on)),
+                             ceiling_date(ymd_hms(DT), unit = paste(k, on), change_on_boundary = FALSE))]
+  tdata[, DT_ROUND := as_datetime(DT_ROUND)]
+  tdata[, LAST_DT := max(DT), by = "DT_ROUND"]
+  tdata[, SIZETPRICE := SIZE * PRICE]
+  tdata[, SIZESUM := sum(SIZE), by = "DT_ROUND"]
+  tdata[, VWPRICE := sum(SIZETPRICE/SIZESUM), by = "DT_ROUND"]
   
-  tdata <- tdata[DT == LAST_DT][, DT := DT_ROUND][, c("DT", "SYMBOL", "PRICE", "SIZE")]
+  tdata <- tdata[DT == LAST_DT][, DT := DT_ROUND][, c("DT", "SYMBOL", "PRICE", "SIZE", "VWPRICE")]
   
   if (dummy_was_xts == TRUE) {
     return(xts(as.matrix(tdata[, -c("DT")]), order.by = tdata$DT, tzone = tz))
@@ -110,7 +114,7 @@ aggregateTrades <- function(tdata, on = "minutes", k = 5, marketopen = "09:30:00
 #' head(qdata_aggregated)
 #' @export
 aggregateQuotes <- function(qdata, on = "minutes", k = 5, marketopen = "09:30:00", marketclose = "16:00:00", tz = "GMT") {
-  DATE = BID = OFR = BIDSIZ = OFRSIZ = DT = FIRST_DT = DT_ROUND = LAST_DT = SYMBOL  = NULL
+  DATE = BID = OFR = BIDSIZ = OFRSIZ = DT = FIRST_DT = DT_ROUND = LAST_DT = SYMBOL = NULL
   
   qdata <- checkColumnNames(qdata)
   checkqdata(qdata)
