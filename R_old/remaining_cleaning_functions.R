@@ -1588,6 +1588,12 @@ rmtradeoutliers = function(...){rmTradeOutliers(...)};
 salescond = function(...){salesCondition(...)};                           
 selectexchange = function(...){selectExchange(...)};                      
 
+
+
+
+
+
+
 ####### Aggregation functions that were formerly in RTAQ ######################
 
 previoustick = function(a){
@@ -1740,49 +1746,4 @@ aggVolume <- function(ts, FUN = "sumN", on = "minutes", k = 5, includeopen = FAL
   ts4 <- c(ts4, bb)
   
   return(ts4)
-}
-
-aggregateTrades <- function (tdata, on = "minutes", k = 5, marketopen = "09:30:00", marketclose = "16:00:00") {
-  tdata <- .check_data(tdata)
-  tdatacheck(tdata)
-  ## Aggregates an entire trades xts object (tdata) over a "k"-minute interval.
-  ## Returned xts-object contains: SYMBOL,EX,PRICE,SIZE.
-  ## Variables COND, CORR, G127 are dropped because aggregating them makes no sense.
-  ## NOTE: first observation (opening price) always included.
-  
-  selection <- colnames(tdata)%in%c("PRICE","EX","SYMBOL")
-  tdata1 <- tdata[,selection]
-  PRICE <- aggregatePrice(tdata$PRICE, on = on, k = k, marketopen = marketopen, marketclose = marketclose)
-  SIZE <- aggVolume(tdata$SIZE, on = on, k = k, includeopen = TRUE, marketopen = marketopen, marketclose = marketclose)
-  
-  EX <- rep(tdata$EX[1], length(PRICE))
-  SYMBOL <- rep(tdata$SYMBOL[1], length(PRICE))
-  
-  all <- data.frame(SYMBOL, EX, PRICE, SIZE)
-  colnames(all) <- c("SYMBOL", "EX", "PRICE", "SIZE")
-  ts <- xts(all, index(SIZE))
-  return(ts)
-}
-
-###QUOTES AGGREGATION:
-aggregateQuotes <- function(qdata, on = "minutes", k = 5, marketopen = "09:30:00", marketclose = "16:00:00") {
-  qdata <- .check_data(qdata)
-  qdatacheck(qdata)
-  
-  ## Aggregates an entire quotes xts object (qdata) object over a "k"-minute interval.
-  ## Returned xts-object contains: SYMBOL,EX,BID,BIDSIZ,OFR,OFRSIZ.
-  ## Variable MODE is dropped because aggregation makes no sense.
-  ## "includeopen" determines whether to include the exact opening quotes.
-  
-  BIDOFR <- aggregatePrice(cbind(qdata$BID,qdata$OFR),on=on,k=k,marketopen=marketopen,marketclose=marketclose)
-  BIDOFRSIZ <- aggVolume(cbind(qdata$BIDSIZ,qdata$OFRSIZ),on=on,k=k,includeopen=TRUE,marketopen=marketopen,marketclose=marketclose)
-  
-  EX <- rep(qdata$EX[1],dim(BIDOFR)[1])
-  SYMBOL <- rep(qdata$SYMBOL[1],dim(BIDOFR)[1])
-  
-  all <- data.frame(SYMBOL,EX,BIDOFR[,1],BIDOFRSIZ[,1],BIDOFR[,2],BIDOFRSIZ[,2])
-  colnames(all) <- c("SYMBOL","EX","BID","BIDSIZ","OFR","OFRSIZ")
-  
-  ts <- xts(all,index(BIDOFR))
-  return(ts)
 }

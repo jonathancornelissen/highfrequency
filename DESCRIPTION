@@ -42,7 +42,8 @@ Imports:
     MASS,
     data.table,
     RcppRoll,
-    bit64
+    bit64,
+    lubridate
 LinkingTo: Rcpp
 Suggests:
     covr,

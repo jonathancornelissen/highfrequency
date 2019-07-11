@@ -2,44 +2,50 @@
 % Please edit documentation in R/data_handling.R
 \name{aggregateTrades}
 \alias{aggregateTrades}
-\title{Aggregate a time series but keep first and last observation}
+\title{Aggregate a data.table or xts object containing trades data}
 \usage{
 aggregateTrades(tdata, on = "minutes", k = 5,
-  marketopen = "09:30:00", marketclose = "16:00:00")
+  marketopen = "09:30:00", marketclose = "16:00:00", tz = "GMT")
 }
 \arguments{
 \item{tdata}{data.table or xts object to be aggregated, containing the intraday price series of a stock for possibly multiple days.}
 
 \item{on}{character, indicating the time scale in which "k" is expressed. Possible values are: "secs", "seconds", "mins", "minutes", "hours".}
 
-\item{k}{positive integer, indicating the number of periods to aggregate over. E.g. to aggregate a 
-xts object to the 5 minute frequency set k=5 and on="minutes".}
+\item{k}{positive integer, indicating the number of periods to aggregate over. E.g. to aggregate an
+object to the 5 minute frequency set k = 5 and on = "minutes".}
 
 \item{marketopen}{the market opening time, by default: marketopen = "09:30:00".}
 
 \item{marketclose}{the market closing time, by default: marketclose = "16:00:00".}
 
 \item{tz}{time zone used, by default: tz = "GMT".}
-
-\item{The}{timestamps of the new time series are the closing times and/or days of the intervals. 
-
-In case of previous tick aggregation or on = "seconds"/"minutes"/"hours",
-the element of the returned series with e.g. timestamp 09:35:00 contains 
-the last observation up to that point, including the value at 09:35:00 itself.}
 }
 \value{
 An data.table or xts object containing the aggregated time series.
 }
 \description{
-Function returns new time series as xts object where first observation is always the opening price
+Function returns new time series as a data.table or xts object where first observation is always the opening price
 and subsequent observations are the closing prices over the interval with as endpoint the timestamp 
 of the result.
 }
+\details{
+The timestamps of the new time series are the closing times and/or days of the intervals. 
+
+The output "PRICE" column is constructed using previous tick aggregation.
+
+The variable "SIZE" is aggregated by taking the sum over each interval.
+
+The timestamps of the new time series are the closing times of the intervals. 
+
+In case of previous tick aggregation or on = "seconds"/"minutes"/"hours",
+the element of the returned series with e.g. timestamp 09:35:00 contains 
+the last observation up to that point, including the value at 09:35:00 itself.
+}
 \examples{
-#load data
-data("sample_tdataraw")
-#aggregate price data to the 30 second frequency
-head(aggregatePrice(sample_tdataraw, on = "secs", k = 30))
+# aggregate trade data to 5 minute frequency
+tdata_aggregated <- aggregateTrades(sample_tdata, on = "minutes", k = 5)
+head(tdata_aggregated)
 }
 \author{
 Jonathan Cornelissen, Kris Boudt and Onno Kleen.
