@@ -284,7 +284,7 @@ has.Qty <- function(x, which = FALSE)
 #' @keywords internal
 checktdata <- function(tdata) {
   if (is.xts(tdata) == FALSE & is.data.table(tdata) == FALSE) {
-    stop("The argument tdata should be an data.table or xts object.")
+    stop("The argument tdata should be a data.table or xts object.")
   }
   if (any(colnames(tdata) == "PRICE") == FALSE) {
     stop("The argument tdata should have a column containing the PRICE. Could not find that column.")

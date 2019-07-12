@@ -432,7 +432,7 @@ mergeQuotesSameTimestamp <- function(qdata, selection = "median") {
 #' \item selection = "weighted.average": take the weighted average of all prices.
 #' }
 #' 
-#' @return xts or data.table object depending on input
+#' @return data.table or xts object depending on input
 #' 
 #' @author Jonathan Cornelissen and Kris Boudt
 #' @keywords cleaning
@@ -747,6 +747,11 @@ rmLargeSpread <- function(qdata, maxi = 50) {
   }
 }
 
+#' Delete transactions with unlikely transaction prices
+#' @description Deprecated - use rmTradeOutliers instead.
+#' @param tdata a data.table or xts object containing the time series data, with at least the column "PRICE", containing the transaction price (ONE DAY ONLY).
+#' @param qdata a data.table or xts object containing the time series data with at least the columns "BID" and "OFR", containing the bid and ask prices (ONE DAY ONLY).
+#' @return xts or data.table object depending on input
 #' @export
 rmTradeOutliers <- function(tdata, qdata) {
   warning("Renamed as rmTradeOutliersUsingQuotes. Will be deprecated in future releases.")
@@ -766,7 +771,7 @@ rmTradeOutliers <- function(tdata, qdata) {
 #' 
 #' @return xts or data.table object depending on input
 #' 
-#' @author Jonathan Cornelissen, ris Boudt and Onno Kleen
+#' @author Jonathan Cornelissen, Kris Boudt and Onno Kleen
 #' @keywords cleaning
 #' @importFrom data.table setkey
 #' @export
