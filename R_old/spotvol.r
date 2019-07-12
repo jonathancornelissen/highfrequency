@@ -466,8 +466,7 @@ detper <- function(mR, rdata = NULL, options = list()) {
 # 
 # This function estimates the spot volatility by using the stochastic periodcity
 # model of Beltratti & Morana (2001)
-stochper <- function(mR, rdata = NULL, options = list()) 
-{
+stochper <- function(mR, rdata = NULL, options = list()) {
   #require(FKF)
   # default options, replace if user-specified
   op <- list(init = list(), P1 = 5, P2 = 5, control = list(trace=1, maxit=500))

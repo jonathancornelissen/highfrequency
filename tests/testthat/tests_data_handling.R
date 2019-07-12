@@ -16,7 +16,7 @@ expect_equal(
 )
 
 expect_equal(
-  dim(rmOutliersTrades(selectExchange(sample_tdataraw, "W"), selectExchange(sample_qdataraw, "W"))),
+  dim(rmTradeOutliersUsingQuotes(selectExchange(sample_tdataraw, "W"), selectExchange(sample_qdataraw, "W"))),
   c(203, 8)
 )
 

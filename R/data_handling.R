@@ -40,7 +40,7 @@
 #' @importFrom lubridate as_datetime
 #' @export
 aggregateTrades <- function(tdata, on = "minutes", k = 5, marketopen = "09:30:00", marketclose = "16:00:00", tz = "GMT") {
-  DATE = SIZE = DT = FIRST_DT = DT_ROUND = LAST_DT = SYMBOL = PRICE = VWPRICE = NULL
+  DATE = SIZE = DT = FIRST_DT = DT_ROUND = LAST_DT = SYMBOL = PRICE = VWPRICE = SIZEPRICE = SIZESUM = NULL
   tdata <- checkColumnNames(tdata)
   checktdata(tdata)
   
@@ -288,7 +288,9 @@ makeReturns <- function(ts) {
 #' tqdata <- matchTradesQuotes(sample_tdata_microseconds, sample_qdata_microseconds)
 #' @importFrom lubridate seconds
 #' @export
-matchTradesQuotes <- function(tdata, qdata, adjustment = 2){
+matchTradesQuotes <- function(tdata, qdata, adjustment = 2) {
+  
+  PRICE = BID = PFR = DATE = DT = FIRST_DT = TD_ROUND = SYMBOL = NULL
   
   tdata <- checkColumnNames(tdata)
   qdata <- checkColumnNames(qdata)
@@ -436,7 +438,7 @@ mergeQuotesSameTimestamp <- function(qdata, selection = "median") {
 #' @keywords cleaning
 #' @export
 mergeTradesSameTimestamp <- function(tdata, selection = "median") {
-  SIZE = MAXSIZE = PRICE = DT = SYMBOL = .SD = NULL
+  SIZE = MAXSIZE = PRICE = DT = SYMBOL = .SD = SIZE_WEIGHT = NULL
   
   tdata <- checkColumnNames(tdata)
   checktdata(tdata)
@@ -484,7 +486,6 @@ mergeTradesSameTimestamp <- function(tdata, selection = "median") {
     tdata <- unique(tdata[, c("DT", "SYMBOL", "PRICE", "SIZE")])
   }
   if (selection == "weighted.average") {
-    tdata <- tdatabackup
     tdata[, SIZE := as.numeric(SIZE)]
     tdata <- tdata[, `:=` (SIZE_WEIGHT = SIZE / sum(SIZE)), by = list(DT, SYMBOL)]
     tdata[, `:=` (PRICE = sum(PRICE * SIZE_WEIGHT)), by = list(DT, SYMBOL)]
@@ -746,6 +747,11 @@ rmLargeSpread <- function(qdata, maxi = 50) {
   }
 }
 
+#' @export
+rmTradeOutliers <- function(tdata, qdata) {
+  warning("Renamed as rmTradeOutliersUsingQuotes. Will be deprecated in future releases.")
+  rmTradeOutliersUsingQuotes(tdata, qdata)
+}
 
 #' Delete transactions with unlikely transaction prices
 #' 
@@ -760,11 +766,11 @@ rmLargeSpread <- function(qdata, maxi = 50) {
 #' 
 #' @return xts or data.table object depending on input
 #' 
-#' @author Jonathan Cornelissen and Kris Boudt
+#' @author Jonathan Cornelissen, ris Boudt and Onno Kleen
 #' @keywords cleaning
 #' @importFrom data.table setkey
 #' @export
-rmOutliersTrades <- function(tdata, qdata) {
+rmTradeOutliersUsingQuotes <- function(tdata, qdata) {
   SPREAD = DT = PRICE = BID = OFR = SYMBOL = 0
   tdata <- checkColumnNames(tdata)
   qdata <- checkColumnNames(qdata)
@@ -1024,7 +1030,7 @@ selectExchange <- function(data, exch = "N") {
 #' \code{\link{noZeroPrices}}, \code{\link{selectExchange}}, \code{\link{salesCondition}},
 #' \code{\link{mergeTradesSameTimestamp}}.
 #' 
-#' Since the function \code{\link{rmOutliersTrades}}
+#' Since the function \code{\link{rmTradeOutliersUsingQuotes}}
 #' also requires cleaned quote data as input, it is not incorporated here and
 #' there is a seperate wrapper called \code{\link{tradesCleanupUsingQuotes}}.
 #' 
@@ -1269,7 +1275,7 @@ tradesCleanupUsingQuotes <- function(from, to, datasource, datadestination, tick
 
 #' Perform a final cleaning procedure on trade data
 #' 
-#' @description Function performs cleaning procedure \code{\link{rmOutliersTrades}} 
+#' @description Function performs cleaning procedure \code{\link{rmTradeOutliersUsingQuotes}} 
 #' for the trades of all stocks in "ticker" over the interval 
 #' [from,to] and saves the result in "datadestination". 
 #' Note that preferably the input data for this function 
@@ -1321,7 +1327,7 @@ tradesCleanupUsingQuotes <- function(from, to, datasource, datadestination, tick
     qdata <- checkColumnNames(qdata)
     
     #1 cleaning procedure that needs cleaned trades and quotes
-    tdata <- rmOutliersTrades(tdata, qdata)
+    tdata <- rmTradeOutliersUsingQuotes(tdata, qdata)
     return(tdata)
   }
 }

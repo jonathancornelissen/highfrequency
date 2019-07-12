@@ -63,7 +63,7 @@ The following cleaning functions are performed sequentially:
 \code{\link{noZeroPrices}}, \code{\link{selectExchange}}, \code{\link{salesCondition}},
 \code{\link{mergeTradesSameTimestamp}}.
 
-Since the function \code{\link{rmOutliersTrades}}
+Since the function \code{\link{rmTradeOutliersUsingQuotes}}
 also requires cleaned quote data as input, it is not incorporated here and
 there is a seperate wrapper called \code{\link{tradesCleanupUsingQuotes}}.
 }

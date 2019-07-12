@@ -204,9 +204,6 @@ multixts <- function(x, y = NULL) {
 }
 
 
-data.toCts <- function(x, millis, millisstart=34200000, millisend=57600000) {
-    .toCts(x=x, millis=millis, millisstart=millisstart, millisend=millisend)
-}
 
 .toCts <- function(x, millis, millisstart=34200000, millisend=57600000) {
     .C("tocts", 
@@ -219,13 +216,6 @@ data.toCts <- function(x, millis, millisstart=34200000, millisend=57600000) {
     COPY=c(FALSE,FALSE,FALSE,FALSE,TRUE), 
     PACKAGE="highfrequency")$ans
 }
-
-data.toReturns <- function(x) {
-    x <- as.numeric(x)   
-    n <- length(x)
-    log(x[2:n]) - log(x[1:(n-1)])
-}
-
 
 
 
@@ -852,25 +842,6 @@ LeeMyklandCV = function( beta = 0.999 , M = 78 ) {
 
  ###### end SPOTVOL FUNCTIONS formerly in periodicityTAQ #########
 
- ###### Liquidity functions formerly in in RTAQ  ######
-
-
-tdatacheck = function(tdata){ 
-  if(!is.xts(tdata)){stop("The argument tdata should be an xts object")}
-  if(!any(colnames(tdata)=="PRICE")){stop("The argument tdata should have a PRICE column")}
-}
-
-tqdatacheck = function(tqdata){ 
-  if(!is.xts(tqdata)){stop("The argument tqdata should be an xts object")}
-  if(!any(colnames(tqdata)=="PRICE")){ stop("The argument tqdata should have a column containing the PRICE data. Could not find that column.")}
-  if(!any(colnames(tqdata)=="BID")){    stop("The argument tqdata should have a column containing the BID. Could not find that column")}
-  if(!any(colnames(tqdata)=="OFR")){    stop("The argument tqdata should have a column containing the ASK / OFR. Could not find that column")}
-} 
-
-rdatacheck = function(rdata,multi=FALSE){
-  #if(!is.xts(rdata)){stop("The argument rdata should be an xts object")} CAN PERFECTLY BE A MATRIX FOR ALL FUNCTIONS SO FAR...
-  if((dim(rdata)[2] < 2) & (multi)){stop("Your rdata object should have at least 2 columns")}
-}
 
 
 getTradeDirection <- function(tqdata,...) {
@@ -902,7 +873,7 @@ getTradeDirection <- function(tqdata,...) {
   return(buy);
 }
 
-es = function(data){
+es <- function(data){
   data = .check_data(data);
   #returns the effective spread as xts object
   bid = as.numeric(data$BID);
@@ -1393,7 +1364,7 @@ tradesCleanupFinal = function(from,to,datasource,datadestination,ticker,tdata=NU
 ##################### Specific cleanup functions formerly in RTAQ ################################
 ## Help functions : 
 ## Help function to make all time notation consistent
-adjtime = function(z){ 
+adjtime <- function(z){ 
   zz = unlist(strsplit(z,":")); 
   if(nchar(zz[1])!=2){
     return(paste(paste(0,zz[1],sep=""),zz[2],zz[3],sep=":"))}
@@ -1449,43 +1420,6 @@ medianN = function(a){
   return(a)
 }
 
-maxvol = function(a){
-  p <- as.numeric(a[,1])
-  s <- as.numeric(a[,2])
-  
-  b <- median(p[s == max(s)])
-  return(b)
-}
-
-waverage <- function(a) {
-  p <- as.numeric(a[,1])
-  s <- as.numeric(a[,2])
-  
-  b <- sum(p * s / sum(s))
-  return(b)
-}
-
-rmTradeOutliers = function(tdata,qdata){
-  tdata = .check_data(tdata);
-  qdata = .check_data(qdata);
-  qdatacheck(qdata);
-  tdatacheck(tdata);
-  
-  ##Function to delete entries with prices that are above the ask plus the bid-ask
-  ##spread. Similar for entries with prices below the bid minus the bid-ask
-  ##spread.
-  data = matchTradesQuotes(tdata,qdata);
-  price = as.numeric(data$PRICE);
-  bid = as.numeric(data$BID);
-  offer = as.numeric(data$OFR);
-  spread = offer - bid;
-  
-  upper = offer+spread;
-  lower = bid-spread;
-  
-  tdata = tdata[(price<upper) & (price>lower)];
-  return(tdata);
-}
 
 #################       QUOTE SPECIFIC FUNCTIONS:       #################
 
@@ -1541,25 +1475,6 @@ correctedTrades <- function (tdata){
   filteredts = tdata[tdata$CR == " 0"];
   return(filteredts)
 }
-
-autoselectexchange = function(...){autoSelectExchangeTrades(...)};        
-autoselectexchangeq = function(...){autoSelectExchangeQuotes(...)};       
-ExchangeHoursOnly = function(...){exchangeHoursOnly(...)};                
-mergequotessametimestamp = function(...){mergeQuotesSameTimestamp(...)};  
-mergesametimestamp = function(...){mergeTradesSameTimestamp(...)};        
-nozeroprices = function(...){noZeroPrices(...)};                          
-nozeroquotes = function(...){noZeroQuotes(...)};                          
-rmlargespread = function(...){rmLargeSpread(...)};                        
-rmnegspread = function(...){rmNegativeSpread(...)};                       
-rmoutliers = function(...){rmOutliers(...)};                              
-rmtradeoutliers = function(...){rmTradeOutliers(...)};                    
-salescond = function(...){salesCondition(...)};                           
-selectexchange = function(...){selectExchange(...)};                      
-
-
-
-
-
 
 
 ####### Aggregation functions that were formerly in RTAQ ######################

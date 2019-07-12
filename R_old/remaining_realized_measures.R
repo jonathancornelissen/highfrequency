@@ -381,9 +381,9 @@ rc.kernel <- function(x,                             # Tick Data for first asset
      ans=double(1),PACKAGE="highfrequency")$ans
 }
 
-rKernel <- function(x,type=0) {
+rKernel <- function(x, type = 0) {
   type <- kernelCharToInt(type)
-  .C("justKernel", x = as.double(x), type = as.integer(type), ans = as.double(0), PACKAGE="highfrequency")$ans
+  .C("justKernel", x = as.double(x), type = as.integer(type), ans = as.double(0), PACKAGE = "highfrequency")$ans
 }
 
 kernelCharToInt <- function(type) {

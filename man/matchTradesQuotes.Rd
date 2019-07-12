@@ -25,7 +25,7 @@ Function matches the trades and quotes and returns an xts-object containing both
 # match the trade and quote data
 tqdata <- matchTradesQuotes(sample_tdata, sample_qdata)
 head(tqdata)
-# also possible with multi-day input
+# multi-day input allowed
 tqdata <- matchTradesQuotes(sample_tdata_microseconds, sample_qdata_microseconds)
 }
 \references{
