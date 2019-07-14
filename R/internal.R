@@ -77,7 +77,6 @@ makePsd <- function(S, method = "covariance") {
 #' @importFrom xts ndays
 #' @keywords internal
 multixts <- function(x, y = NULL) { 
-  
   if (is.null(y) == TRUE) {
     test <- is.xts(x) && (ndays(x)!=1)
     return(test)
@@ -94,6 +93,7 @@ multixts <- function(x, y = NULL) {
     } 
   } 
 } 
+
 
 #' @importFrom xts is.xts
 #' @importFrom xts ndays

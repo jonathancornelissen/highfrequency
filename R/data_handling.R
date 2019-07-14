@@ -40,7 +40,7 @@
 #' @importFrom lubridate as_datetime
 #' @export
 aggregateTrades <- function(tdata, on = "minutes", k = 5, marketopen = "09:30:00", marketclose = "16:00:00", tz = "GMT") {
-  DATE = SIZE = DT = FIRST_DT = DT_ROUND = LAST_DT = SYMBOL = PRICE = VWPRICE = SIZEPRICE = SIZESUM = NULL
+  DATE = SIZE = DT = FIRST_DT = DT_ROUND = LAST_DT = SYMBOL = PRICE = VWPRICE = SIZETPRICE = SIZESUM = NULL
   tdata <- checkColumnNames(tdata)
   checktdata(tdata)
   
@@ -161,25 +161,57 @@ aggregateQuotes <- function(qdata, on = "minutes", k = 5, marketopen = "09:30:00
   }
 }
 
+#' Extract data from an xts object for the Exchange Hours Only
+#' 
+#' @description The function returns data within exchange trading hours
+#' "daybegin" and "dayend". By default, daybegin and dayend
+#' are set to "09:30:00" and "16:00:00" respectively (see Brownlees and Gallo (2006) for more information on good choices for these arguments).
+#' 
+#' @param data a data.table or xts object containing the time series data. 
+#' Multiple days of input are allowed.
+#' @param daybegin character in the format of \"HH:MM:SS\",
+#' specifying the starting hour, minute and second of an exhange
+#' trading day.
+#' @param dayend character in the format of \"HH:MM:SS\^",
+#' specifying the closing hour, minute and second of an exchange
+#' trading day.
+#' 
+#' @return xts or data.table object depending on input
+#'
+#' @references Brownlees, C.T. and Gallo, G.M. (2006). Financial econometric analysis at ultra-high frequency: Data handling concerns. Computational Statistics & Data Analysis, 51, pages 2232-2245.
+#' @author Jonathan Cornelissen, Kris Boudt and Onno Kleen.
+#' @examples 
+#' exchangeHoursOnly(sample_tdataraw_microseconds)
+#' @keywords cleaning
+#' @importFrom lubridate tz
+#' @importFrom lubridate ymd_hms
+#' @export
 exchangeHoursOnly <- function(data, daybegin = "09:30:00", dayend = "16:00:00") {
+  DT = NULL # needed for data table (otherwise notes pop up in check())
   data <- checkColumnNames(data)
   
-  if(is(data, "xts") == FALSE) {
-    stop("data must be an xts object.")
+  dummy_was_xts <- FALSE
+  if (is.data.table(data) == FALSE) {
+    if (is.xts(data) == TRUE) {
+      data <- setnames(as.data.table(data), old = "index", new = "DT")
+      dummy_was_xts <- TRUE
+    } else {
+      stop("Input has to be data.table or xts.")
+    }
+  } else {
+    if (("DT" %in% colnames(data)) == FALSE) {
+      stop("Data.table neeeds DT column.")
+    }
   }
   
-  gettime <- function(z){unlist(strsplit(as.character(z)," "))[2]}
-  times1 <- as.matrix(as.vector(as.character(index(data))))
-  times <- apply(times1,1,gettime); 
-  tdtimes <- as.POSIXct(times,format = "%H:%M:%S",tz = "GMT")
+  data <- data[DT >= ymd_hms(paste(as.Date(data$DT), daybegin), tz = tz(data$DT))]
+  data <- data[DT <= ymd_hms(paste(as.Date(data$DT), dayend), tz = tz(data$DT))]
   
-  #create timeDate begin and end
-  tddaybegin <- as.POSIXct(daybegin,format = "%H:%M:%S", tz = "GMT")
-  tddayend   <- as.POSIXct(dayend,format = "%H:%M:%S",   tz = "GMT")
-  
-  #select correct observations
-  filteredts <- data[tdtimes>=tddaybegin & tdtimes<=tddayend]
-  return(filteredts)
+  if (dummy_was_xts == TRUE) {
+    return(xts(as.matrix(data[, -c("DT")]), order.by = data$DT, tzone = tz(data$DT)))
+  } else {
+    return(data)
+  }
 }
 
 #' Get price column(s) from a timeseries
@@ -290,7 +322,7 @@ makeReturns <- function(ts) {
 #' @export
 matchTradesQuotes <- function(tdata, qdata, adjustment = 2) {
   
-  PRICE = BID = PFR = DATE = DT = FIRST_DT = TD_ROUND = SYMBOL = NULL
+  PRICE = BID = OFR = PFR = DATE = DT = FIRST_DT = DT_ROUND = SYMBOL = NULL
   
   tdata <- checkColumnNames(tdata)
   qdata <- checkColumnNames(qdata)
@@ -741,9 +773,48 @@ rmLargeSpread <- function(qdata, maxi = 50) {
     , SPREAD_MEDIAN := median(SPREAD), by = "DATE"][SPREAD < (SPREAD_MEDIAN * maxi)]
   
   if (dummy_was_xts == TRUE) {
-    return(xts(as.matrix(qdata[, -c("DATE")]), order.by = qdata$DT))
+    return(xts(as.matrix(qdata[, -c("DT", "DATE", "SPREAD", "SPREAD_MEDIAN")]), order.by = qdata$DT))
   } else {
-    return(qdata[, -c("DATE")])
+    return(qdata[, -c("DATE", "SPREAD", "SPREAD_MEDIAN")])
+  }
+}
+
+#' Delete entries for which the spread is negative
+#' @description Function deletes entries for which the spread is negative.
+#' 
+#' @param qdata an xts object at least containing the columns "BID" and "OFR".
+#' 
+#' @return data.table or xts object
+#' 
+#' @author Jonathan Cornelissen, Kris Boudt and Onno Kleen
+#' 
+#' @examples 
+#' rmNegativeSpread(sample_qdataraw_microseconds)
+#' 
+#' @keywords cleaning
+#' @export
+rmNegativeSpread <- function(qdata) {
+  BID = OFR = DATE = DT = NULL
+  qdata <- checkColumnNames(qdata)
+  checkqdata(qdata)
+  dummy_was_xts <- FALSE
+  if (is.data.table(qdata) == FALSE) {
+    if (is.xts(qdata) == TRUE) {
+      qdata <- setnames(as.data.table(qdata), old = "index", new = "DT")
+      qdata[, BID := as.numeric(as.character(BID))]
+      qdata[, OFR := as.numeric(as.character(OFR))]
+      dummy_was_xts <- TRUE
+    } else {
+      stop("Input has to be data.table or xts.")
+    }
+  } 
+  
+  qdata <- qdata[OFR > BID]
+  
+  if (dummy_was_xts == TRUE) {
+    return(xts(as.matrix(qdata[, -c("DT")]), order.by = qdata$DT))
+  } else {
+    return(qdata)
   }
 }
 

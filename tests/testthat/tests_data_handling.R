@@ -22,7 +22,7 @@ expect_equal(
 
 expect_equal(
   dim(rmLargeSpread(selectExchange(sample_qdataraw, "N"))),
-  c(9794, 10)
+  c(9794, 7)
 )
 
 expect_equal(

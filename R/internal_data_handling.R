@@ -226,7 +226,7 @@ has.Hi <- function (x, which = FALSE) {
 }
 
 #' @keywords internal
-has.Lo <- function (x, which = FALSE){
+has.Lo <- function (x, which = FALSE) {
   colAttr <- attr(x, "Lo")
   if (!is.null(colAttr))
     return(if (which) colAttr else TRUE)
@@ -264,11 +264,10 @@ has.Vo<-function (x, which = FALSE){
 }
 
 #' @keywords internal
-has.Qty <- function(x, which = FALSE)
-{
+has.Qty <- function(x, which = FALSE) {
   colAttr <- attr(x, "Qty")
   if(!is.null(colAttr)) {
-    return(if(which) colAttr else TRUE)
+    return(if (which) colAttr else TRUE)
   }
   
   locBidAsk <- c(has.Bid(x, which=TRUE),has.Ask(x, which=TRUE))
@@ -462,22 +461,22 @@ set.AskSize <- function(x, error=TRUE) {
 }
 
 #' @keywords internal
-set.Cl <- function(x, error=TRUE) {
+set.Cl <- function(x, error = TRUE) {
   if(has.Cl(x))
     attr(x,"Cl") <- has.Cl(x, which=TRUE)
   return(x)
 }
 
 #' @keywords internal
-set.Price <- function(x, error=TRUE) {
+set.Price <- function(x, error = TRUE) {
   if(has.Price(x))
-    attr(x,"Price") <- has.Price(x, which=TRUE)
+    attr(x,"Price") <- has.Price(x, which = TRUE)
   return(x)
 }
 
 #' @keywords internal
-set.Trade <- function(x, error=TRUE) {
+set.Trade <- function(x, error = TRUE) {
   if(has.Trade(x))
-    attr(x,"Trade") <- has.Trade(x, which=TRUE)
+    attr(x,"Trade") <- has.Trade(x, which = TRUE)
   return(x)
 }

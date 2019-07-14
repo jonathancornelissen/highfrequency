@@ -319,12 +319,13 @@
     plot(vol6)}
   
   # Compare regular GARCH(1,1) model to eGARCH, both with external regressors
-  \donttest{
-    vol7 <- spotvol(sample_returns_5min, method = "garch", model = "sGARCH")
-    vol8 <- spotvol(sample_returns_5min, method = "garch", model = "eGARCH")
-    plot(as.numeric(t(vol7$spot)), type = "l")
-    lines(as.numeric(t(vol8$spot)), col = "red")
-    legend("topleft", c("GARCH", "eGARCH"), col = c("black", "red"), lty=1)}
+#' \donttest{
+#' vol7 <- spotvol(sample_returns_5min, method = "garch", model = "sGARCH")
+#'  vol8 <- spotvol(sample_returns_5min, method = "garch", model = "eGARCH")
+#' plot(as.numeric(t(vol7$spot)), type = "l")
+#' lines(as.numeric(t(vol8$spot)), col = "red")
+#' legend("topleft", c("GARCH", "eGARCH"), col = c("black", "red"), lty=1)
+#' }
 #' 
 #' @references Andersen, T. G. and T. Bollerslev (1997). Intraday periodicity and volatility persistence in financial markets. Journal of Empirical Finance 4, 115-158.
 #' 

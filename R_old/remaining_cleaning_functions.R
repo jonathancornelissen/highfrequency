@@ -1375,20 +1375,6 @@ autoSelectExchangeTrades = function(tdata){
 }
 
 
-##### TRADE DATA SPECIFIC FUNCTIONS: ###################################
-
-
-##Merge same timestamp:
-sumN = function(a){
-  a = sum(as.numeric(a));
-  return(a)
-}
-
-medianN = function(a){
-  a = median(as.numeric(a));
-  return(a)
-}
-
 
 #################       QUOTE SPECIFIC FUNCTIONS:       #################
 
@@ -1429,13 +1415,13 @@ autoSelectExchangeQuotes = function(qdata){
 
 
 
-# rmNegativeSpread = function(qdata){
-#   qdata = .check_data(qdata);
-#   qdatacheck(qdata);
-#   ##function to remove observations with negative spread
-#   condition = as.numeric(qdata$OFR)>as.numeric(qdata$BID);
-#   qdata[condition];
-# }
+rmNegativeSpread = function(qdata){
+  qdata = .check_data(qdata);
+  qdatacheck(qdata);
+  ##function to remove observations with negative spread
+  condition = as.numeric(qdata$OFR)>as.numeric(qdata$BID);
+  qdata[condition];
+}
 
 
 # Zivot : 
@@ -1447,114 +1433,6 @@ correctedTrades <- function (tdata){
 
 
 ####### Aggregation functions that were formerly in RTAQ ######################
-
-previoustick = function(a){
-  a = as.vector(a);
-  b = a[length(a)];
-  return(b)
-}
-
-weightedaverage = function(a){
-  aa = as.vector(as.numeric(a[,1]));
-  bb = as.vector(as.numeric(a[,2]));
-  c = weighted.mean(aa,bb);
-  return(c)
-}
-
-period.apply2 = function (x, INDEX, FUN2, ...) 
-{
-  x <- try.xts(x, error = FALSE)
-  FUN <- match.fun(FUN2)
-  xx <- sapply(1:(length(INDEX) - 1), function(y) {
-    FUN(x[(INDEX[y] + 1):INDEX[y + 1]], ...)
-  })
-  reclass(xx, x[INDEX])
-}
-
-## AGGREGATION;
-aggregatets = function (ts, FUN = "previoustick", on = "minutes", k = 1, weights = NULL,dropna=FALSE) {
-  makethispartbetter = ((!is.null(weights))| on=="days"|on=="weeks"| (FUN!="previoustick")|dropna);
-  if(makethispartbetter)  {
-    
-    FUN = match.fun(FUN);
-    
-    if (is.null(weights)) {
-      ep = endpoints(ts, on, k)
-      if(dim(ts)[2]==1){ ts2 = period.apply(ts, ep, FUN) }
-      if(dim(ts)[2]>1){  ts2 = xts(apply(ts,2,FUN=period.apply2,FUN2=FUN,INDEX=ep),order.by=index(ts)[ep],)}
-    }
-    if (!is.null(weights)) {
-      tsb = cbind(ts, weights)
-      ep = endpoints(tsb, on, k)
-      ts2 = period.apply(tsb, ep, FUN = match.fun(weightedaverage) )
-    }
-    if (on == "minutes" | on == "mins" | on == "secs" | on == 
-      "seconds") {
-      if (on == "minutes" | on == "mins") {
-        secs = k * 60
-      }
-      if (on == "secs" | on == "seconds") {
-        secs = k
-      }
-      a = .index(ts2) + (secs - .index(ts2)%%secs)
-      ts3 = .xts(ts2, a,tzone="GMT")
-    }
-    if (on == "hours") {
-      secs = 3600
-      a = .index(ts2) + (secs - .index(ts2)%%secs)
-      ts3 = .xts(ts2, a,tzone="GMT")
-    }
-    if (on == "days") {
-      secs = 24 * 3600
-      a = .index(ts2) + (secs - .index(ts2)%%secs) - (24 * 
-        3600)
-      ts3 = .xts(ts2, a,tzone="GMT")
-    }
-    if (on == "weeks") {
-      secs = 24 * 3600 * 7
-      a = (.index(ts2) + (secs - (.index(ts2) + (3L * 86400L))%%secs)) - 
-        (24 * 3600)
-      ts3 = .xts(ts2, a,tzone="GMT")
-    }
-    
-    if (!dropna) {
-      if (on != "weeks" | on != "days") {
-        if (on == "secs" | on == "seconds") {
-          tby = "s"
-        }
-        if (on == "mins" | on == "minutes") {
-          tby = "min"
-        }
-        if (on == "hours") {
-          tby = "h"
-        }
-        by = paste(k, tby, sep = " ")
-        allindex = as.POSIXct(base::seq(start(ts3), end(ts3), 
-                                         by = by))
-        xx = xts(rep("1", length(allindex)), order.by = allindex)
-        ts3 = merge(ts3, xx)[, (1:dim(ts)[2])]
-      }
-    }
-    
-    index(ts3) = as.POSIXct(index(ts3));
-    return(ts3);
-  }
-  
-  if(!makethispartbetter){
-    if (on == "secs" | on == "seconds") { secs = k; tby = paste(k,"sec",sep=" ")}
-    if (on == "mins" | on == "minutes") { secs = 60*k; tby = paste(60*k,"sec",sep=" ")}
-    if (on == "hours") {secs = 3600*k; tby = paste(3600*k,"sec",sep=" ")}
-    
-    FUN = match.fun(FUN);
-    
-    g = base::seq(start(ts), end(ts), by = tby);
-    rawg = as.numeric(as.POSIXct(g,tz="GMT"));
-    newg = rawg + (secs - rawg%%secs);
-    g    = as.POSIXct(newg,origin="1970-01-01",tz="GMT");
-    ts3  = na.locf(merge(ts, zoo(, g)))[as.POSIXct(g,tz="GMT")]
-    return(ts3) 
-  }
-}
 
 #PRICE (specificity: opening price and previoustick)
 

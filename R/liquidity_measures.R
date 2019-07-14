@@ -24,6 +24,8 @@
 ##' @export
 getLiquidityMeasures <- function(tqdata, win = 300, type = NULL) {
   
+  BID = PRICE = OFR = SIZE = OFRSIZ = BIDSIZ = NULL
+  
   tqdata <- checkColumnNames(tqdata)
   checktdata(tqdata)
   checkqdata(tqdata)
@@ -98,7 +100,7 @@ getLiquidityMeasures <- function(tqdata, win = 300, type = NULL) {
       return(xts(as.matrix(tqdata[, -c("DT")]), order.by = tqdata$DT)[, type])
     }
   } else {
-    return(tdata)
+    return(tqdata)
   }
 }
 
