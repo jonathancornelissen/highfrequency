@@ -10,7 +10,7 @@
 #' xts object to the 5 minute frequency set k = 5 and on = "minutes".
 #' @param marketopen the market opening time, by default: marketopen = "09:30:00". 
 #' @param marketclose the market closing time, by default: marketclose = "16:00:00". 
-#' @param tz time zone used, by default the time zone of the input.
+#' @param tz time zone used, by default: tz = timezone of DT column/index of xts.
 #' 
 #' @details 
 #' The timestamps of the new time series are the closing times and/or days of the intervals. 
@@ -30,7 +30,7 @@
 #' @keywords internal
 #' @importFrom xts last
 #' @export
-aggregatePrice <- function (pdata, on = "minutes", k = 1, marketopen = "09:30:00", marketclose = "16:00:00" , tz = NULL) {
+aggregatePrice <- function(pdata, on = "minutes", k = 1, marketopen = "09:30:00", marketclose = "16:00:00" , tz = NULL) {
   
   DATE = DT = FIRST_DT = DT_ROUND = LAST_DT = SYMBOL = PRICE = NULL
 
@@ -41,28 +41,29 @@ aggregatePrice <- function (pdata, on = "minutes", k = 1, marketopen = "09:30:00
   dummy_was_xts <- FALSE
   if (is.data.table(pdata) == FALSE) {
     if (is.xts(pdata) == TRUE) {
-      if (is.null(tz) == TRUE) {
-        tz = tz(pdata)
-      }
       
       dummy_was_xts <- TRUE
       # If there is only one day of input and input is xts,
-      # use old code because it's faster 
+      # use old code because it's faster
       # However, multi-day input not possible
-      if (unique(as.Date(index(pdata))) == 1) {
-        ts2 <- aggregatets(ts, on, k, tz)
-        date <- strsplit(as.character(index(ts)), " ")[[1]][1]
-        
+      if (length(unique(as.Date(index(pdata)))) == 1) {
+        if (is.null(tz) == TRUE) {
+          tz <-tz(pdata)
+        }
+        ts2 <- aggregatets(pdata, on, k, tz)
+        date <- strsplit(as.character(index(pdata)), " ")[[1]][1]
+
         #open
         a <- as.POSIXct(paste(date, marketopen), tz = tz)
-        b <- as.xts(matrix(as.numeric(ts[1]),nrow = 1), a)
+        b <- as.xts(matrix(as.numeric(pdata[1]),nrow = 1), a)
+        storage.mode(ts2) <- "numeric"
         ts3 <- c(b, ts2)
-        
+
         #close
         aa <- as.POSIXct(paste(date, marketclose), tz = tz)
-        condition <- index(ts3) <= aa
+        condition <- index(ts3) < aa
         ts3 <- ts3[condition]
-        bb <- as.xts(matrix(as.numeric(last(ts)), nrow = 1), aa)
+        bb <- as.xts(matrix(as.numeric(last(pdata)), nrow = 1), aa)
         ts3 <- c(ts3, bb)
         return(ts3)
       }
@@ -79,6 +80,7 @@ aggregatePrice <- function (pdata, on = "minutes", k = 1, marketopen = "09:30:00
       stop("Data.table neeeds PRICE column (date-time).")
     }
   }
+  
   pdata <- pdata[DT >= ymd_hms(paste(as.Date(pdata$DT), marketopen), tz = tz(pdata$DT))]
   pdata <- pdata[DT <= ymd_hms(paste(as.Date(pdata$DT), marketclose), tz = tz(pdata$DT))]
 

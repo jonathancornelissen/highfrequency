@@ -5,7 +5,7 @@
 \title{Aggregate a time series but keep first and last observation}
 \usage{
 aggregatePrice(pdata, on = "minutes", k = 1, marketopen = "09:30:00",
-  marketclose = "16:00:00", tz = "GMT")
+  marketclose = "16:00:00", tz = NULL)
 }
 \arguments{
 \item{pdata}{data.table or xts object to be aggregated containing the intraday price series, possibly across multiple days.}
@@ -13,13 +13,13 @@ aggregatePrice(pdata, on = "minutes", k = 1, marketopen = "09:30:00",
 \item{on}{character, indicating the time scale in which "k" is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".}
 
 \item{k}{positive integer, indicating the number of periods to aggregate over; e.g. to aggregate a 
-xts object to the 5 minute frequency set k=5 and on="minutes".}
+xts object to the 5 minute frequency set k = 5 and on = "minutes".}
 
 \item{marketopen}{the market opening time, by default: marketopen = "09:30:00".}
 
 \item{marketclose}{the market closing time, by default: marketclose = "16:00:00".}
 
-\item{tz}{time zone used, by default: tz = "GMT".}
+\item{tz}{time zone used, by default: tz = timezone of DT column/index of xts.}
 }
 \value{
 A data.table or xts object containing the aggregated time series.
@@ -32,12 +32,9 @@ of the result.
 \details{
 The timestamps of the new time series are the closing times and/or days of the intervals. 
 
-In case of previous tick aggregation, 
-for on="seconds"/"minutes"/"hours",
+In case of previous tick aggregation or on = "seconds"/"minutes"/"hours",
 the element of the returned series with e.g. timestamp 09:35:00 contains 
-the last observation up to that point, excluding the value at 09:35:00 itself. An exception 
-is marketclose (i.e. 16:00:00 ET by default), where the observation at 16:00:00 is included in the interval, since this is the
-end of a trading day at the NYSE.
+the last observation up to that point, including the value at 09:35:00 itself.
 }
 \examples{
 # aggregate price data to the 30 second frequency

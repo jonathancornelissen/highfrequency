@@ -53,7 +53,7 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
     delta <- k * 3600
 
   if(xtsible(data) == TRUE) {
-    data = as.xts(data)
+    data <- as.xts(data)
   }
   if (inherits(data, what = "xts")) {
     data <- xts(data, order.by = as.POSIXct(time(data), tz = tz), tzone = tz)
@@ -62,7 +62,7 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
     rdata <- mR <- c()
     intraday <- seq(from = chron::times(marketopen),
                     to = chron::times(marketclose),
-                    by = chron::times(delta/(24*3600)))
+                    by = chron::times(delta / (24 * 3600)))
     if (as.character(tail(intraday, 1)) != marketclose)
     intraday <- c(intraday, marketclose)
     intraday <- intraday[2:length(intraday)]
@@ -81,7 +81,7 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
                               marketclose = marketclose, tz = tz)
       z <- xts(rep(1, length(intraday)), tzone = tz,
                order.by = as.POSIXct(paste(dates[d], as.character(intraday),
-                                           sep=" "), tz = tz))
+                                           sep = " "), tz = tz))
       datad <- merge.xts(z, datad)$datad
       datad <- na.locf(datad)
       rdatad <- makeReturns(datad)
@@ -113,7 +113,7 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
 #' @importFrom xts .indexDate
 #' @importFrom zoo index
 driftKernel <- function(data, delta, intraday, options) {
-  if(ncol(data)>1){
+  if(ncol(data) > 1){
     stop("driftKernel method currently only accepts single day tick data as it relies on the time-stamps of the trades.")
   }
   if(length(unique(.indexDate(data))) != 1){
