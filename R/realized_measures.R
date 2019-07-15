@@ -1122,9 +1122,8 @@ rSV <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE
 #' 
 #' @keywords volatility
 #' @export
-rThresholdCov <- function(rdata, cor = FALSE, align.by = NULL, align.period = NULL, makeReturns = FALSE){
+rThresholdCov <- function(rdata, cor = FALSE, align.by = NULL, align.period = NULL, makeReturns = FALSE) {
   rdatacheck(rdata, multi = TRUE)
-  
   # Multiday adjustment: 
   multixts <- multixts(rdata)
   if (multixts == TRUE) { 

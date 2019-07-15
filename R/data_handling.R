@@ -1,3 +1,185 @@
+
+#' Aggregate a time series but keep first and last observation
+#' @description Function returns new time series as xts object where first observation is always the opening price
+#' and subsequent observations are the closing prices over the interval with as endpoint the timestamp 
+#' of the result.
+#' 
+#' @param pdata data.table or xts object to be aggregated containing the intraday price series, possibly across multiple days.
+#' @param on character, indicating the time scale in which "k" is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".
+#' @param k positive integer, indicating the number of periods to aggregate over; e.g. to aggregate a 
+#' xts object to the 5 minute frequency set k = 5 and on = "minutes".
+#' @param marketopen the market opening time, by default: marketopen = "09:30:00". 
+#' @param marketclose the market closing time, by default: marketclose = "16:00:00". 
+#' @param tz time zone used, by default the time zone of the input.
+#' 
+#' @details 
+#' The timestamps of the new time series are the closing times and/or days of the intervals. 
+#' 
+#' In case of previous tick aggregation or on = "seconds"/"minutes"/"hours",
+#' the element of the returned series with e.g. timestamp 09:35:00 contains 
+#' the last observation up to that point, including the value at 09:35:00 itself.
+#' 
+#' @return A data.table or xts object containing the aggregated time series.
+#' 
+#' @author Jonathan Cornelissen, Kris Boudt and Onno Kleen.
+#' @keywords data manipulation
+#' @examples 
+#' # aggregate price data to the 30 second frequency
+#' head(sample_tdata$PRICE)
+#' head(aggregatePrice(sample_tdata$PRICE, on = "secs", k = 30))
+#' @keywords internal
+#' @importFrom xts last
+#' @export
+aggregatePrice <- function (pdata, on = "minutes", k = 1, marketopen = "09:30:00", marketclose = "16:00:00" , tz = NULL) {
+  
+  DATE = DT = FIRST_DT = DT_ROUND = LAST_DT = SYMBOL = PRICE = NULL
+
+  if ("PRICE" %in% colnames(pdata) == FALSE) {
+    stop("data.table or xts needs column named PRICE.")
+  }
+  
+  dummy_was_xts <- FALSE
+  if (is.data.table(pdata) == FALSE) {
+    if (is.xts(pdata) == TRUE) {
+      if (is.null(tz) == TRUE) {
+        tz = tz(pdata)
+      }
+      
+      dummy_was_xts <- TRUE
+      # If there is only one day of input and input is xts,
+      # use old code because it's faster 
+      # However, multi-day input not possible
+      if (unique(as.Date(index(pdata))) == 1) {
+        ts2 <- aggregatets(ts, on, k, tz)
+        date <- strsplit(as.character(index(ts)), " ")[[1]][1]
+        
+        #open
+        a <- as.POSIXct(paste(date, marketopen), tz = tz)
+        b <- as.xts(matrix(as.numeric(ts[1]),nrow = 1), a)
+        ts3 <- c(b, ts2)
+        
+        #close
+        aa <- as.POSIXct(paste(date, marketclose), tz = tz)
+        condition <- index(ts3) <= aa
+        ts3 <- ts3[condition]
+        bb <- as.xts(matrix(as.numeric(last(ts)), nrow = 1), aa)
+        ts3 <- c(ts3, bb)
+        return(ts3)
+      }
+      pdata <- setnames(as.data.table(pdata)[, PRICE := as.numeric(as.character(PRICE))],
+                        old = "index", new = "DT")
+    } else {
+      stop("Input has to be data.table or xts.")
+    }
+  } else {
+    if (("DT" %in% colnames(pdata)) == FALSE) {
+      stop("Data.table neeeds DT column (date-time ).")
+    }
+    if (("PRICE" %in% colnames(pdata)) == FALSE) {
+      stop("Data.table neeeds PRICE column (date-time).")
+    }
+  }
+  pdata <- pdata[DT >= ymd_hms(paste(as.Date(pdata$DT), marketopen), tz = tz(pdata$DT))]
+  pdata <- pdata[DT <= ymd_hms(paste(as.Date(pdata$DT), marketclose), tz = tz(pdata$DT))]
+
+  pdata[, DATE := as.Date(DT)]
+  pdata[, FIRST_DT := min(DT), by = "DATE"]
+  pdata[, DT_ROUND := ifelse(DT == FIRST_DT,
+                             floor_date(ymd_hms(DT), unit = paste(k, on)),
+                             ceiling_date(ymd_hms(DT), unit = paste(k, on), change_on_boundary = FALSE))]
+  pdata[, DT_ROUND := as_datetime(DT_ROUND)]
+  pdata[, LAST_DT := max(DT), by = "DT_ROUND"]
+
+  pdata <- pdata[DT == LAST_DT][, DT := DT_ROUND][, c("DT", "PRICE")]
+
+  if (dummy_was_xts == TRUE) {
+    return(xts(as.matrix(pdata[, -c("DT")]), order.by = pdata$DT, tzone = tz))
+  } else {
+    return(pdata)
+  }
+}
+
+
+#' Aggregate a data.table or xts object containing quote data
+#' 
+#' @description Function returns a data.table or xts object containing the aggregated quote data with columns "SYMBOL", "EX", "BID","BIDSIZ","OFR","OFRSIZ". 
+#' See \code{\link{sample_qdata}} for an example of the argument qdata.
+#' 
+#' @param qdata data.table or xts object to be aggregated, containing the intraday quote data of a stock for one day.
+#' @param on character, indicating the time scale in which "k" is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".
+#' xts object to the 5 minute frequency, set k=5 and on = "minutes".
+#' @param k positive integer, indicating the number of periods to aggregate over. E.g. to aggregate an
+#' object to the 5 minute frequency set k = 5 and on = "minutes".
+#' @param marketopen the market opening time, by default: marketopen = "09:30:00".
+#' @param marketclose the market closing time, by default: marketclose = "16:00:00".
+#' @param tz time zone used, by default: tz = "GMT".
+#' 
+#' @return An data.table or xts object containing the aggregated time series.
+#' 
+#' @details The output "BID" and "OFR" columns are constructed using previous tick aggregation.
+#' 
+#' The variables "BIDSIZ" and "OFRSIZ" are aggregated by taking the sum of the respective inputs over each interval.
+#' 
+#' The timestamps of the new time series are the closing times of the intervals. 
+#' 
+#' Please Note: Returned objects always contain the first observation (i.e. opening quotes,...).
+#' 
+#' @return A data.table or xts object containing the aggregated quote data.
+#' 
+#' @author Jonathan Cornelissen, Kris Boudt and Onno Kleen
+#' @keywords data manipulation
+#' 
+#' @examples
+#' # aggregate quote data to the 30 second frequency
+#' qdata_aggregated <- aggregateQuotes(sample_qdata, on = "seconds", k = 30)
+#' head(qdata_aggregated)
+#' @export
+aggregateQuotes <- function(qdata, on = "minutes", k = 5, marketopen = "09:30:00", marketclose = "16:00:00", tz = "GMT") {
+  DATE = BID = OFR = BIDSIZ = OFRSIZ = DT = FIRST_DT = DT_ROUND = LAST_DT = SYMBOL = NULL
+  
+  qdata <- checkColumnNames(qdata)
+  checkqdata(qdata)
+  
+  dummy_was_xts <- FALSE
+  if (is.data.table(qdata) == FALSE) {
+    if (is.xts(qdata) == TRUE) {
+      qdata <- setnames(as.data.table(qdata)[, BID := as.numeric(as.character(BID))][
+        , OFR := as.numeric(as.character(OFR))][
+          , BIDSIZ := as.numeric(as.character(BIDSIZ))][
+            , OFRSIZ := as.numeric(as.character(OFRSIZ))], old = "index", new = "DT")
+      dummy_was_xts <- TRUE
+    } else {
+      stop("Input has to be data.table or xts.")
+    }
+  } else {
+    if (("DT" %in% colnames(qdata)) == FALSE) {
+      stop("Data.table neeeds DT column.")
+    }
+  }
+  
+  if (length(unique(qdata$SYMBOL)) > 1) {
+    stop("Please provide only one symbol at a time.")
+  }
+  
+  qdata[, DATE := as.Date(DT)]
+  qdata[, FIRST_DT := min(DT), by = "DATE"]
+  qdata[, DT_ROUND := ifelse(DT == FIRST_DT,
+                             floor_date(ymd_hms(DT), unit = paste(k, on)),
+                             ceiling_date(ymd_hms(DT), unit = paste(k, on), change_on_boundary = FALSE))]
+  qdata[, DT_ROUND := as_datetime(DT_ROUND)]
+  qdata[, LAST_DT := max(DT), by = "DT_ROUND"]
+  qdata[, OFRSIZ := sum(OFRSIZ), by = "DT_ROUND"]
+  qdata[, BIDSIZ := sum(BIDSIZ), by = "DT_ROUND"]
+  
+  qdata <- qdata[DT == LAST_DT][, DT := DT_ROUND][, c("DT", "SYMBOL", "BID", "BIDSIZ", "OFR", "OFRSIZ")]
+  
+  if (dummy_was_xts == TRUE) {
+    return(xts(as.matrix(qdata[, -c("DT")]), order.by = qdata$DT, tzone = tz))
+  } else {
+    return(qdata)
+  }
+}
+
 #' Aggregate a data.table or xts object containing trades data
 #' 
 #' @description Function returns new time series as a data.table or xts object where first observation is always the opening price
@@ -76,88 +258,6 @@ aggregateTrades <- function(tdata, on = "minutes", k = 5, marketopen = "09:30:00
     return(xts(as.matrix(tdata[, -c("DT")]), order.by = tdata$DT, tzone = tz))
   } else {
     return(tdata)
-  }
-}
-
-#' Aggregate a data.table or xts object containing quote data
-#' 
-#' @description Function returns a data.table or xts object containing the aggregated quote data with columns "SYMBOL", "EX", "BID","BIDSIZ","OFR","OFRSIZ". 
-#' See \code{\link{sample_qdata}} for an example of the argument qdata.
-#' 
-#' @param qdata data.table or xts object to be aggregated, containing the intraday quote data of a stock for one day.
-#' @param on character, indicating the time scale in which "k" is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".
-#' xts object to the 5 minute frequency, set k=5 and on="minutes".
-#' @param k positive integer, indicating the number of periods to aggregate over. E.g. to aggregate an
-#' object to the 5 minute frequency set k = 5 and on = "minutes".
-#' @param marketopen the market opening time, by default: marketopen = "09:30:00".
-#' @param marketclose the market closing time, by default: marketclose = "16:00:00".
-#' @param tz time zone used, by default: tz = "GMT".
-#' 
-#' @return An data.table or xts object containing the aggregated time series.
-#' 
-#' @details The output "BID" and "OFR" columns are constructed using previous tick aggregation.
-#' 
-#' The variables "BIDSIZ" and "OFRSIZ" are aggregated by taking the sum of the respective inputs over each interval.
-#' 
-#' The timestamps of the new time series are the closing times of the intervals. 
-#' 
-#' Please Note: Returned objects always contain the first observation (i.e. opening quotes,...).
-#' 
-#' @return A data.table or xts object containing the aggregated quote data.
-#' 
-#' @author Jonathan Cornelissen, Kris Boudt and Onno Kleen
-#' @keywords data manipulation
-#' 
-#' @examples
-#' # aggregate quote data to the 30 second frequency
-#' qdata_aggregated <- aggregateQuotes(sample_qdata, on = "seconds", k = 30)
-#' head(qdata_aggregated)
-#' @export
-aggregateQuotes <- function(qdata, on = "minutes", k = 5, marketopen = "09:30:00", marketclose = "16:00:00", tz = "GMT") {
-  DATE = BID = OFR = BIDSIZ = OFRSIZ = DT = FIRST_DT = DT_ROUND = LAST_DT = SYMBOL = NULL
-  
-  qdata <- checkColumnNames(qdata)
-  checkqdata(qdata)
-  
-  dummy_was_xts <- FALSE
-  if (is.data.table(qdata) == FALSE) {
-    if (is.xts(qdata) == TRUE) {
-      qdata <- setnames(as.data.table(qdata)[, BID := as.numeric(as.character(BID))][
-        , OFR := as.numeric(as.character(OFR))][
-          , BIDSIZ := as.numeric(as.character(BIDSIZ))][
-            , OFRSIZ := as.numeric(as.character(OFRSIZ))], old = "index", new = "DT")
-      dummy_was_xts <- TRUE
-    } else {
-      stop("Input has to be data.table or xts.")
-    }
-  } else {
-    if (("DT" %in% colnames(qdata)) == FALSE) {
-      stop("Data.table neeeds DT column.")
-    }
-  }
-  
-  if (length(unique(qdata$SYMBOL)) > 1) {
-    stop("Please provide only one symbol at a time.")
-  }
-  
-  
-  # tdata <- sample_tdata_microseconds
-  qdata[, DATE := as.Date(DT)]
-  qdata[, FIRST_DT := min(DT), by = "DATE"]
-  qdata[, DT_ROUND := ifelse(DT == FIRST_DT,
-                             floor_date(ymd_hms(DT), unit = paste(k, on)),
-                             ceiling_date(ymd_hms(DT), unit = paste(k, on), change_on_boundary = FALSE))]
-  qdata[, DT_ROUND := as_datetime(DT_ROUND)]
-  qdata[, LAST_DT := max(DT), by = "DT_ROUND"]
-  qdata[, OFRSIZ := sum(OFRSIZ), by = "DT_ROUND"]
-  qdata[, BIDSIZ := sum(BIDSIZ), by = "DT_ROUND"]
-  
-  qdata <- qdata[DT == LAST_DT][, DT := DT_ROUND][, c("DT", "SYMBOL", "BID", "BIDSIZ", "OFR", "OFRSIZ")]
-  
-  if (dummy_was_xts == TRUE) {
-    return(xts(as.matrix(qdata[, -c("DT")]), order.by = qdata$DT, tzone = tz))
-  } else {
-    return(qdata)
   }
 }
 

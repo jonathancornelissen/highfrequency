@@ -11,7 +11,7 @@ aggregateQuotes(qdata, on = "minutes", k = 5,
 \item{qdata}{data.table or xts object to be aggregated, containing the intraday quote data of a stock for one day.}
 
 \item{on}{character, indicating the time scale in which "k" is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".
-xts object to the 5 minute frequency, set k=5 and on="minutes".}
+xts object to the 5 minute frequency, set k=5 and on = "minutes".}
 
 \item{k}{positive integer, indicating the number of periods to aggregate over. E.g. to aggregate an
 object to the 5 minute frequency set k = 5 and on = "minutes".}

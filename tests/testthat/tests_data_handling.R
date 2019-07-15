@@ -6,6 +6,11 @@ expect_equal(
 )
 
 expect_equal(
+  formatC(sum(head(aggregatePrice(sample_tdata$PRICE, on = "secs", k = 30))), digits = 10),
+  "   1157.465"
+)
+
+expect_equal(
   unique(selectExchange(sample_qdataraw, c("N", "W"))$EX),
   c("N", "W")
 )

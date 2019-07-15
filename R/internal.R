@@ -20,8 +20,8 @@ aggregatets <- function (ts, on = "minutes", k = 1, tz = "GMT") {
   rawg <- as.numeric(as.POSIXct(g, tz = tz))
   newg <- rawg + (secs - rawg%%secs)
   g    <- as.POSIXct(newg, origin = "1970-01-01", tz = tz)
-  ts3 <- na.locf(merge(ts, zoo(NULL, g)))[as.POSIXct(g, tz = tz)]
-  return(ts3)
+  ts <- na.locf(merge(ts, zoo(NULL, g)))[as.POSIXct(g, tz = tz)]
+  return(ts)
 } #Very fast and elegant way to do previous tick aggregation :D!
 
 ### Do a daily apply but with list as output:
