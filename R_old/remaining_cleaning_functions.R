@@ -80,32 +80,15 @@ alignReturns <- function(x, period, ...) {
     PACKAGE="highfrequency")$tmpa     
 }
 
-multixts <- function(x, y = NULL) { 
-    if(is.null(y)){
-        test = is.xts(x) && (ndays(x)!=1);
-        return(test);}
-    if(!is.null(y)){
-        test = (is.xts(x) && (ndays(x)!=1)) || ( ndays(y)!=1 && is.xts(y) );
-        if( test ){
-            test1 = dim(y) == dim(x);
-            if(!test1){ warning("Please make sure x and y have the same dimensions") }
-            if(test1){  test = list( TRUE, cbind(x,y) ); return(test) }
-        }
-    }
-}      
-
 .convertData <- function(x, cts = TRUE, millisstart = NA, millisend = NA, makeReturns = FALSE) {
-    if(is.null(x))
-    {
+    if(is.null(x)) {
         return(NULL)
     }
-    if("realizedObject" %in% class(x))
-    {
+    if("realizedObject" %in% class(x)) {
         return(x)
     }
     
-    if("xts" %in% class(x))
-    {
+    if("xts" %in% class(x)) {
         xtmp <- x
         x <- list() 
         x$data <- as.numeric(xtmp[,1])
@@ -222,7 +205,7 @@ multixts <- function(x, y = NULL) {
 
 
 ## Percentage of zero's for given time aggregation calculator:
-rZero = function( rdata, period = 1, align.by = "seconds", align.period = 1, cts = TRUE, makeReturns = FALSE, ...){
+rZero <- function(rdata, period = 1, align.by = "seconds", align.period = 1, cts = TRUE, makeReturns = FALSE, ...){
     if (is.list(rdata) == FALSE) {
         multixts = multixts(rdata);  
         if (multixts) { 

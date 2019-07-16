@@ -40,6 +40,8 @@
 #' kerneldrift <- spotDrift(price, method = "driftKernel", on = "minutes", k = 1)
 #' plot(kerneldrift)
 #'
+#' @importFrom stats filter time
+#' @importFrom utils tail
 #' @importFrom xts xtsible merge.xts
 #' @export
 spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,

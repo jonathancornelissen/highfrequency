@@ -3,41 +3,6 @@
 ## 2 Multivariate measures:    
 ########################################################
 
-
-#Realized Outlyingness Weighted Variance (ROWVar):
-univariateoutlyingness <- function(rdata, ...) {
-  requireNamespace('robustbase')
-  #computes outlyingness of each obs compared to row location and scale
-  location <- 0
-  scale = mad(rdata)
-  if(scale == 0){
-    scale <- mean(rdata)
-  }
-  d = ((rdata - location) / scale)^2
-}
-
-
-#### Two time scale helper functions:
-TSRV <- function(pdata , K = 300 , J = 1) {
-  # based on rv.timescale
-  logprices <- log(as.numeric(pdata))
-  n <- length(logprices) 
-  nbarK <- (n - K + 1)/(K) # average number of obs in 1 K-grid
-  nbarJ <- (n - J + 1)/(J)
-  adj <- (1 - (nbarK/nbarJ))^-1 
-  logreturns_K = logreturns_J = c()
-  for (k in 1:K) {
-    sel <- seq(k,n,K)  
-    logreturns_K <- c(logreturns_K, diff( logprices[sel]))
-  }
-  for (j in 1:J) {
-    sel <-  seq(j,n,J)
-    logreturns_J <- c(logreturns_J, diff( logprices[sel]))
-  }
-  TSRV <- adj * ( (1/K)*sum(logreturns_K^2) - ((nbarK/nbarJ) *(1/J)*sum(logreturns_J^2)))
-  return(TSRV)
-}
-
 RTSRV <- function(pdata, startIV = NULL, noisevar = NULL, K = 300, J = 1, eta = 9) {
   logprices = log(as.numeric(pdata))
   n = length(logprices)
@@ -68,7 +33,7 @@ RTSRV <- function(pdata, startIV = NULL, noisevar = NULL, K = 300, J = 1, eta = 
     sel = seq(1, n, K)
     RTSRV = medRV(diff(logprices[sel]))
   }
-  iter = 1
+  iter <- 1
   while (iter <= 20) {
     I_K = 1 * (logreturns_K^2 <= eta * (RTSRV * vdelta_K + 
                                           2 * noisevar))
@@ -96,12 +61,12 @@ RTSCov_bi <- function (pdata1, pdata2, startIV1 = NULL, startIV2 = NULL, noiseva
                        J_var1 = NULL, J_var2 = NULL, 
                        eta = 9) {
   
-  if( is.null(K_cov)){ K_cov = K }
-  if( is.null(J_cov)){ J_cov = J }
-  if( is.null(K_var1)){ K_var1 = K }
-  if( is.null(K_var2)){ K_var2 = K }   
-  if( is.null(J_var1)){ J_var1 = J } 
-  if( is.null(J_var2)){ J_var2 = J }
+  if (is.null(K_cov)){ K_cov <- K }
+  if (is.null(J_cov)){ J_cov <- J }
+  if (is.null(K_var1)){ K_var1 <- K }
+  if (is.null(K_var2)){ K_var2 <- K }   
+  if (is.null(J_var1)){ J_var1 <- J } 
+  if (is.null(J_var2)){ J_var2 <- J }
   
   # Calculation of the noise variance and TSRV for the truncation
   
@@ -204,40 +169,7 @@ RTSCov_bi <- function (pdata1, pdata2, startIV1 = NULL, startIV2 = NULL, noiseva
   return(RTSCV)
 }
 
-TSCov_bi <- function (pdata1, pdata2, K = 300, J = 1) {
-  x = refreshTime(list(pdata1, pdata2))
-  newprice1 = x[, 1]
-  newprice2 = x[, 2]
-  logprices1 = log(as.numeric(newprice1))
-  logprices2 = log(as.numeric(newprice2))
-  seconds = as.numeric(as.POSIXct(index(newprice1)))
-  secday = last(seconds) - first(seconds)
-  n = length(logprices1)
-  nbarK = (n - K + 1)/(K)
-  nbarJ = (n - J + 1)/(J)
-  adj = n/((K - J) * nbarK)
-  
-  logreturns_K1 = logreturns_K2 = logreturns_J1 = logreturns_J2 = c()
-  vdelta_K =  vdelta_J = c()
-  
-  for (k in 1:K) {
-    sel.avg = seq(k, n, K)
-    logreturns_K1 = c(logreturns_K1, diff(logprices1[sel.avg]))
-    logreturns_K2 = c(logreturns_K2, diff(logprices2[sel.avg]))
-    vdelta_K = c(vdelta_K, diff(seconds[sel.avg]) / secday)
-  }
-  
-  for (j in 1:J) {
-    sel.avg = seq(j, n, J)
-    logreturns_J1 = c(logreturns_J1, diff(logprices1[sel.avg]))
-    logreturns_J2 = c(logreturns_J2, diff(logprices2[sel.avg]))
-    vdelta_J = c(vdelta_J, diff(seconds[sel.avg])/secday)
-  }
-  
-  TSCOV = adj * ((1/K) * sum(logreturns_K1 * logreturns_K2) - 
-                   ((nbarK/nbarJ) * (1/J) * sum(logreturns_J1 * logreturns_J2)))
-  return(TSCOV)
-}
+
 
 cfactor_RTSCV <- function(eta = 9) {
   
@@ -300,17 +232,12 @@ rv.kernel <- function(x,                             # Tick Data
                       adj = NULL,                    # Deprectated
                       q = NULL, ...){                     # Deprectated
   # Multiday adjustment: 
-  multixts = multixts(x);
-  if(multixts){
-    result = apply.daily(x,rv.kernel,kernel.type,kernel.param,kernel.dofadj,
-                         align.by,align.period,cts,makeReturns,type,adj,q);
-    return(result)}
-  if(!multixts){ #Daily estimation:
-    
-    #
-    # Handle deprication
-    #
-    
+  multixts <- multixts(x)
+  if(multixts == TRUE) {
+    result <- apply.daily(x,rv.kernel,kernel.type,kernel.param,kernel.dofadj,
+                         align.by,align.period,cts,makeReturns,type,adj,q)
+    return(result)
+  } else { #Daily estimation:
     
     if(!is.null(type)){
       warning("type is deprecated, use kernel.type")
@@ -324,8 +251,9 @@ rv.kernel <- function(x,                             # Tick Data
       warning("adj is deprecated, use kernel.dofadj")
       kernel.dofadj=adj
     }          
-    align.period = .getAlignPeriod(align.period, align.by)         
-    cdata <- .convertData(x, cts=cts, makeReturns=makeReturns)
+    
+    align.period <- .getAlignPeriod(align.period, align.by)         
+    cdata <- .convertData(x, cts = cts, makeReturns = makeReturns)
     x <- cdata$data
     x <- .alignReturns(x, align.period)
     type <- kernelCharToInt(kernel.type)
@@ -446,7 +374,6 @@ rc.avg <- function( x, y,  period ) {
   x <- cdata$data
   
   .C("subsample", 
-     
      as.double(x), #a
      as.double(x), #na
      as.integer(length(x)), #na
@@ -504,84 +431,7 @@ rc.zero = function(x, y, period) {
 }  
 
 
-### Two time scale covariance : 
-rTSCov <- function (pdata, cor = FALSE, K = 300, J = 1, K_cov = NULL, J_cov = NULL, 
-                    K_var = NULL, J_var = NULL, makePsd = FALSE) {
-  if (!is.list(pdata)) {
-    n = 1
-  }
-  else {
-    n = length(pdata)
-    if (n == 1) {
-      pdata = pdata[[1]]
-    }
-  }
-  
-  if (n == 1) {
-    if (nrow(pdata) < (10 * K)) {
-      stop("Two time scale estimator uses returns based on prices that are K ticks aways. 
-           Please provide a timeseries of at least 10*K" ) 
-    } 
-    multixts = multixts(pdata); 
-    if (multixts) { 
-      stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input");
-    }
-    return(TSRV(pdata, K = K, J = J))
-  }
-  if (n > 1) {
-    if (nrow(pdata[[1]]) < (10 * K)) {
-      stop("Two time scale estimator uses returns based on prices that are K ticks aways. 
-           Please provide a timeseries of at least 10*K" ) 
-    } 
-    multixts <- multixts(pdata[[1]])
-    if (multixts == TRUE){ 
-      stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input") 
-    }
-    
-    cov <- matrix(rep(0, n * n), ncol = n)
-    if (is.null(K_cov) == TRUE) { 
-      K_cov <- K 
-    }
-    if (is.null(J_cov) == TRUE) { 
-      J_cov <- J 
-    }
-    if (is.null(K_var) == TRUE) { 
-      K_var <- rep(K,n) 
-    }
-    if (is.null(J_var) == TRUE) { 
-      J_var <- rep(J,n) 
-    }
-    
-    diagonal <- c()
-    for (i in 1:n) {
-      diagonal[i] = TSRV(pdata[[i]], K = K_var[i], J = J_var[i])
-    }
-    diag(cov) <- diagonal
-    
-    for (i in 2:n) {
-      for (j in 1:(i - 1)) {
-        cov[i, j] = cov[j, i] = TSCov_bi(pdata[[i]], 
-                                         pdata[[j]], K = K_cov, J = J_cov)
-      }
-    }
-    if (cor == FALSE) {
-      if (makePsd == TRUE) {
-        cov <- makePsd(cov)
-      }
-      return(cov)
-    }
-    if (cor == TRUE) {
-      invsdmatrix = try(solve(sqrt(diag(diag(cov)))), silent = F)
-      if (!inherits(invsdmatrix, "try-error")) {
-        rcor = invsdmatrix %*% cov %*% invsdmatrix
-        if (makePsd == TRUE) {
-          rcor = makePsd(rcor)
-        }
-        return(rcor)
-      }
-    }
-  }
-}
+
 
 ### ROBUST Two time scale covariance : 
 rRTSCov <- function (pdata, cor = FALSE, startIV = NULL, noisevar = NULL, 
@@ -783,58 +633,4 @@ rKernelCov = function( rdata, cor=FALSE, kernel.type = "rectangular", kernel.par
   }
 }
 
-## Average subsample estimator: 
-rAVGCov = function( rdata, cor = FALSE, period = 1, align.by = "seconds", align.period = 1, cts = TRUE, makeReturns = FALSE, ...){
-  if (!is.list(rdata)){
-    multixts = multixts(rdata); 
-    if(multixts){ stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")}
-    
-    if(is.null(dim(rdata))){  n = 1
-    }else{ n = dim(rdata)[2] }
-    if( n == 1 ){ 
-      L = .makeROlist( rdata=list(rdata), align.period=align.period, align.by=align.by,cts=cts,makeReturns=makeReturns);#make objects list            
-      result = rv.avg( L[[1]], period=period ); 
-      return(result)  }
-    if( n >  1 ){ stop('The rdata input is not a list. Please provide a list as input for this function. Each list-item should contain the series for one asset.') }
-  }
-  if(is.list(rdata)){
-    n = length(rdata)
-    multixts = multixts(rdata[[1]]); 
-    if(multixts){ stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")}
-    
-    if( n == 1 ){ 
-      L = .makeROlist( rdata=rdata, align.period=align.period, align.by=align.by,cts=cts,makeReturns=makeReturns);#make objects list            
-      result = rv.avg( L[[1]], period=period ); 
-      return(result) 
-    }
-    if( n > 1){
-      
-      cov = matrix(rep(0, n * n), ncol = n);
-      diagonal = c(); 
-      L = .makeROlist(rdata=rdata, align.period=align.period, align.by=align.by,cts=cts,makeReturns=makeReturns);#make objects list     
-      
-      for(i in 1:n){ 
-        diagonal[i] = rv.avg( L[[i]], period=period );
-      } 
-      diag(cov) = diagonal;
-      for(i in 2:n){
-        for (j in 1:(i - 1)){
-          cov[i, j] = cov[j, i] = rc.avg( x = L[[i]], y = L[[j]], period=period ); 
-        } 
-      } 
-      
-      if (cor == FALSE) {
-        cov = makePsd(cov)
-        return(cov)
-      }
-      if (cor == TRUE){
-        invsdmatrix = try(solve(sqrt(diag(diag(cov)))), silent = F)
-        if (!inherits(invsdmatrix, "try-error")) {
-          rcor = invsdmatrix %*% cov %*% invsdmatrix
-          rcor = makePsd(rcor)
-          return(rcor)
-        } 
-      } 
-    }  #List-length > 1
-  }  #If-list condition
-}   #end rAVGCov
+

@@ -123,3 +123,11 @@ expect_equal(
   formatC(as.numeric(rQuar(sample_5minprices_jumps[c('2010-01-04', '2010-01-05'), 1], align.by ="minutes", align.period = 5, makeReturns = TRUE))[1] * 1000000, digits = 20),
   "116.56733664733448563"
 )
+
+# rTSCov
+expect_equal(
+  formatC(rTSCov(pdata = sample_tdata$PRICE), digits = 10),
+  "0.000527687469"
+)
+
+

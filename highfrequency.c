@@ -42,51 +42,42 @@ void justKernel(double *x, int *type, double *ans) {
 
 }
 
-void kernel(double *a, int *na, int *q, int *adj, int *nw, double *ab, double *ans)
-{
-     	int i, j,lags = *q, nab = *na - 1;
-        double theadj, nwadj;
-
-        if(*nw == 1)
-                lags = 2*lags;
-
-        for(j = 0; j <= lags; j++)
-		{
-
-        	for(i = 0; i <= nab-j; i++)
-			     ab[j] += a[i] * a[i+j];
-		}
-        for(i = 0; i <= lags; i ++)
-        {
-
-              nwadj = 1;
-              if(i > *q && *nw == 1)
-              {
-
-                  nwadj = ((double)*q - ((double)i - (double)*q))/((double)*q);
-              }
-
-              if(*adj == 0)
-	     	 {
-                  theadj = 1;
-              }
-              else
-              {
-                  theadj =  ((double)(nab+1)/((double)(nab+1)-(double)i));
-	          }
-              if(i == 0)
-	      	  {
-              		ans[0] += theadj * ab[i];
-              }
-              else
-              {
-	                ans[0] += 2 * nwadj *  theadj * ab[i];
-              }
-        }
+void kernel(double *a, int *na, int *q, int *adj, int *nw, double *ab, double *ans) {
+  int i, j,lags = *q, nab = *na - 1;
+  double theadj, nwadj;
+  
+  if (*nw == 1) {
+    lags = 2 * lags;
+  }
+  
+  for (j = 0; j <= lags; j++) {
+    for(i = 0; i <= nab-j; i++) {
+      ab[j] += a[i] * a[i+j];
+    }
+	}
+  
+  for (i = 0; i <= lags; i ++) {
+    
+    nwadj = 1;
+    if(i > *q && *nw == 1) {
+      nwadj = ((double)*q - ((double)i - (double)*q))/((double)*q);
+    }
+    
+    if(*adj == 0) {
+      theadj = 1;
+    } else {
+      theadj =  ((double)(nab+1)/((double)(nab+1)-(double)i));
+    }
+    
+    if (i == 0) {
+      ans[0] += theadj * ab[i];
+    } else {
+      ans[0] += 2 * nwadj *  theadj * ab[i];
+    }
+  }
 }
 
-void kernelEstimator(double *a, double *b, int *na, int *q, int *adj, int *type, double *ab,  double *ab2, double *ans)
-{
+void kernelEstimator(double *a, double *b, int *na, int *q, int *adj, int *type, double *ab,  double *ab2, double *ans) {
      	int i, j,lags = *q, nab = *na - 1;
         double theadj, w;
 
