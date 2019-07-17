@@ -33,6 +33,8 @@ checkColumnNames <- function(data) {
   # Adjust Bid size col naming:    
   try((colnames(data)[xtsAttributes(data)[['AskSize']]] = 'OFRSIZ'))
   try(setnames(data, "AskSize", "OFRSIZ", skip_absent = TRUE), silent = TRUE)
+  try(setnames(data, "ASKSIZ", "OFRSIZ", skip_absent = TRUE), silent = TRUE)
+  
   
   try(setnames(data, "TR_SCOND", "COND", skip_absent = TRUE), silent = TRUE)
   
@@ -133,7 +135,7 @@ has.AskSize <- function(x, which = FALSE) {
   if (!identical(loc, integer(0))) {
     return(if(which) loc else TRUE)
   }
-  loc <- grep("(ofrsize|ofrsiz|offersize|offersiz)", colnames(x), ignore.case=TRUE)
+  loc <- grep("(ofrsize|ofrsiz|offersize|offersiz|asksiz)", colnames(x), ignore.case=TRUE)
   if (!identical(loc, integer(0))) {
     return(if(which) loc else TRUE)
   }
@@ -369,7 +371,7 @@ rollingMedianInclEnds <- function(x, weights, window, direction = "center") {
 #' @keywords internal
 set.AllColumns <- function(x) {
   cols <- c("Op","Hi","Lo","Cl","Vo","Ad","Price","Trade","Qty",
-            "Bid","BidSize","Ask","AskSize","Mid","Chg")
+            "Bid","BidSize","Ask", "AskSize", "Mid", "Chg")
   for(col in cols) {
     try(x <- do.call(paste("set", col, sep = "."), list(x)), silent = TRUE)
   }

@@ -521,7 +521,11 @@ mergeQuotesSameTimestamp <- function(qdata, selection = "median") {
       stop("Data.table neeeds DT column (date-time).")
     }
   }
+  # qdata <- sample_qdataraw_microseconds
+  # qdata <- checkColumnNames(qdata)
   
+  # keep summed size columns
+  qdata_size <- qdata[, lapply(.SD, sum), by = list(DT, SYMBOL), .SDcols = c("BIDSIZ", "OFRSIZ")]
   if (selection == "median") {
     qdata <- qdata[,  lapply(.SD, median), by = list(DT, SYMBOL), .SDcols = c("BID", "OFR")]
   }
@@ -541,6 +545,8 @@ mergeQuotesSameTimestamp <- function(qdata, selection = "median") {
         , -c("BIDSIZ", "OFRSIZ")][
         , lapply(.SD, unique), by = list(DT, SYMBOL), .SDcols = c("BID", "OFR")]
   }
+  qdata <- merge(qdata, qdata_size)
+  
   if (dummy_was_xts == TRUE) {
     return(xts(as.matrix(qdata[, -c("DT")]), order.by = qdata$DT))
   } else {
@@ -758,8 +764,8 @@ noZeroQuotes <- function(qdata) {
 #' This procedure is performed for each stock in "ticker".
 #' The function returns a vector indicating how many quotes remained after each cleaning step.
 #' 
-#' In case you supply the argument "rawqdata", the on-disk functionality is ignored
-#' and the function returns a list with the cleaned quotes as xts object (see examples).
+#' In case you supply the argument "qdataraw", the on-disk functionality is ignored
+#' and the function returns a list with the cleaned quotes as an xts or data.table object depending on input (see examples).
 #' 
 #' @references Barndorff-Nielsen, O. E., P. R. Hansen, A. Lunde, and N. Shephard (2009). Realized kernels in practice: Trades and quotes. Econometrics Journal 12, C1-C32.
 #' Brownlees, C.T. and Gallo, G.M. (2006). Financial econometric analysis at ultra-high frequency: Data handling concerns. Computational Statistics & Data Analysis, 51, pages 2232-2245.
