@@ -32,12 +32,12 @@ expect_equal(
 
 expect_equal(
   dim(mergeQuotesSameTimestamp(selectExchange(sample_qdataraw, "N"), selection = "max.volume")),
-  c(7707, 3)
+  c(7707, 5)
 )
 
 expect_equal(
   dim(mergeQuotesSameTimestamp(selectExchange(sample_qdataraw, "N"), selection = "weighted.average")),
-  c(7707, 3)
+  c(7707, 5)
 )
 
 expect_equal(
