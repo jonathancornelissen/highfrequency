@@ -342,6 +342,105 @@ MRC <- function(pdata, pairwise = FALSE, makePsd = FALSE) {
   return(mrc)
 } 
 
+#' Realized Covariance: Average Subsample
+#' 
+#' @description Realized Covariance using average subsample.
+#' 
+#' @param rdata In the multivariate case: a list. Each list-item i contains an xts object with the intraday data of stock i for day t. In the univariate case: an xts object containing the (tick) data for one day.
+#' @param cor boolean, in case it is TRUE, the correlation is returned. FALSE by default.
+#' @param period Sampling period 
+#' @param align.by Align the tick data to seconds|minutes|hours
+#' @param align.period Align the tick data to this many [seconds|minutes|hours]
+#' @param cts Create calendar time sampling if a non realizedObject is passed
+#' @param makeReturns Prices are passed make them into log returns
+#' 
+#' @return Realized covariance using average subsample.
+#' 
+#' @references 
+#' L. Zhang, P.A Mykland, and Y. Ait-Sahalia. A tale of two time scales: Determining integrated volatility with noisy high-frequency data. \emph{Journal of the American Statistical Association}, 2005.
+#' 
+#' Michiel de Pooter, Martin Martens, and Dick van Dijk. Predicting the daily covariance matrix for S\&P100 stocks using intraday data - but which frequency to use? \emph{Econometric Reviews}, 2008.
+#' 
+#' @author Scott Payseur
+#' 
+#' @examples 
+#' # Average subsampled realized variance/covariance aligned at one minute returns at 
+#' # 5 subgrids (5 minutes).
+#' 
+#' # Univariate
+#' rvSub <- rAVGCov(rdata = sample_tdata$PRICE, period = 5, align.by = "minutes",
+#'                  align.period = 5, makeReturns = TRUE) 
+#' rvSub
+#' 
+#' # Multivariate:
+#' rcSub = rAVGCov(rdata = list(lltc, sbux), period = 5, align.by = "minutes", 
+#'                 align.period = 5, makeReturns = FALSE)
+#' rcSub
+#' 
+#' @keywords volatility
+#' @export
+rAVGCov <- function(rdata, cor = FALSE, period = 1, align.by = "seconds", align.period = 1, cts = TRUE, makeReturns = FALSE) {
+  NULL
+}
+# ## Average subsample estimator: 
+# rAVGCov <- function(rdata, cor = FALSE, period = 1, align.by = "seconds", align.period = 1, cts = TRUE, makeReturns = FALSE) {
+#   if (!is.list(rdata)){
+#     multixts = multixts(rdata); 
+#     if(multixts){ stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")}
+#     
+#     if(is.null(dim(rdata))){
+#       n = 1
+#     } else { 
+#       n = dim(rdata)[2] 
+#     }
+#     if( n == 1 ){ 
+#       L = .makeROlist( rdata=list(rdata), align.period=align.period, align.by=align.by,cts=cts,makeReturns=makeReturns); #make objects list            
+#       result = rv.avg( L[[1]], period=period )
+#       return(result)  }
+#     if( n >  1 ){ stop('The rdata input is not a list. Please provide a list as input for this function. Each list-item should contain the series for one asset.') }
+#   }
+#   if(is.list(rdata)){
+#     n = length(rdata)
+#     multixts = multixts(rdata[[1]])
+#     if(multixts){ stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")}
+#     
+#     if( n == 1 ){ 
+#       L = .makeROlist( rdata=rdata, align.period=align.period, align.by=align.by,cts=cts,makeReturns=makeReturns);#make objects list            
+#       result = rv.avg( L[[1]], period=period )
+#       return(result) 
+#     }
+#     if( n > 1){
+#       
+#       cov = matrix(rep(0, n * n), ncol = n)
+#       diagonal = c()
+#       L = .makeROlist(rdata=rdata, align.period=align.period, align.by=align.by,cts=cts,makeReturns=makeReturns);#make objects list     
+#       
+#       for(i in 1:n){ 
+#         diagonal[i] = rv.avg( L[[i]], period=period );
+#       } 
+#       diag(cov) = diagonal;
+#       for(i in 2:n){
+#         for (j in 1:(i - 1)){
+#           cov[i, j] = cov[j, i] = rc.avg( x = L[[i]], y = L[[j]], period=period ); 
+#         } 
+#       } 
+#       
+#       if (cor == FALSE) {
+#         cov = makePsd(cov)
+#         return(cov)
+#       }
+#       if (cor == TRUE){
+#         invsdmatrix = try(solve(sqrt(diag(diag(cov)))), silent = F)
+#         if (!inherits(invsdmatrix, "try-error")) {
+#           rcor = invsdmatrix %*% cov %*% invsdmatrix
+#           rcor = makePsd(rcor)
+#           return(rcor)
+#         } 
+#       } 
+#     }  #List-length > 1
+#   }  #If-list condition
+# }   #end rAVGCov
+
 #' Realized beta: a tool in measuring risk with respect to the market. 
 #' 
 #' @description Depending on users' choices of estimator (realized covariance (RCOVestimator) and realized variance (RVestimator)), the function returns the realized beta, defined as the ratio between both.
@@ -845,7 +944,6 @@ rMPV <- function(rdata, m = 2, p = 2, align.by = NULL, align.period = NULL, make
 #' @param alpha is a parameter between 0 en 0.5, 
 #'that determines the rejection threshold value 
 #'(see Boudt et al. (2008) for details).
-#' @param ... additional arguments.
 #' 
 #' @return an \eqn{N x N} matrix
 #' 
@@ -880,7 +978,7 @@ rMPV <- function(rdata, m = 2, p = 2, align.by = NULL, align.period = NULL, make
 #' 
 #' @keywords volatility
 #' @export
-rOWCov <- function (rdata, cor = FALSE, align.by = NULL, align.period = NULL, makeReturns = FALSE, seasadjR = NULL, wfunction = "HR" , alphaMCD = 0.75, alpha = 0.001, ...){
+rOWCov <- function (rdata, cor = FALSE, align.by = NULL, align.period = NULL, makeReturns = FALSE, seasadjR = NULL, wfunction = "HR" , alphaMCD = 0.75, alpha = 0.001){
   
   if (is.null(seasadjR) == TRUE) { 
     seasadjR <- rdata 
@@ -891,7 +989,7 @@ rOWCov <- function (rdata, cor = FALSE, align.by = NULL, align.period = NULL, ma
   }
   
   # Aggregate:
-  if((!is.null(align.by))&&(!is.null(align.period))){
+  if ((!is.null(align.by))&&(!is.null(align.period))) {
     rdata <- aggregatets(rdata, on = align.by, k = align.period)
     seasadjR <- aggregatets(seasadjR, on = align.by, k = align.period)
   }     
@@ -926,6 +1024,7 @@ rOWCov <- function (rdata, cor = FALSE, align.by = NULL, align.period = NULL, ma
     seasadjRselect <- seasadjR[, select]
     N <- ncol(seasadjRselect)
     MCDobject <- try(robustbase::covMcd(x = seasadjRselect, alpha = alphaMCD))
+    
     if (length(MCDobject$raw.mah) > 1) {
       betaMCD  <- 1-alphaMCD
       asycor   <- betaMCD / pchisq(qchisq(betaMCD, df = N), df = N+2)
@@ -935,8 +1034,7 @@ rOWCov <- function (rdata, cor = FALSE, align.by = NULL, align.period = NULL, ma
       for (i in 1:intraT) { 
         outlyingness[i] = matrix(seasadjRselect[i,], ncol = N) %*% invMCDcov %*% matrix(seasadjRselect[i,],nrow=N)    
       }
-    }
-    else {
+    } else {
       print(c("MCD cannot be calculated")); stop();
     }
     k <- qchisq(p = 1 - alpha, df = N)
@@ -949,8 +1047,7 @@ rOWCov <- function (rdata, cor = FALSE, align.by = NULL, align.period = NULL, ma
       covariance <- (conHR(di = N, alpha = alpha) * t(wR) %*% wR) / mean(weights)
       if (cor == FALSE) {
         return(covariance)
-      }
-      if (cor == TRUE) {
+      } else {
         sdmatrix = sqrt(diag(diag(covariance)))
         inv_matrix <- solve(sdmatrix)
         rcor <- inv_matrix %*% covariance %*% inv_matrix
@@ -963,8 +1060,7 @@ rOWCov <- function (rdata, cor = FALSE, align.by = NULL, align.period = NULL, ma
       covariance <- (conhuber(di = N, alpha = alpha) * t(wR) %*% wR) / mean(weights)
       if (cor == FALSE) {
         return(covariance)
-      }
-      if(cor==TRUE){
+      } else {
         sdmatrix <- sqrt(diag(diag(covariance)))
         rcor <- solve(sdmatrix) %*% covariance %*% solve(sdmatrix)
         return(rcor)
@@ -1125,9 +1221,8 @@ rSV <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE
 #' 
 #' @keywords volatility
 #' @export
-rThresholdCov <- function(rdata, cor = FALSE, align.by = NULL, align.period = NULL, makeReturns = FALSE){
+rThresholdCov <- function(rdata, cor = FALSE, align.by = NULL, align.period = NULL, makeReturns = FALSE) {
   rdatacheck(rdata, multi = TRUE)
-  
   # Multiday adjustment: 
   multixts <- multixts(rdata)
   if (multixts == TRUE) { 
@@ -1346,6 +1441,164 @@ rQuar <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
     N     <- length(q) + 1
     rQuar <- N/3 * sum(q^4)
     return(rQuar)
+  }
+}
+
+#' Two time scale covariance estimation 
+#' 
+#' @description Function returns the two time scale covariance matrix proposed in Zhang et al (2005) and Zhang (2010).
+#' By the use of two time scales, this covariance estimate 
+#' is robust to microstructure noise and non-synchronic trading.
+#' 
+#' @param pdata a list. Each list-item i contains an xts object with the intraday price data 
+#' of stock i for day t.
+#' @param cor boolean, in case it is TRUE, the correlation is returned. FALSE by default.
+#' @param K positive integer, slow time scale returns are computed on prices that are K steps apart.
+#' @param J positive integer, fast time scale returns are computed on prices that are J steps apart.
+#' @param K_cov positive integer, for the extradiagonal covariance elements the slow time scale returns are computed on prices that are K steps apart.
+#' @param J_cov positive integer, for the extradiagonal covariance elements the fast time scale returns are computed on prices that are J steps apart.
+#' @param K_var vector of positive integers, for the diagonal variance elements the slow time scale returns are computed on prices that are K steps apart.
+#' @param J_var vector of positive integers, for the diagonal variance elements the fast time scale returns are computed on prices that are J steps apart.
+#' @param makePsd boolean, in case it is TRUE, the positive definite version of rTSCov is returned. FALSE by default.
+#' 
+#' @return an \eqn{N x N} matrix
+#' 
+#' @details The rTSCov requires the tick-by-tick transaction prices. (Co)variances are then computed using log-returns calculated on a rolling basis 
+#' on stock prices that are \eqn{K} (slow time scale) and \eqn{J} (fast time scale) steps apart.
+#' 
+#' The diagonal elements of the rTSCov matrix are the variances, computed for log-price series \eqn{X} with \eqn{n} price observations 
+#' at times \eqn{  \tau_1,\tau_2,\ldots,\tau_n} as follows: 
+#' 
+#' \deqn{(1-\frac{\overline{n}_K}{\overline{n}_J})^{-1}([X,X]_T^{(K)}-
+#'        \frac{\overline{n}_K}{\overline{n}_J}[X,X]_T^{(J))}}
+#'        
+#' where \eqn{\overline{n}_K=(n-K+1)/K},  \eqn{\overline{n}_J=(n-J+1)/J} and
+#' \deqn{[X,X]_T^{(K)} =\frac{1}{K}\sum_{i=1}^{n-K+1}(X_{t_{i+K}}-X_{t_i})^2.} 
+#' 
+#' The extradiagonal elements of the rTSCov are the covariances. 
+#' For their calculation, the data is first synchronized by the refresh time method proposed by Harris et al (1995).
+#' It uses the function \code{\link{refreshTime}} to collect first the so-called refresh times at which all assets have traded at least once 
+#' since the last refresh time point. Suppose we have two log-price series:  \eqn{X} and \eqn{Y}. Let \eqn{ \Gamma =\{ \tau_1,\tau_2,\ldots,\tau_{N^{\mbox{\tiny X}}_{\mbox{\tiny T}}}\}} and 
+#' \eqn{\Theta=\{\theta_1,\theta_2,\ldots,\theta_{N^{\mbox{\tiny Y}}_{\mbox{\tiny T}}}\}} 
+#' be the set of transaction times of these assets. 
+#' The first refresh time corresponds to the first time at which both stocks have traded, i.e. 
+#' \eqn{\phi_1=\max(\tau_1,\theta_1)}. The subsequent refresh time is defined as the first time when both stocks have again traded, i.e.
+#' \eqn{\phi_{j+1}=\max(\tau_{N^{\mbox{\tiny{X}}}_{\phi_j}+1},\theta_{N^{\mbox{\tiny{Y}}}_{\phi_j}+1})}. The
+#' complete refresh time sample grid is 
+#' \eqn{\Phi=\{\phi_1,\phi_2,...,\phi_{M_N+1}\}}, where \eqn{M_N} is the total number of paired returns.  The
+#' sampling points of asset \eqn{X} and \eqn{Y} are defined to be
+#' \eqn{t_i=\max\{\tau\in\Gamma:\tau\leq \phi_i\}} and
+#' \eqn{s_i=\max\{\theta\in\Theta:\theta\leq \phi_i\}}.
+#' 
+#' Given these refresh times, the covariance is computed as follows: 
+#' \deqn{
+#' c_{N}( [X,Y]^{(K)}_T-\frac{\overline{n}_K}{\overline{n}_J}[X,Y]^{(J)}_T ),
+#' }
+#' 
+#' where
+#' \deqn{[X,Y]^{(K)}_T =\frac{1}{K} \sum_{i=1}^{M_N-K+1} (X_{t_{i+K}}-X_{t_{i}})(Y_{s_{i+K}}-Y_{s_{i}}).}
+#' 
+#' Unfortunately, the rTSCov is not always positive semidefinite.  
+#' By setting the argument makePsd = TRUE, the function \code{\link{makePsd}} is used to return a positive semidefinite
+#' matrix. This function replaces the negative eigenvalues with zeroes.
+#' 
+#' @references 
+#' Harris, F., T. McInish, G. Shoesmith, and R. Wood (1995). Cointegration, error correction, and price discovery on infomationally linked security markets. Journal of Financial and Quantitative Analysis 30, 563-581.
+#' Zhang, L., P. A. Mykland, and Y. Ait-Sahalia (2005). A tale of two time scales: Determining integrated volatility with noisy high-frequency data. Journal of the American Statistical Association 100, 1394-1411.
+#' Zhang, L. (2011). Estimating covariation: Epps effect, microstructure noise. Journal of Econometrics 160, 33-47.
+#' 
+#' @author Jonathan Cornelissen and Kris Boudt
+
+#' @examples 
+#' # Robust Realized two timescales Variance/Covariance for CTS
+#' 
+#' # Univariate: 
+#' rvts <- rTSCov(pdata = sample_tdata$PRICE)
+#' # Note: Prices as input
+#' rvts 
+#' 
+#' # Multivariate:
+#' rcovts <- rTSCov(pdata = list(cumsum(lltc) + 100, cumsum(sbux) + 100))
+#' # Note: List of prices as input
+#' rcovts 
+#' 
+#' @keywords volatility
+#' @export
+rTSCov <- function (pdata, cor = FALSE, K = 300, J = 1, K_cov = NULL, J_cov = NULL, 
+                    K_var = NULL, J_var = NULL, makePsd = FALSE) {
+  if (is.list(pdata) == FALSE) {
+    n <- 1
+  }
+  else {
+    n <- length(pdata)
+    if (n == 1) {
+      pdata <- pdata[[1]]
+    }
+  }
+  
+  if (n == 1) {
+    if (nrow(pdata) < (10 * K)) {
+      stop("Two time scale estimator uses returns based on prices that are K ticks aways. 
+           Please provide a timeseries of at least 10 * K." ) 
+    } 
+    multixts <- multixts(pdata)
+    if (multixts == TRUE) { 
+      stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input");
+    }
+    return(TSRV(pdata, K = K, J = J))
+  }
+  if (n > 1) {
+    if (nrow(pdata[[1]]) < (10 * K)) {
+      stop("Two time scale estimator uses returns based on prices that are K ticks aways. 
+           Please provide a timeseries of at least 10*K" ) 
+    } 
+    multixts <- multixts(pdata[[1]])
+    if (multixts == TRUE){ 
+      stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input") 
+    }
+    
+    cov <- matrix(rep(0, n * n), ncol = n)
+    if (is.null(K_cov) == TRUE) { 
+      K_cov <- K 
+    }
+    if (is.null(J_cov) == TRUE) { 
+      J_cov <- J 
+    }
+    if (is.null(K_var) == TRUE) { 
+      K_var <- rep(K,n) 
+    }
+    if (is.null(J_var) == TRUE) { 
+      J_var <- rep(J,n) 
+    }
+    
+    diagonal <- c()
+    for (i in 1:n) {
+      diagonal[i] = TSRV(pdata[[i]], K = K_var[i], J = J_var[i])
+    }
+    diag(cov) <- diagonal
+    
+    for (i in 2:n) {
+      for (j in 1:(i - 1)) {
+        cov[i, j] = cov[j, i] = TSCov_bi(pdata[[i]], 
+                                         pdata[[j]], K = K_cov, J = J_cov)
+      }
+    }
+    if (cor == FALSE) {
+      if (makePsd == TRUE) {
+        cov <- makePsd(cov)
+      }
+      return(cov)
+    }
+    if (cor == TRUE) {
+      invsdmatrix <- try(solve(sqrt(diag(diag(cov)))), silent = F)
+      if (!inherits(invsdmatrix, "try-error")) {
+        rcor <- invsdmatrix %*% cov %*% invsdmatrix
+        if (makePsd == TRUE) {
+          rcor <- makePsd(rcor)
+        }
+        return(rcor)
+      }
+    }
   }
 }
 

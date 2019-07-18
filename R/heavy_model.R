@@ -36,7 +36,7 @@
 #' In this version, the parameters vector to be estimated is \eqn{\left( w, w_R,\alpha_1, \alpha_R, \alpha_2, \beta, \beta_R \right) }.
 #' 
 #' @return A list with the following values:
-#' (i) loglikelihood: The log likelihood evaluated at the parameter estimates.
+#' (i) loglikelihood: the log likelihood evaluated at the parameter estimates.
 #' (ii) likelihoods: an xts object of length T containing the log likelihoods per day.
 #' (iii) condvar: a (T x K) xts object containing the conditional variances
 #' (iv) estparams: a vector with the parameter estimates. The order in which the
@@ -146,7 +146,7 @@ heavyModel <- function (data, p = matrix(c(0, 0, 1, 1), ncol = 2), q = matrix(c(
             lls = as.double( rep(0, TT) ),
             llRM = as.double( rep(0,K ) ),
             ll = as.double(0),
-            PACKAGE="highfrequency");
+            PACKAGE = "highfrequency");
     
     if (is.null(rownames(data)) == FALSE) {
       xx$condvar <- xts(t(matrix(xx$h,K)), order.by = as.POSIXct(rownames(data)))

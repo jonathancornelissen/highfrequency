@@ -1,5 +1,5 @@
 Package: highfrequency
-Version: 0.5.3
+Version: 0.6.0
 Date: 2019-05-24
 Title: Tools for Highfrequency Data Analysis
 Authors@R: c(person("Kris", "Boudt", role = c("aut", "cre"),
@@ -42,7 +42,8 @@ Imports:
     MASS,
     data.table,
     RcppRoll,
-    bit64
+    bit64,
+    lubridate
 LinkingTo: Rcpp
 Suggests:
     covr,

@@ -21,7 +21,7 @@ largest volume.
 }}
 }
 \value{
-xts or data.table object depending on input
+data.table or xts object depending on input
 }
 \description{
 Function replaces multiple transactions that have the same time stamp by a single one and returns an xts or data.table object with unique time stamps only.

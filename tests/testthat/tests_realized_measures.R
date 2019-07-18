@@ -81,6 +81,11 @@ expect_equal(
   formatC(rOWCov(rdata = sample_5minprices_jumps['2010-01-04'], makeReturns = TRUE)[1,1] * 1000000, digits = 10),
   "10038.65677"
 )
+expect_equal(
+  formatC(rOWCov(rdata = sample_5minprices_jumps['2010-01-04'], makeReturns = TRUE, wfunction = "SR")[1,1], digits = 4),
+  "0.01014"
+)
+
 
 # rSkew
 expect_equal(
@@ -99,11 +104,26 @@ expect_equal(
   formatC(sum(rThresholdCov(cbind(lltc, sbux), align.by = "minutes", align.period = 1)) * 10000, digits = 20),
   "0.5945544397569668682"
 )
+expect_equal(
+  formatC(sum(rThresholdCov(cbind(lltc, sbux), align.by = "minutes", align.period = 1), cor = TRUE), digits = 1),
+  " 1"
+)
 
 # rTPVar
 expect_equal(
   formatC(rTPVar(sample_tdata$PRICE,align.by ="minutes", align.period = 5, makeReturns = TRUE) * 1000000, digits = 20),
   "0.0027736636298646998901"
+)
+
+# rTSCov univariate
+expect_equal(
+  formatC(rTSCov(pdata = sample_tdata$PRICE), digits = 10),
+  "0.000527687469"
+)
+# rTSCov multivariate
+expect_equal(
+  formatC(sum(rTSCov(pdata = list(cumsum(lltc) + 100, cumsum(sbux) + 100))) * 10000, digits = 10),
+  "0.002426166025"
 )
 
 # RV
@@ -123,3 +143,8 @@ expect_equal(
   formatC(as.numeric(rQuar(sample_5minprices_jumps[c('2010-01-04', '2010-01-05'), 1], align.by ="minutes", align.period = 5, makeReturns = TRUE))[1] * 1000000, digits = 20),
   "116.56733664733448563"
 )
+
+
+
+
+
