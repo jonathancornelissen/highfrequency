@@ -58,7 +58,7 @@ is.BBO <- function (x) {
 
 #' @keywords internal
 is.TBBO <- function (x) {
-  if (all(has.Trade(x), has.Qty(x), has.Bid(x), has.Ask(x))) {
+  if (all(has.Trade(x), hasQty(x), has.Bid(x), has.Ask(x))) {
     TRUE
   }
   else FALSE
@@ -265,14 +265,22 @@ has.Vo<-function (x, which = FALSE){
   else FALSE
 }
 
-#' @keywords internal
-has.Qty <- function(x, which = FALSE) {
+#' Check for Trade, Bid, and Ask/Offer (BBO/TBBO), Quantity, and Price data
+#' @description A set of functions to check for appropriate TBBO/BBO and price column
+#' names within a data object, as well as the availability and
+#' position of those columns.
+#' 
+#' @param x data object
+#' @param which disply position of match
+#' 
+#' @export
+hasQty <- function(x, which = FALSE) {
   colAttr <- attr(x, "Qty")
   if(!is.null(colAttr)) {
     return(if (which) colAttr else TRUE)
   }
   
-  locBidAsk <- c(has.Bid(x, which=TRUE),has.Ask(x, which=TRUE))
+  locBidAsk <- c(has.Bid(x, which = TRUE), has.Ask(x, which = TRUE))
   loc <- grep("qty", colnames(x), ignore.case=TRUE)
   loc <- loc[!(loc %in% locBidAsk)]
   if (!identical(loc, integer(0))) {
@@ -436,8 +444,8 @@ set.Op <- function(x, error=TRUE) {
 
 #' @keywords internal
 set.Qty <- function(x, error=TRUE) {
-  if(has.Qty(x))
-    attr(x,"Qty") <- has.Qty(x, which=TRUE)
+  if(hasQty(x))
+    attr(x,"Qty") <- hasQty(x, which=TRUE)
   return(x)
 }
 

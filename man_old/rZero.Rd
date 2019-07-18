@@ -22,15 +22,13 @@ rZero(rdata, period=1, align.by="seconds", align.period = 1, cts = TRUE,
 Percentage of co-zero returns.
 }
 \references{
-S. W. Payseur.  A One Day Comparison of Realized Variance and Covariance Estimators. \emph{Working Paper: University 
+S. W. Payseur. A One Day Comparison of Realized Variance and Covariance Estimators. \emph{Working Paper: University 
 of Washington}, 2007
 }
 \author{ Scott Payseur <scott.payseur@gmail.com>}
 
 \examples{
-data(sbux.xts)
-data(lltc.xts)
-rZero( rdata = list(sbux.xts, lltc.xts) , period = 60, align.by ="seconds", align.period=1)
+rZero(rdata = list(sbux, lltc), period = 60, align.by = "seconds", align.period = 1)
 }
 
 \keyword{methods}

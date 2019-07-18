@@ -76,8 +76,8 @@ getLiquidityMeasures <- function(tqdata, win = 300, type = NULL) {
   tqdata[, halfTradedSpread := direction*(PRICE-midpoints)]
   tqdata[, proportionalHalfTradedSpread := halfTradedSpread/midpoints]
 
-  tqdata[, squaredLogReturn := (log(PRICE) - log(shift(PRICE, 1, type="lag")))^2]
-  tqdata[, absLogReturn := abs(log(PRICE) - log(shift(PRICE, 1, type="lag")))]
+  tqdata[, squaredLogReturn := (log(PRICE) - log(shift(PRICE, 1, type = "lag")))^2]
+  tqdata[, absLogReturn := abs(log(PRICE) - log(shift(PRICE, 1, type = "lag")))]
 
   tqdata[, quotedSpread := OFR - BID]
   tqdata[, proportionalQuotedSpread := quotedSpread/midpoints]
@@ -183,8 +183,8 @@ getTradeDirection <- function(tqdata) {
   
   buy <- buy1 | (dif1 & equal) | (equal1 & dif2 & equal)
   
-  buy[buy==TRUE] <- 1                 # 2*as.integer(buy) - 1   does the same
-  buy[buy==FALSE] <- -1
+  buy[buy == TRUE] <- 1                 # 2*as.integer(buy) - 1   does the same
+  buy[buy == FALSE] <- -1
   
   
   ## The tick rule is the most commonly used level-1 algorithm. This
