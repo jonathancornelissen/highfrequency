@@ -1,3 +1,154 @@
+#' Aggregate a time series
+#' 
+#' @description Function returns aggregated time series as xts object. 
+#' It can handle irregularly spaced timeseries and returns a regularly spaced one.
+#' Use univariate timeseries as input for this function, and check out \code{\link{aggregateTrades}}
+#' and \code{\link{aggregateQuotes}} to aggregate Trade or Quote data objects.
+#' 
+#' @param ts xts object to aggregate.
+#' @param FUN function to apply over each interval. By default, previous tick aggregation is done. 
+#' Alternatively one can set e.g. FUN = "mean".
+#' In case weights are supplied, this argument is ignored and a weighted average is taken.
+#' @param on character, indicating the time scale in which "k" is expressed. Possible values are: "secs", "seconds", "mins", "minutes", "hours", "days", "weeks".
+#' @param k positive integer, indicating the number of periods to aggregate over. For example, to aggregate an 
+#' xts object to the five-minute frequency set k = 5 and on = "minutes".
+#' @param weights By default, no weighting scheme is used. 
+#' When you assign an xts object with wheights to this argument, a weighted mean is taken over each interval. 
+#' Of course, the weights should have the same timestamps as the supplied time series.
+#' @param dropna boolean, which determines whether empty intervals should be dropped.
+#' By default, an NA is returned in case an interval is empty, except when the user opts
+#' for previous tick aggregation, by setting FUN = "previoustick" (default).
+#' 
+#' @details The timestamps of the new time series are the closing times and/or days of the intervals. 
+#' E.g. for a weekly aggregation the new timestamp is the last day in that particular week (namely sunday).
+#' 
+#' In case of previous tick aggregation, 
+#' for on = "seconds"/"minutes"/"hours",
+#' the element of the returned series with e.g. timestamp 09:35:00 contains 
+#' the last observation up to that point, excluding the value at 09:35:00 itself.
+#' 
+#' Please Note:
+#' In case an interval is empty, by default an NA is returned.. In case e.g. previous 
+#' tick aggregation it makes sense to fill these NA's by the function \code{na.locf}
+#' (last observation carried forward) from the zoo package.
+#' 
+#' @return An xts object containing the aggregated time series.
+#' 
+#' @author Jonathan Cornelissen and Kris Boudt
+#' @keywords data manipulation
+#' 
+#' @examples 
+#' #load sample price data
+#' ts <- sample_tdata$PRICE
+#' 
+#' #Previous tick aggregation to the 5-minute sampling frequency:
+#' tsagg5min <- aggregatets(ts, on = "minutes", k = 5)
+#' head(tsagg5min)
+#' #Previous tick aggregation to the 30-second sampling frequency:
+#' tsagg30sec <- aggregatets(ts, on = "seconds", k = 30)
+#' tail(tsagg30sec)
+#' 
+#' @importFrom zoo zoo na.locf
+#' @importFrom stats start end
+#' @export
+aggregatets <- function (ts, FUN = "previoustick", on = "minutes", k = 1, weights = NULL, dropna = FALSE) {
+  
+  makethispartbetter <- ((!is.null(weights))| on=="days"|on=="weeks"| (FUN!="previoustick")|dropna)
+  
+  if (FUN == "previoustick") {
+    FUN <- previoustick 
+  } else {
+    FUN <- match.fun(FUN)
+  }
+  
+  if (makethispartbetter == TRUE)  {
+    
+    if (is.null(weights) == TRUE) {
+      ep <- endpoints(ts, on, k)
+      if (dim(ts)[2] == 1) { 
+        ts2 <- period.apply(ts, ep, FUN) 
+      }
+      if (dim(ts)[2] > 1) {  
+        ts2 <- xts(apply(ts, 2, FUN = period.apply2, FUN2 = FUN, INDEX = ep), order.by = index(ts)[ep],)
+      }
+    } else {
+      tsb <- cbind(ts, weights)
+      ep  <- endpoints(tsb, on, k)
+      ts2 <- period.apply(tsb, ep, FUN = match.fun(weightedaverage))
+    }
+    if (on == "minutes" | on == "mins" | on == "secs" | on == 
+        "seconds") {
+      if (on == "minutes" | on == "mins") {
+        secs = k * 60
+      }
+      if (on == "secs" | on == "seconds") {
+        secs <- k
+      }
+      a <- index(ts2) + (secs - .index(ts2)%%secs)
+      ts3 <- xts(ts2, a, tzone = "GMT")
+    }
+    if (on == "hours") {
+      secs = 3600
+      a <- index(ts2) + (secs - .index(ts2) %% secs)
+      ts3 <- xts(ts2, a, tzone = "GMT")
+    }
+    if (on == "days") {
+      secs = 24 * 3600
+      a   <- index(ts2) + (secs - .index(ts2)%%secs) - (24 * 3600)
+      ts3 <- xts(ts2, a, tzone = "GMT")
+    }
+    if (on == "weeks") {
+      secs = 24 * 3600 * 7
+      a <- (index(ts2) + (secs - (index(ts2) + (3L * 86400L)) %% secs)) - 
+        (24 * 3600)
+      ts3 <- xts(ts2, a, tzone = "GMT")
+    }
+    
+    if (dropna == FALSE) {
+      if (on != "weeks" & on != "days") {
+        if (on == "secs" | on == "seconds") {
+          tby <- "s"
+        }
+        if (on == "mins" | on == "minutes") {
+          tby <- "min"
+        }
+        if (on == "hours") {
+          tby <- "h"
+        }
+        by <- paste(k, tby, sep = " ")
+        allindex <- as.POSIXct(seq(start(ts3), end(ts3), by = by))
+        xx <- xts(rep("1", length(allindex)), order.by = allindex)
+        ts3 <- merge(ts3, xx)[, (1:dim(ts)[2])]
+      }
+    }
+    
+    index(ts3) <- as.POSIXct(index(ts3))
+    return(ts3)
+  }
+  
+  if(!makethispartbetter){
+    if (on == "secs" | on == "seconds") { 
+      secs <- k 
+      tby <- paste(k, "sec", sep = " ")
+    }
+    if (on == "mins" | on == "minutes") { 
+      secs <- 60*k; tby = paste(60*k,"sec",sep=" ")
+    }
+    if (on == "hours") { 
+      secs <- 3600 * k 
+      tby <- paste(3600 * k, "sec", sep=" ")
+    }
+    
+    FUN <- match.fun(FUN)
+    
+    g <- base::seq(start(ts), end(ts), by = tby)
+    rawg <- as.numeric(as.POSIXct(g, tz = "GMT"))
+    newg <- rawg + (secs - rawg %% secs)
+    g    <- as.POSIXct(newg, origin = "1970-01-01", tz = "GMT")
+    ts3  <- na.locf(merge(ts, zoo(, g)))[as.POSIXct(g, tz = "GMT")]
+    return(ts3) 
+  }
+}
 
 #' Aggregate a time series but keep first and last observation
 #' @description Function returns new time series as xts object where first observation is always the opening price
@@ -50,7 +201,7 @@ aggregatePrice <- function(pdata, on = "minutes", k = 1, marketopen = "09:30:00"
         if (is.null(tz) == TRUE) {
           tz <-tz(pdata)
         }
-        ts2 <- aggregatets(pdata, on, k, tz)
+        ts2 <- fastTickAgregation(pdata, on, k, tz)
         date <- strsplit(as.character(index(pdata)), " ")[[1]][1]
 
         #open

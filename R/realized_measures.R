@@ -32,7 +32,7 @@ medRQ <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
     return(result)
   } else {
     if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata <- aggregatets(rdata, on = align.by, k = align.period)
+      rdata <- fastTickAgregation(rdata, on = align.by, k = align.period)
     }
     if (makeReturns == TRUE) {
       rdata <- makeReturns(rdata)
@@ -79,7 +79,7 @@ minRQ <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
     return(result)
   } else {
     if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata <- aggregatets(rdata, on = align.by, k = align.period)
+      rdata <- fastTickAgregation(rdata, on = align.by, k = align.period)
     }
     if (makeReturns == TRUE) {
       rdata = makeReturns(rdata)
@@ -131,7 +131,7 @@ minRV <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
     return(result)
   } else {
     if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata <- aggregatets(rdata, on = align.by, k = align.period)
+      rdata <- fastTickAgregation(rdata, on = align.by, k = align.period)
     } 
     if (makeReturns) {
       rdata <- makeReturns(rdata)
@@ -197,7 +197,7 @@ medRV <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
     return(result)
   } else {
     if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata <- aggregatets(rdata, on = align.by, k = align.period)
+      rdata <- fastTickAgregation(rdata, on = align.by, k = align.period)
     }
     if (makeReturns == TRUE) {
       rdata <- makeReturns(rdata)
@@ -638,7 +638,7 @@ rBPCov <- function(rdata, cor = FALSE, align.by = NULL, align.period = NULL, mak
     return(result)
   } else { #single day code
     if ((!is.null(align.by))&&(!is.null(align.period))) {
-      rdata <- aggregatets(rdata, on = align.by, k = align.period);
+      rdata <- fastTickAgregation(rdata, on = align.by, k = align.period);
     } 
     if (makeReturns) {  
       rdata <- makeReturns(rdata) 
@@ -746,7 +746,7 @@ rCov <- function(rdata, cor = FALSE, align.by = NULL, align.period = NULL, makeR
   } else {
     #single day code
     if((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata <- aggregatets(rdata, on = align.by, k = align.period)
+      rdata <- fastTickAgregation(rdata, on = align.by, k = align.period)
     } 
     if (makeReturns) {  
       rdata <- makeReturns(rdata) 
@@ -813,7 +813,7 @@ rKurt <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
     return(result)
   } else {
     if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata <- aggregatets(rdata, on = align.by, k = align.period)
+      rdata <- fastTickAgregation(rdata, on = align.by, k = align.period)
     }
     if (makeReturns == TRUE) {
       rdata <- makeReturns(rdata)
@@ -880,7 +880,7 @@ rMPV <- function(rdata, m = 2, p = 2, align.by = NULL, align.period = NULL, make
     return(result)
   } else {
     if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata <-aggregatets(rdata, on = align.by, k = align.period)
+      rdata <-fastTickAgregation(rdata, on = align.by, k = align.period)
     }
     if (makeReturns) {
       rdata <- makeReturns(rdata)
@@ -990,8 +990,8 @@ rOWCov <- function (rdata, cor = FALSE, align.by = NULL, align.period = NULL, ma
   
   # Aggregate:
   if ((!is.null(align.by))&&(!is.null(align.period))) {
-    rdata <- aggregatets(rdata, on = align.by, k = align.period)
-    seasadjR <- aggregatets(seasadjR, on = align.by, k = align.period)
+    rdata <- fastTickAgregation(rdata, on = align.by, k = align.period)
+    seasadjR <- fastTickAgregation(seasadjR, on = align.by, k = align.period)
   }     
   if (makeReturns == TRUE) { 
     rdata <- makeReturns(rdata)
@@ -1108,7 +1108,7 @@ rSkew <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
     return(result)
   } else {
     if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata <- aggregatets(rdata, on = align.by, k = align.period)
+      rdata <- fastTickAgregation(rdata, on = align.by, k = align.period)
     }
     if (makeReturns) {
       rdata <- makeReturns(rdata)
@@ -1161,7 +1161,7 @@ rSV <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE
   } else {
     
     if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata <- aggregatets(rdata, on = align.by, k = align.period)
+      rdata <- fastTickAgregation(rdata, on = align.by, k = align.period)
     }
     if (makeReturns)  {
       rdata <- makeReturns(rdata)
@@ -1242,7 +1242,7 @@ rThresholdCov <- function(rdata, cor = FALSE, align.by = NULL, align.period = NU
     return(result)
   } else { #single day code
     if ((is.null(align.by) == FALSE) && (!is.null(align.period))) {
-      rdata <- aggregatets(rdata, on = align.by, k = align.period)
+      rdata <- fastTickAgregation(rdata, on = align.by, k = align.period)
     } 
     if (makeReturns == TRUE) { 
       rdata <- makeReturns(rdata) 
@@ -1321,7 +1321,7 @@ rTPVar <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FA
     return(result)
   } else {
     if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata <- aggregatets(rdata, on = align.by, k = align.period)
+      rdata <- fastTickAgregation(rdata, on = align.by, k = align.period)
     }
     if (makeReturns) {
       rdata <- makeReturns(rdata)
@@ -1385,7 +1385,7 @@ rQPVar <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FA
     return(result)
   } else {
     if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata <-aggregatets(rdata, on = align.by, k = align.period)
+      rdata <-fastTickAgregation(rdata, on = align.by, k = align.period)
     }
     if (makeReturns) {
       rdata <- makeReturns(rdata)
@@ -1432,7 +1432,7 @@ rQuar <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
     return(result)
   } else {
     if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata <- aggregatets(rdata, on = align.by, k = align.period)
+      rdata <- fastTickAgregation(rdata, on = align.by, k = align.period)
     }
     if (makeReturns == TRUE) {
       rdata <- makeReturns(rdata)
