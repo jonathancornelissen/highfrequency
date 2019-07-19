@@ -168,6 +168,189 @@ ROWVar <- function(rdata, seasadjR = NULL, wfunction = "HR" , alphaMCD = 0.75, a
   
 }
 
+#' @keywords internal
+RTSCov_bi <- function (pdata1, pdata2, startIV1 = NULL, startIV2 = NULL, noisevar1 = NULL, 
+                       noisevar2 = NULL, K = 300, J = 1,
+                       K_cov = NULL, J_cov = NULL,
+                       K_var1 = NULL, K_var2 = NULL,
+                       J_var1 = NULL, J_var2 = NULL, 
+                       eta = 9) {
+  
+  if (is.null(K_cov)){ 
+    K_cov <- K 
+  }
+  if (is.null(J_cov)) { 
+    J_cov <- J 
+  }
+  if (is.null(K_var1)) { 
+    K_var1 <- K 
+  }
+  if (is.null(K_var2)) { 
+    K_var2 <- K 
+  }   
+  if (is.null(J_var1)) { 
+    J_var1 <- J 
+  } 
+  if (is.null(J_var2)){ 
+    J_var2 <- J 
+  }
+  
+  # Calculation of the noise variance and TSRV for the truncation
+  if (is.null(noisevar1) == TRUE) {
+    logprices1 <- log(as.numeric(pdata1))
+    n_var1     <- length(logprices1)
+    nbarK_var1 <- (n_var1 - K_var1 + 1)/(K_var1)
+    nbarJ_var1 <- (n_var1 - J_var1 + 1)/(J_var1)
+    adj_var1   <- n_var1/((K_var1 - J_var1) * nbarK_var1) 
+    
+    logreturns_K1 = logreturns_J1 = c()
+    for (k in 1:K_var1) {
+      sel.avg <- seq(k, n_var1, K_var1)
+      logreturns_K1 <- c(logreturns_K1, diff(logprices1[sel.avg]))
+    }
+    for (j in 1:J_var1) {
+      sel.avg <- seq(j, n_var1, J_var1)
+      logreturns_J1 <- c(logreturns_J1, diff(logprices1[sel.avg]))
+    }   
+    if (is.null(noisevar1)) {
+      noisevar1 <- max(0,1/(2 * nbarJ_var1) * (sum(logreturns_J1^2)/J_var1 - TSRV(pdata1,K=K_var1,J=J_var1)))
+    }
+  }
+  if (is.null(noisevar2)) {
+    logprices2 = log(as.numeric(pdata2))
+    n_var2 = length(logprices2)
+    nbarK_var2 = (n_var2 - K_var2 + 1)/(K_var2)
+    nbarJ_var2 = (n_var2 - J_var2 + 1)/(J_var2)
+    adj_var2 = n_var2/((K_var2 - J_var2) * nbarK_var2)   
+    
+    logreturns_K2 = logreturns_J2 = c()
+    for (k in 1:K_var2) {
+      sel.avg = seq(k, n_var2, K_var2)
+      logreturns_K2 = c(logreturns_K2, diff(logprices2[sel.avg]))
+    }
+    for (j in 1:J_var2) {
+      sel.avg = seq(j, n_var2, J_var2)
+      logreturns_J2 = c(logreturns_J2, diff(logprices2[sel.avg]))
+    }        
+    noisevar2 = max(0,1/(2 * nbarJ_var2) * (sum(logreturns_J2^2)/J_var2 - TSRV(pdata2,K=K_var2,J=J_var2)))
+  }    
+  
+  if (!is.null(startIV1)) {
+    RTSRV1 = startIV1
+  } else {
+    RTSRV1 <- RTSRV(pdata=pdata1, noisevar = noisevar1, K = K_var1, J = J_var1, eta = eta)      
+  }
+  if (is.null(startIV2) == FALSE) {
+    RTSRV2 <- startIV2
+  }else{
+    RTSRV2 <- RTSRV(pdata = pdata2, noisevar = noisevar2, K = K_var2, J = J_var2, eta = eta)      
+  }
+  
+  # Refresh time is for the covariance calculation
+  
+  x <- refreshTime(list(pdata1, pdata2))
+  newprice1 <- x[, 1]
+  newprice2 <- x[, 2]
+  logprices1 <- log(as.numeric(newprice1))
+  logprices2 <- log(as.numeric(newprice2))
+  seconds <- as.numeric(as.POSIXct(index(newprice1)))
+  secday <- last(seconds) - first(seconds)        
+  K <- K_cov
+  J <- J_cov     
+  
+  n <- length(logprices1)
+  nbarK_cov <- (n - K_cov + 1)/(K_cov)
+  nbarJ_cov <- (n - J_cov + 1)/(J_cov)
+  adj_cov   <- n/((K_cov - J_cov) * nbarK_cov)    
+  
+  logreturns_K1 = logreturns_K2 = vdelta_K = c()
+  for (k in 1:K_cov) {
+    sel.avg <- seq(k, n, K_cov)
+    logreturns_K1 <- c(logreturns_K1, diff(logprices1[sel.avg]))
+    logreturns_K2 <- c(logreturns_K2, diff(logprices2[sel.avg]))
+    vdelta_K <- c(vdelta_K, diff(seconds[sel.avg]) / secday)
+  }
+  
+  logreturns_J1 = logreturns_J2 = vdelta_J = c()      
+  for (j in 1:J_cov) {
+    sel.avg <- seq(j, n, J_cov)
+    logreturns_J1 <- c(logreturns_J1, diff(logprices1[sel.avg]))
+    logreturns_J2 <- c(logreturns_J2, diff(logprices2[sel.avg]))
+    vdelta_J <- c(vdelta_J, diff(seconds[sel.avg])/secday)
+  }
+  
+  I_K1 <- 1 * (logreturns_K1^2 <= eta * (RTSRV1 * vdelta_K + 2 * noisevar1))
+  I_K2 <- 1 * (logreturns_K2^2 <= eta * (RTSRV2 * vdelta_K + 2 * noisevar2))
+  I_J1 <- 1 * (logreturns_J1^2 <= eta * (RTSRV1 * vdelta_J + 2 * noisevar1))
+  I_J2 <- 1 * (logreturns_J2^2 <= eta * (RTSRV2 * vdelta_J + 2 * noisevar2))
+  if (eta == 9) {
+    ccc <- 1.0415
+  } else {
+    ccc <- cfactor_RTSCV(eta = eta)
+  }
+  RTSCV <- adj_cov * 
+    (ccc * (1/K_cov) * 
+       sum(logreturns_K1 * I_K1 * 
+             logreturns_K2 * I_K2)/mean(I_K1 * I_K2) - 
+       ((nbarK_cov/nbarJ_cov) * 
+          ccc * (1/J_cov) * sum(logreturns_J1 * logreturns_J2 * I_J1 * 
+                                  I_J2)/mean(I_J1 * I_J2)))
+  return(RTSCV)
+}
+
+#' @keywords internal
+RTSRV <- function(pdata, startIV = NULL, noisevar = NULL, K = 300, J = 1, eta = 9) {
+  logprices <- log(as.numeric(pdata))
+  n <- length(logprices)
+  nbarK <- (n - K + 1)/(K)
+  nbarJ <- (n - J + 1)/(J)
+  adj <- (1 - (nbarK/nbarJ))^-1
+  zeta <- 1/pchisq(eta, 3)
+  seconds <- as.numeric(as.POSIXct(index(pdata)))
+  secday <- last(seconds) - first(seconds)
+  logreturns_K = vdelta_K = logreturns_J = vdelta_J = c()
+  for (k in 1:K) {
+    sel <- seq(k, n, K)
+    logreturns_K <- c(logreturns_K, diff(logprices[sel]))
+    vdelta_K <- c(vdelta_K, diff(seconds[sel])/secday)
+  }
+  for (j in 1:J) {
+    sel <- seq(j, n, J)
+    logreturns_J <- c(logreturns_J, diff(logprices[sel]))
+    vdelta_J <- c(vdelta_J, diff(seconds[sel])/secday)
+  }
+  if (is.null(noisevar)) {
+    noisevar <- max(0,1/(2 * nbarJ) * (sum(logreturns_J^2)/J - TSRV(pdata=pdata,K=K,J=J)))        
+  }
+  if (!is.null(startIV)) {
+    RTSRV <- startIV
+  }
+  if (is.null(startIV)) {
+    sel <- seq(1, n, K)
+    RTSRV <- medRV(diff(logprices[sel]))
+  }
+  iter <- 1
+  while (iter <= 20) {
+    I_K <- 1 * (logreturns_K^2 <= eta * (RTSRV * vdelta_K + 
+                                          2 * noisevar))
+    I_J <- 1 * (logreturns_J^2 <= eta * (RTSRV * vdelta_J + 
+                                          2 * noisevar))
+    if (sum(I_J) == 0) {
+      I_J <- rep(1, length(logreturns_J))
+    }
+    if (sum(I_K) == 0) {
+      I_K <- rep(1, length(logreturns_K))
+    }
+    RTSRV <- adj * (zeta * (1/K) * sum(logreturns_K^2 * I_K)/mean(I_K) - 
+                     ((nbarK/nbarJ) * zeta * (1/J) * sum(logreturns_J^2 * 
+                                                           I_J)/mean(I_J)))
+    iter <- iter + 1
+  }
+  return(RTSRV)
+}
+
+
+
 #' @importFrom xts first
 #' @keywords internal
 TSCov_bi <- function (pdata1, pdata2, K = 300, J = 1) {

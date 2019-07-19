@@ -414,6 +414,157 @@ aggregateTrades <- function(tdata, on = "minutes", k = 5, marketopen = "09:30:00
   }
 }
 
+#' etain only data from the stock exchange with the highest trading volume
+#' 
+#' @description Function returns a data.table or xts object containing only observations of the 
+#' exchange with the highest value for the variable "SIZE", 
+#' i.e. the highest trade volume.
+#' @param tdata an xts object with at least a column "EX", 
+#' indicating the exchange symbol and "SIZE", 
+#' indicating the trade volume. The chosen exchange is printed on the console.
+#' \itemize{
+#' \item A: AMEX
+#' \item N: NYSE
+#' \item B: Boston
+#' \item P: Arca
+#' \item C: NSX
+#' \item T/Q: NASDAQ
+#' \item D: NASD ADF and TRF
+#' \item X: Philadelphia
+#' \item I: ISE
+#' \item M: Chicago
+#' \item W: CBOE
+#' \item Z: BATS
+#' }
+#' @return data.table or xts object depending on input
+#' 
+#' @examples autoSelectExchangeTrades(sample_tdataraw_microseconds)
+#' 
+#' @author Jonathan Cornelissen, Kris Boudt and Onno Kleen
+#' 
+#' @keywords cleaning
+#' @export
+autoSelectExchangeTrades <- function(tdata) {
+  DATE = SIZE = DT = SIZESUM = NULL
+  
+  exchanges <- c("Q", "A", "P", "B", "C", "N", "D", "X", "I", "M", "W", "Z")
+  exchangenames <- c("NASDAQ", "AMEX", "ARCA", "Boston", "NSX", "NYSE", "NASD ADF and TRF", "Philadelphia", "ISE", "Chicago", "CBOE", "BATS")
+  
+  tdata <- checkColumnNames(tdata)
+  checktdata(tdata)
+  
+  dummy_was_xts <- FALSE
+  if (is.data.table(tdata) == FALSE) {
+    if (is.xts(tdata) == TRUE) {
+      tdata <- setnames(as.data.table(tdata)[, SIZE := as.numeric(as.character(SIZE))], 
+                        old = "index", new = "DT")
+      dummy_was_xts <- TRUE
+    } else {
+      stop("Input has to be data.table or xts.")
+    }
+  } else {
+    if (("DT" %in% colnames(tdata)) == FALSE) {
+      stop("Data.table neeeds DT column (date-time ).")
+    }
+  } 
+  
+  
+  tdata[, SIZESUM := sum(SIZE), by = "EX"]
+  tdata <- tdata[SIZESUM == max(SIZESUM)][, -c("SIZESUM")]
+  
+  exch <- unique(tdata$EX)
+  
+  namechosen <- exchangenames[exch == exchanges]  
+  print(paste("The ", namechosen, "is the exchange with the highest volume."))
+  
+  if (dummy_was_xts == TRUE) {
+    return(xts(as.matrix(tdata[, -c("DT")]), order.by = tdata$DT, tzone = tz(tdata$DT)))
+  } else {
+    return(tdata)
+  }
+}
+
+
+#' Retain only data from the stock exchange with the highest volume
+#' 
+#' @description Function returns an xts object containing only observations 
+#' of the exchange with highest
+#' value for the sum of "BIDSIZ" and "OFRSIZ", i.e. the highest quote volume.
+#' 
+#' @param qdata a data.table or xts object with at least a column "EX", indicating the exchange symbol 
+#' and columns "BIDSIZ" and "OFRSIZ", indicating 
+#' the volume available at the bid and ask respectively.
+#' The chosen exchange is printed on the console.
+#' The possible exchanges are:
+#' \itemize{
+#' \item A: AMEX
+#' \item N: NYSE
+#' \item B: Boston
+#' \item P: Arca
+#' \item C: NSX
+#' \item T/Q: NASDAQ
+#' \item D: NASD ADF and TRF
+#' \item X: Philadelphia
+#' \item I: ISE
+#' \item M: Chicago
+#' \item W: CBOE
+#' \item Z: BATS
+#' }
+#' 
+#' @return data.table or xts object depending on input
+#' 
+#' @examples 
+#' autoSelectExchangeQuotes(sample_qdataraw_microseconds)
+#'
+#' @author Jonathan Cornelissen, Kris Boudt and Onno Kleen
+#' 
+#' @keywords cleaning
+#' @export
+autoSelectExchangeQuotes <- function(qdata) {
+  
+  BIDSIZ = OFRSIZ = DT = EX = SUMVOL = NULL
+  
+  exchanges = c("Q","A","P","B","C","N","D","X","I","M","W","Z");
+  exchangenames = c("NASDAQ","AMEX","ARCA","Boston","NSX","NYSE","NASD ADF and TRF","Philadelphia","ISE","Chicago","CBOE","BATS");
+  
+  qdata <- checkColumnNames(qdata)
+  checkqdata(qdata)
+  
+  dummy_was_xts <- FALSE
+  if (is.data.table(qdata) == FALSE) {
+    if (is.xts(qdata) == TRUE) {
+      qdata <- setnames(as.data.table(qdata)[, BIDSIZ := as.numeric(as.character(BIDSIZ))][
+            , OFRSIZ := as.numeric(as.character(OFRSIZ))], old = "index", new = "DT")
+      dummy_was_xts <- TRUE
+    } else {
+      stop("Input has to be data.table or xts.")
+    }
+  } else {
+    if (("DT" %in% colnames(qdata)) == FALSE) {
+      stop("Data.table neeeds DT column.")
+    }
+  }
+  
+  if (length(unique(qdata$SYMBOL)) > 1) {
+    stop("Please provide only one symbol at a time.")
+  }
+  
+  qdata[, SUMVOL := sum(BIDSIZ + OFRSIZ), by = "EX"]
+  qdata <- qdata[SUMVOL == max(SUMVOL)][, -c("SUMVOL")]
+  
+  exch <- unique(qdata$EX)
+  
+  namechosen <- exchangenames[exch == exchanges]  
+  print(paste("The ", namechosen, "is the exchange with the highest volume."))
+  
+  if (dummy_was_xts == TRUE) {
+    return(xts(as.matrix(qdata[, -c("DT")]), order.by = qdata$DT, tzone = tz(qdata$DT)))
+  } else {
+    return(qdata)
+  }
+}
+
+
 #' Extract data from an xts object for the Exchange Hours Only
 #' 
 #' @description The function returns data within exchange trading hours

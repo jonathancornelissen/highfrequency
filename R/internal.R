@@ -143,11 +143,11 @@ previoustick <- function(a) {
 #' @keywords internal
 checkMultiDays <- function(x) { 
   
-  if (is.matrix(x) != is.xts(x)) {
+  if ((is.matrix(x) | is.numeric(x)) & !is.xts(x)) {
     return(FALSE)
   }
   if (is.xts(x) == FALSE) {
-    stop("Please provide xts-object.")
+    stop("Please provide xts-object or simple numeric vector.")
   }
   if (is.xts(x) && (ndays(x)!=1)) {
     TRUE

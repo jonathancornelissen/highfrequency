@@ -86,6 +86,16 @@ expect_equal(
   "0.01014"
 )
 
+# rRTSCov
+expect_equal(
+  formatC(rRTSCov(pdata = sample_tdata$PRICE) * 10000, digits = 10),
+  "3.527644071"
+)
+expect_equal(
+  formatC(sum(rRTSCov(pdata = list(cumsum(lltc) + 100, cumsum(sbux) + 100))) * 1000000, digits = 10),
+  "0.2472914228"
+)
+
 
 # rSkew
 expect_equal(
