@@ -1,3 +1,19 @@
+
+#' @keywords internal
+alignReturns <- function(x, period, ...) {
+  .C("rv", 
+     as.double(x), #a
+     as.double(x), #b
+     as.integer(length(x)), #na
+     as.integer(period), #period 
+     tmpa = as.double(rep(0,as.integer(length(x) / period +1))), #tmp
+     as.double(rep(0,as.integer(length(x) / period +1))), #tmp
+     as.integer(length(x) / period), #tmpn
+     ans = double(1), 
+     COPY = c(FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,TRUE), 
+     PACKAGE = "highfrequency")$tmpa     
+}
+
 #' @importFrom stats qchisq
 #' @importFrom stats pchisq
 #' @keywords internal
@@ -51,6 +67,49 @@ multixts <- function(x, y = NULL) {
     }
   }
 }      
+
+
+
+rcKernel <- function(x,                             # Tick Data for first asset
+                     y,                             # Tick Data for second asset
+                     kernel.type = "rectangular",   # Kernel name (or number)
+                     kernel.param = 1,              # Kernel parameter (usually lags)
+                     kernel.dofadj = TRUE,          # Kernel Degree of freedom adjustment
+                     align.by = "seconds",            # Align the tick data to [seconds|minutes|hours]
+                     align.period = 1,              # Align the tick data to this many [seconds|minutes|hours]
+                     cts = TRUE,                    # Calendar Time Sampling is used
+                     makeReturns = FALSE) {           # Convert to Returns
+  #
+  # Handle deprication
+  #
+  if(!is.null(type)){
+    warning("type is deprecated, use kernel.type")
+    kernel.type <- type
+  }
+  if(!is.null(q)){
+    warning("q is deprecated, use kernel.param")
+    kernel.param <- q
+  }
+  if(!is.null(adj)){
+    warning("adj is deprecated, use kernel.dofadj")
+    kernel.dofadj <- adj
+  }
+  
+  align.period <- .getAlignPeriod(align.period, align.by)   
+  cdata <- .convertData(x, cts = cts, makeReturns = makeReturns)
+  
+  x <- cdata$data
+  x <- .alignReturns(x, align.period)
+  cdatay <- .convertData(y, cts = cts, makeReturns = makeReturns)
+  y <- cdatay$data
+  y <- .alignReturns(y, align.period)
+  type <- kernelCharToInt(kernel.type)
+  .C("kernelEstimator", as.double(x), as.double(y), as.integer(length(x)),
+     as.integer(kernel.param), as.integer(ifelse(kernel.dofadj, 1, 0)),
+     as.integer(type), ab=double(kernel.param + 1),
+     ab2 = double(kernel.param + 1),
+     ans = double(1), PACKAGE = "highfrequency")$ans
+}
 
 # Check data:
 #' @keywords internal
@@ -137,6 +196,37 @@ RBPVar <- function(rdata) {
   n <- length(returns)
   rbpvar <- (pi/2) * sum(abs(returns[1:(n-1)]) * abs(returns[2:n]))
   return(rbpvar)
+}
+
+#' @keywords internal
+kernelCharToInt <- function(type) {
+  if (is.character(type) == TRUE) {
+    ans <- switch(casefold(type), 
+                  rectangular = 0,
+                  bartlett = 1,
+                  second = 2,
+                  epanechnikov = 3,
+                  cubic = 4,
+                  fifth = 5,
+                  sixth = 6,
+                  seventh = 7,
+                  eighth = 8,
+                  parzen = 9,
+                  th = 10,
+                  mth = 11,
+                  tukeyhanning = 10,
+                  modifiedtukeyhanning = 11,
+                  -99)
+    
+    if (ans == -99) { 
+      warning("Invalid Kernel, using Bartlet")
+      1
+    } else {
+      ans     
+    }
+  } else {
+    type
+  }
 }
 
 #' @importFrom robustbase covMcd
@@ -349,7 +439,32 @@ RTSRV <- function(pdata, startIV = NULL, noisevar = NULL, K = 300, J = 1, eta = 
   return(RTSRV)
 }
 
-
+#' @keywords internal
+rvKernel <- function(x,                             # Tick Data
+                     kernel.type = "rectangular",   # Kernel name (or number)
+                     kernel.param = 1,              # Kernel parameter (usually lags)
+                     kernel.dofadj = TRUE,          # Kernel Degree of freedom adjustment
+                     align.by = "seconds",          # Align the tick data to [seconds|minutes|hours]
+                     align.period = 1) {            # Align the tick data to this many [seconds|minutes|hours]            
+  # Multiday adjustment: 
+  multixts <- multixts(x)
+  if (multixts == TRUE) {
+    result <- apply.daily(x, rv.kernel,kernel.type,kernel.param,kernel.dofadj,
+                          align.by, align.period, cts, makeReturns)
+    return(result)
+  } else { #Daily estimation:
+    align.period <- .getAlignPeriod(align.period, align.by)         
+    cdata <- .convertData(x, cts = cts, makeReturns = makeReturns)
+    x <- cdata$data
+    x <- .alignReturns(x, align.period)
+    type <- kernelCharToInt(kernel.type)
+    .C("kernelEstimator", as.double(x), as.double(x), as.integer(length(x)),
+       as.integer(kernel.param), as.integer(ifelse(kernel.dofadj, 1, 0)),
+       as.integer(type), ab = double(kernel.param + 1),
+       ab2 = double(kernel.param + 1),
+       ans = double(1), PACKAGE = "highfrequency")$ans
+  }
+}
 
 #' @importFrom xts first
 #' @keywords internal

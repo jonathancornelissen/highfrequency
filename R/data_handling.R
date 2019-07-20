@@ -50,6 +50,7 @@
 #' 
 #' @importFrom zoo zoo na.locf
 #' @importFrom stats start end
+#' @importFrom xts period.apply	
 #' @export
 aggregatets <- function (ts, FUN = "previoustick", on = "minutes", k = 1, weights = NULL, dropna = FALSE) {
   
@@ -84,17 +85,17 @@ aggregatets <- function (ts, FUN = "previoustick", on = "minutes", k = 1, weight
       if (on == "secs" | on == "seconds") {
         secs <- k
       }
-      a <- index(ts2) + (secs - .index(ts2)%%secs)
+      a <- index(ts2) + (secs - as.numeric(index(ts2)) %% secs)
       ts3 <- xts(ts2, a, tzone = "GMT")
     }
     if (on == "hours") {
       secs = 3600
-      a <- index(ts2) + (secs - .index(ts2) %% secs)
+      a <- index(ts2) + (secs - as.numeric(index(ts2)) %% secs)
       ts3 <- xts(ts2, a, tzone = "GMT")
     }
     if (on == "days") {
       secs = 24 * 3600
-      a   <- index(ts2) + (secs - .index(ts2)%%secs) - (24 * 3600)
+      a   <- index(ts2) + (secs - as.numeric(index(ts2)) %% secs) - (24 * 3600)
       ts3 <- xts(ts2, a, tzone = "GMT")
     }
     if (on == "weeks") {
@@ -122,7 +123,7 @@ aggregatets <- function (ts, FUN = "previoustick", on = "minutes", k = 1, weight
       }
     }
     
-    index(ts3) <- as.POSIXct(index(ts3))
+    ts3 <- xts(ts3, as.POSIXct(index(ts3)))
     return(ts3)
   }
   
