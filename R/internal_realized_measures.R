@@ -14,6 +14,26 @@ alignReturns <- function(x, period, ...) {
      PACKAGE = "highfrequency")$tmpa     
 }
 
+#' @importFrom stats pchisq
+#' @keywords internal
+cfactor_RTSCV <- function(eta = 9) {
+  # rho = 1
+  c1 <- pchisq(eta, df = 1) / pchisq(eta, df = 3) 
+  # 
+  rho <- 0.001
+  R <- matrix( c(1,rho,rho,1) , ncol = 2 ) 
+  int1 <- function(x) {    
+    mvtnorm::dmvnorm(x, sigma = R) 
+  }
+  num = cubature::adaptIntegrate(int1, c(-3,-3), c(3,3), tol=1e-4)$integral
+  int2 <- function(x) {  
+    x[1] * x[2] * mvtnorm::dmvnorm(x, sigma = R) 
+  }
+  denom <- cubature::adaptIntegrate(int2, c(-3,-3), c(3,3), tol=1e-4)$integral
+  c2 <- rho * num / denom   
+  return((c1 + c2) / 2)
+}
+
 #' @importFrom stats qchisq
 #' @importFrom stats pchisq
 #' @keywords internal
@@ -110,6 +130,42 @@ rcKernel <- function(x,                             # Tick Data for first asset
      ab2 = double(kernel.param + 1),
      ans = double(1), PACKAGE = "highfrequency")$ans
 }
+
+
+
+# Hayashi-Yoshida helper function:
+rcHY <- function(x, y, period = 1, align.by = "seconds", align.period = 1, makeReturns = FALSE) {
+  align.period = .getAlignPeriod(align.period, align.by)
+  cdata <- .convertData(x, cts=cts, makeReturns=makeReturns)
+  x <- cdata$data
+  x.t <- cdata$milliseconds
+  
+  cdatay <- .convertData(y, cts=cts, makeReturns=makeReturns)
+  y <- cdatay$data
+  y.t <- cdatay$milliseconds
+  
+  
+  errorCheck <- c(is.null(x.t),is.na(x.t), is.null(y.t), is.na(y.t))
+  if(any(errorCheck))
+    stop("ERROR: Time data is not in x or y.")
+  
+  
+  sum(.C("pcovcc", 
+         as.double(x), #a
+         as.double(rep(0,length(x)/(period*align.period)+1)),
+         as.double(y), #b
+         as.double(x.t), #a
+         as.double(rep(0,length(x)/(period*align.period)+1)), #a
+         as.double(y.t), #b
+         as.integer(length(x)), #na
+         as.integer(length(x)/(period*align.period)),
+         as.integer(length(y)), #na
+         as.integer(period*align.period),
+         ans = double(length(x)/(period*align.period)+1), 
+         COPY=c(FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,TRUE), 
+         PACKAGE="highfrequency")$ans)
+}
+
 
 # Check data:
 #' @keywords internal
