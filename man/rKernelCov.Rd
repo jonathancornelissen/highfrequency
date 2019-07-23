@@ -42,7 +42,7 @@ rvKernel <- rKernelCov(rdata = sample_tdata$PRICE, align.by = "minutes",
 rvKernel
 
 # Multivariate:
-rcKernel <- rKernelCov(rdata = cbind(lltc, sbux), align.by = "minutes",
+rcKernel <- rKernelCov(rdata = cbind(lltc, sbux, fill = 0), align.by = "minutes",
                        align.period = 5, makeReturns = FALSE)
 rcKernel
 }
