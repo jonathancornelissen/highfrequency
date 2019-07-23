@@ -184,21 +184,21 @@ int nsmaller(int *times, int *lengths, int start, int end, int max) {
 
 void pcovcc(double *a, double *ap, double *b, double *at,double *atp, double *bt, int *na, int *nap, int *nb, int *period, double *ans) {
   int i, prevj = 0, j, nbi=*nb, nai = *na, napi = *nap;
-  double tmpRet=0;
+  double tmpRet = 0;
   
   for(i = 0; i < nai; i++) {
     ap[i/ *period] += a[i];
     atp[i/ *period] = at[i];
   }
   for(i = 0; i < napi; i++) {
-    tmpRet=0;
-    for(j=prevj; j < nbi; j++) {
+    tmpRet = 0;
+    for(j = prevj; j < nbi; j++) {
       tmpRet += b[j];
       if(bt[j] > atp[i]) {
         prevj = j;
         j = nbi;
       } else {
-        if(bt[j] == atp[i]) {
+        if (bt[j] == atp[i]) {
           prevj = j+1;
           j = nbi;
         }
@@ -212,22 +212,24 @@ void refreshpoints( int *times, int *lengths, int *ttau, int *dim, int *aa, int 
   // my first C program, so probably improvable..
   // length start with all starting points: from zero and upto last endpoint +1
   //  getting variables declared
-  int  t_max=0, i, j,a,b;;
+  int t_max = 0, i, j, a, b;
   int condition = 1;
   int Ntau[*dim];
   int tnext[*dim];
   // int xx tau[*lindex];
   // getting starting values before looping
   *ttau = 0;
-  for(i = 0; i<*dim ; i++){
-    if( *ttau < *(times + lengths[i]) )
-    { *ttau = *(times + lengths[i] ); }
+  for(i = 0; i<*dim ; i++) {
+    if (*ttau < *(times + lengths[i])) { 
+      *ttau = *(times + lengths[i] ); 
+    }
   }
   
   for(i = 0; i < *dim; i++){
     Ntau[i] = nsmaller(times, lengths, i, (i+1), *ttau);
-    *(indices + i * (*lindex))  = Ntau[i];}
-  j=0;
+    *(indices + i * (*lindex))  = Ntau[i];
+  }
+  j = 0;
   // start the loop over all observations
   while( condition >= 1 ){
     
@@ -239,7 +241,7 @@ void refreshpoints( int *times, int *lengths, int *ttau, int *dim, int *aa, int 
     *(ttau+j) = t_max;
     for(i = 0; i<*dim; i++){
       Ntau[i] = nsmaller(times, lengths, i, (i+1), *(ttau+j));
-      *(indices + i* (*lindex) + j)  = Ntau[i];
+      *(indices + i* (*lindex) + j) = Ntau[i];
       a = lengths[i+1];
       b =  (Ntau[i] + lengths[i]);
       if (a <= b) { 
