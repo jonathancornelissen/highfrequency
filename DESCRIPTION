@@ -39,7 +39,7 @@ Imports:
     chron,
     timeDate,
     MASS,
-    data.table,
+    data.table (>= 1.12.0),
     RcppRoll,
     bit64,
     lubridate
