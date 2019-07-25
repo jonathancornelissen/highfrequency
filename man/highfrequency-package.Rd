@@ -24,7 +24,7 @@ Kris Boudt, Jonathan Cornelissen, Scott Payseur
 
 Maintainer: Kris Boudt <Kris.Boudt@econ.kuleuven.be>
 
-Contributors: Giang Nguyen, Maarten Schermers.
+Contributors: Giang Nguyen, Onno Kleen
 
-Thanks: A special thanks for additional contributions from Chris Blakely, Brian Peterson, Eric Zivot, Dirk Eddelbuettel and GSoC.
+Thanks: We would like to thank Brian Peterson, Chris Blakely, Eric Zivot and Maarten Schermer. We are also grateful to Dirk Eddelbuettel for his extraordinary support as a mentor during the Google Summmer of Code 2019. Moreover, we thank Emil Sjørup for implementing additional options in the harModel function.
 }

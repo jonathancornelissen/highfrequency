@@ -10,7 +10,7 @@ Authors@R: c(person("Kris", "Boudt", role = c("aut", "cre"),
              person("Giang", "Nguyen", role = c("ctb")),
              person("Onno", "Kleen", role = c("ctb"), comment = c(ORCID = "0000-0003-4731-4640")))
 Author: Kris Boudt [aut, cre], Jonathan Cornelissen [aut], Scott Payseur [aut],
-    Giang Nguyen [ctb], Maarten Schermer [ctb], Onno Kleen [ctb]
+    Giang Nguyen [ctb], Onno Kleen [ctb]
 Maintainer: Kris Boudt
     <Kris.Boudt@econ.kuleuven.be>
 Description: Provide functionality to manage, clean and match highfrequency
