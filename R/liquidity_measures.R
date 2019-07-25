@@ -147,8 +147,8 @@ getTradeDirection <- function(tqdata) {
   dummy_was_xts <- FALSE
   if (is.data.table(tqdata) == FALSE) {
     if (is.xts(tqdata) == TRUE) {
-      tqdata <- setnames(as.data.table(tqdata)[, BID := as.numeric(as.character(BID))],
-                        old = "index", new = "DT")
+      tqdata <- setnames(as.data.table(tqdata), old = "index", new = "DT")
+      tqdata[, BID := as.numeric(as.character(BID))]
       tqdata[, PRICE := as.numeric(as.character(PRICE))]
       tqdata[, OFR := as.numeric(as.character(OFR))]
       dummy_was_xts <- TRUE
@@ -157,9 +157,6 @@ getTradeDirection <- function(tqdata) {
     }
   } else {
     if (("DT" %in% colnames(tqdata)) == FALSE) {
-      tqdata[, BID := as.numeric(as.character(BID))]
-      tqdata[, PRICE := as.numeric(as.character(PRICE))] # just for being sure
-      tqdata[, OFR := as.numeric(as.character(OFR))]      # if one converts from xts back and forth.
       stop("Data.table neeeds DT column (date-time ).")
     }
   }

@@ -1,3 +1,33 @@
+
+#' Available Kernels
+#' 
+#' @description Returns a vector of the available kernels.
+#' 
+#' @return character vector 
+#' 
+#' @references Ole E. Barndorff-Nielsen, Peter Reinhard Hansen, Asger Lunde, and Neil Shephard (2008). Designing Realized Kernels to Measure the ex post Variation of Equity Prices in the Presence of Noise. \emph{Econometrica}, 76, pp. 1481-1536.
+#' 
+#' @author Scott Payseur
+#' 
+#' @examples
+#' listAvailableKernels
+#' @keywords volatility
+#' @export
+listAvailableKernels <- function() {
+  c("Rectangular", 
+    "Bartlett",
+    "Second",
+    "Epanechnikov",
+    "Cubic",
+    "Fifth",
+    "Sixth",
+    "Seventh",
+    "Eighth",
+    "Parzen",
+    "TukeyHanning",
+    "ModifiedTukeyHanning")
+}
+
 #' An estimator of integrated quarticity from applying the median operator on blocks of three returns.
 #' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
 #' @description Function returns the medRQ, defined in Andersen et al. (2012).
@@ -32,7 +62,7 @@ medRQ <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
     return(result)
   } else {
     if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata <- aggregatets(rdata, on = align.by, k = align.period)
+      rdata <- fastTickAgregation(rdata, on = align.by, k = align.period)
     }
     if (makeReturns == TRUE) {
       rdata <- makeReturns(rdata)
@@ -79,7 +109,7 @@ minRQ <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
     return(result)
   } else {
     if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata <- aggregatets(rdata, on = align.by, k = align.period)
+      rdata <- fastTickAgregation(rdata, on = align.by, k = align.period)
     }
     if (makeReturns == TRUE) {
       rdata = makeReturns(rdata)
@@ -131,7 +161,7 @@ minRV <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
     return(result)
   } else {
     if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata <- aggregatets(rdata, on = align.by, k = align.period)
+      rdata <- fastTickAgregation(rdata, on = align.by, k = align.period)
     } 
     if (makeReturns) {
       rdata <- makeReturns(rdata)
@@ -197,7 +227,7 @@ medRV <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
     return(result)
   } else {
     if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata <- aggregatets(rdata, on = align.by, k = align.period)
+      rdata <- fastTickAgregation(rdata, on = align.by, k = align.period)
     }
     if (makeReturns == TRUE) {
       rdata <- makeReturns(rdata)
@@ -346,12 +376,12 @@ MRC <- function(pdata, pairwise = FALSE, makePsd = FALSE) {
 #' 
 #' @description Realized Covariance using average subsample.
 #' 
-#' @param rdata In the multivariate case: a list. Each list-item i contains an xts object with the intraday data of stock i for day t. In the univariate case: an xts object containing the (tick) data for one day.
+#' @param rdata a \eqn{(M x N)} matrix/zoo/xts object containing the \eqn{N}
+#' return series over period \eqn{t}, with \eqn{M} observations during \eqn{t}.
 #' @param cor boolean, in case it is TRUE, the correlation is returned. FALSE by default.
 #' @param period Sampling period 
 #' @param align.by Align the tick data to seconds|minutes|hours
 #' @param align.period Align the tick data to this many [seconds|minutes|hours]
-#' @param cts Create calendar time sampling if a non realizedObject is passed
 #' @param makeReturns Prices are passed make them into log returns
 #' 
 #' @return Realized covariance using average subsample.
@@ -373,73 +403,81 @@ MRC <- function(pdata, pairwise = FALSE, makePsd = FALSE) {
 #' rvSub
 #' 
 #' # Multivariate:
-#' rcSub = rAVGCov(rdata = list(lltc, sbux), period = 5, align.by = "minutes", 
-#'                 align.period = 5, makeReturns = FALSE)
-#' rcSub
+#' rcovSub <- rAVGCov(rdata = cbind(lltc, sbux), period = 5, align.by = "minutes", 
+#'                    align.period = 5, makeReturns = FALSE)
+#' rcovSub
 #' 
 #' @keywords volatility
 #' @export
-rAVGCov <- function(rdata, cor = FALSE, period = 1, align.by = "seconds", align.period = 1, cts = TRUE, makeReturns = FALSE) {
-  NULL
+rAVGCov <- function(rdata, cor = FALSE, period = 1, align.by = "minutes", align.period = 5, makeReturns = FALSE) {
+  # multixts <- multixts(rdata)
+  # if (multixts == TRUE) {
+  #   stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")
+  # }
+  # 
+  # # Aggregate:
+  # if((!is.null(align.by)) && (!is.null(align.period))) {
+  #   rdata <- fastTickAgregation(rdata, on = align.by, k = 1)
+  # } 
+  # 
+  # if (makeReturns) {  
+  #   rdata <- makeReturns(rdata) 
+  # }  
+  # 
+  # if (is.null(dim(rdata))) {  
+  #   n = 1
+  # } else { 
+  #   n <- dim(rdata)[2]
+  # }
+  # 
+  # if (n == 1) {
+  #   
+  #   rollingwindow <- aggregatets(rdata, FUN = "sum", on = align.by, k = align.period)
+  #   
+  #   rollingwindow <- period.apply(rdata, INDEX = rep(c(1:(length(rdata) / align.period)), each = align.p), FUN = "sum")
+  #   
+  #   rdata
+  #   
+  #   rvsubsampled <- RV(rdata)
+  #   
+  #   if (align.period == 1) { # no subsampling
+  #     return(rvsubsampled)
+  #   } else {
+  #     for (ii in c(1:align.period)) {
+  #       rvsubsampled <- rvsubsampled + RV(rdata[-c(1:ii, (length(rdata) - align.period + ii + 1):length(rdata)), ])
+  #     }
+  #     return(rvsubsampled / align.period)
+  #   }
+  # }
+  # if (n > 1) {
+  #   rdatamatrix <- as.matrix(rdata)
+  #   covariance <- t(rdatamatrix) %*% rdatamatrix
+  #   if (align.period == 1) { # no subsampling
+  #     if (cor == FALSE) {
+  #       return(covariance)
+  #     }
+  #     if (cor == TRUE){
+  #       sdmatrix <- sqrt(diag(diag(covariance)))
+  #       rcor <- solve(sdmatrix) %*% covariance %*% solve(sdmatrix)
+  #       return(rcor)
+  #     }
+  #   } else {
+  #     for (ii in c(2:align.period)) {
+  #       covariance <- covariance + t(rdatamatrix[-c(1:ii), ]) %*% rdatamatrix[-c(1:ii), ]
+  #     }
+  #     covariance / align.period
+  #     if (cor == FALSE) {
+  #       return(covariance)
+  #     }
+  #     if (cor == TRUE){
+  #       sdmatrix <- sqrt(diag(diag(covariance)))
+  #       rcor <- solve(sdmatrix) %*% covariance %*% solve(sdmatrix)
+  #       return(rcor)
+  #     }
+  #   }
+  # }
 }
-# ## Average subsample estimator: 
-# rAVGCov <- function(rdata, cor = FALSE, period = 1, align.by = "seconds", align.period = 1, cts = TRUE, makeReturns = FALSE) {
-#   if (!is.list(rdata)){
-#     multixts = multixts(rdata); 
-#     if(multixts){ stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")}
-#     
-#     if(is.null(dim(rdata))){
-#       n = 1
-#     } else { 
-#       n = dim(rdata)[2] 
-#     }
-#     if( n == 1 ){ 
-#       L = .makeROlist( rdata=list(rdata), align.period=align.period, align.by=align.by,cts=cts,makeReturns=makeReturns); #make objects list            
-#       result = rv.avg( L[[1]], period=period )
-#       return(result)  }
-#     if( n >  1 ){ stop('The rdata input is not a list. Please provide a list as input for this function. Each list-item should contain the series for one asset.') }
-#   }
-#   if(is.list(rdata)){
-#     n = length(rdata)
-#     multixts = multixts(rdata[[1]])
-#     if(multixts){ stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")}
-#     
-#     if( n == 1 ){ 
-#       L = .makeROlist( rdata=rdata, align.period=align.period, align.by=align.by,cts=cts,makeReturns=makeReturns);#make objects list            
-#       result = rv.avg( L[[1]], period=period )
-#       return(result) 
-#     }
-#     if( n > 1){
-#       
-#       cov = matrix(rep(0, n * n), ncol = n)
-#       diagonal = c()
-#       L = .makeROlist(rdata=rdata, align.period=align.period, align.by=align.by,cts=cts,makeReturns=makeReturns);#make objects list     
-#       
-#       for(i in 1:n){ 
-#         diagonal[i] = rv.avg( L[[i]], period=period );
-#       } 
-#       diag(cov) = diagonal;
-#       for(i in 2:n){
-#         for (j in 1:(i - 1)){
-#           cov[i, j] = cov[j, i] = rc.avg( x = L[[i]], y = L[[j]], period=period ); 
-#         } 
-#       } 
-#       
-#       if (cor == FALSE) {
-#         cov = makePsd(cov)
-#         return(cov)
-#       }
-#       if (cor == TRUE){
-#         invsdmatrix = try(solve(sqrt(diag(diag(cov)))), silent = F)
-#         if (!inherits(invsdmatrix, "try-error")) {
-#           rcor = invsdmatrix %*% cov %*% invsdmatrix
-#           rcor = makePsd(rcor)
-#           return(rcor)
-#         } 
-#       } 
-#     }  #List-length > 1
-#   }  #If-list condition
-# }   #end rAVGCov
+
 
 #' Realized beta: a tool in measuring risk with respect to the market. 
 #' 
@@ -518,9 +556,7 @@ rBeta <- function(rdata, rindex, RCOVestimator = "rCov", RVestimator = "RV", mak
   
   if (multixts) {
     print("No support for multiple days")
-  }
-  
-  if (!multixts) {
+  } else {
     rcovfun <- function(rdata, rindex, RCOVestimator) {
       
       switch(RCOVestimator,
@@ -606,16 +642,14 @@ rBeta <- function(rdata, rindex, RCOVestimator = "rCov", RVestimator = "RV", mak
 #' @examples 
 #' # Realized Bipower Variance/Covariance for CTS aligned   
 #' # at 5 minutes.
-#' data(sample_tdata); 
-#' data(sample_5minprices_jumps);
 #'  
 #' # Univariate: 
-#' rbpv = rBPCov(rdata = sample_tdata$PRICE, align.by ="minutes", 
-#'                 align.period =5, makeReturns=TRUE); 
+#' rbpv <- rBPCov(rdata = sample_tdata$PRICE, align.by ="minutes", 
+#'                align.period = 5, makeReturns = TRUE) 
 #' rbpv 
 #'  
 #' # Multivariate: 
-#' rbpc = rBPCov(rdata = sample_5minprices_jumps['2010-01-04'], makeReturns = TRUE, makePsd = TRUE)
+#' rbpc <- rBPCov(rdata = sample_5minprices_jumps['2010-01-04'], makeReturns = TRUE, makePsd = TRUE)
 #' rbpc
 #'  
 #' @keywords volatility
@@ -630,15 +664,15 @@ rBPCov <- function(rdata, cor = FALSE, align.by = NULL, align.period = NULL, mak
       n <- dim(rdata)[2] 
     }
     if (n == 1){ 
-      result <- apply.daily(rdata, rBPCov, align.by=align.by,align.period=align.period,makeReturns=makeReturns, makePsd) 
+      result <- apply.daily(rdata, rBPCov, align.by = align.by, align.period = align.period, makeReturns = makeReturns, makePsd) 
     }
     if (n > 1) { 
-      result <- applyGetList(rdata, rBPCov, cor=cor,align.by=align.by,align.period=align.period, makeReturns = makeReturns, makePsd) 
+      result <- applyGetList(rdata, rBPCov, cor = cor, align.by = align.by, align.period = align.period, makeReturns = makeReturns, makePsd) 
     }    
     return(result)
   } else { #single day code
-    if ((!is.null(align.by))&&(!is.null(align.period))) {
-      rdata <- aggregatets(rdata, on = align.by, k = align.period);
+    if ((!is.null(align.by)) && (!is.null(align.period))) {
+      rdata <- fastTickAgregation(rdata, on = align.by, k = align.period);
     } 
     if (makeReturns) {  
       rdata <- makeReturns(rdata) 
@@ -654,7 +688,7 @@ rBPCov <- function(rdata, cor = FALSE, align.by = NULL, align.period = NULL, mak
     }
     
     ## ACTUAL RBPCOV calculation:   
-    if( n > 1 ){    
+    if (n > 1) {    
       
       rdata  <- as.matrix(rdata);
       n <- dim(rdata)[2]
@@ -746,7 +780,7 @@ rCov <- function(rdata, cor = FALSE, align.by = NULL, align.period = NULL, makeR
   } else {
     #single day code
     if((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata <- aggregatets(rdata, on = align.by, k = align.period)
+      rdata <- fastTickAgregation(rdata, on = align.by, k = align.period)
     } 
     if (makeReturns) {  
       rdata <- makeReturns(rdata) 
@@ -769,6 +803,208 @@ rCov <- function(rdata, cor = FALSE, align.by = NULL, align.period = NULL, makeR
       if (cor == TRUE){
         sdmatrix <- sqrt(diag(diag(covariance)));
         rcor <- solve(sdmatrix) %*% covariance %*% solve(sdmatrix)
+        return(rcor)
+      }
+    }
+  }
+}
+
+#' Hayashi-Yoshida Covariance
+#' @description Calculates the Hayashi-Yoshida Covariance estimator
+#' 
+#' @param rdata anpossibly multivariate xts object.
+#' @param cor boolean, in case it is TRUE, the correlation is returned. FALSE by default.
+#' @param period Sampling period 
+#' @param align.by Align the tick data to seconds|minutes|hours
+#' @param align.period Align the tick data to this many [seconds|minutes|hours]
+#' @param makeReturns Prices are passed make them into log returns
+#' @param makePsd boolean, in case it is TRUE, the positive definite version of rHYCov is returned. FALSE by default.
+#' 
+#' @references T. Hayashi and N. Yoshida. On covariance estimation of non-synchronously observed diffusion processes. \emph{Bernoulli}, 11, 359-379, 2005.
+#' 
+#' @author Scott Payseur
+#' 
+#' # Average Hayashi-Yoshida Covariance estimator is calculated on five-minute returns
+#' 
+#' # Multivariate:
+#' # rHYCov <- rHYCov(rdata = cbind(lltc, sbux, fill = 0), period = 5, align.by = "minutes", 
+#' #                  align.period = 5, makeReturns = FALSE)
+#' # rHYCov 
+#' Note: for the diagonal elements the rCov is used.
+#' 
+#' @keywords volatility
+#' @export
+rHYCov <- function(rdata, cor = FALSE, period = 1, align.by = "seconds", align.period = 1, makeReturns = FALSE, makePsd = TRUE) {
+  
+  multixts <- multixts(rdata)
+  if (multixts == TRUE) {
+    stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")
+  }
+  
+  if ((!is.null(align.by)) && (!is.null(align.period))) {
+    rdata <- fastTickAgregation(rdata, on = align.by, k = align.period);
+  } 
+  if (makeReturns == TRUE) {  
+    rdata <- makeReturns(rdata) 
+  }  
+  if (is.null(dim(rdata))) {
+    n <- 1
+  } else { 
+    n <- dim(rdata)[2]
+  }
+  
+  if (n == 1) {
+    return(rCov(rdata, align.by = align.by, align.period = align.period, makeReturns = FALSE))
+  }
+  
+  if (n > 1) {    
+    
+    rdata  <- as.matrix(rdata);
+    n <- dim(rdata)[2]
+    cov <- matrix(rep(0, n * n), ncol = n)
+    diagonal <- c()
+    for (i in 1:n) {
+      diagonal[i] <- t(rdata[, i]) %*% rdata[, i]
+    }
+    diag(cov) <- diagonal
+    for (i in 2:n) {
+      for (j in 1:(i - 1)) {
+        cov[i, j] <- sum(.C("pcovcc", 
+                            as.double(x), #a
+                            as.double(rep(0,length(x)/(period * align.period) + 1)),
+                            as.double(y), #b
+                            as.double(x.t), #a
+                            as.double(rep(0, length(x)/(period * align.period) + 1)), #a
+                            as.double(y.t), #b
+                            as.integer(length(x)), #na
+                            as.integer(length(x)/(period*align.period)),
+                            as.integer(length(y)), #na
+                            as.integer(period * align.period),
+                            ans = double(length(x)/(period*align.period)+1), 
+                            COPY = c(FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,TRUE), 
+                            PACKAGE = "highfrequency")$ans)
+        cov[j, i] <- cov[i, j]  
+      }
+    }
+    
+    if (cor == FALSE){
+      if (makePsd == TRUE) {
+        cov <- makePsd(cov)
+      }
+      return(cov)
+    }
+    if(cor==TRUE){
+      sdmatrix <- sqrt(diag(diag(cov)))
+      rcor <- solve(sdmatrix) %*% cov %*% solve(sdmatrix)
+      if (makePsd == TRUE) {
+        rcor <- makePsd(rcor)
+      }
+      return(rcor)
+    }
+  } 
+} 
+
+#' Realized Covariance: Kernel
+#'
+#' @description Realized covariance calculation using a kernel estimator.
+#'
+#' @param rdata a \eqn{(M x N)} matrix/zoo/xts object containing the \eqn{N}
+#' return series over period \eqn{t}, with \eqn{M} observations during \eqn{t}.
+#' @param cor boolean, in case it is TRUE, the correlation is returned. FALSE by default.
+#' @param align.by Align the tick data to seconds|minutes|hours
+#' @param align.period Align the tick data to this many [seconds|minutes|hours]
+#' @param makeReturns Convert to Returns
+#' @param kernel.type Kernel name (or number)
+#' @param kernel.param Kernel parameter (usually lags)
+#' @param kernel.dofadj Kernel Degree of freedom adjustment
+#'
+#' @details The different types of kernels can be found using \code{\link{listAvailableKernels}}.
+#' 
+#' @return Kernel estimate of realized covariance.
+#' 
+#' @references
+#' Ole E. Barndorff-Nielsen, Peter Reinhard Hansen, Asger Lunde, and Neil Shephard (2008). Designing Realized Kernels to Measure the ex post Variation of Equity Prices in the Presence of Noise. \emph{Econometrica}, 76, pp. 1481-1536.
+#'
+#' B. Zhou. High-frequency data and volatility in foreign-exchange rates. \emph{Journal of Buiness & Economic Statistics}, 14:45-52, 1996.
+#'
+#' P. Hansen and A. Lunde. Realized variance and market microstructure noise. \emph{Journal of Business and Economic Statistics}, 24:127-218, 2006.
+#'
+#' @author Scott Payseur and Onno Kleen
+#'
+#' @examples
+#' # Univariate:
+#' rvKernel <- rKernelCov(rdata = sample_tdata$PRICE, align.by = "minutes",
+#'                        align.period = 5, makeReturns = TRUE)
+#' rvKernel
+#'
+#' # Multivariate:
+#' rcKernel <- rKernelCov(rdata = cbind(lltc, sbux, fill = 0), align.by = "minutes",
+#'                        align.period = 5, makeReturns = FALSE)
+#' rcKernel
+#' @keywords volatility
+#' @export
+rKernelCov <- function(rdata, cor = FALSE,  align.by = "seconds", align.period = 1,
+                       makeReturns = FALSE, kernel.type = "rectangular", kernel.param = 1,
+                       kernel.dofadj = TRUE) {
+  
+  multixts <- multixts(rdata)
+  if (multixts == TRUE) {
+    stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")
+  }
+  
+  # # Aggregate:
+  if ((!is.null(align.by)) && (!is.null(align.period))) {
+    rdata <- fastTickAgregation(rdata, on = align.by, k = align.period)
+  }
+  if (makeReturns == TRUE) {
+    rdata <- makeReturns(rdata)
+  }
+  
+  if (is.null(dim(rdata)) == TRUE) {
+    n <- 1
+  } else {
+    n <- dim(rdata)[2]
+  }
+  type <- kernelCharToInt(kernel.type)
+  if (n == 1) {
+    return(.C("kernelEstimator", as.double(rdata), as.double(rdata), as.integer(length(rdata)),
+              as.integer(kernel.param), as.integer(ifelse(kernel.dofadj, 1, 0)),
+              as.integer(type), ab = double(kernel.param + 1),
+              ab2 = double(kernel.param + 1),
+              ans = double(1), PACKAGE = "highfrequency")$ans)
+  }
+  
+  if (n > 1) {
+    cov <- matrix(rep(0, n * n), ncol = n)
+    diagonal <- c()
+    for (i in 1:n) {
+      diagonal[i] <- .C("kernelEstimator", as.double(rdata[, i]), as.double(rdata[, i]), as.integer(length(rdata[, i])),
+                        as.integer(kernel.param), as.integer(ifelse(kernel.dofadj, 1, 0)),
+                        as.integer(type), ab = double(kernel.param + 1),
+                        ab2 = double(kernel.param + 1),
+                        ans = double(1), PACKAGE = "highfrequency")$ans
+    }
+    diag(cov) <- diagonal
+    
+    for (i in 2:n) {
+      for (j in 1:(i - 1)) {
+        cov[i, j] = cov[j, i] = .C("kernelEstimator", as.double(rdata[, i]), as.double(rdata[, j]), as.integer(length(rdata[, i])),
+                                   as.integer(kernel.param), as.integer(ifelse(kernel.dofadj, 1, 0)),
+                                   as.integer(type), ab = double(kernel.param + 1),
+                                   ab2 = double(kernel.param + 1),
+                                   ans = double(1), PACKAGE = "highfrequency")$ans
+      }
+    }
+    if (cor == FALSE) {
+      return(cov)
+    }
+    if (cor == TRUE) {
+      invsdmatrix <- try(solve(sqrt(diag(diag(cov)))), silent = F)
+      if (inherits(invsdmatrix, "try-error") == FALSE) {
+        rcor <- invsdmatrix %*% cov %*% invsdmatrix
+        if (makePsd == TRUE) {
+          rcor <- makePsd(rcor)
+        }
         return(rcor)
       }
     }
@@ -813,7 +1049,7 @@ rKurt <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
     return(result)
   } else {
     if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata <- aggregatets(rdata, on = align.by, k = align.period)
+      rdata <- fastTickAgregation(rdata, on = align.by, k = align.period)
     }
     if (makeReturns == TRUE) {
       rdata <- makeReturns(rdata)
@@ -880,7 +1116,7 @@ rMPV <- function(rdata, m = 2, p = 2, align.by = NULL, align.period = NULL, make
     return(result)
   } else {
     if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata <-aggregatets(rdata, on = align.by, k = align.period)
+      rdata <- fastTickAgregation(rdata, on = align.by, k = align.period)
     }
     if (makeReturns) {
       rdata <- makeReturns(rdata)
@@ -990,8 +1226,8 @@ rOWCov <- function (rdata, cor = FALSE, align.by = NULL, align.period = NULL, ma
   
   # Aggregate:
   if ((!is.null(align.by))&&(!is.null(align.period))) {
-    rdata <- aggregatets(rdata, on = align.by, k = align.period)
-    seasadjR <- aggregatets(seasadjR, on = align.by, k = align.period)
+    rdata <- fastTickAgregation(rdata, on = align.by, k = align.period)
+    seasadjR <- fastTickAgregation(seasadjR, on = align.by, k = align.period)
   }     
   if (makeReturns == TRUE) { 
     rdata <- makeReturns(rdata)
@@ -1108,7 +1344,7 @@ rSkew <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
     return(result)
   } else {
     if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata <- aggregatets(rdata, on = align.by, k = align.period)
+      rdata <- fastTickAgregation(rdata, on = align.by, k = align.period)
     }
     if (makeReturns) {
       rdata <- makeReturns(rdata)
@@ -1161,7 +1397,7 @@ rSV <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE
   } else {
     
     if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata <- aggregatets(rdata, on = align.by, k = align.period)
+      rdata <- fastTickAgregation(rdata, on = align.by, k = align.period)
     }
     if (makeReturns)  {
       rdata <- makeReturns(rdata)
@@ -1242,7 +1478,7 @@ rThresholdCov <- function(rdata, cor = FALSE, align.by = NULL, align.period = NU
     return(result)
   } else { #single day code
     if ((is.null(align.by) == FALSE) && (!is.null(align.period))) {
-      rdata <- aggregatets(rdata, on = align.by, k = align.period)
+      rdata <- fastTickAgregation(rdata, on = align.by, k = align.period)
     } 
     if (makeReturns == TRUE) { 
       rdata <- makeReturns(rdata) 
@@ -1268,6 +1504,185 @@ rThresholdCov <- function(rdata, cor = FALSE, align.by = NULL, align.period = NU
     }
   } 
 } 
+
+
+#' Robust two time scale covariance estimation
+#' 
+#' @description Function returns the robust two time scale covariance matrix proposed in Boudt and Zhang (2010). 
+#' Unlike the \code{\link{rOWCov}}, but similarly to the \code{\link{rThresholdCov}}, the rRTSCov uses  univariate jump detection rules 
+#' to truncate the effect of jumps on the covariance 
+#' estimate. By the use of two time scales, this covariance estimate 
+#' is not only robust to price jumps, but also to microstructure noise and non-synchronic trading. 
+#' 
+#' @param pdata a list. Each list-item i contains an xts object with the intraday price data 
+#' of stock i for day t.
+#' @param cor boolean, in case it is TRUE, the correlation is returned. FALSE by default.
+#' @param startIV vector containing the first step estimates of the integrated variance of the assets, needed in the truncation. Is NULL by default. 
+#' @param noisevar vector containing the estimates of the noise variance of the assets, needed in the truncation. Is NULL by default.
+#' @param K positive integer, slow time scale returns are computed on prices that are K steps apart.
+#' @param J positive integer, fast time scale returns are computed on prices that are J steps apart.
+#' @param K_cov positive integer, for the extradiagonal covariance elements the slow time scale returns are computed on prices that are K steps apart.
+#' @param J_cov positive integer, for the extradiagonal covariance elements the fast time scale returns are computed on prices that are J steps apart.
+#' @param K_var vector of positive integers, for the diagonal variance elements the slow time scale returns are computed on prices that are K steps apart.
+#' @param J_var vector of positive integers, for the diagonal variance elements the fast time scale returns are computed on prices that are J steps apart.
+#' @param makePsd boolean, in case it is TRUE, the positive definite version of rRTSCov is returned. FALSE by default.
+#' @param eta positive real number, squared standardized high-frequency returns that exceed eta are detected as jumps.
+#'
+#' @return an \eqn{N x N} matrix
+#' 
+#' @details 
+#' The rRTSCov requires the tick-by-tick transaction prices. (Co)variances are then computed using log-returns calculated on a rolling basis 
+#' on stock prices that are \eqn{K} (slow time scale) and \eqn{J} (fast time scale) steps apart.     
+#' 
+#' The diagonal elements of the rRTSCov matrix are the variances, computed for log-price series \eqn{X} with \eqn{n} price observations 
+#' at times \eqn{  \tau_1,\tau_2,\ldots,\tau_n} as follows: 
+#' \deqn{
+#' (1-\frac{\overline{n}_K}{\overline{n}_J})^{-1}(\{X,X\}_T^{(K)^{*}}-\frac{\overline{n}_K}{\overline{n}_J}\{X,X\}_T^{(J)^{*}}),
+#' }
+#' where \eqn{\overline{n}_K=(n-K+1)/K},  \eqn{\overline{n}_J=(n-J+1)/J} and 
+#' \deqn{\{X,X\}_T^{(K)^{*}} =\frac{c_\eta^{*}}{K}\frac{\sum_{i=1}^{n-K+1}(X_{t_{i+K}}-X_{t_i})^2I_X^K(i;\eta)}{\frac{1}{n-K+1}\sum_{i=1}^{n-K+1}I_X^K(i;\eta)}.} 
+#' The constant  \eqn{c_\eta} adjusts for the bias due to the thresholding  and \eqn{I_{X}^K(i;\eta)} is a jump indicator function
+#' that is one if 
+#' \deqn{ \frac{(X_{t_{i+K}}-X_{t_{i}})^2}{(\int_{t_{i}}^{t_{i+K}} \sigma^2_sds +2\sigma_{\varepsilon_{\mbox{\tiny X}}}^2)}  \ \ \leq  \ \    \eta } 
+#' and zero otherwise.  The elements in the denominator are the integrated variance (estimated recursively) and noise variance (estimated by the method in Zhang et al, 2005). 
+#' 
+#' The extradiagonal elements of the rRTSCov are the covariances. 
+#' For their calculation, the data is first synchronized by the refresh time method proposed by Harris et al (1995).
+#' It uses the function \code{\link{refreshTime}} to collect first the so-called refresh times at which all assets have traded at least once 
+#' since the last refresh time point. Suppose we have two log-price series:  \eqn{X} and \eqn{Y}. Let \eqn{ \Gamma =\{ \tau_1,\tau_2,\ldots,\tau_{N^{\mbox{\tiny X}}_{\mbox{\tiny T}}}\}} and 
+#' \eqn{\Theta=\{\theta_1,\theta_2,\ldots,\theta_{N^{\mbox{\tiny Y}}_{\mbox{\tiny T}}}\}} 
+#' be the set of transaction times of these assets. 
+#' The first refresh time corresponds to the first time at which both stocks have traded, i.e. 
+#' \eqn{\phi_1=\max(\tau_1,\theta_1)}. The subsequent refresh time is defined as the first time when both stocks have again traded, i.e.
+#' \eqn{\phi_{j+1}=\max(\tau_{N^{\mbox{\tiny{X}}}_{\phi_j}+1},\theta_{N^{\mbox{\tiny{Y}}}_{\phi_j}+1})}. The
+#' complete refresh time sample grid is 
+#' \eqn{\Phi=\{\phi_1,\phi_2,...,\phi_{M_N+1}\}}, where \eqn{M_N} is the total number of paired returns.  The
+#' sampling points of asset \eqn{X} and \eqn{Y} are defined to be
+#' \eqn{t_i=\max\{\tau\in\Gamma:\tau\leq \phi_i\}} and
+#' \eqn{s_i=\max\{\theta\in\Theta:\theta\leq \phi_i\}}.
+#' 
+#' Given these refresh times, the covariance is computed as follows: 
+#' \deqn{
+#' c_{N}( \{X,Y\}^{(K)}_T-\frac{\overline{n}_K}{\overline{n}_J}\{X,Y\}^{(J)}_T ),
+#' }
+#' 
+#' where
+#' \deqn{\{X,Y\}^{(K)}_T =\frac{1}{K} \frac{\sum_{i=1}^{M_N-K+1}c_i (X_{t_{i+K}}-X_{t_{i}})(Y_{s_{i+K}}-Y_{s_{i}})I_{X}^K(i;\eta)
+#' I_{Y}^K(i;\eta)}{\frac{1}{M_N-K+1}\sum_{i=1}^{M_N-K+1}{I_X^K(i;\eta)I_Y^K(i;\eta)}},}
+#' with  \eqn{I_{X}^K(i;\eta)} the same jump indicator function as for the variance and \eqn{c_N} a constant to adjust for the bias due to the thresholding.  
+#' 
+#' Unfortunately, the rRTSCov is not always positive semidefinite.  
+#' By setting the argument makePsd = TRUE, the function  \code{\link{makePsd}} is used to return a positive semidefinite
+#' matrix. This function replaces the negative eigenvalues with zeroes. 
+#' 
+#' @references 
+#' Boudt K. and Zhang, J. 2010. Jump robust two time scale covariance estimation and realized volatility budgets. Mimeo.
+#' 
+#' Harris, F., T. McInish, G. Shoesmith, and R. Wood (1995). Cointegration, error correction, and price discovery on infomationally linked security markets. Journal of Financial and Quantitative Analysis 30, 563-581.
+#' 
+#' Zhang, L., P. A. Mykland, and Y. Ait-Sahalia (2005). A tale of two time scales: Determining integrated volatility with noisy high-frequency data. Journal of the American Statistical Association 100, 1394-1411.
+#' 
+#' @author Jonathan Cornelissen and Kris Boudt
+#' @examples
+#' # Robust Realized two timescales Variance/Covariance
+#' data(sample_tdata)
+#' # Univariate: 
+#' rvRTS <- rRTSCov(pdata = sample_tdata$PRICE)
+#' # Note: Prices as input
+#' rvRTS 
+#' 
+#' # Multivariate:
+#' rcRTS <- rRTSCov(pdata = list(cumsum(lltc) + 100, cumsum(sbux) + 100))
+#' # Note: List of prices as input
+#' rcRTS 
+#' 
+#' @keywords volatility
+#' @export
+rRTSCov <- function (pdata, cor = FALSE, startIV = NULL, noisevar = NULL, 
+                     K = 300, J = 1, 
+                     K_cov = NULL , J_cov = NULL,
+                     K_var = NULL , J_var = NULL , 
+                     eta = 9, makePsd = FALSE){
+  if (!is.list(pdata)) {
+    n <- 1
+  }
+  else {
+    n = length(pdata)
+    if (n == 1) {
+      pdata = pdata[[1]]
+    }
+  }
+  
+  if (n == 1) {
+    if (nrow(pdata) < (10 * K) ) {
+      stop("Two time scale estimator uses returns based on prices that are K ticks aways. 
+           Please provide a timeseries of at least 10*K" ) 
+    } 
+    multixts <- multixts(pdata)
+    if (multixts == TRUE) { 
+      stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input.")
+    }    
+    return(RTSRV(pdata, startIV = startIV, noisevar = noisevar, 
+                 K = K, J = J, eta = eta))
+  }
+  if (n > 1) {
+    if (nrow(pdata[[1]]) < (10*K)) {
+      stop("Two time scale estimator uses returns based on prices that are K ticks aways. 
+           Please provide a timeseries of at least 10*K" ) 
+    } 
+    multixts <- multixts(pdata[[1]])
+    if (multixts) { 
+      stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input.")
+    }
+    
+    cov <- matrix(rep(0, n * n), ncol = n)
+    diagonal <- c()
+    if (is.null(K_cov)) { 
+      K_cov <- K 
+    }
+    if (is.null(J_cov)) { 
+      J_cov <- J 
+    }  
+    if (is.null(K_var)) { 
+      K_var <- rep(K,n) 
+    }
+    if (is.null(J_var)) { 
+      J_var <- rep(J,n) 
+    }        
+    for (i in 1:n){ 
+      diagonal[i] <- RTSRV(pdata[[i]], startIV = startIV[i], 
+                           noisevar = noisevar[i], K = K_var[i], J = J_var[i], 
+                           eta = eta)
+    }
+    diag(cov) <- diagonal
+    if( is.null(K_cov)){ K_cov = K }
+    if( is.null(J_cov)){ J_cov = J }                        
+    for (i in 2:n) {
+      for (j in 1:(i - 1)) {
+        cov[i, j] = cov[j, i] = RTSCov_bi(pdata[[i]], 
+                                          pdata[[j]], startIV1 = diagonal[i], startIV2 = diagonal[j], 
+                                          noisevar1 = noisevar[i], noisevar2 = noisevar[j], 
+                                          K = K_cov, J = J_cov, eta = eta)
+      }
+    }
+    if (cor == FALSE) {
+      if (makePsd == TRUE) {
+        cov = makePsd(cov)
+      }
+      return(cov)
+    }
+    if (cor == TRUE) {
+      invsdmatrix = try(solve(sqrt(diag(diag(cov)))), silent = F)
+      if (!inherits(invsdmatrix, "try-error")) {
+        rcor = invsdmatrix %*% cov %*% invsdmatrix
+        if (makePsd == TRUE) {
+          rcor = makePsd(rcor)
+        }
+        return(rcor)
+      }
+    }
+  }
+}
 
 #' An estimator of realized variance.
 #' @param rdata a zoo/xts object containing all returns in period t for one asset.
@@ -1321,7 +1736,7 @@ rTPVar <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FA
     return(result)
   } else {
     if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata <- aggregatets(rdata, on = align.by, k = align.period)
+      rdata <- fastTickAgregation(rdata, on = align.by, k = align.period)
     }
     if (makeReturns) {
       rdata <- makeReturns(rdata)
@@ -1385,7 +1800,7 @@ rQPVar <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FA
     return(result)
   } else {
     if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata <-aggregatets(rdata, on = align.by, k = align.period)
+      rdata <-fastTickAgregation(rdata, on = align.by, k = align.period)
     }
     if (makeReturns) {
       rdata <- makeReturns(rdata)
@@ -1432,7 +1847,7 @@ rQuar <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
     return(result)
   } else {
     if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata <- aggregatets(rdata, on = align.by, k = align.period)
+      rdata <- fastTickAgregation(rdata, on = align.by, k = align.period)
     }
     if (makeReturns == TRUE) {
       rdata <- makeReturns(rdata)

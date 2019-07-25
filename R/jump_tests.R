@@ -103,7 +103,7 @@ AJjumptest <- function(pdata, p = 4 , k = 2, align.by = NULL, align.period = NUL
     result <- apply.daily(pdata, AJjumptest, align.by, align.period, makeReturns)
     return(result)
   } else {
-    pdata <- aggregatets(pdata, on = "seconds", k = 1)
+    pdata <- fastTickAgregation(pdata, on = "seconds", k = 1)
   }
   
   N <- length(pdata)-1
@@ -215,7 +215,7 @@ BNSjumptest <- function (rdata, IVestimator = "BV", IQestimator = "TP", type = "
     return(result)
   } else {
     if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata <- aggregatets(rdata, on = align.by, k = align.period)
+      rdata <- fastTickAgregation(rdata, on = align.by, k = align.period)
     }
     if (makeReturns == TRUE) {
       rdata <- makeReturns(rdata)

@@ -33,4 +33,4 @@ quotesCleanup(qdataraw = sample_qdataraw_microseconds, exchanges = "N")
 
 ## Special thanks
 
-We would like to thank [Brian Peterson](https://github.com/braverock), [Chris Blakely](https://github.com/clisztian) and [Eric Zivot](https://faculty.washington.edu/ezivot/). We are also grateful to [Dirk Eddelbuettel](https://github.com/eddelbuettel) for his extraordinary support as a mentor during the Google Summmer of Code 2019. Moreover, we thank [Emil Sjørup](https://github.com/emilsjoerup) for implementing additional options in the harModel function.
+We would like to thank [Brian Peterson](https://github.com/braverock), [Chris Blakely](https://github.com/clisztian), [Eric Zivot](https://faculty.washington.edu/ezivot/) and Maarten Schermer. We are also grateful to [Dirk Eddelbuettel](https://github.com/eddelbuettel) for his extraordinary support as a mentor during the Google Summmer of Code 2019. Moreover, we thank [Emil Sjørup](https://github.com/emilsjoerup) for implementing additional options in the harModel function.

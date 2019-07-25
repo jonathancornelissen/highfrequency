@@ -1,4 +1,13 @@
 
+expect_equal(
+  unique(autoSelectExchangeTrades(sample_tdataraw)$EX),
+  "N"
+)
+
+expect_equal(
+  unique(autoSelectExchangeQuotes(sample_qdataraw)$EX),
+  "N"
+)
 
 expect_equal(
   quotesCleanup(qdataraw = sample_qdataraw, exchanges = "N")$report["remove_outliers"],
