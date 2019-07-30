@@ -50,7 +50,7 @@ plot(mediandrift)
 
 # Example 2: Kernel based estimator for one day
 price <- sample_tdata$PRICE
-storage.mode(price) = "numeric"
+storage.mode(price) <- "numeric"
 kerneldrift <- spotDrift(price, method = "driftKernel", on = "minutes", k = 1)
 plot(kerneldrift)
 
