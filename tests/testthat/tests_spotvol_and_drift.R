@@ -8,17 +8,20 @@
 
 
 expect_identical(
-  {dat <- sample_tdata_microseconds[, SYMBOL := NULL]
+  {dat <- data.table::copy(sample_tdata_microseconds)
+  dat[, SYMBOL := NULL]
   meandrift <- spotDrift(data = dat, k = 1, tz = "EST")
   formatC(meandrift$mu[1:10], digits = 5)},
   c("    NA", "    NA", "    NA", "    NA", "0.00040961", "0.00046663", "0.00060476", "0.00051623", "0.00050264", "-2.5183e-05")
 )
 
 expect_identical(
-  {dat <- sample_tdata_microseconds[, SYMBOL := NULL]
+  {dat <- data.table::copy(sample_tdata_microseconds)
+  dat[, SYMBOL := NULL]
   meandrift1 <- spotDrift(data = dat, k = 10, on =  "seconds", tz = "EST")
   formatC(meandrift1$mu[11:40], digits = 5)},
-  {dat <- sample_tdata_microseconds[, SYMBOL := NULL]
+  {dat <- data.table::copy(sample_tdata_microseconds)
+  dat[, SYMBOL := NULL]
   meandrift2 <- spotDrift(data = dat, k = 10000, on =  "milliseconds", tz = "EST")
   formatC(meandrift2$mu[11:40], digits = 5)}
 )

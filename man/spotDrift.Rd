@@ -38,7 +38,7 @@ The additional arguments for the mean and median methods are: \code{periods} for
 }
 \examples{
 # Example 1: Rolling mean and median estimators for 2 days
-dat <- sample_tdata_microseconds[, SYMBOL := NULL]
+dat <- sample_tdata_microseconds
 meandrift <- spotDrift(data = dat, k = 1, tz = "EST")
 mediandrift <- spotDrift(data = dat, method = "driftMedian", on = "seconds", k = 30, tz = "EST")
 plot(meandrift)
@@ -47,8 +47,8 @@ plot(mediandrift)
 # Example 2: Kernel based estimator for one day
 price <- sample_tdata$PRICE
 storage.mode(price) <- "numeric"
-kerneldrift <- spotDrift(price, method = "driftKernel", on = "minutes", k = 1)
-plot(kerneldrift)
+#kerneldrift <- spotDrift(price, method = "driftKernel", on = "minutes", k = 1)
+#plot(kerneldrift)
 
 }
 \references{
