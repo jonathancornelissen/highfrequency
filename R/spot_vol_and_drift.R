@@ -419,7 +419,7 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
 #' lines(as.numeric(t(vol5$spot))[1:2880], col = "blue")
 #' legend("topright", c("h = simple estimate", "h = quarticity corrected",
 #'                      "h = crossvalidated"), col = c("black", "red", "blue"), lty=1)}
-#' \dontshow{par(par.def)}
+#' 
 #' # Piecewise constant volatility, using an example from Fried (2012)
 #' \donttest{
 #' simdata <- matrix(sqrt(5/3)*rt(3000, df = 5), ncol = 500, byrow = TRUE)
