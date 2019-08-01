@@ -16,7 +16,7 @@ fastTickAgregation <- function (ts, on = "minutes", k = 1, tz = "GMT") {
   } 
   g <- base::seq(start(ts), end(ts), by = tby)
   rawg <- as.numeric(as.POSIXct(g, tz = tz))
-  newg <- rawg + (secs - rawg%%secs)
+  newg <- rawg + (secs - rawg %% secs)
   g    <- as.POSIXct(newg, origin = "1970-01-01", tz = tz)
   ts <- na.locf(merge(ts, zoo(NULL, g)))[as.POSIXct(g, tz = tz)]
   return(ts)

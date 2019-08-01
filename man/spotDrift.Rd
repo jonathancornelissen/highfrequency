@@ -8,11 +8,7 @@ spotDrift(data, method = "driftMean", ..., on = "minutes", k = 5,
   marketopen = "09:30:00", marketclose = "16:00:00", tz = "GMT")
 }
 \arguments{
-\item{data}{Can be one of 3 input types, \code{xts}, \code{matrix} or \code{data.table}.
-If a \code{data.table} is supplied, it will be made into an \code{xts} if possible.
-If the data is \code{xtsible}, it is assumed that the input is the price in levels.
-If the data is not \code{xtsible},
-it will be treated as already prepared return data, i.e. if the desired output is a 5 rolling mean estimation of the spot drift, it should contain returns sampled every 5 minutes.}
+\item{data}{Can be one of two input types, \code{xts} or \code{data.table}. It is assumed that the input is the price in levels.}
 
 \item{method}{Which method to be used to estimate the spot-drift. Currently 3 methods are available, rolling mean and median as well as the kernel method of Christensen et al. 2018.
 The kernel is a left hand exponential kernel that will weigh newer observations more heavily than older observations.}

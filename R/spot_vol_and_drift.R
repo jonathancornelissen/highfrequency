@@ -1,11 +1,7 @@
 #' Spot Drift Estimation
 #' @description Function used to estimate the spot drift of intra-day (tick) stock prices/returns
 #'
-#' @param data Can be one of 3 input types, \code{xts}, \code{matrix} or \code{data.table}.
-#' If a \code{data.table} is supplied, it will be made into an \code{xts} if possible.
-#' If the data is \code{xtsible}, it is assumed that the input is the price in levels.
-#' If the data is not \code{xtsible},
-#' it will be treated as already prepared return data, i.e. if the desired output is a 5 rolling mean estimation of the spot drift, it should contain returns sampled every 5 minutes.
+#' @param data Can be one of two input types, \code{xts} or \code{data.table}. It is assumed that the input is the price in levels.
 #' @param method Which method to be used to estimate the spot-drift. Currently 3 methods are available, rolling mean and median as well as the kernel method of Christensen et al. 2018.
 #' The kernel is a left hand exponential kernel that will weigh newer observations more heavily than older observations.
 #' @param ... Additional arguments for the individual methods. See details
@@ -47,16 +43,23 @@
 spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
                      marketopen = "09:30:00", marketclose = "16:00:00",
                      tz = "GMT"){
-  if (on == "seconds" | on == "secs")
+  
+  if (on == "seconds" | on == "secs") {
     delta <- k
-  if (on == "minutes" | on == "mins")
+  }
+  
+  if (on == "minutes" | on == "mins") {
     delta <- k * 60
-  if (on == "hours")
+  }
+    
+  if (on == "hours") {
     delta <- k * 3600
+  }
 
-  if(xtsible(data) == TRUE) {
+  if (xtsible(data) == TRUE) {
     data <- as.xts(data)
   }
+  
   if (inherits(data, what = "xts")) {
     data <- xts(data, order.by = as.POSIXct(time(data), tz = tz), tzone = tz)
     dates <- unique(format(time(data), "%Y-%m-%d"))
@@ -84,12 +87,12 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
       z <- xts(rep(1, length(intraday)), tzone = tz,
                order.by = as.POSIXct(paste(dates[d], as.character(intraday),
                                            sep = " "), tz = tz))
-      datad <- merge.xts(z, datad)$datad
-      datad <- na.locf(datad)
+      datad  <- merge.xts(z, datad)$datad
+      datad  <- na.locf(datad)
       rdatad <- makeReturns(datad)
       rdatad <- rdatad[time(rdatad) > min(time(rdatad))]
-      rdata <- rbind(rdata, rdatad)
-      mR <- rbind(mR, as.numeric(rdatad))
+      rdata  <- rbind(rdata, rdatad)
+      mR     <- rbind(mR, as.numeric(rdatad))
     }
     if (method != "driftKernel") {
       mR <- t(mR)
@@ -99,15 +102,16 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
     rdata <- NULL
   } else {
   stop("Input data has to consist of either of the following:
-            1. An xts object or an xtsible data.table containing price data
-            2. A matrix or a data.table containing return data")
+            1. An xts object or a 
+            2) data.table 
+       containing price data")
   }
-
+  
   options <- list(...)
   out <- switch(method, ### works only for one day at a time! Does the rest of data preparation in the function.
-                driftKernel = driftKernel(data = data, delta, intraday, options), 
-                driftMean   = driftMean(mR = mR, rdata = rdata, delta, intraday, options),
-                driftMedian = driftMedian(mR = mR, rdata = rdata, delta, intraday, options))
+                driftKernel = driftKernel(data = data, intraday, options), 
+                driftMean   = driftMean(mR = mR, options),
+                driftMedian = driftMedian(mR = mR, options))
   return(out)
 }
 
@@ -481,8 +485,7 @@ spotvol <- function(data, method = "detper", ..., on = "minutes", k = 5,
       datad <- aggregatePrice(datad, on = on, k = k , marketopen = marketopen,
                               marketclose = marketclose, tz = tz)
       z <- xts(rep(1, length(intraday)), tzone = tz, 
-               order.by = as.POSIXct(paste(dates[d], as.character(intraday), 
-                                           sep=" "), tz = tz))
+               order.by = as.POSIXct(paste(dates[d], as.character(intraday)), tz = tz))
       datad <- merge.xts(z, datad)$datad
       datad <- na.locf(datad)
       rdatad <- makeReturns(datad)
@@ -490,13 +493,17 @@ spotvol <- function(data, method = "detper", ..., on = "minutes", k = 5,
       rdata <- rbind(rdata, rdatad)
       mR <- rbind(mR, as.numeric(rdatad))
     }
-  } else if (class(data) == "matrix") {
-    mR <- data
-    rdata <- NULL
-  } else stop("Input data has to consist of either of the following: 
+  } else {
+    if (class(data) == "matrix") {
+      mR <- data
+      rdata <- NULL
+    } else {
+      stop("Input data has to consist of either of the following: 
             1. An xts object containing price data
             2. A matrix containing return data")
-  
+    }
+  }
+  browser()
   options <- list(...)
   out <- switch(method, 
                 detper = detper(mR, rdata = rdata, options = options), 

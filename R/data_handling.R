@@ -162,6 +162,7 @@ aggregatets <- function (ts, FUN = "previoustick", on = "minutes", k = 1, weight
 #' xts object to the 5 minute frequency set k = 5 and on = "minutes".
 #' @param marketopen the market opening time, by default: marketopen = "09:30:00". 
 #' @param marketclose the market closing time, by default: marketclose = "16:00:00". 
+#' @param fill indicates whether rows without trades should be added with the most recent value, FALSE by default.
 #' @param tz time zone used, by default: tz = timezone of DT column/index of xts.
 #' 
 #' @details 
@@ -181,7 +182,7 @@ aggregatets <- function (ts, FUN = "previoustick", on = "minutes", k = 1, weight
 #' @keywords internal
 #' @importFrom xts last
 #' @export
-aggregatePrice <- function(pdata, on = "minutes", k = 1, marketopen = "09:30:00", marketclose = "16:00:00" , tz = NULL) {
+aggregatePrice <- function(pdata, on = "minutes", k = 1, marketopen = "09:30:00", marketclose = "16:00:00" , fill = FALSE, tz = NULL) {
   
   DATE = DT = FIRST_DT = DT_ROUND = LAST_DT = SYMBOL = PRICE = NULL
 
@@ -206,7 +207,7 @@ aggregatePrice <- function(pdata, on = "minutes", k = 1, marketopen = "09:30:00"
 
         #open
         a <- as.POSIXct(paste(date, marketopen), tz = tz)
-        b <- as.xts(matrix(as.numeric(pdata[1]),nrow = 1), a)
+        b <- as.xts(matrix(as.numeric(pdata[1]), nrow = 1), a)
         storage.mode(ts2) <- "numeric"
         ts3 <- c(b, ts2)
 
@@ -242,16 +243,40 @@ aggregatePrice <- function(pdata, on = "minutes", k = 1, marketopen = "09:30:00"
                              ceiling_date(ymd_hms(DT), unit = paste(k, on), change_on_boundary = FALSE))]
   pdata[, DT_ROUND := as_datetime(DT_ROUND)]
   pdata[, LAST_DT := max(DT), by = "DT_ROUND"]
+  
+  pdata_open <- data.table::copy(pdata[DT == FIRST_DT])
+  pdata_open[, DT := ymd_hms(paste(as.Date(pdata_open$DT), marketopen), tz = tz(pdata_open$DT))]
+  pdata_open <- pdata_open[, c("DT", "PRICE")]
 
   pdata <- pdata[DT == LAST_DT][, DT := DT_ROUND][, c("DT", "PRICE")]
+  lubridate::tz(pdata$DT) <- tz(pdata_open$DT)
+  
+  pdata <- merge(pdata, pdata_open, all = TRUE)
+  
+  if (fill == TRUE) {
+    if (on == "minutes") {
+      on = "mins"
+    }
+    if (on == "seconds") {
+      on <- "secs"
+    }
+    dt_full_index <-
+      rbindlist(lapply(unique(as.Date(sample_tdata_microseconds$DT)),
+                       FUN = function(x) data.frame(DT = seq.POSIXt(from = as.POSIXct(paste0(x, marketopen, tz = tz(pdata$DT))), 
+                                                                    to   = as.POSIXct(paste0(x, marketclose, tz = tz(pdata$DT))), 
+                                                                    by = paste(k, on)))))
+    lubridate::tz(dt_full_index$DT) <- tz(pdata$DT)
+    pdata <- merge(pdata, dt_full_index, by = "DT", all = TRUE)
+    
+    pdata$PRICE <- na.locf(pdata$PRICE)
+  }
 
   if (dummy_was_xts == TRUE) {
-    return(xts(as.matrix(pdata[, -c("DT")]), order.by = pdata$DT, tzone = tz))
+    return(xts(as.matrix(pdata[, -c("DT")]), order.by = pdata$DT, tzone = tz(pdata$DT)))
   } else {
     return(pdata)
   }
 }
-
 
 #' Aggregate a data.table or xts object containing quote data
 #' 
