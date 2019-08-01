@@ -2,7 +2,7 @@
 #' @keywords internal
 #' @importFrom xts .indexDate
 #' @importFrom zoo index
-driftKernel <- function(data, delta, intraday, options) {
+driftKernel <- function(data, intraday, options) {
   if(ncol(data) > 1){
     stop("driftKernel method currently only accepts single day tick data as it relies on the time-stamps of the trades.")
   }
@@ -23,7 +23,7 @@ driftKernel <- function(data, delta, intraday, options) {
   vPreAveraged <- c(0,vPreAveraged)
   time <- index(data)
   time <- as.numeric(time) - (.indexDate(data)[1] * 86400)
-  estimtimes = c(34200, as.numeric(intraday) * 86400)
+  estimtimes <- c(34200, as.numeric(intraday) * 86400)
   for (i in 2:length(estimtimes)) {
     x     <- time - estimtimes[i]
     vWm   <- exp(-abs(x/bandwidth)) * (x<=0)    ##left sided exponential kernel
@@ -38,17 +38,17 @@ driftKernel <- function(data, delta, intraday, options) {
 
 #' @keywords internal
 #' @importFrom zoo rollmean
-driftMean <- function(mR, rdata, delta, intraday, options){
+driftMean <- function(mR, options){
   op <- list(init = list(), periods = 5, align = "right")
   op[names(options)] <- options
   periods <- op$periods
   align   <- op$align
-  if(dim(mR)[2]>1){
-    mu <- apply(mR, 2, rollmean, k = periods, align = align, fill = NA)
-    colnames(mu) <- paste0("mu",1:ncol(mR)) #Here we will have a matrix
-  }else{
-    mu <- rollmean(rdata, k = periods, align = align, fill = NA)
-    mu <- as.matrix(mu, ncol = 1) #Here we have a single day
+  
+  mu <- apply(mR, 2, rollmean, k = periods, align = align, fill = NA)
+  
+  if (dim(mR)[2] > 1) {
+    colnames(mu) <- paste0("mu", 1:ncol(mR)) #Here we will have a matrix
+  } else {
     colnames(mu) <- "mu"
   }
   out <- list("mu" = mu)
@@ -58,17 +58,17 @@ driftMean <- function(mR, rdata, delta, intraday, options){
 
 #' @keywords internal
 #' @importFrom zoo rollmedian
-driftMedian <- function(mR, rdata, delta, intraday, options){
+driftMedian <- function(mR, options){
   op <- list(init = list(), periods = 5, align = "right")
   op[names(options)] <- options
   periods <- op$periods
   align   <- op$align
-  if(dim(mR)[2]>1){
-    mu <- apply(mR, 2, rollmedian, k = periods, align = align, fill = NA)
+  
+  mu <- apply(mR, 2, rollmedian, k = periods, align = align, fill = NA)
+  
+  if (dim(mR)[2] > 1) {
     colnames(mu) <- paste0("mu",1:ncol(mR))
   }else{
-    mu <- rollmedian(rdata, k = periods, align = align, fill = NA)
-    mu <- as.matrix(mu, ncol = 1)
     colnames(mu) <- "mu"
   }
   
