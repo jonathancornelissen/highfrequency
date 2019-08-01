@@ -177,8 +177,7 @@ aggregatets <- function (ts, FUN = "previoustick", on = "minutes", k = 1, weight
 #' @keywords data manipulation
 #' @examples 
 #' # aggregate price data to the 30 second frequency
-#' head(sample_tdata$PRICE)
-#' head(aggregatePrice(sample_tdata$PRICE, on = "secs", k = 30))
+#' aggregatePrice(sample_tdata_microseconds, on = "secs", k = 30)
 #' @keywords internal
 #' @importFrom xts last
 #' @export
