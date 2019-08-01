@@ -26,86 +26,130 @@
 #' # Example 1: Rolling mean and median estimators for 2 days
 #' dat <- sample_tdata_microseconds[, SYMBOL := NULL]
 #' meandrift <- spotDrift(data = dat, k = 1, tz = "EST")
-#' mediandrift <- spotDrift(data = dat, method = "driftMedian",k = 1, tz = "EST")
+#' mediandrift <- spotDrift(data = dat, method = "driftMedian", on = "seconds", k = 30, tz = "EST")
 #' plot(meandrift)
 #' plot(mediandrift)
 #'
 #' # Example 2: Kernel based estimator for one day
 #' price <- sample_tdata$PRICE
 #' storage.mode(price) <- "numeric"
-#' kerneldrift <- spotDrift(price, method = "driftKernel", on = "minutes", k = 1)
-#' plot(kerneldrift)
+#' #kerneldrift <- spotDrift(price, method = "driftKernel", on = "minutes", k = 1)
+#' #plot(kerneldrift)
 #'
 #' @importFrom stats filter time
 #' @importFrom utils tail
 #' @importFrom xts xtsible merge.xts
+#' @importFrom data.table rbindlist
+#' @importFrom data.table setkeyv
 #' @export
 spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
-                     marketopen = "09:30:00", marketclose = "16:00:00",
-                     tz = "GMT"){
+                     marketopen = "09:30:00", marketclose = "16:00:00", tz = "GMT") {
   
-  if (on == "seconds" | on == "secs") {
-    delta <- k
-  }
+  PRICE = DATE = RETURN = NULL
   
-  if (on == "minutes" | on == "mins") {
-    delta <- k * 60
-  }
-    
-  if (on == "hours") {
-    delta <- k * 3600
-  }
-
-  if (xtsible(data) == TRUE) {
-    data <- as.xts(data)
+  if ("PRICE" %in% colnames(data) == FALSE) {
+    stop("data.table or xts needs column named PRICE.")
   }
   
-  if (inherits(data, what = "xts")) {
-    data <- xts(data, order.by = as.POSIXct(time(data), tz = tz), tzone = tz)
-    dates <- unique(format(time(data), "%Y-%m-%d"))
-    cDays <- length(dates)
-    rdata <- mR <- c()
-    intraday <- seq(from = chron::times(marketopen),
-                    to = chron::times(marketclose),
-                    by = chron::times(delta / (24 * 3600)))
-    if (as.character(tail(intraday, 1)) != marketclose)
-    intraday <- c(intraday, marketclose)
-    intraday <- intraday[2:length(intraday)]
-    for (d in 1:cDays) {
-      if (method == "driftKernel") {
-        break
-      }
-      datad <- data[as.character(dates[d])]
-      if (!all(format(time(datad), format = "%Z") == tz))
-        stop(paste("Not all data on ", dates[d], " is in time zone \"", tz,
-                   "\". This may be due to daylight saving time. Try using a",
-                   " time zone without daylight saving, such as GMT.",
-                   sep = ""))
-
-      datad <- aggregatePrice(datad, on = on, k = k , marketopen = marketopen,
-                              marketclose = marketclose, tz = tz)
-      z <- xts(rep(1, length(intraday)), tzone = tz,
-               order.by = as.POSIXct(paste(dates[d], as.character(intraday),
-                                           sep = " "), tz = tz))
-      datad  <- merge.xts(z, datad)$datad
-      datad  <- na.locf(datad)
-      rdatad <- makeReturns(datad)
-      rdatad <- rdatad[time(rdatad) > min(time(rdatad))]
-      rdata  <- rbind(rdata, rdatad)
-      mR     <- rbind(mR, as.numeric(rdatad))
+  dummy_was_xts <- FALSE
+  if (is.data.table(data) == FALSE) {
+    if (is.xts(data) == TRUE) {
+      data <- setnames(as.data.table(data), old = "index", new = "DT")
+      data[, PRICE := as.numeric(PRICE)]
+      dummy_was_xts <- TRUE
+    } else {
+      stop("Input has to be data.table or xts.")
     }
-    if (method != "driftKernel") {
-      mR <- t(mR)
-    }
-  } else if ("matrix" %in% class(data) | "data.table" %in% class(data)) {
-    mR <- as.matrix(data)
-    rdata <- NULL
   } else {
-  stop("Input data has to consist of either of the following:
-            1. An xts object or a 
-            2) data.table 
-       containing price data")
+    if (("DT" %in% colnames(data)) == FALSE) {
+      stop("Data.table neeeds DT column.")
+    }
   }
+  
+  datad <- aggregatePrice(data, on = on, k = k , marketopen = marketopen,
+                          marketclose = marketclose, tz = tz, fill = TRUE) 
+  
+  datad[, DATE := as.Date(DT)]
+  
+  # datad <- aggregatePrice(sample_tdata_microseconds, on = "secs", k = 30, fill = TRUE)[, DATE := as.Date(DT)] %>% split(.$DATE)
+  setkeyv(datad, "DT")
+  
+  datad <- datad[, RETURN := log(PRICE) - shift(log(PRICE), type = "lag"), by = "DATE"][is.na(RETURN) == FALSE]
+                 
+  datad <- split(datad, by = "DATE")
+  
+  # datad[, RETURN := log(PRICE) - lag(log(PRICE), by = DATE)]
+  
+  mR <- matrix(unlist(lapply(datad, FUN = function(x) as.numeric(x$RETURN))), ncol = length(datad[[1]]$RETURN), byrow = TRUE)
+  
+  if (method != "driftKernel") {
+    mR <- t(mR)
+  }
+  
+  # if (on == "seconds" | on == "secs") {
+  #   delta <- k
+  # }
+  # 
+  # if (on == "minutes" | on == "mins") {
+  #   delta <- k * 60
+  # }
+  #   
+  # if (on == "hours") {
+  #   delta <- k * 3600
+  # }
+  # 
+  # if (xtsible(data) == TRUE) {
+  #   data <- as.xts(data)
+  # }
+  
+  # if (inherits(data, what = "xts")) {
+  #   data <- xts(data, order.by = as.POSIXct(time(data), tz = tz), tzone = tz)
+  #   dates <- unique(format(time(data), "%Y-%m-%d"))
+  #   cDays <- length(dates)
+  #   rdata <- mR <- c()
+  #   intraday <- seq(from = chron::times(marketopen),
+  #                   to = chron::times(marketclose),
+  #                   by = chron::times(delta / (24 * 3600)))
+  #   if (as.character(tail(intraday, 1)) != marketclose)
+  #   intraday <- c(intraday, marketclose)
+  #   intraday <- intraday[2:length(intraday)]
+  #   for (d in 1:cDays) {
+  #     if (method == "driftKernel") {
+  #       break
+  #     }
+  #     datad <- data[as.character(dates[d])]
+  #     if (!all(format(time(datad), format = "%Z") == tz))
+  #       stop(paste("Not all data on ", dates[d], " is in time zone \"", tz,
+  #                  "\". This may be due to daylight saving time. Try using a",
+  #                  " time zone without daylight saving, such as GMT.",
+  #                  sep = ""))
+  # 
+  #     datad <- aggregatePrice(datad, on = on, k = k , marketopen = marketopen,
+  #                             marketclose = marketclose, tz = tz, fill = TRUE)
+  #     z <- xts(rep(1, length(intraday)), tzone = tz,
+  #              order.by = as.POSIXct(paste(dates[d], as.character(intraday),
+  #                                          sep = " "), tz = tz))
+  #     datad  <- merge.xts(z, datad)$datad
+  #     datad  <- na.locf(datad)
+  #     rdatad <- makeReturns(datad)
+  #     rdatad <- rdatad[time(rdatad) > min(time(rdatad))]
+  #     rdata  <- rbind(rdata, rdatad)
+  #     mR     <- rbind(mR, as.numeric(rdatad))
+  #   }
+  #   if (method != "driftKernel") {
+  #     mR <- t(mR)
+  #   }
+  # } else {
+  #   if ("matrix" %in% class(data) | "data.table" %in% class(data)) {
+  #     mR <- as.matrix(data)
+  #     rdata <- NULL
+  #   } else {
+  #     stop("Input data has to consist of either of the following:
+  #           1. An xts object or a 
+  #           2) data.table 
+  #      containing price data")
+  #   }
+  # }
   
   options <- list(...)
   out <- switch(method, ### works only for one day at a time! Does the rest of data preparation in the function.

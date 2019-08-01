@@ -157,7 +157,7 @@ aggregatets <- function (ts, FUN = "previoustick", on = "minutes", k = 1, weight
 #' of the result.
 #' 
 #' @param pdata data.table or xts object to be aggregated containing the intraday price series, possibly across multiple days.
-#' @param on character, indicating the time scale in which "k" is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".
+#' @param on character, indicating the time scale in which "k" is expressed. Possible values are: "milliseconds", "secs", "seconds", "mins", "minutes","hours".
 #' @param k positive integer, indicating the number of periods to aggregate over; e.g. to aggregate a 
 #' xts object to the 5 minute frequency set k = 5 and on = "minutes".
 #' @param marketopen the market opening time, by default: marketopen = "09:30:00". 
@@ -179,15 +179,28 @@ aggregatets <- function (ts, FUN = "previoustick", on = "minutes", k = 1, weight
 #' @examples 
 #' # aggregate price data to the 30 second frequency
 #' aggregatePrice(sample_tdata_microseconds, on = "secs", k = 30)
+#' # aggregate price data to the 30 second frequency including zero return price changes
+#' aggregatePrice(sample_tdata_microseconds, on = "secs", k = 30)
+#' 
+#' # aggregate price data to half a second frequency including zero return price changes
+#' aggregatePrice(sample_tdata_microseconds, on = "milliseconds", k = 500, fill = TRUE)
 #' @keywords internal
 #' @importFrom xts last
 #' @export
 aggregatePrice <- function(pdata, on = "minutes", k = 1, marketopen = "09:30:00", marketclose = "16:00:00" , fill = FALSE, tz = NULL) {
   
   DATE = DT = FIRST_DT = DT_ROUND = LAST_DT = SYMBOL = PRICE = NULL
+  
+  on_true <- NULL
 
   if ("PRICE" %in% colnames(pdata) == FALSE) {
     stop("data.table or xts needs column named PRICE.")
+  }
+  
+  if (on == "milliseconds") {
+    on_true <- "milliseconds"
+    on <- "secs"
+    k <- k / 1000
   }
   
   dummy_was_xts <- FALSE
@@ -260,13 +273,27 @@ aggregatePrice <- function(pdata, on = "minutes", k = 1, marketopen = "09:30:00"
     if (on == "seconds") {
       on <- "secs"
     }
-    dt_full_index <-
-      rbindlist(lapply(unique(as.Date(sample_tdata_microseconds$DT)),
-                       FUN = function(x) data.frame(DT = seq.POSIXt(from = as.POSIXct(paste0(x, marketopen, tz = tz(pdata$DT))), 
-                                                                    to   = as.POSIXct(paste0(x, marketclose, tz = tz(pdata$DT))), 
-                                                                    by = paste(k, on)))))
+    
+    # if/else seems unnecessary but otherwise seq.POSIXt won't work for milliseconds
+    if (is.null(on_true) == FALSE) {
+      dt_full_index <-
+        rbindlist(lapply(unique(as.Date(sample_tdata_microseconds$DT)),
+                         FUN = function(x) data.frame(DT = seq.POSIXt(from = as.POSIXct(paste0(x, marketopen, tz = tz(pdata$DT))), 
+                                                                      to   = as.POSIXct(paste0(x, marketclose, tz = tz(pdata$DT))), 
+                                                                      units = on,
+                                                                      by = k))))
+    } else {
+      dt_full_index <-
+        rbindlist(lapply(unique(as.Date(sample_tdata_microseconds$DT)),
+                         FUN = function(x) data.frame(DT = seq.POSIXt(from = as.POSIXct(paste0(x, marketopen, tz = tz(pdata$DT))), 
+                                                                      to   = as.POSIXct(paste0(x, marketclose, tz = tz(pdata$DT))),
+                                                                      by = paste(k, on)))))
+    }
+    
     lubridate::tz(dt_full_index$DT) <- tz(pdata$DT)
     pdata <- merge(pdata, dt_full_index, by = "DT", all = TRUE)
+    
+    setkeyv(pdata, "DT")
     
     pdata$PRICE <- na.locf(pdata$PRICE)
   }
@@ -277,6 +304,12 @@ aggregatePrice <- function(pdata, on = "minutes", k = 1, marketopen = "09:30:00"
     return(pdata)
   }
 }
+# 
+# blub <- data.table(DT = c(1,3,4, 2), PRICE = c(1, NA, 2, 4))
+# setkeyv(blub, "DT")
+# blub$PRICE <- na.locf(blub$PRICE)
+# 
+# blub
 
 #' Aggregate a data.table or xts object containing quote data
 #' 
@@ -335,8 +368,10 @@ aggregateQuotes <- function(qdata, on = "minutes", k = 5, marketopen = "09:30:00
     }
   }
   
-  if (length(unique(qdata$SYMBOL)) > 1) {
-    stop("Please provide only one symbol at a time.")
+  if ("SYMBOL" %in% colnames(qdata)) {
+    if (length(unique(qdata$SYMBOL)) > 1) {
+      stop("Please provide only one symbol at a time.")
+    }
   }
   
   qdata[, DATE := as.Date(DT)]
