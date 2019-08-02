@@ -3,30 +3,29 @@
 #' @importFrom xts .indexDate
 #' @importFrom zoo index
 driftKernel <- function(data, intraday, options) {
-  if(ncol(data) > 1){
+  
+  if(length(unique(as.Date(data$DT))) != 1){
     stop("driftKernel method currently only accepts single day tick data as it relies on the time-stamps of the trades.")
   }
-  if(length(unique(.indexDate(data))) != 1){
-    stop("driftKernel method currently only accept single day tick data as it relies on the time-stamps of the trades.")
-  }
+  
   op <- list(init = list(), PreAverage = 5, bandwidth = 300)
   op[names(options)] <- options
-  data           <- log(data)
-  vX             <- c(0,diff(data)[-1])
+  datap          <- log(data$PRICE)
+  vX             <- c(0,diff(datap)[-1])
   k              <- op$PreAverage
   bandwidth      <- op$bandwidth
-  iT             <- length(data)
+  iT             <- length(datap)
   vPreAveraged   <- rep(0 , iT-1)
   mu             <- numeric(length(intraday))
   mu[1]          <- 0
-  vPreAveraged[(k*2-1):(iT-1)] <- filter(x = as.numeric(data) , c(rep(1,k),rep(-1,k)))[k:(iT-k)]
-  vPreAveraged <- c(0,vPreAveraged)
-  time <- index(data)
-  time <- as.numeric(time) - (.indexDate(data)[1] * 86400)
-  estimtimes <- c(34200, as.numeric(intraday) * 86400)
+  vPreAveraged[(k*2-1):(iT-1)] <- filter(x = as.numeric(datap), c(rep(1,k),rep(-1,k)))[k:(iT-k)]
+  vPreAveraged <- c(0, vPreAveraged)
+  time <- as.numeric(data$DT)
+  # time <- time - as.numeric(data$DT)[1]
+  estimtimes <- intraday #c(34200, as.numeric(intraday) * 86400)
   for (i in 2:length(estimtimes)) {
     x     <- time - estimtimes[i]
-    vWm   <- exp(-abs(x/bandwidth)) * (x<=0)    ##left sided exponential kernel
+    vWm   <- exp(-abs(x/bandwidth)) * (x <= 0)    ##left sided exponential kernel
     idx   <- sum(x <= 0)                        # makes sure we don't include future data!
     mu[i] <- (sum(vWm[1:idx] * vPreAveraged[1:idx])) / bandwidth
   }
@@ -361,6 +360,7 @@ kernelestim <- function(mR, rdata = NULL, delta = 300, options = list()) {
 
 # calculate values of certain kernels
 # arguments b and y only needed for type == "beta"
+#' @importFrom stats dnorm dbeta
 #' @keywords internal
 kernelk <- function(x, type = "gaussian", b = 1, y = 1) {
   if (type == "gaussian") 
@@ -377,6 +377,7 @@ kernelk <- function(x, type = "gaussian", b = 1, y = 1) {
 # estimate optimal bandwidth paramater h
 # by default, this is done through crossvalidation (cv)
 # else the formula for h_opt in Kristensen(2010) is approximated
+#' @importFrom stats optimize bw.nrd0
 #' @keywords internal
 estbandwidth <- function(x, delta = 300, qmult = 1, type = "gaussian", 
                          est = "cv", lower = NULL, upper = NULL) {
@@ -430,6 +431,7 @@ ISE <- function(h, x, delta = 300, type = "gaussian") {
 
 # Piecewise constant volatility method
 # See Fried (2012)
+#' @importFrom stats sd
 #' @keywords internal
 piecewise <- function(mR, rdata = NULL, options = list()) {
   # default options, replace if user-specified
@@ -497,9 +499,9 @@ changePoints <- function(vR, type = "MDa", alpha = 0.005, m = 40, n = 20) {
       reference <- logR[(t - N + 1):(t - n)]
       testperiod <- logR[(t - n + 1):t]  
       if(switch(type,
-                MDa = MDtest(reference, testperiod, type = type, alpha = alpha),
-                MDb = MDtest(reference, testperiod, type = type, alpha = alpha),
-                DM = DMtest(reference, testperiod, alpha = alpha))) {
+                MDa <- MDtest(reference, testperiod, type = type, alpha = alpha),
+                MDb <- MDtest(reference, testperiod, type = type, alpha = alpha),
+                DM  <- DMtest(reference, testperiod, alpha = alpha))) {
         points <- c(points, t - n)     
         np <- np + 1
         cat(paste("Change detected at observation", points[np], "...\n"))
@@ -512,6 +514,7 @@ changePoints <- function(vR, type = "MDa", alpha = 0.005, m = 40, n = 20) {
 # Difference of medians test
 # See Fried (2012)
 # Returns TRUE if H0 is rejected
+#' @importFrom stats density
 #' @keywords internal
 DMtest <- function(x, y, alpha = 0.005) {
   m <- length(x)
@@ -611,6 +614,7 @@ garch_s <- function(mR, rdata = NULL, options = list()) {
   return(out)
 }
 
+#' @importFrom graphics abline layout title
 #' @export
 plot.spotvol <- function(x, ...) {
   options <- list(...)

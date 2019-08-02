@@ -8,14 +8,14 @@ spotDrift(data, method = "driftMean", ..., on = "minutes", k = 5,
   marketopen = "09:30:00", marketclose = "16:00:00", tz = "GMT")
 }
 \arguments{
-\item{data}{Can be one of two input types, \code{xts} or \code{data.table}. It is assumed that the input is the price in levels.}
+\item{data}{Can be one of two input types, \code{xts} or \code{data.table}. It is assumed that the input comprises prices in levels.}
 
-\item{method}{Which method to be used to estimate the spot-drift. Currently 3 methods are available, rolling mean and median as well as the kernel method of Christensen et al. 2018.
+\item{method}{Which method to be used to estimate the spot-drift. Currently, three methods are available, rolling mean and median as well as the kernel method of Christensen et al. 2018.
 The kernel is a left hand exponential kernel that will weigh newer observations more heavily than older observations.}
 
 \item{...}{Additional arguments for the individual methods. See details}
 
-\item{on}{What time-frame should the estimator be applied? Accepted inputs are \code{"seconds"} and \code{"secs"} for seconds, \code{"minutes"} and \code{"mins"} for minutes, and \code{"hours"} for hours.
+\item{on}{What time-frame should the estimator be applied? Accepted inputs are \code{"milliseconds"}, \code{"seconds"} and \code{"secs"} for seconds, \code{"minutes"} and \code{"mins"} for minutes, and \code{"hours"} for hours.
 Standard is minutes}
 
 \item{k}{How often should the estimation take place? If \code{k} is 5 the estimation will be done every fifth unit of \code{on}.}
@@ -30,7 +30,7 @@ Standard is minutes}
 An object of class "spotdrift" containing at least the estimated spot drift process. Input on what this class should contain and methods for it is welcome.
 }
 \description{
-Function used to estimate the spot drift of intra-day (tick) stock prices/returns
+Function used to estimate the spot drift of intraday (tick) stock prices/returns
 }
 \details{
 The additional arguments for the mean and median methods are: \code{periods} for the rolling window length which is 5 by standard and

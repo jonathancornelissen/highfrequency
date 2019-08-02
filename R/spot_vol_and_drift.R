@@ -1,11 +1,11 @@
 #' Spot Drift Estimation
-#' @description Function used to estimate the spot drift of intra-day (tick) stock prices/returns
+#' @description Function used to estimate the spot drift of intraday (tick) stock prices/returns
 #'
-#' @param data Can be one of two input types, \code{xts} or \code{data.table}. It is assumed that the input is the price in levels.
-#' @param method Which method to be used to estimate the spot-drift. Currently 3 methods are available, rolling mean and median as well as the kernel method of Christensen et al. 2018.
+#' @param data Can be one of two input types, \code{xts} or \code{data.table}. It is assumed that the input comprises prices in levels.
+#' @param method Which method to be used to estimate the spot-drift. Currently, three methods are available, rolling mean and median as well as the kernel method of Christensen et al. 2018.
 #' The kernel is a left hand exponential kernel that will weigh newer observations more heavily than older observations.
 #' @param ... Additional arguments for the individual methods. See details
-#' @param on What time-frame should the estimator be applied? Accepted inputs are \code{"seconds"} and \code{"secs"} for seconds, \code{"minutes"} and \code{"mins"} for minutes, and \code{"hours"} for hours.
+#' @param on What time-frame should the estimator be applied? Accepted inputs are \code{"milliseconds"}, \code{"seconds"} and \code{"secs"} for seconds, \code{"minutes"} and \code{"mins"} for minutes, and \code{"hours"} for hours.
 #' Standard is minutes
 #' @param k How often should the estimation take place? If \code{k} is 5 the estimation will be done every fifth unit of \code{on}.
 #' @param marketopen Opening time of the market, standard is "09:30:00"
@@ -45,7 +45,7 @@
 spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
                      marketopen = "09:30:00", marketclose = "16:00:00", tz = "GMT") {
   
-  PRICE = DATE = RETURN = NULL
+  PRICE = DATE = RETURN = DT = NULL
   
   if ("PRICE" %in% colnames(data) == FALSE) {
     stop("data.table or xts needs column named PRICE.")
@@ -68,91 +68,21 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
   
   datad <- aggregatePrice(data, on = on, k = k , marketopen = marketopen,
                           marketclose = marketclose, tz = tz, fill = TRUE) 
-  
   datad[, DATE := as.Date(DT)]
-  
-  # datad <- aggregatePrice(sample_tdata_microseconds, on = "secs", k = 30, fill = TRUE)[, DATE := as.Date(DT)] %>% split(.$DATE)
   setkeyv(datad, "DT")
-  
   datad <- datad[, RETURN := log(PRICE) - shift(log(PRICE), type = "lag"), by = "DATE"][is.na(RETURN) == FALSE]
-                 
   datad <- split(datad, by = "DATE")
-  
-  # datad[, RETURN := log(PRICE) - lag(log(PRICE), by = DATE)]
-  
   mR <- matrix(unlist(lapply(datad, FUN = function(x) as.numeric(x$RETURN))), ncol = length(datad[[1]]$RETURN), byrow = TRUE)
   
   if (method != "driftKernel") {
     mR <- t(mR)
   }
   
-  # if (on == "seconds" | on == "secs") {
-  #   delta <- k
-  # }
-  # 
-  # if (on == "minutes" | on == "mins") {
-  #   delta <- k * 60
-  # }
-  #   
-  # if (on == "hours") {
-  #   delta <- k * 3600
-  # }
-  # 
-  # if (xtsible(data) == TRUE) {
-  #   data <- as.xts(data)
-  # }
-  
-  # if (inherits(data, what = "xts")) {
-  #   data <- xts(data, order.by = as.POSIXct(time(data), tz = tz), tzone = tz)
-  #   dates <- unique(format(time(data), "%Y-%m-%d"))
-  #   cDays <- length(dates)
-  #   rdata <- mR <- c()
-  #   intraday <- seq(from = chron::times(marketopen),
-  #                   to = chron::times(marketclose),
-  #                   by = chron::times(delta / (24 * 3600)))
-  #   if (as.character(tail(intraday, 1)) != marketclose)
-  #   intraday <- c(intraday, marketclose)
-  #   intraday <- intraday[2:length(intraday)]
-  #   for (d in 1:cDays) {
-  #     if (method == "driftKernel") {
-  #       break
-  #     }
-  #     datad <- data[as.character(dates[d])]
-  #     if (!all(format(time(datad), format = "%Z") == tz))
-  #       stop(paste("Not all data on ", dates[d], " is in time zone \"", tz,
-  #                  "\". This may be due to daylight saving time. Try using a",
-  #                  " time zone without daylight saving, such as GMT.",
-  #                  sep = ""))
-  # 
-  #     datad <- aggregatePrice(datad, on = on, k = k , marketopen = marketopen,
-  #                             marketclose = marketclose, tz = tz, fill = TRUE)
-  #     z <- xts(rep(1, length(intraday)), tzone = tz,
-  #              order.by = as.POSIXct(paste(dates[d], as.character(intraday),
-  #                                          sep = " "), tz = tz))
-  #     datad  <- merge.xts(z, datad)$datad
-  #     datad  <- na.locf(datad)
-  #     rdatad <- makeReturns(datad)
-  #     rdatad <- rdatad[time(rdatad) > min(time(rdatad))]
-  #     rdata  <- rbind(rdata, rdatad)
-  #     mR     <- rbind(mR, as.numeric(rdatad))
-  #   }
-  #   if (method != "driftKernel") {
-  #     mR <- t(mR)
-  #   }
-  # } else {
-  #   if ("matrix" %in% class(data) | "data.table" %in% class(data)) {
-  #     mR <- as.matrix(data)
-  #     rdata <- NULL
-  #   } else {
-  #     stop("Input data has to consist of either of the following:
-  #           1. An xts object or a 
-  #           2) data.table 
-  #      containing price data")
-  #   }
-  # }
-  
+  if (method == "driftKernel") {
+    intraday <- as.numeric(datad[[1]]$DT)
+  }
   options <- list(...)
-  out <- switch(method, ### works only for one day at a time! Does the rest of data preparation in the function.
+  out <- switch(method, ### driftKernel works only for one day at a time! Does the rest of data preparation in the function.
                 driftKernel = driftKernel(data = data, intraday, options), 
                 driftMean   = driftMean(mR = mR, options),
                 driftMedian = driftMedian(mR = mR, options))

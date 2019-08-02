@@ -277,14 +277,14 @@ aggregatePrice <- function(pdata, on = "minutes", k = 1, marketopen = "09:30:00"
     # if/else seems unnecessary but otherwise seq.POSIXt won't work for milliseconds
     if (is.null(on_true) == FALSE) {
       dt_full_index <-
-        rbindlist(lapply(unique(as.Date(sample_tdata_microseconds$DT)),
+        rbindlist(lapply(unique(as.Date(pdata$DT)),
                          FUN = function(x) data.frame(DT = seq.POSIXt(from = as.POSIXct(paste0(x, marketopen, tz = tz(pdata$DT))), 
                                                                       to   = as.POSIXct(paste0(x, marketclose, tz = tz(pdata$DT))), 
                                                                       units = on,
                                                                       by = k))))
     } else {
       dt_full_index <-
-        rbindlist(lapply(unique(as.Date(sample_tdata_microseconds$DT)),
+        rbindlist(lapply(unique(as.Date(pdata$DT)),
                          FUN = function(x) data.frame(DT = seq.POSIXt(from = as.POSIXct(paste0(x, marketopen, tz = tz(pdata$DT))), 
                                                                       to   = as.POSIXct(paste0(x, marketclose, tz = tz(pdata$DT))),
                                                                       by = paste(k, on)))))
@@ -304,12 +304,6 @@ aggregatePrice <- function(pdata, on = "minutes", k = 1, marketopen = "09:30:00"
     return(pdata)
   }
 }
-# 
-# blub <- data.table(DT = c(1,3,4, 2), PRICE = c(1, NA, 2, 4))
-# setkeyv(blub, "DT")
-# blub$PRICE <- na.locf(blub$PRICE)
-# 
-# blub
 
 #' Aggregate a data.table or xts object containing quote data
 #' 
