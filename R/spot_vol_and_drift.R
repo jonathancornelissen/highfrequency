@@ -44,13 +44,13 @@
 #' @export
 spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
                      marketopen = "09:30:00", marketclose = "16:00:00", tz = "GMT") {
-  
+
   PRICE = DATE = RETURN = DT = NULL
-  
+
   if ("PRICE" %in% colnames(data) == FALSE) {
     stop("data.table or xts needs column named PRICE.")
   }
-  
+
   dummy_was_xts <- FALSE
   if (is.data.table(data) == FALSE) {
     if (is.xts(data) == TRUE) {
@@ -62,35 +62,35 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
     }
   } else {
     if (("DT" %in% colnames(data)) == FALSE) {
-      stop("Data.table neeeds DT column.")
+      stop("Data.table needs DT column containing the time-stamps of the trades.") # added the timestamp comment for verbosity.
     }
   }
-  
+
   datad <- aggregatePrice(data, on = on, k = k , marketopen = marketopen,
-                          marketclose = marketclose, tz = tz, fill = TRUE) 
+                          marketclose = marketclose, tz = tz, fill = TRUE)
   datad[, DATE := as.Date(DT)]
   setkeyv(datad, "DT")
   datad <- datad[, RETURN := log(PRICE) - shift(log(PRICE), type = "lag"), by = "DATE"][is.na(RETURN) == FALSE]
   datad <- split(datad, by = "DATE")
   mR <- matrix(unlist(lapply(datad, FUN = function(x) as.numeric(x$RETURN))), ncol = length(datad[[1]]$RETURN), byrow = TRUE)
-  
+
   if (method != "driftKernel") {
     mR <- t(mR)
   }
-  
+
   if (method == "driftKernel") {
     intraday <- as.numeric(datad[[1]]$DT)
   }
   options <- list(...)
   out <- switch(method, ### driftKernel works only for one day at a time! Does the rest of data preparation in the function.
-                driftKernel = driftKernel(data = data, intraday, options), 
+                driftKernel = driftKernel(data = data, intraday, options),
                 driftMean   = driftMean(mR = mR, options),
                 driftMedian = driftMedian(mR = mR, options))
   return(out)
 }
 
 #' Spot volatility estimation
-#' 
+#'
 #' @param data Either an \code{xts} object, containing price data, or a
 #' \code{matrix} containing returns. For price data, irregularly spaced
 #' observations are allowed. They will be aggregated to the level specified by
@@ -99,7 +99,7 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
 #' and \code{k}. Return data should be in matrix form, where each row
 #' corresponds to a day, and each column to an intraday period. The output
 #' will be in the same form as the input (\code{xts} or \code{matrix}/\code{numeric}).
-#' 
+#'
 #' @param method specifies which method will be used to estimate the spot
 #' volatility. Options include \code{"detper"} and \code{"stochper"}.
 #' See 'Details'.
@@ -115,26 +115,26 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
 #' @param tz string specifying the time zone to which the times in \code{data}
 #' and/or \code{marketopen}/ \code{marketclose} belong. Default = \code{"GMT"}.
 #' @param ... method-specific parameters (see 'Details').
-#' 
+#'
 #' @return A \code{spotvol} object, which is a list containing one or more of the
 #' following outputs, depending on the method used:
-#' 
+#'
 #' \code{spot}
-#' 
+#'
 #' An \code{xts} or \code{matrix} object (depending on the input) containing
 #' spot volatility estimates \eqn{\sigma_{t,i}}, reported for each interval
 #' \eqn{i} between \code{marketopen} and \code{marketclose} for every day
 #' \eqn{t} in \code{data}. The length of the intervals is specifiedby \code{k}
 #' and \code{on}. Methods that provide this output: All.
-#' 
+#'
 #' \code{daily}
 #' An \code{xts} or \code{numeric} object (depending on the input) containing
 #' estimates of the daily volatility levels for each day \eqn{t} in \code{data},
 #' if the used method decomposed spot volatility into a daily and an intraday
 #' component. Methods that provide this output: \code{"detper"}.
-#' 
+#'
 #' \code{periodic}
-#' 
+#'
 #' An \code{xts} or \code{numeric} object (depending on the input) containing
 #' estimates of the intraday periodicity factor for each day interval \eqn{i}
 #' between \code{marketopen} and \code{marketclose}, if the spot volatility was
@@ -142,41 +142,41 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
 #' \code{xts} format, this periodicity factor will be dated to the first day of
 #' the input data, but it is identical for each day in the sample. Methods that
 #' provide this output: \code{"detper"}.
-#' 
+#'
 #' \code{par}
-#' 
+#'
 #' A named list containing parameter estimates, for methods that estimate one
 #' or more parameters. Methods that provide this output:
 #' \code{"stochper", "kernel"}.
-#' 
+#'
 #' \code{cp}
-#' 
+#'
 #' A vector containing the change points in the volatility, i.e. the observation
 #' indices after which the volatility level changed, according to the applied
 #' tests. The vector starts with a 0. Methods that provide this output:
 #'  \code{"piecewise"}.
-#' 
+#'
 #' \code{ugarchfit}
-#' 
+#'
 #' A \code{ugarchfit} object, as used by the \code{rugarch}
 #' package, containing all output from fitting the GARCH model to the data.
 #' Methods that provide this output: \code{"garch"}.
-#' 
+#'
 #' The \code{spotvol} function offers several methods to estimate spot
 #' volatility and its intraday seasonality, using high-frequency data. It
 #' returns an object of class \code{spotvol}, which can contain various outputs,
 #' depending on the method used. See 'Details' for a description of each method.
 #' In any case, the output will contain the spot volatility estimates.
-#' 
+#'
 #' The input can consist of price data or return data, either tick by tick or
 #' sampled at set intervals. The data will be converted to equispaced
 #' high-frequency returns \eqn{r_{t,i}} (read: the \eqn{i}th return on day
 #'                                      \eqn{t}).
-#' 
+#'
 #' @details The following estimation methods can be specified in \code{method}:
-#' 
+#'
 #' \strong{Deterministic periodicity method (\code{"detper"})}
-#'   
+#'
 #' Parameters:
 #'   \tabular{ll}{
 #'     \code{dailyvol} \tab A string specifying the estimation method for the daily
@@ -209,7 +209,7 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
 #' are then estimated separately. For more details, see Taylor and Xu (1997)
 #' and Andersen and Bollerslev (1997). The jump robust versions by Boudt et al.
 #' (2011) have also been implemented.
-#' 
+#'
 #' \strong{Stochastic periodicity method (\code{"stochper"})}
 #' Parameters:
 #' \tabular{ll}{
@@ -221,7 +221,7 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
 #' optimization routine (\code{"BFGS"} in \code{optim}). Default =
 #' \code{list(sigma = 0.03, sigma_mu = 0.005, sigma_h = 0.005, sigma_k = 0.05,
 #' phi = 0.2, rho = 0.98, mu = c(2, -0.5), delta_c = rep(0, max(1,P1)),
-#' delta_s = rep(0, max(1,P2)))}. 
+#' delta_s = rep(0, max(1,P2)))}.
 #' See Beltratti & Morana (2001) for a definition
 #' of each parameter. \code{init} can contain any number of these parameters.
 #' For parameters not specified in \code{init}, the default initial value will
@@ -240,9 +240,9 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
 #' quasi-maximum likelihood method based on the Kalman Filter. The package
 #' \code{FKF} is used to apply the Kalman filter. In addition to
 #' the spot volatility estimates, all parameter estimates are returned.
-#' 
+#'
 #' \strong{Nonparametric filtering (\code{"kernel"})}
-#' 
+#'
 #' Parameters:
 #' \tabular{ll}{
 #' \code{type} \tab String specifying the type of kernel to be used. Options
@@ -263,25 +263,25 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
 #' \code{upper} \tab Upper bound to be used in bandwidth optimization routine,
 #' when using cross-validation method. Default is \eqn{n^{-0.2}}. \cr
 #' }
-#' 
+#'
 #' Outputs (see 'Value' for a full description of each component):
 #' \itemize{
 #' \item{\code{spot}}
 #' \item{\code{par}}
 #' }
-#' 
+#'
 #' This method by Kristensen (2010) filters the spot volatility in a
 #' nonparametric way by applying kernel weights to the standard realized
 #' volatility estimator. Different kernels and bandwidths can
 #' be used to focus on specific characteristics of the volatility process.
-#' 
+#'
 #' Estimation results heavily depend on the bandwidth parameter \eqn{h}, so it
 #' is important that this parameter is well chosen. However, it is difficult to
 #' come up with a method that determines the optimal bandwidth for any kind of
 #' data or kernel that can be used. Although some estimation methods are
 #' provided, it is advised that you specify \eqn{h} yourself, or make sure that
 #' the estimation results are appropiate.
-#' 
+#'
 #' One way to estimate \eqn{h}, is by using cross-validation. For each day in
 #' the sample, \eqn{h} is chosen as to minimize the Integrated Square Error,
 #' which is a function of \eqn{h}. However, this function often has multiple
@@ -290,12 +290,12 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
 #' can be specified by \code{lower} and \code{upper}, which by default are
 #' \eqn{0.1n^{-0.2}} and \eqn{n^{-0.2}} respectively, where \eqn{n} is the
 #' number of observations in a day.
-#' 
+#'
 #' When using the method \code{"kernel"}, in addition to the spot volatility
 #' estimates, all used values of the bandwidth \eqn{h} are returned.
-#' 
+#'
 #' \strong{Piecewise constant volatility (\code{"piecewise"})}
-#' 
+#'
 #' Parameters:
 #' \tabular{ll}{
 #' \code{type} \tab String specifying the type of test to be used. Options
@@ -317,26 +317,26 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
 #' \eqn{t-1}), or ex post (using all observations between two change points).
 #' Default = \code{TRUE}.  \cr
 #' }
-#' 
+#'
 #' Outputs (see 'Value' for a full description of each component):
 #' \itemize{
 #' \item{\code{spot}}
 #' \item{\code{cp}}
 #' }
-#' 
+#'
 #' This nonparametric method by Fried (2012) assumes the volatility to be
 #' piecewise constant over local windows. Robust two-sample tests are applied to
 #' detect changes in variability between subsequent windows. The spot volatility
 #' can then be estimated by evaluating regular realized volatility estimators
 #' within each local window.
-#' 
+#'
 #' Along with the spot volatility estimates, this method will return the
 #' detected change points in the volatility level. When plotting a
 #' \code{spotvol} object containing \code{cp}, these change points will be
 #' visualized.
-#' 
+#'
 #' \strong{GARCH models with intraday seasonality  (\code{"garch"})}
-#' 
+#'
 #' Parameters:
 #' \tabular{ll}{
 #' \code{model} \tab String specifying the type of test to be used. Options
@@ -363,29 +363,29 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
 #' This method generates the external regressors needed to model the intraday
 #' seasonality with a Flexible Fourier form. The \code{rugarch} package
 #' is then employed to estimate the specified GARCH(1,1) model.
-#' 
+#'
 #' Along with the spot volatility estimates, this method will return the
 #' \code{ugarchfit} object used by the \code{rugarch} package.
-#' 
+#'
 #' @examples
 #' # Default method, deterministic periodicity
-#' 
+#'
 #' vol1 <- spotvol(sample_real5minprices)
 #' plot(vol1)
-#' 
+#'
 #' # Compare to stochastic periodicity
 #' \donttest{
 #' init <- list(sigma = 0.03, sigma_mu = 0.005, sigma_h = 0.007,
 #'              sigma_k = 0.06, phi = 0.194, rho = 0.986, mu = c(1.87,-0.42),
-#'              delta_c = c(0.25, -0.05, -0.2, 0.13, 0.02), 
+#'              delta_c = c(0.25, -0.05, -0.2, 0.13, 0.02),
 #'              delta_s = c(-1.2, 0.11, 0.26, -0.03, 0.08))
-#' 
+#'
 #' # next method will take around 110 iterations
 #' vol2 <- spotvol(sample_real5minprices, method = "stochper", init = init)
 #' plot(as.numeric(vol1$spot[1:780]), type="l")
 #' lines(as.numeric(vol2$spot[1:780]), col="red")
 #' legend("topright", c("detper", "stochper"), col = c("black", "red"), lty=1)}
-#' 
+#'
 #' # Various kernel estimates
 #' \donttest{
 #' h1 <- bw.nrd0((1:nrow(sample_returns_5min))*(5*60))
@@ -397,7 +397,7 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
 #' lines(as.numeric(t(vol5$spot))[1:2880], col = "blue")
 #' legend("topright", c("h = simple estimate", "h = quarticity corrected",
 #'                      "h = crossvalidated"), col = c("black", "red", "blue"), lty=1)}
-#' 
+#'
 #' # Piecewise constant volatility, using an example from Fried (2012)
 #' \donttest{
 #' simdata <- matrix(sqrt(5/3)*rt(3000, df = 5), ncol = 500, byrow = TRUE)
@@ -415,50 +415,50 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
 #' lines(as.numeric(t(vol8$spot)), col = "red")
 #' legend("topleft", c("GARCH", "eGARCH"), col = c("black", "red"), lty=1)
 #' }
-#' 
+#'
 #' @references Andersen, T. G. and T. Bollerslev (1997). Intraday periodicity and volatility persistence in financial markets. Journal of Empirical Finance 4, 115-158.
-#' 
+#'
 #' Beltratti, A. and C. Morana (2001). Deterministic and stochastic methods for estimation of intraday seasonal components with high frequency data. Economic Notes 30, 205-234.
-#' 
+#'
 #' Boudt K., Croux C. and Laurent S. (2011). Robust estimation of intraweek periodicity in volatility and jump detection. Journal of Empirical Finance 18, 353-367.
-#' 
+#'
 #' Fried, Roland (2012). On the online estimation of local constant volatilities. Computational Statistics and Data Analysis 56, 3080-3090.
-#' 
+#'
 #' Kristensen, Dennis (2010). Nonparametric filtering of the realized spot volatility: A kernel-based approach. Econometric Theory 26, 60-93.
-#' 
+#'
 #' Taylor, S. J. and X. Xu (1997). The incremental volatility information in one million foreign exchange quotations. Journal of Empirical Finance 4, 317-340.
 #' @export
 spotvol <- function(data, method = "detper", ..., on = "minutes", k = 5,
                       marketopen = "09:30:00", marketclose = "16:00:00",
                       tz = "GMT") {
-  if (on == "seconds" | on == "secs") 
-    delta <- k 
-  if (on == "minutes" | on == "mins") 
-    delta <- k * 60  
-  if (on == "hours") 
-    delta <- k * 3600 
-  
+  if (on == "seconds" | on == "secs")
+    delta <- k
+  if (on == "minutes" | on == "mins")
+    delta <- k * 60
+  if (on == "hours")
+    delta <- k * 3600
+
   if (inherits(data, what = "xts")) {
     data <- xts(data, order.by = as.POSIXct(time(data), tz = tz), tzone = tz)
     dates <- unique(format(time(data), "%Y-%m-%d"))
     cDays <- length(dates)
     rdata <- mR <- c()
-    intraday <- seq(from = chron::times(marketopen), 
-                    to = chron::times(marketclose), 
-                    by = chron::times(delta/(24*3600))) 
-    if (as.character(tail(intraday, 1)) != marketclose) 
+    intraday <- seq(from = chron::times(marketopen),
+                    to = chron::times(marketclose),
+                    by = chron::times(delta/(24*3600)))
+    if (as.character(tail(intraday, 1)) != marketclose)
       intraday <- c(intraday, marketclose)
     intraday <- intraday[2:length(intraday)]
     for (d in 1:cDays) {
       datad <- data[as.character(dates[d])]
-      if (!all(format(time(datad), format = "%Z") == tz)) 
+      if (!all(format(time(datad), format = "%Z") == tz))
         stop(paste("Not all data on ", dates[d], " is in time zone \"", tz,
                    "\". This may be due to daylight saving time. Try using a",
-                   " time zone without daylight saving, such as GMT.", 
+                   " time zone without daylight saving, such as GMT.",
                    sep = ""))
       datad <- aggregatePrice(datad, on = on, k = k , marketopen = marketopen,
                               marketclose = marketclose, tz = tz)
-      z <- xts(rep(1, length(intraday)), tzone = tz, 
+      z <- xts(rep(1, length(intraday)), tzone = tz,
                order.by = as.POSIXct(paste(dates[d], as.character(intraday)), tz = tz))
       datad <- merge.xts(z, datad)$datad
       datad <- na.locf(datad)
@@ -472,19 +472,18 @@ spotvol <- function(data, method = "detper", ..., on = "minutes", k = 5,
       mR <- data
       rdata <- NULL
     } else {
-      stop("Input data has to consist of either of the following: 
+      stop("Input data has to consist of either of the following:
             1. An xts object containing price data
             2. A matrix containing return data")
     }
   }
   browser()
   options <- list(...)
-  out <- switch(method, 
-                detper = detper(mR, rdata = rdata, options = options), 
+  out <- switch(method,
+                detper = detper(mR, rdata = rdata, options = options),
                 stochper = stochper(mR, rdata = rdata, options = options),
                 kernel = kernelestim(mR, rdata = rdata, delta, options = options),
                 piecewise = piecewise(mR, rdata = rdata, options = options),
-                garch = garch_s(mR, rdata = rdata, options = options))  
+                garch = garch_s(mR, rdata = rdata, options = options))
   return(out)
 }
-

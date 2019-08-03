@@ -1,17 +1,16 @@
-
 #' @keywords internal
 #' @importFrom xts .indexDate
 #' @importFrom zoo index
 driftKernel <- function(data, intraday, options) {
-  
+
   if(length(unique(as.Date(data$DT))) != 1){
     stop("driftKernel method currently only accepts single day tick data as it relies on the time-stamps of the trades.")
   }
-  
+
   op <- list(init = list(), PreAverage = 5, bandwidth = 300)
   op[names(options)] <- options
   datap          <- log(data$PRICE)
-  vX             <- c(0,diff(datap)[-1])
+  #vX             <- c(0,diff(datap)[-1])
   k              <- op$PreAverage
   bandwidth      <- op$bandwidth
   iT             <- length(datap)
@@ -22,9 +21,10 @@ driftKernel <- function(data, intraday, options) {
   vPreAveraged <- c(0, vPreAveraged)
   time <- as.numeric(data$DT)
   # time <- time - as.numeric(data$DT)[1]
-  estimtimes <- intraday #c(34200, as.numeric(intraday) * 86400)
-  for (i in 2:length(estimtimes)) {
-    x     <- time - estimtimes[i]
+  #estimtimes <- intraday #c(34200, as.numeric(intraday) * 86400)
+
+  for (i in 1:length(intraday)) {
+    x     <- time - intraday[i]
     vWm   <- exp(-abs(x/bandwidth)) * (x <= 0)    ##left sided exponential kernel
     idx   <- sum(x <= 0)                        # makes sure we don't include future data!
     mu[i] <- (sum(vWm[1:idx] * vPreAveraged[1:idx])) / bandwidth
@@ -42,9 +42,9 @@ driftMean <- function(mR, options){
   op[names(options)] <- options
   periods <- op$periods
   align   <- op$align
-  
+
   mu <- apply(mR, 2, rollmean, k = periods, align = align, fill = NA)
-  
+
   if (dim(mR)[2] > 1) {
     colnames(mu) <- paste0("mu", 1:ncol(mR)) #Here we will have a matrix
   } else {
@@ -62,15 +62,15 @@ driftMedian <- function(mR, options){
   op[names(options)] <- options
   periods <- op$periods
   align   <- op$align
-  
+
   mu <- apply(mR, 2, rollmedian, k = periods, align = align, fill = NA)
-  
+
   if (dim(mR)[2] > 1) {
     colnames(mu) <- paste0("mu",1:ncol(mR))
   }else{
     colnames(mu) <- "mu"
   }
-  
+
   out <- list("mu" = mu)
   class(out) <- "spotdrift"
   return(out)
@@ -88,61 +88,67 @@ plot.spotdrift <- function(x, ...) {
   }
 }
 
+#' @export
+print.spotdrift <- function(x, ...){
+  print(x$mu)
+}
+
+
 
 # Deterministic periodicity model
-# 
+#
 # Modified spotVol function from highfrequency package
 #' @keywords internal
 detper <- function(mR, rdata = NULL, options = list()) {
   # default options, replace if user-specified
-  op <- list(dailyvol = "bipower", periodicvol = "TML", dummies = FALSE, 
+  op <- list(dailyvol = "bipower", periodicvol = "TML", dummies = FALSE,
              P1 = 5, P2 = 5)
-  op[names(options)] <- options 
-  
+  op[names(options)] <- options
+
   cDays <- nrow(mR)
   M <- ncol(mR)
-  if (cDays == 1 & is.null(rdata)) { 
+  if (cDays == 1 & is.null(rdata)) {
     mR <- as.numeric(mR)
-    estimdailyvol <- switch(op$dailyvol, 
-                            bipower = rBPCov(mR), 
-                            medrv = medRV(mR), 
+    estimdailyvol <- switch(op$dailyvol,
+                            bipower = rBPCov(mR),
+                            medrv = medRV(mR),
                             rv = rCov(mR))
   } else {
     if (is.null(rdata)) {
-      estimdailyvol <- switch(op$dailyvol, 
+      estimdailyvol <- switch(op$dailyvol,
                               bipower = apply(mR, 1, "rBPCov"),
                               medrv = apply(mR, 1, "medRV"),
                               rv = apply(mR, 1, "rCov"))
     } else {
-      estimdailyvol <- switch(op$dailyvol, 
+      estimdailyvol <- switch(op$dailyvol,
                               bipower = apply.daily(rdata, rBPCov),
                               medrv = apply.daily(rdata, medRV),
                               rv = apply.daily(rdata, rCov))
       dates = time(estimdailyvol)
     }
-  }  
+  }
   if (cDays <= 50) {
-    print("Periodicity estimation requires at least 50 observations. 
+    print("Periodicity estimation requires at least 50 observations.
           Periodic component set to unity")
     estimperiodicvol = rep(1, M)
   } else {
     mstdR <- mR/sqrt(as.numeric(estimdailyvol) * (1/M))
-    selection <- c(1:M)[ (nrow(mR)-apply(mR,2,'countzeroes')) >=20] 
+    selection <- c(1:M)[ (nrow(mR)-apply(mR,2,'countzeroes')) >=20]
     # preferably no na is between
     selection <- c( min(selection) : max(selection) )
     mstdR <- mstdR[,selection]
-    estimperiodicvol_temp <- diurnal(stddata = mstdR, method = op$periodicvol, 
-                                     dummies = op$dummies, P1 = op$P1, 
+    estimperiodicvol_temp <- diurnal(stddata = mstdR, method = op$periodicvol,
+                                     dummies = op$dummies, P1 = op$P1,
                                      P2 = op$P2)[[1]]
     estimperiodicvol <- rep(1,M)
     estimperiodicvol[selection] <- estimperiodicvol_temp
-    mfilteredR <- mR/matrix(rep(estimperiodicvol, cDays), byrow = T, 
+    mfilteredR <- mR/matrix(rep(estimperiodicvol, cDays), byrow = T,
                             nrow = cDays)
-    estimdailyvol <- switch(op$dailyvol, 
+    estimdailyvol <- switch(op$dailyvol,
                             bipower = apply(mfilteredR, 1, "rBPCov"),
-                            medrv = apply(mfilteredR, 1, "medRV"), 
+                            medrv = apply(mfilteredR, 1, "medRV"),
                             rv = apply(mfilteredR, 1, "rCov"))
-    spot <- rep(sqrt(as.numeric(estimdailyvol) * (1/M)), each = M) * 
+    spot <- rep(sqrt(as.numeric(estimdailyvol) * (1/M)), each = M) *
       rep(estimperiodicvol, cDays)
     if (is.null(rdata)) {
       spot <- matrix(spot, nrow = cDays, ncol = M, byrow = TRUE)
@@ -158,7 +164,7 @@ detper <- function(mR, rdata = NULL, options = list()) {
 }
 
 # Stochastic periodicity model
-# 
+#
 # This function estimates the spot volatility by using the stochastic periodcity
 # model of Beltratti & Morana (2001)
 #' @keywords internal
@@ -166,15 +172,15 @@ stochper <- function(mR, rdata = NULL, options = list()) {
   #require(FKF)
   # default options, replace if user-specified
   op <- list(init = list(), P1 = 5, P2 = 5, control = list(trace=1, maxit=500))
-  op[names(options)] <- options 
-  
+  op[names(options)] <- options
+
   N <- ncol(mR)
   days <- nrow(mR)
   mR[mR == 0] <- NA
   logr2 <- log(mR^2)
-  rvector <- as.vector(t(logr2)) 
+  rvector <- as.vector(t(logr2))
   lambda <- (2*pi)/N;
-  
+
   # default starting values of parameters
   sp <- list(sigma = 0.03,
              sigma_mu = 0.005,
@@ -185,48 +191,48 @@ stochper <- function(mR, rdata = NULL, options = list()) {
              mu = c(2, -0.5),
              delta_c = rep(0, max(1,op$P1)),
              delta_s = rep(0, max(1,op$P2)))
-  
+
   # replace if user has specified different values
   sp[names(op$init)] <- op$init
-  
+
   # check input
   for (i in c("sigma", "sigma_mu", "sigma_h", "sigma_k", "phi", "rho")) {
-    if (sapply(sp, length)[i] != 1) stop(paste(i, " must be a scalar"))  
+    if (sapply(sp, length)[i] != 1) stop(paste(i, " must be a scalar"))
   }
-  if (length(sp$mu) != 2) 
+  if (length(sp$mu) != 2)
     stop("mu must have length 2")
-  if (length(sp$delta_c) != op$P1 & op$P1 > 0) 
+  if (length(sp$delta_c) != op$P1 & op$P1 > 0)
     stop("delta_c must have length equal to P1")
-  if (length(sp$delta_s) != op$P2 & op$P2 > 0) 
+  if (length(sp$delta_s) != op$P2 & op$P2 > 0)
     stop("delta_s must have length equal to P2")
-  if (length(sp$delta_c) < 1) 
+  if (length(sp$delta_c) < 1)
     stop("delta_c must at least have length 1")
-  if (length(sp$delta_s) < 1) 
+  if (length(sp$delta_s) < 1)
     stop("delta_s must at least have length 1")
-  
-  # transform parameters to allow for unrestricted optimization 
+
+  # transform parameters to allow for unrestricted optimization
   # (domain -Inf to Inf)
-  par_t <- c(sigma = log(sp$sigma), sigma_mu = log(sp$sigma_mu), 
-             sigma_h = log(sp$sigma_h), sigma_k = log(sp$sigma_k), 
+  par_t <- c(sigma = log(sp$sigma), sigma_mu = log(sp$sigma_mu),
+             sigma_h = log(sp$sigma_h), sigma_k = log(sp$sigma_k),
              phi = log(sp$phi/(1-sp$phi)), rho = log(sp$rho/(1-sp$rho)),
-             mu = sp$mu, delta_c = sp$delta_c, delta_s = sp$delta_s) 
-  
-  opt <- optim(par_t, loglikBM, yt = rvector, N = N, days = days, P1 = op$P1, 
+             mu = sp$mu, delta_c = sp$delta_c, delta_s = sp$delta_s)
+
+  opt <- optim(par_t, loglikBM, yt = rvector, N = N, days = days, P1 = op$P1,
                P2 = op$P2, method="BFGS", control = op$control)
-  
+
   # recreate model to obtain volatility estimates
   ss <- ssmodel(opt$par, days, N, P1 = op$P1, P2 = op$P2)
-  kf <- FKF::fkf(a0 = ss$a0, P0 = ss$P0, dt = ss$dt, ct = ss$ct, Tt = ss$Tt, 
-                 Zt = ss$Zt, HHt = ss$HHt, GGt = ss$GGt, 
+  kf <- FKF::fkf(a0 = ss$a0, P0 = ss$P0, dt = ss$dt, ct = ss$ct, Tt = ss$Tt,
+                 Zt = ss$Zt, HHt = ss$HHt, GGt = ss$GGt,
                  yt = matrix(rvector, ncol = length(rvector)))
   sigmahat <- as.vector(exp((ss$Zt%*%kf$at[,1:(N*days)] + ss$ct + 1.27)/2))
-  
+
   # transform parameter estimates back
-  estimates <- c(exp(opt$par["sigma"]), exp(opt$par["sigma_mu"]), 
+  estimates <- c(exp(opt$par["sigma"]), exp(opt$par["sigma_mu"]),
                  exp(opt$par["sigma_h"]), exp(opt$par["sigma_k"]),
-                 exp(opt$par["phi"])/(1+exp(opt$par["phi"])), 
+                 exp(opt$par["phi"])/(1+exp(opt$par["phi"])),
                  exp(opt$par["rho"])/(1+exp(opt$par["rho"])), opt$par[-(1:6)])
-  
+
   if (is.null(rdata)) {
     spot <- matrix(sigmahat, nrow = days, ncol = N, byrow = TRUE)
   } else {
@@ -238,33 +244,33 @@ stochper <- function(mR, rdata = NULL, options = list()) {
 }
 
 # Calculate log likelihood using Kalman Filter
-# 
-# This function returns the average log likehood value of the stochastic 
+#
+# This function returns the average log likehood value of the stochastic
 # periodicity model, given the input parameters.
 #' @keywords internal
 loglikBM <- function(par_t, yt, days, N = 288, P1 = 5, P2 = 5) {
   ss <- ssmodel(par_t, days, N, P1 = P1, P2 = P2)
   yt <- matrix(yt, ncol = length(yt))
-  kf <- FKF::fkf(a0 = ss$a0, P0 = ss$P0, dt = ss$dt, ct = ss$ct, Tt = ss$Tt, 
+  kf <- FKF::fkf(a0 = ss$a0, P0 = ss$P0, dt = ss$dt, ct = ss$ct, Tt = ss$Tt,
                  Zt = ss$Zt, HHt = ss$HHt, GGt = ss$GGt, yt = yt)
   return(-kf$logLik/length(yt))
 }
 
 # Generate state space model
-# 
+#
 # This function creates the state space matrices from the input parameters.
 # The output is in the format used by the FKF package.
 #' @keywords internal
 ssmodel <- function(par_t, days, N = 288, P1 = 5, P2 = 5) {
-  par <- c(exp(par_t["sigma"]), exp(par_t["sigma_mu"]), exp(par_t["sigma_h"]), 
-           exp(par_t["sigma_k"]), exp(par_t["phi"])/(1+exp(par_t["phi"])), 
+  par <- c(exp(par_t["sigma"]), exp(par_t["sigma_mu"]), exp(par_t["sigma_h"]),
+           exp(par_t["sigma_k"]), exp(par_t["phi"])/(1+exp(par_t["phi"])),
            exp(par_t["rho"])/(1+exp(par_t["rho"])), par_t[-(1:6)])
   lambda <- (2*pi)/288
   a0 <- c(0, 0, par["delta_c1"], par["delta_s1"])
-  if (P1 == 0) 
+  if (P1 == 0)
     a0[3] <- par["delta_c"]
-  if (P2 == 0) 
-    a0[4] <- par["delta_s"]   
+  if (P2 == 0)
+    a0[4] <- par["delta_s"]
   m <- length(a0)
   P0 <- Tt <- Ht <- matrix(0, m, m)
   diag(Tt) <- c(1, par["phi"], rep(par["rho"]*cos(lambda), 2))
@@ -277,7 +283,7 @@ ssmodel <- function(par_t, days, N = 288, P1 = 5, P2 = 5) {
   HHt <- Ht %*% t(Ht)
   dt <- matrix(0, nrow = m)
   ct <- log(par["sigma"]^2) - 1.270363
-  
+
   # calculate deterministic part c2, add to ct
   n <- 1:N
   M1 <- (2*n)/(N+1)
@@ -285,43 +291,43 @@ ssmodel <- function(par_t, days, N = 288, P1 = 5, P2 = 5) {
   c2 <- par["mu1"]*M1 + par["mu2"]*M2
   if (P1 > 1) {
     for (k in 2:P1) {
-      c2 <- c2 + par[paste("delta_c", k, sep="")]*cos(k*lambda*n) 
-    }  
+      c2 <- c2 + par[paste("delta_c", k, sep="")]*cos(k*lambda*n)
+    }
   }
   if (P2 > 1) {
     for (p in 2:P2) {
       c2 <- c2 + par[paste("delta_s", p, sep="")]*sin(p*lambda*n)
-    }  
+    }
   }
   ct <- matrix(ct + c2, ncol = N*days)
-  
-  return(list(a0 = a0, P0 = P0, Tt = Tt, Zt = Zt, GGt = GGt, HHt = HHt, 
+
+  return(list(a0 = a0, P0 = P0, Tt = Tt, Zt = Zt, GGt = GGt, HHt = HHt,
               dt = dt, ct = ct))
 }
 
 # Kernel estimation method
-# 
+#
 # See Kristensen (2010)
 #' @keywords internal
 kernelestim <- function(mR, rdata = NULL, delta = 300, options = list()) {
   # default options, replace if user-specified
-  op <- list(type = "gaussian", h = NULL, est = "cv", lower = NULL, 
+  op <- list(type = "gaussian", h = NULL, est = "cv", lower = NULL,
              upper = NULL)
   op[names(options)] <- options
-  
+
   D <- nrow(mR)
   N <- ncol(mR)
-  if (N < 100 & op$est == "cv") 
+  if (N < 100 & op$est == "cv")
     warning("Cross-validation may not return optimal results in small samples.")
   if (op$type == "beta" & op$est == "quarticity" ) {
     warning("No standard estimator available for Beta kernel bandwidth.
                 Cross-validation will be used instead.")
-    op$est = "cv" 
+    op$est = "cv"
   }
   t <- (1:N)*delta
   S <- N*delta
-  if (is.null(op$h)) { 
-    h <- numeric(D) 
+  if (is.null(op$h)) {
+    h <- numeric(D)
   } else {
     h <- rep(op$h, length.out = D)
   }
@@ -331,10 +337,10 @@ kernelestim <- function(mR, rdata = NULL, delta = 300, options = list()) {
       quarticity <- (N/3)*rowSums(mR^4)
       qscale <- quarticity^0.2
       qmult <- qscale/sqrt((1/D)*sum(qscale^2))
-      if (op$est == "cv") 
+      if (op$est == "cv")
         cat(paste("Estimating optimal bandwidth for day", d, "of", D, "...\n"))
-      h[d] <- estbandwidth(mR[d, ], delta = delta, qmult = qmult[d], 
-                           type = op$type, est = op$est, lower = op$lower, 
+      h[d] <- estbandwidth(mR[d, ], delta = delta, qmult = qmult[d],
+                           type = op$type, est = op$est, lower = op$lower,
                            upper = op$upper)
     }
     for(n in 1:N) {
@@ -363,14 +369,14 @@ kernelestim <- function(mR, rdata = NULL, delta = 300, options = list()) {
 #' @importFrom stats dnorm dbeta
 #' @keywords internal
 kernelk <- function(x, type = "gaussian", b = 1, y = 1) {
-  if (type == "gaussian") 
-    return(dnorm(x))  
+  if (type == "gaussian")
+    return(dnorm(x))
   if (type == "epanechnikov") {
     z <- (3/4)*(1-x^2)
     z[abs(x) > 1] <- 0
     return(z)
   }
-  if (type == "beta") 
+  if (type == "beta")
     return(dbeta(x, y/b + 1, (1-y)/b + 1))
 }
 
@@ -379,25 +385,25 @@ kernelk <- function(x, type = "gaussian", b = 1, y = 1) {
 # else the formula for h_opt in Kristensen(2010) is approximated
 #' @importFrom stats optimize bw.nrd0
 #' @keywords internal
-estbandwidth <- function(x, delta = 300, qmult = 1, type = "gaussian", 
+estbandwidth <- function(x, delta = 300, qmult = 1, type = "gaussian",
                          est = "cv", lower = NULL, upper = NULL) {
   N <- length(x)
   S <- N*delta
   default <- bw.nrd0((1:N)*delta)
-  if (type == "epanechnikov") 
+  if (type == "epanechnikov")
     default <- default*2.34
-  if (est == "quarticity")  
-    h <- default*qmult 
+  if (est == "quarticity")
+    h <- default*qmult
   if (est == "cv") {
     if (type == "beta") {
-      if (is.null(lower)) 
+      if (is.null(lower))
         lower <- 0.0001
-      if (is.null(upper)) 
+      if (is.null(upper))
         upper <- 1
     } else {
-      if (is.null(lower)) 
+      if (is.null(lower))
         lower <- default/3
-      if (is.null(upper)) 
+      if (is.null(upper))
         upper <- default*3
     }
     opt <- optimize(ISE, c(lower, upper), x = x, type = type, delta = delta)
@@ -421,8 +427,8 @@ ISE <- function(h, x, delta = 300, type = "gaussian") {
     }
     K[n] <- 0
     K <- K/sum(K)
-    sigma2hat[n] <- K %*% (x^2) 
-  }    
+    sigma2hat[n] <- K %*% (x^2)
+  }
   tl <- 5
   tu <- N-5
   ISE <- sum(((x[tl:tu]^2) - sigma2hat[tl:tu])^2)
@@ -438,26 +444,26 @@ piecewise <- function(mR, rdata = NULL, options = list()) {
   op <- list(type = "MDa", m = 40, n = 20, alpha = 0.005, volest = "bipower",
              online = TRUE)
   op[names(options)] <- options
-  
+
   N <- ncol(mR)
   D <- nrow(mR)
   vR <- as.numeric(t(mR))
   spot <- rep(NA, N*D)
-  cp <- changePoints(vR, type = op$type, alpha = op$alpha, m = op$m, n = op$n)  
+  cp <- changePoints(vR, type = op$type, alpha = op$alpha, m = op$m, n = op$n)
   for (i in 1:(N*D)) {
     if (op$online) {
       if (i > op$n) {
         lastchange <- max(which(cp + op$n < i))
       } else {
         lastchange = 1
-      } 
+      }
       lastchange <- cp[lastchange]
-      spot[i] = switch(op$volest, 
-                       bipower = sqrt((1/(i - lastchange + 1)) * 
+      spot[i] = switch(op$volest,
+                       bipower = sqrt((1/(i - lastchange + 1)) *
                                         (rBPCov(vR[(lastchange + 1):i]))),
-                       medrv = sqrt((1/(i - lastchange + 1)) * 
+                       medrv = sqrt((1/(i - lastchange + 1)) *
                                       (medRV(vR[(lastchange+1):i]))),
-                       rv = sqrt((1/(i - lastchange + 1)) * 
+                       rv = sqrt((1/(i - lastchange + 1)) *
                                    (rCov(vR[(lastchange + 1):i]))),
                        sd = sd(vR[(lastchange + 1):i]),
                        tau = robustbase::scaleTau2(vR[(lastchange + 1):i]))
@@ -465,14 +471,14 @@ piecewise <- function(mR, rdata = NULL, options = list()) {
       from <- cp[max(which(cp < i))]
       to <- min(c(N*D, cp[which(cp >= i)]))
       len <- to - from
-      spot[i] <- switch(op$volest, 
+      spot[i] <- switch(op$volest,
                         bipower = sqrt((1/len)*(rBPCov(vR[from:to]))),
                         medrv = sqrt((1/len)*(medRV(vR[from:to]))),
                         rv = sqrt((1/len)*(rCov(vR[from:to]))),
                         sd = sd(vR[from:to]),
                         tau = robustbase::scaleTau2(vR[from:to]))
     }
-  } 
+  }
   if (is.null(rdata)) {
     spot <- matrix(spot, nrow = D, ncol = N, byrow = TRUE)
   } else {
@@ -480,7 +486,7 @@ piecewise <- function(mR, rdata = NULL, options = list()) {
   }
   out <- list(spot = spot, cp = cp)
   class(out) <- "spotvol"
-  return(out) 
+  return(out)
 }
 
 # Detect points on which the volatility level changes
@@ -494,18 +500,18 @@ changePoints <- function(vR, type = "MDa", alpha = 0.005, m = 40, n = 20) {
   np <- length(points)
   N <- n + m
   cat("Detecting change points...\n")
-  for (t in 1:L) { 
+  for (t in 1:L) {
     if (t - points[np] >= N) {
       reference <- logR[(t - N + 1):(t - n)]
-      testperiod <- logR[(t - n + 1):t]  
+      testperiod <- logR[(t - n + 1):t]
       if(switch(type,
                 MDa <- MDtest(reference, testperiod, type = type, alpha = alpha),
                 MDb <- MDtest(reference, testperiod, type = type, alpha = alpha),
                 DM  <- DMtest(reference, testperiod, alpha = alpha))) {
-        points <- c(points, t - n)     
+        points <- c(points, t - n)
         np <- np + 1
         cat(paste("Change detected at observation", points[np], "...\n"))
-      }    
+      }
     }
   }
   return(points)
@@ -526,7 +532,7 @@ DMtest <- function(x, y, alpha = 0.005) {
   delta1 <- ymed - xmed
   out <- density(c(xcor, ycor), kernel = "epanechnikov")
   fmed <- as.numeric(BMS::quantile.density(out, probs = 0.5))
-  fmedvalue <- (out$y[max(which(out$x < fmed))] + 
+  fmedvalue <- (out$y[max(which(out$x < fmed))] +
                   out$y[max(which(out$x < fmed))+1])/2
   test <- sqrt((m*n)/(m + n))*2*fmedvalue*delta1
   return(abs(test) > qnorm(1-alpha/2))
@@ -570,43 +576,43 @@ MDtest <- function(x, y, alpha = 0.005, type = "MDa") {
 #' @keywords internal
 garch_s <- function(mR, rdata = NULL, options = list()) {
   # default options, replace if user-specified
-  op <- list(model = "eGARCH", order = c(1,1), dist = "norm", P1 = 5, 
+  op <- list(model = "eGARCH", order = c(1,1), dist = "norm", P1 = 5,
              P2 = 5, solver.control = list())
   op[names(options)] <- options
-  
+
   D <- nrow(mR)
   N <- ncol(mR)
   mR <- mR - mean(mR)
   X <- intraday_regressors(D, N = N, order = 2, almond = FALSE, P1 = op$P1,
                            P2 = op$P2)
-  spec <- rugarch::ugarchspec(variance.model = list(model = op$model, 
+  spec <- rugarch::ugarchspec(variance.model = list(model = op$model,
                                                     external.regressors = X,
-                                                    garchOrder = op$order),                    
+                                                    garchOrder = op$order),
                               mean.model = list(include.mean = FALSE),
                               distribution.model = op$dist)
   if (is.null(rdata)) {
     cat(paste("Fitting", op$model, "model..."))
-    fit <- tryCatch(rugarch::ugarchfit(spec = spec, data = as.numeric(t(mR)), 
-                                       solver = "nloptr", 
+    fit <- tryCatch(rugarch::ugarchfit(spec = spec, data = as.numeric(t(mR)),
+                                       solver = "nloptr",
                                        solver.control = op$solver.control),
                     error = function(e) e,
                     warning = function(w) w)
     if (inherits(fit, what = c("error", "warning"))) {
-      stop(paste("GARCH optimization routine did not converge.\n", 
+      stop(paste("GARCH optimization routine did not converge.\n",
                  "Message returned by ugarchfit:\n", fit))
     }
     spot <- as.numeric(rugarch::sigma(fit))
   } else {
     cat(paste("Fitting", op$model, "model..."))
-    fit <- tryCatch(rugarch::ugarchfit(spec = spec, data = rdata, 
+    fit <- tryCatch(rugarch::ugarchfit(spec = spec, data = rdata,
                                        solver = "nloptr",
-                                       solver.control = op$solver.control), 
+                                       solver.control = op$solver.control),
                     error = function(e) e,
                     warning = function(w) w)
     if (inherits(fit, what = c("error", "warning"))) {
-      stop(paste("GARCH optimization routine did not converge.\n", 
+      stop(paste("GARCH optimization routine did not converge.\n",
                  "Message returned by ugarchfit:\n", fit))
-    } 
+    }
     spot <- rugarch::sigma(fit)
   }
   out <- list(spot = spot, ugarchfit = fit)
@@ -621,19 +627,19 @@ plot.spotvol <- function(x, ...) {
   plottable <- c("spot", "periodic", "daily")
   elements <- names(x)
   nplots <- sum(is.element(plottable, elements))
-  
+
   if (nplots == 3) {
     par(mar = c(3, 3, 3, 1))
     layout(matrix(c(1,2,1,3), nrow = 2))
   }
   spot <- as.numeric(t(x$spot))
-  
+
   if(is.element("length", names(options))) {
     length = options$length
   } else {
     length = length(spot)
   }
-  
+
   plot(spot[1:length], type = "l", xlab = "", ylab = "")
   title(main = "Spot volatility")
   if ("cp" %in% elements)
@@ -644,7 +650,7 @@ plot.spotvol <- function(x, ...) {
       intraday <- time(x$periodic)
       plot(x = intraday, y = periodic, type = "l", xlab = "", ylab = "")
     } else {
-      plot(periodic, type = "l", xlab = "", ylab = "") 
+      plot(periodic, type = "l", xlab = "", ylab = "")
     }
     title(main = "Intraday periodicity")
   }
@@ -657,12 +663,12 @@ plot.spotvol <- function(x, ...) {
       plot(daily, type = "l", xlab = "", ylab = "")
     }
     title(main = "Daily volatility")
-  } 
+  }
 }
 
 #' @keywords internal
-intraday_regressors <- function(D, N = 288, order = 1, almond = TRUE, 
-                                dummies = FALSE, P1 = 5, P2 = 5) {  
+intraday_regressors <- function(D, N = 288, order = 1, almond = TRUE,
+                                dummies = FALSE, P1 = 5, P2 = 5) {
   if (order == 1) {
     vi <- rep(c(1:N), each = D)
   } else {
@@ -755,7 +761,7 @@ WSDnozero <- function(weights, series) {
 diurnal <- function (stddata, method = "TML", dummies = F, P1 = 6, P2 = 4) {
   cDays <- dim(stddata)[1]
   intraT <- dim(stddata)[2]
-  
+
   if (method == "SD" | method == "OLS") {
     seas <- sqrt(apply(stddata^2, 2, "meannozero"))
   }
@@ -763,9 +769,9 @@ diurnal <- function (stddata, method = "TML", dummies = F, P1 = 6, P2 = 4) {
     seas <- apply(stddata, 2, "shorthscalenozero")
     shorthseas <- seas/sqrt(mean(seas^2))
     shorthseas[shorthseas == 0] <- 1
-    weights <- matrix(HRweight(as.vector(t(stddata^2) /rep(shorthseas, cDays)^2), 
-                              qchisq(0.99, df = 1)), 
-                      ncol = dim(stddata)[2], 
+    weights <- matrix(HRweight(as.vector(t(stddata^2) /rep(shorthseas, cDays)^2),
+                              qchisq(0.99, df = 1)),
+                      ncol = dim(stddata)[2],
                       byrow = T)
     for (c in 1:intraT) {
       seas[c] <- WSDnozero(weights[, c], stddata[, c])
@@ -780,7 +786,7 @@ diurnal <- function (stddata, method = "TML", dummies = F, P1 = 6, P2 = 4) {
     nobs <- length(vstddata)
     vi <- rep(c(1:intraT), each = cDays)
     if (method == "TML") {
-      if (length(vstddata)!= length(seas) * cDays) { 
+      if (length(vstddata)!= length(seas) * cDays) {
         print(length(vstddata))
         print(length(seas))
         print(cDays)
@@ -829,8 +835,8 @@ diurnal <- function (stddata, method = "TML", dummies = F, P1 = 6, P2 = 4) {
       rm(truncX)
       rm(truncvy)
     }
-    # disable plot for now      
-    #       plot(seas, main = "Non-parametric and parametric periodicity estimates", 
+    # disable plot for now
+    #       plot(seas, main = "Non-parametric and parametric periodicity estimates",
     #            xlab = "intraday period", type = "l", lty = 3)
     #       legend("topright", c("Parametric", "Non-parametric"), cex = 1.1,
     #              lty = c(1,3), lwd = 1, bty = "n")
@@ -849,44 +855,44 @@ diurnalfit <- function( theta , P1 , P2 , intraT , dummies=F ) {
   vi <- c(1:intraT)
   M1 <- (intraT+1) / 2
   M2 <- (2 * intraT^2 + 3 * intraT + 1) / 6
-  
+
   # Regressors that do not depend on Day of Week:
   X <- c()
   if(dummies == FALSE) {
-    if (P1 > 0) { 
-      for (j in 1:P1 ) { 
-        X <- cbind(X , cos(2*pi*j*vi/intraT))   
-      }  
-    } 
-    
-    ADD <- (vi/M1 ) 
+    if (P1 > 0) {
+      for (j in 1:P1 ) {
+        X <- cbind(X , cos(2*pi*j*vi/intraT))
+      }
+    }
+
+    ADD <- (vi/M1 )
     X   <- cbind(X,ADD)
     ADD <- (vi^2/M2)
     X   <- cbind(X,ADD)
-    if (P2 > 0) { 
+    if (P2 > 0) {
       ADD <- c()
-      for (j in 1:P2) {  
-        ADD <- cbind(ADD , sin(2*pi*j*vi/intraT)) 
+      for (j in 1:P2) {
+        ADD <- cbind(ADD , sin(2*pi*j*vi/intraT))
       }
-    } 
-    X <- cbind(X , ADD) 
-    
+    }
+    X <- cbind(X , ADD)
+
     #openingeffect
-    opening <- vi - 0 
+    opening <- vi - 0
     stdopening <- (vi-0)/80 ;
     almond1_opening <- ( 1 - (stdopening)^3 )
     almond2_opening <- ( 1 - (stdopening)^2 )*( opening)
-    almond3_opening <- ( 1 - (stdopening)   )*( opening^2)  
-    X = cbind(X, almond1_opening, almond2_opening, almond3_opening)  
-    
+    almond3_opening <- ( 1 - (stdopening)   )*( opening^2)
+    X = cbind(X, almond1_opening, almond2_opening, almond3_opening)
+
     #closing effect
-    closing <- max(vi)-vi 
+    closing <- max(vi)-vi
     stdclosing <- (max(vi)-vi)/max(vi)
     almond1_closing <- ( 1 - (stdclosing)^3 )
     almond2_closing <- ( 1 - (stdclosing)^2 )*( closing)
     almond3_closing <- ( 1 - (stdclosing)) * (closing^2)
     X <- cbind(X, almond1_closing , almond2_closing , almond3_closing)
-    
+
   } else {
     for (d in 1:intraT) {
       dummy <- rep(0,intraT)
@@ -896,12 +902,12 @@ diurnalfit <- function( theta , P1 , P2 , intraT , dummies=F ) {
   }
   # Compute fit
   seas <- exp(X %*% matrix(theta,ncol=1))
-  seas <- seas / sqrt(mean(seas^2))    
-  return(seas)          
+  seas <- seas / sqrt(mean(seas^2))
+  return(seas)
 }
 
 # only seperate function for compiler
-#' @keywords internal 
+#' @keywords internal
 finternal <- function(y) {
   y * sqrt(2/pi) * exp(y-exp(2*y)/2)
 }
@@ -915,19 +921,19 @@ center <- function() {
 # aggregatePrice <- function (ts, FUN = "previoustick", on = "minutes", k = 1, marketopen = "09:30:00", marketclose = "16:00:00", tz = "GMT") {
 #   ts2 = aggregatets(ts, FUN = FUN, on, k)
 #   date = strsplit(as.character(index(ts)), " ")[[1]][1]
-#   
+#
 #   #open
 #   a = as.POSIXct(paste(date, marketopen), tz = tz)
 #   b = as.xts(matrix(as.numeric(ts[1]),nrow=1), a)
 #   ts3 = c(b, ts2)
-#   
+#
 #   #close
 #   aa = as.POSIXct(paste(date, marketclose), tz = tz)
 #   condition = index(ts3) < aa
 #   ts3 = ts3[condition]
 #   bb = as.xts(matrix(as.numeric(last(ts)),nrow=1), aa)
 #   ts3 = c(ts3, bb)
-#   
+#
 #   return(ts3)
 # }
-  
+
