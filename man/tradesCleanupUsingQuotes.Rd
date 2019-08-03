@@ -32,7 +32,7 @@ In case you supply the arguments "tdata" and "qdata", the on-disk functionality 
 and the function returns a list with the cleaned trades as xts object (see examples).
 }
 \description{
-Function performs cleaning procedure \code{\link{rmOutliersTrades}} 
+Function performs cleaning procedure \code{\link{rmTradeOutliersUsingQuotes}} 
 for the trades of all stocks in "ticker" over the interval 
 [from,to] and saves the result in "datadestination". 
 Note that preferably the input data for this function 

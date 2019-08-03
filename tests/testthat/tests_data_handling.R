@@ -1,8 +1,22 @@
 
+expect_equal(
+  unique(autoSelectExchangeTrades(sample_tdataraw)$EX),
+  "N"
+)
+
+expect_equal(
+  unique(autoSelectExchangeQuotes(sample_qdataraw)$EX),
+  "N"
+)
 
 expect_equal(
   quotesCleanup(qdataraw = sample_qdataraw, exchanges = "N")$report["remove_outliers"],
   c(remove_outliers = 7706)
+)
+
+expect_equal(
+  formatC(sum(head(aggregatePrice(sample_tdata$PRICE, on = "secs", k = 30))), digits = 10),
+  "   1157.465"
 )
 
 expect_equal(
@@ -16,23 +30,23 @@ expect_equal(
 )
 
 expect_equal(
-  dim(rmOutliersTrades(selectExchange(sample_tdataraw, "W"), selectExchange(sample_qdataraw, "W"))),
+  dim(rmTradeOutliersUsingQuotes(selectExchange(sample_tdataraw, "W"), selectExchange(sample_qdataraw, "W"))),
   c(203, 8)
 )
 
 expect_equal(
   dim(rmLargeSpread(selectExchange(sample_qdataraw, "N"))),
-  c(9794, 10)
+  c(9794, 7)
 )
 
 expect_equal(
   dim(mergeQuotesSameTimestamp(selectExchange(sample_qdataraw, "N"), selection = "max.volume")),
-  c(7707, 3)
+  c(7707, 5)
 )
 
 expect_equal(
   dim(mergeQuotesSameTimestamp(selectExchange(sample_qdataraw, "N"), selection = "weighted.average")),
-  c(7707, 3)
+  c(7707, 5)
 )
 
 expect_equal(
@@ -47,7 +61,7 @@ expect_equal(
 
 expect_equal(
   dim(tradesCleanup(tdataraw = sample_tdataraw, exchanges = "N", report = FALSE)),
-  c(9104, 2)
+  c(9104, 3)
 )
 
 

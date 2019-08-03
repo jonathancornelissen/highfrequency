@@ -1,5 +1,5 @@
 Package: highfrequency
-Version: 0.5.3
+Version: 0.6.0
 Date: 2019-05-24
 Title: Tools for Highfrequency Data Analysis
 Authors@R: c(person("Kris", "Boudt", role = c("aut", "cre"),
@@ -8,10 +8,9 @@ Authors@R: c(person("Kris", "Boudt", role = c("aut", "cre"),
              person("Scott", "Payseur", role = c("aut"),
                     email = "Scott.Payseur@gmail.com"),
              person("Giang", "Nguyen", role = c("ctb")),
-             person("Maarten", "Schermer", role = c("ctb")),
              person("Onno", "Kleen", role = c("ctb"), comment = c(ORCID = "0000-0003-4731-4640")))
 Author: Kris Boudt [aut, cre], Jonathan Cornelissen [aut], Scott Payseur [aut],
-    Giang Nguyen [ctb], Maarten Schermer [ctb], Onno Kleen [ctb]
+    Giang Nguyen [ctb], Onno Kleen [ctb]
 Maintainer: Kris Boudt
     <Kris.Boudt@econ.kuleuven.be>
 Description: Provide functionality to manage, clean and match highfrequency
@@ -40,14 +39,18 @@ Imports:
     chron,
     timeDate,
     MASS,
-    data.table,
+    data.table (>= 1.12.0),
     RcppRoll,
-    bit64
+    bit64,
+    lubridate
 LinkingTo: Rcpp
 Suggests:
     covr,
     FKF,
     BMS,
     rugarch,
-    testthat
+    testthat,
+    knitr,
+    rmarkdown
 RoxygenNote: 6.1.1
+VignetteBuilder: knitr

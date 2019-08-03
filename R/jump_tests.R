@@ -103,7 +103,7 @@ AJjumptest <- function(pdata, p = 4 , k = 2, align.by = NULL, align.period = NUL
     result <- apply.daily(pdata, AJjumptest, align.by, align.period, makeReturns)
     return(result)
   } else {
-    pdata <- aggregatets(pdata, on = "seconds", k = 1)
+    pdata <- fastTickAgregation(pdata, on = "seconds", k = 1)
   }
   
   N <- length(pdata)-1
@@ -176,7 +176,6 @@ AJjumptest <- function(pdata, p = 4 , k = 2, align.by = NULL, align.period = NUL
 #' @param align.by a string, align the tick data to "seconds"|"minutes"|"hours".
 #' @param align.period an integer, align the tick data to this many [seconds|minutes|hours].
 #' @param makeReturns boolean, should be TRUE when rdata contains prices instead of returns. FALSE by default.
-#' @param ... additional arguments.
 #' 
 #' @return list
 #' 
@@ -210,36 +209,36 @@ AJjumptest <- function(pdata, p = 4 , k = 2, align.by = NULL, align.period = NUL
 #' @export
 BNSjumptest <- function (rdata, IVestimator = "BV", IQestimator = "TP", type = "linear",
                          logtransform = FALSE, max = FALSE, align.by = NULL, align.period = NULL,
-                         makeReturns = FALSE, ...) {
+                         makeReturns = FALSE) {
   if (checkMultiDays(rdata) == TRUE) { 
     result <- apply.daily(rdata, BNSjumptest, align.by, align.period, makeReturns)
     return(result)
   } else {
     if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata <- aggregatets(rdata, on = align.by, k = align.period)
+      rdata <- fastTickAgregation(rdata, on = align.by, k = align.period)
     }
     if (makeReturns == TRUE) {
       rdata <- makeReturns(rdata)
     }
     N <- length(rdata)
     hatQV <- RV(rdata)
-    hatIV <- .hativ(rdata, IVestimator)
+    hatIV <- hatIV(rdata, IVestimator)
     theta <- tt(IVestimator)
-    hatIQ <- .hatiq(rdata, IQestimator)
+    hatIQ <- hatIQ(rdata, IQestimator)
     if (type == "linear") {
       if (logtransform) {
         hatQV <- log(RV(rdata))
-        hatIV <- log(.hativ(rdata, IVestimator))
+        hatIV <- log(hatIV(rdata, IVestimator))
       }
       if (!logtransform) {
         hatQV <- RV(rdata)
-        hatIV <- .hativ(rdata, IVestimator)
+        hatIV <- hatIV(rdata, IVestimator)
       }
       if (max) {
-        product <- max(1, .hatiq(rdata, IQestimator)/.hativ(rdata, IVestimator)^2)
+        product <- max(1, hatIQ(rdata, IQestimator)/hatIV(rdata, IVestimator)^2)
       }
       if (!max) {
-        product = .hatiq(rdata, IQestimator)
+        product = hatIQ(rdata, IQestimator)
       }
       a <- sqrt(N) * (hatQV - hatIV)/sqrt((theta - 2) * product)
       out <- list()
@@ -250,12 +249,12 @@ BNSjumptest <- function (rdata, IVestimator = "BV", IQestimator = "TP", type = "
     }
     if (type == "ratio") {
       if (max) {
-        product <- max(1, .hatiq(rdata, IQestimator)/.hativ(rdata, IVestimator)^2)
+        product <- max(1, hatIQ(rdata, IQestimator)/hatIV(rdata, IVestimator)^2)
       }
       if (!max) {
-        product <- .hatiq(rdata, IQestimator)/.hativ(rdata, IVestimator)^2
+        product <- hatIQ(rdata, IQestimator)/hatIV(rdata, IVestimator)^2
       }
-      a <- sqrt(N) * (1 - .hativ(rdata, IVestimator, N)/RV(rdata))/sqrt((theta - 2) * product)
+      a <- sqrt(N) * (1 - hatIV(rdata, IVestimator, N)/RV(rdata))/sqrt((theta - 2) * product)
       out <- list()
       out$ztest <- a
       out$critical.value <- qnorm(c(0.025, 0.975))

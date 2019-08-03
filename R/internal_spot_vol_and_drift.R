@@ -1,4 +1,3 @@
-
 #' @keywords internal
 #' @importFrom xts .indexDate
 #' @importFrom zoo index
@@ -937,3 +936,4 @@ center <- function() {
 #
 #   return(ts3)
 # }
+

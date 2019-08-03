@@ -18,3 +18,4 @@ speed_comparison.Rmd
 playground.R
 tests/testthat/Rplots.pdf
 gitignore/*
+inst/doc

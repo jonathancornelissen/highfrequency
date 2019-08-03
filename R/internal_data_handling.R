@@ -14,7 +14,7 @@ checkColumnNames <- function(data) {
   
   # Change column names to previous RTAQ format! 
   # Adjust price col naming:  
-  try((colnames(data)[xtsAttributes(data)[['Price']]] = 'PRICE'))
+  try((colnames(data)[xtsAttributes(data)[['Price']]] = 'PRICE'), silent = TRUE)
   try(setnames(data, "Price", "PRICE", skip_absent = TRUE), silent = TRUE)
   # Adjust Bid col naming:    
   try((colnames(data)[xtsAttributes(data)[['Bid']]] = 'BID'))
@@ -33,6 +33,8 @@ checkColumnNames <- function(data) {
   # Adjust Bid size col naming:    
   try((colnames(data)[xtsAttributes(data)[['AskSize']]] = 'OFRSIZ'))
   try(setnames(data, "AskSize", "OFRSIZ", skip_absent = TRUE), silent = TRUE)
+  try(setnames(data, "ASKSIZ", "OFRSIZ", skip_absent = TRUE), silent = TRUE)
+  
   
   try(setnames(data, "TR_SCOND", "COND", skip_absent = TRUE), silent = TRUE)
   
@@ -56,7 +58,7 @@ is.BBO <- function (x) {
 
 #' @keywords internal
 is.TBBO <- function (x) {
-  if (all(has.Trade(x), has.Qty(x), has.Bid(x), has.Ask(x))) {
+  if (all(has.Trade(x), hasQty(x), has.Bid(x), has.Ask(x))) {
     TRUE
   }
   else FALSE
@@ -133,7 +135,7 @@ has.AskSize <- function(x, which = FALSE) {
   if (!identical(loc, integer(0))) {
     return(if(which) loc else TRUE)
   }
-  loc <- grep("(ofrsize|ofrsiz|offersize|offersiz)", colnames(x), ignore.case=TRUE)
+  loc <- grep("(ofrsize|ofrsiz|offersize|offersiz|asksiz)", colnames(x), ignore.case=TRUE)
   if (!identical(loc, integer(0))) {
     return(if(which) loc else TRUE)
   }
@@ -226,7 +228,7 @@ has.Hi <- function (x, which = FALSE) {
 }
 
 #' @keywords internal
-has.Lo <- function (x, which = FALSE){
+has.Lo <- function (x, which = FALSE) {
   colAttr <- attr(x, "Lo")
   if (!is.null(colAttr))
     return(if (which) colAttr else TRUE)
@@ -263,15 +265,22 @@ has.Vo<-function (x, which = FALSE){
   else FALSE
 }
 
-#' @keywords internal
-has.Qty <- function(x, which = FALSE)
-{
+#' Check for Trade, Bid, and Ask/Offer (BBO/TBBO), Quantity, and Price data
+#' @description A set of functions to check for appropriate TBBO/BBO and price column
+#' names within a data object, as well as the availability and
+#' position of those columns.
+#' 
+#' @param x data object
+#' @param which disply position of match
+#' 
+#' @export
+hasQty <- function(x, which = FALSE) {
   colAttr <- attr(x, "Qty")
   if(!is.null(colAttr)) {
-    return(if(which) colAttr else TRUE)
+    return(if (which) colAttr else TRUE)
   }
   
-  locBidAsk <- c(has.Bid(x, which=TRUE),has.Ask(x, which=TRUE))
+  locBidAsk <- c(has.Bid(x, which = TRUE), has.Ask(x, which = TRUE))
   loc <- grep("qty", colnames(x), ignore.case=TRUE)
   loc <- loc[!(loc %in% locBidAsk)]
   if (!identical(loc, integer(0))) {
@@ -284,7 +293,7 @@ has.Qty <- function(x, which = FALSE)
 #' @keywords internal
 checktdata <- function(tdata) {
   if (is.xts(tdata) == FALSE & is.data.table(tdata) == FALSE) {
-    stop("The argument tdata should be an data.table or xts object.")
+    stop("The argument tdata should be a data.table or xts object.")
   }
   if (any(colnames(tdata) == "PRICE") == FALSE) {
     stop("The argument tdata should have a column containing the PRICE. Could not find that column.")
@@ -331,7 +340,7 @@ checkqdata <- function(qdata) {
 # 2. Rolling median of the following "window" observations
 # 3. Rolling median of the previous "window" observations
 #' @keywords internal
-rolling_median_incl_ends <- function(x, weights, window, direction = "center") {
+rollingMedianInclEnds <- function(x, weights, window, direction = "center") {
   
   length_median_vec <- length(x)
   median_vec <- rep(NA, times = length_median_vec)
@@ -370,7 +379,7 @@ rolling_median_incl_ends <- function(x, weights, window, direction = "center") {
 #' @keywords internal
 set.AllColumns <- function(x) {
   cols <- c("Op","Hi","Lo","Cl","Vo","Ad","Price","Trade","Qty",
-            "Bid","BidSize","Ask","AskSize","Mid","Chg")
+            "Bid","BidSize","Ask", "AskSize", "Mid", "Chg")
   for(col in cols) {
     try(x <- do.call(paste("set", col, sep = "."), list(x)), silent = TRUE)
   }
@@ -435,8 +444,8 @@ set.Op <- function(x, error=TRUE) {
 
 #' @keywords internal
 set.Qty <- function(x, error=TRUE) {
-  if(has.Qty(x))
-    attr(x,"Qty") <- has.Qty(x, which=TRUE)
+  if(hasQty(x))
+    attr(x,"Qty") <- hasQty(x, which=TRUE)
   return(x)
 }
 
@@ -462,22 +471,22 @@ set.AskSize <- function(x, error=TRUE) {
 }
 
 #' @keywords internal
-set.Cl <- function(x, error=TRUE) {
+set.Cl <- function(x, error = TRUE) {
   if(has.Cl(x))
     attr(x,"Cl") <- has.Cl(x, which=TRUE)
   return(x)
 }
 
 #' @keywords internal
-set.Price <- function(x, error=TRUE) {
+set.Price <- function(x, error = TRUE) {
   if(has.Price(x))
-    attr(x,"Price") <- has.Price(x, which=TRUE)
+    attr(x,"Price") <- has.Price(x, which = TRUE)
   return(x)
 }
 
 #' @keywords internal
-set.Trade <- function(x, error=TRUE) {
+set.Trade <- function(x, error = TRUE) {
   if(has.Trade(x))
-    attr(x,"Trade") <- has.Trade(x, which=TRUE)
+    attr(x,"Trade") <- has.Trade(x, which = TRUE)
   return(x)
 }

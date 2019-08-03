@@ -57,8 +57,8 @@ For each day an xts object is saved into the folder of that date, containing the
 This procedure is performed for each stock in "ticker".
 The function returns a vector indicating how many quotes remained after each cleaning step.
 
-In case you supply the argument "rawqdata", the on-disk functionality is ignored
-and the function returns a list with the cleaned quotes as xts object (see examples).
+In case you supply the argument "qdataraw", the on-disk functionality is ignored
+and the function returns a list with the cleaned quotes as an xts or data.table object depending on input (see examples).
 }
 \description{
 This is a wrapper function for cleaning the quote data of all stocks in "ticker" over the interval [from,to]. 

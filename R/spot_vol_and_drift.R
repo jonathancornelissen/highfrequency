@@ -487,4 +487,3 @@ spotvol <- function(data, method = "detper", ..., on = "minutes", k = 5,
                 garch = garch_s(mR, rdata = rdata, options = options))
   return(out)
 }
-
