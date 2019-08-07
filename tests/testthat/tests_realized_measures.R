@@ -27,7 +27,7 @@ expect_equal(
 expect_equal({
   formatC(sum(MRC(list(sample_5minprices_jumps["2010-01-04",1], sample_5minprices_jumps["2010-01-04",2]), pairwise = TRUE, makePsd = TRUE)), digits = 10)
   },
-  "0.03169161677"
+  "0.03171753237"
 )
 
 # rBeta
@@ -93,7 +93,7 @@ expect_equal(
 )
 expect_equal(
   formatC(sum(rRTSCov(pdata = list(cumsum(lltc) + 100, cumsum(sbux) + 100))) * 1000000, digits = 10),
-  "0.2472914228"
+  "0.2469302743"
 )
 
 
@@ -133,7 +133,7 @@ expect_equal(
 # rTSCov multivariate
 expect_equal(
   formatC(sum(rTSCov(pdata = list(cumsum(lltc) + 100, cumsum(sbux) + 100))) * 10000, digits = 10),
-  "0.002426166025"
+  "0.002425863765"
 )
 
 # RV

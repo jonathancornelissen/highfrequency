@@ -104,7 +104,7 @@ Spot volatility estimation
 The following estimation methods can be specified in \code{method}:
 
 \strong{Deterministic periodicity method (\code{"detper"})}
-  
+
 Parameters:
   \tabular{ll}{
     \code{dailyvol} \tab A string specifying the estimation method for the daily
@@ -149,7 +149,7 @@ Default = 5. \cr
 optimization routine (\code{"BFGS"} in \code{optim}). Default =
 \code{list(sigma = 0.03, sigma_mu = 0.005, sigma_h = 0.005, sigma_k = 0.05,
 phi = 0.2, rho = 0.98, mu = c(2, -0.5), delta_c = rep(0, max(1,P1)),
-delta_s = rep(0, max(1,P2)))}. 
+delta_s = rep(0, max(1,P2)))}.
 See Beltratti & Morana (2001) for a definition
 of each parameter. \code{init} can contain any number of these parameters.
 For parameters not specified in \code{init}, the default initial value will
@@ -305,7 +305,7 @@ plot(vol1)
 \donttest{
 init <- list(sigma = 0.03, sigma_mu = 0.005, sigma_h = 0.007,
              sigma_k = 0.06, phi = 0.194, rho = 0.986, mu = c(1.87,-0.42),
-             delta_c = c(0.25, -0.05, -0.2, 0.13, 0.02), 
+             delta_c = c(0.25, -0.05, -0.2, 0.13, 0.02),
              delta_s = c(-1.2, 0.11, 0.26, -0.03, 0.08))
 
 # next method will take around 110 iterations

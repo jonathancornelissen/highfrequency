@@ -869,20 +869,18 @@ rHYCov <- function(rdata, cor = FALSE, period = 1, align.by = "seconds", align.p
     diag(cov) <- diagonal
     for (i in 2:n) {
       for (j in 1:(i - 1)) {
-        cov[i, j] <- sum(.C("pcovcc", 
-                            as.double(x), #a
-                            as.double(rep(0,length(x)/(period * align.period) + 1)),
-                            as.double(y), #b
-                            as.double(x.t), #a
-                            as.double(rep(0, length(x)/(period * align.period) + 1)), #a
-                            as.double(y.t), #b
-                            as.integer(length(x)), #na
-                            as.integer(length(x)/(period*align.period)),
-                            as.integer(length(y)), #na
-                            as.integer(period * align.period),
-                            ans = double(length(x)/(period*align.period)+1), 
-                            COPY = c(FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,TRUE), 
-                            PACKAGE = "highfrequency")$ans)
+        cov[i, j] <- 
+          sum(pcovcc(
+            as.double(x),
+            as.double(rep(0,length(x)/(period * align.period) + 1)),
+            as.double(y), #b
+            as.double(x.t), #a
+            as.double(rep(0, length(x)/(period * align.period) + 1)), #a
+            as.double(y.t), #b
+            as.integer(length(x)), #na
+            as.integer(length(x)/(period*align.period)),
+            as.integer(length(y)), #na
+            as.integer(period * align.period)))
         cov[j, i] <- cov[i, j]  
       }
     }
@@ -967,32 +965,34 @@ rKernelCov <- function(rdata, cor = FALSE,  align.by = "seconds", align.period =
   }
   type <- kernelCharToInt(kernel.type)
   if (n == 1) {
-    return(.C("kernelEstimator", as.double(rdata), as.double(rdata), as.integer(length(rdata)),
-              as.integer(kernel.param), as.integer(ifelse(kernel.dofadj, 1, 0)),
-              as.integer(type), ab = double(kernel.param + 1),
-              ab2 = double(kernel.param + 1),
-              ans = double(1), PACKAGE = "highfrequency")$ans)
+    return(kernelEstimator(as.double(rdata),
+                           as.double(rdata),
+                           as.integer(length(rdata)),
+                           as.integer(kernel.param),
+                           as.integer(ifelse(kernel.dofadj, 1, 0)),
+                           as.integer(type),
+                           ab = double(kernel.param + 1),
+                           ab2 = double(kernel.param + 1)))
   }
   
   if (n > 1) {
     cov <- matrix(rep(0, n * n), ncol = n)
     diagonal <- c()
     for (i in 1:n) {
-      diagonal[i] <- .C("kernelEstimator", as.double(rdata[, i]), as.double(rdata[, i]), as.integer(length(rdata[, i])),
+      diagonal[i] <- 
+        kernelEstimator(as.double(rdata[, i]), as.double(rdata[, i]), as.integer(length(rdata[, i])),
                         as.integer(kernel.param), as.integer(ifelse(kernel.dofadj, 1, 0)),
                         as.integer(type), ab = double(kernel.param + 1),
-                        ab2 = double(kernel.param + 1),
-                        ans = double(1), PACKAGE = "highfrequency")$ans
+                        ab2 = double(kernel.param + 1))
     }
     diag(cov) <- diagonal
     
     for (i in 2:n) {
       for (j in 1:(i - 1)) {
-        cov[i, j] = cov[j, i] = .C("kernelEstimator", as.double(rdata[, i]), as.double(rdata[, j]), as.integer(length(rdata[, i])),
+        cov[i, j] = cov[j, i] = kernelEstimator(as.double(rdata[, i]), as.double(rdata[, j]), as.integer(length(rdata[, i])),
                                    as.integer(kernel.param), as.integer(ifelse(kernel.dofadj, 1, 0)),
                                    as.integer(type), ab = double(kernel.param + 1),
-                                   ab2 = double(kernel.param + 1),
-                                   ans = double(1), PACKAGE = "highfrequency")$ans
+                                   ab2 = double(kernel.param + 1))
       }
     }
     if (cor == FALSE) {

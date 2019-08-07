@@ -26,6 +26,7 @@ Imports:
     xts,
     zoo,
     Rcpp,
+    RcppArmadillo,
     graphics,
     methods,
     stats,
@@ -43,7 +44,7 @@ Imports:
     RcppRoll,
     bit64,
     lubridate
-LinkingTo: Rcpp
+LinkingTo: Rcpp, RcppArmadillo 
 Suggests:
     covr,
     FKF,

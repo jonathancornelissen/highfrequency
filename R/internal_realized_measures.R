@@ -1,17 +1,24 @@
 
 #' @keywords internal
 alignReturns <- function(x, period, ...) {
-  .C("rv", 
-     as.double(x), #a
+  rv(as.double(x), #a
      as.double(x), #b
      as.integer(length(x)), #na
-     as.integer(period), #period 
+     as.integer(period), #period
      tmpa = as.double(rep(0,as.integer(length(x) / period +1))), #tmp
      as.double(rep(0,as.integer(length(x) / period +1))), #tmp
-     as.integer(length(x) / period), #tmpn
-     ans = double(1), 
-     COPY = c(FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,TRUE), 
-     PACKAGE = "highfrequency")$tmpa     
+     as.integer(length(x) / period)) #tmpn
+  # .Call("rv",
+  #    as.double(x), #a
+  #    as.double(x), #b
+  #    as.integer(length(x)), #na
+  #    as.integer(period), #period
+  #    tmpa = as.double(rep(0,as.integer(length(x) / period +1))), #tmp
+  #    as.double(rep(0,as.integer(length(x) / period +1))), #tmp
+  #    as.integer(length(x) / period), #tmpn
+  #    ans = double(1),
+  #    COPY = c(FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,TRUE),
+  #    PACKAGE = "highfrequency")
 }
 
 #' @importFrom stats pchisq
@@ -124,11 +131,10 @@ rcKernel <- function(x,                             # Tick Data for first asset
   y <- cdatay$data
   y <- .alignReturns(y, align.period)
   type <- kernelCharToInt(kernel.type)
-  .C("kernelEstimator", as.double(x), as.double(y), as.integer(length(x)),
-     as.integer(kernel.param), as.integer(ifelse(kernel.dofadj, 1, 0)),
-     as.integer(type), ab=double(kernel.param + 1),
-     ab2 = double(kernel.param + 1),
-     ans = double(1), PACKAGE = "highfrequency")$ans
+  kernelEstimator(as.double(x), as.double(y), as.integer(length(x)),
+                  as.integer(kernel.param), as.integer(ifelse(kernel.dofadj, 1, 0)),
+                  as.integer(type), ab=double(kernel.param + 1),
+                  ab2 = double(kernel.param + 1))
 }
 
 
@@ -150,20 +156,17 @@ rcHY <- function(x, y, period = 1, align.by = "seconds", align.period = 1, makeR
     stop("ERROR: Time data is not in x or y.")
   
   
-  sum(.C("pcovcc", 
-         as.double(x), #a
-         as.double(rep(0,length(x)/(period*align.period)+1)),
-         as.double(y), #b
-         as.double(x.t), #a
-         as.double(rep(0,length(x)/(period*align.period)+1)), #a
-         as.double(y.t), #b
-         as.integer(length(x)), #na
-         as.integer(length(x)/(period*align.period)),
-         as.integer(length(y)), #na
-         as.integer(period*align.period),
-         ans = double(length(x)/(period*align.period)+1), 
-         COPY=c(FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,TRUE), 
-         PACKAGE="highfrequency")$ans)
+  # sum(pcovcc(
+  #        as.double(x), #a
+  #        as.double(rep(0,length(x)/(period*align.period)+1)),
+  #        as.double(y), #b
+  #        as.double(x.t), #a
+  #        as.double(rep(0,length(x)/(period*align.period)+1)), #a
+  #        as.double(y.t), #b
+  #        as.integer(length(x)), #na
+  #        as.integer(length(x)/(period*align.period)),
+  #        as.integer(length(y)), #na
+  #        as.integer(period*align.period)))
 }
 
 
@@ -180,7 +183,7 @@ rdatacheck <- function (rdata, multi = FALSE) {
 #' @description This function implements the refresh time synchronization scheme proposed by Harris et al. (1995). 
 #' It picks the so-called refresh times at which all assets have traded at least once since the last refresh time point. 
 #' For example, the first refresh time corresponds to the first time at which all stocks have traded.
-#' The subsequent refresh time is defined as the first time when all stocks have again traded.
+#' The subsequent refresh time is defined as the first time when all stocks have traded again.
 #' This process is repeated untill the end of one time series is reached.
 #' 
 #' @param pdata a list. Each list-item contains an xts object  
@@ -208,30 +211,36 @@ rdatacheck <- function (rdata, multi = FALSE) {
 #' @importFrom xts as.xts
 #' @export
 refreshTime <- function (pdata) {
-  dim <- length(pdata)
-  lengths <- rep(0, dim + 1)
-  for (i in 1:dim) {
-    lengths[i + 1] <- length(pdata[[i]])
+  if (length(pdata) < 1) {
+    stop("pdata should contain at least two time series.")
   }
-  minl <- min(lengths[(2:(dim + 1))])
-  lengths <- cumsum(lengths)
-  alltimes <- rep(0, lengths[dim + 1])
-  for (i in 1:dim) {
-    alltimes[(lengths[i] + 1):lengths[i + 1]] <- as.numeric(as.POSIXct(index(pdata[[i]]), tz = "GMT"))
+  blub <- pdata[[1]]
+  for (i in 1:length(pdata)) {
+    blub <- merge(blub, pdata[[2]])
   }
-  x <- .C("refreshpoints", as.integer(alltimes), as.integer(lengths),
-         as.integer(rep(0, minl)), as.integer(dim), as.integer(0),
-         as.integer(rep(0, minl * dim)), as.integer(minl), PACKAGE = "highfrequency")
   
-  newlength <- x[[5]]
-  pmatrix <- matrix(ncol = dim, nrow = newlength)
-  for (i in 1:dim) {
-    selection    <- x[[6]][((i - 1) * minl + 1):(i * minl)]
-    pmatrix[, i] <- pdata[[i]][selection[1:newlength]]
+  blub2 <- xts(matrix(NA, nrow = dim(blub)[1], ncol = dim(blub)[2]), order.by = index(blub))
+  
+  last_values <- as.numeric(blub[1, ])
+  
+  if (sum(is.na(last_values)) == 0) {
+    blub2[1, ] <- last_values
+    last_values <- rep(NA, times = dim(blub)[2])
   }
-  time <- as.POSIXct(x[[3]][1:newlength], origin = "1970-01-01", tz = "GMT")
-  resmatrix <- xts(pmatrix, order.by = time)
-  return(resmatrix)
+  
+  for (ii in c(2:dim(blub)[1])) {
+    if (sum(is.na(last_values)) == 0) {
+      blub2[ii, ] <- last_values
+      last_values <- rep(NA, times = dim(blub)[2])
+    }
+    for (jj in c(1:dim(blub)[2])) {
+      if (is.na(last_values[jj]) == TRUE) {
+        last_values[jj] <- blub[ii,jj]
+      }
+    }
+  }
+  
+  return(blub2[!is.na(blub2[, 1])])
 }
 
 #' @keywords internal
@@ -514,11 +523,10 @@ rvKernel <- function(x,                             # Tick Data
     x <- cdata$data
     x <- .alignReturns(x, align.period)
     type <- kernelCharToInt(kernel.type)
-    .C("kernelEstimator", as.double(x), as.double(x), as.integer(length(x)),
-       as.integer(kernel.param), as.integer(ifelse(kernel.dofadj, 1, 0)),
-       as.integer(type), ab = double(kernel.param + 1),
-       ab2 = double(kernel.param + 1),
-       ans = double(1), PACKAGE = "highfrequency")$ans
+    kernelEstimator(as.double(x), as.double(x), as.integer(length(x)),
+                    as.integer(kernel.param), as.integer(ifelse(kernel.dofadj, 1, 0)),
+                    as.integer(type), ab = double(kernel.param + 1),
+                    ab2 = double(kernel.param + 1))
   }
 }
 

@@ -477,7 +477,6 @@ spotvol <- function(data, method = "detper", ..., on = "minutes", k = 5,
             2. A matrix containing return data")
     }
   }
-  browser()
   options <- list(...)
   out <- switch(method,
                 detper = detper(mR, rdata = rdata, options = options),
