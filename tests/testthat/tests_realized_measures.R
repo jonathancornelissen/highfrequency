@@ -82,8 +82,8 @@ expect_equal(
   "10038.65677"
 )
 expect_equal(
-  formatC(rOWCov(rdata = sample_5minprices_jumps['2010-01-04'], makeReturns = TRUE, wfunction = "SR")[1,1], digits = 4),
-  "0.01014"
+  formatC(rOWCov(rdata = sample_5minprices_jumps['2010-01-04'], makeReturns = TRUE, wfunction = "SR")[1,1], digits = 3),
+  "0.0101"
 )
 
 # rRTSCov
@@ -94,7 +94,7 @@ expect_equal(
 expect_equal(
   formatC(sum(rRTSCov(pdata = list(cumsum(lltc) + 100, cumsum(sbux) + 100))) * 1000000, digits = 10),
   "0.2469302743"
-)
+) 
 
 
 # rSkew
