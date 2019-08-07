@@ -8,14 +8,9 @@ spotvol(data, method = "detper", ..., on = "minutes", k = 5,
   marketopen = "09:30:00", marketclose = "16:00:00", tz = "GMT")
 }
 \arguments{
-\item{data}{Either an \code{xts} object, containing price data, or a
-\code{matrix} containing returns. For price data, irregularly spaced
+\item{data}{Can be one of two input types, \code{xts} or \code{data.table}. It is assumed that the input comprises prices in levels. Irregularly spaced
 observations are allowed. They will be aggregated to the level specified by
-parameters \code{on} and \code{k}. For return data, the observations are
-assumed to be equispaced, with the time between them specified by \code{on}
-and \code{k}. Return data should be in matrix form, where each row
-corresponds to a day, and each column to an intraday period. The output
-will be in the same form as the input (\code{xts} or \code{matrix}/\code{numeric}).}
+parameters \code{on} and \code{k}.}
 
 \item{method}{specifies which method will be used to estimate the spot
 volatility. Options include \code{"detper"} and \code{"stochper"}.

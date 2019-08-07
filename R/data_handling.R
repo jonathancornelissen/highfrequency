@@ -246,10 +246,10 @@ aggregatePrice <- function(pdata, on = "minutes", k = 1, marketopen = "09:30:00"
     }
   }
   
-  pdata <- pdata[DT >= ymd_hms(paste(as.Date(pdata$DT), marketopen), tz = tz(pdata$DT))]
-  pdata <- pdata[DT <= ymd_hms(paste(as.Date(pdata$DT), marketclose), tz = tz(pdata$DT))]
+  pdata <- pdata[DT >= ymd_hms(paste(as.Date(pdata$DT, tz = tz(pdata$DT)), marketopen), tz = tz(pdata$DT))]
+  pdata <- pdata[DT <= ymd_hms(paste(as.Date(pdata$DT, tz = tz(pdata$DT)), marketclose), tz = tz(pdata$DT))]
 
-  pdata[, DATE := as.Date(DT)]
+  pdata[, DATE := as.Date(DT, tz = tz(pdata))]
   pdata[, FIRST_DT := min(DT), by = "DATE"]
   pdata[, DT_ROUND := ifelse(DT == FIRST_DT,
                              floor_date(ymd_hms(DT), unit = paste(k, on)),
@@ -263,6 +263,8 @@ aggregatePrice <- function(pdata, on = "minutes", k = 1, marketopen = "09:30:00"
 
   pdata <- pdata[DT == LAST_DT][, DT := DT_ROUND][, c("DT", "PRICE")]
   lubridate::tz(pdata$DT) <- tz(pdata_open$DT)
+  # due to rounding there may be an observation that is refered to the opening time
+  pdata <- pdata[!(DT %in% pdata_open$DT)]
   
   pdata <- merge(pdata, pdata_open, all = TRUE)
   

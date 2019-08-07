@@ -24,9 +24,9 @@
 #'
 #' @examples
 #' # Example 1: Rolling mean and median estimators for 2 days
-#' dat <- sample_tdata_microseconds
-#' meandrift <- spotDrift(data = dat, k = 1, tz = "EST")
-#' mediandrift <- spotDrift(data = dat, method = "driftMedian", on = "seconds", k = 30, tz = "EST")
+#' meandrift <- spotDrift(data = sample_tdata_microseconds, k = 1, tz = "EST")
+#' mediandrift <- spotDrift(data = sample_tdata_microseconds, method = "driftMedian", 
+#'                          on = "seconds", k = 30, tz = "EST")
 #' plot(meandrift)
 #' plot(mediandrift)
 #'
@@ -91,14 +91,9 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
 
 #' Spot volatility estimation
 #'
-#' @param data Either an \code{xts} object, containing price data, or a
-#' \code{matrix} containing returns. For price data, irregularly spaced
+#' @param data Can be one of two input types, \code{xts} or \code{data.table}. It is assumed that the input comprises prices in levels. Irregularly spaced
 #' observations are allowed. They will be aggregated to the level specified by
-#' parameters \code{on} and \code{k}. For return data, the observations are
-#' assumed to be equispaced, with the time between them specified by \code{on}
-#' and \code{k}. Return data should be in matrix form, where each row
-#' corresponds to a day, and each column to an intraday period. The output
-#' will be in the same form as the input (\code{xts} or \code{matrix}/\code{numeric}).
+#' parameters \code{on} and \code{k}.
 #'
 #' @param method specifies which method will be used to estimate the spot
 #' volatility. Options include \code{"detper"} and \code{"stochper"}.
@@ -431,52 +426,84 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
 spotvol <- function(data, method = "detper", ..., on = "minutes", k = 5,
                       marketopen = "09:30:00", marketclose = "16:00:00",
                       tz = "GMT") {
-  if (on == "seconds" | on == "secs")
-    delta <- k
-  if (on == "minutes" | on == "mins")
-    delta <- k * 60
-  if (on == "hours")
-    delta <- k * 3600
-
-  if (inherits(data, what = "xts")) {
-    data <- xts(data, order.by = as.POSIXct(time(data), tz = tz), tzone = tz)
-    dates <- unique(format(time(data), "%Y-%m-%d"))
-    cDays <- length(dates)
-    rdata <- mR <- c()
-    intraday <- seq(from = chron::times(marketopen),
-                    to = chron::times(marketclose),
-                    by = chron::times(delta/(24*3600)))
-    if (as.character(tail(intraday, 1)) != marketclose)
-      intraday <- c(intraday, marketclose)
-    intraday <- intraday[2:length(intraday)]
-    for (d in 1:cDays) {
-      datad <- data[as.character(dates[d])]
-      if (!all(format(time(datad), format = "%Z") == tz))
-        stop(paste("Not all data on ", dates[d], " is in time zone \"", tz,
-                   "\". This may be due to daylight saving time. Try using a",
-                   " time zone without daylight saving, such as GMT.",
-                   sep = ""))
-      datad <- aggregatePrice(datad, on = on, k = k , marketopen = marketopen,
-                              marketclose = marketclose, tz = tz)
-      z <- xts(rep(1, length(intraday)), tzone = tz,
-               order.by = as.POSIXct(paste(dates[d], as.character(intraday)), tz = tz))
-      datad <- merge.xts(z, datad)$datad
-      datad <- na.locf(datad)
-      rdatad <- makeReturns(datad)
-      rdatad <- rdatad[time(rdatad) > min(time(rdatad))]
-      rdata <- rbind(rdata, rdatad)
-      mR <- rbind(mR, as.numeric(rdatad))
+  # if (on == "seconds" | on == "secs")
+  #   delta <- k
+  # if (on == "minutes" | on == "mins")
+  #   delta <- k * 60
+  # if (on == "hours")
+  #   delta <- k * 3600
+  # 
+  # if (inherits(data, what = "xts")) {
+  #   data <- xts(data, order.by = as.POSIXct(time(data), tz = tz), tzone = tz)
+  #   dates <- unique(format(time(data), "%Y-%m-%d"))
+  #   cDays <- length(dates)
+  #   rdata <- mR <- c()
+  #   intraday <- seq(from = chron::times(marketopen),
+  #                   to = chron::times(marketclose),
+  #                   by = chron::times(delta/(24*3600)))
+  #   if (as.character(tail(intraday, 1)) != marketclose)
+  #     intraday <- c(intraday, marketclose)
+  #   intraday <- intraday[2:length(intraday)]
+  #   for (d in 1:cDays) {
+  #     datad <- data[as.character(dates[d])]
+  #     if (!all(format(time(datad), format = "%Z") == tz))
+  #       stop(paste("Not all data on ", dates[d], " is in time zone \"", tz,
+  #                  "\". This may be due to daylight saving time. Try using a",
+  #                  " time zone without daylight saving, such as GMT.",
+  #                  sep = ""))
+  #     datad <- aggregatePrice(datad, on = on, k = k , marketopen = marketopen,
+  #                             marketclose = marketclose, tz = tz)
+  #     z <- xts(rep(1, length(intraday)), tzone = tz,
+  #              order.by = as.POSIXct(paste(dates[d], as.character(intraday)), tz = tz))
+  #     datad <- merge.xts(z, datad)$datad
+  #     datad <- na.locf(datad)
+  #     rdatad <- makeReturns(datad)
+  #     rdatad <- rdatad[time(rdatad) > min(time(rdatad))]
+  #     rdata <- rbind(rdata, rdatad)
+  #     mR <- rbind(mR, as.numeric(rdatad))
+  #   }
+  # } else {
+  #   if (class(data) == "matrix") {
+  #     mR <- data
+  #     rdata <- NULL
+  #   } else {
+  #     stop("Input data has to consist of either of the following:
+  #           1. An xts object containing price data
+  #           2. A matrix containing return data")
+  #   }
+  # }
+  # browser()
+  
+  PRICE = DATE = RETURN = DT = NULL
+  
+  if ("PRICE" %in% colnames(data) == FALSE) {
+    stop("data.table or xts needs column named PRICE.")
+  }
+  
+  dummy_was_xts <- FALSE
+  if (is.data.table(data) == FALSE) {
+    if (is.xts(data) == TRUE) {
+      data <- setnames(as.data.table(data), old = "index", new = "DT")
+      data[, PRICE := as.numeric(PRICE)]
+      dummy_was_xts <- TRUE
+    } else {
+      stop("Input has to be data.table or xts.")
     }
   } else {
-    if (class(data) == "matrix") {
-      mR <- data
-      rdata <- NULL
-    } else {
-      stop("Input data has to consist of either of the following:
-            1. An xts object containing price data
-            2. A matrix containing return data")
+    if (("DT" %in% colnames(data)) == FALSE) {
+      stop("Data.table needs DT column containing the time-stamps of the trades.") # added the timestamp comment for verbosity.
     }
   }
+  
+  datad <- aggregatePrice(data, on = on, k = k , marketopen = marketopen,
+                          marketclose = marketclose, tz = tz, fill = TRUE)
+  datad[, DATE := as.Date(DT, tz = tz(datad))]
+  setkeyv(datad, "DT")
+  datad <- datad[, RETURN := log(PRICE) - shift(log(PRICE), type = "lag"), by = "DATE"][is.na(RETURN) == FALSE]
+  rdata <- xts(datad$RETURN, order.by = datad$DT)
+  datad <- split(datad, by = "DATE")
+  mR <- matrix(unlist(lapply(datad, FUN = function(x) as.numeric(x$RETURN))), ncol = length(datad[[1]]$RETURN), byrow = TRUE)
+  
   options <- list(...)
   out <- switch(method,
                 detper = detper(mR, rdata = rdata, options = options),
