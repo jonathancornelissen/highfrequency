@@ -94,8 +94,8 @@ getLiquidityMeasures <- function(tqdata, win = 300, type = NULL) {
   tqdata[, quotedSlope := quotedSpread/logQuotedSize]
   tqdata[, logQSlope := logQuotedSpread/logQuotedSize]
 
-  tqdata[, midQuoteSquaredReturn := (log(midpoints) - log(shift(midpoints,1,type="lag")))^2]
-  tqdata[, midQuoteAbsReturn := abs(log(midpoints) - log(shift(midpoints,1,type="lag")))]
+  tqdata[, midQuoteSquaredReturn := (log(midpoints) - log(shift(midpoints,1, type = "lag")))^2]
+  tqdata[, midQuoteAbsReturn := abs(log(midpoints) - log(shift(midpoints,1, type = "lag")))]
 
   tqdata[, signedTradeSize := direction * SIZE]
   

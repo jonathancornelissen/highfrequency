@@ -1770,7 +1770,6 @@ RTQ <- function(rdata) {
   return(tq)
 } 
 
-
 #' Realized quad-power variation of highfrequency return series. 
 #' @description Function returns the realized quad-power variation, defined in Andersen et al. (2012).
 #'  

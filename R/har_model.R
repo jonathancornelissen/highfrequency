@@ -168,27 +168,27 @@ harInsanityFilter <- function(fittedValues, lower, upper, replacement) {
 #'
 #'
 #' ##### Example 3: HARRVQ #####
-#' #dat <- sample_5minprices_jumps$stock1
-#' #dat <- makeReturns(dat) #Get the high-frequency return data
+#' dat <- sample_5minprices_jumps$stock1
+#' dat <- makeReturns(dat) #Get the high-frequency return data
 #' #
-#' #x <- harModel(dat, periods = c(1,5,10), periodsJ = c(1,5,10),
-#' #            periodsQ = c(1), RVest = c("rCov", "rQuar"),
-#' #              type="HARRVQ", inputType = "returns")
+#' x <- harModel(dat, periods = c(1,5,10), periodsJ = c(1,5,10),
+#'             periodsQ = c(1), RVest = c("rCov", "rQuar"),
+#'               type="HARRVQ", inputType = "returns")
 #' ## Estimate the HAR model of type HARRVQ
-#' #class(x)
-#' #x
-#' ## plot(x)
+#' class(x)
+#' x
+#' # plot(x)
 #' #predict(x)
 #' 
 #' ##### Example 4: HARRVQJ with already computed realized measures #####
-#' #dat <- SP500RM[, c("RV", "BPV", "RQ")]
-#' #x <- harModel(dat, periods = c(1,5,22), periodsJ = c(1),
-#' #              periodsQ = c(1), type = "HARRVQJ")
+#' dat <- SP500RM[, c("RV", "BPV", "RQ")]
+#' x <- harModel(dat, periods = c(1,5,22), periodsJ = c(1),
+#'               periodsQ = c(1), type = "HARRVQJ")
 #' ## Estimate the HAR model of type HARRVQJ
-#' #class(x)
-#' #x
-#' ##plot(x)
-#' #predict(x)
+#' class(x)
+#' x
+#' # plot(x)
+#' predict(x)
 #'
 #' ##### Example 5: CHARRV with already computed realized measures #####
 #' dat <- SP500RM[, c("RV", "BPV")]
@@ -197,18 +197,18 @@ harInsanityFilter <- function(fittedValues, lower, upper, replacement) {
 #' # Estimate the HAR model of type CHARRV
 #' class(x)
 #' x
-#' #plot(x)
+#' # plot(x)
 #' predict(x)
 #'
 #' ##### Example 6: CHARRVQ with already computed realized measures #####
-#' #dat <- SP500RM[, c("RV", "BPV", "RQ")]
-#' #
-#' #x <- harModel(dat, periods = c(1,5,22), periodsQ = c(1), type = "CHARRVQ")
-#' ## Estimate the HAR model of type CHARRVQ
-#' #class(x)
-#' #x
-#' ##plot(x)
-#' #predict(x)
+#' dat <- SP500RM[, c("RV", "BPV", "RQ")]
+#' 
+#' x <- harModel(dat, periods = c(1,5,22), periodsQ = c(1), type = "CHARRVQ")
+#' # Estimate the HAR model of type CHARRVQ
+#' class(x)
+#' x
+#' # plot(x)
+#' predict(x)
 #'
 #'#' ##### Example 7: HARRV #####
 #' # Forecasting weekly Realized volatility for the S&P 500 using the basic harModel: HARRV
@@ -309,8 +309,8 @@ harModel <- function(data, periods = c(1,5,22), periodsJ = c(1,5,22), periodsQ =
     x2 <- RVmatrix2[(maxp:(n-h)),]
   }  # In case a jumprobust estimator is supplied
   if (type %in% quarticityModels) { #in case realized quarticity estimator is supplied
-    RQmatrix  <- har_agg(RM3,periodsQ, periods)[(maxp:(n-h)),]
-    colnames(RQmatrix) <- paste0("RQ", periods)
+    RQmatrix  <- as.matrix(har_agg(RM3,periodsQ, nperiodsQ)[(maxp:(n-h)),])
+    colnames(RQmatrix) <- paste0("RQ", periodsQ)
     if(nperiodsQ == 1){
       RQmatrix <- as.matrix(sqrt(RQmatrix) - sqrt(mean(RM3)))
     }else{
@@ -776,7 +776,7 @@ predict.harModel <- function(object, newdata = NULL, warnings = TRUE, ...) {
     if (type == "HARRVCJ") {
 
       if (object$jumptest=="ABDJumptest") {
-        TQ <- apply.daily(newdata, TQfun)
+        TQ <- apply.daily(newdata, RTQ)
         J <- J[, 1]
         teststats <- ABDJumptest(RV = RM1, BPV = RM2,TQ = TQ)
       } else {
