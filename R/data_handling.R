@@ -54,7 +54,7 @@
 #' @export
 aggregatets <- function (ts, FUN = "previoustick", on = "minutes", k = 1, weights = NULL, dropna = FALSE) {
   
-  makethispartbetter <- ((!is.null(weights))| on=="days"|on=="weeks"| (FUN!="previoustick")|dropna)
+  makethispartbetter <- ((!is.null(weights))| on=="days"| on=="weeks" | (FUN!="previoustick") | dropna)
   
   if (FUN == "previoustick") {
     FUN <- previoustick 

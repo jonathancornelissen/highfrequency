@@ -418,15 +418,15 @@ rAVGCov <- function(rdata, cor = FALSE, period = 1, align.by = "minutes", align.
   # # Aggregate:
   # if((!is.null(align.by)) && (!is.null(align.period))) {
   #   rdata <- fastTickAgregation(rdata, on = align.by, k = 1)
-  # } 
+  # }
   # 
-  # if (makeReturns) {  
-  #   rdata <- makeReturns(rdata) 
-  # }  
+  # if (makeReturns) {
+  #   rdata <- makeReturns(rdata)
+  # }
   # 
-  # if (is.null(dim(rdata))) {  
+  # if (is.null(dim(rdata))) {
   #   n = 1
-  # } else { 
+  # } else {
   #   n <- dim(rdata)[2]
   # }
   # 
@@ -827,9 +827,9 @@ rCov <- function(rdata, cor = FALSE, align.by = NULL, align.period = NULL, makeR
 #' # Average Hayashi-Yoshida Covariance estimator is calculated on five-minute returns
 #' 
 #' # Multivariate:
-#' # rHYCov <- rHYCov(rdata = cbind(lltc, sbux, fill = 0), period = 5, align.by = "minutes", 
-#' #                  align.period = 5, makeReturns = FALSE)
-#' # rHYCov 
+#' # realized_cov <- rHYCov(rdata = cbind(lltc, sbux, fill = 0), period = 5, align.by = "minutes", 
+#' #                        align.period = 5, makeReturns = FALSE)
+#' # realized_cov 
 #' Note: for the diagonal elements the rCov is used.
 #' 
 #' @keywords volatility
@@ -871,17 +871,25 @@ rHYCov <- function(rdata, cor = FALSE, period = 1, align.by = "seconds", align.p
       for (j in 1:(i - 1)) {
         cov[i, j] <- 
           sum(pcovcc(
-            as.double(x),
-            as.double(rep(0,length(x)/(period * align.period) + 1)),
-            as.double(y), #b
+            as.double(rdata[[j]]),
+            as.double(rep(0,length(rdata[[j]])/(period * align.period) + 1)),
+            as.double(rdata[[j]]), #b
             as.double(x.t), #a
-            as.double(rep(0, length(x)/(period * align.period) + 1)), #a
+            as.double(rep(0, length(rdata[[j]])/(period * align.period) + 1)), #a
             as.double(y.t), #b
             as.integer(length(x)), #na
             as.integer(length(x)/(period*align.period)),
             as.integer(length(y)), #na
             as.integer(period * align.period)))
         cov[j, i] <- cov[i, j]  
+        
+        # kernelEstimator(as.double(rdata[, i]), as.double(rdata[, j]), as.integer(length(rdata[, i])),
+        #                 as.integer(kernel.param), as.integer(ifelse(kernel.dofadj, 1, 0)),
+        #                 as.integer(type), ab = double(kernel.param + 1),
+        #                 ab2 = double(kernel.param + 1))
+        
+        # rc.hy( x=rdata[[i]], y=rdata[[j]], period = period,align.by=align.by, 
+        #        align.period = align.period, cts = cts, makeReturns = makeReturns)
       }
     }
     
@@ -1200,8 +1208,6 @@ rMPV <- function(rdata, m = 2, p = 2, align.by = NULL, align.period = NULL, make
 #' @examples 
 #' # Realized Outlyingness Weighted Variance/Covariance for CTS aligned   
 #' # at 5 minutes.
-#' data(sample_tdata)
-#' data(sample_5minprices_jumps)
 #' 
 #' # Univariate: 
 #' rvoutw <- rOWCov(rdata = sample_tdata$PRICE, align.by = "minutes",
@@ -1472,7 +1478,7 @@ rThresholdCov <- function(rdata, cor = FALSE, align.by = NULL, align.period = NU
                             align.period = align.period, makeReturns = makeReturns) 
     }
     if (n > 1) { 
-      result <- applygetlist(rdata, rThresholdCov, cor = cor, align.by = align.by,
+      result <- applyGetList(rdata, rThresholdCov, cor = cor, align.by = align.by,
                               align.period = align.period, makeReturns = makeReturns)
     }    
     return(result)

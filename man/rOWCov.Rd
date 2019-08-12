@@ -73,8 +73,6 @@ a zero weight, due to which the rOWCov can have a low finite sample efficiency i
 \examples{
 # Realized Outlyingness Weighted Variance/Covariance for CTS aligned   
 # at 5 minutes.
-data(sample_tdata)
-data(sample_5minprices_jumps)
 
 # Univariate: 
 rvoutw <- rOWCov(rdata = sample_tdata$PRICE, align.by = "minutes",

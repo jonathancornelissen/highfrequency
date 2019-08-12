@@ -38,9 +38,9 @@ The additional arguments for the mean and median methods are: \code{periods} for
 }
 \examples{
 # Example 1: Rolling mean and median estimators for 2 days
-dat <- sample_tdata_microseconds
-meandrift <- spotDrift(data = dat, k = 1, tz = "EST")
-mediandrift <- spotDrift(data = dat, method = "driftMedian", on = "seconds", k = 30, tz = "EST")
+meandrift <- spotDrift(data = sample_tdata_microseconds, k = 1, tz = "EST")
+mediandrift <- spotDrift(data = sample_tdata_microseconds, method = "driftMedian", 
+                         on = "seconds", k = 30, tz = "EST")
 plot(meandrift)
 plot(mediandrift)
 

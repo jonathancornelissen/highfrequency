@@ -96,6 +96,15 @@ expect_equal(
   "0.2469302743"
 ) 
 
+# rKernel
+expect_equal(
+  formatC(rKernelCov(rdata = sample_tdata$PRICE, align.by = "minutes",  align.period = 5, makeReturns = TRUE), digits = 5),
+  "0.00059605"
+)
+expect_equal(
+  formatC(sum(rKernelCov(rdata = cbind(lltc, sbux, fill = 0), align.by = "minutes", align.period = 5, makeReturns = FALSE)) * 1000, digits = 5),
+  "0.021378"
+)
 
 # rSkew
 expect_equal(

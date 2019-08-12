@@ -26,6 +26,12 @@ getLiquidityMeasures <- function(tqdata, win = 300, type = NULL) {
   
   BID = PRICE = OFR = SIZE = OFRSIZ = BIDSIZ = NULL
   
+  midpoints = direction = effectiveSpread = realizedSpread = valueTrade = signedValueTrade = NULL
+  depthImbalanceRatio = depthImbalanceDifference = proportionalEffectiveSpread = proportionalRealizedSpread = NULL
+  priceImpact = proportionalPriceImpact = halfTradedSpread = proportionalHalfTradedSpread = squaredLogReturn = NULL
+  squaredLogReturn = absLogReturn = quotedSpread = proportionalQuotedSpread = logQuotedSpread = logQuotedSize = NULL
+  quotedSlope = logQSlope = midQuoteSquaredReturn = midQuoteAbsReturn = signedTradeSize = NULL
+  
   tqdata <- checkColumnNames(tqdata)
   checktdata(tqdata)
   checkqdata(tqdata)

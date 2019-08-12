@@ -132,8 +132,8 @@ NumericVector pcovcc(NumericVector a, NumericVector ap, NumericVector b, Numeric
   NumericVector ans;
   
   for(i = 0; i < na; i++) {
-    ap[i/ period] += a[i];
-    atp[i/ period] = at[i];
+    ap[i / period] += a[i];
+    atp[i / period] = at[i];
   }
   for(i = 0; i < nap; i++) {
     tmpRet = 0;

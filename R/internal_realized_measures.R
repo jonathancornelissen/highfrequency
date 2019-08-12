@@ -8,17 +8,20 @@ alignReturns <- function(x, period, ...) {
      tmpa = as.double(rep(0,as.integer(length(x) / period +1))), #tmp
      as.double(rep(0,as.integer(length(x) / period +1))), #tmp
      as.integer(length(x) / period)) #tmpn
-  # .Call("rv",
-  #    as.double(x), #a
-  #    as.double(x), #b
-  #    as.integer(length(x)), #na
-  #    as.integer(period), #period
-  #    tmpa = as.double(rep(0,as.integer(length(x) / period +1))), #tmp
-  #    as.double(rep(0,as.integer(length(x) / period +1))), #tmp
-  #    as.integer(length(x) / period), #tmpn
-  #    ans = double(1),
-  #    COPY = c(FALSE,FALSE,FALSE,FALSE,FALSE,FALSE,TRUE),
-  #    PACKAGE = "highfrequency")
+}
+
+#' @keywords internal
+avarMCD <- function(alpha){
+  N <- 1
+  q_alpha <- qchisq(1 - alpha , df = N)
+  c_alpha <- (1-alpha)/pchisq( q_alpha , df = N+2 )
+  a_alpha <- -2*sqrt(q_alpha)*dnorm(sqrt(q_alpha))+1-alpha
+  b_alpha <- -2*q_alpha^(3/2)*dnorm(sqrt(q_alpha))+3*a_alpha
+
+  avar <- c_alpha^2*q_alpha^2+1-2*c_alpha*q_alpha
+  avar <- avar + c_alpha^2/(1-alpha)^2*(b_alpha+q_alpha^2*(1-alpha)-2*q_alpha*a_alpha)
+  avar <- avar + 2*( c_alpha*q_alpha - 1)*c_alpha*(1/(1-alpha))*(-q_alpha*(1-alpha)+a_alpha)
+  return(avar)
 }
 
 #' @importFrom stats pchisq
@@ -68,6 +71,63 @@ conhuber <- function(di, alpha = 0.05) {
 }
 
 #' @keywords internal
+ctBV <- function(rdata, startV = NULL) {
+  
+  N <- length(rdata)
+
+  if (is.null(startV)) {
+    hatV <- medRV(rdata)
+  } else {
+    hatV <- startV
+  }
+  v  <- 3^2 * hatV
+  z1 <- rep(0, N - 1);
+  for (i in 2:N) {
+    z1[i-1] <- zgamma(rdata[i], v, gamma_power = 1)
+  }
+
+  z2 <- rep(0, N - 1);
+  for (j in 1:(N - 1)) {
+    z2[j] <- zgamma(rdata[j], v, gamma_power = 1)
+  }
+  ctbv <- (pi/2) * sum(z1 * z2)
+  return(ctbv)
+}
+
+
+
+
+#' @keywords internal
+ctTPV <- function (rdata, startV = NULL){
+  q <- as.numeric(rdata)
+  N <- length(rdata);
+
+  if (is.null(startV)) {
+    hatV <- medRV(rdata)
+  } else {
+    hatV <- startV
+  }
+  v <- 3^2 * hatV
+  z1 <- rep(0, N - 2)
+  for (i in 3:N) {
+    z1[i-2] <- zgamma(rdata[i], v, gamma_power = 4/3)
+  }
+
+  z2 <- rep(0, N - 2);
+  for (j in 2:(N - 1)) {
+    z2[j-1] <- zgamma(rdata[j], v, gamma_power = 4/3)
+  }
+  z3 <- rep(0, N - 2);
+  for (l in 1:(N-2)) {
+    z3[l] <- zgamma(rdata[l], v, gamma_power = 4/3)
+  }
+  cttpv <- 0.8309^(-3) * sum(z1^(4/3) * z2^(4/3) * z3^(4/3))
+  return(cttpv)
+}
+
+
+
+#' @keywords internal
 huberweight <- function(d,k) {
   # Huber or soft rejection weight function
   w <- apply(cbind(rep(1, length(d)), (k/d)), 1, 'min')
@@ -97,77 +157,76 @@ multixts <- function(x, y = NULL) {
 
 
 
-rcKernel <- function(x,                             # Tick Data for first asset
-                     y,                             # Tick Data for second asset
-                     kernel.type = "rectangular",   # Kernel name (or number)
-                     kernel.param = 1,              # Kernel parameter (usually lags)
-                     kernel.dofadj = TRUE,          # Kernel Degree of freedom adjustment
-                     align.by = "seconds",            # Align the tick data to [seconds|minutes|hours]
-                     align.period = 1,              # Align the tick data to this many [seconds|minutes|hours]
-                     cts = TRUE,                    # Calendar Time Sampling is used
-                     makeReturns = FALSE) {           # Convert to Returns
-  #
-  # Handle deprication
-  #
-  if(!is.null(type)){
-    warning("type is deprecated, use kernel.type")
-    kernel.type <- type
-  }
-  if(!is.null(q)){
-    warning("q is deprecated, use kernel.param")
-    kernel.param <- q
-  }
-  if(!is.null(adj)){
-    warning("adj is deprecated, use kernel.dofadj")
-    kernel.dofadj <- adj
-  }
-  
-  align.period <- .getAlignPeriod(align.period, align.by)   
-  cdata <- .convertData(x, cts = cts, makeReturns = makeReturns)
-  
-  x <- cdata$data
-  x <- .alignReturns(x, align.period)
-  cdatay <- .convertData(y, cts = cts, makeReturns = makeReturns)
-  y <- cdatay$data
-  y <- .alignReturns(y, align.period)
-  type <- kernelCharToInt(kernel.type)
-  kernelEstimator(as.double(x), as.double(y), as.integer(length(x)),
-                  as.integer(kernel.param), as.integer(ifelse(kernel.dofadj, 1, 0)),
-                  as.integer(type), ab=double(kernel.param + 1),
-                  ab2 = double(kernel.param + 1))
-}
+# rcKernel <- function(x,                             # Tick Data for first asset
+#                      y,                             # Tick Data for second asset
+#                      kernel.type = "rectangular",   # Kernel name (or number)
+#                      kernel.param = 1,              # Kernel parameter (usually lags)
+#                      kernel.dofadj = TRUE,          # Kernel Degree of freedom adjustment
+#                      align.by = "seconds",            # Align the tick data to [seconds|minutes|hours]
+#                      align.period = 1,              # Align the tick data to this many [seconds|minutes|hours]
+#                      cts = TRUE,                    # Calendar Time Sampling is used
+#                      makeReturns = FALSE) {           # Convert to Returns
+#   #
+#   # Handle deprication
+#   #
+#   if(!is.null(type)){
+#     warning("type is deprecated, use kernel.type")
+#     kernel.type <- type
+#   }
+#   if(!is.null(q)){
+#     warning("q is deprecated, use kernel.param")
+#     kernel.param <- q
+#   }
+#   if(!is.null(adj)){
+#     warning("adj is deprecated, use kernel.dofadj")
+#     kernel.dofadj <- adj
+#   }
+#   
+#   align.period <- .getAlignPeriod(align.period, align.by)   
+#   cdata <- .convertData(x, cts = cts, makeReturns = makeReturns)
+#   
+#   x <- cdata$data
+#   x <- .alignReturns(x, align.period)
+#   cdatay <- .convertData(y, cts = cts, makeReturns = makeReturns)
+#   y <- cdatay$data
+#   y <- .alignReturns(y, align.period)
+#   type <- kernelCharToInt(kernel.type)
+#   kernelEstimator(as.double(x), as.double(y), as.integer(length(x)),
+#                   as.integer(kernel.param), as.integer(ifelse(kernel.dofadj, 1, 0)),
+#                   as.integer(type), ab=double(kernel.param + 1),
+#                   ab2 = double(kernel.param + 1))
+# }
 
 
 
-# Hayashi-Yoshida helper function:
-rcHY <- function(x, y, period = 1, align.by = "seconds", align.period = 1, makeReturns = FALSE) {
-  align.period = .getAlignPeriod(align.period, align.by)
-  cdata <- .convertData(x, cts=cts, makeReturns=makeReturns)
-  x <- cdata$data
-  x.t <- cdata$milliseconds
-  
-  cdatay <- .convertData(y, cts=cts, makeReturns=makeReturns)
-  y <- cdatay$data
-  y.t <- cdatay$milliseconds
-  
-  
-  errorCheck <- c(is.null(x.t),is.na(x.t), is.null(y.t), is.na(y.t))
-  if(any(errorCheck))
-    stop("ERROR: Time data is not in x or y.")
-  
-  
-  # sum(pcovcc(
-  #        as.double(x), #a
-  #        as.double(rep(0,length(x)/(period*align.period)+1)),
-  #        as.double(y), #b
-  #        as.double(x.t), #a
-  #        as.double(rep(0,length(x)/(period*align.period)+1)), #a
-  #        as.double(y.t), #b
-  #        as.integer(length(x)), #na
-  #        as.integer(length(x)/(period*align.period)),
-  #        as.integer(length(y)), #na
-  #        as.integer(period*align.period)))
-}
+# # Hayashi-Yoshida helper function:
+# rcHY <- function(x, y, period = 1, align.by = "seconds", align.period = 1, makeReturns = FALSE) {
+#   align.period = .getAlignPeriod(align.period, align.by)
+#   cdata <- .convertData(x, cts=cts, makeReturns=makeReturns)
+#   x <- cdata$data
+#   x.t <- cdata$milliseconds
+#   
+#   cdatay <- .convertData(y, cts=cts, makeReturns=makeReturns)
+#   y <- cdatay$data
+#   y.t <- cdatay$milliseconds
+#   
+#   
+#   errorCheck <- c(is.null(x.t),is.na(x.t), is.null(y.t), is.na(y.t))
+#   if(any(errorCheck))
+#     stop("ERROR: Time data is not in x or y.")
+#   
+#   sum(pcovcc(
+#          as.double(x), #a
+#          as.double(rep(0,length(x)/(period*align.period)+1)),
+#          as.double(y), #b
+#          as.double(x.t), #a
+#          as.double(rep(0,length(x)/(period*align.period)+1)), #a
+#          as.double(y.t), #b
+#          as.integer(length(x)), #na
+#          as.integer(length(x)/(period*align.period)),
+#          as.integer(length(y)), #na
+#          as.integer(period*align.period)))
+# }
 
 
 # Check data:
@@ -293,6 +352,41 @@ kernelCharToInt <- function(type) {
     type
   }
 }
+
+#' @importFrom stats qchisq
+#' @keywords internal
+thetaROWVar <- function(alpha = 0.001 , alphaMCD = 0.5) {
+  N <- 1
+  q_alpha <- qchisq(1-alpha , df = N)
+  c_alpha <- (1-alpha) / pchisq(q_alpha , df = N+2)
+  a_alpha <- -2 * sqrt(q_alpha) * dnorm(sqrt(q_alpha)) + 1 - alpha
+  b_alpha <- -2 * q_alpha^(3/2) * dnorm(sqrt(q_alpha)) + 3 * a_alpha
+
+  k <- qchisq(1 - alpha, df = 1)
+  halfk <- sqrt(k)
+  halfq <- sqrt(q_alpha)
+
+  Ewu2   <- 2 * pnorm(halfk)-1
+  Ewu2u2 <- -2 * halfk * dnorm(halfk) + Ewu2
+  Ewu2u4 <- -2 * (k^(3/2)) * dnorm(halfk)+3 * Ewu2u2
+
+  Ewu2u2IF <- (-1+c_alpha*q_alpha-(c_alpha*q_alpha)/(1-alpha))*a_alpha+c_alpha*b_alpha/(1-alpha)
+  Ewu2u2IF <- Ewu2u2IF + 2*(1-c_alpha*q_alpha)*(
+    halfk*dnorm(halfk)-halfq*dnorm(halfq) + 1 - alpha/2 - pnorm(halfk)   )
+  Ewu2IF <- (alpha-1-c_alpha*q_alpha*alpha) + c_alpha*a_alpha/(1-alpha) + 2*(c_alpha*q_alpha-1)*( pnorm(halfk)-(1-alpha/2))
+  Ederwu2u4 <- -k^(3/2)*dnorm(halfk)
+  Ederwu2u2 <- -halfk*dnorm(halfk)
+  c1 <- 1 / Ewu2u2
+  c2 <- 1 / Ewu2
+  c3 <- c2 * Ederwu2u2 - c1 * Ederwu2u4
+  Avar0 <- avarMCD(alpha)
+  theta <- c3^2 * Avar0 + c1^2 * Ewu2u4 + c2^2 * Ewu2 - 2 * c1 * c2 * Ewu2u2
+  theta <- theta + 2 * c3 * (c1 * Ewu2u2IF - c2 * Ewu2IF)
+
+  return(theta)
+}
+
+
 
 #' @importFrom robustbase covMcd
 #' @keywords internal
@@ -504,31 +598,30 @@ RTSRV <- function(pdata, startIV = NULL, noisevar = NULL, K = 300, J = 1, eta = 
   return(RTSRV)
 }
 
-#' @keywords internal
-rvKernel <- function(x,                             # Tick Data
-                     kernel.type = "rectangular",   # Kernel name (or number)
-                     kernel.param = 1,              # Kernel parameter (usually lags)
-                     kernel.dofadj = TRUE,          # Kernel Degree of freedom adjustment
-                     align.by = "seconds",          # Align the tick data to [seconds|minutes|hours]
-                     align.period = 1) {            # Align the tick data to this many [seconds|minutes|hours]            
-  # Multiday adjustment: 
-  multixts <- multixts(x)
-  if (multixts == TRUE) {
-    result <- apply.daily(x, rv.kernel,kernel.type,kernel.param,kernel.dofadj,
-                          align.by, align.period, cts, makeReturns)
-    return(result)
-  } else { #Daily estimation:
-    align.period <- .getAlignPeriod(align.period, align.by)         
-    cdata <- .convertData(x, cts = cts, makeReturns = makeReturns)
-    x <- cdata$data
-    x <- .alignReturns(x, align.period)
-    type <- kernelCharToInt(kernel.type)
-    kernelEstimator(as.double(x), as.double(x), as.integer(length(x)),
-                    as.integer(kernel.param), as.integer(ifelse(kernel.dofadj, 1, 0)),
-                    as.integer(type), ab = double(kernel.param + 1),
-                    ab2 = double(kernel.param + 1))
-  }
-}
+#' rvKernel <- function(x,                             # Tick Data
+#'                      kernel.type = "rectangular",   # Kernel name (or number)
+#'                      kernel.param = 1,              # Kernel parameter (usually lags)
+#'                      kernel.dofadj = TRUE,          # Kernel Degree of freedom adjustment
+#'                      align.by = "seconds",          # Align the tick data to [seconds|minutes|hours]
+#'                      align.period = 1) {            # Align the tick data to this many [seconds|minutes|hours]            
+#'   # Multiday adjustment: 
+#'   multixts <- multixts(x)
+#'   if (multixts == TRUE) {
+#'     result <- apply.daily(x, rv.kernel,kernel.type,kernel.param,kernel.dofadj,
+#'                           align.by, align.period, cts, makeReturns)
+#'     return(result)
+#'   } else { #Daily estimation:
+#'     align.period <- .getAlignPeriod(align.period, align.by)         
+#'     cdata <- .convertData(x, cts = cts, makeReturns = makeReturns)
+#'     x <- cdata$data
+#'     x <- .alignReturns(x, align.period)
+#'     type <- kernelCharToInt(kernel.type)
+#'     kernelEstimator(as.double(x), as.double(x), as.integer(length(x)),
+#'                     as.integer(kernel.param), as.integer(ifelse(kernel.dofadj, 1, 0)),
+#'                     as.integer(type), ab = double(kernel.param + 1),
+#'                     ab2 = double(kernel.param + 1))
+#'   }
+#' }
 
 #' @importFrom xts first
 #' @keywords internal
@@ -586,4 +679,23 @@ TSRV <- function(pdata , K = 300 , J = 1) {
   }
   TSRV <- adj * ( (1/K) * sum(logreturns_K^2) - ((nbarK/nbarJ) * (1/J) * sum(logreturns_J^2)))
   return(TSRV)
+}
+
+#' @keywords internal
+zgamma <- function (x, y, gamma_power) {
+  if (x^2 < y) {
+    out <- abs(x)^gamma_power
+  } else {
+    if (gamma_power == 1) {
+      out <- 1.094 * sqrt(y)
+    }
+    if (gamma_power == 2) {
+      out <- 1.207 * y
+    }
+    if (gamma_power == 4/3) {
+      out <- 1.129 * y^(2/3)
+    }
+  }
+  
+  return(out)
 }

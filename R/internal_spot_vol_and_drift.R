@@ -757,6 +757,7 @@ WSDnozero <- function(weights, series) {
   return(sqrt(1.081 * out))
 }
 
+#' @importFrom stats optim
 #' @keywords internal
 diurnal <- function (stddata, method = "TML", dummies = F, P1 = 6, P2 = 4) {
   cDays <- dim(stddata)[1]
