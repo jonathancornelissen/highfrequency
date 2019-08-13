@@ -29,3 +29,5 @@ src_old/heavy_model.o
 src_old/heavy_model.h
 src_old/heavy_model.c
 src_old/har_model.o
+R/.DS_Store
+.DS_Store

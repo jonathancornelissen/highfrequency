@@ -126,6 +126,22 @@ ctTPV <- function (rdata, startV = NULL){
 }
 
 
+#' @keywords internal
+getAlignPeriod <- function(align.period, align.by) {   
+  align.by <- gsub("(^ +)|( +$)", "",align.by) # Trim White
+  
+  if(casefold(align.by) == "min" || casefold(align.by) == "mins" ||casefold(align.by) == "minute"||casefold(align.by) == "minutes"||casefold(align.by) == "m"){
+    ans <- align.period * 60
+  }
+  if(casefold(align.by) == "sec" || casefold(align.by) == "secs" ||casefold(align.by) == "second"||casefold(align.by) == "seconds"||casefold(align.by) == "s"||casefold(align.by) == ""){
+    ans <- align.period
+  }
+  if(casefold(align.by) == "hour" || casefold(align.by) == "hours" ||casefold(align.by) == "h"){
+    ans <- align.period * 60 * 60
+  }
+  return(ans)
+}
+
 
 #' @keywords internal
 huberweight <- function(d,k) {

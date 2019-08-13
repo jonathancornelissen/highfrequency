@@ -164,6 +164,9 @@ expect_equal(
 )
 
 
-
+expect_equal(
+  formatC(ivInference(sample_tdata$PRICE, IVestimator= "minRV", IQestimator = "medRQ", confidence = 0.95, makeReturns = TRUE)$cb * 10000, digits = 5),
+  c("4.7594", "5.7472")
+)
 
 

@@ -311,10 +311,10 @@ legend("topright", c("detper", "stochper"), col = c("black", "red"), lty=1)}
 
 # Various kernel estimates
 \donttest{
-h1 <- bw.nrd0((1:nrow(sample_returns_5min))*(5*60))
-vol3 <- spotvol(sample_returns_5min, method = "kernel", h = h1)
-vol4 <- spotvol(sample_returns_5min, method = "kernel", est = "quarticity")
-vol5 <- spotvol(sample_returns_5min, method = "kernel", est = "cv")
+h1 <- bw.nrd0((1:nrow(sample_real5minprices))*(5*60))
+vol3 <- spotvol(sample_real5minprices, method = "kernel", h = h1)
+vol4 <- spotvol(sample_real5minprices, method = "kernel", est = "quarticity")
+vol5 <- spotvol(sample_real5minprices, method = "kernel", est = "cv")
 plot(vol3, length = 2880)
 lines(as.numeric(t(vol4$spot))[1:2880], col = "red")
 lines(as.numeric(t(vol5$spot))[1:2880], col = "blue")
@@ -332,8 +332,8 @@ plot(vol6)}
 
 # Compare regular GARCH(1,1) model to eGARCH, both with external regressors
 \donttest{
-vol7 <- spotvol(sample_returns_5min, method = "garch", model = "sGARCH")
-vol8 <- spotvol(sample_returns_5min, method = "garch", model = "eGARCH")
+vol7 <- spotvol(sample_real5minprices, method = "garch", model = "sGARCH")
+vol8 <- spotvol(sample_real5minprices, method = "garch", model = "eGARCH")
 plot(as.numeric(t(vol7$spot)), type = "l")
 lines(as.numeric(t(vol8$spot)), col = "red")
 legend("topleft", c("GARCH", "eGARCH"), col = c("black", "red"), lty=1)

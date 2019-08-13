@@ -70,7 +70,7 @@ aggregatets <- function (ts, FUN = "previoustick", on = "minutes", k = 1, weight
         ts2 <- period.apply(ts, ep, FUN) 
       }
       if (dim(ts)[2] > 1) {  
-        ts2 <- xts(apply(ts, 2, FUN = period.apply2, FUN2 = FUN, INDEX = ep), order.by = index(ts)[ep],)
+        ts2 <- xts(apply(ts, 2, FUN = periodApply2, FUN2 = FUN, INDEX = ep), order.by = index(ts)[ep],)
       }
     } else {
       tsb <- cbind(ts, weights)

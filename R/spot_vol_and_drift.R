@@ -383,10 +383,10 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
 #'
 #' # Various kernel estimates
 #' \donttest{
-#' h1 <- bw.nrd0((1:nrow(sample_returns_5min))*(5*60))
-#' vol3 <- spotvol(sample_returns_5min, method = "kernel", h = h1)
-#' vol4 <- spotvol(sample_returns_5min, method = "kernel", est = "quarticity")
-#' vol5 <- spotvol(sample_returns_5min, method = "kernel", est = "cv")
+#' h1 <- bw.nrd0((1:nrow(sample_real5minprices))*(5*60))
+#' vol3 <- spotvol(sample_real5minprices, method = "kernel", h = h1)
+#' vol4 <- spotvol(sample_real5minprices, method = "kernel", est = "quarticity")
+#' vol5 <- spotvol(sample_real5minprices, method = "kernel", est = "cv")
 #' plot(vol3, length = 2880)
 #' lines(as.numeric(t(vol4$spot))[1:2880], col = "red")
 #' lines(as.numeric(t(vol5$spot))[1:2880], col = "blue")
@@ -404,8 +404,8 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
 #'
 #' # Compare regular GARCH(1,1) model to eGARCH, both with external regressors
 #' \donttest{
-#' vol7 <- spotvol(sample_returns_5min, method = "garch", model = "sGARCH")
-#' vol8 <- spotvol(sample_returns_5min, method = "garch", model = "eGARCH")
+#' vol7 <- spotvol(sample_real5minprices, method = "garch", model = "sGARCH")
+#' vol8 <- spotvol(sample_real5minprices, method = "garch", model = "eGARCH")
 #' plot(as.numeric(t(vol7$spot)), type = "l")
 #' lines(as.numeric(t(vol8$spot)), col = "red")
 #' legend("topleft", c("GARCH", "eGARCH"), col = c("black", "red"), lty=1)
@@ -426,53 +426,6 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
 spotvol <- function(data, method = "detper", ..., on = "minutes", k = 5,
                       marketopen = "09:30:00", marketclose = "16:00:00",
                       tz = "GMT") {
-  # if (on == "seconds" | on == "secs")
-  #   delta <- k
-  # if (on == "minutes" | on == "mins")
-  #   delta <- k * 60
-  # if (on == "hours")
-  #   delta <- k * 3600
-  # 
-  # if (inherits(data, what = "xts")) {
-  #   data <- xts(data, order.by = as.POSIXct(time(data), tz = tz), tzone = tz)
-  #   dates <- unique(format(time(data), "%Y-%m-%d"))
-  #   cDays <- length(dates)
-  #   rdata <- mR <- c()
-  #   intraday <- seq(from = chron::times(marketopen),
-  #                   to = chron::times(marketclose),
-  #                   by = chron::times(delta/(24*3600)))
-  #   if (as.character(tail(intraday, 1)) != marketclose)
-  #     intraday <- c(intraday, marketclose)
-  #   intraday <- intraday[2:length(intraday)]
-  #   for (d in 1:cDays) {
-  #     datad <- data[as.character(dates[d])]
-  #     if (!all(format(time(datad), format = "%Z") == tz))
-  #       stop(paste("Not all data on ", dates[d], " is in time zone \"", tz,
-  #                  "\". This may be due to daylight saving time. Try using a",
-  #                  " time zone without daylight saving, such as GMT.",
-  #                  sep = ""))
-  #     datad <- aggregatePrice(datad, on = on, k = k , marketopen = marketopen,
-  #                             marketclose = marketclose, tz = tz)
-  #     z <- xts(rep(1, length(intraday)), tzone = tz,
-  #              order.by = as.POSIXct(paste(dates[d], as.character(intraday)), tz = tz))
-  #     datad <- merge.xts(z, datad)$datad
-  #     datad <- na.locf(datad)
-  #     rdatad <- makeReturns(datad)
-  #     rdatad <- rdatad[time(rdatad) > min(time(rdatad))]
-  #     rdata <- rbind(rdata, rdatad)
-  #     mR <- rbind(mR, as.numeric(rdatad))
-  #   }
-  # } else {
-  #   if (class(data) == "matrix") {
-  #     mR <- data
-  #     rdata <- NULL
-  #   } else {
-  #     stop("Input data has to consist of either of the following:
-  #           1. An xts object containing price data
-  #           2. A matrix containing return data")
-  #   }
-  # }
-  # browser()
   
   PRICE = DATE = RETURN = DT = NULL
   
@@ -503,6 +456,15 @@ spotvol <- function(data, method = "detper", ..., on = "minutes", k = 5,
   rdata <- xts(datad$RETURN, order.by = datad$DT)
   datad <- split(datad, by = "DATE")
   mR <- matrix(unlist(lapply(datad, FUN = function(x) as.numeric(x$RETURN))), ncol = length(datad[[1]]$RETURN), byrow = TRUE)
+  
+  if (method == "kernel") {
+    if (on == "seconds" | on == "secs")
+      delta <- k
+    if (on == "minutes" | on == "mins")
+      delta <- k * 60
+    if (on == "hours")
+      delta <- k * 3600
+  }
   
   options <- list(...)
   out <- switch(method,

@@ -812,7 +812,7 @@ rCov <- function(rdata, cor = FALSE, align.by = NULL, align.period = NULL, makeR
 #' Hayashi-Yoshida Covariance
 #' @description Calculates the Hayashi-Yoshida Covariance estimator
 #' 
-#' @param rdata anpossibly multivariate xts object.
+#' @param rdata a possibly multivariate xts object.
 #' @param cor boolean, in case it is TRUE, the correlation is returned. FALSE by default.
 #' @param period Sampling period 
 #' @param align.by Align the tick data to seconds|minutes|hours
@@ -841,11 +841,13 @@ rHYCov <- function(rdata, cor = FALSE, period = 1, align.by = "seconds", align.p
     stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")
   }
   
-  if ((!is.null(align.by)) && (!is.null(align.period))) {
-    rdata <- fastTickAgregation(rdata, on = align.by, k = align.period);
-  } 
+  rdata <- fastTickAgregation(rdata, on = "seconds", k = 1)
+  rdata <- rdata[-dim(rdata)[1], ]
+  aggrdata <- fastTickAgregation(rdata, on = align.by, k = align.period)
+  
   if (makeReturns == TRUE) {  
     rdata <- makeReturns(rdata) 
+    aggrdata <- makeReturns(aggrdata)
   }  
   if (is.null(dim(rdata))) {
     n <- 1
@@ -854,32 +856,34 @@ rHYCov <- function(rdata, cor = FALSE, period = 1, align.by = "seconds", align.p
   }
   
   if (n == 1) {
-    return(rCov(rdata, align.by = align.by, align.period = align.period, makeReturns = FALSE))
+    return(rCov(aggrdata))
   }
   
   if (n > 1) {    
     
-    rdata  <- as.matrix(rdata);
+    # rdata  <- as.matrix(rdata)
     n <- dim(rdata)[2]
     cov <- matrix(rep(0, n * n), ncol = n)
     diagonal <- c()
     for (i in 1:n) {
-      diagonal[i] <- t(rdata[, i]) %*% rdata[, i]
+      diagonal[i] <- rCov(aggrdata[, i])#t(rdata[, i]) %*% rdata[, i]
     }
     diag(cov) <- diagonal
+    align.period <- getAlignPeriod(align.period, align.by)
     for (i in 2:n) {
       for (j in 1:(i - 1)) {
+        browser()
         cov[i, j] <- 
           sum(pcovcc(
-            as.double(rdata[[j]]),
-            as.double(rep(0,length(rdata[[j]])/(period * align.period) + 1)),
-            as.double(rdata[[j]]), #b
-            as.double(x.t), #a
-            as.double(rep(0, length(rdata[[j]])/(period * align.period) + 1)), #a
-            as.double(y.t), #b
-            as.integer(length(x)), #na
-            as.integer(length(x)/(period*align.period)),
-            as.integer(length(y)), #na
+            as.numeric(rdata[,i]),
+            as.double(rep(0,length(rdata[, j])/(period * align.period) + 1)),
+            as.numeric(rdata[,j]), #b
+            as.double(c(1:length(rdata[, j]))), #a
+            as.double(rep(0, length(rdata[, j])/(period * align.period) + 1)), #a
+            as.double(c(1:length(rdata[, j]))), #b
+            as.integer(length(rdata[, j])), #na
+            as.integer(length(rdata[, j])/(period*align.period)),
+            as.integer(length(rdata[, j])), #na
             as.integer(period * align.period)))
         cov[j, i] <- cov[i, j]  
         
