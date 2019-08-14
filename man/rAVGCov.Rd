@@ -4,16 +4,14 @@
 \alias{rAVGCov}
 \title{Realized Covariance: Average Subsample}
 \usage{
-rAVGCov(rdata, cor = FALSE, period = 1, align.by = "minutes",
-  align.period = 5, makeReturns = FALSE)
+rAVGCov(rdata, cor = FALSE, align.by = "minutes", align.period = 5,
+  makeReturns = FALSE)
 }
 \arguments{
 \item{rdata}{a \eqn{(M x N)} matrix/zoo/xts object containing the \eqn{N}
 return series over period \eqn{t}, with \eqn{M} observations during \eqn{t}.}
 
 \item{cor}{boolean, in case it is TRUE, the correlation is returned. FALSE by default.}
-
-\item{period}{Sampling period}
 
 \item{align.by}{Align the tick data to seconds|minutes|hours}
 
@@ -32,12 +30,12 @@ Realized Covariance using average subsample.
 # 5 subgrids (5 minutes).
 
 # Univariate
-rvSub <- rAVGCov(rdata = sample_tdata$PRICE, period = 5, align.by = "minutes",
+rvSub <- rAVGCov(rdata = sample_tdata$PRICE, align.by = "minutes",
                  align.period = 5, makeReturns = TRUE) 
 rvSub
 
 # Multivariate:
-rcovSub <- rAVGCov(rdata = cbind(lltc, sbux), period = 5, align.by = "minutes", 
+rcovSub <- rAVGCov(rdata = cbind(lltc, sbux, fill = 0), align.by = "minutes", 
                    align.period = 5, makeReturns = FALSE)
 rcovSub
 

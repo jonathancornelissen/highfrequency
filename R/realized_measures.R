@@ -379,7 +379,6 @@ MRC <- function(pdata, pairwise = FALSE, makePsd = FALSE) {
 #' @param rdata a \eqn{(M x N)} matrix/zoo/xts object containing the \eqn{N}
 #' return series over period \eqn{t}, with \eqn{M} observations during \eqn{t}.
 #' @param cor boolean, in case it is TRUE, the correlation is returned. FALSE by default.
-#' @param period Sampling period 
 #' @param align.by Align the tick data to seconds|minutes|hours
 #' @param align.period Align the tick data to this many [seconds|minutes|hours]
 #' @param makeReturns Prices are passed make them into log returns
@@ -398,37 +397,160 @@ MRC <- function(pdata, pairwise = FALSE, makePsd = FALSE) {
 #' # 5 subgrids (5 minutes).
 #' 
 #' # Univariate
-#' rvSub <- rAVGCov(rdata = sample_tdata$PRICE, period = 5, align.by = "minutes",
+#' rvSub <- rAVGCov(rdata = sample_tdata$PRICE, align.by = "minutes",
 #'                  align.period = 5, makeReturns = TRUE) 
 #' rvSub
 #' 
 #' # Multivariate:
-#' rcovSub <- rAVGCov(rdata = cbind(lltc, sbux), period = 5, align.by = "minutes", 
+#' rcovSub <- rAVGCov(rdata = cbind(lltc, sbux, fill = 0), align.by = "minutes", 
 #'                    align.period = 5, makeReturns = FALSE)
 #' rcovSub
 #' 
+#' @importFrom data.table data.table
 #' @keywords volatility
 #' @export
-rAVGCov <- function(rdata, cor = FALSE, period = 1, align.by = "minutes", align.period = 5, makeReturns = FALSE) {
-  # multixts <- multixts(rdata)
-  # if (multixts == TRUE) {
-  #   stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")
-  # }
+rAVGCov <- function(rdata, cor = FALSE, align.by = "minutes", align.period = 5, makeReturns = FALSE) {
+  
+  DT = DT_ROUND = DT_SUBSAMPLE = FIRST_DT = MAXDT = RETURN = RETURN1 = RETURN2 = NULL
+  
+  multixts <- multixts(rdata)
+  if (multixts == TRUE) {
+    stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")
+  }
+  
+  if (is.null(dim(rdata))) {
+    n <- 1
+  } else {
+    n <- dim(rdata)[2]
+  }
+  
+  if (n == 1) {
+    rdatabackup <- data.table(DT = index(rdata), RETURN = as.numeric(rdata))
+    rdata <- rdatabackup
+    rdata[, FIRST_DT := min(DT)]
+    if (makeReturns == TRUE) {
+      rdata[, DT_ROUND := ifelse(DT == FIRST_DT,
+                                 floor_date(ymd_hms(DT), unit =  paste0(1, " ", align.by)),
+                                 ceiling_date(ymd_hms(DT), unit = paste0(1, " ", align.by), change_on_boundary = FALSE))]
+      rdata[, DT_ROUND := as_datetime(DT_ROUND)]
+      rdata[, MAXDT := max(DT), by = "DT_ROUND"]
+      rdata <- rdata[DT == MAXDT]
+      rdata[, RETURN := log(RETURN) - shift(log(RETURN), n = 1, type = "lag")]
+      rdata <- rdata[is.na(RETURN) == FALSE]
+      rdata <- rdata[, c("DT_ROUND", "RETURN")]
+    } else {
+      rdata[, DT_ROUND := ceiling_date(ymd_hms(DT), unit = paste0(1, " ", align.by), change_on_boundary = FALSE)]
+      rdata[, DT_ROUND := as_datetime(DT_ROUND)]
+    }
+    rvavg <- sum(rdata[, DT_SUBSAMPLE := ceiling_date(DT_ROUND, unit = paste0(align.period, " ", align.by), change_on_boundary = FALSE)
+                  ][, list(RETURN = sum(RETURN)), by = list(DT_SUBSAMPLE)]$RETURN^2)
+    
+    for (ii in c(1:(align.period - 1))) {
+      rdatasub <- rdata[-c(1:ii, (dim(rdata)[1]-align.period + ii + 1):dim(rdata)[1]), ]
+      rdatasub[, DT_ROUND := DT_ROUND - eval(parse(text = paste0("lubridate::", align.by, "(", ii, ")")))]
+      rvavg <- rvavg + sum(rdatasub[, DT_SUBSAMPLE := ceiling_date(DT_ROUND, unit = paste0(align.period, " ", align.by), change_on_boundary = FALSE)
+                                    ][, list(RETURN = sum(RETURN)), by = list(DT_SUBSAMPLE)]$RETURN^2) * (dim(rdatasub)[1]/align.period + 1) / (dim(rdatasub)[1]/align.period)
+    }
+    return(rvavg / align.period)
+  }
+  
+  if (n > 1) {
+    rdatamatrix <- matrix(0, nrow = n, ncol = n)
+    for (ii in c(1:n)) {
+      rdatamatrix[ii, ii] <- rAVGCov(rdata[, ii], cor = cor, align.by = align.by, align.period = align.period, makeReturns = makeReturns)
+      if (ii < n) {
+        for (jj in c((ii+1):n)) {
+          # browser()
+          rdatabackup <- data.table(DT = index(rdata), RETURN1 = as.numeric(rdata[, ii]), RETURN2 = as.numeric(rdata[,jj]))
+          rdatabackup[, FIRST_DT := min(DT)]
+          if (makeReturns == TRUE) {
+            rdatabackup[, DT_ROUND := ifelse(DT == FIRST_DT,
+                                             floor_date(ymd_hms(DT), unit =  paste0(1, " ", align.by)),
+                                             ceiling_date(ymd_hms(DT), unit = paste0(1, " ", align.by), change_on_boundary = FALSE))]
+            rdatabackup[, DT_ROUND := as_datetime(DT_ROUND)]
+            rdatabackup[, MAXDT := max(DT), by = "DT_ROUND"]
+            rdatabackup <- rdatabackup[DT == MAXDT]
+            rdatabackup[, RETURN1 := log(RETURN1) - shift(log(RETURN1), n = 1, type = "lag")]
+            rdatabackup[, RETURN2 := log(RETURN2) - shift(log(RETURN2), n = 1, type = "lag")]
+            rdatabackup <- rdatabackup[is.na(RETURN1) == FALSE][is.na(RETURN2) == FALSE]
+            rdatabackup <- rdatabackup[, c("DT_ROUND", "RETURN1", "RETURN2")]
+          } else {
+            rdatabackup[, DT_ROUND := ceiling_date(ymd_hms(DT), unit = paste0(1, " ", align.by), change_on_boundary = FALSE)]
+            rdatabackup[, DT_ROUND := as_datetime(DT_ROUND)]
+          }
+          returns <- rdatabackup[, DT_SUBSAMPLE := ceiling_date(DT_ROUND, unit = paste0(align.period, " ", align.by), change_on_boundary = FALSE)
+                                 ][, list(RETURN1 = sum(RETURN1), RETURN2 = sum(RETURN2)), by = list(DT_SUBSAMPLE)]
+          covavg <- t(returns$RETURN1) %*% returns$RETURN2
+          
+          for (kk in c(1:(align.period - 1))) {
+            returns <- rdatabackup[, DT_SUBSAMPLE := ceiling_date(DT_ROUND, unit = paste0(1, " ", align.by), change_on_boundary = FALSE)
+                                   ][, list(RETURN1 = sum(RETURN1), RETURN2 = sum(RETURN2)), by = list(DT_SUBSAMPLE)]
+            rdatasub <- returns[-c(1:kk, (dim(returns)[1]-align.period + kk + 1):dim(returns)[1]), ]
+            rdatasub[, DT_SUBSAMPLE:= DT_SUBSAMPLE - eval(parse(text = paste0("lubridate::", align.by, "(", kk, ")")))]
+            # returns <- 
+            returns <- rdatasub[, DT_SUBSAMPLE := ceiling_date(DT_SUBSAMPLE, unit = paste0(align.period, " ", align.by), change_on_boundary = FALSE)
+                                ][, list(RETURN1 = sum(RETURN1), RETURN2 = sum(RETURN2)), by = list(DT_SUBSAMPLE)]
+            covavg <- covavg + t(returns$RETURN1) %*% returns$RETURN2
+          }
+          
+          rdatamatrix[ii, jj] <- covavg / align.period
+          rdatamatrix[jj, ii] <- rdatamatrix[ii, jj]
+        }
+      }
+    }
+    return(rdatamatrix)
+  }
   # 
-  # # Aggregate:
-  # if((!is.null(align.by)) && (!is.null(align.period))) {
-  #   rdata <- fastTickAgregation(rdata, on = align.by, k = 1)
-  # }
-  # 
-  # if (makeReturns) {
+  # r# Aggregate:
+  # if (makeReturns == TRUE) {
+  #   if((!is.null(align.by)) && (!is.null(align.period))) {
+  #     rdata <- fastTickAgregation(rdata, on = align.by, k = 1)
+  #   }
   #   rdata <- makeReturns(rdata)
+  # } else {
+  #   rdata <- aggregatets(rdata, FUN = "sum", on = align.by, k = 1)
   # }
   # 
   # if (is.null(dim(rdata))) {
-  #   n = 1
+  #   n <- 1
   # } else {
   #   n <- dim(rdata)[2]
   # }
+  # 
+  # zoo::index(rdata) <- index(rdata) - eval(parse(text = paste0("lubridate::", align.by, "(", 1, ")"))) # shift due to change on boundary in aggregatets
+  # if (n == 1) {
+  #   rvavg <- rCov(aggregatets(rdata, FUN = "sum", on = align.by, k = align.period))
+  #   for (ii in c(1:(align.period - 1))) {
+  #     rdatasub <- rdata[-c(1:ii, (length(rdata)-align.period + ii):length(rdata)), ]
+  #     zoo::index(rdatasub) <-  ymd_hms(index(rdatasub), tz = tz(index(rdatasub))) - eval(parse(text = paste0("lubridate::", align.by, "(", ii, ")")))
+  #     n_obs <- length(fastTickAgregation(rdatasub, on = align.by, k = align.period))
+  #     rvavg <- rvavg + rCov(aggregatets(rdatasub, FUN = "sum", on = align.by, k = align.period)) #* (n_obs + 1) / (n_obs) # correction term for one observation less
+  #   }
+  #   return(rvavg / align.period)
+  # } else {
+  #   rdatamatrix <- matrix(0, nrow = n, ncol = n)
+  #   for (ii in c(1:n)) {
+  #     rvavg <- rCov(aggregatets(rdata[, ii], FUN = "sum", on = align.by, k = align.period))
+  #     for (jj in c(1:(align.period - 1))) {
+  #       rdatasub <- rdata[-c(1:jj, (length(rdata[,ii])-align.period + jj):length(rdata[,ii])), ii]
+  #       zoo::index(rdatasub) <- ymd_hms(index(rdatasub), tz = tz(index(rdatasub))) - eval(parse(text = paste0("lubridate::", align.by, "(", ii, ")")))
+  #       n_obs <- length(fastTickAgregation(rdatasub, on = align.by, k = align.period))
+  #       rvavg <- rvavg + rCov(aggregatets(rdatasub, FUN = "sum", on = align.by, k = align.period)) #* (n_obs + 1) / (n_obs) # correction term for one observation less
+  #     }
+  #     rdatamatrix[ii, ii] <- rvavg / align.period
+  #     if (ii < n) {
+  #       for (jj in c((ii+1):n)) {
+  #         rdatamatrix[ii, jj] <- 1
+  #         rdatamatrix[jj, ii] <- rdatamatrix[ii, jj]
+  #       }
+  #     }
+  #     
+  #   }
+  #   return(rdatamatrix)
+  # }
+  
+  
+  # rv_avg_sub <- apply(xts_one_minute, 2, rAVGCov, period = 5)
   # 
   # if (n == 1) {
   #   
@@ -785,7 +907,8 @@ rCov <- function(rdata, cor = FALSE, align.by = NULL, align.period = NULL, makeR
     if (makeReturns) {  
       rdata <- makeReturns(rdata) 
     }  
-    if (is.null(dim(rdata))) {  n = 1
+    if (is.null(dim(rdata))) {  
+      n <- 1
     } else { 
       n <- dim(rdata)[2]
     }
