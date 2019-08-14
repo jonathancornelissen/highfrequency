@@ -4,37 +4,29 @@
 \alias{tradesCleanupUsingQuotes}
 \title{Perform a final cleaning procedure on trade data}
 \usage{
-tradesCleanupUsingQuotes(from, to, datasource, datadestination, ticker,
+tradesCleanupUsingQuotes(datasource = NULL, datadestination = NULL,
   tdata = NULL, qdata = NULL)
 }
 \arguments{
-\item{from}{character indicating first date to clean, e.g. "2008-01-30".}
-
-\item{to}{character indicating last date to clean, e.g. "2008-01-31".}
-
 \item{datasource}{character indicating the folder in which the original data is stored.}
 
-\item{datadestination}{character indicating the folder in which the cleaned data is stored.}
-
-\item{ticker}{vector of tickers for which the data should be cleaned.}
+\item{datadestination}{character indicating the folder in which the cleaned data is stored, folder of datasource by default.}
 
 \item{tdata}{data.table or xts object containing (ONE day and for ONE stock only) trade data cleaned by \code{\link{tradesCleanup}}. This argument is NULL by default. Enabling it, means the arguments
 from, to, datasource and datadestination will be ignored. (only advisable for small chunks of data)}
 
-\item{qdata}{xts object containing (ONE day and for ONE stock only) cleaned quote data. This argument is NULL by default. Enabling it means the arguments
+\item{qdata}{data.table or xts object containing (ONE day and for ONE stock only) cleaned quote data. This argument is NULL by default. Enabling it means the arguments
 from, to, datasource, datadestination will be ignored. (only advisable for small chunks of data)}
 }
 \value{
 For each day an xts object is saved into the folder of that date, containing the cleaned data.
-This procedure is performed for each stock in "ticker".
 
 In case you supply the arguments "tdata" and "qdata", the on-disk functionality is ignored
-and the function returns a list with the cleaned trades as xts object (see examples).
+and the function returns cleaned trades as a data.table or xts object (see examples).
 }
 \description{
 Function performs cleaning procedure \code{\link{rmTradeOutliersUsingQuotes}} 
-for the trades of all stocks in "ticker" over the interval 
-[from,to] and saves the result in "datadestination". 
+for the trades of all stocks data in "datadestination". 
 Note that preferably the input data for this function 
 is trade and quote data cleaned by respectively e.g. \code{\link{tradesCleanup}}
 and \code{\link{quotesCleanup}}.
@@ -60,6 +52,6 @@ Barndorff-Nielsen, O. E., P. R. Hansen, A. Lunde, and N. Shephard (2009). Realiz
 Brownlees, C.T. and Gallo, G.M. (2006). Financial econometric analysis at ultra-high frequency: Data handling concerns. Computational Statistics & Data Analysis, 51, pages 2232-2245.
 }
 \author{
-Jonathan Cornelissen and Kris Boudt.
+Jonathan Cornelissen, Kris Boudt and Onno Kleen.
 }
 \keyword{cleaning}

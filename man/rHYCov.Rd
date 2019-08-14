@@ -8,7 +8,7 @@ rHYCov(rdata, cor = FALSE, period = 1, align.by = "seconds",
   align.period = 1, makeReturns = FALSE, makePsd = TRUE)
 }
 \arguments{
-\item{rdata}{anpossibly multivariate xts object.}
+\item{rdata}{a possibly multivariate xts object.}
 
 \item{cor}{boolean, in case it is TRUE, the correlation is returned. FALSE by default.}
 

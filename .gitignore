@@ -13,6 +13,7 @@ man/.Rapp.history
 _man/*.Rd
 
 taqdata/*
+taqdataconverted/*
 speed_comparison.html
 speed_comparison.Rmd
 playground.R

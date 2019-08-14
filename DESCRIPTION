@@ -43,7 +43,8 @@ Imports:
     data.table (>= 1.12.0),
     RcppRoll,
     bit64,
-    lubridate
+    lubridate,
+    readr
 LinkingTo: Rcpp, RcppArmadillo 
 Suggests:
     covr,
