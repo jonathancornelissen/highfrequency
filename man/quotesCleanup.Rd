@@ -4,7 +4,7 @@
 \alias{quotesCleanup}
 \title{Cleans quote data}
 \usage{
-quotesCleanup(datasource = NULL, datadestination, exchanges,
+quotesCleanup(datasource = NULL, datadestination = NULL, exchanges,
   qdataraw = NULL, report = TRUE, selection = "median", maxi = 50,
   window = 50, type = "advanced", rmoutliersmaxi = 10,
   saveasxts = TRUE)

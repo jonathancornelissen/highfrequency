@@ -36,7 +36,7 @@ NOTE: xts or data.table should only contain one day of observations
 
 The respective liquidity measures are defined as follows:
   \itemize{
-    \item{es: effective spread}{
+    \item{effectiveSpread}{
     \deqn{
      \mbox{effective spread}_t =  2*D_t*(\mbox{PRICE}_{t} - \frac{(\mbox{BID}_{t}+\mbox{OFR}_{t})}{2}),
     }

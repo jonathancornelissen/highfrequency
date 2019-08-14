@@ -4,7 +4,7 @@
 \alias{tradesCleanup}
 \title{Cleans trade data}
 \usage{
-tradesCleanup(datasource = NULL, datadestination, exchanges,
+tradesCleanup(datasource = NULL, datadestination = NULL, exchanges,
   tdataraw = NULL, report = TRUE, selection = "median",
   saveasxts = TRUE)
 }

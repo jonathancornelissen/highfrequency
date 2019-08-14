@@ -18,7 +18,7 @@
 #' 
 #' The respective liquidity measures are defined as follows:
 #'   \itemize{
-#'     \item{es: effective spread}{
+#'     \item{effectiveSpread}{
 #'     \deqn{
 #'      \mbox{effective spread}_t =  2*D_t*(\mbox{PRICE}_{t} - \frac{(\mbox{BID}_{t}+\mbox{OFR}_{t})}{2}),
 #'     }
@@ -264,9 +264,8 @@ getLiquidityMeasures <- function(tqdata, win = 300, type = NULL) {
 
   tqdata[, direction := getTradeDirection(tqdata)]
   tqdata[, effectiveSpread := 2 * direction * (PRICE - midpoints)]
-
-  ## realized spread imposed fixed time window. hm. time offset arbitrary
-  tqdata[, realizedSpread := 2 * direction * (PRICE - shift(midpoints, win, type = "lead"))]
+  
+  # tqdata[, realizedSpread := 2 * direction * (PRICE - midpoints)] / midpoints
 
   tqdata[, valueTrade := SIZE * PRICE]
   tqdata[, signedValueTrade := direction * valueTrade]
@@ -276,10 +275,10 @@ getLiquidityMeasures <- function(tqdata, win = 300, type = NULL) {
   tqdata[, depthImbalanceRatio := (direction * OFRSIZ / BIDSIZ) ^ direction]
 
   tqdata[, proportionalEffectiveSpread := effectiveSpread/midpoints]
-  tqdata[, proportionalRealizedSpread := realizedSpread/midpoints]
+  # tqdata[, proportionalRealizedSpread := realizedSpread/midpoints]
 
-  tqdata[, priceImpact := (effectiveSpread - realizedSpread)/2]
-  tqdata[, proportionalPriceImpact := priceImpact / midpoints]
+  # tqdata[, priceImpact := (effectiveSpread - realizedSpread)/2]
+  # tqdata[, proportionalPriceImpact := priceImpact / midpoints]
 
   tqdata[, halfTradedSpread := direction*(PRICE-midpoints)]
   tqdata[, proportionalHalfTradedSpread := halfTradedSpread/midpoints]
@@ -311,13 +310,6 @@ getLiquidityMeasures <- function(tqdata, win = 300, type = NULL) {
     return(tqdata)
   }
 }
-
-
-# tqdata <- matchTradesQuotes(sample_tdata, sample_qdata)
-# tqdata_dt <- as.data.table(tqdata)[, DT := index]
-# tqdata_dt[, BID := as.numeric(as.character(BID))]
-# tqdata_dt[, OFR := as.numeric(as.character(OFR))]
-# tqdata_dt[, PRICE := as.numeric(as.character(PRICE))]
 
 #' Get trade direction
 #' 
