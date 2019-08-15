@@ -1,4 +1,5 @@
 #include <Rcpp.h>
+#include <math.h>
 using namespace Rcpp;
 
 //[[Rcpp::export]]
