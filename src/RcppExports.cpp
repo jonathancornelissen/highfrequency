@@ -19,6 +19,69 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// heavy_parameter_transformR_
+List heavy_parameter_transformR_(NumericVector parameters, int K, IntegerVector p, IntegerVector q, NumericVector O, NumericVector A, NumericVector B, IntegerVector pMax1, IntegerVector qMax1);
+RcppExport SEXP _highfrequency_heavy_parameter_transformR_(SEXP parametersSEXP, SEXP KSEXP, SEXP pSEXP, SEXP qSEXP, SEXP OSEXP, SEXP ASEXP, SEXP BSEXP, SEXP pMax1SEXP, SEXP qMax1SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type parameters(parametersSEXP);
+    Rcpp::traits::input_parameter< int >::type K(KSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type p(pSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type q(qSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type O(OSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type A(ASEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type B(BSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type pMax1(pMax1SEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type qMax1(qMax1SEXP);
+    rcpp_result_gen = Rcpp::wrap(heavy_parameter_transformR_(parameters, K, p, q, O, A, B, pMax1, qMax1));
+    return rcpp_result_gen;
+END_RCPP
+}
+// heavy_parameter_transform_RetrackR_
+List heavy_parameter_transform_RetrackR_(NumericVector parameters, int K, IntegerVector p, IntegerVector q, NumericVector means, NumericVector O, NumericVector A, NumericVector B, IntegerVector pMax1, IntegerVector qMax1);
+RcppExport SEXP _highfrequency_heavy_parameter_transform_RetrackR_(SEXP parametersSEXP, SEXP KSEXP, SEXP pSEXP, SEXP qSEXP, SEXP meansSEXP, SEXP OSEXP, SEXP ASEXP, SEXP BSEXP, SEXP pMax1SEXP, SEXP qMax1SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type parameters(parametersSEXP);
+    Rcpp::traits::input_parameter< int >::type K(KSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type p(pSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type q(qSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type means(meansSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type O(OSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type A(ASEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type B(BSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type pMax1(pMax1SEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type qMax1(qMax1SEXP);
+    rcpp_result_gen = Rcpp::wrap(heavy_parameter_transform_RetrackR_(parameters, K, p, q, means, O, A, B, pMax1, qMax1));
+    return rcpp_result_gen;
+END_RCPP
+}
+// heavy_likelihoodR_
+List heavy_likelihoodR_(NumericVector h, NumericVector O, NumericVector A, NumericVector B, int TT, int K, int pMax, int qMax, NumericVector data, NumericVector backcast, NumericVector LB, NumericVector UB, NumericVector llRM, NumericVector lls);
+RcppExport SEXP _highfrequency_heavy_likelihoodR_(SEXP hSEXP, SEXP OSEXP, SEXP ASEXP, SEXP BSEXP, SEXP TTSEXP, SEXP KSEXP, SEXP pMaxSEXP, SEXP qMaxSEXP, SEXP dataSEXP, SEXP backcastSEXP, SEXP LBSEXP, SEXP UBSEXP, SEXP llRMSEXP, SEXP llsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type h(hSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type O(OSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type A(ASEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type B(BSEXP);
+    Rcpp::traits::input_parameter< int >::type TT(TTSEXP);
+    Rcpp::traits::input_parameter< int >::type K(KSEXP);
+    Rcpp::traits::input_parameter< int >::type pMax(pMaxSEXP);
+    Rcpp::traits::input_parameter< int >::type qMax(qMaxSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type data(dataSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type backcast(backcastSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type LB(LBSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type UB(UBSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type llRM(llRMSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type lls(llsSEXP);
+    rcpp_result_gen = Rcpp::wrap(heavy_likelihoodR_(h, O, A, B, TT, K, pMax, qMax, data, backcast, LB, UB, llRM, lls));
+    return rcpp_result_gen;
+END_RCPP
+}
 // nsmaller
 int nsmaller(IntegerVector times, IntegerVector lengths, int start, int end, int max);
 RcppExport SEXP _highfrequency_nsmaller(SEXP timesSEXP, SEXP lengthsSEXP, SEXP startSEXP, SEXP endSEXP, SEXP maxSEXP) {
@@ -104,6 +167,9 @@ END_RCPP
 
 static const R_CallMethodDef CallEntries[] = {
     {"_highfrequency_har_agg", (DL_FUNC) &_highfrequency_har_agg, 3},
+    {"_highfrequency_heavy_parameter_transformR_", (DL_FUNC) &_highfrequency_heavy_parameter_transformR_, 9},
+    {"_highfrequency_heavy_parameter_transform_RetrackR_", (DL_FUNC) &_highfrequency_heavy_parameter_transform_RetrackR_, 10},
+    {"_highfrequency_heavy_likelihoodR_", (DL_FUNC) &_highfrequency_heavy_likelihoodR_, 14},
     {"_highfrequency_nsmaller", (DL_FUNC) &_highfrequency_nsmaller, 5},
     {"_highfrequency_KK", (DL_FUNC) &_highfrequency_KK, 2},
     {"_highfrequency_kernelEstimator", (DL_FUNC) &_highfrequency_kernelEstimator, 8},

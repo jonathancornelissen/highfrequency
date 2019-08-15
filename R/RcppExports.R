@@ -5,6 +5,18 @@ har_agg <- function(RM, periods, iNperiods) {
     .Call(`_highfrequency_har_agg`, RM, periods, iNperiods)
 }
 
+heavy_parameter_transformR_ <- function(parameters, K, p, q, O, A, B, pMax1, qMax1) {
+    .Call(`_highfrequency_heavy_parameter_transformR_`, parameters, K, p, q, O, A, B, pMax1, qMax1)
+}
+
+heavy_parameter_transform_RetrackR_ <- function(parameters, K, p, q, means, O, A, B, pMax1, qMax1) {
+    .Call(`_highfrequency_heavy_parameter_transform_RetrackR_`, parameters, K, p, q, means, O, A, B, pMax1, qMax1)
+}
+
+heavy_likelihoodR_ <- function(h, O, A, B, TT, K, pMax, qMax, data, backcast, LB, UB, llRM, lls) {
+    .Call(`_highfrequency_heavy_likelihoodR_`, h, O, A, B, TT, K, pMax, qMax, data, backcast, LB, UB, llRM, lls)
+}
+
 nsmaller <- function(times, lengths, start, end, max) {
     .Call(`_highfrequency_nsmaller`, times, lengths, start, end, max)
 }
