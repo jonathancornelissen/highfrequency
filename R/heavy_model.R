@@ -109,7 +109,6 @@ heavyModel <- function(data, p = matrix(c(0, 0, 1, 1), ncol = 2), q = matrix(c(1
 
     splittedparams <- transToSplit(startingvalues, p, q)[[1]]
     
-    
     x <- try(optim(par = splittedparams, fn = heavyLikelihoodllC, data = data, p = p, q = q,
                   backcast = backcast, LB = LB, UB = UB, compconst = compconst,
                   return.only.llh = TRUE,
@@ -124,7 +123,7 @@ heavyModel <- function(data, p = matrix(c(0, 0, 1, 1), ncol = 2), q = matrix(c(1
         print("Possible problem in likelihood optimization. Check convergence")
       }
     }
-    
+    output <- list()
     output$loglikelihood <- x$value
     
     xx <- heavyLikelihoodllC(splittedparams = x$par, 
@@ -136,7 +135,8 @@ heavyModel <- function(data, p = matrix(c(0, 0, 1, 1), ncol = 2), q = matrix(c(1
       output$condvar <- xts(t(matrix(xx$h, K)), order.by = as.POSIXct(rownames(data)))
       output$likelihoods <- xts(t(matrix(xx$lls, 1)), order.by = as.POSIXct(rownames(data)))
     }
-    output$estparams <- matrix(x$par, ncol = 1)
+    
+    output$estparams <- matrix(transToPar(x$par, p, q), ncol = 1)
     rownames(output$estparams) <- getParamNames(x$par, p, q)
     output$convergence <- x$convergence
     return(output)
@@ -160,7 +160,7 @@ heavyLikelihoodllC <- function(splittedparams, data, p, q, backcast, LB, UB, com
   means <- c(colMeans(data))
   maxp  <- max(p)
   maxq  <- max(q)
-
+  
   par <- transToPar(splittedparams, p, q)
 
   out <- heavy_likelihoodR(
@@ -188,7 +188,7 @@ heavyLikelihoodllC <- function(splittedparams, data, p, q, backcast, LB, UB, com
   }
 }
 
-#' @keywords 
+#' @keywords internal
 heavy_likelihoodR <- function(parameters, data, T1, K, means, p, q, pMax, qMax,
                               backcast, LB, UB, compconst, h, lls, llRM) {
   ll = 0
