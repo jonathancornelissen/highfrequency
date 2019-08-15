@@ -1,6 +1,6 @@
 #include <Rcpp.h>
 #include <stdlib.h> 
-#include <math.h>
+#include <cmath>
 using namespace Rcpp;
 
 //[[Rcpp::export]]
@@ -190,7 +190,7 @@ List heavy_likelihoodR_(NumericVector h, NumericVector O, NumericVector A, Numer
 
   ll = lll;
 
-  if (isnan(ll) || isinf(ll)) {
+  if (std::isnan(ll) || std::isinf(ll)) {
     ll = 1000000000000.0;
   }
   return List::create(Named("ll") = ll,
@@ -198,4 +198,3 @@ List heavy_likelihoodR_(NumericVector h, NumericVector O, NumericVector A, Numer
                       Named("h") = h,
                       Named("llRM") = llRM);
 }
-// 
