@@ -9,7 +9,9 @@ ivInference(rdata, IVestimator = "RV", IQestimator = "rQuar",
   makeReturns = FALSE, ...)
 }
 \arguments{
-\item{IVestimator}{can be chosen among integrated variance estimators: RV, BV, minRV or medRV. RV by default.}
+\item{rdata}{zoo/xts object containing all returns in period t for one asset.}
+
+\item{IVestimator}{can be chosen among integrated variance estimators: RV, BV, TV, minRV or medRV. RV by default.}
 
 \item{IQestimator}{can be chosen among integrated quarticity estimators: rQuar, realized tri-power quarticity (TPQ), quad-power quarticity (QPQ), minRQ or medRQ. TPQ by default.}
 
@@ -22,8 +24,6 @@ ivInference(rdata, IVestimator = "RV", IQestimator = "rQuar",
 \item{makeReturns}{boolean, should be TRUE when rdata contains prices instead of returns. FALSE by  default.}
 
 \item{...}{additional arguments.}
-
-\item{rdata}{a}{zoo/xts object containing all returns in period t for one asset.}
 }
 \value{
 list

@@ -43,7 +43,7 @@ This function calculatest the High frEquency bAsed VolatilitY (HEAVY) model prop
 \details{
 Assume there are \eqn{T} daily returns and realized measures in the period \eqn{t}. Let \eqn{r_i} and \eqn{RM_i} be the \eqn{i^{th}} daily return and daily realized measure respectively (with \eqn{i=1, \ldots,T}).
 
-The most basic heavy model is the one with lag matrices p of \eqn{\left( \begin{array}{ccc} 0 & 1 \\ 0 & 1 \end{array} \right)} and q of \eqn{\left( \begin{array}{ccc} 1 & 0 \\ 0 & 1 \end{array} \right)}. This can be reprensented by the following equations: 
+The most basic heavy model is the one with lag matrices p of \eqn{\left( \begin{array}{ccc} 0 & 1 \\ 0 & 1 \end{array} \right)} and q of \eqn{\left( \begin{array}{ccc} 1 & 0 \\ 0 & 1 \end{array} \right)}. This can be reprensented by the following equations:
 \deqn{
      \mbox{var}{\left(r_t \right)} = h_t = w + \alpha RM_{t-1} + \beta h_{t-1}; w,\alpha \geq 0, \beta \in [0,1]
 }
@@ -58,8 +58,8 @@ Equivalently, they can be presented in terms of matrix notation as below:
 
 In this version, the parameters vector to be estimated is \eqn{\left( w, w_R,\alpha, \alpha_R, \beta, \beta_R \right) }.
 
-In terms of startingvalues, Shephard and Sheppard recommend for this version of the Heavy model to set  \eqn{\beta} be around 0.6 and sum of \eqn{\alpha}+\eqn{\beta} to be close to but slightly less than one. 
-In general, the lag length for the model innovation and the conditional covariance can be greater than 1. Consider, for example, matrix p is  \eqn{\left( \begin{array}{ccc} 0 & 2 \\ 0 & 1 \end{array} \right)} and matrix q is the same as above. Matrix notation will be as below: 
+In terms of startingvalues, Shephard and Sheppard recommend for this version of the Heavy model to set  \eqn{\beta} be around 0.6 and sum of \eqn{\alpha}+\eqn{\beta} to be close to but slightly less than one.
+In general, the lag length for the model innovation and the conditional covariance can be greater than 1. Consider, for example, matrix p is  \eqn{\left( \begin{array}{ccc} 0 & 2 \\ 0 & 1 \end{array} \right)} and matrix q is the same as above. Matrix notation will be as below:
 \deqn{
 \left( \begin{array}{ccc} h_t \\ \mu_t \end{array} \right) = \left( \begin{array}{ccc} w \\ w_R \end{array} \right)  + \left( \begin{array}{ccc} 0 & \alpha_1 \\ 0 & \alpha_R \end{array} \right) \left( \begin{array}{ccc} r^2_{t-1} \\ RM_{t-1} \end{array} \right) +\left( \begin{array}{ccc} 0 & \alpha_2 \\ 0 & 0 \end{array} \right) \left( \begin{array}{ccc} r^2_{t-2} \\ RM_{t-2} \end{array} \right) + \left( \begin{array}{ccc} \beta & 0 \\ 0 & \beta_R \end{array} \right) \left( \begin{array}{ccc} h_{t-1} \\ \mu_{t-1} \end{array} \right)}
 
@@ -67,26 +67,25 @@ In this version, the parameters vector to be estimated is \eqn{\left( w, w_R,\al
 }
 \examples{
 # Implementation of the heavy model on DJI:
-data("realized_library")
 returns <-  realized_library$open_to_close
 bv      <-  realized_library$bv
-returns <- returns[!is.na(bv)]  
-bv <- bv[!is.na(bv)] # Remove NA's 
+returns <- returns[!is.na(bv)]
+bv <- bv[!is.na(bv)] # Remove NA's
 data <- cbind( returns^2, bv) # Make data matrix with returns and realized measures
 backcast <- matrix(c(var(returns), mean(bv)), ncol = 1)
 
 #For traditional (default) version:
 startvalues <- c(0.004,0.02,0.44,0.41,0.74,0.56) # Initial values
-output <- heavyModel(data = as.matrix(data,ncol=2), compconst=FALSE, 
-                     startingvalues = startvalues, backcast=backcast) 
-#For general version: 
+output <- heavyModel(data = as.matrix(data,ncol=2), compconst=FALSE,
+                     startingvalues = startvalues, backcast=backcast)
+#For general version:
 startvalues <- c(0.004, 0.02, 0.44, 0.4, 0.41, 0.74, 0.56) # Initial values;
 p <- matrix(c(2, 0, 0, 1), ncol = 2)
 q <- matrix(c(1, 0, 0, 1), ncol = 2)
 
-heavy_model <- heavyModel(data = as.matrix(data, ncol = 2), p = p, q = q, compconst = FALSE, 
+heavy_model <- heavyModel(data = as.matrix(data, ncol = 2), p = p, q = q, compconst = FALSE,
                       startingvalues = startvalues, backcast = backcast)
-                      
+
 }
 \references{
 Shephard, N. and K. Sheppard (2010). Realising the future: forecasting with high frequency based volatility (heavy) models. Journal of Applied Econometrics 25, 197-231.

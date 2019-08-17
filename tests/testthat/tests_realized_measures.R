@@ -27,7 +27,7 @@ expect_equal(
 expect_equal({
   formatC(sum(MRC(list(sample_5minprices_jumps["2010-01-04",1], sample_5minprices_jumps["2010-01-04",2]), pairwise = TRUE, makePsd = TRUE)), digits = 10)
   },
-  "0.03169161677"
+  "0.03171753237"
 )
 
 # rBeta
@@ -82,8 +82,8 @@ expect_equal(
   "10038.65677"
 )
 expect_equal(
-  formatC(rOWCov(rdata = sample_5minprices_jumps['2010-01-04'], makeReturns = TRUE, wfunction = "SR")[1,1], digits = 4),
-  "0.01014"
+  formatC(rOWCov(rdata = sample_5minprices_jumps['2010-01-04'], makeReturns = TRUE, wfunction = "SR")[1,1], digits = 3),
+  "0.0101"
 )
 
 # rRTSCov
@@ -93,9 +93,18 @@ expect_equal(
 )
 expect_equal(
   formatC(sum(rRTSCov(pdata = list(cumsum(lltc) + 100, cumsum(sbux) + 100))) * 1000000, digits = 10),
-  "0.2472914228"
-)
+  "0.2469302743"
+) 
 
+# rKernel
+expect_equal(
+  formatC(rKernelCov(rdata = sample_tdata$PRICE, align.by = "minutes",  align.period = 5, makeReturns = TRUE), digits = 5),
+  "0.00059605"
+)
+expect_equal(
+  formatC(sum(rKernelCov(rdata = cbind(lltc, sbux, fill = 0), align.by = "minutes", align.period = 5, makeReturns = FALSE)) * 1000, digits = 5),
+  "0.021378"
+)
 
 # rSkew
 expect_equal(
@@ -133,7 +142,7 @@ expect_equal(
 # rTSCov multivariate
 expect_equal(
   formatC(sum(rTSCov(pdata = list(cumsum(lltc) + 100, cumsum(sbux) + 100))) * 10000, digits = 10),
-  "0.002426166025"
+  "0.002425863765"
 )
 
 # RV
@@ -155,6 +164,9 @@ expect_equal(
 )
 
 
-
+expect_equal(
+  formatC(ivInference(sample_tdata$PRICE, IVestimator= "minRV", IQestimator = "medRQ", confidence = 0.95, makeReturns = TRUE)$cb * 10000, digits = 5),
+  c("4.7594", "5.7472")
+)
 
 

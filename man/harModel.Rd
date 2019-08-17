@@ -22,7 +22,7 @@ harModel(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22),
 \item{leverage}{a vector of integers indicating over what periods the negative returns should be aggregated.
 See Corsi and Reno (2012) for more information. By default leverage = NULL and the model assumes the absence of a  leverage effect. Set leverage = c(1,5,22) to mimic the analysis in Corsi and Reno (2012).}
 
-\item{RVest}{a character vector with one, two, or three elements. The first element always refers to the name of the function to estimate the daily integrated variance (non-jump-robust). 
+\item{RVest}{a character vector with one, two, or three elements. The first element always refers to the name of the function to estimate the daily integrated variance (non-jump-robust).
 The second and third element depends on which type of model is estimated: If type = "HARRVJ", type = "HARRVCJ", type = "HARRVQJ" the second element refers to the name of the function to estimate the continuous component of daily volatility (jump robust). If type = "HARRVQ", the second element refers to the name of the function used to estimate the integrated quarticity.
 If type = "HARRVQJ" the third element always refers to the name of the function used to estimate integrated quarticity.
 By default RVest = c("rCov","rBPCov","rQuar"), i.e. using the Realized Volatility, Realized Bi-Power Variance, and Realized Quarticity.}
@@ -35,7 +35,7 @@ By default RVest = c("rCov","rBPCov","rQuar"), i.e. using the Realized Volatilit
 
 \item{alpha}{a real indicating the confidence level used in testing for jumps. By default alpha = 0.05.}
 
-\item{h}{an integer indicating the number over how many days the dependent variable should be aggregated. 
+\item{h}{an integer indicating the number over how many days the dependent variable should be aggregated.
 By default, h=1, i.e. no aggregation takes place, you just model the daily realized volatility.}
 
 \item{transform}{optionally a string referring to a function that transforms both the dependent and explanatory variables in the model. By default transform=NULL, so no transformation is done. Typical other choices in this context would be "log" or "sqrt".}
@@ -46,80 +46,95 @@ By default, h=1, i.e. no aggregation takes place, you just model the daily reali
 The function outputs an object of class \code{harModel} and \code{\link{lm}} (so \code{harModel} is  a subclass of \code{\link{lm}}). So far I only added a print method as you can see in the examples. Input here is welcome, what should a plot of an "harmodel" object look like? What other methods are useful?
 }
 \description{
-Function returns the estimates for the Heterogeneous Autoregressive model 
-for Realized volatility discussed in Andersen et al. (2007) and Corsi (2009). 
+Function returns the estimates for the Heterogeneous Autoregressive model
+for Realized volatility discussed in Andersen et al. (2007) and Corsi (2009).
 This model is mainly used to forecast the next days'volatility based on the high-frequency returns of the past. Consult the vignette for more information.
 }
 \examples{
-##### Example 1: HARRVCJ ##### 
+##### Example 1: HARRVCJ #####
 dat <- sample_5minprices_jumps$stock1
 dat <- makeReturns(dat) #Get the high-frequency return data
 
-x <- harModel(dat, periods = c(1,5,10), periodsJ = c(1,5,10), 
+x <- harModel(dat, periods = c(1,5,10), periodsJ = c(1,5,10),
              RVest = c("rCov","rBPCov"),
              type = "HARRVCJ",transform = "sqrt", inputType = "returns")
-# Estimate the HAR model of type HARRVCJ  
+# Estimate the HAR model of type HARRVCJ
 class(x)
-x 
+x
 # plot(x)
 predict(x)
 
 
-##### Example 2: HARRV ##### 
+##### Example 2: HARRV #####
 # Forecasting daily Realized volatility for the S&P 500 using the basic harModel: HARRV
 library(xts)
 RV_SP500 <- as.xts(realized_library$rv5, order.by = realized_library$date)
 
-x <- harModel(data = RV_SP500 , periods = c(1,5,22), RVest = c("rCov"), 
-              type = "HARRV", h = 1, transform = NULL, inputType = "returns")
+x <- harModel(data = RV_SP500 , periods = c(1,5,22), RVest = c("rCov"),
+              type = "HARRV", h = 1, transform = NULL, inputType = "RM")
 class(x)
 x
 summary(x)
 plot(x)
 predict(x)
 
+
 ##### Example 3: HARRVQ #####
 dat <- sample_5minprices_jumps$stock1
 dat <- makeReturns(dat) #Get the high-frequency return data
-
+#
 x <- harModel(dat, periods = c(1,5,10), periodsJ = c(1,5,10),
-             periodsQ = c(1), RVest = c("rCov", "rQuar"),
-             type="HARRVQ", inputType = "returns")
-# Estimate the HAR model of type HARRVQ
+            periodsQ = c(1), RVest = c("rCov", "rQuar"),
+              type="HARRVQ", inputType = "returns")
+## Estimate the HAR model of type HARRVQ
+class(x)
+x
+# plot(x)
+#predict(x)
+
+##### Example 4: HARRVQJ with already computed realized measures #####
+dat <- SP500RM[, c("RV", "BPV", "RQ")]
+x <- harModel(dat, periods = c(1,5,22), periodsJ = c(1),
+              periodsQ = c(1), type = "HARRVQJ")
+## Estimate the HAR model of type HARRVQJ
 class(x)
 x
 # plot(x)
 predict(x)
 
-##### Example 4: HARRVQJ with already computed realized measures #####
-dat <- SP500RM[, c("RV", "BPV", "RQ")] 
-x <- harModel(dat, periods = c(1,5,22), periodsJ = c(1), 
-             periodsQ = c(1), type = "HARRVQJ")
-# Estimate the HAR model of type HARRVQJ
-class(x)
-x
-#plot(x)
-predict(x)
-
-##### Example 5: CHARRV with already computed realized measures ##### 
+##### Example 5: CHARRV with already computed realized measures #####
 dat <- SP500RM[, c("RV", "BPV")]
 
 x <- harModel(dat, periods = c(1, 5, 22), type = "CHARRV")
-# Estimate the HAR model of type CHARRV 
+# Estimate the HAR model of type CHARRV
 class(x)
 x
-#plot(x)
+# plot(x)
 predict(x)
 
-##### Example 6: CHARRVQ with already computed realized measures ##### 
-dat <- SP500RM[, c("RV", "BPV", "RQ")] 
+##### Example 6: CHARRVQ with already computed realized measures #####
+dat <- SP500RM[, c("RV", "BPV", "RQ")]
 
 x <- harModel(dat, periods = c(1,5,22), periodsQ = c(1), type = "CHARRVQ")
-# Estimate the HAR model of type CHARRVQ  
+# Estimate the HAR model of type CHARRVQ
 class(x)
 x
-#plot(x)
+# plot(x)
 predict(x)
+
+#' ##### Example 7: HARRV #####
+# Forecasting weekly Realized volatility for the S&P 500 using the basic harModel: HARRV
+library(xts)
+RV_SP500 <- as.xts(realized_library$rv5, order.by = realized_library$date)
+
+x <- harModel(data = RV_SP500 , periods = c(1,5,22), RVest = c("rCov"),
+              type = "HARRV", h = 5, transform = NULL, inputType = "RM")
+class(x)
+x
+summary(x)
+plot(x)
+predict(x)
+
 
 }
 \references{

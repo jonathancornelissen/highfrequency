@@ -15,7 +15,7 @@ hatIV <- function(rdata, IVestimator, startV = NULL) {
          minRV = minRV(rdata),
          medRV = medRV(rdata),
          ROWvar = rOWCov(rdata),
-         CTBV = .ctBV(rdata, startV = startV))
+         CTBV = ctBV(rdata, startV = startV))
 }
 
 ### ivInference help functions:
@@ -28,7 +28,7 @@ hatIQ <- function (rdata, IQestimator) {
          TP = rTPVar(rdata),
          minRQ = minRQ(rdata),
          medRQ = medRQ(rdata),
-         CTTPV = .ctTPV(rdata))
+         CTTPV = ctTPV(rdata))
 }
 
 
@@ -43,8 +43,7 @@ IV <- function(IVestimator, iq) {
          BV = sqrt(2.61 * iq),
          TV = sqrt(3.06 * iq), 
          minRV = sqrt(3.81 * iq), 
-         medRV = sqrt(2.96 * iq), 
-         ROWVar = sqrt(.thetaROWVar(alpha , alphaMCD) * iq))
+         medRV = sqrt(2.96 * iq))
 }
 
 #' Function returns the value, the standard error and the confidence band of the integrated variance (IV) estimator. 
@@ -75,8 +74,8 @@ IV <- function(IVestimator, iq) {
 #' 
 #' \eqn{\hat{IQ}} integrated quarticity estimator.
 #' 
-#' @param rdata}{a zoo/xts object containing all returns in period t for one asset.
-#' @param IVestimator can be chosen among integrated variance estimators: RV, BV, minRV or medRV. RV by default.
+#' @param rdata zoo/xts object containing all returns in period t for one asset.
+#' @param IVestimator can be chosen among integrated variance estimators: RV, BV, TV, minRV or medRV. RV by default.
 #' @param IQestimator can be chosen among integrated quarticity estimators: rQuar, realized tri-power quarticity (TPQ), quad-power quarticity (QPQ), minRQ or medRQ. TPQ by default.
 #' @param confidence confidence level set by users. 0.95 by default. 
 #' @param align.by a string, align the tick data to "seconds"|"minutes"|"hours"
@@ -148,5 +147,6 @@ tt <- function(IVestimator, ...) {
          minRV = 3.81,
          medRV = 2.96,
          CTBV = pi^2/4+pi-3,
-         ROWVar = .thetaROWVar(...))
+         ROWVar = thetaROWVar(...))
 }
+

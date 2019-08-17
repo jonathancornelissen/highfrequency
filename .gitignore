@@ -13,9 +13,22 @@ man/.Rapp.history
 _man/*.Rd
 
 taqdata/*
+taqdataconverted/*
 speed_comparison.html
 speed_comparison.Rmd
 playground.R
 tests/testthat/Rplots.pdf
 gitignore/*
 inst/doc
+src_old/realized_measures.o
+src_old/realized_measures.h
+src_old/realized_measures.c_old
+src_old/realized_measures.c
+src_old/old_c_code.cpp
+src_old/highfrequency.so
+src_old/heavy_model.o
+src_old/heavy_model.h
+src_old/heavy_model.c
+src_old/har_model.o
+R/.DS_Store
+.DS_Store

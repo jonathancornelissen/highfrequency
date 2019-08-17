@@ -16,7 +16,7 @@ fastTickAgregation <- function (ts, on = "minutes", k = 1, tz = "GMT") {
   } 
   g <- base::seq(start(ts), end(ts), by = tby)
   rawg <- as.numeric(as.POSIXct(g, tz = tz))
-  newg <- rawg + (secs - rawg%%secs)
+  newg <- rawg + (secs - rawg %% secs)
   g    <- as.POSIXct(newg, origin = "1970-01-01", tz = tz)
   ts <- na.locf(merge(ts, zoo(NULL, g)))[as.POSIXct(g, tz = tz)]
   return(ts)
@@ -131,11 +131,31 @@ multixts <- function(x, y = NULL) {
   } 
 } 
 
+#' @importFrom stats weighted.mean
+#' @keywords internal
+weightedaverage <- function(a){
+  aa <- as.vector(as.numeric(a[,1]))
+  bb <- as.vector(as.numeric(a[,2]))
+  c  <- weighted.mean(aa,bb)
+  return(c)
+}
+
 #' @keywords internal
 previoustick <- function(a) {
   a <- as.vector(a)
   b <- a[length(a)]
   return(b)
+}
+
+#' @importFrom xts reclass
+#' @keywords internal
+periodApply2 <- function (x, INDEX, FUN2, ...) {
+  x <- try.xts(x, error = FALSE)
+  FUN <- match.fun(FUN2)
+  xx <- sapply(1:(length(INDEX) - 1), function(y) {
+    FUN(x[(INDEX[y] + 1):INDEX[y + 1]], ...)
+  })
+  reclass(xx, x[INDEX])
 }
 
 #' @importFrom xts is.xts

@@ -8,7 +8,7 @@ rHYCov(rdata, cor = FALSE, period = 1, align.by = "seconds",
   align.period = 1, makeReturns = FALSE, makePsd = TRUE)
 }
 \arguments{
-\item{rdata}{anpossibly multivariate xts object.}
+\item{rdata}{a possibly multivariate xts object.}
 
 \item{cor}{boolean, in case it is TRUE, the correlation is returned. FALSE by default.}
 
@@ -34,9 +34,9 @@ Scott Payseur
 # Average Hayashi-Yoshida Covariance estimator is calculated on five-minute returns
 
 # Multivariate:
-# rHYCov <- rHYCov(rdata = cbind(lltc, sbux, fill = 0), period = 5, align.by = "minutes", 
-#                  align.period = 5, makeReturns = FALSE)
-# rHYCov 
+# realized_cov <- rHYCov(rdata = cbind(lltc, sbux, fill = 0), period = 5, align.by = "minutes", 
+#                        align.period = 5, makeReturns = FALSE)
+# realized_cov 
 Note: for the diagonal elements the rCov is used.
 }
 \keyword{volatility}

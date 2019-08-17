@@ -4,19 +4,14 @@
 \alias{tradesCleanup}
 \title{Cleans trade data}
 \usage{
-tradesCleanup(from, to, datasource, datadestination, ticker, exchanges,
-  tdataraw = NULL, report = TRUE, selection = "median")
+tradesCleanup(datasource = NULL, datadestination = NULL, exchanges,
+  tdataraw = NULL, report = TRUE, selection = "median",
+  saveasxts = TRUE)
 }
 \arguments{
-\item{from}{character indicating first date to clean, e.g. "2008-01-30".}
-
-\item{to}{character indicating last date to clean, e.g. "2008-01-31".}
-
 \item{datasource}{character indicating the folder in which the original data is stored.}
 
 \item{datadestination}{character indicating the folder in which the cleaned data is stored.}
-
-\item{ticker}{vector of tickers for which the data should be cleaned, e.g. ticker = c("AAPL","AIG")}
 
 \item{exchanges}{list of vectors of stock exchange(s) for all tickers in vector "ticker". It thus should have the same length as the vector ticker.
 E.g. in case of two stocks; exchanges = list("N", c("Q","T")).
@@ -42,6 +37,8 @@ from, to, datasource and datadestination will be ignored. (only advisable for sm
 \item{report}{boolean and TRUE by default. In case it is true the function returns (also) a vector indicating how many trades remained after each cleaning step.}
 
 \item{selection}{argument to be passed on to the cleaning routine \code{\link{mergeTradesSameTimestamp}}. The default is "median".}
+
+\item{saveasxts}{indicates whether data should be saved in xts format instead of data.table when using on-disk functionality. TRUE by default.}
 }
 \value{
 For each day an xts or data.table object is saved into the folder of that date, containing the cleaned data.
@@ -52,11 +49,11 @@ In case you supply the argument "rawtdata", the on-disk functionality is ignored
 and the function returns a list with the cleaned trades as xts object (see examples).
 }
 \description{
-This is a wrapper function for cleaning the trade data of all stocks in "ticker" over the interval [from,to]. 
-The result is saved in the folder datadestination. The function returns a vector
-indicating how many trades were removed at each cleaning step.
+This is a wrapper function for cleaning the trade data of all stock data inside the folder datasource. 
+The result is saved in the folder datadestination. 
 
-In case you supply the argument "rawtdata", the on-disk functionality is ignored
+In case you supply the argument "rawtdata", the on-disk functionality is ignored. The function returns a vector
+indicating how many trades were removed at each cleaning step in this case.
 and the function returns an xts or data.table object.
 
 The following cleaning functions are performed sequentially:

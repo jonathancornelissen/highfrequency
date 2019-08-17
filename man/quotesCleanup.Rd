@@ -4,20 +4,15 @@
 \alias{quotesCleanup}
 \title{Cleans quote data}
 \usage{
-quotesCleanup(from, to, datasource, datadestination, ticker, exchanges,
+quotesCleanup(datasource = NULL, datadestination = NULL, exchanges,
   qdataraw = NULL, report = TRUE, selection = "median", maxi = 50,
-  window = 50, type = "advanced", rmoutliersmaxi = 10)
+  window = 50, type = "advanced", rmoutliersmaxi = 10,
+  saveasxts = TRUE)
 }
 \arguments{
-\item{from}{character indicating first date to clean, e.g. "2008-01-30".}
-
-\item{to}{character indicating last date to clean, e.g. "2008-01-31".}
-
 \item{datasource}{character indicating the folder in which the original data is stored.}
 
 \item{datadestination}{character indicating the folder in which the cleaned data is stored.}
-
-\item{ticker}{vector of tickers for which the data should be cleaned, e.g. ticker = c("AAPL","AIG").}
 
 \item{exchanges}{vector of stock exchange symbols for all tickers in vector "ticker". It thus should have the same length as the vector ticker.
 Only data from one single exchange will be retained for each stock respectively, e.g. exchanges = c("T","N").
@@ -51,20 +46,21 @@ from, to, datasource and datadestination will be ignored. (only advisable for sm
 \item{type}{argument to be passed on to the cleaning routine \code{\link{rmOutliersQuotes}}.}
 
 \item{rmoutliersmaxi}{argument to be passed on to the cleaning routine \code{\link{rmOutliersQuotes}}.}
+
+\item{saveasxts}{indicates whether data should be saved in xts format instead of data.table when using on-disk functionality. TRUE by default.}
 }
 \value{
-For each day an xts object is saved into the folder of that date, containing the cleaned data.
-This procedure is performed for each stock in "ticker".
-The function returns a vector indicating how many quotes remained after each cleaning step.
+The function converts every csv file in datasource into multiple xts or data.table files.
+In datadestination, there will be one folder for each symbol containing .rds files with cleaned data stored either in data.table or xts format.
 
 In case you supply the argument "qdataraw", the on-disk functionality is ignored
 and the function returns a list with the cleaned quotes as an xts or data.table object depending on input (see examples).
 }
 \description{
-This is a wrapper function for cleaning the quote data of all stocks in "ticker" over the interval [from,to]. 
+This is a wrapper function for cleaning the quote data in the entire folder datasource. 
 The result is saved in the folder datadestination. 
 
-In case you supply the argument "rawqdata", the on-disk functionality is ignored
+In case you supply the argument "qdataraw", the on-disk functionality is ignored
 and the function returns the cleaned quotes as xts or data.table object (see examples).
 
 The following cleaning steps are performed sequentially:
@@ -89,6 +85,6 @@ Brownlees, C.T. and Gallo, G.M. (2006). Financial econometric analysis at ultra-
 Falkenberry, T.N. (2002). High frequency data filtering. Unpublished technical report.
 }
 \author{
-Jonathan Cornelissen and Kris Boudt
+Jonathan Cornelissen, Kris Boudt and Onno Kleen.
 }
 \keyword{cleaning}

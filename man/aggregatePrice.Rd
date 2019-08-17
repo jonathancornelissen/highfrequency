@@ -5,12 +5,12 @@
 \title{Aggregate a time series but keep first and last observation}
 \usage{
 aggregatePrice(pdata, on = "minutes", k = 1, marketopen = "09:30:00",
-  marketclose = "16:00:00", tz = NULL)
+  marketclose = "16:00:00", fill = FALSE, tz = NULL)
 }
 \arguments{
 \item{pdata}{data.table or xts object to be aggregated containing the intraday price series, possibly across multiple days.}
 
-\item{on}{character, indicating the time scale in which "k" is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".}
+\item{on}{character, indicating the time scale in which "k" is expressed. Possible values are: "milliseconds", "secs", "seconds", "mins", "minutes","hours".}
 
 \item{k}{positive integer, indicating the number of periods to aggregate over; e.g. to aggregate a 
 xts object to the 5 minute frequency set k = 5 and on = "minutes".}
@@ -18,6 +18,8 @@ xts object to the 5 minute frequency set k = 5 and on = "minutes".}
 \item{marketopen}{the market opening time, by default: marketopen = "09:30:00".}
 
 \item{marketclose}{the market closing time, by default: marketclose = "16:00:00".}
+
+\item{fill}{indicates whether rows without trades should be added with the most recent value, FALSE by default.}
 
 \item{tz}{time zone used, by default: tz = timezone of DT column/index of xts.}
 }
@@ -38,8 +40,12 @@ the last observation up to that point, including the value at 09:35:00 itself.
 }
 \examples{
 # aggregate price data to the 30 second frequency
-head(sample_tdata$PRICE)
-head(aggregatePrice(sample_tdata$PRICE, on = "secs", k = 30))
+aggregatePrice(sample_tdata_microseconds, on = "secs", k = 30)
+# aggregate price data to the 30 second frequency including zero return price changes
+aggregatePrice(sample_tdata_microseconds, on = "secs", k = 30)
+
+# aggregate price data to half a second frequency including zero return price changes
+aggregatePrice(sample_tdata_microseconds, on = "milliseconds", k = 500, fill = TRUE)
 }
 \author{
 Jonathan Cornelissen, Kris Boudt and Onno Kleen.

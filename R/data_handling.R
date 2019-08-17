@@ -54,7 +54,7 @@
 #' @export
 aggregatets <- function (ts, FUN = "previoustick", on = "minutes", k = 1, weights = NULL, dropna = FALSE) {
   
-  makethispartbetter <- ((!is.null(weights))| on=="days"|on=="weeks"| (FUN!="previoustick")|dropna)
+  makethispartbetter <- ((!is.null(weights))| on=="days"| on=="weeks" | (FUN!="previoustick") | dropna)
   
   if (FUN == "previoustick") {
     FUN <- previoustick 
@@ -70,7 +70,7 @@ aggregatets <- function (ts, FUN = "previoustick", on = "minutes", k = 1, weight
         ts2 <- period.apply(ts, ep, FUN) 
       }
       if (dim(ts)[2] > 1) {  
-        ts2 <- xts(apply(ts, 2, FUN = period.apply2, FUN2 = FUN, INDEX = ep), order.by = index(ts)[ep],)
+        ts2 <- xts(apply(ts, 2, FUN = periodApply2, FUN2 = FUN, INDEX = ep), order.by = index(ts)[ep],)
       }
     } else {
       tsb <- cbind(ts, weights)
@@ -157,11 +157,12 @@ aggregatets <- function (ts, FUN = "previoustick", on = "minutes", k = 1, weight
 #' of the result.
 #' 
 #' @param pdata data.table or xts object to be aggregated containing the intraday price series, possibly across multiple days.
-#' @param on character, indicating the time scale in which "k" is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".
+#' @param on character, indicating the time scale in which "k" is expressed. Possible values are: "milliseconds", "secs", "seconds", "mins", "minutes","hours".
 #' @param k positive integer, indicating the number of periods to aggregate over; e.g. to aggregate a 
 #' xts object to the 5 minute frequency set k = 5 and on = "minutes".
 #' @param marketopen the market opening time, by default: marketopen = "09:30:00". 
 #' @param marketclose the market closing time, by default: marketclose = "16:00:00". 
+#' @param fill indicates whether rows without trades should be added with the most recent value, FALSE by default.
 #' @param tz time zone used, by default: tz = timezone of DT column/index of xts.
 #' 
 #' @details 
@@ -177,17 +178,29 @@ aggregatets <- function (ts, FUN = "previoustick", on = "minutes", k = 1, weight
 #' @keywords data manipulation
 #' @examples 
 #' # aggregate price data to the 30 second frequency
-#' head(sample_tdata$PRICE)
-#' head(aggregatePrice(sample_tdata$PRICE, on = "secs", k = 30))
+#' aggregatePrice(sample_tdata_microseconds, on = "secs", k = 30)
+#' # aggregate price data to the 30 second frequency including zero return price changes
+#' aggregatePrice(sample_tdata_microseconds, on = "secs", k = 30)
+#' 
+#' # aggregate price data to half a second frequency including zero return price changes
+#' aggregatePrice(sample_tdata_microseconds, on = "milliseconds", k = 500, fill = TRUE)
 #' @keywords internal
 #' @importFrom xts last
 #' @export
-aggregatePrice <- function(pdata, on = "minutes", k = 1, marketopen = "09:30:00", marketclose = "16:00:00" , tz = NULL) {
+aggregatePrice <- function(pdata, on = "minutes", k = 1, marketopen = "09:30:00", marketclose = "16:00:00" , fill = FALSE, tz = NULL) {
   
   DATE = DT = FIRST_DT = DT_ROUND = LAST_DT = SYMBOL = PRICE = NULL
+  
+  on_true <- NULL
 
   if ("PRICE" %in% colnames(pdata) == FALSE) {
     stop("data.table or xts needs column named PRICE.")
+  }
+  
+  if (on == "milliseconds") {
+    on_true <- "milliseconds"
+    on <- "secs"
+    k <- k / 1000
   }
   
   dummy_was_xts <- FALSE
@@ -207,7 +220,7 @@ aggregatePrice <- function(pdata, on = "minutes", k = 1, marketopen = "09:30:00"
 
         #open
         a <- as.POSIXct(paste(date, marketopen), tz = tz)
-        b <- as.xts(matrix(as.numeric(pdata[1]),nrow = 1), a)
+        b <- as.xts(matrix(as.numeric(pdata[1]), nrow = 1), a)
         storage.mode(ts2) <- "numeric"
         ts3 <- c(b, ts2)
 
@@ -233,26 +246,66 @@ aggregatePrice <- function(pdata, on = "minutes", k = 1, marketopen = "09:30:00"
     }
   }
   
-  pdata <- pdata[DT >= ymd_hms(paste(as.Date(pdata$DT), marketopen), tz = tz(pdata$DT))]
-  pdata <- pdata[DT <= ymd_hms(paste(as.Date(pdata$DT), marketclose), tz = tz(pdata$DT))]
+  pdata <- pdata[DT >= ymd_hms(paste(as.Date(pdata$DT, tz = tz(pdata$DT)), marketopen), tz = tz(pdata$DT))]
+  pdata <- pdata[DT <= ymd_hms(paste(as.Date(pdata$DT, tz = tz(pdata$DT)), marketclose), tz = tz(pdata$DT))]
 
-  pdata[, DATE := as.Date(DT)]
+  pdata[, DATE := as.Date(DT, tz = tz(pdata))]
   pdata[, FIRST_DT := min(DT), by = "DATE"]
   pdata[, DT_ROUND := ifelse(DT == FIRST_DT,
                              floor_date(ymd_hms(DT), unit = paste(k, on)),
                              ceiling_date(ymd_hms(DT), unit = paste(k, on), change_on_boundary = FALSE))]
   pdata[, DT_ROUND := as_datetime(DT_ROUND)]
   pdata[, LAST_DT := max(DT), by = "DT_ROUND"]
+  
+  pdata_open <- data.table::copy(pdata[DT == FIRST_DT])
+  pdata_open[, DT := ymd_hms(paste(as.Date(pdata_open$DT), marketopen), tz = tz(pdata_open$DT))]
+  pdata_open <- pdata_open[, c("DT", "PRICE")]
 
   pdata <- pdata[DT == LAST_DT][, DT := DT_ROUND][, c("DT", "PRICE")]
+  lubridate::tz(pdata$DT) <- tz(pdata_open$DT)
+  # due to rounding there may be an observation that is refered to the opening time
+  pdata <- pdata[!(DT %in% pdata_open$DT)]
+  
+  pdata <- merge(pdata, pdata_open, all = TRUE)
+  
+  if (fill == TRUE) {
+    if (on == "minutes") {
+      on = "mins"
+    }
+    if (on == "seconds") {
+      on <- "secs"
+    }
+    
+    # if/else seems unnecessary but otherwise seq.POSIXt won't work for milliseconds
+    if (is.null(on_true) == FALSE) {
+      dt_full_index <-
+        rbindlist(lapply(unique(as.Date(pdata$DT)),
+                         FUN = function(x) data.frame(DT = seq.POSIXt(from = as.POSIXct(paste0(x, marketopen, tz = tz(pdata$DT))), 
+                                                                      to   = as.POSIXct(paste0(x, marketclose, tz = tz(pdata$DT))), 
+                                                                      units = on,
+                                                                      by = k))))
+    } else {
+      dt_full_index <-
+        rbindlist(lapply(unique(as.Date(pdata$DT)),
+                         FUN = function(x) data.frame(DT = seq.POSIXt(from = as.POSIXct(paste0(x, marketopen, tz = tz(pdata$DT))), 
+                                                                      to   = as.POSIXct(paste0(x, marketclose, tz = tz(pdata$DT))),
+                                                                      by = paste(k, on)))))
+    }
+    
+    lubridate::tz(dt_full_index$DT) <- tz(pdata$DT)
+    pdata <- merge(pdata, dt_full_index, by = "DT", all = TRUE)
+    
+    setkeyv(pdata, "DT")
+    
+    pdata$PRICE <- na.locf(pdata$PRICE)
+  }
 
   if (dummy_was_xts == TRUE) {
-    return(xts(as.matrix(pdata[, -c("DT")]), order.by = pdata$DT, tzone = tz))
+    return(xts(as.matrix(pdata[, -c("DT")]), order.by = pdata$DT, tzone = tz(pdata$DT)))
   } else {
     return(pdata)
   }
 }
-
 
 #' Aggregate a data.table or xts object containing quote data
 #' 
@@ -311,8 +364,10 @@ aggregateQuotes <- function(qdata, on = "minutes", k = 5, marketopen = "09:30:00
     }
   }
   
-  if (length(unique(qdata$SYMBOL)) > 1) {
-    stop("Please provide only one symbol at a time.")
+  if ("SYMBOL" %in% colnames(qdata)) {
+    if (length(unique(qdata$SYMBOL)) > 1) {
+      stop("Please provide only one symbol at a time.")
+    }
   }
   
   qdata[, DATE := as.Date(DT)]
@@ -1023,20 +1078,17 @@ noZeroQuotes <- function(qdata) {
 
 #' Cleans quote data
 #' 
-#' @description This is a wrapper function for cleaning the quote data of all stocks in "ticker" over the interval [from,to]. 
+#' @description This is a wrapper function for cleaning the quote data in the entire folder datasource. 
 #' The result is saved in the folder datadestination. 
 #' 
-#' In case you supply the argument "rawqdata", the on-disk functionality is ignored
+#' In case you supply the argument "qdataraw", the on-disk functionality is ignored
 #' and the function returns the cleaned quotes as xts or data.table object (see examples).
 #' 
 #' The following cleaning steps are performed sequentially:
 #' \code{\link{noZeroQuotes}}, \code{\link{selectExchange}}, rmLargeSpread,
 #' \code{\link{mergeQuotesSameTimestamp}}, \code{\link{rmOutliersQuotes}}.
-#' @param from character indicating first date to clean, e.g. "2008-01-30".
-#' @param to character indicating last date to clean, e.g. "2008-01-31".
 #' @param datasource character indicating the folder in which the original data is stored.
 #' @param datadestination character indicating the folder in which the cleaned data is stored.
-#' @param ticker vector of tickers for which the data should be cleaned, e.g. ticker = c("AAPL","AIG").
 #' @param exchanges vector of stock exchange symbols for all tickers in vector "ticker". It thus should have the same length as the vector ticker.
 #' Only data from one single exchange will be retained for each stock respectively, e.g. exchanges = c("T","N").
 #' The possible exchange symbols are:
@@ -1062,10 +1114,10 @@ noZeroQuotes <- function(qdata) {
 #' @param window argument to be passed on to the cleaning routine \code{\link{rmOutliersQuotes}}. 
 #' @param type argument to be passed on to the cleaning routine \code{\link{rmOutliersQuotes}}.
 #' @param rmoutliersmaxi argument to be passed on to the cleaning routine \code{\link{rmOutliersQuotes}}.
+#' @param saveasxts indicates whether data should be saved in xts format instead of data.table when using on-disk functionality. TRUE by default.
 #' 
-#' @return For each day an xts object is saved into the folder of that date, containing the cleaned data.
-#' This procedure is performed for each stock in "ticker".
-#' The function returns a vector indicating how many quotes remained after each cleaning step.
+#' @return The function converts every csv file in datasource into multiple xts or data.table files.
+#' In datadestination, there will be one folder for each symbol containing .rds files with cleaned data stored either in data.table or xts format.
 #' 
 #' In case you supply the argument "qdataraw", the on-disk functionality is ignored
 #' and the function returns a list with the cleaned quotes as an xts or data.table object depending on input (see examples).
@@ -1074,7 +1126,7 @@ noZeroQuotes <- function(qdata) {
 #' Brownlees, C.T. and Gallo, G.M. (2006). Financial econometric analysis at ultra-high frequency: Data handling concerns. Computational Statistics & Data Analysis, 51, pages 2232-2245.
 #' Falkenberry, T.N. (2002). High frequency data filtering. Unpublished technical report.
 #' 
-#' @author Jonathan Cornelissen and Kris Boudt
+#' @author Jonathan Cornelissen, Kris Boudt and Onno Kleen.
 #' 
 #' @examples
 #' # Consider you have raw quote data for 1 stock for 2 days
@@ -1087,11 +1139,13 @@ noZeroQuotes <- function(qdata) {
 #' # In case you have more data it is advised to use the on-disk functionality
 #' # via "from","to","datasource",etc. arguments
 #' 
+#' @importFrom readr read_csv
 #' @keywords cleaning
 #' @export
-quotesCleanup <- function(from, to, datasource, datadestination, ticker, exchanges, qdataraw = NULL, report = TRUE, 
-                          selection = "median", maxi = 50, window = 50, type = "advanced", rmoutliersmaxi = 10) {
-  BID = OFR = DT = SPREAD = SPREAD_MEDIAN = EX = DATE = BIDSIZ = OFRSIZ = NULL
+quotesCleanup <- function(datasource = NULL, datadestination = NULL, exchanges, qdataraw = NULL, report = TRUE, 
+                          selection = "median", maxi = 50, window = 50, type = "advanced", rmoutliersmaxi = 10, saveasxts = TRUE) {
+  
+  BID = OFR = DT = SPREAD = SPREAD_MEDIAN = EX = DATE = BIDSIZ = OFRSIZ = TIME_M  = NULL
   nresult <- c(initial_number = 0,
                no_zero_quotes = 0,
                select_exchange = 0,
@@ -1101,7 +1155,34 @@ quotesCleanup <- function(from, to, datasource, datadestination, ticker, exchang
                remove_outliers = 0)
   
   if (is.null(qdataraw) == TRUE) {
-    stop("On-disk functionality has to be added once again!")
+    try(dir.create(datadestination), silent = TRUE)
+    
+    quotesfiles <- list.files(datasource, recursive = TRUE)[grepl("quotes", list.files(datasource, recursive = TRUE))]
+    for (ii in quotesfiles) {
+      readdata <- try(as.data.table(read_csv(paste0(datasource, "/", ii))), silent = TRUE)
+      readdata <- try(readdata[, DT := as.POSIXct(substring(paste(as.character(DATE), TIME_M, sep = " "), 1, 20), tz = "EST", format = "%Y%m%d %H:%M:%OS")], silent = TRUE)
+      qdata <- try(quotesCleanup(qdataraw = readdata,
+                                 selection = selection,
+                                 exchanges = exchanges,
+                                 maxi = maxi,
+                                 window = window,
+                                 type = type,
+                                 rmoutliersmaxi = rmoutliersmaxi))$qdata
+      
+      qdata <- qdata[, DATE := as.Date(DT, tz = "EST")]
+      qdata <- split(qdata, by = "DATE")
+      
+      try(dir.create(paste0(datadestination, "/", strsplit(ii, "/")[[1]][1])), silent = TRUE)
+      for (jj in qdata) {
+        if (saveasxts == TRUE) {
+          df_result <- xts(as.matrix(jj[, -c("DT", "DATE")]), order.by = jj$DT)
+        } else {
+          df_result <- jj[, -c( "DATE")]
+        }
+        saveRDS(df_result, paste0(datadestination, "/", strsplit(ii, "/")[[1]][1], "/", unique(as.Date(jj$DT, tz = "EST")), "quotes.rds"))
+        # saveRDS(df_result, paste0(datadestination, "/", strsplit(ii, "/")[[1]][1], "/", strsplit(strsplit(ii, "/")[[1]][2], ".zip")[1], ".rds"))
+      }
+    }
   }
   
   if (is.null(qdataraw) == FALSE) {
@@ -1506,11 +1587,11 @@ selectExchange <- function(data, exch = "N") {
 
 #' Cleans trade data
 #' 
-#' @description This is a wrapper function for cleaning the trade data of all stocks in "ticker" over the interval [from,to]. 
-#' The result is saved in the folder datadestination. The function returns a vector
-#' indicating how many trades were removed at each cleaning step.
+#' @description This is a wrapper function for cleaning the trade data of all stock data inside the folder datasource. 
+#' The result is saved in the folder datadestination. 
 #' 
-#' In case you supply the argument "rawtdata", the on-disk functionality is ignored
+#' In case you supply the argument "rawtdata", the on-disk functionality is ignored. The function returns a vector
+#' indicating how many trades were removed at each cleaning step in this case.
 #' and the function returns an xts or data.table object.
 #' 
 #' The following cleaning functions are performed sequentially:
@@ -1521,11 +1602,8 @@ selectExchange <- function(data, exch = "N") {
 #' also requires cleaned quote data as input, it is not incorporated here and
 #' there is a seperate wrapper called \code{\link{tradesCleanupUsingQuotes}}.
 #' 
-#' @param from character indicating first date to clean, e.g. "2008-01-30".
-#' @param to character indicating last date to clean, e.g. "2008-01-31".
 #' @param datasource character indicating the folder in which the original data is stored.
 #' @param datadestination character indicating the folder in which the cleaned data is stored.
-#' @param ticker vector of tickers for which the data should be cleaned, e.g. ticker = c("AAPL","AIG")
 #' @param exchanges list of vectors of stock exchange(s) for all tickers in vector "ticker". It thus should have the same length as the vector ticker.
 #' E.g. in case of two stocks; exchanges = list("N", c("Q","T")).
 #' The possible exchange symbols are:
@@ -1548,6 +1626,7 @@ selectExchange <- function(data, exch = "N") {
 #' from, to, datasource and datadestination will be ignored. (only advisable for small chunks of data)
 #' @param report boolean and TRUE by default. In case it is true the function returns (also) a vector indicating how many trades remained after each cleaning step.
 #' @param selection argument to be passed on to the cleaning routine \code{\link{mergeTradesSameTimestamp}}. The default is "median".
+#' @param saveasxts indicates whether data should be saved in xts format instead of data.table when using on-disk functionality. TRUE by default.
 #' 
 #' @return For each day an xts or data.table object is saved into the folder of that date, containing the cleaned data.
 #' This procedure is performed for each stock in "ticker".
@@ -1574,10 +1653,33 @@ selectExchange <- function(data, exch = "N") {
 #' @author Jonathan Cornelissen and Kris Boudt
 #' @keywords cleaning
 #' @export
-tradesCleanup <- function(from, to, datasource, datadestination, ticker, exchanges, tdataraw = NULL, report = TRUE, selection = "median") {
-  PRICE = EX = COND = NULL
+tradesCleanup <- function(datasource = NULL, datadestination = NULL, exchanges, tdataraw = NULL, report = TRUE, selection = "median", saveasxts = TRUE) {
+  PRICE = EX = COND = DT = DATE = TIME_M = NULL
+  
   if (is.null(tdataraw) == TRUE) {
-    stop("On-disk functionality has to be added once again!")
+    try(dir.create(datadestination), silent = TRUE)
+    
+    tradesfiles <- list.files(datasource, recursive = TRUE)[!grepl("quotes", list.files(datasource, recursive = TRUE))]
+    for (ii in tradesfiles) {
+      readdata <- try(as.data.table(read_csv(paste0(datasource, "/", ii))), silent = TRUE)
+      readdata <- try(readdata[, DT := as.POSIXct(substring(paste(as.character(DATE), TIME_M, sep = " "), 1, 20), tz = "EST", format = "%Y%m%d %H:%M:%OS")], silent = TRUE)
+      tdata <- try(tradesCleanup(tdataraw = readdata,
+                                 selection = selection,
+                                 exchanges = exchanges))$tdata
+      tdata <- tdata[, DATE := as.Date(DT, tz = "EST")]
+      tdata <- split(tdata, by = "DATE")
+      
+      try(dir.create(paste0(datadestination, "/", strsplit(ii, "/")[[1]][1])), silent = TRUE)
+      for (jj in tdata) {
+        if (saveasxts == TRUE) {
+          df_result <- xts(as.matrix(jj[, -c("DT", "DATE")]), order.by = jj$DT)
+        } else {
+          df_result <- jj[, -c( "DATE")]
+        }
+        saveRDS(df_result, paste0(datadestination, "/", strsplit(ii, "/")[[1]][1], "/", unique(as.Date(jj$DT, tz = "EST")), ".rds"))
+        # saveRDS(df_result, paste0(datadestination, "/", strsplit(ii, "/")[[1]][1], "/", strsplit(strsplit(ii, "/")[[1]][2], ".zip")[1], ".rds"))
+      }
+    }
   }
   
   if (is.null(tdataraw) == FALSE) {
@@ -1625,133 +1727,6 @@ tradesCleanup <- function(from, to, datasource, datadestination, ticker, exchang
       return(df_result)
     }
   }
-  
-  # 
-  # nresult <- rep(0, 5)
-  # if (is.list(exchanges) == FALSE) { 
-  #   exchanges <- as.list(exchanges)
-  # }
-  # 
-  # if (is.null(tdataraw) == TRUE) {
-  #   dates = timeDate::timeSequence(from, to, format = "%Y-%m-%d")
-  #   dates = dates[timeDate::isBizday(dates, holidays = timeDate::holidayNYSE(1960:2050))]
-  #   for (j in 1:length(dates)) {
-  #     datasourcex = paste(datasource, "/", dates[j], sep = "")
-  #     datadestinationx = paste(datadestination, "/", dates[j], sep = "")
-  #     for (i in 1:length(ticker)) {
-  #       dataname = paste(ticker[i], "_trades.RData", sep = "")
-  #       if (file.exists(paste(datasourcex, "/", dataname, sep = ""))) {
-  #         load(paste(datasourcex, "/", dataname, sep = ""))
-  #         if (class(tdata)[1] != "try-error") {            
-  #           exchange = exchanges[[i]]            
-  #           if (length(tdata$PRICE) > 0) {
-  #             tdata <- checkColumnNames(tdata);
-  #             nresult[1] <- nresult[1] + dim(tdata)[1]
-  #           } else {
-  #             tdata <- NULL
-  #           }
-  #           
-  #           if (length(tdata$PRICE) > 0) {
-  #             tdata <- try(nozeroprices(tdata))
-  #             nresult[2] <- nresult[2] + dim(tdata)[1]
-  #           } else {
-  #             tdata <- NULL
-  #           }
-  #           
-  #           if (length(tdata$PRICE) > 0) {
-  #             tdata <- try(selectexchange(tdata, exch = exchange))
-  #             nresult[3] <- nresult[3] + dim(tdata)[1]
-  #           } else {
-  #             tdata <- NULL
-  #           }
-  #           
-  #           if (length(tdata$PRICE) > 0) {
-  #             tdata <- try(salescond(tdata))
-  #             nresult[4] <- nresult[4] + dim(tdata)[1]
-  #           } else {
-  #             tdata <- NULL
-  #           }
-  #           
-  #           if (length(tdata$PRICE) > 0) {
-  #             tdata <- try(mergeTradesSameTimestamp(tdata, selection = selection))
-  #             nresult[5] <- nresult[5] + dim(tdata)[1]
-  #           } else {
-  #             tdata <-NULL
-  #           }
-  #           save(tdata, file = paste(datadestinationx,"/", dataname, sep = ""))
-  #         }
-  #         if (class(tdata) == "try-error") {
-  #           abc = 1
-  #           save(abc, file = paste(datadestinationx, "/missing_", 
-  #                                  ticker[i], ".RData", sep = ""))
-  #         }
-  #         
-  #       }else{
-  #         next;
-  #       }
-  #     }   
-  #   }
-  #   if (report == TRUE) {
-  #     names(nresult) = c("initial number", "no zero prices", 
-  #                        "select exchange", "sales condition", "merge same timestamp")
-  #     return(nresult)
-  #   }
-  # }
-  # 
-  # if (is.null(tdataraw) == FALSE) {
-  #   if (class(tdataraw)[1] != "try-error") {
-  #     if (length(exchanges) > 1) {
-  #       print("The argument exchanges contains more than 1 element. Please select a single exchange, in case you provide tdataraw.")
-  #     }
-  #     exchange <- exchanges[[1]]
-  #     tdata <- tdataraw
-  #     rm(tdataraw)
-  #     
-  #     if (length(tdata) > 0) {
-  #       tdata <- checkColumnNames(tdata)
-  #       nresult[1] <- nresult[1] + dim(tdata)[1]
-  #     } else {
-  #       tdata <- NULL
-  #     }
-  #     
-  #     if(length(tdata)>0){
-  #       tdata = try(nozeroprices(tdata))
-  #       nresult[2] = nresult[2] + dim(tdata)[1]
-  #     } else {
-  #       tdata <- NULL
-  #     }
-  #     
-  #     if (length(tdata) > 0) {
-  #       tdata = try(selectexchange(tdata, exch = exchange))
-  #       nresult[3] = nresult[3] + dim(tdata)[1]
-  #     } else {
-  #       tdata <- NULL
-  #     }
-  #     
-  #     if (length(tdata) > 0) {
-  #       tdata = try(salescond(tdata))
-  #       nresult[4] = nresult[4] + dim(tdata)[1]
-  #     } else {
-  #       tdata <- NULL
-  #     }
-  #     
-  #     if (length(tdata) > 0) {
-  #       tdata <- try(mergeTradesSameTimestamp(tdata, selection = selection))
-  #       nresult[5] <- nresult[5] + dim(tdata)[1]
-  #     } else {
-  #       tdata <- NULL
-  #     }
-  #     
-  #     if (report == TRUE) {
-  #       names(nresult) = c("initial number", "no zero prices", 
-  #                          "select exchange", "sales condition", "merge same timestamp")
-  #       return(list(tdata = tdata, report = nresult))
-  #     }
-  #     if (report != TRUE) {
-  #       return(tdata)
-  #     }
-  #   }
-  # }
 }
 
 #' @export
@@ -1763,33 +1738,28 @@ tradesCleanupUsingQuotes <- function(from, to, datasource, datadestination, tick
 #' Perform a final cleaning procedure on trade data
 #' 
 #' @description Function performs cleaning procedure \code{\link{rmTradeOutliersUsingQuotes}} 
-#' for the trades of all stocks in "ticker" over the interval 
-#' [from,to] and saves the result in "datadestination". 
+#' for the trades of all stocks data in "datadestination". 
 #' Note that preferably the input data for this function 
 #' is trade and quote data cleaned by respectively e.g. \code{\link{tradesCleanup}}
 #' and \code{\link{quotesCleanup}}.
 #' 
-#' @param from character indicating first date to clean, e.g. "2008-01-30".
-#' @param to character indicating last date to clean, e.g. "2008-01-31".
 #' @param datasource character indicating the folder in which the original data is stored.
-#' @param datadestination character indicating the folder in which the cleaned data is stored.
-#' @param ticker vector of tickers for which the data should be cleaned.
+#' @param datadestination character indicating the folder in which the cleaned data is stored, folder of datasource by default.
 #' @param tdata data.table or xts object containing (ONE day and for ONE stock only) trade data cleaned by \code{\link{tradesCleanup}}. This argument is NULL by default. Enabling it, means the arguments
 #' from, to, datasource and datadestination will be ignored. (only advisable for small chunks of data)
-#' @param qdata xts object containing (ONE day and for ONE stock only) cleaned quote data. This argument is NULL by default. Enabling it means the arguments
+#' @param qdata data.table or xts object containing (ONE day and for ONE stock only) cleaned quote data. This argument is NULL by default. Enabling it means the arguments
 #' from, to, datasource, datadestination will be ignored. (only advisable for small chunks of data)
 #' 
 #' @return For each day an xts object is saved into the folder of that date, containing the cleaned data.
-#' This procedure is performed for each stock in "ticker".
 #' 
 #' In case you supply the arguments "tdata" and "qdata", the on-disk functionality is ignored
-#' and the function returns a list with the cleaned trades as xts object (see examples).
+#' and the function returns cleaned trades as a data.table or xts object (see examples).
 #' 
 #' @references Barndorff-Nielsen, O. E., P. R. Hansen, A. Lunde, and N. Shephard (2009). Realized kernels in practice: Trades and quotes. Econometrics Journal 12, C1-C32.
 #' 
 #' Brownlees, C.T. and Gallo, G.M. (2006). Financial econometric analysis at ultra-high frequency: Data handling concerns. Computational Statistics & Data Analysis, 51, pages 2232-2245.
 #' 
-#' @author Jonathan Cornelissen and Kris Boudt.
+#' @author Jonathan Cornelissen, Kris Boudt and Onno Kleen.
 #' 
 #' @examples 
 #' # Consider you have raw trade data for 1 stock for 2 days 
@@ -1807,7 +1777,11 @@ tradesCleanupUsingQuotes <- function(from, to, datasource, datadestination, tick
 #' #via "from","to","datasource", etc. arguments
 #' @keywords cleaning
 #' @export
-tradesCleanupUsingQuotes <- function(from, to, datasource, datadestination, ticker, tdata = NULL, qdata = NULL) {
+tradesCleanupUsingQuotes <- function(datasource = NULL, datadestination = NULL, tdata = NULL, qdata = NULL) {
+  
+  if (is.null(datadestination) == TRUE) {
+    datadestination <- datasource
+  }
   
   if ((!is.null(tdata)) & (!is.null(qdata))) {
     tdata <- checkColumnNames(tdata)
@@ -1816,5 +1790,17 @@ tradesCleanupUsingQuotes <- function(from, to, datasource, datadestination, tick
     #1 cleaning procedure that needs cleaned trades and quotes
     tdata <- rmTradeOutliersUsingQuotes(tdata, qdata)
     return(tdata)
+  } else {
+    ticker <- list.files(datasource)
+    for (ii in ticker) {
+      filesforticker <- list.files(paste0(datasource, "/", ii, "/"))
+      for (jj in filesforticker[!grepl("quotes", filesforticker)]) {
+        tdata <- try(readRDS(paste0(datasource, "/", ii, "/", jj)))
+        qdata <- try(readRDS(paste0(datasource, "/", ii, "/", substring(jj, 1, 10), "quotes.rds")))
+        tdata <- checkColumnNames(tdata)
+        qdata <- checkColumnNames(qdata)
+        saveRDS(rmTradeOutliersUsingQuotes(tdata, qdata), paste0(datadestination, "/", ii, "/", substring(jj, 1, 10), "tradescleanedbyquotes.rds"))
+      }
+    }
   }
 }

@@ -8,18 +8,14 @@ spotDrift(data, method = "driftMean", ..., on = "minutes", k = 5,
   marketopen = "09:30:00", marketclose = "16:00:00", tz = "GMT")
 }
 \arguments{
-\item{data}{Can be one of 3 input types, \code{xts}, \code{matrix} or \code{data.table}.
-If a \code{data.table} is supplied, it will be made into an \code{xts} if possible.
-If the data is \code{xtsible}, it is assumed that the input is the price in levels.
-If the data is not \code{xtsible},
-it will be treated as already prepared return data, i.e. if the desired output is a 5 rolling mean estimation of the spot drift, it should contain returns sampled every 5 minutes.}
+\item{data}{Can be one of two input types, \code{xts} or \code{data.table}. It is assumed that the input comprises prices in levels.}
 
-\item{method}{Which method to be used to estimate the spot-drift. Currently 3 methods are available, rolling mean and median as well as the kernel method of Christensen et al. 2018.
+\item{method}{Which method to be used to estimate the spot-drift. Currently, three methods are available, rolling mean and median as well as the kernel method of Christensen et al. 2018.
 The kernel is a left hand exponential kernel that will weigh newer observations more heavily than older observations.}
 
 \item{...}{Additional arguments for the individual methods. See details}
 
-\item{on}{What time-frame should the estimator be applied? Accepted inputs are \code{"seconds"} and \code{"secs"} for seconds, \code{"minutes"} and \code{"mins"} for minutes, and \code{"hours"} for hours.
+\item{on}{What time-frame should the estimator be applied? Accepted inputs are \code{"milliseconds"}, \code{"seconds"} and \code{"secs"} for seconds, \code{"minutes"} and \code{"mins"} for minutes, and \code{"hours"} for hours.
 Standard is minutes}
 
 \item{k}{How often should the estimation take place? If \code{k} is 5 the estimation will be done every fifth unit of \code{on}.}
@@ -34,7 +30,7 @@ Standard is minutes}
 An object of class "spotdrift" containing at least the estimated spot drift process. Input on what this class should contain and methods for it is welcome.
 }
 \description{
-Function used to estimate the spot drift of intra-day (tick) stock prices/returns
+Function used to estimate the spot drift of intraday (tick) stock prices/returns
 }
 \details{
 The additional arguments for the mean and median methods are: \code{periods} for the rolling window length which is 5 by standard and
@@ -42,17 +38,17 @@ The additional arguments for the mean and median methods are: \code{periods} for
 }
 \examples{
 # Example 1: Rolling mean and median estimators for 2 days
-dat <- sample_tdata_microseconds[, SYMBOL := NULL]
-meandrift <- spotDrift(data = dat, k = 1, tz = "EST")
-mediandrift <- spotDrift(data = dat, method = "driftMedian",k = 1, tz = "EST")
+meandrift <- spotDrift(data = sample_tdata_microseconds, k = 1, tz = "EST")
+mediandrift <- spotDrift(data = sample_tdata_microseconds, method = "driftMedian", 
+                         on = "seconds", k = 30, tz = "EST")
 plot(meandrift)
 plot(mediandrift)
 
 # Example 2: Kernel based estimator for one day
 price <- sample_tdata$PRICE
-storage.mode(price) = "numeric"
-kerneldrift <- spotDrift(price, method = "driftKernel", on = "minutes", k = 1)
-plot(kerneldrift)
+storage.mode(price) <- "numeric"
+#kerneldrift <- spotDrift(price, method = "driftKernel", on = "minutes", k = 1)
+#plot(kerneldrift)
 
 }
 \references{
