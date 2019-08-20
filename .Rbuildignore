@@ -1,6 +1,16 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 news.txt
-readme.txt
+readme.md
 notes.R
 ^\.travis\.yml$
+^taqdata$
+^taqdataconverted$
+^scr_old$
+^testthat$
+^gitignore$
+^data-raw$
+^CRAN-RELEASE$
+^cran-comments\.md$
+^GSoC\.md$
+^GSoC$

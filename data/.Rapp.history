@@ -1,0 +1,5 @@
+load("/Users/Arbeit/Git/highfrequency/data/sample_tdataraw_microseconds2.rda")
+sample_tdataraw_microseconds
+load("/Users/Arbeit/Git/highfrequency/data/sample_tdataraw_microseconds2.rda")
+ls()
+sample_tdata_microseconds
