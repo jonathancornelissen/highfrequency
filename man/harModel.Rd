@@ -43,7 +43,7 @@ By default, h=1, i.e. no aggregation takes place, you just model the daily reali
 \item{...}{extra arguments for jump test.}
 }
 \value{
-The function outputs an object of class \code{harModel} and \code{\link{lm}} (so \code{harModel} is  a subclass of \code{\link{lm}}). So far I only added a print method as you can see in the examples. Input here is welcome, what should a plot of an "harmodel" object look like? What other methods are useful?
+The function outputs an object of class \code{harModel} and \code{\link{lm}} (so \code{harModel} is  a subclass of \code{\link{lm}}).
 }
 \description{
 Function returns the estimates for the Heterogeneous Autoregressive model
