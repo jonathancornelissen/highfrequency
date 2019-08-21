@@ -128,7 +128,7 @@ harInsanityFilter <- function(fittedValues, lower, upper, replacement) {
 #' @param transform optionally a string referring to a function that transforms both the dependent and explanatory variables in the model. By default transform=NULL, so no transformation is done. Typical other choices in this context would be "log" or "sqrt".
 #' @param ... extra arguments for jump test.
 #'
-#' @return The function outputs an object of class \code{harModel} and \code{\link{lm}} (so \code{harModel} is  a subclass of \code{\link{lm}}). So far I only added a print method as you can see in the examples. Input here is welcome, what should a plot of an "harmodel" object look like? What other methods are useful?
+#' @return The function outputs an object of class \code{harModel} and \code{\link{lm}} (so \code{harModel} is  a subclass of \code{\link{lm}}).
 #'
 #' @references Andersen, T. G., T. Bollerslev, and F. Diebold (2007). Roughing it up: including jump components in the measurement, modelling and forecasting of return volatility. The Review of Economics and Statistics 89, 701-720.
 #' Corsi, F. (2009). A simple approximate long memory model of realized volatility. Journal of Financial Econometrics 7, 174-196.

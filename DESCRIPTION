@@ -1,6 +1,6 @@
 Package: highfrequency
 Version: 0.6.0
-Date: 2019-05-24
+Date: 2019-08-19
 Title: Tools for Highfrequency Data Analysis
 Authors@R: c(person("Kris", "Boudt", role = c("aut", "cre"),
                      email = "Kris.Boudt@econ.kuleuven.be"),
@@ -9,8 +9,6 @@ Authors@R: c(person("Kris", "Boudt", role = c("aut", "cre"),
                     email = "Scott.Payseur@gmail.com"),
              person("Giang", "Nguyen", role = c("ctb")),
              person("Onno", "Kleen", role = c("ctb"), comment = c(ORCID = "0000-0003-4731-4640")))
-Author: Kris Boudt [aut, cre], Jonathan Cornelissen [aut], Scott Payseur [aut],
-    Giang Nguyen [ctb], Onno Kleen [ctb]
 Maintainer: Kris Boudt
     <Kris.Boudt@econ.kuleuven.be>
 Description: Provide functionality to manage, clean and match highfrequency
@@ -45,7 +43,7 @@ Imports:
     bit64,
     lubridate,
     readr
-LinkingTo: Rcpp, RcppArmadillo 
+LinkingTo: Rcpp, RcppArmadillo
 Suggests:
     covr,
     FKF,
