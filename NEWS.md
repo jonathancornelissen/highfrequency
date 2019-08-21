@@ -20,3 +20,5 @@ Changes in version 0.5
  - updated references
  - cleanup of code basis
 
+Changes in version 0.6.1
+ - bug fix for Fedora compilation

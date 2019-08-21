@@ -1,5 +1,5 @@
 Package: highfrequency
-Version: 0.6.0
+Version: 0.6.1
 Date: 2019-08-19
 Title: Tools for Highfrequency Data Analysis
 Authors@R: c(person("Kris", "Boudt", role = c("aut", "cre"),
@@ -30,17 +30,11 @@ Imports:
     stats,
     utils,
     grDevices,
-    numDeriv,
-    sandwich,
     robustbase,
     cubature,
     mvtnorm,
-    chron,
-    timeDate,
-    MASS,
     data.table (>= 1.12.0),
     RcppRoll,
-    bit64,
     lubridate,
     readr
 LinkingTo: Rcpp, RcppArmadillo

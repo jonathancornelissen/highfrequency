@@ -120,8 +120,8 @@ expect_equal({
 
 # rThresholdCov
 expect_equal(
-  formatC(sum(rThresholdCov(cbind(lltc, sbux), align.by = "minutes", align.period = 1)) * 10000, digits = 20),
-  "0.5945544397569668682"
+  formatC(sum(rThresholdCov(cbind(lltc, sbux), align.by = "minutes", align.period = 1)) * 10000, digits = 8),
+  "0.59455444"
 )
 expect_equal(
   formatC(sum(rThresholdCov(cbind(lltc, sbux), align.by = "minutes", align.period = 1), cor = TRUE), digits = 1),
