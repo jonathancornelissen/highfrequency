@@ -2,8 +2,8 @@ expect_identical(
   {price <- sample_tdata$PRICE
   storage.mode(price) <- "numeric"
   kerneldrift <- spotDrift(price, method = "driftKernel", on = "minutes", k = 1)
-  formatC(kerneldrift$mu[1:6], digits = 7)},
-  c("-0.0708763", "-0.1144962",  "-0.07290184",  "0.02054575",  "0.07848068",  "0.08924061")
+  formatC(kerneldrift$mu[1:6], digits = 5)},
+  c("-0.070876", "-0.1145", "-0.072902", "0.020546", "0.078481", "0.089241")
 )
 
 
