@@ -19,3 +19,9 @@ Check: package dependencies, Result: NOTE
   Package in Depends/Imports which should probably only be in LinkingTo: 'RcppArmadillo'
 
 It is actually necessary this way.
+
+### CRAN Package Check Results for Package
+
+Currently, ATLAS MKL noLD checks fail
+
+Now, the tests are simplified in terms of precision so that hopefully this issue is resolved.
