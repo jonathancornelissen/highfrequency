@@ -4,8 +4,12 @@
 \alias{tradesCleanupUsingQuotes}
 \title{Perform a final cleaning procedure on trade data}
 \usage{
-tradesCleanupUsingQuotes(datasource = NULL, datadestination = NULL,
-  tdata = NULL, qdata = NULL)
+tradesCleanupUsingQuotes(
+  datasource = NULL,
+  datadestination = NULL,
+  tdata = NULL,
+  qdata = NULL
+)
 }
 \arguments{
 \item{datasource}{character indicating the folder in which the original data is stored.}

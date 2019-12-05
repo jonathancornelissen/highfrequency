@@ -4,8 +4,15 @@
 \alias{rHYCov}
 \title{Hayashi-Yoshida Covariance}
 \usage{
-rHYCov(rdata, cor = FALSE, period = 1, align.by = "seconds",
-  align.period = 1, makeReturns = FALSE, makePsd = TRUE)
+rHYCov(
+  rdata,
+  cor = FALSE,
+  period = 1,
+  align.by = "seconds",
+  align.period = 1,
+  makeReturns = FALSE,
+  makePsd = TRUE
+)
 }
 \arguments{
 \item{rdata}{a possibly multivariate xts object.}

@@ -21,11 +21,12 @@
 #' @importFrom zoo as.zoo
 #' @keywords internal
 .hatreturn <- function(pdata, kn) {
+  
   rdata <- as.zoo(makeReturns(pdata))
   kn <- as.numeric(kn)
   if (kn == 1) {
     hatre <- rdata
-  } else{
+  } else {
     x <- (1:(kn-1)) / kn
     x[x > (1-x)] <- (1-x)[x > (1-x)]
     weightedsum <- function(series){

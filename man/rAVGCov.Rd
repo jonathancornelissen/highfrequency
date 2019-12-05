@@ -4,8 +4,13 @@
 \alias{rAVGCov}
 \title{Realized Covariance: Average Subsample}
 \usage{
-rAVGCov(rdata, cor = FALSE, align.by = "minutes", align.period = 5,
-  makeReturns = FALSE)
+rAVGCov(
+  rdata,
+  cor = FALSE,
+  align.by = "minutes",
+  align.period = 5,
+  makeReturns = FALSE
+)
 }
 \arguments{
 \item{rdata}{a \eqn{(M x N)} matrix/zoo/xts object containing the \eqn{N}

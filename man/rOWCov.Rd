@@ -4,9 +4,17 @@
 \alias{rOWCov}
 \title{Realized Outlyingness Weighted Covariance}
 \usage{
-rOWCov(rdata, cor = FALSE, align.by = NULL, align.period = NULL,
-  makeReturns = FALSE, seasadjR = NULL, wfunction = "HR",
-  alphaMCD = 0.75, alpha = 0.001)
+rOWCov(
+  rdata,
+  cor = FALSE,
+  align.by = NULL,
+  align.period = NULL,
+  makeReturns = FALSE,
+  seasadjR = NULL,
+  wfunction = "HR",
+  alphaMCD = 0.75,
+  alpha = 0.001
+)
 }
 \arguments{
 \item{rdata}{a \eqn{(M x N)} matrix/zoo/xts object containing the \eqn{N}

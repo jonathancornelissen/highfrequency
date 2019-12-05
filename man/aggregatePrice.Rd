@@ -4,8 +4,15 @@
 \alias{aggregatePrice}
 \title{Aggregate a time series but keep first and last observation}
 \usage{
-aggregatePrice(pdata, on = "minutes", k = 1, marketopen = "09:30:00",
-  marketclose = "16:00:00", fill = FALSE, tz = NULL)
+aggregatePrice(
+  pdata,
+  on = "minutes",
+  k = 1,
+  marketopen = "09:30:00",
+  marketclose = "16:00:00",
+  fill = FALSE,
+  tz = NULL
+)
 }
 \arguments{
 \item{pdata}{data.table or xts object to be aggregated containing the intraday price series, possibly across multiple days.}

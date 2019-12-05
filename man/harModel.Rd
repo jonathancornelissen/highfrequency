@@ -4,11 +4,21 @@
 \alias{harModel}
 \title{HAR model estimation (Heterogeneous Autoregressive model for Realized volatility)}
 \usage{
-harModel(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22),
-  periodsQ = c(1), leverage = NULL, RVest = c("rCov", "rBPCov",
-  "rQuar"), type = "HARRV", inputType = "RM",
-  jumptest = "ABDJumptest", alpha = 0.05, h = 1, transform = NULL,
-  ...)
+harModel(
+  data,
+  periods = c(1, 5, 22),
+  periodsJ = c(1, 5, 22),
+  periodsQ = c(1),
+  leverage = NULL,
+  RVest = c("rCov", "rBPCov", "rQuar"),
+  type = "HARRV",
+  inputType = "RM",
+  jumptest = "ABDJumptest",
+  alpha = 0.05,
+  h = 1,
+  transform = NULL,
+  ...
+)
 }
 \arguments{
 \item{data}{an xts object containing either: intra-day (log-)returns or realized measures already computed from such returns. In case more than one realized measure is needed, the object should have the as many columns as realized measures needed.}

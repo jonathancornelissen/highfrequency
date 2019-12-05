@@ -4,8 +4,7 @@
 \alias{rQuar}
 \title{Realized quarticity of highfrequency return series.}
 \usage{
-rQuar(rdata, align.by = NULL, align.period = NULL,
-  makeReturns = FALSE)
+rQuar(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE)
 }
 \arguments{
 \item{rdata}{a zoo/xts object containing all returns in period t for one asset.}

@@ -4,9 +4,16 @@
 \alias{rKernelCov}
 \title{Realized Covariance: Kernel}
 \usage{
-rKernelCov(rdata, cor = FALSE, align.by = "seconds",
-  align.period = 1, makeReturns = FALSE, kernel.type = "rectangular",
-  kernel.param = 1, kernel.dofadj = TRUE)
+rKernelCov(
+  rdata,
+  cor = FALSE,
+  align.by = "seconds",
+  align.period = 1,
+  makeReturns = FALSE,
+  kernel.type = "rectangular",
+  kernel.param = 1,
+  kernel.dofadj = TRUE
+)
 }
 \arguments{
 \item{rdata}{a \eqn{(M x N)} matrix/zoo/xts object containing the \eqn{N}

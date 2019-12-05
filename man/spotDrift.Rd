@@ -4,8 +4,16 @@
 \alias{spotDrift}
 \title{Spot Drift Estimation}
 \usage{
-spotDrift(data, method = "driftMean", ..., on = "minutes", k = 5,
-  marketopen = "09:30:00", marketclose = "16:00:00", tz = "GMT")
+spotDrift(
+  data,
+  method = "driftMean",
+  ...,
+  on = "minutes",
+  k = 5,
+  marketopen = "09:30:00",
+  marketclose = "16:00:00",
+  tz = "GMT"
+)
 }
 \arguments{
 \item{data}{Can be one of two input types, \code{xts} or \code{data.table}. It is assumed that the input comprises prices in levels.}

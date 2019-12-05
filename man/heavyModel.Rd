@@ -4,9 +4,16 @@
 \alias{heavyModel}
 \title{HEAVY Model estimation}
 \usage{
-heavyModel(data, p = matrix(c(0, 0, 1, 1), ncol = 2), q = matrix(c(1,
-  0, 0, 1), ncol = 2), startingvalues = NULL, LB = NULL, UB = NULL,
-  backcast = NULL, compconst = FALSE)
+heavyModel(
+  data,
+  p = matrix(c(0, 0, 1, 1), ncol = 2),
+  q = matrix(c(1, 0, 0, 1), ncol = 2),
+  startingvalues = NULL,
+  LB = NULL,
+  UB = NULL,
+  backcast = NULL,
+  compconst = FALSE
+)
 }
 \arguments{
 \item{data}{a (T x K) matrix containing the data, with T the number of days. For the traditional HEAVY model: K = 2, the first column contains the squared daily demeaned returns, the second column contains the realized measures.}

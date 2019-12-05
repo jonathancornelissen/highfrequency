@@ -4,8 +4,14 @@
 \alias{aggregateTrades}
 \title{Aggregate a data.table or xts object containing trades data}
 \usage{
-aggregateTrades(tdata, on = "minutes", k = 5,
-  marketopen = "09:30:00", marketclose = "16:00:00", tz = "GMT")
+aggregateTrades(
+  tdata,
+  on = "minutes",
+  k = 5,
+  marketopen = "09:30:00",
+  marketclose = "16:00:00",
+  tz = "GMT"
+)
 }
 \arguments{
 \item{tdata}{data.table or xts object to be aggregated, containing the intraday price series of a stock for possibly multiple days.}

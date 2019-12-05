@@ -4,8 +4,16 @@
 \alias{spotvol}
 \title{Spot volatility estimation}
 \usage{
-spotvol(data, method = "detper", ..., on = "minutes", k = 5,
-  marketopen = "09:30:00", marketclose = "16:00:00", tz = "GMT")
+spotvol(
+  data,
+  method = "detper",
+  ...,
+  on = "minutes",
+  k = 5,
+  marketopen = "09:30:00",
+  marketclose = "16:00:00",
+  tz = "GMT"
+)
 }
 \arguments{
 \item{data}{Can be one of two input types, \code{xts} or \code{data.table}. It is assumed that the input comprises prices in levels. Irregularly spaced

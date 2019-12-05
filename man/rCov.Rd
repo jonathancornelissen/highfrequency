@@ -4,8 +4,13 @@
 \alias{rCov}
 \title{Realized Covariance}
 \usage{
-rCov(rdata, cor = FALSE, align.by = NULL, align.period = NULL,
-  makeReturns = FALSE)
+rCov(
+  rdata,
+  cor = FALSE,
+  align.by = NULL,
+  align.period = NULL,
+  makeReturns = FALSE
+)
 }
 \arguments{
 \item{rdata}{a \eqn{(M x N)} matrix/zoo/xts object containing the \eqn{N}

@@ -4,8 +4,17 @@
 \alias{rTSCov}
 \title{Two time scale covariance estimation}
 \usage{
-rTSCov(pdata, cor = FALSE, K = 300, J = 1, K_cov = NULL,
-  J_cov = NULL, K_var = NULL, J_var = NULL, makePsd = FALSE)
+rTSCov(
+  pdata,
+  cor = FALSE,
+  K = 300,
+  J = 1,
+  K_cov = NULL,
+  J_cov = NULL,
+  K_var = NULL,
+  J_var = NULL,
+  makePsd = FALSE
+)
 }
 \arguments{
 \item{pdata}{a list. Each list-item i contains an xts object with the intraday price data 

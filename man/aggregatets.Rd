@@ -4,8 +4,14 @@
 \alias{aggregatets}
 \title{Aggregate a time series}
 \usage{
-aggregatets(ts, FUN = "previoustick", on = "minutes", k = 1,
-  weights = NULL, dropna = FALSE)
+aggregatets(
+  ts,
+  FUN = "previoustick",
+  on = "minutes",
+  k = 1,
+  weights = NULL,
+  dropna = FALSE
+)
 }
 \arguments{
 \item{ts}{xts object to aggregate.}

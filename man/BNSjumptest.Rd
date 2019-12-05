@@ -4,9 +4,17 @@
 \alias{BNSjumptest}
 \title{Barndorff-Nielsen and Shephard (2006) tests for the presence of jumps in the price series.}
 \usage{
-BNSjumptest(rdata, IVestimator = "BV", IQestimator = "TP",
-  type = "linear", logtransform = FALSE, max = FALSE,
-  align.by = NULL, align.period = NULL, makeReturns = FALSE)
+BNSjumptest(
+  rdata,
+  IVestimator = "BV",
+  IQestimator = "TP",
+  type = "linear",
+  logtransform = FALSE,
+  max = FALSE,
+  align.by = NULL,
+  align.period = NULL,
+  makeReturns = FALSE
+)
 }
 \arguments{
 \item{rdata}{a zoo/xts object containing all returns in period t for one asset.}
