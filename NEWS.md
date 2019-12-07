@@ -1,5 +1,6 @@
  Changes in version 0.6.2
  - spotvol and spotdrift don not assume naming convention for univariate time series anymore
+ - bug fix tpv and finite sample corrections
  
  Changes in version 0.6.1
  - bug fix for Fedora compilation
