@@ -131,7 +131,7 @@ expect_equal(
 # rTPVar
 expect_equal(
   formatC(rTPVar(sample_tdata$PRICE,align.by ="minutes", align.period = 5, makeReturns = TRUE) * 1000000, digits = 5),
-  "0.0027737"
+  "0.41334"
 )
 
 # rTSCov univariate
@@ -154,7 +154,7 @@ expect_equal(
 # rQPVar
 expect_equal(
   formatC(as.numeric(rQPVar(sample_5minprices_jumps[c('2010-01-04', '2010-01-05'), 1], align.by ="minutes", align.period = 5, makeReturns = TRUE))[1] * 1000000, digits = 5),
-  "1.4635"
+  "115.62"
 )
 
 # rQuar
