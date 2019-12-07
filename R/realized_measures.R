@@ -1831,7 +1831,7 @@ RV <- function(rdata) {
 }
 
 
-#' Realized tri-power variation of highfrequency return series.
+#' Realized tri-power variation estimator of quarticity for a highfrequency return series.
 #' 
 #' @description Function returns the rTPVar, defined in Andersen et al. (2012).
 #'  
@@ -1839,7 +1839,7 @@ RV <- function(rdata) {
 #'  
 #'  Then, the rTPVar is given by
 #'  \deqn{
-#'    \mbox{rTPVar}_{t}=\frac{N}{N-2} \left( 2^{1/3} \frac{\Gamma \left(5/6\right)}{ \Gamma \left(1/2\right)} \right)^{-3} \sum_{i=3}^{N} \mbox({|r_{t,i}|}^{2/3} {|r_{t,i-1}|}^{2/3} {|r_{t,i-2}|}^{2/3})
+#'    \mbox{rTPVar}_{t}=N\frac{N}{N-2} \left\frac{\Gamma \left(0.5\right)}{ 2^{2/3}\Gamma \left(7/6\right)} \right)^{3} \sum_{i=3}^{N} \mbox({|r_{t,i}|}^{4/3} {|r_{t,i-1}|}^{4/3} {|r_{t,i-2}|}^{4/3})
 #'  }
 #'  
 #' @param rdata a zoo/xts object containing all returns in period t for one asset.
@@ -1878,7 +1878,7 @@ rTPVar <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FA
     q      <- as.numeric(rdata)
     q      <- abs(rollapply(q, width = 3, FUN = prod, align = "left"))
     N      <- length(q)+2
-    rTPVar <- N / (N-2) * gamma(1/2)^2/(4*gamma(7/6)^2) * sum(q^(4/3))
+    rTPVar <- N * (N/(N - 2)) * ((gamma(0.5)/(2^(2/3)*gamma( 7/6 ) ))^3) * sum(q^(4/3))
     return(rTPVar)
   }
 }
@@ -1893,7 +1893,7 @@ rTPVar <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FA
 RTQ <- function(rdata) { 
   returns <- as.vector(as.numeric(rdata))
   n <- length(returns)
-  tq <- n * ((2^(2/3) * gamma(7/6) * gamma(1/2)^(-1))^(-3)) *  sum(abs(returns[1:(n - 2)])^(4/3) * abs(returns[2:(n-1)])^(4/3) * abs(returns[3:n])^(4/3))
+  tq <- n * (n/(n-2)) *((2^(2/3) * gamma(7/6) * gamma(1/2)^(-1))^(-3)) *  sum(abs(returns[1:(n - 2)])^(4/3) * abs(returns[2:(n-1)])^(4/3) * abs(returns[3:n])^(4/3))
   return(tq)
 } 
 
@@ -1904,7 +1904,7 @@ RTQ <- function(rdata) {
 #'  
 #'  Then, the rQPVar is given by
 #'  \deqn{
-#'    \mbox{rQPVar}_{t}=\frac{N}{N-3} \left( 2^{1/4} \frac{\Gamma \left(3/4\right)}{ \Gamma \left(1/2\right)} \right)^{-4} \sum_{i=4}^{N} \mbox({|r_{t,i}|}^{1/2} {|r_{t,i-1}|}^{1/2} {|r_{t,i-2}|}^{1/2} {|r_{t,i-3}|}^{1/2})
+#'    \mbox{rQPVar}_{t}=N*\frac{N}{N-3} \frac{\pi^2}{4} \right)^{-4} \mbox({|r_{t,i}|} {|r_{t,i-1}|} {|r_{t,i-2}|} {|r_{t,i-3}|})
 #'  }
 #'
 #' @param rdata a zoo/xts object containing all returns in period t for one asset.
@@ -1937,10 +1937,10 @@ rQPVar <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FA
     if (makeReturns) {
       rdata <- makeReturns(rdata)
     }
-    q      <- as.numeric(rdata)
-    q      <- abs(rollapply(q, width = 4, FUN = prod, align = "left"))
+    q      <- abs(as.numeric(rdata))
+    q      <- rollapply(q, width = 4, FUN = prod, align = "left")
     N      <- length(q) + 3
-    rQPVar <- N / (N-3) * pi^2 / 4 * sum(q)
+    rQPVar <- N* (N / (N-3)) * (pi^2 / 4) * sum(q)
     return(rQPVar)
   }
 }
