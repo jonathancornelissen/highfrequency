@@ -4,10 +4,19 @@
 \alias{quotesCleanup}
 \title{Cleans quote data}
 \usage{
-quotesCleanup(datasource = NULL, datadestination = NULL, exchanges,
-  qdataraw = NULL, report = TRUE, selection = "median", maxi = 50,
-  window = 50, type = "advanced", rmoutliersmaxi = 10,
-  saveasxts = TRUE)
+quotesCleanup(
+  datasource = NULL,
+  datadestination = NULL,
+  exchanges,
+  qdataraw = NULL,
+  report = TRUE,
+  selection = "median",
+  maxi = 50,
+  window = 50,
+  type = "advanced",
+  rmoutliersmaxi = 10,
+  saveasxts = TRUE
+)
 }
 \arguments{
 \item{datasource}{character indicating the folder in which the original data is stored.}

@@ -48,7 +48,11 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
   PRICE = DATE = RETURN = DT = NULL
 
   if ("PRICE" %in% colnames(data) == FALSE) {
-    stop("data.table or xts needs column named PRICE.")
+    if (dim(data)[2] == 1) {
+      names(data) <- "PRICE"
+    } else {
+      stop("data.table or xts needs column named PRICE.")
+    }
   }
 
   dummy_was_xts <- FALSE
@@ -430,7 +434,11 @@ spotvol <- function(data, method = "detper", ..., on = "minutes", k = 5,
   PRICE = DATE = RETURN = DT = NULL
   
   if ("PRICE" %in% colnames(data) == FALSE) {
-    stop("data.table or xts needs column named PRICE.")
+    if (dim(data)[2] == 1) {
+      names(data) <- "PRICE"
+    } else {
+      stop("data.table or xts needs column named PRICE.")
+    }
   }
   
   dummy_was_xts <- FALSE

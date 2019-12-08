@@ -4,8 +4,7 @@
 \alias{medRQ}
 \title{An estimator of integrated quarticity from applying the median operator on blocks of three returns.}
 \usage{
-medRQ(rdata, align.by = NULL, align.period = NULL,
-  makeReturns = FALSE)
+medRQ(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE)
 }
 \arguments{
 \item{rdata}{a zoo/xts object containing all returns in period t for one asset.}

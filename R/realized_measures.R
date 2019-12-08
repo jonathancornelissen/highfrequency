@@ -309,7 +309,7 @@ MRC <- function(pdata, pairwise = FALSE, makePsd = FALSE) {
     n <- length(pdata)
   }
   if (n == 1) {
-    multixts = multixts(pdata);
+    multixts <- multixts(pdata)
     if (multixts == TRUE) {
       stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")
     }
@@ -317,14 +317,14 @@ MRC <- function(pdata, pairwise = FALSE, makePsd = FALSE) {
   }
   
   if (n > 1) {
-    multixts <- multixts(pdata[[1]]);
+    multixts <- multixts(pdata[[1]])
     if (multixts == TRUE) {
       stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")
     }
     
     if (pairwise == TRUE) {
       cov <- matrix(rep(0, n * n), ncol = n)
-      diagonal = c()
+      diagonal <- c()
       for (i in 1:n) {
         diagonal[i] <- .crv(pdata[[i]])
       }

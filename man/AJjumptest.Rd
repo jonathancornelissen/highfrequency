@@ -4,9 +4,16 @@
 \alias{AJjumptest}
 \title{Ait-Sahalia and Jacod (2009) tests for the presence of jumps in the price series.}
 \usage{
-AJjumptest(pdata, p = 4, k = 2, align.by = NULL,
-  align.period = NULL, alpha.multiplier = 4, makeReturns = FALSE,
-  ...)
+AJjumptest(
+  pdata,
+  p = 4,
+  k = 2,
+  align.by = NULL,
+  align.period = NULL,
+  alpha.multiplier = 4,
+  makeReturns = FALSE,
+  ...
+)
 }
 \arguments{
 \item{pdata}{a zoo/xts object containing all prices in period t for one asset.}

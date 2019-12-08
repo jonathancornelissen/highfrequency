@@ -4,9 +4,16 @@
 \alias{ivInference}
 \title{Function returns the value, the standard error and the confidence band of the integrated variance (IV) estimator.}
 \usage{
-ivInference(rdata, IVestimator = "RV", IQestimator = "rQuar",
-  confidence = 0.95, align.by = NULL, align.period = NULL,
-  makeReturns = FALSE, ...)
+ivInference(
+  rdata,
+  IVestimator = "RV",
+  IQestimator = "rQuar",
+  confidence = 0.95,
+  align.by = NULL,
+  align.period = NULL,
+  makeReturns = FALSE,
+  ...
+)
 }
 \arguments{
 \item{rdata}{zoo/xts object containing all returns in period t for one asset.}

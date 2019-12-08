@@ -4,8 +4,13 @@
 \alias{rBeta}
 \title{Realized beta: a tool in measuring risk with respect to the market.}
 \usage{
-rBeta(rdata, rindex, RCOVestimator = "rCov", RVestimator = "RV",
-  makeReturns = FALSE)
+rBeta(
+  rdata,
+  rindex,
+  RCOVestimator = "rCov",
+  RVestimator = "RV",
+  makeReturns = FALSE
+)
 }
 \arguments{
 \item{rdata}{a zoo/xts object containing all returns in period t for one asset.}

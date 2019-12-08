@@ -4,8 +4,7 @@
 \alias{minRQ}
 \title{An estimator of integrated quarticity from applying the minimum operator on blocks of two returns.}
 \usage{
-minRQ(rdata, align.by = NULL, align.period = NULL,
-  makeReturns = FALSE)
+minRQ(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE)
 }
 \arguments{
 \item{rdata}{a zoo/xts object containing all returns in period t for one asset.}

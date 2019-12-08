@@ -4,8 +4,7 @@
 \alias{minRV}
 \title{minRV}
 \usage{
-minRV(rdata, align.by = NULL, align.period = NULL,
-  makeReturns = FALSE)
+minRV(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE)
 }
 \arguments{
 \item{rdata}{a zoo/xts object containing all returns in period t for one asset.}

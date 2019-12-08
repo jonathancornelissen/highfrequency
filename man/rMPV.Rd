@@ -4,8 +4,14 @@
 \alias{rMPV}
 \title{Realized multipower variation (MPV), an estimator of integrated power variation.}
 \usage{
-rMPV(rdata, m = 2, p = 2, align.by = NULL, align.period = NULL,
-  makeReturns = FALSE)
+rMPV(
+  rdata,
+  m = 2,
+  p = 2,
+  align.by = NULL,
+  align.period = NULL,
+  makeReturns = FALSE
+)
 }
 \arguments{
 \item{rdata}{a zoo/xts object containing all returns in period t for one asset.}

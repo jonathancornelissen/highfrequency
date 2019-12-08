@@ -4,9 +4,20 @@
 \alias{rRTSCov}
 \title{Robust two time scale covariance estimation}
 \usage{
-rRTSCov(pdata, cor = FALSE, startIV = NULL, noisevar = NULL,
-  K = 300, J = 1, K_cov = NULL, J_cov = NULL, K_var = NULL,
-  J_var = NULL, eta = 9, makePsd = FALSE)
+rRTSCov(
+  pdata,
+  cor = FALSE,
+  startIV = NULL,
+  noisevar = NULL,
+  K = 300,
+  J = 1,
+  K_cov = NULL,
+  J_cov = NULL,
+  K_var = NULL,
+  J_var = NULL,
+  eta = 9,
+  makePsd = FALSE
+)
 }
 \arguments{
 \item{pdata}{a list. Each list-item i contains an xts object with the intraday price data 

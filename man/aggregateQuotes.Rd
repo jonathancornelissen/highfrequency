@@ -4,8 +4,14 @@
 \alias{aggregateQuotes}
 \title{Aggregate a data.table or xts object containing quote data}
 \usage{
-aggregateQuotes(qdata, on = "minutes", k = 5,
-  marketopen = "09:30:00", marketclose = "16:00:00", tz = "GMT")
+aggregateQuotes(
+  qdata,
+  on = "minutes",
+  k = 5,
+  marketopen = "09:30:00",
+  marketclose = "16:00:00",
+  tz = "GMT"
+)
 }
 \arguments{
 \item{qdata}{data.table or xts object to be aggregated, containing the intraday quote data of a stock for one day.}

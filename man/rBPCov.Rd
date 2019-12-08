@@ -4,8 +4,14 @@
 \alias{rBPCov}
 \title{Realized BiPower Covariance}
 \usage{
-rBPCov(rdata, cor = FALSE, align.by = NULL, align.period = NULL,
-  makeReturns = FALSE, makePsd = FALSE)
+rBPCov(
+  rdata,
+  cor = FALSE,
+  align.by = NULL,
+  align.period = NULL,
+  makeReturns = FALSE,
+  makePsd = FALSE
+)
 }
 \arguments{
 \item{rdata}{a \eqn{(M x N)} matrix/zoo/xts object containing the \eqn{N}

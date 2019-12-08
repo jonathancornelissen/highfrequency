@@ -4,8 +4,7 @@
 \alias{rTPVar}
 \title{Realized tri-power variation of highfrequency return series.}
 \usage{
-rTPVar(rdata, align.by = NULL, align.period = NULL,
-  makeReturns = FALSE)
+rTPVar(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE)
 }
 \arguments{
 \item{rdata}{a zoo/xts object containing all returns in period t for one asset.}

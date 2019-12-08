@@ -4,9 +4,15 @@
 \alias{tradesCleanup}
 \title{Cleans trade data}
 \usage{
-tradesCleanup(datasource = NULL, datadestination = NULL, exchanges,
-  tdataraw = NULL, report = TRUE, selection = "median",
-  saveasxts = TRUE)
+tradesCleanup(
+  datasource = NULL,
+  datadestination = NULL,
+  exchanges,
+  tdataraw = NULL,
+  report = TRUE,
+  selection = "median",
+  saveasxts = TRUE
+)
 }
 \arguments{
 \item{datasource}{character indicating the folder in which the original data is stored.}

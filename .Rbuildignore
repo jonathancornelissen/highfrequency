@@ -1,6 +1,5 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
-news.txt
 readme.md
 notes.R
 ^\.travis\.yml$
