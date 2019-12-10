@@ -2,7 +2,7 @@
 % Please edit documentation in R/realized_measures.R
 \name{rTPVar}
 \alias{rTPVar}
-\title{Realized tri-power variation of highfrequency return series.}
+\title{Realized tri-power variation estimator of quarticity for a highfrequency return series.}
 \usage{
 rTPVar(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE)
 }
@@ -25,7 +25,7 @@ Function returns the rTPVar, defined in Andersen et al. (2012).
  
  Then, the rTPVar is given by
  \deqn{
-   \mbox{rTPVar}_{t}=\frac{N}{N-2} \left( 2^{1/3} \frac{\Gamma \left(5/6\right)}{ \Gamma \left(1/2\right)} \right)^{-3} \sum_{i=3}^{N} \mbox({|r_{t,i}|}^{2/3} {|r_{t,i-1}|}^{2/3} {|r_{t,i-2}|}^{2/3})
+   \mbox{rTPVar}_{t}=N\frac{N}{N-2} \left\frac{\Gamma \left(0.5\right)}{ 2^{2/3}\Gamma \left(7/6\right)} \right)^{3} \sum_{i=3}^{N} \mbox({|r_{t,i}|}^{4/3} {|r_{t,i-1}|}^{4/3} {|r_{t,i-2}|}^{4/3})
  }
 }
 \examples{
