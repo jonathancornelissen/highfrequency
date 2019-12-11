@@ -23,8 +23,8 @@ quotesCleanup(
 
 \item{datadestination}{character indicating the folder in which the cleaned data is stored.}
 
-\item{exchanges}{vector of stock exchange symbols for all tickers in vector "ticker". It thus should have the same length as the vector ticker.
-Only data from one single exchange will be retained for each stock respectively, e.g. exchanges = c("T","N").
+\item{exchanges}{vector of stock exchange symbols for all data in datasource, 
+e.g. exchanges = c("T","N") retrieves all stock market data from both NYSE and NASDAQ.
 The possible exchange symbols are:
 \itemize{
 \item A: AMEX
