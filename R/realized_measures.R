@@ -1839,7 +1839,7 @@ RV <- function(rdata) {
 #'  
 #'  Then, the rTPVar is given by
 #'  \deqn{
-#'    \mbox{rTPVar}_{t}=N\frac{N}{N-2} \left\frac{\Gamma \left(0.5\right)}{ 2^{2/3}\Gamma \left(7/6\right)} \right)^{3} \sum_{i=3}^{N} \mbox({|r_{t,i}|}^{4/3} {|r_{t,i-1}|}^{4/3} {|r_{t,i-2}|}^{4/3})
+#'    \mbox{rTPVar}_{t}=N\frac{N}{N-2} \left(\frac{\Gamma \left(0.5\right)}{ 2^{2/3}\Gamma \left(7/6\right)} \right)^{3} \sum_{i=3}^{N} \mbox({|r_{t,i}|}^{4/3} {|r_{t,i-1}|}^{4/3} {|r_{t,i-2}|}^{4/3})
 #'  }
 #'  
 #' @param rdata a zoo/xts object containing all returns in period t for one asset.
