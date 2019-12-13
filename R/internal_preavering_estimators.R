@@ -18,11 +18,10 @@
   return(crv)
 }
 
-#' @importFrom zoo as.zoo
 #' @keywords internal
 .hatreturn <- function(pdata, kn) {
-  
-  rdata <- as.zoo(makeReturns(pdata))
+  rdata <- makeReturns(pdata)
+  class(rdata) <- "zoo"
   kn <- as.numeric(kn)
   if (kn == 1) {
     hatre <- rdata
