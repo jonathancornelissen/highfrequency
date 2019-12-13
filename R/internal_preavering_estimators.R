@@ -32,7 +32,9 @@
       return(sum(x * series))
     }
     hatre <- rollapply(rdata, width = kn - 1, FUN = weightedsum, align = "left")
-    hatre[is.na(hatre)] <- rdata[is.na(hatre)]
+    if (sum(is.na(hatre)) > 0) {
+      hatre[is.na(hatre)] <- rdata[is.na(hatre)]
+    }
   }
   return(hatre)
 }

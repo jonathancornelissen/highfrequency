@@ -2,13 +2,26 @@ Package: highfrequency
 Version: 0.6.2
 Date: 2019-12-13
 Title: Tools for Highfrequency Data Analysis
-Authors@R: c(person("Kris", "Boudt", role = c("aut", "cre"),
-                     email = "kris.boudt@ugent.be", comment = c(ORCID = "0000-0002-1000-5142")),
-             person("Jonathan", "Cornelissen", role = c("aut")),
-             person("Scott", "Payseur", role = c("aut"),
-                    email = "Scott.Payseur@gmail.com"),
-             person("Giang", "Nguyen", role = c("ctb")),
-             person("Onno", "Kleen", role = c("aut"), comment = c(ORCID = "0000-0003-4731-4640")))
+Authors@R: 
+    c(person(given = "Kris",
+             family = "Boudt",
+             role = c("aut", "cre"),
+             email = "kris.boudt@ugent.be",
+             comment = c(ORCID = "0000-0002-1000-5142")),
+      person(given = "Jonathan",
+             family = "Cornelissen",
+             role = "aut"),
+      person(given = "Scott",
+             family = "Payseur",
+             role = "aut",
+             email = "Scott.Payseur@gmail.com"),
+      person(given = "Giang",
+             family = "Nguyen",
+             role = "ctb"),
+      person(given = "Onno",
+             family = "Kleen",
+             role = "aut",
+             comment = c(ORCID = "0000-0003-4731-4640")))
 Maintainer: Kris Boudt
     <kris.boudt@ugent.be>
 Description: Provide functionality to manage, clean and match highfrequency
