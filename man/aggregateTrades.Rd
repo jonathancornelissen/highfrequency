@@ -32,8 +32,7 @@ An data.table or xts object containing the aggregated time series.
 }
 \description{
 Function returns new time series as a data.table or xts object where first observation is always the opening price
-and subsequent observations are the closing prices over the interval with as endpoint the timestamp 
-of the result.
+and subsequent observations are the closing prices over the interval.
 }
 \details{
 The timestamps of the new time series are the closing times and/or days of the intervals. 

@@ -18,11 +18,10 @@
   return(crv)
 }
 
-#' @importFrom zoo as.zoo
 #' @keywords internal
 .hatreturn <- function(pdata, kn) {
-  
-  rdata <- as.zoo(makeReturns(pdata))
+  rdata <- makeReturns(pdata)
+  class(rdata) <- "zoo"
   kn <- as.numeric(kn)
   if (kn == 1) {
     hatre <- rdata
@@ -33,7 +32,9 @@
       return(sum(x * series))
     }
     hatre <- rollapply(rdata, width = kn - 1, FUN = weightedsum, align = "left")
-    hatre[is.na(hatre)] <- rdata[is.na(hatre)]
+    if (sum(is.na(hatre)) > 0) {
+      hatre[is.na(hatre)] <- rdata[is.na(hatre)]
+    }
   }
   return(hatre)
 }

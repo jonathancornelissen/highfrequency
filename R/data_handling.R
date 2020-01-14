@@ -392,8 +392,7 @@ aggregateQuotes <- function(qdata, on = "minutes", k = 5, marketopen = "09:30:00
 #' Aggregate a data.table or xts object containing trades data
 #' 
 #' @description Function returns new time series as a data.table or xts object where first observation is always the opening price
-#' and subsequent observations are the closing prices over the interval with as endpoint the timestamp 
-#' of the result.
+#' and subsequent observations are the closing prices over the interval.
 #' 
 #' @param tdata data.table or xts object to be aggregated, containing the intraday price series of a stock for possibly multiple days.
 #' @param on character, indicating the time scale in which "k" is expressed. Possible values are: "secs", "seconds", "mins", "minutes", "hours".
@@ -460,6 +459,7 @@ aggregateTrades <- function(tdata, on = "minutes", k = 5, marketopen = "09:30:00
   tdata[, SIZETPRICE := SIZE * PRICE]
   tdata[, SIZESUM := sum(SIZE), by = "DT_ROUND"]
   tdata[, VWPRICE := sum(SIZETPRICE/SIZESUM), by = "DT_ROUND"]
+  tdata[, SIZE := SIZESUM]
   
   tdata <- tdata[DT == LAST_DT][, DT := DT_ROUND][, c("DT", "SYMBOL", "PRICE", "SIZE", "VWPRICE")]
   
