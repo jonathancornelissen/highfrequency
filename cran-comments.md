@@ -19,5 +19,3 @@ Check: package dependencies, Result: NOTE
   Package in Depends/Imports which should probably only be in LinkingTo: 'RcppArmadillo'
 
 It is actually necessary this way.
-
-New maintainer email address

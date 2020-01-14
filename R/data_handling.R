@@ -460,6 +460,7 @@ aggregateTrades <- function(tdata, on = "minutes", k = 5, marketopen = "09:30:00
   tdata[, SIZETPRICE := SIZE * PRICE]
   tdata[, SIZESUM := sum(SIZE), by = "DT_ROUND"]
   tdata[, VWPRICE := sum(SIZETPRICE/SIZESUM), by = "DT_ROUND"]
+  tdata[, SIZE := SIZESUM]
   
   tdata <- tdata[DT == LAST_DT][, DT := DT_ROUND][, c("DT", "SYMBOL", "PRICE", "SIZE", "VWPRICE")]
   
