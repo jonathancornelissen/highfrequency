@@ -357,7 +357,7 @@ MRC <- function(pdata, pairwise = FALSE, makePsd = FALSE) {
       
       preavreturn <- c()
       for (i in 1:ncol(x)) {
-        preavreturn <- cbind(preavreturn , .hatreturn(x[,i],kn) )
+        preavreturn <- cbind(preavreturn, as.numeric(.hatreturn(x[,i],kn)))
       }
       
       S <- rCov(preavreturn)
