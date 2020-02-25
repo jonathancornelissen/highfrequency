@@ -2,7 +2,7 @@
 % Please edit documentation in R/data_handling.R
 \name{autoSelectExchangeTrades}
 \alias{autoSelectExchangeTrades}
-\title{etain only data from the stock exchange with the highest trading volume}
+\title{Retain only data from the stock exchange with the highest trading volume}
 \usage{
 autoSelectExchangeTrades(tdata)
 }
