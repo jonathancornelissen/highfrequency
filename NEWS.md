@@ -1,6 +1,7 @@
 Changes in version 0.6.4
  - bug fix in refreshTime (affected MRC for n > 2)
  - one additional test for MRC
+ - updated realized library file until end of 2019
 
 Changes in version 0.6.3
  - aggregateTrades size aggregation bug fix
