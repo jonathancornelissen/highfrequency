@@ -29,6 +29,11 @@ expect_equal({
   },
   "0.031718"
 )
+expect_equal({
+  formatC(sum(MRC(list(sample_5minprices_jumps["2010-01-04",1], sample_5minprices_jumps["2010-01-04",2]), pairwise = FALSE, makePsd = TRUE)), digits = 5)
+  },
+  "0.034418"
+)
 
 # rBeta
 expect_equal({

@@ -5,9 +5,9 @@
 
 ## Highfrequency financial data in R
 
-The package is still under development and is distributed without warranty. Currently, it undergoes a major overhaul.
+The package is still under development and is distributed without warranty.
 
-Thanks to report bugs or make suggestions to <kris.boudt@kuleuven.be>.
+Thanks to report bugs or make suggestions to <kris.boudt@ugent.be>.
 
 ## Installation
 CRAN:

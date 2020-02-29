@@ -11,7 +11,7 @@ selectExchange(data, exch = "N")
 The object should have a column "EX", indicating the exchange by its symbol.}
 
 \item{exch}{The (vector of) symbol(s) of the stock exchange(s) that should be selected.
-By default the NYSE is chosen (exch="N"). Other exchange symbols are:
+By default the NYSE is chosen (exch = "N"). Other exchange symbols are:
 \itemize{
 \item A: AMEX
 \item N: NYSE

@@ -313,7 +313,7 @@ MRC <- function(pdata, pairwise = FALSE, makePsd = FALSE) {
     if (multixts == TRUE) {
       stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")
     }
-    mrc <- .crv(pdata)
+    mrc <- crv(pdata)
   }
   
   if (n > 1) {
@@ -326,13 +326,13 @@ MRC <- function(pdata, pairwise = FALSE, makePsd = FALSE) {
       cov <- matrix(rep(0, n * n), ncol = n)
       diagonal <- c()
       for (i in 1:n) {
-        diagonal[i] <- .crv(pdata[[i]])
+        diagonal[i] <- crv(pdata[[i]])
       }
       diag(cov) <- diagonal
       
       for (i in 2:n) {
         for (j in 1:(i - 1)) {
-          cov[i, j] = cov[j, i] = .preav_bi(pdata[[i]], pdata[[j]])
+          cov[i, j] = cov[j, i] = preavbi(pdata[[i]], pdata[[j]])
         }
       }
       
@@ -352,12 +352,12 @@ MRC <- function(pdata, pairwise = FALSE, makePsd = FALSE) {
       psi1 <- 1
       psi2 <- 1 / 12
       
-      psi1kn <- kn * sum((.gfunction((1:kn)/kn) - .gfunction(((1:kn) - 1) / kn))^2 )
-      psi2kn <- 1 / kn * sum(.gfunction((1:kn) / kn)^2)
+      psi1kn <- kn * sum((gfunction((1:kn)/kn) - gfunction(((1:kn) - 1) / kn))^2 )
+      psi2kn <- 1 / kn * sum(gfunction((1:kn) / kn)^2)
       
       preavreturn <- c()
       for (i in 1:ncol(x)) {
-        preavreturn <- cbind(preavreturn , .hatreturn(x[,i],kn) )
+        preavreturn <- cbind(preavreturn, as.numeric(hatreturn(x[,i],kn)))
       }
       
       S <- rCov(preavreturn)

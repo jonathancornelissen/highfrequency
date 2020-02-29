@@ -289,33 +289,33 @@ refreshTime <- function (pdata) {
   if (length(pdata) < 1) {
     stop("pdata should contain at least two time series.")
   }
-  blub <- pdata[[1]]
-  for (i in 1:length(pdata)) {
-    blub <- merge(blub, pdata[[2]])
+  temp <- pdata[[1]]
+  for (i in 2:length(pdata)) {
+    temp <- merge(temp, pdata[[i]])
   }
   
-  blub2 <- xts(matrix(NA, nrow = dim(blub)[1], ncol = dim(blub)[2]), order.by = index(blub))
+  temp2 <- xts(matrix(NA, nrow = dim(temp)[1], ncol = dim(temp)[2]), order.by = index(temp))
   
-  last_values <- as.numeric(blub[1, ])
+  last_values <- as.numeric(temp[1, ])
   
   if (sum(is.na(last_values)) == 0) {
-    blub2[1, ] <- last_values
-    last_values <- rep(NA, times = dim(blub)[2])
+    temp2[1, ] <- last_values
+    last_values <- rep(NA, times = dim(temp)[2])
   }
   
-  for (ii in c(2:dim(blub)[1])) {
+  for (ii in c(2:dim(temp)[1])) {
     if (sum(is.na(last_values)) == 0) {
-      blub2[ii, ] <- last_values
-      last_values <- rep(NA, times = dim(blub)[2])
+      temp2[ii, ] <- last_values
+      last_values <- rep(NA, times = dim(temp)[2])
     }
-    for (jj in c(1:dim(blub)[2])) {
+    for (jj in c(1:dim(temp)[2])) {
       if (is.na(last_values[jj]) == TRUE) {
-        last_values[jj] <- blub[ii,jj]
+        last_values[jj] <- temp[ii,jj]
       }
     }
   }
   
-  return(blub2[!is.na(blub2[, 1])])
+  return(temp2[!is.na(temp2[, 1])])
 }
 
 #' @keywords internal

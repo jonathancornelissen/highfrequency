@@ -470,7 +470,7 @@ aggregateTrades <- function(tdata, on = "minutes", k = 5, marketopen = "09:30:00
   }
 }
 
-#' etain only data from the stock exchange with the highest trading volume
+#' Retain only data from the stock exchange with the highest trading volume
 #' 
 #' @description Function returns a data.table or xts object containing only observations of the 
 #' exchange with the highest value for the variable "SIZE", 
@@ -1545,7 +1545,7 @@ salesCondition <- function(tdata) {
 #' @param data an xts or data.table object containing the time series data. 
 #' The object should have a column "EX", indicating the exchange by its symbol.
 #' @param exch The (vector of) symbol(s) of the stock exchange(s) that should be selected.
-#' By default the NYSE is chosen (exch="N"). Other exchange symbols are:
+#' By default the NYSE is chosen (exch = "N"). Other exchange symbols are:
 #' \itemize{
 #' \item A: AMEX
 #' \item N: NYSE
