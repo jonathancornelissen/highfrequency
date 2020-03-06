@@ -7,7 +7,7 @@
 rmOutliersQuotes(qdata, maxi = 10, window = 50, type = "advanced")
 }
 \arguments{
-\item{qdata}{an data.table or xts object at least containing the columns "BID" and "OFR".}
+\item{qdata}{a data.table or xts object at least containing the columns "BID" and "OFR".}
 
 \item{maxi}{an integer, indicating the maximum number of median absolute deviations allowed.}
 

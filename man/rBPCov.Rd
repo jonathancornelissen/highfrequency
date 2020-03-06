@@ -50,7 +50,7 @@ Function returns the Realized BiPower Covariance (rBPCov),
  \eqn{k}-th component of the return vector \eqn{r_{i,t}}.
 }
 \examples{
-# Realized Bipower Variance/Covariance for CTS aligned   
+# Realized Bipower Variance/Covariance for a price series aligned   
 # at 5 minutes.
  
 # Univariate: 

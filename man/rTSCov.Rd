@@ -85,7 +85,7 @@ By setting the argument makePsd = TRUE, the function \code{\link{makePsd}} is us
 matrix. This function replaces the negative eigenvalues with zeroes.
 }
 \examples{
-# Robust Realized two timescales Variance/Covariance for CTS
+# Robust Realized two timescales Variance/Covariance
 
 # Univariate: 
 rvts <- rTSCov(pdata = sample_tdata$PRICE)
