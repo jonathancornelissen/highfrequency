@@ -762,7 +762,7 @@ rBeta <- function(rdata, rindex, RCOVestimator = "rCov", RVestimator = "RV", mak
 #' @author Jonathan Cornelissen and Kris Boudt
 #' 
 #' @examples 
-#' # Realized Bipower Variance/Covariance for CTS aligned   
+#' # Realized Bipower Variance/Covariance for a price series aligned   
 #' # at 5 minutes.
 #'  
 #' # Univariate: 
@@ -868,7 +868,7 @@ rBPCov <- function(rdata, cor = FALSE, align.by = NULL, align.period = NULL, mak
 #' @author Jonathan Cornelissen and Kris Boudt
 #' 
 #' @examples 
-#' # Realized Variance/Covariance for CTS aligned   
+#' # Realized Variance/Covariance for prices aligned   
 #' # at 5 minutes.
 #' data(sample_tdata)
 #' data(sample_5minprices_jumps)
@@ -1333,7 +1333,7 @@ rMPV <- function(rdata, m = 2, p = 2, align.by = NULL, align.period = NULL, make
 #' @author Jonathan Cornelissen and Kris Boudt
 #' 
 #' @examples 
-#' # Realized Outlyingness Weighted Variance/Covariance for CTS aligned   
+#' # Realized Outlyingness Weighted Variance/Covariance for prices aligned   
 #' # at 5 minutes.
 #' 
 #' # Univariate: 
@@ -2057,7 +2057,7 @@ rQuar <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
 #' @author Jonathan Cornelissen and Kris Boudt
 
 #' @examples 
-#' # Robust Realized two timescales Variance/Covariance for CTS
+#' # Robust Realized two timescales Variance/Covariance
 #' 
 #' # Univariate: 
 #' rvts <- rTSCov(pdata = sample_tdata$PRICE)

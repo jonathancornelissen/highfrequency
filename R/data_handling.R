@@ -27,8 +27,7 @@
 #' the element of the returned series with e.g. timestamp 09:35:00 contains 
 #' the last observation up to that point, excluding the value at 09:35:00 itself.
 #' 
-#' Please Note:
-#' In case an interval is empty, by default an NA is returned.. In case e.g. previous 
+#' Please note: In case an interval is empty, by default an NA is returned.. In case e.g. previous 
 #' tick aggregation it makes sense to fill these NA's by the function \code{na.locf}
 #' (last observation carried forward) from the zoo package.
 #' 
@@ -321,7 +320,7 @@ aggregatePrice <- function(pdata, on = "minutes", k = 1, marketopen = "09:30:00"
 #' @param marketclose the market closing time, by default: marketclose = "16:00:00".
 #' @param tz time zone used, by default: tz = "GMT".
 #' 
-#' @return An data.table or xts object containing the aggregated time series.
+#' @return a data.table or xts object containing the aggregated time series.
 #' 
 #' @details The output "BID" and "OFR" columns are constructed using previous tick aggregation.
 #' 
@@ -329,9 +328,9 @@ aggregatePrice <- function(pdata, on = "minutes", k = 1, marketopen = "09:30:00"
 #' 
 #' The timestamps of the new time series are the closing times of the intervals. 
 #' 
-#' Please Note: Returned objects always contain the first observation (i.e. opening quotes,...).
+#' Please note: Returned objects always contain the first observation (i.e. opening quotes,...).
 #' 
-#' @return A data.table or xts object containing the aggregated quote data.
+#' @return A data.table or an xts object containing the aggregated quote data.
 #' 
 #' @author Jonathan Cornelissen, Kris Boudt and Onno Kleen
 #' @keywords data manipulation
@@ -415,7 +414,7 @@ aggregateQuotes <- function(qdata, on = "minutes", k = 5, marketopen = "09:30:00
 #' the element of the returned series with e.g. timestamp 09:35:00 contains 
 #' the last observation up to that point, including the value at 09:35:00 itself.
 #' 
-#' @return An data.table or xts object containing the aggregated time series.
+#' @return A data.table or xts object containing the aggregated time series.
 #' 
 #' @author Jonathan Cornelissen, Kris Boudt and Onno Kleen.
 #' @keywords data manipulation
@@ -1415,7 +1414,7 @@ rmTradeOutliersUsingQuotes <- function(tdata, qdata) {
 #' day. In case it is zero (which can happen if mid-quotes don't change much), 
 #' the median absolute deviation is taken over a subsample without constant mid-quotes.
 #' 
-#' @param qdata an data.table or xts object at least containing the columns "BID" and "OFR".
+#' @param qdata a data.table or xts object at least containing the columns "BID" and "OFR".
 #' @param maxi an integer, indicating the maximum number of median absolute deviations allowed.
 #' @param window an integer, indicating the time window for which the "outlyingness" is considered.
 #' @param type should be "standard" or "advanced" (see description).
