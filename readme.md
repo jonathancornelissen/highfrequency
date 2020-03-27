@@ -1,6 +1,6 @@
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/highfrequency)](https://cran.r-project.org/package=highfrequency) 
-[![Travis-CI Build Status](https://travis-ci.org/onnokleen/highfrequency.svg?branch=master)](https://travis-ci.org/onnokleen/highfrequency)
-[![Codecov test coverage](https://codecov.io/gh/onnokleen/highfrequency/branch/master/graph/badge.svg)](https://codecov.io/gh/onnokleen/highfrequency?branch=master)
+[![Travis-CI Build Status](https://travis-ci.org/jonathancornelissen/highfrequency.svg?branch=master)](https://travis-ci.org/jonathancornelissen/highfrequency)
+[![Codecov test coverage](https://codecov.io/gh/jonathancornelissen/highfrequency/branch/master/graph/badge.svg)](https://codecov.io/gh/jonathancornelissen/highfrequency?branch=master)
 [![Downloads](https://cranlogs.r-pkg.org/badges/highfrequency)](https://cranlogs.r-pkg.org/badges/highfrequency)
 
 ## Highfrequency financial data in R
