@@ -29,9 +29,9 @@ object to the 5 minute frequency set k = 5 and on = "minutes".}
 \item{tz}{time zone used, by default: tz = "GMT".}
 }
 \value{
-An data.table or xts object containing the aggregated time series.
+a data.table or xts object containing the aggregated time series.
 
-A data.table or xts object containing the aggregated quote data.
+A data.table or an xts object containing the aggregated quote data.
 }
 \description{
 Function returns a data.table or xts object containing the aggregated quote data with columns "SYMBOL", "EX", "BID","BIDSIZ","OFR","OFRSIZ". 
@@ -44,7 +44,7 @@ The variables "BIDSIZ" and "OFRSIZ" are aggregated by taking the sum of the resp
 
 The timestamps of the new time series are the closing times of the intervals. 
 
-Please Note: Returned objects always contain the first observation (i.e. opening quotes,...).
+Please note: Returned objects always contain the first observation (i.e. opening quotes,...).
 }
 \examples{
 # aggregate quote data to the 30 second frequency

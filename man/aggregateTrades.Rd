@@ -28,7 +28,7 @@ object to the 5 minute frequency set k = 5 and on = "minutes".}
 \item{tz}{time zone used, by default: tz = "GMT".}
 }
 \value{
-An data.table or xts object containing the aggregated time series.
+A data.table or xts object containing the aggregated time series.
 }
 \description{
 Function returns new time series as a data.table or xts object where first observation is always the opening price

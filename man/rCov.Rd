@@ -39,7 +39,7 @@ Then, the rCov is given by
  }
 }
 \examples{
-# Realized Variance/Covariance for CTS aligned   
+# Realized Variance/Covariance for prices aligned   
 # at 5 minutes.
 data(sample_tdata)
 data(sample_5minprices_jumps)

@@ -51,8 +51,7 @@ for on = "seconds"/"minutes"/"hours",
 the element of the returned series with e.g. timestamp 09:35:00 contains 
 the last observation up to that point, excluding the value at 09:35:00 itself.
 
-Please Note:
-In case an interval is empty, by default an NA is returned.. In case e.g. previous 
+Please note: In case an interval is empty, by default an NA is returned.. In case e.g. previous 
 tick aggregation it makes sense to fill these NA's by the function \code{na.locf}
 (last observation carried forward) from the zoo package.
 }

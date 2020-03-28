@@ -458,7 +458,7 @@ spotvol <- function(data, method = "detper", ..., on = "minutes", k = 5,
   
   datad <- aggregatePrice(data, on = on, k = k , marketopen = marketopen,
                           marketclose = marketclose, tz = tz, fill = TRUE)
-  datad[, DATE := as.Date(DT, tz = tz(datad))]
+  datad[, DATE := as.Date(DT, tz = tz(datad$DT))]
   setkeyv(datad, "DT")
   datad <- datad[, RETURN := log(PRICE) - shift(log(PRICE), type = "lag"), by = "DATE"][is.na(RETURN) == FALSE]
   rdata <- xts(datad$RETURN, order.by = datad$DT)

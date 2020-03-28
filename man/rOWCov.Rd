@@ -79,7 +79,7 @@ of the series. This means that a potentially large proportion of the returns rec
 a zero weight, due to which the rOWCov can have a low finite sample efficiency in higher dimensions
 }
 \examples{
-# Realized Outlyingness Weighted Variance/Covariance for CTS aligned   
+# Realized Outlyingness Weighted Variance/Covariance for prices aligned   
 # at 5 minutes.
 
 # Univariate: 
