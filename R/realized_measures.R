@@ -409,6 +409,7 @@ MRC <- function(pdata, pairwise = FALSE, makePsd = FALSE) {
 #' @importFrom data.table data.table
 #' @keywords volatility
 #' @export
+#' 
 rAVGCov <- function(rdata, cor = FALSE, align.by = "minutes", align.period = 5, makeReturns = FALSE) {
   
   DT = DT_ROUND = DT_SUBSAMPLE = FIRST_DT = MAXDT = RETURN = RETURN1 = RETURN2 = NULL
@@ -417,7 +418,7 @@ rAVGCov <- function(rdata, cor = FALSE, align.by = "minutes", align.period = 5, 
   if (multixts == TRUE) {
     stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")
   }
-  
+   
   if (is.null(dim(rdata))) {
     n <- 1
   } else {
