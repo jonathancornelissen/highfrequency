@@ -146,6 +146,7 @@ aggregatets <- function (ts, FUN = "previoustick", on = "minutes", k = 1, weight
     newg <- rawg + (secs - rawg %% secs)
     g    <- as.POSIXct(newg, origin = "1970-01-01", tz = "GMT")
     ts3  <- na.locf(merge(ts, zoo(, g)))[as.POSIXct(g, tz = "GMT")]
+    ts3 <- ts3[!duplicated(index(ts3), fromLast = TRUE)]
     return(ts3) 
   }
 }
