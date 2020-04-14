@@ -1132,15 +1132,12 @@ rKernelCov <- function(rdata, cor = FALSE,  align.by = "seconds", align.period =
       }
     }
     if (cor == FALSE) {
-      return(cov)
+      return(makePsd(cov))
     }
     if (cor == TRUE) {
       invsdmatrix <- try(solve(sqrt(diag(diag(cov)))), silent = F)
       if (inherits(invsdmatrix, "try-error") == FALSE) {
         rcor <- invsdmatrix %*% cov %*% invsdmatrix
-        if (makePsd == TRUE) {
-          rcor <- makePsd(rcor)
-        }
         return(rcor)
       }
     }
