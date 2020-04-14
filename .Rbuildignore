@@ -13,3 +13,5 @@ notes.R
 ^cran-comments\.md$
 ^GSoC\.md$
 ^GSoC$
+^doc$
+^Meta$

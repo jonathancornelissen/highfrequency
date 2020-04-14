@@ -34,3 +34,5 @@ R/.DS_Store
 .DS_Store
 CRAN-RELEASE
 tests/testthat/Rplots.pdf
+doc
+Meta

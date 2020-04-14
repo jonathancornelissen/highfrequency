@@ -1,6 +1,6 @@
 Package: highfrequency
-Version: 0.6.4
-Date: 2020-02-25
+Version: 0.6.5
+Date: 2020-04-14
 Title: Tools for Highfrequency Data Analysis
 Authors@R: 
     c(person(given = "Kris",
@@ -31,6 +31,7 @@ Description: Provide functionality to manage, clean and match highfrequency
 License: GPL (>= 2)
 Encoding: UTF-8
 LazyData: true
+URL: https://github.com/jonathancornelissen/highfrequency
 Depends:
     R (>= 3.5.0)
 Imports:
