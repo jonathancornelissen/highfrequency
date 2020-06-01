@@ -996,7 +996,6 @@ rHYCov <- function(rdata, cor = FALSE, period = 1, align.by = "seconds", align.p
     align.period <- getAlignPeriod(align.period, align.by)
     for (i in 2:n) {
       for (j in 1:(i - 1)) {
-        browser()
         cov[i, j] <- 
           sum(pcovcc(
             as.numeric(rdata[,i]),
