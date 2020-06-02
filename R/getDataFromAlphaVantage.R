@@ -26,18 +26,18 @@
 #' @examples
 #' \dontrun{
 #' # Get data for SPY at an interval of 1 minute in the standard xts format.
-#' data = getHFData(symbols = "SPY", apiKey = "yourKey", interval = "1min")
+#' data <- getHFData(symbols = "SPY", apiKey = "yourKey", interval = "1min")
 #' 
 #' # Get data for 3M and Goldman Sachs  at a 5 minute interval in the data.table format. The data.tables will be put in a list.
-#' data = getHFData(symbols = c("MMM", "GS"), interval = "5min", outputType = "DT", apiKey = 'yourKey')
+#' data <- getHFData(symbols = c("MMM", "GS"), interval = "5min", outputType = "DT", apiKey = 'yourKey')
 #' 
 #' # Get data for JPM and Citicorp at a 15 minute interval in the xts format. The xts objects will be put in a list.
-#' data = getHFData(symbols = c("JPM", "C"), interval = "15min", outputType = "xts", apiKey = 'yourKey')
+#' data <- getHFData(symbols = c("JPM", "C"), interval = "15min", outputType = "xts", apiKey = 'yourKey')
 #' }
 #' @export
 
 
-getHFData = function(symbols = NULL, interval = "5min", outputType = "xts", apiKey = NULL, do.sleep = TRUE, ...){
+getHFData <- function(symbols = NULL, interval = "5min", outputType = "xts", apiKey = NULL, do.sleep = TRUE, ...){
   # Check for API key set in quantmod if it is not present, we kindly remind the user to get it.
   if(is.null(getDefaults(getSymbols.av, "api.key")$api.key) & is.null(apiKey)){
     stop("Your AlphaVantage API key is not set in the quantmod package and no API key was provided. 

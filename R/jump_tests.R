@@ -373,3 +373,112 @@ JOjumptest <- function(pdata, power = 4, ...) {
     return(out)
   }
 }
+
+
+####### extraArgs is a list of args I haven't found a name for yet #######
+#' intradayjumptest
+#' @importFrom zoo index
+#' @export
+intradayjumptest <- function(pdata, test.type = "LM", testing.times, window.size, K = 10, alpha = 0.05, extraArgs = list()){
+  
+  ## Make space for data preparation
+
+  ###TODO: make the LM test work over more than one day-
+  
+  
+  # Lee-Mykland needs this - maybe others too
+  test.data <- aggregatets(pdata, on = "minutes", k = window.size)
+  
+    out <- switch (test.type,
+    LM <- LeeMyklandtest(test.data, testing.times, window.size, K, alpha)
+  )
+  
+  return(out)
+  
+  
+}
+
+#' @keyword internal
+LeeMyklandtest <- function(test.data, testing.times, window.size, K, alpha){
+  
+  oldK <- K
+  const <- 0.7978846 # c in formula 10 in the paper
+  Cn <- Sn <- L <- numeric(length(testing.times))
+  betastar <- -log(-log(1-alpha))
+  dateofdata <- as.character(as.Date(index(test.data[1])))
+  
+  # The testing.times can be provided in terms of seconds after midnight. Thus we can easliy construct a seq
+  if(is.numeric(testing.times)){
+    testing.times <- as.POSIXct(testing.times, origin = dateofdata)
+    
+    testing.times <- trimws(gsub(dateofdata, '', testing.times))
+  }
+  
+  
+  for (i in 1:length(testing.times)) {
+    # Here we keep only the data needed for this test.
+    this.data <- test.data[paste0("/", dateofdata, ' ', testing.times[i])]
+
+    
+        # here we check if enough data is available to conduct this test. If not we have to truncate K. 
+    # In the else clause we simply set K to the user selected value such that we only use a 'wrong' K when there is not enough data.
+    # This means that the generalization to more dates should be easier.
+
+    if (K > length(this.data)){
+      # Here it is not possible to construct a test.
+      
+      
+      if(length(this.data) <5){
+        L[i] <- 0
+        Cn[i] <- 0
+        Sn[i] <- 0
+        warning(paste0("Not enough data to test at time ", testing.times[i], " Skipping!\n This happened on test ", i))  
+        # We need to reset K so we can have more than one test fail.
+        K <- oldK
+        next
+      }
+      #browser()
+      warning(paste0("The window K mandates using more data than is available in the data provided\n using less data. This happened on test ", i))
+      K <- length(this.data) -1
+    } 
+    
+    
+    # We can drop the xts attribute so we don't have to use as.numeric multiple times below
+    this.data <- as.numeric(this.data[(length(this.data)-K):length(this.data)])
+    #this.data <- this.data[(length(this.data)-K):length(this.data)]
+    
+    return <- log(this.data[length(this.data)] / this.data[length(this.data) - 1])
+    
+    returns <- diff(log(this.data[-length(this.data)]))
+    n <- length(returns)
+    spotBPV <- 1/(K-2) * sum(abs(returns[1:(n-1)] * returns[2:n]))
+    
+    
+    L[i] <- return/sqrt(spotBPV)
+    # We have Cn and Sn as vectors as the size of these may change.
+    Cn[i] <- sqrt(2 * log(n))/const - (log(pi) + log( log(n) ))/(2 * const*sqrt((2 * log(n))))
+    Sn[i] <- 1/sqrt(const * 2 * log(n)) 
+    
+    K <- oldK  
+    
+  }
+  
+  jumps <- (abs(L) - Cn)/Sn > betastar
+  
+  jumps <- xts(jumps, as.POSIXct(paste(dateofdata, testing.times)))
+  
+  return(list(data = test.data, jumps = jumps, teststatistic = L))
+  
+}
+
+
+
+
+
+
+
+
+
+
+
+
