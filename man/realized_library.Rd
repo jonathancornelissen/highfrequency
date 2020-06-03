@@ -4,7 +4,9 @@
 \name{realized_library}
 \alias{realized_library}
 \title{The realized library from the Oxford-Man Institute of Quantitative Finance}
-\format{data.frame}
+\format{
+data.frame
+}
 \usage{
 realized_library
 }

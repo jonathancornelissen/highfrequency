@@ -4,7 +4,9 @@
 \name{sample_tdata}
 \alias{sample_tdata}
 \title{Sample of cleaned trades for stock XXX for 1 day}
-\format{A large \code{xts} object.}
+\format{
+A large \code{xts} object.
+}
 \usage{
 sample_tdata
 }

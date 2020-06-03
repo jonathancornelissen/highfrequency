@@ -4,7 +4,9 @@
 \name{sample_qdataraw_microseconds}
 \alias{sample_qdataraw_microseconds}
 \title{Sample of raw quotes for stock XXX for 2 days measured in microseconds}
-\format{data.table object}
+\format{
+data.table object
+}
 \usage{
 sample_qdataraw_microseconds
 }

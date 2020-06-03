@@ -4,7 +4,9 @@
 \name{sample_real5minprices}
 \alias{sample_real5minprices}
 \title{Sample of imaginary price data for 61 days}
-\format{xts object}
+\format{
+xts object
+}
 \usage{
 sample_real5minprices
 }

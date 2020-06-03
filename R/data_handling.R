@@ -1731,7 +1731,9 @@ tradesCleanup <- function(datasource = NULL, datadestination = NULL, exchanges, 
 
 #' @export
 tradesCleanupUsingQuotes <- function(from, to, datasource, datadestination, ticker, tdata = NULL, qdata = NULL) {
-  warning("Please use tradesCleanupUsingQuotes instead of tradesCleanupFinal.")
+  
+  ## Deprecated
+  warning("Please use tradesCleanupUsingQuotes instead of tradesCleanupFinal.") 
   tradesCleanupFinal(from, to, datasource, datadestination, ticker, tdata = NULL, qdata = NULL)
 }
 

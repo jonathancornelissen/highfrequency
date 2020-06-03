@@ -4,7 +4,9 @@
 \name{sample_tdataraw_microseconds}
 \alias{sample_tdataraw_microseconds}
 \title{Sample of raw trades for stock XXX for 2 days}
-\format{A data.table object.}
+\format{
+A data.table object.
+}
 \usage{
 sample_tdataraw_microseconds
 }

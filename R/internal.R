@@ -2,6 +2,7 @@
 #' @importFrom stats start end
 #' @keywords internal
 fastTickAgregation <- function (ts, on = "minutes", k = 1, tz = "GMT") {
+  
   if (on == "secs" | on == "seconds") {
     secs <- k
     tby <- paste(k, "sec", sep = " ")
@@ -14,6 +15,7 @@ fastTickAgregation <- function (ts, on = "minutes", k = 1, tz = "GMT") {
     secs <- 3600 * k
     tby <- paste(3600 * k, "sec", sep = " ")
   } 
+  
   g <- base::seq(start(ts), end(ts), by = tby)
   rawg <- as.numeric(as.POSIXct(g, tz = tz))
   newg <- rawg + (secs - rawg %% secs)

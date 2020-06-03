@@ -4,7 +4,9 @@
 \name{sample_qdataraw}
 \alias{sample_qdataraw}
 \title{Sample of raw quotes for stock XXX for 1 day}
-\format{xts object}
+\format{
+xts object
+}
 \usage{
 sample_qdataraw
 }

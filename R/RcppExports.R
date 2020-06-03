@@ -17,6 +17,11 @@ heavy_likelihoodR_ <- function(h, O, A, B, TT, K, pMax, qMax, data, backcast, LB
     .Call(`_highfrequency_heavy_likelihoodR_`, h, O, A, B, TT, K, pMax, qMax, data, backcast, LB, UB, llRM, lls)
 }
 
+#' @keywords internal
+colCumsum <- function(x) {
+    .Call(`_highfrequency_colCumsum`, x)
+}
+
 nsmaller <- function(times, lengths, start, end, max) {
     .Call(`_highfrequency_nsmaller`, times, lengths, start, end, max)
 }

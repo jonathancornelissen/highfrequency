@@ -4,7 +4,9 @@
 \name{sample_returns_5min}
 \alias{sample_returns_5min}
 \title{Sample returns data}
-\format{A large \code{xts} object.}
+\format{
+A large \code{xts} object.
+}
 \usage{
 sample_returns_5min
 }

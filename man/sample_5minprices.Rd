@@ -4,7 +4,9 @@
 \name{sample_5minprices}
 \alias{sample_5minprices}
 \title{Ten artificial time series for the NYSE trading days during January 2010}
-\format{xts object}
+\format{
+xts object
+}
 \usage{
 sample_5minprices
 }

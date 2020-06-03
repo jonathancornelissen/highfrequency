@@ -2,7 +2,7 @@
 % Please edit documentation in R/getDataFromAlphaVantage.R
 \name{getHFData}
 \alias{getHFData}
-\title{getHFData}
+\title{Get high frequency data from Alpha Vantage}
 \usage{
 getHFData(
   symbols = NULL,
@@ -47,11 +47,12 @@ data <- getHFData(symbols = c("MMM", "GS"), interval = "5min", outputType = "DT"
 # Get data for JPM and Citicorp at a 15 minute interval in the xts format. The xts objects will be put in a list.
 data <- getHFData(symbols = c("JPM", "C"), interval = "15min", outputType = "xts", apiKey = 'yourKey')
 }
+
 }
 \seealso{
 The getSymbols.av function in the quantMod package
 }
 \author{
-Emil Sjoerup (wrapper only) Paul Teetor (for quantMods' getSymbols.av)
+Emil Sjørup (wrapper only) Paul Teetor (for quantMods' getSymbols.av)
 }
 \keyword{data}

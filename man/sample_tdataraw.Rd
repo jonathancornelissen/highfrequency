@@ -4,7 +4,9 @@
 \name{sample_tdataraw}
 \alias{sample_tdataraw}
 \title{Sample of raw trades for stock XXX for 1 day}
-\format{A large \code{xts} object.}
+\format{
+A large \code{xts} object.
+}
 \usage{
 sample_tdataraw
 }
