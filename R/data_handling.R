@@ -144,9 +144,14 @@ aggregatets <- function (ts, FUN = "previoustick", on = "minutes", k = 1, weight
     g <- base::seq(start(ts), end(ts), by = tby)
     rawg <- as.numeric(as.POSIXct(g, tz = "GMT"))
     newg <- rawg + (secs - rawg %% secs)
+    ## 
+    if(rawg[length(rawg)] < newg[length(newg)]){
+      newg <- newg[-length(newg)]
+    }
     g    <- as.POSIXct(newg, origin = "1970-01-01", tz = "GMT")
     ts3  <- na.locf(merge(ts, zoo(, g)))[as.POSIXct(g, tz = "GMT")]
     ts3 <- ts3[!duplicated(index(ts3), fromLast = TRUE)]
+    
     return(ts3) 
   }
 }
