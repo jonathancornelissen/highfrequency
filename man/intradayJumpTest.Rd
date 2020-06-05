@@ -5,13 +5,15 @@
 \title{intradayJumpTest}
 \usage{
 intradayJumpTest(
-  pData,
+  pData = NULL,
+  rData = NULL,
   testType = "LM",
   testingTimes,
   windowSize,
   K = 10,
   alpha = 0.05,
-  extraArgs = list()
+  extraArgs = list(),
+  ...
 )
 }
 \description{

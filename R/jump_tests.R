@@ -375,32 +375,156 @@ JOjumptest <- function(pdata, power = 4, ...) {
 }
 
 
+####### extraArgs is a list of args I haven't found a name for yet #######
+
 #' intradayJumpTest
 #' @importFrom zoo index
 #' @export
-####### extraArgs is a list of args I haven't found a name for yet #######
-intradayJumpTest <- function(pData, testType = "LM", testingTimes, windowSize, K = 10, alpha = 0.05, extraArgs = list()){
+
+intradayJumpTest <- function(pData = NULL, rData = NULL, testType = "LM", testingTimes, windowSize, K = 10, alpha = 0.05, extraArgs = list(), ...){
   
   ## Make space for data preparation
-
-  ###TODO: make the LM test work over more than one day-
+  if(ncol(pData) >1 ){
+    print("multiple assets are not supported yet.")
+  }
+  
+  internals <- list(...)
+  if(!("setClass" %in% names(internals))){
+    setClass <- TRUE
+  } else {
+    setClass <- internals[["setClass"]]
+  }
+  
+  internals <- list(...)
+  if(!("returnData" %in% names(internals))){
+    returnData <- TRUE
+  } else {
+    returnData <- internals[["returnData"]]
+  }
   
   
-  # Lee-Mykland needs this - maybe others too
-  testData <- aggregatets(pData, on = "minutes", k = windowSize)
+  if(highfrequency:::checkMultiDays(pData)){
+    
+    dates <- as.character(unique(as.Date(index(pData)))) # We will need to loop over all days in the sample
+    out <- vector(mode = "list", length = 2)
+    names(out) <- c("tests", "information")
+    
+    out[["tests"]] <- vector(mode = "list", length = length(dates))
+    
+    names(out[["tests"]]) <- dates
+    for (date in dates) {
+      ## Conduct the testing day-by-day
+      out[["tests"]][[date]] <- intradayJumpTest(pData[date], testType, testingTimes, windowSize, K, alpha, extraArgs, setClass = FALSE)
+    }
+    out[["information"]] <- list("testType" = testType, "isMultiDay" = TRUE)
+    class(out) <- c("intradayJumpTest", "list")
+    
+  } else {
+    # Lee-Mykland needs this - maybe others too
+    testData <- aggregatets(pData, on = "minutes", k = windowSize)
+    
+    out <- switch (testType,
+      LM = LeeMyklandtest(testData, testingTimes, windowSize, K, alpha)
+    )
+    
+    if(setClass){
+      out <- list("tests" = merge.xts(pData, out), "information" = list("testType" = testType, "isMultiDay" = FALSE))
+      class(out) <- c( "intradayJumpTest", "list")
+    }
+    
+  }
   
-  out <- switch (testType,
-    LM = LeeMyklandtest(testData, testingTimes, windowSize, K, alpha)
-  )
+  
   
   return(out)
   
   
 }
 
+
+#' @importFrom xts addPolygon
+#' @export
+plot.intradayJumpTest <- function(x, ...){
+  #unpack values
+  isMultiday <- x[["information"]][["isMultiDay"]]
+  # Here, we have more than one day
+  if(isMultiday){
+    dates <- names(x[["tests"]])
+    dat <- NULL
+    
+    for (i in 1:length(dates)) {
+      if(is.null(dat)){
+        dat <- x[["tests"]][[i]]  
+      } else {
+        dat <- rbind(dat, x[["tests"]][[i]])
+      }
+    }
+  } else {
+    dat <- x[["tests"]]
+  }
+  
+  # Make the shade to show where we detect jumps
+  
+  
+  testType <- x[["information"]][["testType"]]
+  
+  if(testType == "LM"){
+    testType <- "Lee-Mykland"
+  }
+  
+  if(isMultiday){
+    #####
+    #For loop????
+    #####
+    #Plot the data
+    print("Support for plotting intradayJumpTests when the data spans more than one day is not ready yet.")
+    #return(0)
+    
+    shade <- dat$jumps
+    #shade <- shade + na.omit(lag(shade,-1))
+    shade <- cbind(upper = shade * as.numeric(max(dat$ts, na.rm = TRUE) +1e5), lower = shade * as.numeric(min(dat$ts, na.rm = TRUE)) -1e5)
+    colnames(shade) <- c("upper", "lower")
+    
+    browser()
+    p1 <- plot(na.locf0(dat[, "ts"]), main = paste0("Intraday Jump Test: ", testType), lty = 2, observation.based = TRUE)
+    ## Add shaded region to the plot where we detect jumps
+    
+    foo <- na.omit(shade)
+    foo <- foo[foo$upper!=0]
+    p1 <- addPolygon(foo, on = -1, col = "red", new = TRUE)
+    plot(p1)
+    
+    
+  } else {
+    
+    shade <- dat$jumps
+    #shade <- shade + na.omit(lag(shade,-1))
+    shade <- cbind(upper = shade * as.numeric(max(dat$pData, na.rm = TRUE) +1e5), lower = shade * as.numeric(min(dat$pData, na.rm = TRUE)) -1e5)
+    colnames(shade) <- c("upper", "lower")
+    
+    
+    p1 <- plot(na.locf0(dat[, "pData"]), main = paste0("Intraday Jump Test: ", testType), lty = 2)
+    p1 <- addLegend(legend.loc = 'topleft', legend.names = c("Actual prices", "Sub-sampled prices", "Jump detection zone"), lwd = c(2,2,0), pch=c(NA,NA,15), col =c(1, "blue", 2)) 
+    p1 <- lines(na.locf0(dat$ts), col = "blue", lwd = 2)
+    ## Add shaded region to the plot where we detect jumps
+    shade <- na.omit(shade)
+    p1 <- addPolygon(shade, on = -1, col = 2)
+    plot(p1)
+  }
+  
+  
+  
+  invisible(p1)
+  
+}
+
+
+
+
+
 ###### All the functions under this comment will be moved to internal_jump_tests but for working purposes, I keep them here to have them near where they're used.
 
-
+#' @importFrom xts xts
 #' @keywords internal
 LeeMyklandtest <- function(testData, testingTimes, windowSize, K, alpha){
   
@@ -410,11 +534,10 @@ LeeMyklandtest <- function(testData, testingTimes, windowSize, K, alpha){
   betastar <- -log(-log(1-alpha))
   dateOfData <- as.character(as.Date(index(testData[1])))
   
-  # The testingTimes can be provided in terms of seconds after midnight. Thus we can easliy construct a seq
+  # The testingTimes can be provided in terms of seconds after midnight. 
   if(is.numeric(testingTimes)){
     testingTimes <- as.POSIXct(testingTimes, origin = dateOfData)
-    
-    testingTimes <- trimws(gsub(dateOfData, '', testingTimes))
+    testingTimes <- trimws(gsub(dateOfData, '', testingTimes)) # We only want hours:mins:sec
   }
   
   
@@ -438,7 +561,6 @@ LeeMyklandtest <- function(testData, testingTimes, windowSize, K, alpha){
         K <- oldK
         next
       }
-      #browser()
       warning(paste0("The window K mandates using more data than is available in the data provided\n using less data. This happened on test ", i))
       K <- length(thisData) -1
     } 
@@ -460,19 +582,15 @@ LeeMyklandtest <- function(testData, testingTimes, windowSize, K, alpha){
     Sn[i] <- 1/sqrt(const * 2 * log(n)) 
     
     K <- oldK  
-    
   }
   
   jumps <- (abs(L) - Cn)/Sn > betastar
   
   jumps <- xts(jumps, as.POSIXct(paste(dateOfData, testingTimes)))
-  
-  return(list(data = testData, jumps = jumps, teststatistic = L))
+  out <- merge.xts(testData, merge.xts(jumps, L))
+  return(out)
   
 }
-
-
-
 
 
 
