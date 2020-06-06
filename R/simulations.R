@@ -25,7 +25,7 @@ hfsim.do <- function(hfSimSpec){
   ### Returns coming from mu(t)
   
   driftReturns <- switch(hfSimSpec$driftModel$modelType,
-                         constant = hfSimSpec$driftModel$drift
+                         constant = hfSimSpec$driftModel$drift * 1/nObs
                          )
   
   ### Returns coming from sigma(t)
