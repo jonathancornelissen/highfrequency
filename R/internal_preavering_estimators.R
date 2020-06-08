@@ -42,7 +42,7 @@ hatreturn <- function(pdata, kn) {
 #' @keywords internal
 gfunction <- function(x) {
   # returns the minimum of x and 1-x
-  # whenevr x > 1-x , replace with 1-x
+  # whenever x > 1-x , replace with 1-x
   x[x > (1-x)] <- (1-x)[x > (1-x)]
   return(x)
 }

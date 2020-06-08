@@ -18,24 +18,32 @@ if(FALSE)
   data <- getHFData(symbols = c("MMM", "GS", "SPY"), outputType = "DT")
 
 ####### Simulations #######
-volatilityModel <- list(modelType = "constant burst", variance = 0.2, burstModel = list(burstMultiplier = 3, burstInterval = c(16/32, 17/32)),
+volatilityModel <- list(modelType = "constant", variance = 1, burstModel = list(burstMultiplier = 3, burstInterval = c(16/32, 17/32)),
                         includeDiurnality = FALSE, diurnalModel = list(C = 0.88929198, A = 0.75, B = 0.25, a = 10, b = 10))
 driftModel <- list(modelType = "constant", drift = 0)
 nSeries <- 1
-nDays <- 5
-nObs <- 23400 
+nDays <- 1
+nObs <- 23401
 timeSettings  <- list(tradingStart = 34200, tradingEnd = 57600, origin = "1970-01-01" , sampling = "equidistant")
 discretize <- FALSE
 
-jumpModel  <- list(modelType = "none", jumpComponent = 1 / 5, jumpTime = c(0.25, 0.75)) #includeJumps should be automated in the creation of the spec
+jumpModel  <- list(modelType = "PA", jumpComponent = 1 / 5, jumpTime = c(0.25, 0.75), includeJumps = TRUE) #includeJumps should be automated in the creation of the spec
 
 hfSimSpec <- createHFSimSpec(volatilityModel = volatilityModel, driftModel = driftModel, jumpModel = jumpModel, nDays = nDays, nSeries = nSeries, nObs = nObs)
 sim <- hfsim.do(hfSimSpec)
-
+hatreturn <- highfrequency:::hatreturn
+gfunction <- highfrequency:::gfunction
+theta <- 0.1
+testingTimes <- seq(34200 + 10*300, 57600 - 3600, 300) + 3600
+pData <-  exp(sim$prices)["1970-01-01"]
+plot(pData)
 gc()
 
 rv <- rCov(exp(sim$prices), makeReturns = TRUE, align.by = "secs", align.period = 1)
-bpv  <- rBPCov(exp(sim$prices), makeReturns = TRUE, align.by = "secs", align.period = 1)
+bpv <- rBPCov(exp(sim$prices), makeReturns = TRUE, align.by = "secs", align.period = 1)
+mean((rv-bpv))
+mean(rv) # Converges to the quadratic variation
+mean(bpv) # Converges to the integrated variance
 
 jumpVariation <- matrix(0, nrow = nDays, ncol = nSeries)
 jumpComponent <- 0
@@ -71,7 +79,5 @@ plot(LMtest)
 timestamps <- rep(0:(10-1), each = 23400) * 86400 + seq(34200, 57600, length.out = 23400)
 x <- xts(cumsum(rnorm(23400 * 10) * sqrt(1/23400)), as.POSIXct(timestamps, origin = "1970-01-01"))
 plot(x)
-
-
 
 

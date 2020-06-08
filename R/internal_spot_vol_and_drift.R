@@ -14,7 +14,7 @@ driftKernel <- function(data, intraday, options) {
   k              <- op$PreAverage
   bandwidth      <- op$bandwidth
   iT             <- length(datap)
-  vPreAveraged   <- rep(0 , iT-1)
+  vPreAveraged   <- rep(0 , iT-1) 
   mu             <- numeric(length(intraday))
   mu[1]          <- 0
   vPreAveraged[(k*2-1):(iT-1)] <- filter(x = as.numeric(datap), c(rep(1,k),rep(-1,k)))[k:(iT-k)]

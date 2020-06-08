@@ -380,12 +380,12 @@ JOjumptest <- function(pdata, power = 4, ...) {
 #' intradayJumpTest
 #' @importFrom zoo index
 #' @export
-
-intradayJumpTest <- function(pData = NULL, rData = NULL, testType = "LM", testingTimes, windowSize, K = 10, alpha = 0.05, extraArgs = list(), ...){
+#' PRICES IN LEVELS!!!
+intradayJumpTest <- function(pData = NULL, testType = "LM", testingTimes, windowSize = 5, K = 10, alpha = 0.05, theta = 0.5, extraArgs = list(), ...){
   
   ## Make space for data preparation
   if(ncol(pData) >1 ){
-    print("multiple assets are not supported yet.")
+    print("multiple assets are not supported yet. -> working on it!")
   }
   
   internals <- list(...)
@@ -424,7 +424,8 @@ intradayJumpTest <- function(pData = NULL, rData = NULL, testType = "LM", testin
     testData <- aggregatets(pData, on = "minutes", k = windowSize)
     
     out <- switch (testType,
-      LM = LeeMyklandtest(testData, testingTimes, windowSize, K, alpha)
+      LM = LeeMyklandtest(testData, testingTimes, windowSize, K, alpha),
+      FoF = FoFJumpTest(pData, theta)
     )
     
     if(setClass){
@@ -596,7 +597,97 @@ LeeMyklandtest <- function(testData, testingTimes, windowSize, K, alpha){
 
 
 
+FoFJumpTest <- function(pData, theta, testingTimes){
+  
+  dateOfData <- as.character(as.Date(index(pData[1])))
+  
+  if(is.numeric(testingTimes)){
+    testingTimes <- as.POSIXct(testingTimes, origin = dateOfData)
+    testingTimes <- trimws(gsub(dateOfData, '', testingTimes)) # We only want hours:mins:sec
+  }
+  
+  nObs <- length(pData)
+  
+  ## We need to ensure kn is even, thus we round half and multiply by 2
+  kn <- round(theta * sqrt(nObs))
+  kn <- kn + kn%%2
+  
+  vPreAveraged   <- rep(0 , nObs-1) 
+  vPreAveraged[(kn*2-1):(nObs-1)] <- filter(x = as.numeric(log(pData)), c(rep(1,kn),rep(-1,kn)))[kn:(nObs-kn)]
+  vPreAveraged <- c(0, vPreAveraged)
+  
+  
+  preAveragedReturns <- hatreturn(pData, kn)
+  preAveragedReturns <- xts(preAveragedReturns, as.POSIXct(index(preAveragedReturns), origin = dateOfData))
+  preAveragedReturns <- c(as.numeric(preAveragedReturns), rep(NA, 23400 - length(preAveragedReturns)))
+  nPAObs <- length(preAveragedReturns)
+  
+  psi1kn <- kn * sum((gfunction((1:kn)/kn) - gfunction(( (1:kn) - 1 )/kn ) )^2)
+  
+  psi2kn <- 1 / kn * sum(gfunction((1:kn)/kn)^2)
+  
+  psi2kn <- (1 + (2*kn)^-2)/12
+  returns <- diff(log(pData))
+  omegaHat <- -1/(nObs-1) * sum(returns[2:nObs] * returns[1:(nObs-1)])
+  
+  biasCorrection <- omegaHat^2/theta^2 * psi1kn/psi2kn
+  
+  preAveragedRealizedVariance <- nObs/(nObs - kn + 2) * 1/(kn * psi2kn) * sum(preAveragedReturns^2, na.rm= TRUE) - biasCorrection
+  preAveragedBipowerVariation <- nObs/(nObs - 2*kn + 2) * 1/(kn * psi2kn) * pi/2 * sum(abs(preAveragedReturns[1:(nObs-2*kn)]) * abs(preAveragedReturns[1:(nObs-2*kn) + kn])) - biasCorrection
+  
+  
+  
+  
 
+  L <- sigmaSQ <- numeric(length(testingTimes))
+  
+  for (i in 1:length(testingTimes)) {
+    # Here we keep only the data needed for this test.
+    thisData <- preAveragedReturns[paste0("/", dateOfData, ' ', testingTimes[i])]
+    
+    
+    sigmaSQ[i] <- pi/2 * 1/(M-2)
+    if (K > length(thisData)){
+      # Here it is not possible to construct a test.
+      if(length(thisData) < 5){
+        L[i] <- 0
+        Cn[i] <- 0
+        Sn[i] <- 0
+        warning(paste0("Not enough data to test at time ", testingTimes[i], " Skipping!\n This happened on test ", i))  
+        # We need to reset K so we can have more than one test fail.
+        K <- oldK
+        next
+      }
+      warning(paste0("The window K mandates using more data than is available in the data provided\n using less data. This happened on test ", i))
+      K <- length(thisData) -1
+    } 
+    
+    
+    # We can drop the xts attribute so we don't have to use as.numeric multiple times below
+    thisData <- as.numeric(thisData[(length(thisData)-K):length(thisData)])
+    
+    return <- log(thisData[length(thisData)] / thisData[length(thisData) - 1])
+    
+    returns <- diff(log(thisData[-length(thisData)]))
+    n <- length(returns)
+    spotBPV <- 1/(K-2) * sum(abs(returns[1:(n-1)] * returns[2:n]))
+    
+    
+    L[i] <- return/sqrt(spotBPV)
+    # We have Cn and Sn as vectors as the size of these may change.
+    Cn[i] <- sqrt(2 * log(n))/const - (log(pi) + log( log(n) ))/(2 * const*sqrt((2 * log(n))))
+    Sn[i] <- 1/sqrt(const * 2 * log(n)) 
+    
+    K <- oldK  
+  }
+  
+  
+  
+  
+  
+  
+  
+}
 
 
 

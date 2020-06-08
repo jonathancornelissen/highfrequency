@@ -68,10 +68,11 @@ expect_equal(
 
 # Test edge cases of aggregatets
 expect_equal(index(aggregatets(xts(1:23400, as.POSIXct(seq(34200, 57600, length.out = 23400), origin = '1970-01-01')))),
-                   index(aggregatets(xts(1:23400, as.POSIXct(seq(34200, 57659, length.out = 23400), origin = '1970-01-01'))))
+                   index(aggregatets(xts(1:23400, as.POSIXct(seq(34200, 57599, length.out = 23400), origin = '1970-01-01'))))
 )
 
 expect_true(
   max(index(aggregatets(xts(1:23400, as.POSIXct(seq(34200, 57600, length.out = 23400), origin = '1970-01-01')))))<
   max(index(aggregatets(xts(1:23400, as.POSIXct(seq(34200, 57601, length.out = 23400), origin = '1970-01-01')))))
 )
+

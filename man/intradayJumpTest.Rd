@@ -6,12 +6,12 @@
 \usage{
 intradayJumpTest(
   pData = NULL,
-  rData = NULL,
   testType = "LM",
   testingTimes,
-  windowSize,
+  windowSize = 5,
   K = 10,
   alpha = 0.05,
+  theta = 0.5,
   extraArgs = list(),
   ...
 )
