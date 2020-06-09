@@ -58,7 +58,8 @@ hfsim.do <- function(hfSimSpec){
   if(hfSimSpec$timeSettings$sampling == "equidistant"){
     timestamps <- numeric(ifelse(is.matrix(returns), nrow(returns), length(returns))) # If we have a multivariate output, we will use nrow.
     timestamps <- rep(0:(nDays-1), each = nObs) * 86400 + seq(hfSimSpec$timeSettings$tradingStart, hfSimSpec$timeSettings$tradingEnd, length.out = nObs)
-    out$prices <- xts(colCumsum(returns), as.POSIXct(timestamps, origin = hfSimSpec$timeSettings$origin))  
+    out$prices <- xts(colCumsum(returns), as.POSIXct(timestamps, origin = hfSimSpec$timeSettings$origin))
+    out$jumps <- jumps
   }
   
   return(out)
@@ -252,7 +253,7 @@ createHFSimSpec <- function(volatilityModel = list(modelType = "constant", varia
   # And we set it FALSE if we should not.
   if(jumpModel$modelType != "none" && is.null(jumpModel$includeJumps)){
     jumpModel$includeJumps <- TRUE
-  } else if(jumpModel$modelType == "none" && is.null(jumpModel$includeJumps)){
+  } else if(jumpModel$modelType == "none"){
     jumpModel$includeJumps <- FALSE
   }
   
@@ -434,6 +435,24 @@ FoFVolatilitySim <- function(model, nDays, nSeries, nObs){
   
 }
 
+#' @importFrom data.table between
+#' @keywords internal
+singularityDriftBurst <- function(nObs, drift, driftBurstTimeInterval, alpha, a){
+  driftBurstTimeInterval <- c(0.475, 0.525)
+  timestamps <- 1:nObs/nObs
+  alpha <- 0.3
+  a <- 3
+  drift <- 0
+  drift <- rep(drift, nObs)
+  driftDB <- drift * sign(timestamps - 0.5)/abs(0.5 - timestamps)^alpha
+  drift[between(timestamps, driftBurstTimeInterval[1], driftBurstTimeInterval[2])] <- driftDB[between(timestamps, driftBurstTimeInterval[1], driftBurstTimeInterval[2])]
+  
+  plot.ts(drift)
+  
+  
+}
+
+
 
 
 
@@ -451,3 +470,6 @@ preAnnouncedJumpSim <- function(model, nDays, nSeries, nObs){
   out <- list("jumps" = jumps, "jumpIndices" = jumpIndices)
   return(out)
 }
+
+
+
