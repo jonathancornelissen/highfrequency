@@ -2,7 +2,8 @@
 % Please edit documentation in R/jump_tests.R
 \name{intradayJumpTest}
 \alias{intradayJumpTest}
-\title{intradayJumpTest}
+\title{intradayJumpTest
+PRICES IN LEVELS!!!}
 \usage{
 intradayJumpTest(
   pData = NULL,
@@ -16,6 +17,14 @@ intradayJumpTest(
   ...
 )
 }
+\arguments{
+\item{pData}{the price data in levels. This data can (and should in some cases) be tick-level data}
+
+\item{windowSize}{the size of the window to test for jumps in, in minutes. Not used in the FoF type test.}
+
+\item{K}{In the LM test, K, is the amount of windowSizes to use for estimation of the local variance. In case of the FoF test K will be used as M in eqn: 21 in the paper.}
+}
 \description{
 intradayJumpTest
+PRICES IN LEVELS!!!
 }
