@@ -111,7 +111,7 @@
 
 #' Sample of cleaned quotes for stock XXX for 2 days measured in microseconds
 #' 
-#' @description A data.table object containing the raw quotes for the imaginary stock XXX for 2 days. This is the cleaned version of the data sample \code{\link{sampleQDataRaw_microseconds}}, using \code{quotesCleanup}.
+#' @description A data.table object containing the raw quotes for the imaginary stock XXX for 2 days. This is the cleaned version of the data sample \code{\link{sampleQDataRawMicroseconds}}, using \code{quotesCleanup}.
 #' 
 #' @format data.table object
 #' 
@@ -124,7 +124,7 @@
 #' @format data.table object
 #' 
 #' @keywords datasets
-"sampleQDataRaw_microseconds"
+"sampleQDataRawMicroseconds"
 
 #' Sample returns data
 #' 

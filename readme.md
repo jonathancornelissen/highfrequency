@@ -26,9 +26,9 @@ install_github("https://github.com/jonathancornelissen/highfrequency")
 ```r
 library(highfrequency)
 # Print raw quotes data to console
-sampleQDataRaw_microseconds
+sampleQDataRawMicroseconds
 # Cleanup quotes leaves 46566 out of 464221 observations.
-quotesCleanup(qdataraw = sampleQDataRaw_microseconds, exchanges = "N")
+quotesCleanup(qdataraw = sampleQDataRawMicroseconds, exchanges = "N")
 ```
 
 ## Special thanks

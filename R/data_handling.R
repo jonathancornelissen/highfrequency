@@ -576,7 +576,7 @@ autoSelectExchangeTrades <- function(tdata) {
 #' @return data.table or xts object depending on input
 #' 
 #' @examples 
-#' autoSelectExchangeQuotes(sampleQDataRaw_microseconds)
+#' autoSelectExchangeQuotes(sampleQDataRawMicroseconds)
 #'
 #' @author Jonathan Cornelissen, Kris Boudt and Onno Kleen
 #' 
@@ -885,7 +885,7 @@ mergeQuotesSameTimestamp <- function(qdata, selection = "median") {
       stop("Data.table neeeds DT column (date-time).")
     }
   }
-  # qdata <- sampleQDataRaw_microseconds
+  # qdata <- sampleQDataRawMicroseconds
   # qdata <- checkColumnNames(qdata)
   
   # keep summed size columns
@@ -1136,9 +1136,9 @@ noZeroQuotes <- function(qdata) {
 #' 
 #' @examples
 #' # Consider you have raw quote data for 1 stock for 2 days
-#' head(sampleQDataRaw_microseconds)
-#' dim(sampleQDataRaw_microseconds)
-#' qdata_aftercleaning <- quotesCleanup(qdataraw = sampleQDataRaw_microseconds, exchanges = "N")
+#' head(sampleQDataRawMicroseconds)
+#' dim(sampleQDataRawMicroseconds)
+#' qdata_aftercleaning <- quotesCleanup(qdataraw = sampleQDataRawMicroseconds, exchanges = "N")
 #' qdata_aftercleaning$report
 #' dim(qdata_aftercleaning$qdata)
 #' 
@@ -1287,7 +1287,7 @@ rmLargeSpread <- function(qdata, maxi = 50) {
 #' @author Jonathan Cornelissen, Kris Boudt and Onno Kleen
 #' 
 #' @examples 
-#' rmNegativeSpread(sampleQDataRaw_microseconds)
+#' rmNegativeSpread(sampleQDataRawMicroseconds)
 #' 
 #' @keywords cleaning
 #' @export
@@ -1774,7 +1774,7 @@ tradesCleanupUsingQuotes <- function(from, to, datasource, datadestination, tick
 #' tdata_afterfirstcleaning <- tradesCleanup(tdataraw = sample_tdataraw_microseconds, 
 #'                                           exchanges = "N", report = FALSE)
 #' # 
-#' qdata <- quotesCleanup(qdataraw = sampleQDataRaw_microseconds, 
+#' qdata <- quotesCleanup(qdataraw = sampleQDataRawMicroseconds, 
 #'                        exchanges = "N", report = FALSE)
 #' dim(tdata_afterfirstcleaning)
 #' tdata_afterfinalcleaning <- 

@@ -11,6 +11,6 @@ data.table object
 sampleQDataMicroseconds
 }
 \description{
-A data.table object containing the raw quotes for the imaginary stock XXX for 2 days. This is the cleaned version of the data sample \code{\link{sampleQDataRaw_microseconds}}, using \code{quotesCleanup}.
+A data.table object containing the raw quotes for the imaginary stock XXX for 2 days. This is the cleaned version of the data sample \code{\link{sampleQDataRawMicroseconds}}, using \code{quotesCleanup}.
 }
 \keyword{datasets}

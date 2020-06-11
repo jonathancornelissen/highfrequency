@@ -65,7 +65,7 @@ The highfrequency function also brings a similarly-named function for cleaning q
 - removing quotes that may be seen to be outliers.
 
 ```{r eval = TRUE}
-qdata_cleaned <- quotesCleanup(qdataraw = sampleQDataRaw_microseconds, exchange = "N")
+qdata_cleaned <- quotesCleanup(qdataraw = sampleQDataRawMicroseconds, exchange = "N")
 ```
 
 quotesCleanup also provides a list with two elements, a report and the cleaned data.
