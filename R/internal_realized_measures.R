@@ -261,7 +261,7 @@ rdatacheck <- function (rdata, multi = FALSE) {
 #' The subsequent refresh time is defined as the first time when all stocks have traded again.
 #' This process is repeated untill the end of one time series is reached.
 #' 
-#' @param pdata a list. Each list-item contains an xts object  
+#' @param pData a list. Each list-item contains an xts object  
 #' containing the original time series (one day only and typically a price series).
 #' 
 #' @return An xts object containing the synchronized time series.
@@ -285,13 +285,13 @@ rdatacheck <- function (rdata, multi = FALSE) {
 #' @keywords data manipulation
 #' @importFrom xts as.xts
 #' @export
-refreshTime <- function (pdata) {
-  if (length(pdata) < 1) {
-    stop("pdata should contain at least two time series.")
+refreshTime <- function (pData) {
+  if (length(pData) < 1) {
+    stop("pData should contain at least two time series.")
   }
-  temp <- pdata[[1]]
-  for (i in 2:length(pdata)) {
-    temp <- merge(temp, pdata[[i]])
+  temp <- pData[[1]]
+  for (i in 2:length(pData)) {
+    temp <- merge(temp, pData[[i]])
   }
   
   temp2 <- xts(matrix(NA, nrow = dim(temp)[1], ncol = dim(temp)[2]), order.by = index(temp))
@@ -434,7 +434,7 @@ ROWVar <- function(rdata, seasadjR = NULL, wfunction = "HR" , alphaMCD = 0.75, a
 }
 
 #' @keywords internal
-RTSCov_bi <- function (pdata1, pdata2, startIV1 = NULL, startIV2 = NULL, noisevar1 = NULL, 
+RTSCov_bi <- function (pData1, pData2, startIV1 = NULL, startIV2 = NULL, noisevar1 = NULL, 
                        noisevar2 = NULL, K = 300, J = 1,
                        K_cov = NULL, J_cov = NULL,
                        K_var1 = NULL, K_var2 = NULL,
@@ -462,7 +462,7 @@ RTSCov_bi <- function (pdata1, pdata2, startIV1 = NULL, startIV2 = NULL, noiseva
   
   # Calculation of the noise variance and TSRV for the truncation
   if (is.null(noisevar1) == TRUE) {
-    logprices1 <- log(as.numeric(pdata1))
+    logprices1 <- log(as.numeric(pData1))
     n_var1     <- length(logprices1)
     nbarK_var1 <- (n_var1 - K_var1 + 1)/(K_var1)
     nbarJ_var1 <- (n_var1 - J_var1 + 1)/(J_var1)
@@ -478,11 +478,11 @@ RTSCov_bi <- function (pdata1, pdata2, startIV1 = NULL, startIV2 = NULL, noiseva
       logreturns_J1 <- c(logreturns_J1, diff(logprices1[sel.avg]))
     }   
     if (is.null(noisevar1)) {
-      noisevar1 <- max(0,1/(2 * nbarJ_var1) * (sum(logreturns_J1^2)/J_var1 - TSRV(pdata1,K=K_var1,J=J_var1)))
+      noisevar1 <- max(0,1/(2 * nbarJ_var1) * (sum(logreturns_J1^2)/J_var1 - TSRV(pData1,K=K_var1,J=J_var1)))
     }
   }
   if (is.null(noisevar2)) {
-    logprices2 = log(as.numeric(pdata2))
+    logprices2 = log(as.numeric(pData2))
     n_var2 = length(logprices2)
     nbarK_var2 = (n_var2 - K_var2 + 1)/(K_var2)
     nbarJ_var2 = (n_var2 - J_var2 + 1)/(J_var2)
@@ -497,23 +497,23 @@ RTSCov_bi <- function (pdata1, pdata2, startIV1 = NULL, startIV2 = NULL, noiseva
       sel.avg = seq(j, n_var2, J_var2)
       logreturns_J2 = c(logreturns_J2, diff(logprices2[sel.avg]))
     }        
-    noisevar2 = max(0,1/(2 * nbarJ_var2) * (sum(logreturns_J2^2)/J_var2 - TSRV(pdata2,K=K_var2,J=J_var2)))
+    noisevar2 = max(0,1/(2 * nbarJ_var2) * (sum(logreturns_J2^2)/J_var2 - TSRV(pData2,K=K_var2,J=J_var2)))
   }    
   
   if (!is.null(startIV1)) {
     RTSRV1 = startIV1
   } else {
-    RTSRV1 <- RTSRV(pdata=pdata1, noisevar = noisevar1, K = K_var1, J = J_var1, eta = eta)      
+    RTSRV1 <- RTSRV(pData=pData1, noisevar = noisevar1, K = K_var1, J = J_var1, eta = eta)      
   }
   if (is.null(startIV2) == FALSE) {
     RTSRV2 <- startIV2
   }else{
-    RTSRV2 <- RTSRV(pdata = pdata2, noisevar = noisevar2, K = K_var2, J = J_var2, eta = eta)      
+    RTSRV2 <- RTSRV(pData = pData2, noisevar = noisevar2, K = K_var2, J = J_var2, eta = eta)      
   }
   
   # Refresh time is for the covariance calculation
   
-  x <- refreshTime(list(pdata1, pdata2))
+  x <- refreshTime(list(pData1, pData2))
   newprice1 <- x[, 1]
   newprice2 <- x[, 2]
   logprices1 <- log(as.numeric(newprice1))
@@ -564,14 +564,14 @@ RTSCov_bi <- function (pdata1, pdata2, startIV1 = NULL, startIV2 = NULL, noiseva
 }
 
 #' @keywords internal
-RTSRV <- function(pdata, startIV = NULL, noisevar = NULL, K = 300, J = 1, eta = 9) {
-  logprices <- log(as.numeric(pdata))
+RTSRV <- function(pData, startIV = NULL, noisevar = NULL, K = 300, J = 1, eta = 9) {
+  logprices <- log(as.numeric(pData))
   n <- length(logprices)
   nbarK <- (n - K + 1)/(K)
   nbarJ <- (n - J + 1)/(J)
   adj <- (1 - (nbarK/nbarJ))^-1
   zeta <- 1/pchisq(eta, 3)
-  seconds <- as.numeric(as.POSIXct(index(pdata)))
+  seconds <- as.numeric(as.POSIXct(index(pData)))
   secday <- last(seconds) - first(seconds)
   logreturns_K = vdelta_K = logreturns_J = vdelta_J = c()
   for (k in 1:K) {
@@ -585,7 +585,7 @@ RTSRV <- function(pdata, startIV = NULL, noisevar = NULL, K = 300, J = 1, eta = 
     vdelta_J <- c(vdelta_J, diff(seconds[sel])/secday)
   }
   if (is.null(noisevar)) {
-    noisevar <- max(0,1/(2 * nbarJ) * (sum(logreturns_J^2)/J - TSRV(pdata=pdata,K=K,J=J)))        
+    noisevar <- max(0,1/(2 * nbarJ) * (sum(logreturns_J^2)/J - TSRV(pData=pData,K=K,J=J)))        
   }
   if (!is.null(startIV)) {
     RTSRV <- startIV
@@ -641,8 +641,8 @@ RTSRV <- function(pdata, startIV = NULL, noisevar = NULL, K = 300, J = 1, eta = 
 
 #' @importFrom xts first
 #' @keywords internal
-TSCov_bi <- function (pdata1, pdata2, K = 300, J = 1) {
-  x <- refreshTime(list(pdata1, pdata2))
+TSCov_bi <- function (pData1, pData2, K = 300, J = 1) {
+  x <- refreshTime(list(pData1, pData2))
   newprice1 <- x[, 1]
   newprice2 <- x[, 2]
   logprices1 <- log(as.numeric(newprice1))
@@ -677,9 +677,9 @@ TSCov_bi <- function (pdata1, pdata2, K = 300, J = 1) {
 }
 
 #' @keywords internal
-TSRV <- function(pdata , K = 300 , J = 1) {
+TSRV <- function(pData , K = 300 , J = 1) {
   # based on rv.timescale
-  logprices <- log(as.numeric(pdata))
+  logprices <- log(as.numeric(pData))
   n <- length(logprices) 
   nbarK <- (n - K + 1)/(K) # average number of obs in 1 K-grid
   nbarJ <- (n - J + 1)/(J)

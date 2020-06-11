@@ -27,7 +27,7 @@
   }
 }}
 \usage{
-TSCov_bi(pdata1, pdata2, K = 300, J = 1)
+TSCov_bi(pData1, pData2, K = 300, J = 1)
 }
 \description{
 rvKernel <- function(x,                             # Tick Data

@@ -4,10 +4,10 @@
 \alias{JOjumptest}
 \title{Jiang and Oomen (2008) tests for the presence of jumps in the price series.}
 \usage{
-JOjumptest(pdata, power = 4, ...)
+JOjumptest(pData, power = 4, ...)
 }
 \arguments{
-\item{pdata}{a zoo/xts object containing all prices in period t for one asset.}
+\item{pData}{a zoo/xts object containing all prices in period t for one asset.}
 
 \item{power}{can be chosen among 4 or 6. 4 by default.}
 

@@ -76,12 +76,12 @@ scale <- function (align.by) {
 
 #Function to calculate simple returns#
 #' @keywords internal
-simre <- function (pdata) {
-  l <- dim(pdata)[1]
-  x <- matrix(as.numeric(pdata), nrow = l)
+simre <- function (pData) {
+  l <- dim(pData)[1]
+  x <- matrix(as.numeric(pData), nrow = l)
   x[(2:l), ] <- x[(2:l), ]/x[(1:(l - 1)), ]-1
-  x[1, ] <- rep(0, dim(pdata)[2])
-  x <- xts(x, order.by = index(pdata))
+  x[1, ] <- rep(0, dim(pData)[2])
+  x <- xts(x, order.by = index(pData))
   return(x)
 }
 

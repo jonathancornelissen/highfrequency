@@ -93,11 +93,11 @@ expect_equal(
 
 # rRTSCov
 expect_equal(
-  formatC(rRTSCov(pdata = sampleTData$PRICE) * 10000, digits = 5),
+  formatC(rRTSCov(pData = sampleTData$PRICE) * 10000, digits = 5),
   "3.5276"
 )
 expect_equal(
-  formatC(sum(rRTSCov(pdata = list(cumsum(lltc) + 100, cumsum(sbux) + 100))) * 1000000, digits = 5),
+  formatC(sum(rRTSCov(pData = list(cumsum(lltc) + 100, cumsum(sbux) + 100))) * 1000000, digits = 5),
   "0.24693"
 ) 
 
@@ -141,12 +141,12 @@ expect_equal(
 
 # rTSCov univariate
 expect_equal(
-  formatC(rTSCov(pdata = sampleTData$PRICE), digits = 5),
+  formatC(rTSCov(pData = sampleTData$PRICE), digits = 5),
   "0.00052769"
 )
 # rTSCov multivariate
 expect_equal(
-  formatC(sum(rTSCov(pdata = list(cumsum(lltc) + 100, cumsum(sbux) + 100))) * 10000, digits = 5),
+  formatC(sum(rTSCov(pData = list(cumsum(lltc) + 100, cumsum(sbux) + 100))) * 10000, digits = 5),
   "0.0024259"
 )
 

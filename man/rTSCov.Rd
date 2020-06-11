@@ -5,7 +5,7 @@
 \title{Two time scale covariance estimation}
 \usage{
 rTSCov(
-  pdata,
+  pData,
   cor = FALSE,
   K = 300,
   J = 1,
@@ -17,7 +17,7 @@ rTSCov(
 )
 }
 \arguments{
-\item{pdata}{a list. Each list-item i contains an xts object with the intraday price data 
+\item{pData}{a list. Each list-item i contains an xts object with the intraday price data 
 of stock i for day t.}
 
 \item{cor}{boolean, in case it is TRUE, the correlation is returned. FALSE by default.}
@@ -88,12 +88,12 @@ matrix. This function replaces the negative eigenvalues with zeroes.
 # Robust Realized two timescales Variance/Covariance
 
 # Univariate: 
-rvts <- rTSCov(pdata = sampleTData$PRICE)
+rvts <- rTSCov(pData = sampleTData$PRICE)
 # Note: Prices as input
 rvts 
 
 # Multivariate:
-rcovts <- rTSCov(pdata = list(cumsum(lltc) + 100, cumsum(sbux) + 100))
+rcovts <- rTSCov(pData = list(cumsum(lltc) + 100, cumsum(sbux) + 100))
 # Note: List of prices as input
 rcovts 
 

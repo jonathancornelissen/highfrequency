@@ -5,7 +5,7 @@
 \title{Aggregate a time series but keep first and last observation}
 \usage{
 aggregatePrice(
-  pdata,
+  pData,
   on = "minutes",
   k = 1,
   marketopen = "09:30:00",
@@ -15,7 +15,7 @@ aggregatePrice(
 )
 }
 \arguments{
-\item{pdata}{data.table or xts object to be aggregated containing the intraday price series, possibly across multiple days.}
+\item{pData}{data.table or xts object to be aggregated containing the intraday price series, possibly across multiple days.}
 
 \item{on}{character, indicating the time scale in which "k" is expressed. Possible values are: "milliseconds", "secs", "seconds", "mins", "minutes","hours".}
 

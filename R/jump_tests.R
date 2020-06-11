@@ -58,7 +58,7 @@ ABDJumptest <- function(RV, BPV, TQ) { # Compute jump detection stat mentioned i
 #'  
 #'  \eqn{U, V}: independent standard normal random variables; \eqn{h=1/N}; \eqn{p, k, \alpha, w}: parameters. 
 #'  
-#' @param pdata a zoo/xts object containing all prices in period t for one asset.
+#' @param pData a zoo/xts object containing all prices in period t for one asset.
 #' @param p can be chosen among 2 or 3 or 4. The author suggests 4. 4 by default.
 #' @param k can be chosen among 2 or 3 or 4. The author suggests 2. 2 by default.
 #' @param align.by a string, align the tick data to "seconds"|"minutes"|"hours"
@@ -97,20 +97,20 @@ ABDJumptest <- function(RV, BPV, TQ) { # Compute jump detection stat mentioned i
 #' @importFrom stats qnorm
 #' @importFrom stats pnorm
 #' @export
-AJjumptest <- function(pdata, p = 4 , k = 2, align.by = NULL, align.period = NULL, alpha.multiplier = 4, makeReturns = FALSE, ...) {
+AJjumptest <- function(pData, p = 4 , k = 2, align.by = NULL, align.period = NULL, alpha.multiplier = 4, makeReturns = FALSE, ...) {
 
-  if (checkMultiDays(pdata) == TRUE) {
-    result <- apply.daily(pdata, AJjumptest, align.by, align.period, makeReturns)
+  if (checkMultiDays(pData) == TRUE) {
+    result <- apply.daily(pData, AJjumptest, align.by, align.period, makeReturns)
     return(result)
   } else {
-    pdata <- fastTickAgregation(pdata, on = "seconds", k = 1)
+    pData <- fastTickAgregation(pData, on = "seconds", k = 1)
   }
 
-  N <- length(pdata)-1
+  N <- length(pData)-1
   p <- as.numeric(p)
   k <- as.numeric(k)
 
-  alpha <- alpha.multiplier * sqrt(rCov(pdata, align.by = align.by, align.period = align.period, makeReturns = makeReturns))
+  alpha <- alpha.multiplier * sqrt(rCov(pData, align.by = align.by, align.period = align.period, makeReturns = makeReturns))
   w <- 0.47
   cvalue <- alpha * (1/N)^w
 
@@ -121,12 +121,12 @@ AJjumptest <- function(pdata, p = 4 , k = 2, align.by = NULL, align.period = NUL
   seq2 <- seq(1, N, hk)
 
   # return data
-  pdata1 <- pdata[seq1]
-  pdata2 <- pdata[seq2]
+  pData1 <- pData[seq1]
+  pData2 <- pData[seq2]
 
-  r  <- abs(makeReturns(pdata))
-  r1 <- abs(makeReturns(pdata1))
-  r2 <- abs(makeReturns(pdata2))
+  r  <- abs(makeReturns(pData))
+  r1 <- abs(makeReturns(pData1))
+  r2 <- abs(makeReturns(pData2))
 
   pv1 <- sum(r1^p)
   pv2 <- sum(r2^p)
@@ -135,7 +135,7 @@ AJjumptest <- function(pdata, p = 4 , k = 2, align.by = NULL, align.period = NUL
 
   ## selection return:
   selection <- abs(r) < cvalue
-  rse <- abs(makeReturns(pdata[selection]))
+  rse <- abs(makeReturns(pData[selection]))
 
   ## AJ test: 
   AJtest <- (S-k^(p/2-1))/sqrt(calculateV(rse, p, k, N))
@@ -299,7 +299,7 @@ BNSjumptest <- function (rdata, IVestimator = "BV", IQestimator = "TP", type = "
 #'  
 #'  p: parameter (power).
 #'  
-#' @param pdata a zoo/xts object containing all prices in period t for one asset.
+#' @param pData a zoo/xts object containing all prices in period t for one asset.
 #' @param power can be chosen among 4 or 6. 4 by default.
 #' @param ... additional arguments.
 #'
@@ -335,11 +335,11 @@ BNSjumptest <- function (rdata, IVestimator = "BV", IQestimator = "TP", type = "
 #' @importFrom stats pnorm
 #' @importFrom zoo as.zoo
 #' @export
-JOjumptest <- function(pdata, power = 4, ...) {
+JOjumptest <- function(pData, power = 4, ...) {
 
-  R  <- as.zoo(simre(pdata))
-  r  <- as.zoo(makeReturns(pdata))
-  N  <- length(pdata) - 1
+  R  <- as.zoo(simre(pData))
+  r  <- as.zoo(makeReturns(pData))
+  N  <- length(pData) - 1
   bv <- RBPVar(r)
   rv <- RV(r)
 

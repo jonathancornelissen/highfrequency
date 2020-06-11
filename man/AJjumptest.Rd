@@ -5,7 +5,7 @@
 \title{Ait-Sahalia and Jacod (2009) tests for the presence of jumps in the price series.}
 \usage{
 AJjumptest(
-  pdata,
+  pData,
   p = 4,
   k = 2,
   align.by = NULL,
@@ -16,7 +16,7 @@ AJjumptest(
 )
 }
 \arguments{
-\item{pdata}{a zoo/xts object containing all prices in period t for one asset.}
+\item{pData}{a zoo/xts object containing all prices in period t for one asset.}
 
 \item{p}{can be chosen among 2 or 3 or 4. The author suggests 4. 4 by default.}
 

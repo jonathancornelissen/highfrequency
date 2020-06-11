@@ -245,7 +245,7 @@ medRV <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
 #' 
 #' @description Function returns univariate or multivariate preaveraged estimator, as defined in Hautsch and Podolskij (2013). 
 #'
-#' @param pdata a list. Each list-item contains an xts object with the intraday price data of a stock.
+#' @param pData a list. Each list-item contains an xts object with the intraday price data of a stock.
 #' @param pairwise boolean, should be TRUE when refresh times are based on pairs of assets. FALSE by default.
 #' @param makePsd boolean, in case it is TRUE, the positive definite version of MRC is returned. FALSE by default.
 #' 
@@ -301,23 +301,23 @@ medRV <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
 #' 
 #' @keywords highfrequency preaveraging
 #' @export
-MRC <- function(pdata, pairwise = FALSE, makePsd = FALSE) {
+MRC <- function(pData, pairwise = FALSE, makePsd = FALSE) {
   
-  if (is.list(pdata) == FALSE) {
+  if (is.list(pData) == FALSE) {
     n <- 1
   } else {
-    n <- length(pdata)
+    n <- length(pData)
   }
   if (n == 1) {
-    multixts <- multixts(pdata)
+    multixts <- multixts(pData)
     if (multixts == TRUE) {
       stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")
     }
-    mrc <- crv(pdata)
+    mrc <- crv(pData)
   }
   
   if (n > 1) {
-    multixts <- multixts(pdata[[1]])
+    multixts <- multixts(pData[[1]])
     if (multixts == TRUE) {
       stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")
     }
@@ -326,13 +326,13 @@ MRC <- function(pdata, pairwise = FALSE, makePsd = FALSE) {
       cov <- matrix(rep(0, n * n), ncol = n)
       diagonal <- c()
       for (i in 1:n) {
-        diagonal[i] <- crv(pdata[[i]])
+        diagonal[i] <- crv(pData[[i]])
       }
       diag(cov) <- diagonal
       
       for (i in 2:n) {
         for (j in 1:(i - 1)) {
-          cov[i, j] = cov[j, i] = preavbi(pdata[[i]], pdata[[j]])
+          cov[i, j] = cov[j, i] = preavbi(pData[[i]], pData[[j]])
         }
       }
       
@@ -343,7 +343,7 @@ MRC <- function(pdata, pairwise = FALSE, makePsd = FALSE) {
       }
       
     } else {
-      x     <- refreshTime(pdata)
+      x     <- refreshTime(pData)
       N     <- nrow(x)
       theta <- 0.8 #recommendation by Hautsch and Podolskij
       kn    <- floor(theta * sqrt(N))
@@ -1644,7 +1644,7 @@ rThresholdCov <- function(rdata, cor = FALSE, align.by = NULL, align.period = NU
 #' estimate. By the use of two time scales, this covariance estimate 
 #' is not only robust to price jumps, but also to microstructure noise and non-synchronic trading. 
 #' 
-#' @param pdata a list. Each list-item i contains an xts object with the intraday price data 
+#' @param pData a list. Each list-item i contains an xts object with the intraday price data 
 #' of stock i for day t.
 #' @param cor boolean, in case it is TRUE, the correlation is returned. FALSE by default.
 #' @param startIV vector containing the first step estimates of the integrated variance of the assets, needed in the truncation. Is NULL by default. 
@@ -1717,50 +1717,50 @@ rThresholdCov <- function(rdata, cor = FALSE, align.by = NULL, align.period = NU
 #' # Robust Realized two timescales Variance/Covariance
 #' data(sampleTData)
 #' # Univariate: 
-#' rvRTS <- rRTSCov(pdata = sampleTData$PRICE)
+#' rvRTS <- rRTSCov(pData = sampleTData$PRICE)
 #' # Note: Prices as input
 #' rvRTS 
 #' 
 #' # Multivariate:
-#' rcRTS <- rRTSCov(pdata = list(cumsum(lltc) + 100, cumsum(sbux) + 100))
+#' rcRTS <- rRTSCov(pData = list(cumsum(lltc) + 100, cumsum(sbux) + 100))
 #' # Note: List of prices as input
 #' rcRTS 
 #' 
 #' @keywords volatility
 #' @export
-rRTSCov <- function (pdata, cor = FALSE, startIV = NULL, noisevar = NULL, 
+rRTSCov <- function (pData, cor = FALSE, startIV = NULL, noisevar = NULL, 
                      K = 300, J = 1, 
                      K_cov = NULL , J_cov = NULL,
                      K_var = NULL , J_var = NULL , 
                      eta = 9, makePsd = FALSE){
-  if (!is.list(pdata)) {
+  if (!is.list(pData)) {
     n <- 1
   }
   else {
-    n = length(pdata)
+    n = length(pData)
     if (n == 1) {
-      pdata = pdata[[1]]
+      pData = pData[[1]]
     }
   }
   
   if (n == 1) {
-    if (nrow(pdata) < (10 * K) ) {
+    if (nrow(pData) < (10 * K) ) {
       stop("Two time scale estimator uses returns based on prices that are K ticks aways. 
            Please provide a timeseries of at least 10*K" ) 
     } 
-    multixts <- multixts(pdata)
+    multixts <- multixts(pData)
     if (multixts == TRUE) { 
       stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input.")
     }    
-    return(RTSRV(pdata, startIV = startIV, noisevar = noisevar, 
+    return(RTSRV(pData, startIV = startIV, noisevar = noisevar, 
                  K = K, J = J, eta = eta))
   }
   if (n > 1) {
-    if (nrow(pdata[[1]]) < (10*K)) {
+    if (nrow(pData[[1]]) < (10*K)) {
       stop("Two time scale estimator uses returns based on prices that are K ticks aways. 
            Please provide a timeseries of at least 10*K" ) 
     } 
-    multixts <- multixts(pdata[[1]])
+    multixts <- multixts(pData[[1]])
     if (multixts) { 
       stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input.")
     }
@@ -1780,7 +1780,7 @@ rRTSCov <- function (pdata, cor = FALSE, startIV = NULL, noisevar = NULL,
       J_var <- rep(J,n) 
     }        
     for (i in 1:n){ 
-      diagonal[i] <- RTSRV(pdata[[i]], startIV = startIV[i], 
+      diagonal[i] <- RTSRV(pData[[i]], startIV = startIV[i], 
                            noisevar = noisevar[i], K = K_var[i], J = J_var[i], 
                            eta = eta)
     }
@@ -1789,8 +1789,8 @@ rRTSCov <- function (pdata, cor = FALSE, startIV = NULL, noisevar = NULL,
     if( is.null(J_cov)){ J_cov = J }                        
     for (i in 2:n) {
       for (j in 1:(i - 1)) {
-        cov[i, j] = cov[j, i] = RTSCov_bi(pdata[[i]], 
-                                          pdata[[j]], startIV1 = diagonal[i], startIV2 = diagonal[j], 
+        cov[i, j] = cov[j, i] = RTSCov_bi(pData[[i]], 
+                                          pData[[j]], startIV1 = diagonal[i], startIV2 = diagonal[j], 
                                           noisevar1 = noisevar[i], noisevar2 = noisevar[j], 
                                           K = K_cov, J = J_cov, eta = eta)
       }
@@ -1994,7 +1994,7 @@ rQuar <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
 #' By the use of two time scales, this covariance estimate 
 #' is robust to microstructure noise and non-synchronic trading.
 #' 
-#' @param pdata a list. Each list-item i contains an xts object with the intraday price data 
+#' @param pData a list. Each list-item i contains an xts object with the intraday price data 
 #' of stock i for day t.
 #' @param cor boolean, in case it is TRUE, the correlation is returned. FALSE by default.
 #' @param K positive integer, slow time scale returns are computed on prices that are K steps apart.
@@ -2057,46 +2057,46 @@ rQuar <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
 #' # Robust Realized two timescales Variance/Covariance
 #' 
 #' # Univariate: 
-#' rvts <- rTSCov(pdata = sampleTData$PRICE)
+#' rvts <- rTSCov(pData = sampleTData$PRICE)
 #' # Note: Prices as input
 #' rvts 
 #' 
 #' # Multivariate:
-#' rcovts <- rTSCov(pdata = list(cumsum(lltc) + 100, cumsum(sbux) + 100))
+#' rcovts <- rTSCov(pData = list(cumsum(lltc) + 100, cumsum(sbux) + 100))
 #' # Note: List of prices as input
 #' rcovts 
 #' 
 #' @keywords volatility
 #' @export
-rTSCov <- function (pdata, cor = FALSE, K = 300, J = 1, K_cov = NULL, J_cov = NULL, 
+rTSCov <- function (pData, cor = FALSE, K = 300, J = 1, K_cov = NULL, J_cov = NULL, 
                     K_var = NULL, J_var = NULL, makePsd = FALSE) {
-  if (is.list(pdata) == FALSE) {
+  if (is.list(pData) == FALSE) {
     n <- 1
   }
   else {
-    n <- length(pdata)
+    n <- length(pData)
     if (n == 1) {
-      pdata <- pdata[[1]]
+      pData <- pData[[1]]
     }
   }
   
   if (n == 1) {
-    if (nrow(pdata) < (10 * K)) {
+    if (nrow(pData) < (10 * K)) {
       stop("Two time scale estimator uses returns based on prices that are K ticks aways. 
            Please provide a timeseries of at least 10 * K." ) 
     } 
-    multixts <- multixts(pdata)
+    multixts <- multixts(pData)
     if (multixts == TRUE) { 
       stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input");
     }
-    return(TSRV(pdata, K = K, J = J))
+    return(TSRV(pData, K = K, J = J))
   }
   if (n > 1) {
-    if (nrow(pdata[[1]]) < (10 * K)) {
+    if (nrow(pData[[1]]) < (10 * K)) {
       stop("Two time scale estimator uses returns based on prices that are K ticks aways. 
            Please provide a timeseries of at least 10*K" ) 
     } 
-    multixts <- multixts(pdata[[1]])
+    multixts <- multixts(pData[[1]])
     if (multixts == TRUE){ 
       stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input") 
     }
@@ -2117,14 +2117,14 @@ rTSCov <- function (pdata, cor = FALSE, K = 300, J = 1, K_cov = NULL, J_cov = NU
     
     diagonal <- c()
     for (i in 1:n) {
-      diagonal[i] = TSRV(pdata[[i]], K = K_var[i], J = J_var[i])
+      diagonal[i] = TSRV(pData[[i]], K = K_var[i], J = J_var[i])
     }
     diag(cov) <- diagonal
     
     for (i in 2:n) {
       for (j in 1:(i - 1)) {
-        cov[i, j] = cov[j, i] = TSCov_bi(pdata[[i]], 
-                                         pdata[[j]], K = K_cov, J = J_cov)
+        cov[i, j] = cov[j, i] = TSCov_bi(pData[[i]], 
+                                         pData[[j]], K = K_cov, J = J_cov)
       }
     }
     if (cor == FALSE) {

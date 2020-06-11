@@ -4,10 +4,10 @@
 \alias{MRC}
 \title{Modulated Realized Covariance (MRC): Return univariate or multivariate preaveraged estimator.}
 \usage{
-MRC(pdata, pairwise = FALSE, makePsd = FALSE)
+MRC(pData, pairwise = FALSE, makePsd = FALSE)
 }
 \arguments{
-\item{pdata}{a list. Each list-item contains an xts object with the intraday price data of a stock.}
+\item{pData}{a list. Each list-item contains an xts object with the intraday price data of a stock.}
 
 \item{pairwise}{boolean, should be TRUE when refresh times are based on pairs of assets. FALSE by default.}
 

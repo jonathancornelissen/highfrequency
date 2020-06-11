@@ -162,7 +162,7 @@ aggregateTS <- function (ts, FUN = "previoustick", on = "minutes", k = 1, weight
 #' and subsequent observations are the closing prices over the interval with as endpoint the timestamp 
 #' of the result.
 #' 
-#' @param pdata data.table or xts object to be aggregated containing the intraday price series, possibly across multiple days.
+#' @param pData data.table or xts object to be aggregated containing the intraday price series, possibly across multiple days.
 #' @param on character, indicating the time scale in which "k" is expressed. Possible values are: "milliseconds", "secs", "seconds", "mins", "minutes","hours".
 #' @param k positive integer, indicating the number of periods to aggregate over; e.g. to aggregate a 
 #' xts object to the 5 minute frequency set k = 5 and on = "minutes".
@@ -193,13 +193,13 @@ aggregateTS <- function (ts, FUN = "previoustick", on = "minutes", k = 1, weight
 #' @keywords internal
 #' @importFrom xts last
 #' @export
-aggregatePrice <- function(pdata, on = "minutes", k = 1, marketopen = "09:30:00", marketclose = "16:00:00" , fill = FALSE, tz = NULL) {
+aggregatePrice <- function(pData, on = "minutes", k = 1, marketopen = "09:30:00", marketclose = "16:00:00" , fill = FALSE, tz = NULL) {
   
   DATE = DT = FIRST_DT = DT_ROUND = LAST_DT = SYMBOL = PRICE = NULL
   
   on_true <- NULL
 
-  if ("PRICE" %in% colnames(pdata) == FALSE) {
+  if ("PRICE" %in% colnames(pData) == FALSE) {
     stop("data.table or xts needs column named PRICE.")
   }
   
@@ -210,23 +210,23 @@ aggregatePrice <- function(pdata, on = "minutes", k = 1, marketopen = "09:30:00"
   }
   
   dummy_was_xts <- FALSE
-  if (is.data.table(pdata) == FALSE) {
-    if (is.xts(pdata) == TRUE) {
+  if (is.data.table(pData) == FALSE) {
+    if (is.xts(pData) == TRUE) {
       
       dummy_was_xts <- TRUE
       # If there is only one day of input and input is xts,
       # use old code because it's faster
       # However, multi-day input not possible
-      if (length(unique(as.Date(index(pdata)))) == 1) {
+      if (length(unique(as.Date(index(pData)))) == 1) {
         if (is.null(tz) == TRUE) {
-          tz <-tz(pdata)
+          tz <-tz(pData)
         }
-        ts2 <- fastTickAgregation(pdata, on, k, tz)
-        date <- strsplit(as.character(index(pdata)), " ")[[1]][1]
+        ts2 <- fastTickAgregation(pData, on, k, tz)
+        date <- strsplit(as.character(index(pData)), " ")[[1]][1]
 
         #open
         a <- as.POSIXct(paste(date, marketopen), tz = tz)
-        b <- as.xts(matrix(as.numeric(pdata[1]), nrow = 1), a)
+        b <- as.xts(matrix(as.numeric(pData[1]), nrow = 1), a)
         storage.mode(ts2) <- "numeric"
         ts3 <- c(b, ts2)
 
@@ -234,45 +234,45 @@ aggregatePrice <- function(pdata, on = "minutes", k = 1, marketopen = "09:30:00"
         aa <- as.POSIXct(paste(date, marketclose), tz = tz)
         condition <- index(ts3) < aa
         ts3 <- ts3[condition]
-        bb <- as.xts(matrix(as.numeric(last(pdata)), nrow = 1), aa)
+        bb <- as.xts(matrix(as.numeric(last(pData)), nrow = 1), aa)
         ts3 <- c(ts3, bb)
         return(ts3)
       }
-      pdata <- setnames(as.data.table(pdata)[, PRICE := as.numeric(as.character(PRICE))],
+      pData <- setnames(as.data.table(pData)[, PRICE := as.numeric(as.character(PRICE))],
                         old = "index", new = "DT")
     } else {
       stop("Input has to be data.table or xts.")
     }
   } else {
-    if (("DT" %in% colnames(pdata)) == FALSE) {
+    if (("DT" %in% colnames(pData)) == FALSE) {
       stop("Data.table neeeds DT column (date-time ).")
     }
-    if (("PRICE" %in% colnames(pdata)) == FALSE) {
+    if (("PRICE" %in% colnames(pData)) == FALSE) {
       stop("Data.table neeeds PRICE column (date-time).")
     }
   }
   
-  pdata <- pdata[DT >= ymd_hms(paste(as.Date(pdata$DT, tz = tz(pdata$DT)), marketopen), tz = tz(pdata$DT))]
-  pdata <- pdata[DT <= ymd_hms(paste(as.Date(pdata$DT, tz = tz(pdata$DT)), marketclose), tz = tz(pdata$DT))]
+  pData <- pData[DT >= ymd_hms(paste(as.Date(pData$DT, tz = tz(pData$DT)), marketopen), tz = tz(pData$DT))]
+  pData <- pData[DT <= ymd_hms(paste(as.Date(pData$DT, tz = tz(pData$DT)), marketclose), tz = tz(pData$DT))]
 
-  pdata[, DATE := as.Date(DT, tz = tz(pdata))]
-  pdata[, FIRST_DT := min(DT), by = "DATE"]
-  pdata[, DT_ROUND := ifelse(DT == FIRST_DT,
+  pData[, DATE := as.Date(DT, tz = tz(pData))]
+  pData[, FIRST_DT := min(DT), by = "DATE"]
+  pData[, DT_ROUND := ifelse(DT == FIRST_DT,
                              floor_date(ymd_hms(DT), unit = paste(k, on)),
                              ceiling_date(ymd_hms(DT), unit = paste(k, on), change_on_boundary = FALSE))]
-  pdata[, DT_ROUND := as_datetime(DT_ROUND)]
-  pdata[, LAST_DT := max(DT), by = "DT_ROUND"]
+  pData[, DT_ROUND := as_datetime(DT_ROUND)]
+  pData[, LAST_DT := max(DT), by = "DT_ROUND"]
   
-  pdata_open <- data.table::copy(pdata[DT == FIRST_DT])
-  pdata_open[, DT := ymd_hms(paste(as.Date(pdata_open$DT), marketopen), tz = tz(pdata_open$DT))]
-  pdata_open <- pdata_open[, c("DT", "PRICE")]
+  pData_open <- data.table::copy(pData[DT == FIRST_DT])
+  pData_open[, DT := ymd_hms(paste(as.Date(pData_open$DT), marketopen), tz = tz(pData_open$DT))]
+  pData_open <- pData_open[, c("DT", "PRICE")]
 
-  pdata <- pdata[DT == LAST_DT][, DT := DT_ROUND][, c("DT", "PRICE")]
-  lubridate::tz(pdata$DT) <- tz(pdata_open$DT)
+  pData <- pData[DT == LAST_DT][, DT := DT_ROUND][, c("DT", "PRICE")]
+  lubridate::tz(pData$DT) <- tz(pData_open$DT)
   # due to rounding there may be an observation that is refered to the opening time
-  pdata <- pdata[!(DT %in% pdata_open$DT)]
+  pData <- pData[!(DT %in% pData_open$DT)]
   
-  pdata <- merge(pdata, pdata_open, all = TRUE)
+  pData <- merge(pData, pData_open, all = TRUE)
   
   if (fill == TRUE) {
     if (on == "minutes") {
@@ -285,31 +285,31 @@ aggregatePrice <- function(pdata, on = "minutes", k = 1, marketopen = "09:30:00"
     # if/else seems unnecessary but otherwise seq.POSIXt won't work for milliseconds
     if (is.null(on_true) == FALSE) {
       dt_full_index <-
-        rbindlist(lapply(unique(as.Date(pdata$DT)),
-                         FUN = function(x) data.frame(DT = seq.POSIXt(from = as.POSIXct(paste0(x, marketopen, tz = tz(pdata$DT))), 
-                                                                      to   = as.POSIXct(paste0(x, marketclose, tz = tz(pdata$DT))), 
+        rbindlist(lapply(unique(as.Date(pData$DT)),
+                         FUN = function(x) data.frame(DT = seq.POSIXt(from = as.POSIXct(paste0(x, marketopen, tz = tz(pData$DT))), 
+                                                                      to   = as.POSIXct(paste0(x, marketclose, tz = tz(pData$DT))), 
                                                                       units = on,
                                                                       by = k))))
     } else {
       dt_full_index <-
-        rbindlist(lapply(unique(as.Date(pdata$DT)),
-                         FUN = function(x) data.frame(DT = seq.POSIXt(from = as.POSIXct(paste0(x, marketopen, tz = tz(pdata$DT))), 
-                                                                      to   = as.POSIXct(paste0(x, marketclose, tz = tz(pdata$DT))),
+        rbindlist(lapply(unique(as.Date(pData$DT)),
+                         FUN = function(x) data.frame(DT = seq.POSIXt(from = as.POSIXct(paste0(x, marketopen, tz = tz(pData$DT))), 
+                                                                      to   = as.POSIXct(paste0(x, marketclose, tz = tz(pData$DT))),
                                                                       by = paste(k, on)))))
     }
     
-    lubridate::tz(dt_full_index$DT) <- tz(pdata$DT)
-    pdata <- merge(pdata, dt_full_index, by = "DT", all = TRUE)
+    lubridate::tz(dt_full_index$DT) <- tz(pData$DT)
+    pData <- merge(pData, dt_full_index, by = "DT", all = TRUE)
     
-    setkeyv(pdata, "DT")
+    setkeyv(pData, "DT")
     
-    pdata$PRICE <- na.locf(pdata$PRICE)
+    pData$PRICE <- na.locf(pData$PRICE)
   }
 
   if (dummy_was_xts == TRUE) {
-    return(xts(as.matrix(pdata[, -c("DT")]), order.by = pdata$DT, tzone = tz(pdata$DT)))
+    return(xts(as.matrix(pData[, -c("DT")]), order.by = pData$DT, tzone = tz(pData$DT)))
   } else {
-    return(pdata)
+    return(pData)
   }
 }
 
