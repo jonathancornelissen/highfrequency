@@ -377,14 +377,27 @@ JOjumptest <- function(pdata, power = 4, ...) {
 
 ####### extraArgs is a list of args I haven't found a name for yet #######
 
-#' intradayJumpTest
-#' PRICES IN LEVELS!!!
-#' @param pData the price data in levels. This data can (and should in some cases) be tick-level data
-#' @param windowSize the size of the window to test for jumps in, in minutes. Not used in the FoF type test.
-#' @param K In the LM test, K, is the amount of windowSizes to use for estimation of the local variance. In case of the FoF test K will be used as M in eqn: 21 in the paper.
+#' General framework for testing for jumps on an intraday basis
+#' 
+#' @param pData (currently only xts) of the price data in levels. This data can (and should in some cases) be tick-level data
+#' @param testType type of test to use. Currently supports "LM" as "Lee-Mykland" test of Lee and Mykland (2018), and "FoF" as "Fact or Friction" test from Christensen, Oomen, and Podolskij (2014)
+#' @param testingTimes a character vector of times to test for jumps, for example  \code{c("11:30", "11:35", "14:30")}. 
+#' This argument can also be a numeric vector containing times to test in seconds after midnight. For example, using \code{seq(39200, 57600, 300)}, 
+#' where testing will take place every five minutes, starting fifty minutes after opening. (On when open is 09:30). This argument is not used in the FoF type test.
+#' @param windowSize the size of the window to test for jumps in, in minutes. Default = 5. Not used in the FoF type test.
+#' @param K In the LM test, K, is the amount of windowSizes to use for estimation of the local variance. 
+#' In case of the FoF test K will be used as M in eqn: 21 in the paper, which changes the meaning into how many non-overlapping pre-averaged returns should be used in each test.
+#' @param alpha numeric significance level to use for the jump tests.
+#' @param theta numeric parameter in determining the pre-averaging horizon. Default = 0.5. The pre-averaging horizon is \code{round(theta * sqrt(n))}, where n is the number of observations. 
+#' This parameter will also help determine the testing times as the test is done on non-overlapping pre-averaged returns.
+#' @param ... used internally. Don't set this parameter.
+#' @references COP2014, LM 2008
 #' @importFrom zoo index
 #' @export
-intradayJumpTest <- function(pData = NULL, testType = "LM", testingTimes, windowSize = 5, K = 10, alpha = 0.05, theta = 0.5, extraArgs = list(), ...){
+intradayJumpTest <- function(pData = NULL, testType = "LM", testingTimes = NULL, windowSize = 5, K = 10, alpha = 0.05, theta = 0.5, ...){
+  
+  
+  print("make pData able to use data.table")
   
   ## Make space for data preparation
   if(ncol(pData) >1 ){
