@@ -32,7 +32,7 @@ expect_identical(
 #     
 #     #For traditional (default) version:
 #     startvalues <- c(0.004,0.02,0.44,0.41,0.74,0.56) # Initial values
-#     output <- heavyModel(data = as.matrix(data,ncol=2), compconst=FALSE, startingvalues = startvalues, backcast=backcast) 
+#     output <- HEAVYmodel(data = as.matrix(data,ncol=2), compconst=FALSE, startingvalues = startvalues, backcast=backcast) 
 #     formatC(sum(output$parameters), digits = 5)},
 #   "2.2092"
 # )
