@@ -78,7 +78,7 @@ predict(x)
 ##### Example 2: HARRV #####
 # Forecasting daily Realized volatility for the S&P 500 using the basic HARmodel: HARRV
 library(xts)
-RV_SP500 <- as.xts(realized_library$rv5, order.by = realized_library$date)
+RV_SP500 <- as.xts(realizedLibrary$rv5, order.by = realizedLibrary$date)
 
 x <- HARmodel(data = RV_SP500 , periods = c(1,5,22), RVest = c("rCov"),
               type = "HARRV", h = 1, transform = NULL, inputType = "RM")
@@ -135,7 +135,7 @@ predict(x)
 #' ##### Example 7: HARRV #####
 # Forecasting weekly Realized volatility for the S&P 500 using the basic HARmodel: HARRV
 library(xts)
-RV_SP500 <- as.xts(realized_library$rv5, order.by = realized_library$date)
+RV_SP500 <- as.xts(realizedLibrary$rv5, order.by = realizedLibrary$date)
 
 x <- HARmodel(data = RV_SP500 , periods = c(1,5,22), RVest = c("rCov"),
               type = "HARRV", h = 5, transform = NULL, inputType = "RM")

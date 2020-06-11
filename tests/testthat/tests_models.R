@@ -22,9 +22,9 @@ expect_identical(
 )
 
 # expect_identical(
-#   {data("realized_library")
-#     returns <-  realized_library$open_to_close
-#     bv      <-  realized_library$bv
+#   {data("realizedLibrary")
+#     returns <-  realizedLibrary$open_to_close
+#     bv      <-  realizedLibrary$bv
 #     returns <- returns[!is.na(bv)]  
 #     bv <- bv[!is.na(bv)] # Remove NA's 
 #     data <- cbind( returns^2, bv) # Make data matrix with returns and realized measures
