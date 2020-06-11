@@ -5,12 +5,12 @@ expect_equal(
 )
 
 expect_equal(
-  unique(autoSelectExchangeQuotes(sample_qdataraw)$EX),
+  unique(autoSelectExchangeQuotes(sampleQDataraw)$EX),
   "N"
 )
 
 expect_equal(
-  quotesCleanup(qdataraw = sample_qdataraw, exchanges = "N")$report["remove_outliers"],
+  quotesCleanup(qdataraw = sampleQDataraw, exchanges = "N")$report["remove_outliers"],
   c(remove_outliers = 7706)
 )
 
@@ -20,42 +20,42 @@ expect_equal(
 )
 
 expect_equal(
-  unique(selectExchange(sample_qdataraw, c("N", "W"))$EX),
+  unique(selectExchange(sampleQDataraw, c("N", "W"))$EX),
   c("N", "W")
 )
 
 expect_equal(
-  dim(rmOutliersQuotes(selectExchange(sample_qdataraw, "W"))),
-  dim(rmOutliersQuotes(selectExchange(sample_qdataraw, "W"), type = "standard"))
+  dim(rmOutliersQuotes(selectExchange(sampleQDataraw, "W"))),
+  dim(rmOutliersQuotes(selectExchange(sampleQDataraw, "W"), type = "standard"))
 )
 
 expect_equal(
-  dim(rmTradeOutliersUsingQuotes(selectExchange(sample_tdataraw, "W"), selectExchange(sample_qdataraw, "W"))),
+  dim(rmTradeOutliersUsingQuotes(selectExchange(sample_tdataraw, "W"), selectExchange(sampleQDataraw, "W"))),
   c(203, 8)
 )
 
 expect_equal(
-  dim(rmLargeSpread(selectExchange(sample_qdataraw, "N"))),
+  dim(rmLargeSpread(selectExchange(sampleQDataraw, "N"))),
   c(9794, 7)
 )
 
 expect_equal(
-  dim(mergeQuotesSameTimestamp(selectExchange(sample_qdataraw, "N"), selection = "max.volume")),
+  dim(mergeQuotesSameTimestamp(selectExchange(sampleQDataraw, "N"), selection = "max.volume")),
   c(7707, 5)
 )
 
 expect_equal(
-  dim(mergeQuotesSameTimestamp(selectExchange(sample_qdataraw, "N"), selection = "weighted.average")),
+  dim(mergeQuotesSameTimestamp(selectExchange(sampleQDataraw, "N"), selection = "weighted.average")),
   c(7707, 5)
 )
 
 expect_equal(
-  dim(noZeroQuotes(selectExchange(sample_qdataraw, "N"))),
+  dim(noZeroQuotes(selectExchange(sampleQDataraw, "N"))),
   c(9792, 7)
 )
 
 expect_equal(
-  dim(tradesCleanupUsingQuotes(tdata = sample_tdata, qdata = sample_qdata)),
+  dim(tradesCleanupUsingQuotes(tdata = sample_tdata, qdata = sampleQData)),
   c(8153, 8)
 )
 

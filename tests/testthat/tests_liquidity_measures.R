@@ -1,6 +1,6 @@
 
 expect_equal(
-  {tqdata <- matchTradesQuotes(sample_tdata, sample_qdata)
+  {tqdata <- matchTradesQuotes(sample_tdata, sampleQData)
     directions <- getTradeDirection(tqdata)
     sum(directions)
   },
@@ -8,7 +8,7 @@ expect_equal(
 )
 
 expect_equal(
-  {tqdata <- matchTradesQuotes(sample_tdata_microseconds, sample_qdata_microseconds)
+  {tqdata <- matchTradesQuotes(sample_tdata_microseconds, sampleQData_microseconds)
   directions <- getTradeDirection(tqdata)
   sum(directions)},
   -1403
@@ -16,7 +16,7 @@ expect_equal(
 
 # 
 # expect_equal(
-#   {tqdata <- matchTradesQuotes(sample_tdata, sample_qdata)
+#   {tqdata <- matchTradesQuotes(sample_tdata, sampleQData)
 #   getLiquidityMeasures(tqdata, type = "prs")
 #   }
 #   

@@ -35,7 +35,7 @@ A data.table or an xts object containing the aggregated quote data.
 }
 \description{
 Function returns a data.table or xts object containing the aggregated quote data with columns "SYMBOL", "EX", "BID","BIDSIZ","OFR","OFRSIZ". 
-See \code{\link{sample_qdata}} for an example of the argument qdata.
+See \code{\link{sampleQData}} for an example of the argument qdata.
 }
 \details{
 The output "BID" and "OFR" columns are constructed using previous tick aggregation.
@@ -48,7 +48,7 @@ Please note: Returned objects always contain the first observation (i.e. opening
 }
 \examples{
 # aggregate quote data to the 30 second frequency
-qdata_aggregated <- aggregateQuotes(sample_qdata, on = "seconds", k = 30)
+qdata_aggregated <- aggregateQuotes(sampleQData, on = "seconds", k = 30)
 head(qdata_aggregated)
 }
 \author{

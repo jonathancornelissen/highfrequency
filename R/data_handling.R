@@ -316,7 +316,7 @@ aggregatePrice <- function(pdata, on = "minutes", k = 1, marketopen = "09:30:00"
 #' Aggregate a data.table or xts object containing quote data
 #' 
 #' @description Function returns a data.table or xts object containing the aggregated quote data with columns "SYMBOL", "EX", "BID","BIDSIZ","OFR","OFRSIZ". 
-#' See \code{\link{sample_qdata}} for an example of the argument qdata.
+#' See \code{\link{sampleQData}} for an example of the argument qdata.
 #' 
 #' @param qdata data.table or xts object to be aggregated, containing the intraday quote data of a stock for one day.
 #' @param on character, indicating the time scale in which "k" is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".
@@ -344,7 +344,7 @@ aggregatePrice <- function(pdata, on = "minutes", k = 1, marketopen = "09:30:00"
 #' 
 #' @examples
 #' # aggregate quote data to the 30 second frequency
-#' qdata_aggregated <- aggregateQuotes(sample_qdata, on = "seconds", k = 30)
+#' qdata_aggregated <- aggregateQuotes(sampleQData, on = "seconds", k = 30)
 #' head(qdata_aggregated)
 #' @export
 aggregateQuotes <- function(qdata, on = "minutes", k = 5, marketopen = "09:30:00", marketclose = "16:00:00", tz = "GMT") {
@@ -576,7 +576,7 @@ autoSelectExchangeTrades <- function(tdata) {
 #' @return data.table or xts object depending on input
 #' 
 #' @examples 
-#' autoSelectExchangeQuotes(sample_qdataraw_microseconds)
+#' autoSelectExchangeQuotes(sampleQDataraw_microseconds)
 #'
 #' @author Jonathan Cornelissen, Kris Boudt and Onno Kleen
 #' 
@@ -780,10 +780,10 @@ makeReturns <- function(ts) {
 #' 
 #' @examples 
 #' # match the trade and quote data
-#' tqdata <- matchTradesQuotes(sample_tdata, sample_qdata)
+#' tqdata <- matchTradesQuotes(sample_tdata, sampleQData)
 #' head(tqdata)
 #' # multi-day input allowed
-#' tqdata <- matchTradesQuotes(sample_tdata_microseconds, sample_qdata_microseconds)
+#' tqdata <- matchTradesQuotes(sample_tdata_microseconds, sampleQData_microseconds)
 #' @importFrom lubridate seconds
 #' @export
 matchTradesQuotes <- function(tdata, qdata, adjustment = 2) {
@@ -885,7 +885,7 @@ mergeQuotesSameTimestamp <- function(qdata, selection = "median") {
       stop("Data.table neeeds DT column (date-time).")
     }
   }
-  # qdata <- sample_qdataraw_microseconds
+  # qdata <- sampleQDataraw_microseconds
   # qdata <- checkColumnNames(qdata)
   
   # keep summed size columns
@@ -917,8 +917,8 @@ mergeQuotesSameTimestamp <- function(qdata, selection = "median") {
     return(qdata)
   }
 }
-# microbenchmark::microbenchmark(quotesCleanup(qdataraw = sample_qdataraw, exchanges = "N", selection = "max.volume"), times = 10, unit = "s")
-# microbenchmark::microbenchmark(quotesCleanup(qdataraw = sample_qdataraw, exchanges = "N", selection = "maxvolume"), times = 10, unit = "s")
+# microbenchmark::microbenchmark(quotesCleanup(qdataraw = sampleQDataraw, exchanges = "N", selection = "max.volume"), times = 10, unit = "s")
+# microbenchmark::microbenchmark(quotesCleanup(qdataraw = sampleQDataraw, exchanges = "N", selection = "maxvolume"), times = 10, unit = "s")
 
 #' Merge multiple transactions with the same time stamp
 #' 
@@ -1136,9 +1136,9 @@ noZeroQuotes <- function(qdata) {
 #' 
 #' @examples
 #' # Consider you have raw quote data for 1 stock for 2 days
-#' head(sample_qdataraw_microseconds)
-#' dim(sample_qdataraw_microseconds)
-#' qdata_aftercleaning <- quotesCleanup(qdataraw = sample_qdataraw_microseconds, exchanges = "N")
+#' head(sampleQDataraw_microseconds)
+#' dim(sampleQDataraw_microseconds)
+#' qdata_aftercleaning <- quotesCleanup(qdataraw = sampleQDataraw_microseconds, exchanges = "N")
 #' qdata_aftercleaning$report
 #' dim(qdata_aftercleaning$qdata)
 #' 
@@ -1287,7 +1287,7 @@ rmLargeSpread <- function(qdata, maxi = 50) {
 #' @author Jonathan Cornelissen, Kris Boudt and Onno Kleen
 #' 
 #' @examples 
-#' rmNegativeSpread(sample_qdataraw_microseconds)
+#' rmNegativeSpread(sampleQDataraw_microseconds)
 #' 
 #' @keywords cleaning
 #' @export
@@ -1774,7 +1774,7 @@ tradesCleanupUsingQuotes <- function(from, to, datasource, datadestination, tick
 #' tdata_afterfirstcleaning <- tradesCleanup(tdataraw = sample_tdataraw_microseconds, 
 #'                                           exchanges = "N", report = FALSE)
 #' # 
-#' qdata <- quotesCleanup(qdataraw = sample_qdataraw_microseconds, 
+#' qdata <- quotesCleanup(qdataraw = sampleQDataraw_microseconds, 
 #'                        exchanges = "N", report = FALSE)
 #' dim(tdata_afterfirstcleaning)
 #' tdata_afterfinalcleaning <- 
