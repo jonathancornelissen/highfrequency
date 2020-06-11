@@ -328,7 +328,7 @@ BNSjumptest <- function (rdata, IVestimator = "BV", IQestimator = "TP", type = "
 #' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
 #' 
 #' @examples
-#' JOjumptest(sample_5minprices_jumps$stock1, power = 6)
+#' JOjumptest(sample5MinPrices_jumps$stock1, power = 6)
 #' 
 #' @keywords highfrequency JOjumptest
 #' @importFrom stats qnorm

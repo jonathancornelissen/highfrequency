@@ -52,7 +52,7 @@
 #' trading. Journal of Econometrics, 162, 149-169.
 #' 
 #' @keywords datasets        
-"sample_5minprices"
+"sample5MinPrices"
 
 #' Ten artificial time series (including jumps) for the NYSE trading days during January 2010
 #' 
@@ -80,7 +80,7 @@
 #' Boudt, K., C. Croux, and S. Laurent (2008). Outlyingness weighted covariation. Mimeo.
 #' 
 #' @keywords datasets
-"sample_5minprices_jumps"
+"sample5MinPrices_jumps"
 
 #' Sample of imaginary price data for 61 days
 #'

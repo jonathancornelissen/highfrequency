@@ -62,7 +62,7 @@ This model is mainly used to forecast the next days'volatility based on the high
 }
 \examples{
 ##### Example 1: HARRVCJ #####
-dat <- sample_5minprices_jumps$stock1
+dat <- sample5MinPrices_jumps$stock1
 dat <- makeReturns(dat) #Get the high-frequency return data
 
 x <- HARmodel(dat, periods = c(1,5,10), periodsJ = c(1,5,10),
@@ -90,7 +90,7 @@ predict(x)
 
 
 ##### Example 3: HARRVQ #####
-dat <- sample_5minprices_jumps$stock1
+dat <- sample5MinPrices_jumps$stock1
 dat <- makeReturns(dat) #Get the high-frequency return data
 #
 x <- HARmodel(dat, periods = c(1,5,10), periodsJ = c(1,5,10),

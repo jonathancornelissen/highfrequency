@@ -5,12 +5,12 @@ expect_equal(
 )
 
 expect_equal(
-  formatC(JOjumptest(sample_5minprices_jumps[,1], power = 6)$ztest, digits = 10),
+  formatC(JOjumptest(sample5MinPrices_jumps[,1], power = 6)$ztest, digits = 10),
   "8.998787842"
 )
 
 expect_equal(
-  formatC(JOjumptest(sample_5minprices_jumps[,1], power = 4)$ztest, digits = 4),
+  formatC(JOjumptest(sample5MinPrices_jumps[,1], power = 4)$ztest, digits = 4),
   "7.832"
 )
 

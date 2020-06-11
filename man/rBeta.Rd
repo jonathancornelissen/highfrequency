@@ -53,8 +53,8 @@ By default, the RCov is used and the realized beta coefficient is computed as:
 Note: It is worth to note that the function does not support to calculate for data of multiple days.
 }
 \examples{
-a <- sample_5minprices_jumps['2010-01-04', 1]
-b <- sample_5minprices_jumps['2010-01-04', 2]
+a <- sample5MinPrices_jumps['2010-01-04', 1]
+b <- sample5MinPrices_jumps['2010-01-04', 2]
 rBeta(a, b, RCOVestimator = "rBPCov", RVestimator = "minRV", makeReturns = TRUE)
 
 }
