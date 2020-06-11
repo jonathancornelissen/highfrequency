@@ -128,7 +128,7 @@ harInsanityFilter <- function(fittedValues, lower, upper, replacement) {
 #' @param transform optionally a string referring to a function that transforms both the dependent and explanatory variables in the model. By default transform=NULL, so no transformation is done. Typical other choices in this context would be "log" or "sqrt".
 #' @param ... extra arguments for jump test.
 #'
-#' @return The function outputs an object of class \code{harModel} and \code{\link{lm}} (so \code{harModel} is  a subclass of \code{\link{lm}}).
+#' @return The function outputs an object of class \code{HARmodel} and \code{\link{lm}} (so \code{HARmodel} is  a subclass of \code{\link{lm}}).
 #'
 #' @references Andersen, T. G., T. Bollerslev, and F. Diebold (2007). Roughing it up: including jump components in the measurement, modelling and forecasting of return volatility. The Review of Economics and Statistics 89, 701-720.
 #' Corsi, F. (2009). A simple approximate long memory model of realized volatility. Journal of Financial Econometrics 7, 174-196.
@@ -143,7 +143,7 @@ harInsanityFilter <- function(fittedValues, lower, upper, replacement) {
 #' dat <- sample_5minprices_jumps$stock1
 #' dat <- makeReturns(dat) #Get the high-frequency return data
 #'
-#' x <- harModel(dat, periods = c(1,5,10), periodsJ = c(1,5,10),
+#' x <- HARmodel(dat, periods = c(1,5,10), periodsJ = c(1,5,10),
 #'              RVest = c("rCov","rBPCov"),
 #'              type = "HARRVCJ",transform = "sqrt", inputType = "returns")
 #' # Estimate the HAR model of type HARRVCJ
@@ -154,11 +154,11 @@ harInsanityFilter <- function(fittedValues, lower, upper, replacement) {
 #'
 #'
 #' ##### Example 2: HARRV #####
-#' # Forecasting daily Realized volatility for the S&P 500 using the basic harModel: HARRV
+#' # Forecasting daily Realized volatility for the S&P 500 using the basic HARmodel: HARRV
 #' library(xts)
 #' RV_SP500 <- as.xts(realized_library$rv5, order.by = realized_library$date)
 #'
-#' x <- harModel(data = RV_SP500 , periods = c(1,5,22), RVest = c("rCov"),
+#' x <- HARmodel(data = RV_SP500 , periods = c(1,5,22), RVest = c("rCov"),
 #'               type = "HARRV", h = 1, transform = NULL, inputType = "RM")
 #' class(x)
 #' x
@@ -171,7 +171,7 @@ harInsanityFilter <- function(fittedValues, lower, upper, replacement) {
 #' dat <- sample_5minprices_jumps$stock1
 #' dat <- makeReturns(dat) #Get the high-frequency return data
 #' #
-#' x <- harModel(dat, periods = c(1,5,10), periodsJ = c(1,5,10),
+#' x <- HARmodel(dat, periods = c(1,5,10), periodsJ = c(1,5,10),
 #'             periodsQ = c(1), RVest = c("rCov", "rQuar"),
 #'               type="HARRVQ", inputType = "returns")
 #' ## Estimate the HAR model of type HARRVQ
@@ -182,7 +182,7 @@ harInsanityFilter <- function(fittedValues, lower, upper, replacement) {
 #' 
 #' ##### Example 4: HARRVQJ with already computed realized measures #####
 #' dat <- SP500RM[, c("RV", "BPV", "RQ")]
-#' x <- harModel(dat, periods = c(1,5,22), periodsJ = c(1),
+#' x <- HARmodel(dat, periods = c(1,5,22), periodsJ = c(1),
 #'               periodsQ = c(1), type = "HARRVQJ")
 #' ## Estimate the HAR model of type HARRVQJ
 #' class(x)
@@ -193,7 +193,7 @@ harInsanityFilter <- function(fittedValues, lower, upper, replacement) {
 #' ##### Example 5: CHARRV with already computed realized measures #####
 #' dat <- SP500RM[, c("RV", "BPV")]
 #'
-#' x <- harModel(dat, periods = c(1, 5, 22), type = "CHARRV")
+#' x <- HARmodel(dat, periods = c(1, 5, 22), type = "CHARRV")
 #' # Estimate the HAR model of type CHARRV
 #' class(x)
 #' x
@@ -203,7 +203,7 @@ harInsanityFilter <- function(fittedValues, lower, upper, replacement) {
 #' ##### Example 6: CHARRVQ with already computed realized measures #####
 #' dat <- SP500RM[, c("RV", "BPV", "RQ")]
 #' 
-#' x <- harModel(dat, periods = c(1,5,22), periodsQ = c(1), type = "CHARRVQ")
+#' x <- HARmodel(dat, periods = c(1,5,22), periodsQ = c(1), type = "CHARRVQ")
 #' # Estimate the HAR model of type CHARRVQ
 #' class(x)
 #' x
@@ -211,11 +211,11 @@ harInsanityFilter <- function(fittedValues, lower, upper, replacement) {
 #' predict(x)
 #'
 #'#' ##### Example 7: HARRV #####
-#' # Forecasting weekly Realized volatility for the S&P 500 using the basic harModel: HARRV
+#' # Forecasting weekly Realized volatility for the S&P 500 using the basic HARmodel: HARRV
 #' library(xts)
 #' RV_SP500 <- as.xts(realized_library$rv5, order.by = realized_library$date)
 #'
-#' x <- harModel(data = RV_SP500 , periods = c(1,5,22), RVest = c("rCov"),
+#' x <- HARmodel(data = RV_SP500 , periods = c(1,5,22), RVest = c("rCov"),
 #'               type = "HARRV", h = 5, transform = NULL, inputType = "RM")
 #' class(x)
 #' x
@@ -226,7 +226,7 @@ harInsanityFilter <- function(fittedValues, lower, upper, replacement) {
 #'
 #' @import RcppArmadillo
 #' @export
-harModel <- function(data, periods = c(1,5,22), periodsJ = c(1,5,22), periodsQ = c(1),
+HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), periodsQ = c(1),
                      leverage=NULL, RVest = c("rCov","rBPCov", "rQuar"), type = "HARRV", inputType = "RM",
                      jumptest = "ABDJumptest", alpha = 0.05, h = 1, transform = NULL, ...){
 
@@ -527,7 +527,7 @@ plot.harModel <- function(x, which = c(1L:3L, 5L), caption = list("Residuals vs 
   fitted   <- xts(fitted, order.by=dates)
   type     <- x$type
 
-  g_range = range(fitted,observed)
+  g_range <- range(fitted,observed)
   g_range[1] <- 0.95*g_range[1]
   g_range[2] <- 1.05 * g_range[2]
   #ind = seq(1,length(fitted),length.out=5);
@@ -590,7 +590,7 @@ predict.harModel <- function(object, newdata = NULL, warnings = TRUE, ...) {
       return(as.numeric(cbind(1, newdata)  %*%  object$coefficients))
     }
   } else {
-    # Aggregate price data as in harModel function
+    # Aggregate price data as in HARmodel function
 
     # Extract periods from coefficient names
     if (type == "HARRV") {
@@ -881,21 +881,21 @@ predict.harModel <- function(object, newdata = NULL, warnings = TRUE, ...) {
 #' @importFrom stats coef
 #' @export
 print.harModel <- function(x, digits = max(3, getOption("digits") - 3), ...){
-  formula = getHarmodelformula(x); modeldescription = formula[[1]]; betas = formula[[2]];
+  formula <- getHarmodelformula(x); modeldescription = formula[[1]]; betas = formula[[2]];
 
   cat("\nModel:\n", paste(modeldescription, sep = "\n", collapse = "\n"),
       "\n\n", sep = "")
 
-  coefs = coef(x);
-  names(coefs)  = c("beta0",betas)
+  coefs <- coef(x);
+  names(coefs) <- c("beta0",betas)
 
   if (length(coef(x))){
     cat("Coefficients:\n")
     print.default(format(coefs, digits = digits), print.gap = 2,quote = FALSE);
     cat("\n\n");
-    Rs = summary(x)[c("r.squared", "adj.r.squared")]
-    zz = c(Rs$r.squared,Rs$adj.r.squared);
-    names(zz) = c("r.squared","adj.r.squared")
+    Rs <- summary(x)[c("r.squared", "adj.r.squared")]
+    zz <- c(Rs$r.squared,Rs$adj.r.squared);
+    names(zz) <- c("r.squared","adj.r.squared")
     print.default((format(zz,digits=digits) ),print.gap = 2,quote=FALSE)
   }
   else cat("No coefficients\n")
@@ -909,8 +909,8 @@ summary.harModel <- function(object, correlation = FALSE, symbolic.cor = FALSE, 
   x <- object
   dd <- summary.lm(x)
   formula <- getHarmodelformula(x)
-  modeldescription = formula[[1]]
-  betas = formula[[2]]
+  modeldescription <- formula[[1]]
+  betas <- formula[[2]]
   dd$call <- modeldescription
   rownames(dd$coefficients) <- c("beta0", betas)
   return(dd)
