@@ -11,6 +11,6 @@ xts object
 sampleQData
 }
 \description{
-An xts object containing the raw quotes for the imaginary stock XXX for 1 day, in the typical NYSE TAQ database format. This is the cleaned version of the data sample \code{\link{sampleQDataraw}}, using \code{quotesCleanup}.
+An xts object containing the raw quotes for the imaginary stock XXX for 1 day, in the typical NYSE TAQ database format. This is the cleaned version of the data sample \code{\link{sampleQDataRaw}}, using \code{quotesCleanup}.
 }
 \keyword{datasets}

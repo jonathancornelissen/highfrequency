@@ -16,7 +16,7 @@ data.table or xts object
 Function deletes entries for which the spread is negative.
 }
 \examples{
-rmNegativeSpread(sampleQDataraw_microseconds)
+rmNegativeSpread(sampleQDataRaw_microseconds)
 
 }
 \author{

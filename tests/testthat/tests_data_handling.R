@@ -5,12 +5,12 @@ expect_equal(
 )
 
 expect_equal(
-  unique(autoSelectExchangeQuotes(sampleQDataraw)$EX),
+  unique(autoSelectExchangeQuotes(sampleQDataRaw)$EX),
   "N"
 )
 
 expect_equal(
-  quotesCleanup(qdataraw = sampleQDataraw, exchanges = "N")$report["remove_outliers"],
+  quotesCleanup(qdataraw = sampleQDataRaw, exchanges = "N")$report["remove_outliers"],
   c(remove_outliers = 7706)
 )
 
@@ -20,37 +20,37 @@ expect_equal(
 )
 
 expect_equal(
-  unique(selectExchange(sampleQDataraw, c("N", "W"))$EX),
+  unique(selectExchange(sampleQDataRaw, c("N", "W"))$EX),
   c("N", "W")
 )
 
 expect_equal(
-  dim(rmOutliersQuotes(selectExchange(sampleQDataraw, "W"))),
-  dim(rmOutliersQuotes(selectExchange(sampleQDataraw, "W"), type = "standard"))
+  dim(rmOutliersQuotes(selectExchange(sampleQDataRaw, "W"))),
+  dim(rmOutliersQuotes(selectExchange(sampleQDataRaw, "W"), type = "standard"))
 )
 
 expect_equal(
-  dim(rmTradeOutliersUsingQuotes(selectExchange(sample_tdataraw, "W"), selectExchange(sampleQDataraw, "W"))),
+  dim(rmTradeOutliersUsingQuotes(selectExchange(sample_tdataraw, "W"), selectExchange(sampleQDataRaw, "W"))),
   c(203, 8)
 )
 
 expect_equal(
-  dim(rmLargeSpread(selectExchange(sampleQDataraw, "N"))),
+  dim(rmLargeSpread(selectExchange(sampleQDataRaw, "N"))),
   c(9794, 7)
 )
 
 expect_equal(
-  dim(mergeQuotesSameTimestamp(selectExchange(sampleQDataraw, "N"), selection = "max.volume")),
+  dim(mergeQuotesSameTimestamp(selectExchange(sampleQDataRaw, "N"), selection = "max.volume")),
   c(7707, 5)
 )
 
 expect_equal(
-  dim(mergeQuotesSameTimestamp(selectExchange(sampleQDataraw, "N"), selection = "weighted.average")),
+  dim(mergeQuotesSameTimestamp(selectExchange(sampleQDataRaw, "N"), selection = "weighted.average")),
   c(7707, 5)
 )
 
 expect_equal(
-  dim(noZeroQuotes(selectExchange(sampleQDataraw, "N"))),
+  dim(noZeroQuotes(selectExchange(sampleQDataRaw, "N"))),
   c(9792, 7)
 )
 
