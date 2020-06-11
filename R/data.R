@@ -135,7 +135,7 @@
 #' @format A large \code{xts} object.
 #' 
 #' @keywords datasets
-"sample_returns_5min"
+"sampleReturns5Min"
 
 #' Sample of cleaned trades for stock XXX for 1 day
 #' 
