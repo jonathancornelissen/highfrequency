@@ -500,7 +500,7 @@ aggregateTrades <- function(tdata, on = "minutes", k = 5, marketopen = "09:30:00
 #' }
 #' @return data.table or xts object depending on input
 #' 
-#' @examples autoSelectExchangeTrades(sampleTDataRaw_microseconds)
+#' @examples autoSelectExchangeTrades(sampleTDataRawMicroseconds)
 #' 
 #' @author Jonathan Cornelissen, Kris Boudt and Onno Kleen
 #' 
@@ -647,7 +647,7 @@ autoSelectExchangeQuotes <- function(qdata) {
 #' @references Brownlees, C.T. and Gallo, G.M. (2006). Financial econometric analysis at ultra-high frequency: Data handling concerns. Computational Statistics & Data Analysis, 51, pages 2232-2245.
 #' @author Jonathan Cornelissen, Kris Boudt and Onno Kleen.
 #' @examples 
-#' exchangeHoursOnly(sampleTDataRaw_microseconds)
+#' exchangeHoursOnly(sampleTDataRawMicroseconds)
 #' @keywords cleaning
 #' @importFrom lubridate tz
 #' @importFrom lubridate ymd_hms
@@ -1643,8 +1643,8 @@ selectExchange <- function(data, exch = "N") {
 #' 
 #' @examples 
 #' # Consider you have raw trade data for 1 stock for 2 days 
-#' head(sampleTDataRaw_microseconds)
-#' dim(sampleTDataRaw_microseconds)
+#' head(sampleTDataRawMicroseconds)
+#' dim(sampleTDataRawMicroseconds)
 #' tdata_afterfirstcleaning <- tradesCleanup(tdataraw = sampleTDataRaw, exchanges = list("N"))
 #' tdata_afterfirstcleaning$report
 #' dim(tdata_afterfirstcleaning$tdata)
@@ -1771,7 +1771,7 @@ tradesCleanupUsingQuotes <- function(from, to, datasource, datadestination, tick
 #' 
 #' @examples 
 #' # Consider you have raw trade data for 1 stock for 2 days 
-#' tdata_afterfirstcleaning <- tradesCleanup(tdataraw = sampleTDataRaw_microseconds, 
+#' tdata_afterfirstcleaning <- tradesCleanup(tdataraw = sampleTDataRawMicroseconds, 
 #'                                           exchanges = "N", report = FALSE)
 #' # 
 #' qdata <- quotesCleanup(qdataraw = sampleQDataRawMicroseconds, 

@@ -12,6 +12,6 @@ sampleTDataMicroseconds
 }
 \description{
 An data.table object containing the trades for the imaginary stock XXX for 2 days, in the typical NYSE TAQ database format.
-This is the cleaned version of the data sample \code{\link{sampleTDataRaw_microseconds}}, using \code{tradesCleanup}.
+This is the cleaned version of the data sample \code{\link{sampleTDataRawMicroseconds}}, using \code{tradesCleanup}.
 }
 \keyword{datasets}
