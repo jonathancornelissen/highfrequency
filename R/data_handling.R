@@ -1085,7 +1085,7 @@ noZeroQuotes <- function(qData) {
 #' Cleans quote data
 #' 
 #' @description This is a wrapper function for cleaning the quote data in the entire folder dataSource. 
-#' The result is saved in the folder datadestination. 
+#' The result is saved in the folder dataDestination. 
 #' 
 #' In case you supply the argument "qDataraw", the on-disk functionality is ignored
 #' and the function returns the cleaned quotes as xts or data.table object (see examples).
@@ -1094,7 +1094,7 @@ noZeroQuotes <- function(qData) {
 #' \code{\link{noZeroQuotes}}, \code{\link{selectExchange}}, rmLargeSpread,
 #' \code{\link{mergeQuotesSameTimestamp}}, \code{\link{rmOutliersQuotes}}.
 #' @param dataSource character indicating the folder in which the original data is stored.
-#' @param datadestination character indicating the folder in which the cleaned data is stored.
+#' @param dataDestination character indicating the folder in which the cleaned data is stored.
 #' @param exchanges vector of stock exchange symbols for all data in dataSource, 
 #' e.g. exchanges = c("T","N") retrieves all stock market data from both NYSE and NASDAQ.
 #' The possible exchange symbols are:
@@ -1113,7 +1113,7 @@ noZeroQuotes <- function(qData) {
 #' \item Z: BATS
 #' }
 #' @param qDataraw xts or data.table object containing (ONE stock only) raw quote data. This argument is NULL by default. Enabling it means the arguments
-#' from, to, dataSource and datadestination will be ignored. (only advisable for small chunks of data)
+#' from, to, dataSource and dataDestination will be ignored. (only advisable for small chunks of data)
 #' @param report boolean and TRUE by default. In case it is true the function returns (also) a vector indicating how many quotes remained after each cleaning step.
 #' @param selection argument to be passed on to the cleaning routine \code{\link{mergeQuotesSameTimestamp}}. The default is "median".
 #' @param maxi spreads which are greater than median(spreads of day) times maxi are excluded.
@@ -1123,7 +1123,7 @@ noZeroQuotes <- function(qData) {
 #' @param saveasxts indicates whether data should be saved in xts format instead of data.table when using on-disk functionality. TRUE by default.
 #' 
 #' @return The function converts every csv file in dataSource into multiple xts or data.table files.
-#' In datadestination, there will be one folder for each symbol containing .rds files with cleaned data stored either in data.table or xts format.
+#' In dataDestination, there will be one folder for each symbol containing .rds files with cleaned data stored either in data.table or xts format.
 #' 
 #' In case you supply the argument "qDataraw", the on-disk functionality is ignored
 #' and the function returns a list with the cleaned quotes as an xts or data.table object depending on input (see examples).
@@ -1148,7 +1148,7 @@ noZeroQuotes <- function(qData) {
 #' @importFrom readr read_csv
 #' @keywords cleaning
 #' @export
-quotesCleanup <- function(dataSource = NULL, datadestination = NULL, exchanges, qDataraw = NULL, report = TRUE, 
+quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, qDataraw = NULL, report = TRUE, 
                           selection = "median", maxi = 50, window = 50, type = "advanced", rmoutliersmaxi = 10, saveasxts = TRUE) {
   
   BID = OFR = DT = SPREAD = SPREAD_MEDIAN = EX = DATE = BIDSIZ = OFRSIZ = TIME_M  = NULL
@@ -1161,7 +1161,7 @@ quotesCleanup <- function(dataSource = NULL, datadestination = NULL, exchanges, 
                remove_outliers = 0)
   
   if (is.null(qDataraw) == TRUE) {
-    try(dir.create(datadestination), silent = TRUE)
+    try(dir.create(dataDestination), silent = TRUE)
     
     quotesfiles <- list.files(dataSource, recursive = TRUE)[grepl("quotes", list.files(dataSource, recursive = TRUE))]
     for (ii in quotesfiles) {
@@ -1178,15 +1178,15 @@ quotesCleanup <- function(dataSource = NULL, datadestination = NULL, exchanges, 
       qData <- qData[, DATE := as.Date(DT, tz = "EST")]
       qData <- split(qData, by = "DATE")
       
-      try(dir.create(paste0(datadestination, "/", strsplit(ii, "/")[[1]][1])), silent = TRUE)
+      try(dir.create(paste0(dataDestination, "/", strsplit(ii, "/")[[1]][1])), silent = TRUE)
       for (jj in qData) {
         if (saveasxts == TRUE) {
           df_result <- xts(as.matrix(jj[, -c("DT", "DATE")]), order.by = jj$DT)
         } else {
           df_result <- jj[, -c( "DATE")]
         }
-        saveRDS(df_result, paste0(datadestination, "/", strsplit(ii, "/")[[1]][1], "/", unique(as.Date(jj$DT, tz = "EST")), "quotes.rds"))
-        # saveRDS(df_result, paste0(datadestination, "/", strsplit(ii, "/")[[1]][1], "/", strsplit(strsplit(ii, "/")[[1]][2], ".zip")[1], ".rds"))
+        saveRDS(df_result, paste0(dataDestination, "/", strsplit(ii, "/")[[1]][1], "/", unique(as.Date(jj$DT, tz = "EST")), "quotes.rds"))
+        # saveRDS(df_result, paste0(dataDestination, "/", strsplit(ii, "/")[[1]][1], "/", strsplit(strsplit(ii, "/")[[1]][2], ".zip")[1], ".rds"))
       }
     }
   }
@@ -1594,7 +1594,7 @@ selectExchange <- function(data, exch = "N") {
 #' Cleans trade data
 #' 
 #' @description This is a wrapper function for cleaning the trade data of all stock data inside the folder dataSource. 
-#' The result is saved in the folder datadestination. 
+#' The result is saved in the folder dataDestination. 
 #' 
 #' In case you supply the argument "rawtData", the on-disk functionality is ignored. The function returns a vector
 #' indicating how many trades were removed at each cleaning step in this case.
@@ -1609,7 +1609,7 @@ selectExchange <- function(data, exch = "N") {
 #' there is a seperate wrapper called \code{\link{tradesCleanupUsingQuotes}}.
 #' 
 #' @param dataSource character indicating the folder in which the original data is stored.
-#' @param datadestination character indicating the folder in which the cleaned data is stored.
+#' @param dataDestination character indicating the folder in which the cleaned data is stored.
 #' @param exchanges vector of stock exchange symbols for all data in dataSource, 
 #' e.g. exchanges = c("T","N") retrieves all stock market data from both NYSE and NASDAQ.
 #' The possible exchange symbols are:
@@ -1629,7 +1629,7 @@ selectExchange <- function(data, exch = "N") {
 #' }
 #' 
 #' @param tDataraw xts object containing (for ONE stock only) raw trade data. This argument is NULL by default. Enabling it means the arguments
-#' from, to, dataSource and datadestination will be ignored. (only advisable for small chunks of data)
+#' from, to, dataSource and dataDestination will be ignored. (only advisable for small chunks of data)
 #' @param report boolean and TRUE by default. In case it is true the function returns (also) a vector indicating how many trades remained after each cleaning step.
 #' @param selection argument to be passed on to the cleaning routine \code{\link{mergeTradesSameTimestamp}}. The default is "median".
 #' @param saveasxts indicates whether data should be saved in xts format instead of data.table when using on-disk functionality. TRUE by default.
@@ -1659,11 +1659,11 @@ selectExchange <- function(data, exch = "N") {
 #' @author Jonathan Cornelissen and Kris Boudt
 #' @keywords cleaning
 #' @export
-tradesCleanup <- function(dataSource = NULL, datadestination = NULL, exchanges, tDataraw = NULL, report = TRUE, selection = "median", saveasxts = TRUE) {
+tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, tDataraw = NULL, report = TRUE, selection = "median", saveasxts = TRUE) {
   PRICE = EX = COND = DT = DATE = TIME_M = NULL
   
   if (is.null(tDataraw) == TRUE) {
-    try(dir.create(datadestination), silent = TRUE)
+    try(dir.create(dataDestination), silent = TRUE)
     
     tradesfiles <- list.files(dataSource, recursive = TRUE)[!grepl("quotes", list.files(dataSource, recursive = TRUE))]
     for (ii in tradesfiles) {
@@ -1675,15 +1675,15 @@ tradesCleanup <- function(dataSource = NULL, datadestination = NULL, exchanges, 
       tData <- tData[, DATE := as.Date(DT, tz = "EST")]
       tData <- split(tData, by = "DATE")
       
-      try(dir.create(paste0(datadestination, "/", strsplit(ii, "/")[[1]][1])), silent = TRUE)
+      try(dir.create(paste0(dataDestination, "/", strsplit(ii, "/")[[1]][1])), silent = TRUE)
       for (jj in tData) {
         if (saveasxts == TRUE) {
           df_result <- xts(as.matrix(jj[, -c("DT", "DATE")]), order.by = jj$DT)
         } else {
           df_result <- jj[, -c( "DATE")]
         }
-        saveRDS(df_result, paste0(datadestination, "/", strsplit(ii, "/")[[1]][1], "/", unique(as.Date(jj$DT, tz = "EST")), ".rds"))
-        # saveRDS(df_result, paste0(datadestination, "/", strsplit(ii, "/")[[1]][1], "/", strsplit(strsplit(ii, "/")[[1]][2], ".zip")[1], ".rds"))
+        saveRDS(df_result, paste0(dataDestination, "/", strsplit(ii, "/")[[1]][1], "/", unique(as.Date(jj$DT, tz = "EST")), ".rds"))
+        # saveRDS(df_result, paste0(dataDestination, "/", strsplit(ii, "/")[[1]][1], "/", strsplit(strsplit(ii, "/")[[1]][2], ".zip")[1], ".rds"))
       }
     }
   }
@@ -1736,27 +1736,27 @@ tradesCleanup <- function(dataSource = NULL, datadestination = NULL, exchanges, 
 }
 
 #' @export
-tradesCleanupUsingQuotes <- function(from, to, dataSource, datadestination, ticker, tData = NULL, qData = NULL) {
+tradesCleanupUsingQuotes <- function(from, to, dataSource, dataDestination, ticker, tData = NULL, qData = NULL) {
   
   ## Deprecated
   warning("Please use tradesCleanupUsingQuotes instead of tradesCleanupFinal.") 
-  tradesCleanupFinal(from, to, dataSource, datadestination, ticker, tData = NULL, qData = NULL)
+  tradesCleanupFinal(from, to, dataSource, dataDestination, ticker, tData = NULL, qData = NULL)
 }
 
 #' Perform a final cleaning procedure on trade data
 #' 
 #' @description Function performs cleaning procedure \code{\link{rmTradeOutliersUsingQuotes}} 
-#' for the trades of all stocks data in "datadestination". 
+#' for the trades of all stocks data in "dataDestination". 
 #' Note that preferably the input data for this function 
 #' is trade and quote data cleaned by respectively e.g. \code{\link{tradesCleanup}}
 #' and \code{\link{quotesCleanup}}.
 #' 
 #' @param dataSource character indicating the folder in which the original data is stored.
-#' @param datadestination character indicating the folder in which the cleaned data is stored, folder of dataSource by default.
+#' @param dataDestination character indicating the folder in which the cleaned data is stored, folder of dataSource by default.
 #' @param tData data.table or xts object containing (ONE day and for ONE stock only) trade data cleaned by \code{\link{tradesCleanup}}. This argument is NULL by default. Enabling it, means the arguments
-#' from, to, dataSource and datadestination will be ignored. (only advisable for small chunks of data)
+#' from, to, dataSource and dataDestination will be ignored. (only advisable for small chunks of data)
 #' @param qData data.table or xts object containing (ONE day and for ONE stock only) cleaned quote data. This argument is NULL by default. Enabling it means the arguments
-#' from, to, dataSource, datadestination will be ignored. (only advisable for small chunks of data)
+#' from, to, dataSource, dataDestination will be ignored. (only advisable for small chunks of data)
 #' 
 #' @return For each day an xts object is saved into the folder of that date, containing the cleaned data.
 #' 
@@ -1785,10 +1785,10 @@ tradesCleanupUsingQuotes <- function(from, to, dataSource, datadestination, tick
 #' #via "from","to","dataSource", etc. arguments
 #' @keywords cleaning
 #' @export
-tradesCleanupUsingQuotes <- function(dataSource = NULL, datadestination = NULL, tData = NULL, qData = NULL) {
+tradesCleanupUsingQuotes <- function(dataSource = NULL, dataDestination = NULL, tData = NULL, qData = NULL) {
   
-  if (is.null(datadestination) == TRUE) {
-    datadestination <- dataSource
+  if (is.null(dataDestination) == TRUE) {
+    dataDestination <- dataSource
   }
   
   if ((!is.null(tData)) & (!is.null(qData))) {
@@ -1807,7 +1807,7 @@ tradesCleanupUsingQuotes <- function(dataSource = NULL, datadestination = NULL, 
         qData <- try(readRDS(paste0(dataSource, "/", ii, "/", substring(jj, 1, 10), "quotes.rds")))
         tData <- checkColumnNames(tData)
         qData <- checkColumnNames(qData)
-        saveRDS(rmTradeOutliersUsingQuotes(tData, qData), paste0(datadestination, "/", ii, "/", substring(jj, 1, 10), "tradescleanedbyquotes.rds"))
+        saveRDS(rmTradeOutliersUsingQuotes(tData, qData), paste0(dataDestination, "/", ii, "/", substring(jj, 1, 10), "tradescleanedbyquotes.rds"))
       }
     }
   }

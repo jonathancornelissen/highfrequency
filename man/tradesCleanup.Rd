@@ -6,7 +6,7 @@
 \usage{
 tradesCleanup(
   dataSource = NULL,
-  datadestination = NULL,
+  dataDestination = NULL,
   exchanges,
   tDataraw = NULL,
   report = TRUE,
@@ -17,7 +17,7 @@ tradesCleanup(
 \arguments{
 \item{dataSource}{character indicating the folder in which the original data is stored.}
 
-\item{datadestination}{character indicating the folder in which the cleaned data is stored.}
+\item{dataDestination}{character indicating the folder in which the cleaned data is stored.}
 
 \item{exchanges}{vector of stock exchange symbols for all data in dataSource, 
 e.g. exchanges = c("T","N") retrieves all stock market data from both NYSE and NASDAQ.
@@ -38,7 +38,7 @@ The possible exchange symbols are:
 }}
 
 \item{tDataraw}{xts object containing (for ONE stock only) raw trade data. This argument is NULL by default. Enabling it means the arguments
-from, to, dataSource and datadestination will be ignored. (only advisable for small chunks of data)}
+from, to, dataSource and dataDestination will be ignored. (only advisable for small chunks of data)}
 
 \item{report}{boolean and TRUE by default. In case it is true the function returns (also) a vector indicating how many trades remained after each cleaning step.}
 
@@ -56,7 +56,7 @@ and the function returns a list with the cleaned trades as xts object (see examp
 }
 \description{
 This is a wrapper function for cleaning the trade data of all stock data inside the folder dataSource. 
-The result is saved in the folder datadestination. 
+The result is saved in the folder dataDestination. 
 
 In case you supply the argument "rawtData", the on-disk functionality is ignored. The function returns a vector
 indicating how many trades were removed at each cleaning step in this case.

@@ -6,7 +6,7 @@
 \usage{
 tradesCleanupUsingQuotes(
   dataSource = NULL,
-  datadestination = NULL,
+  dataDestination = NULL,
   tData = NULL,
   qData = NULL
 )
@@ -14,13 +14,13 @@ tradesCleanupUsingQuotes(
 \arguments{
 \item{dataSource}{character indicating the folder in which the original data is stored.}
 
-\item{datadestination}{character indicating the folder in which the cleaned data is stored, folder of dataSource by default.}
+\item{dataDestination}{character indicating the folder in which the cleaned data is stored, folder of dataSource by default.}
 
 \item{tData}{data.table or xts object containing (ONE day and for ONE stock only) trade data cleaned by \code{\link{tradesCleanup}}. This argument is NULL by default. Enabling it, means the arguments
-from, to, dataSource and datadestination will be ignored. (only advisable for small chunks of data)}
+from, to, dataSource and dataDestination will be ignored. (only advisable for small chunks of data)}
 
 \item{qData}{data.table or xts object containing (ONE day and for ONE stock only) cleaned quote data. This argument is NULL by default. Enabling it means the arguments
-from, to, dataSource, datadestination will be ignored. (only advisable for small chunks of data)}
+from, to, dataSource, dataDestination will be ignored. (only advisable for small chunks of data)}
 }
 \value{
 For each day an xts object is saved into the folder of that date, containing the cleaned data.
@@ -30,7 +30,7 @@ and the function returns cleaned trades as a data.table or xts object (see examp
 }
 \description{
 Function performs cleaning procedure \code{\link{rmTradeOutliersUsingQuotes}} 
-for the trades of all stocks data in "datadestination". 
+for the trades of all stocks data in "dataDestination". 
 Note that preferably the input data for this function 
 is trade and quote data cleaned by respectively e.g. \code{\link{tradesCleanup}}
 and \code{\link{quotesCleanup}}.
