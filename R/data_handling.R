@@ -41,17 +41,17 @@
 #' ts <- sampleTData$PRICE
 #' 
 #' #Previous tick aggregation to the 5-minute sampling frequency:
-#' tsagg5min <- aggregatets(ts, on = "minutes", k = 5)
+#' tsagg5min <- aggregateTS(ts, on = "minutes", k = 5)
 #' head(tsagg5min)
 #' #Previous tick aggregation to the 30-second sampling frequency:
-#' tsagg30sec <- aggregatets(ts, on = "seconds", k = 30)
+#' tsagg30sec <- aggregateTS(ts, on = "seconds", k = 30)
 #' tail(tsagg30sec)
 #' 
 #' @importFrom zoo zoo na.locf
 #' @importFrom stats start end
 #' @importFrom xts period.apply	
 #' @export
-aggregatets <- function (ts, FUN = "previoustick", on = "minutes", k = 1, weights = NULL, dropna = FALSE) {
+aggregateTS <- function (ts, FUN = "previoustick", on = "minutes", k = 1, weights = NULL, dropna = FALSE) {
   
   makethispartbetter <- ((!is.null(weights))| on=="days"| on=="weeks" | (FUN!="previoustick") | dropna)
   

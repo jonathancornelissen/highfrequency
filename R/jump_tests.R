@@ -438,7 +438,7 @@ intradayJumpTest <- function(pData = NULL, testType = "LM", testingTimes = NULL,
 
   } else {
     # Lee-Mykland needs this - maybe others too
-    testData <- aggregatets(pData, on = "minutes", k = windowSize)
+    testData <- aggregateTS(pData, on = "minutes", k = windowSize)
 
     out <- switch (testType,
       LM = LeeMyklandtest(testData, testingTimes, windowSize, K, alpha),

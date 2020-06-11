@@ -509,7 +509,7 @@ rAVGCov <- function(rdata, cor = FALSE, align.by = "minutes", align.period = 5, 
   #   }
   #   rdata <- makeReturns(rdata)
   # } else {
-  #   rdata <- aggregatets(rdata, FUN = "sum", on = align.by, k = 1)
+  #   rdata <- aggregateTS(rdata, FUN = "sum", on = align.by, k = 1)
   # }
   # 
   # if (is.null(dim(rdata))) {
@@ -518,25 +518,25 @@ rAVGCov <- function(rdata, cor = FALSE, align.by = "minutes", align.period = 5, 
   #   n <- dim(rdata)[2]
   # }
   # 
-  # zoo::index(rdata) <- index(rdata) - eval(parse(text = paste0("lubridate::", align.by, "(", 1, ")"))) # shift due to change on boundary in aggregatets
+  # zoo::index(rdata) <- index(rdata) - eval(parse(text = paste0("lubridate::", align.by, "(", 1, ")"))) # shift due to change on boundary in aggregateTS
   # if (n == 1) {
-  #   rvavg <- rCov(aggregatets(rdata, FUN = "sum", on = align.by, k = align.period))
+  #   rvavg <- rCov(aggregateTS(rdata, FUN = "sum", on = align.by, k = align.period))
   #   for (ii in c(1:(align.period - 1))) {
   #     rdatasub <- rdata[-c(1:ii, (length(rdata)-align.period + ii):length(rdata)), ]
   #     zoo::index(rdatasub) <-  ymd_hms(index(rdatasub), tz = tz(index(rdatasub))) - eval(parse(text = paste0("lubridate::", align.by, "(", ii, ")")))
   #     n_obs <- length(fastTickAgregation(rdatasub, on = align.by, k = align.period))
-  #     rvavg <- rvavg + rCov(aggregatets(rdatasub, FUN = "sum", on = align.by, k = align.period)) #* (n_obs + 1) / (n_obs) # correction term for one observation less
+  #     rvavg <- rvavg + rCov(aggregateTS(rdatasub, FUN = "sum", on = align.by, k = align.period)) #* (n_obs + 1) / (n_obs) # correction term for one observation less
   #   }
   #   return(rvavg / align.period)
   # } else {
   #   rdatamatrix <- matrix(0, nrow = n, ncol = n)
   #   for (ii in c(1:n)) {
-  #     rvavg <- rCov(aggregatets(rdata[, ii], FUN = "sum", on = align.by, k = align.period))
+  #     rvavg <- rCov(aggregateTS(rdata[, ii], FUN = "sum", on = align.by, k = align.period))
   #     for (jj in c(1:(align.period - 1))) {
   #       rdatasub <- rdata[-c(1:jj, (length(rdata[,ii])-align.period + jj):length(rdata[,ii])), ii]
   #       zoo::index(rdatasub) <- ymd_hms(index(rdatasub), tz = tz(index(rdatasub))) - eval(parse(text = paste0("lubridate::", align.by, "(", ii, ")")))
   #       n_obs <- length(fastTickAgregation(rdatasub, on = align.by, k = align.period))
-  #       rvavg <- rvavg + rCov(aggregatets(rdatasub, FUN = "sum", on = align.by, k = align.period)) #* (n_obs + 1) / (n_obs) # correction term for one observation less
+  #       rvavg <- rvavg + rCov(aggregateTS(rdatasub, FUN = "sum", on = align.by, k = align.period)) #* (n_obs + 1) / (n_obs) # correction term for one observation less
   #     }
   #     rdatamatrix[ii, ii] <- rvavg / align.period
   #     if (ii < n) {
@@ -555,7 +555,7 @@ rAVGCov <- function(rdata, cor = FALSE, align.by = "minutes", align.period = 5, 
   # 
   # if (n == 1) {
   #   
-  #   rollingwindow <- aggregatets(rdata, FUN = "sum", on = align.by, k = align.period)
+  #   rollingwindow <- aggregateTS(rdata, FUN = "sum", on = align.by, k = align.period)
   #   
   #   rollingwindow <- period.apply(rdata, INDEX = rep(c(1:(length(rdata) / align.period)), each = align.p), FUN = "sum")
   #   

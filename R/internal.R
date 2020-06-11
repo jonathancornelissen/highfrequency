@@ -24,7 +24,7 @@ fastTickAgregation <- function (ts, on = "minutes", k = 1, tz = "GMT") {
   return(ts)
 }
 
-# system.time(aggregatets(sampleTData$PRICE, k = 5))
+# system.time(aggregateTS(sampleTData$PRICE, k = 5))
 # # 
 # system.time({blub <- sampleTData$PRICE[endpoints(index(sampleTData$PRICE), on = "minutes", k = 5), ]
 # blub <- xts(blub, order.by = ceiling_date(index(blub), unit = paste(5, "minutes")))})
