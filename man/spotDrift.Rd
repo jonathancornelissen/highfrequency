@@ -11,7 +11,7 @@ spotDrift(
   on = "minutes",
   k = 5,
   marketOpen = "09:30:00",
-  marketclose = "16:00:00",
+  marketClose = "16:00:00",
   tz = "GMT"
 )
 }
@@ -30,7 +30,7 @@ Standard is minutes}
 
 \item{marketOpen}{Opening time of the market, standard is "09:30:00"}
 
-\item{marketclose}{Closing time of the market, standard is "16:00:00"}
+\item{marketClose}{Closing time of the market, standard is "16:00:00"}
 
 \item{tz}{Time zone, standard is "GMT"}
 }

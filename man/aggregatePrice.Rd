@@ -9,7 +9,7 @@ aggregatePrice(
   on = "minutes",
   k = 1,
   marketOpen = "09:30:00",
-  marketclose = "16:00:00",
+  marketClose = "16:00:00",
   fill = FALSE,
   tz = NULL
 )
@@ -24,7 +24,7 @@ xts object to the 5 minute frequency set k = 5 and on = "minutes".}
 
 \item{marketOpen}{the market opening time, by default: marketOpen = "09:30:00".}
 
-\item{marketclose}{the market closing time, by default: marketclose = "16:00:00".}
+\item{marketClose}{the market closing time, by default: marketClose = "16:00:00".}
 
 \item{fill}{indicates whether rows without trades should be added with the most recent value, FALSE by default.}
 

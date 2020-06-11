@@ -9,7 +9,7 @@ aggregateQuotes(
   on = "minutes",
   k = 5,
   marketOpen = "09:30:00",
-  marketclose = "16:00:00",
+  marketClose = "16:00:00",
   tz = "GMT"
 )
 }
@@ -24,7 +24,7 @@ object to the 5 minute frequency set k = 5 and on = "minutes".}
 
 \item{marketOpen}{the market opening time, by default: marketOpen = "09:30:00".}
 
-\item{marketclose}{the market closing time, by default: marketclose = "16:00:00".}
+\item{marketClose}{the market closing time, by default: marketClose = "16:00:00".}
 
 \item{tz}{time zone used, by default: tz = "GMT".}
 }

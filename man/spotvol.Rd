@@ -11,7 +11,7 @@ spotvol(
   on = "minutes",
   k = 5,
   marketOpen = "09:30:00",
-  marketclose = "16:00:00",
+  marketClose = "16:00:00",
   tz = "GMT"
 )
 }
@@ -36,11 +36,11 @@ over. E.g. to aggregate an \code{xts} object to the 5 minute frequency, set
 \item{marketOpen}{the market opening time. This should be in the time zone
 specified by \code{tz}. By default, \code{marketOpen = "09:30:00"}.}
 
-\item{marketclose}{the market closing time. This should be in the time zone
-specified by \code{tz}. By default, \code{marketclose = "16:00:00"}.}
+\item{marketClose}{the market closing time. This should be in the time zone
+specified by \code{tz}. By default, \code{marketClose = "16:00:00"}.}
 
 \item{tz}{string specifying the time zone to which the times in \code{data}
-and/or \code{marketOpen}/ \code{marketclose} belong. Default = \code{"GMT"}.}
+and/or \code{marketOpen}/ \code{marketClose} belong. Default = \code{"GMT"}.}
 }
 \value{
 A \code{spotvol} object, which is a list containing one or more of the
@@ -50,7 +50,7 @@ following outputs, depending on the method used:
 
 An \code{xts} or \code{matrix} object (depending on the input) containing
 spot volatility estimates \eqn{\sigma_{t,i}}, reported for each interval
-\eqn{i} between \code{marketOpen} and \code{marketclose} for every day
+\eqn{i} between \code{marketOpen} and \code{marketClose} for every day
 \eqn{t} in \code{data}. The length of the intervals is specifiedby \code{k}
 and \code{on}. Methods that provide this output: All.
 
@@ -64,7 +64,7 @@ component. Methods that provide this output: \code{"detper"}.
 
 An \code{xts} or \code{numeric} object (depending on the input) containing
 estimates of the intraday periodicity factor for each day interval \eqn{i}
-between \code{marketOpen} and \code{marketclose}, if the spot volatility was
+between \code{marketOpen} and \code{marketClose}, if the spot volatility was
 decomposed into a daily and an intraday component. If the output is in
 \code{xts} format, this periodicity factor will be dated to the first day of
 the input data, but it is identical for each day in the sample. Methods that
