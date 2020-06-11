@@ -166,7 +166,7 @@ aggregateTS <- function (ts, FUN = "previoustick", on = "minutes", k = 1, weight
 #' @param on character, indicating the time scale in which "k" is expressed. Possible values are: "milliseconds", "secs", "seconds", "mins", "minutes","hours".
 #' @param k positive integer, indicating the number of periods to aggregate over; e.g. to aggregate a 
 #' xts object to the 5 minute frequency set k = 5 and on = "minutes".
-#' @param marketopen the market opening time, by default: marketopen = "09:30:00". 
+#' @param marketOpen the market opening time, by default: marketOpen = "09:30:00". 
 #' @param marketclose the market closing time, by default: marketclose = "16:00:00". 
 #' @param fill indicates whether rows without trades should be added with the most recent value, FALSE by default.
 #' @param tz time zone used, by default: tz = timezone of DT column/index of xts.
@@ -193,7 +193,7 @@ aggregateTS <- function (ts, FUN = "previoustick", on = "minutes", k = 1, weight
 #' @keywords internal
 #' @importFrom xts last
 #' @export
-aggregatePrice <- function(pData, on = "minutes", k = 1, marketopen = "09:30:00", marketclose = "16:00:00" , fill = FALSE, tz = NULL) {
+aggregatePrice <- function(pData, on = "minutes", k = 1, marketOpen = "09:30:00", marketclose = "16:00:00" , fill = FALSE, tz = NULL) {
   
   DATE = DT = FIRST_DT = DT_ROUND = LAST_DT = SYMBOL = PRICE = NULL
   
@@ -225,7 +225,7 @@ aggregatePrice <- function(pData, on = "minutes", k = 1, marketopen = "09:30:00"
         date <- strsplit(as.character(index(pData)), " ")[[1]][1]
 
         #open
-        a <- as.POSIXct(paste(date, marketopen), tz = tz)
+        a <- as.POSIXct(paste(date, marketOpen), tz = tz)
         b <- as.xts(matrix(as.numeric(pData[1]), nrow = 1), a)
         storage.mode(ts2) <- "numeric"
         ts3 <- c(b, ts2)
@@ -252,7 +252,7 @@ aggregatePrice <- function(pData, on = "minutes", k = 1, marketopen = "09:30:00"
     }
   }
   
-  pData <- pData[DT >= ymd_hms(paste(as.Date(pData$DT, tz = tz(pData$DT)), marketopen), tz = tz(pData$DT))]
+  pData <- pData[DT >= ymd_hms(paste(as.Date(pData$DT, tz = tz(pData$DT)), marketOpen), tz = tz(pData$DT))]
   pData <- pData[DT <= ymd_hms(paste(as.Date(pData$DT, tz = tz(pData$DT)), marketclose), tz = tz(pData$DT))]
 
   pData[, DATE := as.Date(DT, tz = tz(pData))]
@@ -264,7 +264,7 @@ aggregatePrice <- function(pData, on = "minutes", k = 1, marketopen = "09:30:00"
   pData[, LAST_DT := max(DT), by = "DT_ROUND"]
   
   pData_open <- data.table::copy(pData[DT == FIRST_DT])
-  pData_open[, DT := ymd_hms(paste(as.Date(pData_open$DT), marketopen), tz = tz(pData_open$DT))]
+  pData_open[, DT := ymd_hms(paste(as.Date(pData_open$DT), marketOpen), tz = tz(pData_open$DT))]
   pData_open <- pData_open[, c("DT", "PRICE")]
 
   pData <- pData[DT == LAST_DT][, DT := DT_ROUND][, c("DT", "PRICE")]
@@ -286,14 +286,14 @@ aggregatePrice <- function(pData, on = "minutes", k = 1, marketopen = "09:30:00"
     if (is.null(on_true) == FALSE) {
       dt_full_index <-
         rbindlist(lapply(unique(as.Date(pData$DT)),
-                         FUN = function(x) data.frame(DT = seq.POSIXt(from = as.POSIXct(paste0(x, marketopen, tz = tz(pData$DT))), 
+                         FUN = function(x) data.frame(DT = seq.POSIXt(from = as.POSIXct(paste0(x, marketOpen, tz = tz(pData$DT))), 
                                                                       to   = as.POSIXct(paste0(x, marketclose, tz = tz(pData$DT))), 
                                                                       units = on,
                                                                       by = k))))
     } else {
       dt_full_index <-
         rbindlist(lapply(unique(as.Date(pData$DT)),
-                         FUN = function(x) data.frame(DT = seq.POSIXt(from = as.POSIXct(paste0(x, marketopen, tz = tz(pData$DT))), 
+                         FUN = function(x) data.frame(DT = seq.POSIXt(from = as.POSIXct(paste0(x, marketOpen, tz = tz(pData$DT))), 
                                                                       to   = as.POSIXct(paste0(x, marketclose, tz = tz(pData$DT))),
                                                                       by = paste(k, on)))))
     }
@@ -323,7 +323,7 @@ aggregatePrice <- function(pData, on = "minutes", k = 1, marketopen = "09:30:00"
 #' xts object to the 5 minute frequency, set k=5 and on = "minutes".
 #' @param k positive integer, indicating the number of periods to aggregate over. E.g. to aggregate an
 #' object to the 5 minute frequency set k = 5 and on = "minutes".
-#' @param marketopen the market opening time, by default: marketopen = "09:30:00".
+#' @param marketOpen the market opening time, by default: marketOpen = "09:30:00".
 #' @param marketclose the market closing time, by default: marketclose = "16:00:00".
 #' @param tz time zone used, by default: tz = "GMT".
 #' 
@@ -347,7 +347,7 @@ aggregatePrice <- function(pData, on = "minutes", k = 1, marketopen = "09:30:00"
 #' qdata_aggregated <- aggregateQuotes(sampleQData, on = "seconds", k = 30)
 #' head(qdata_aggregated)
 #' @export
-aggregateQuotes <- function(qdata, on = "minutes", k = 5, marketopen = "09:30:00", marketclose = "16:00:00", tz = "GMT") {
+aggregateQuotes <- function(qdata, on = "minutes", k = 5, marketOpen = "09:30:00", marketclose = "16:00:00", tz = "GMT") {
   DATE = BID = OFR = BIDSIZ = OFRSIZ = DT = FIRST_DT = DT_ROUND = LAST_DT = SYMBOL = NULL
   
   qdata <- checkColumnNames(qdata)
@@ -404,7 +404,7 @@ aggregateQuotes <- function(qdata, on = "minutes", k = 5, marketopen = "09:30:00
 #' @param on character, indicating the time scale in which "k" is expressed. Possible values are: "secs", "seconds", "mins", "minutes", "hours".
 #' @param k positive integer, indicating the number of periods to aggregate over. E.g. to aggregate an
 #' object to the 5 minute frequency set k = 5 and on = "minutes".
-#' @param marketopen the market opening time, by default: marketopen = "09:30:00".
+#' @param marketOpen the market opening time, by default: marketOpen = "09:30:00".
 #' @param marketclose the market closing time, by default: marketclose = "16:00:00".
 #' @param tz time zone used, by default: tz = "GMT".
 #' @details The timestamps of the new time series are the closing times and/or days of the intervals. 
@@ -435,7 +435,7 @@ aggregateQuotes <- function(qdata, on = "minutes", k = 5, marketopen = "09:30:00
 #' @importFrom lubridate ymd_hms
 #' @importFrom lubridate as_datetime
 #' @export
-aggregateTrades <- function(tdata, on = "minutes", k = 5, marketopen = "09:30:00", marketclose = "16:00:00", tz = "GMT") {
+aggregateTrades <- function(tdata, on = "minutes", k = 5, marketOpen = "09:30:00", marketclose = "16:00:00", tz = "GMT") {
   DATE = SIZE = DT = FIRST_DT = DT_ROUND = LAST_DT = SYMBOL = PRICE = VWPRICE = SIZETPRICE = SIZESUM = NULL
   tdata <- checkColumnNames(tdata)
   checktdata(tdata)

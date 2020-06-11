@@ -8,7 +8,7 @@ aggregatePrice(
   pData,
   on = "minutes",
   k = 1,
-  marketopen = "09:30:00",
+  marketOpen = "09:30:00",
   marketclose = "16:00:00",
   fill = FALSE,
   tz = NULL
@@ -22,7 +22,7 @@ aggregatePrice(
 \item{k}{positive integer, indicating the number of periods to aggregate over; e.g. to aggregate a 
 xts object to the 5 minute frequency set k = 5 and on = "minutes".}
 
-\item{marketopen}{the market opening time, by default: marketopen = "09:30:00".}
+\item{marketOpen}{the market opening time, by default: marketOpen = "09:30:00".}
 
 \item{marketclose}{the market closing time, by default: marketclose = "16:00:00".}
 

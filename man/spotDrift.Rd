@@ -10,7 +10,7 @@ spotDrift(
   ...,
   on = "minutes",
   k = 5,
-  marketopen = "09:30:00",
+  marketOpen = "09:30:00",
   marketclose = "16:00:00",
   tz = "GMT"
 )
@@ -28,7 +28,7 @@ Standard is minutes}
 
 \item{k}{How often should the estimation take place? If \code{k} is 5 the estimation will be done every fifth unit of \code{on}.}
 
-\item{marketopen}{Opening time of the market, standard is "09:30:00"}
+\item{marketOpen}{Opening time of the market, standard is "09:30:00"}
 
 \item{marketclose}{Closing time of the market, standard is "16:00:00"}
 

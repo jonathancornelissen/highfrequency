@@ -8,7 +8,7 @@
 #' @param on What time-frame should the estimator be applied? Accepted inputs are \code{"milliseconds"}, \code{"seconds"} and \code{"secs"} for seconds, \code{"minutes"} and \code{"mins"} for minutes, and \code{"hours"} for hours.
 #' Standard is minutes
 #' @param k How often should the estimation take place? If \code{k} is 5 the estimation will be done every fifth unit of \code{on}.
-#' @param marketopen Opening time of the market, standard is "09:30:00"
+#' @param marketOpen Opening time of the market, standard is "09:30:00"
 #' @param marketclose Closing time of the market, standard is "16:00:00"
 #' @param tz Time zone, standard is "GMT"
 #'
@@ -43,7 +43,7 @@
 #' @importFrom data.table setkeyv
 #' @export
 spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
-                     marketopen = "09:30:00", marketclose = "16:00:00", tz = "GMT") {
+                     marketOpen = "09:30:00", marketclose = "16:00:00", tz = "GMT") {
 
   PRICE = DATE = RETURN = DT = NULL
 
@@ -70,7 +70,7 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
     }
   }
 
-  datad <- aggregatePrice(data, on = on, k = k , marketopen = marketopen,
+  datad <- aggregatePrice(data, on = on, k = k , marketOpen = marketOpen,
                           marketclose = marketclose, tz = tz, fill = TRUE)
   datad[, DATE := as.Date(DT)]
   setkeyv(datad, "DT")
@@ -107,12 +107,12 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
 #' @param k positive integer, indicating the number of periods to aggregate
 #' over. E.g. to aggregate an \code{xts} object to the 5 minute frequency, set
 #' \code{k = 5} and \code{on = "minutes"}.
-#' @param marketopen the market opening time. This should be in the time zone
-#' specified by \code{tz}. By default, \code{marketopen = "09:30:00"}.
+#' @param marketOpen the market opening time. This should be in the time zone
+#' specified by \code{tz}. By default, \code{marketOpen = "09:30:00"}.
 #' @param marketclose the market closing time. This should be in the time zone
 #' specified by \code{tz}. By default, \code{marketclose = "16:00:00"}.
 #' @param tz string specifying the time zone to which the times in \code{data}
-#' and/or \code{marketopen}/ \code{marketclose} belong. Default = \code{"GMT"}.
+#' and/or \code{marketOpen}/ \code{marketclose} belong. Default = \code{"GMT"}.
 #' @param ... method-specific parameters (see 'Details').
 #'
 #' @return A \code{spotvol} object, which is a list containing one or more of the
@@ -122,7 +122,7 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
 #'
 #' An \code{xts} or \code{matrix} object (depending on the input) containing
 #' spot volatility estimates \eqn{\sigma_{t,i}}, reported for each interval
-#' \eqn{i} between \code{marketopen} and \code{marketclose} for every day
+#' \eqn{i} between \code{marketOpen} and \code{marketclose} for every day
 #' \eqn{t} in \code{data}. The length of the intervals is specifiedby \code{k}
 #' and \code{on}. Methods that provide this output: All.
 #'
@@ -136,7 +136,7 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
 #'
 #' An \code{xts} or \code{numeric} object (depending on the input) containing
 #' estimates of the intraday periodicity factor for each day interval \eqn{i}
-#' between \code{marketopen} and \code{marketclose}, if the spot volatility was
+#' between \code{marketOpen} and \code{marketclose}, if the spot volatility was
 #' decomposed into a daily and an intraday component. If the output is in
 #' \code{xts} format, this periodicity factor will be dated to the first day of
 #' the input data, but it is identical for each day in the sample. Methods that
@@ -428,7 +428,7 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
 #' Taylor, S. J. and X. Xu (1997). The incremental volatility information in one million foreign exchange quotations. Journal of Empirical Finance 4, 317-340.
 #' @export
 spotvol <- function(data, method = "detper", ..., on = "minutes", k = 5,
-                      marketopen = "09:30:00", marketclose = "16:00:00",
+                      marketOpen = "09:30:00", marketclose = "16:00:00",
                       tz = "GMT") {
   
   PRICE = DATE = RETURN = DT = NULL
@@ -456,7 +456,7 @@ spotvol <- function(data, method = "detper", ..., on = "minutes", k = 5,
     }
   }
   
-  datad <- aggregatePrice(data, on = on, k = k , marketopen = marketopen,
+  datad <- aggregatePrice(data, on = on, k = k , marketOpen = marketOpen,
                           marketclose = marketclose, tz = tz, fill = TRUE)
   datad[, DATE := as.Date(DT, tz = tz(datad$DT))]
   setkeyv(datad, "DT")

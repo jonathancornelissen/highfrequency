@@ -919,12 +919,12 @@ center <- function() {
 }
 
 # # modified version of 'aggregatePrice' from highfrequency package
-# aggregatePrice <- function (ts, FUN = "previoustick", on = "minutes", k = 1, marketopen = "09:30:00", marketclose = "16:00:00", tz = "GMT") {
+# aggregatePrice <- function (ts, FUN = "previoustick", on = "minutes", k = 1, marketOpen = "09:30:00", marketclose = "16:00:00", tz = "GMT") {
 #   ts2 = aggregateTS(ts, FUN = FUN, on, k)
 #   date = strsplit(as.character(index(ts)), " ")[[1]][1]
 #
 #   #open
-#   a = as.POSIXct(paste(date, marketopen), tz = tz)
+#   a = as.POSIXct(paste(date, marketOpen), tz = tz)
 #   b = as.xts(matrix(as.numeric(ts[1]),nrow=1), a)
 #   ts3 = c(b, ts2)
 #
