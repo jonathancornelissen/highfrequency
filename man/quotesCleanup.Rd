@@ -78,9 +78,9 @@ The following cleaning steps are performed sequentially:
 }
 \examples{
 # Consider you have raw quote data for 1 stock for 2 days
-head(sampleqDataRawMicroseconds)
-dim(sampleqDataRawMicroseconds)
-qData_aftercleaning <- quotesCleanup(qDataraw = sampleqDataRawMicroseconds, exchanges = "N")
+head(sampleQDataRawMicroseconds)
+dim(sampleQDataRawMicroseconds)
+qData_aftercleaning <- quotesCleanup(qDataraw = sampleQDataRawMicroseconds, exchanges = "N")
 qData_aftercleaning$report
 dim(qData_aftercleaning$qData)
 

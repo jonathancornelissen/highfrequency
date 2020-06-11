@@ -88,7 +88,7 @@ matrix. This function replaces the negative eigenvalues with zeroes.
 # Robust Realized two timescales Variance/Covariance
 
 # Univariate: 
-rvts <- rTSCov(pData = sampletData$PRICE)
+rvts <- rTSCov(pData = sampleTData$PRICE)
 # Note: Prices as input
 rvts 
 

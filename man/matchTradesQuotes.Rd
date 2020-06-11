@@ -23,10 +23,10 @@ Function matches the trades and quotes and returns an xts-object containing both
 }
 \examples{
 # match the trade and quote data
-tqData <- matchTradesQuotes(sampletData, sampleqData)
+tqData <- matchTradesQuotes(sampleTData, sampleQData)
 head(tqData)
 # multi-day input allowed
-tqData <- matchTradesQuotes(sampletDataMicroseconds, sampleqDataMicroseconds)
+tqData <- matchTradesQuotes(sampleTDataMicroseconds, sampleQDataMicroseconds)
 }
 \references{
 Vergote, O. (2005). How to match trades and quotes for NYSE stocks?

@@ -90,7 +90,7 @@ ABDJumptest <- function(RV, BPV, TQ) { # Compute jump detection stat mentioned i
 #' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
 #'
 #' @examples
-#' AJjumptest(sampletData$PRICE, p = 2, k = 3, align.by = "seconds", 
+#' AJjumptest(sampleTData$PRICE, p = 2, k = 3, align.by = "seconds", 
 #'   align.period = 5, makeReturns = TRUE)
 #' 
 #' @keywords highfrequency AJjumptest
@@ -202,7 +202,7 @@ AJjumptest <- function(pData, p = 4 , k = 2, align.by = NULL, align.period = NUL
 #' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
 #' 
 #' @examples 
-#' BNSjumptest(sampletData$PRICE, IVestimator= "minRV", 
+#' BNSjumptest(sampleTData$PRICE, IVestimator= "minRV", 
 #'             IQestimator = "medRQ", type= "linear", makeReturns = TRUE)
 #' 
 #' @keywords highfrequency BNSjumptest

@@ -16,7 +16,7 @@ intradayJumpTest(
 )
 }
 \arguments{
-\item{pData}{(currently only xts) of the price data in levels. This data can (and should in some cases) be tick-level data}
+\item{pData}{(currently only xts) of the price data in levels. This data can (and should in some cases) be tick-level data. This data can span more than one day}
 
 \item{testType}{type of test to use. Currently supports "LM" test of Lee and Mykland (2018), and "FoF" as "Fact or Friction" test from Christensen, Oomen, and Podolskij (2014)}
 

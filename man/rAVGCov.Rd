@@ -35,7 +35,7 @@ Realized Covariance using average subsample.
 # 5 subgrids (5 minutes).
 
 # Univariate
-rvSub <- rAVGCov(rdata = sampletData$PRICE, align.by = "minutes",
+rvSub <- rAVGCov(rdata = sampleTData$PRICE, align.by = "minutes",
                  align.period = 5, makeReturns = TRUE) 
 rvSub
 

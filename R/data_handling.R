@@ -38,7 +38,7 @@
 #' 
 #' @examples 
 #' #load sample price data
-#' ts <- sampletData$PRICE
+#' ts <- sampleTData$PRICE
 #' 
 #' #Previous tick aggregation to the 5-minute sampling frequency:
 #' tsagg5min <- aggregateTS(ts, on = "minutes", k = 5)
@@ -184,12 +184,12 @@ aggregateTS <- function (ts, FUN = "previoustick", on = "minutes", k = 1, weight
 #' @keywords data manipulation
 #' @examples 
 #' # aggregate price data to the 30 second frequency
-#' aggregatePrice(sampletDataMicroseconds, on = "secs", k = 30)
+#' aggregatePrice(sampleTDataMicroseconds, on = "secs", k = 30)
 #' # aggregate price data to the 30 second frequency including zero return price changes
-#' aggregatePrice(sampletDataMicroseconds, on = "secs", k = 30)
+#' aggregatePrice(sampleTDataMicroseconds, on = "secs", k = 30)
 #' 
 #' # aggregate price data to half a second frequency including zero return price changes
-#' aggregatePrice(sampletDataMicroseconds, on = "milliseconds", k = 500, fill = TRUE)
+#' aggregatePrice(sampleTDataMicroseconds, on = "milliseconds", k = 500, fill = TRUE)
 #' @keywords internal
 #' @importFrom xts last
 #' @export
@@ -316,7 +316,7 @@ aggregatePrice <- function(pData, on = "minutes", k = 1, marketOpen = "09:30:00"
 #' Aggregate a data.table or xts object containing quote data
 #' 
 #' @description Function returns a data.table or xts object containing the aggregated quote data with columns "SYMBOL", "EX", "BID","BIDSIZ","OFR","OFRSIZ". 
-#' See \code{\link{sampleqData}} for an example of the argument qData.
+#' See \code{\link{sampleQData}} for an example of the argument qData.
 #' 
 #' @param qData data.table or xts object to be aggregated, containing the intraday quote data of a stock for one day.
 #' @param on character, indicating the time scale in which "k" is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".
@@ -344,7 +344,7 @@ aggregatePrice <- function(pData, on = "minutes", k = 1, marketOpen = "09:30:00"
 #' 
 #' @examples
 #' # aggregate quote data to the 30 second frequency
-#' qData_aggregated <- aggregateQuotes(sampleqData, on = "seconds", k = 30)
+#' qData_aggregated <- aggregateQuotes(sampleQData, on = "seconds", k = 30)
 #' head(qData_aggregated)
 #' @export
 aggregateQuotes <- function(qData, on = "minutes", k = 5, marketOpen = "09:30:00", marketClose = "16:00:00", tz = "GMT") {
@@ -428,7 +428,7 @@ aggregateQuotes <- function(qData, on = "minutes", k = 5, marketOpen = "09:30:00
 #' 
 #' @examples 
 #' # aggregate trade data to 5 minute frequency
-#' tData_aggregated <- aggregateTrades(sampletData, on = "minutes", k = 5)
+#' tData_aggregated <- aggregateTrades(sampleTData, on = "minutes", k = 5)
 #' head(tData_aggregated)
 #' @importFrom lubridate floor_date
 #' @importFrom lubridate ceiling_date
@@ -500,7 +500,7 @@ aggregateTrades <- function(tData, on = "minutes", k = 5, marketOpen = "09:30:00
 #' }
 #' @return data.table or xts object depending on input
 #' 
-#' @examples autoSelectExchangeTrades(sampletDataRawMicroseconds)
+#' @examples autoSelectExchangeTrades(sampleTDataRawMicroseconds)
 #' 
 #' @author Jonathan Cornelissen, Kris Boudt and Onno Kleen
 #' 
@@ -576,7 +576,7 @@ autoSelectExchangeTrades <- function(tData) {
 #' @return data.table or xts object depending on input
 #' 
 #' @examples 
-#' autoSelectExchangeQuotes(sampleqDataRawMicroseconds)
+#' autoSelectExchangeQuotes(sampleQDataRawMicroseconds)
 #'
 #' @author Jonathan Cornelissen, Kris Boudt and Onno Kleen
 #' 
@@ -647,7 +647,7 @@ autoSelectExchangeQuotes <- function(qData) {
 #' @references Brownlees, C.T. and Gallo, G.M. (2006). Financial econometric analysis at ultra-high frequency: Data handling concerns. Computational Statistics & Data Analysis, 51, pages 2232-2245.
 #' @author Jonathan Cornelissen, Kris Boudt and Onno Kleen.
 #' @examples 
-#' exchangeHoursOnly(sampletDataRawMicroseconds)
+#' exchangeHoursOnly(sampleTDataRawMicroseconds)
 #' @keywords cleaning
 #' @importFrom lubridate tz
 #' @importFrom lubridate ymd_hms
@@ -780,10 +780,10 @@ makeReturns <- function(ts) {
 #' 
 #' @examples 
 #' # match the trade and quote data
-#' tqData <- matchTradesQuotes(sampletData, sampleqData)
+#' tqData <- matchTradesQuotes(sampleTData, sampleQData)
 #' head(tqData)
 #' # multi-day input allowed
-#' tqData <- matchTradesQuotes(sampletDataMicroseconds, sampleqDataMicroseconds)
+#' tqData <- matchTradesQuotes(sampleTDataMicroseconds, sampleQDataMicroseconds)
 #' @importFrom lubridate seconds
 #' @export
 matchTradesQuotes <- function(tData, qData, adjustment = 2) {
@@ -885,7 +885,7 @@ mergeQuotesSameTimestamp <- function(qData, selection = "median") {
       stop("Data.table neeeds DT column (date-time).")
     }
   }
-  # qData <- sampleqDataRawMicroseconds
+  # qData <- sampleQDataRawMicroseconds
   # qData <- checkColumnNames(qData)
   
   # keep summed size columns
@@ -917,8 +917,8 @@ mergeQuotesSameTimestamp <- function(qData, selection = "median") {
     return(qData)
   }
 }
-# microbenchmark::microbenchmark(quotesCleanup(qDataraw = sampleqDataRaw, exchanges = "N", selection = "max.volume"), times = 10, unit = "s")
-# microbenchmark::microbenchmark(quotesCleanup(qDataraw = sampleqDataRaw, exchanges = "N", selection = "maxvolume"), times = 10, unit = "s")
+# microbenchmark::microbenchmark(quotesCleanup(qDataraw = sampleQDataRaw, exchanges = "N", selection = "max.volume"), times = 10, unit = "s")
+# microbenchmark::microbenchmark(quotesCleanup(qDataraw = sampleQDataRaw, exchanges = "N", selection = "maxvolume"), times = 10, unit = "s")
 
 #' Merge multiple transactions with the same time stamp
 #' 
@@ -1136,9 +1136,9 @@ noZeroQuotes <- function(qData) {
 #' 
 #' @examples
 #' # Consider you have raw quote data for 1 stock for 2 days
-#' head(sampleqDataRawMicroseconds)
-#' dim(sampleqDataRawMicroseconds)
-#' qData_aftercleaning <- quotesCleanup(qDataraw = sampleqDataRawMicroseconds, exchanges = "N")
+#' head(sampleQDataRawMicroseconds)
+#' dim(sampleQDataRawMicroseconds)
+#' qData_aftercleaning <- quotesCleanup(qDataraw = sampleQDataRawMicroseconds, exchanges = "N")
 #' qData_aftercleaning$report
 #' dim(qData_aftercleaning$qData)
 #' 
@@ -1287,7 +1287,7 @@ rmLargeSpread <- function(qData, maxi = 50) {
 #' @author Jonathan Cornelissen, Kris Boudt and Onno Kleen
 #' 
 #' @examples 
-#' rmNegativeSpread(sampleqDataRawMicroseconds)
+#' rmNegativeSpread(sampleQDataRawMicroseconds)
 #' 
 #' @keywords cleaning
 #' @export
@@ -1643,9 +1643,9 @@ selectExchange <- function(data, exch = "N") {
 #' 
 #' @examples 
 #' # Consider you have raw trade data for 1 stock for 2 days 
-#' head(sampletDataRawMicroseconds)
-#' dim(sampletDataRawMicroseconds)
-#' tData_afterfirstcleaning <- tradesCleanup(tDataraw = sampletDataRaw, exchanges = list("N"))
+#' head(sampleTDataRawMicroseconds)
+#' dim(sampleTDataRawMicroseconds)
+#' tData_afterfirstcleaning <- tradesCleanup(tDataraw = sampleTDataRaw, exchanges = list("N"))
 #' tData_afterfirstcleaning$report
 #' dim(tData_afterfirstcleaning$tData)
 #' 
@@ -1771,10 +1771,10 @@ tradesCleanupUsingQuotes <- function(from, to, dataSource, dataDestination, tick
 #' 
 #' @examples 
 #' # Consider you have raw trade data for 1 stock for 2 days 
-#' tData_afterfirstcleaning <- tradesCleanup(tDataraw = sampletDataRawMicroseconds, 
+#' tData_afterfirstcleaning <- tradesCleanup(tDataraw = sampleTDataRawMicroseconds, 
 #'                                           exchanges = "N", report = FALSE)
 #' # 
-#' qData <- quotesCleanup(qDataraw = sampleqDataRawMicroseconds, 
+#' qData <- quotesCleanup(qDataraw = sampleQDataRawMicroseconds, 
 #'                        exchanges = "N", report = FALSE)
 #' dim(tData_afterfirstcleaning)
 #' tData_afterfinalcleaning <- 

@@ -231,7 +231,7 @@ The respective liquidity measures are defined as follows:
  }
 }
 \examples{
-tqData <- matchTradesQuotes(sampletData, sampleqData)
+tqData <- matchTradesQuotes(sampleTData, sampleQData)
 res <- getLiquidityMeasures(tqData)
 head(res)
 }

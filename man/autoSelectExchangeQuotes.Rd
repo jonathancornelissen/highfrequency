@@ -36,7 +36,7 @@ of the exchange with highest
 value for the sum of "BIDSIZ" and "OFRSIZ", i.e. the highest quote volume.
 }
 \examples{
-autoSelectExchangeQuotes(sampleqDataRawMicroseconds)
+autoSelectExchangeQuotes(sampleQDataRawMicroseconds)
 
 }
 \author{

@@ -219,7 +219,7 @@
 #' Venkataraman, K. (2001). Automated versus floor trading: An analysis of execution costs on the paris and new york exchanges. The Journal of Finance, 56, 1445-1485.
 #' 
 #' @examples
-#' tqData <- matchTradesQuotes(sampletData, sampleqData)
+#' tqData <- matchTradesQuotes(sampleTData, sampleQData)
 #' res <- getLiquidityMeasures(tqData)
 #' head(res)
 #' @importFrom data.table shift
@@ -330,7 +330,7 @@ getLiquidityMeasures <- function(tqData, win = 300, type = NULL) {
 #' 
 #' @examples 
 #' # generate matched trades and quote data set
-#' tqData <- matchTradesQuotes(sampletData, sampleqData)
+#' tqData <- matchTradesQuotes(sampleTData, sampleQData)
 #' directions <- getTradeDirection(tqData)
 #' head(directions)
 #' 

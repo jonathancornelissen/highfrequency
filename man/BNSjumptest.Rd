@@ -71,7 +71,7 @@ where \eqn{k_j} are nonzero random variables. The counting process can be either
 Since the realized volatility converges to the sum of integrated variance and jump variation, while the robust IVestimator converges to the integrated variance,  it follows that the difference between #' \eqn{RV_{t,N}} and the IVestimator captures the jump part only, and this observation underlines the BNS test for jumps. (Theodosiou& Zikes(2009))
 }
 \examples{
-BNSjumptest(sampletData$PRICE, IVestimator= "minRV", 
+BNSjumptest(sampleTData$PRICE, IVestimator= "minRV", 
             IQestimator = "medRQ", type= "linear", makeReturns = TRUE)
 
 }

@@ -47,7 +47,7 @@ listAvailableKernels <- function() {
 #' 
 #' @examples
 #' \dontrun{
-#' medRQ(rdata = sampletData$PRICE, align.by = "minutes", align.period = 5, makeReturns = TRUE)
+#' medRQ(rdata = sampleTData$PRICE, align.by = "minutes", align.period = 5, makeReturns = TRUE)
 #' medRQ
 #' }
 #' @keywords highfrequency medRQ
@@ -94,7 +94,7 @@ medRQ <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
 #' 
 #' @examples
 #' \dontrun{
-#' minRQ(rdata = sampletData$PRICE, align.by = "minutes", align.period = 5, makeReturns = TRUE)
+#' minRQ(rdata = sampleTData$PRICE, align.by = "minutes", align.period = 5, makeReturns = TRUE)
 #' minRQ
 #' }
 #'@references Andersen, T. G., D. Dobrev, and E. Schaumburg (2012). Jump-robust volatility estimation using nearest neighbor truncation. Journal of Econometrics, 169(1), 75- 93.
@@ -146,8 +146,8 @@ minRQ <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
 #' @author Jonathan Cornelissen and Kris Boudt
 #' 
 #' @examples
-#' data(sampletData)
-#' minrv <- minRV(rdata = sampletData$PRICE, align.by = "minutes",
+#' data(sampleTData)
+#' minrv <- minRV(rdata = sampleTData$PRICE, align.by = "minutes",
 #'                align.period = 5, makeReturns = TRUE)
 #' minrv 
 #' 
@@ -212,8 +212,8 @@ minRV <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
 #' @author Jonathan Cornelissen and Kris Boudt
 #' 
 #' @examples 
-#' data(sampletData);
-#' medrv <- medRV(rdata = sampletData$PRICE, align.by = "minutes", 
+#' data(sampleTData);
+#' medrv <- medRV(rdata = sampleTData$PRICE, align.by = "minutes", 
 #'                align.period = 5, makeReturns = TRUE)
 #' medrv 
 #'  
@@ -397,7 +397,7 @@ MRC <- function(pData, pairwise = FALSE, makePsd = FALSE) {
 #' # 5 subgrids (5 minutes).
 #' 
 #' # Univariate
-#' rvSub <- rAVGCov(rdata = sampletData$PRICE, align.by = "minutes",
+#' rvSub <- rAVGCov(rdata = sampleTData$PRICE, align.by = "minutes",
 #'                  align.period = 5, makeReturns = TRUE) 
 #' rvSub
 #' 
@@ -767,7 +767,7 @@ rBeta <- function(rdata, rindex, RCOVestimator = "rCov", RVestimator = "RV", mak
 #' # at 5 minutes.
 #'  
 #' # Univariate: 
-#' rbpv <- rBPCov(rdata = sampletData$PRICE, align.by ="minutes", 
+#' rbpv <- rBPCov(rdata = sampleTData$PRICE, align.by ="minutes", 
 #'                align.period = 5, makeReturns = TRUE) 
 #' rbpv 
 #'  
@@ -871,11 +871,11 @@ rBPCov <- function(rdata, cor = FALSE, align.by = NULL, align.period = NULL, mak
 #' @examples 
 #' # Realized Variance/Covariance for prices aligned   
 #' # at 5 minutes.
-#' data(sampletData)
+#' data(sampleTData)
 #' data(sample5MinPricesJumps)
 #' 
 #' # Univariate: 
-#' rv = rCov(rdata = sampletData$PRICE, align.by = "minutes", 
+#' rv = rCov(rdata = sampleTData$PRICE, align.by = "minutes", 
 #'                    align.period = 5, makeReturns = TRUE)
 #' rv 
 #' 
@@ -1066,7 +1066,7 @@ rHYCov <- function(rdata, cor = FALSE, period = 1, align.by = "seconds", align.p
 #'
 #' @examples
 #' # Univariate:
-#' rvKernel <- rKernelCov(rdata = sampletData$PRICE, align.by = "minutes",
+#' rvKernel <- rKernelCov(rdata = sampleTData$PRICE, align.by = "minutes",
 #'                        align.period = 5, makeReturns = TRUE)
 #' rvKernel
 #'
@@ -1167,8 +1167,8 @@ rKernelCov <- function(rdata, cor = FALSE,  align.by = "seconds", align.period =
 #' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
 #' 
 #' @examples 
-#' data(sampletData)
-#' rKurt(sampletData$PRICE, align.by = "minutes", align.period = 5, makeReturns = TRUE)
+#' data(sampleTData)
+#' rKurt(sampleTData$PRICE, align.by = "minutes", align.period = 5, makeReturns = TRUE)
 #' 
 #' @keywords highfrequency rKurt
 #' @importFrom xts apply.daily
@@ -1235,8 +1235,8 @@ rKurt <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
 #' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
 #' 
 #' @examples
-#' data(sampletData)
-#' rMPV(sampletData$PRICE, m = 2, p = 3, align.by = "minutes", align.period = 5, makeReturns = TRUE)
+#' data(sampleTData)
+#' rMPV(sampleTData$PRICE, m = 2, p = 3, align.by = "minutes", align.period = 5, makeReturns = TRUE)
 #' 
 #' @keywords highfrequency rMPV
 #' @export
@@ -1334,7 +1334,7 @@ rMPV <- function(rdata, m = 2, p = 2, align.by = NULL, align.period = NULL, make
 #' # at 5 minutes.
 #' 
 #' # Univariate: 
-#' rvoutw <- rOWCov(rdata = sampletData$PRICE, align.by = "minutes",
+#' rvoutw <- rOWCov(rdata = sampleTData$PRICE, align.by = "minutes",
 #'                    align.period = 5, makeReturns = TRUE)
 #' rvoutw 
 #' 
@@ -1461,8 +1461,8 @@ rOWCov <- function (rdata, cor = FALSE, align.by = NULL, align.period = NULL, ma
 #' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
 #' 
 #' @examples 
-#' data(sampletData)
-#' rSkew(sampletData$PRICE,align.by ="minutes", align.period =5, makeReturns = TRUE)
+#' data(sampleTData)
+#' rSkew(sampleTData$PRICE,align.by ="minutes", align.period =5, makeReturns = TRUE)
 #' 
 #' @keywords highfrequency rSkew
 #' @export
@@ -1511,8 +1511,8 @@ rSkew <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
 #' @return list with to arguments. The realized positive and negative semivariance.
 #' @examples 
 #' \dontrun{
-#' data(sampletData)
-#' rSV(sampletData$PRICE, align.by = "minutes", align.period = 5, makeReturns = TRUE)
+#' data(sampleTData)
+#' rSV(sampleTData$PRICE, align.by = "minutes", align.period = 5, makeReturns = TRUE)
 #' }
 #' @references Barndorff-Nielsen, O.E., Kinnebrock, S. and Shephard N. (2008). Measuring downside risk - realized semivariance. CREATES research paper. p. 3-5.
 #' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
@@ -1715,9 +1715,9 @@ rThresholdCov <- function(rdata, cor = FALSE, align.by = NULL, align.period = NU
 #' @author Jonathan Cornelissen and Kris Boudt
 #' @examples
 #' # Robust Realized two timescales Variance/Covariance
-#' data(sampletData)
+#' data(sampleTData)
 #' # Univariate: 
-#' rvRTS <- rRTSCov(pData = sampletData$PRICE)
+#' rvRTS <- rRTSCov(pData = sampleTData$PRICE)
 #' # Note: Prices as input
 #' rvRTS 
 #' 
@@ -1851,8 +1851,8 @@ RV <- function(rdata) {
 #' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
 #'  
 #' @examples 
-#' data(sampletData)
-#' rTPVar(rdata = sampletData$PRICE, align.by = "minutes", align.period = 5, makeReturns = TRUE)
+#' data(sampleTData)
+#' rTPVar(rdata = sampleTData$PRICE, align.by = "minutes", align.period = 5, makeReturns = TRUE)
 #' rTPVar
 #' 
 #' @importFrom zoo rollapply
@@ -1915,8 +1915,8 @@ RTQ <- function(rdata) {
 #' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
 #' 
 #' @examples 
-#' data(sampletData)
-#' rQPVar(rdata= sampletData$PRICE, align.by= "minutes", align.period =5, makeReturns= TRUE)
+#' data(sampleTData)
+#' rQPVar(rdata= sampleTData$PRICE, align.by= "minutes", align.period =5, makeReturns= TRUE)
 #' rQPVar
 #' 
 #' @keywords highfrequency rQPVar
@@ -1963,8 +1963,8 @@ rQPVar <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FA
 #' @references  Andersen, T. G., D. Dobrev, and E. Schaumburg (2012). Jump-robust volatility estimation using nearest neighbor truncation. Journal of Econometrics, 169(1), 75- 93.
 #' @examples 
 #' \dontrun{
-#' data(sampletData)
-#' rQuar(rdata = sampletData$PRICE, align.by = "minutes", align.period = 5, makeReturns = TRUE)
+#' data(sampleTData)
+#' rQuar(rdata = sampleTData$PRICE, align.by = "minutes", align.period = 5, makeReturns = TRUE)
 #' }
 #' @keywords  highfrequency rQuar
 #' @export
@@ -2057,7 +2057,7 @@ rQuar <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
 #' # Robust Realized two timescales Variance/Covariance
 #' 
 #' # Univariate: 
-#' rvts <- rTSCov(pData = sampletData$PRICE)
+#' rvts <- rTSCov(pData = sampleTData$PRICE)
 #' # Note: Prices as input
 #' rvts 
 #' 

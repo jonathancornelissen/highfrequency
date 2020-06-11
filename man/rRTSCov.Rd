@@ -102,9 +102,9 @@ matrix. This function replaces the negative eigenvalues with zeroes.
 }
 \examples{
 # Robust Realized two timescales Variance/Covariance
-data(sampletData)
+data(sampleTData)
 # Univariate: 
-rvRTS <- rRTSCov(pData = sampletData$PRICE)
+rvRTS <- rRTSCov(pData = sampleTData$PRICE)
 # Note: Prices as input
 rvRTS 
 

@@ -23,7 +23,7 @@ for the first (second) observation.
 }
 \examples{
 # generate matched trades and quote data set
-tqData <- matchTradesQuotes(sampletData, sampleqData)
+tqData <- matchTradesQuotes(sampleTData, sampleQData)
 directions <- getTradeDirection(tqData)
 head(directions)
 

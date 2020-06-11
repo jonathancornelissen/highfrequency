@@ -7,7 +7,7 @@ expect_equal(
 
 # medRQ
 expect_equal(
-  formatC(medRQ(sampletData$PRICE,align.by = "minutes", align.period = 5, makeReturns = TRUE) * 1000000, digits = 5),
+  formatC(medRQ(sampleTData$PRICE,align.by = "minutes", align.period = 5, makeReturns = TRUE) * 1000000, digits = 5),
   "0.23645"
 )
 
@@ -19,7 +19,7 @@ expect_equal(
 
 # minRQ
 expect_equal(
-  minRQ(sampletData$PRICE, align.by = "minutes", align.period = 5, makeReturns = TRUE) * 1000000,
+  minRQ(sampleTData$PRICE, align.by = "minutes", align.period = 5, makeReturns = TRUE) * 1000000,
   0.13061613812613856456
 )
 
@@ -77,7 +77,7 @@ expect_equal(
 
 # rMPV
 expect_equal(
-  formatC(rMPV(sampletData$PRICE, align.by ="minutes", align.period = 5, makeReturns = TRUE), digits = 5),
+  formatC(rMPV(sampleTData$PRICE, align.by ="minutes", align.period = 5, makeReturns = TRUE), digits = 5),
   "0.00042328"
 )
 
@@ -93,7 +93,7 @@ expect_equal(
 
 # rRTSCov
 expect_equal(
-  formatC(rRTSCov(pData = sampletData$PRICE) * 10000, digits = 5),
+  formatC(rRTSCov(pData = sampleTData$PRICE) * 10000, digits = 5),
   "3.5276"
 )
 expect_equal(
@@ -103,7 +103,7 @@ expect_equal(
 
 # rKernel
 expect_equal(
-  formatC(rKernelCov(rdata = sampletData$PRICE, align.by = "minutes",  align.period = 5, makeReturns = TRUE), digits = 5),
+  formatC(rKernelCov(rdata = sampleTData$PRICE, align.by = "minutes",  align.period = 5, makeReturns = TRUE), digits = 5),
   "0.00059605"
 )
 expect_equal(
@@ -119,7 +119,7 @@ expect_equal(
 
 # rSV
 expect_equal({
-  rSV(sampletData$PRICE,align.by ="minutes", align.period = 5, makeReturns = TRUE)},
+  rSV(sampleTData$PRICE,align.by ="minutes", align.period = 5, makeReturns = TRUE)},
   list(rSVdownside = 0.00029125752237359241398, rSVupside = 0.00016310984360246060573)
 )
 
@@ -135,13 +135,13 @@ expect_equal(
 
 # rTPVar
 expect_equal(
-  formatC(rTPVar(sampletData$PRICE,align.by ="minutes", align.period = 5, makeReturns = TRUE) * 1000000, digits = 5),
+  formatC(rTPVar(sampleTData$PRICE,align.by ="minutes", align.period = 5, makeReturns = TRUE) * 1000000, digits = 5),
   "0.41334"
 )
 
 # rTSCov univariate
 expect_equal(
-  formatC(rTSCov(pData = sampletData$PRICE), digits = 5),
+  formatC(rTSCov(pData = sampleTData$PRICE), digits = 5),
   "0.00052769"
 )
 # rTSCov multivariate
@@ -152,7 +152,7 @@ expect_equal(
 
 # RV
 expect_equal(
-  formatC(RV(makeReturns(sampletData$PRICE)), digits = 5),
+  formatC(RV(makeReturns(sampleTData$PRICE)), digits = 5),
   "0.00064381"
 )
 
@@ -170,7 +170,7 @@ expect_equal(
 
 
 expect_equal(
-  formatC(ivInference(sampletData$PRICE, IVestimator= "minRV", IQestimator = "medRQ", confidence = 0.95, makeReturns = TRUE)$cb * 10000, digits = 5),
+  formatC(ivInference(sampleTData$PRICE, IVestimator= "minRV", IQestimator = "medRQ", confidence = 0.95, makeReturns = TRUE)$cb * 10000, digits = 5),
   c("4.7594", "5.7472")
 )
 

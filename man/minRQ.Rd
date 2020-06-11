@@ -30,7 +30,7 @@ Then, the minRQ is given by
 }
 \examples{
 \dontrun{
-minRQ(rdata = sampletData$PRICE, align.by = "minutes", align.period = 5, makeReturns = TRUE)
+minRQ(rdata = sampleTData$PRICE, align.by = "minutes", align.period = 5, makeReturns = TRUE)
 minRQ
 }
 }

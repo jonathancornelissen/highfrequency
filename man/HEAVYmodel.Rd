@@ -8,11 +8,11 @@ HEAVYmodel(
   data,
   p = matrix(c(0, 0, 1, 1), ncol = 2),
   q = matrix(c(1, 0, 0, 1), ncol = 2),
-  startingvalues = NULL,
+  startingValues = NULL,
   LB = NULL,
   UB = NULL,
-  backcast = NULL,
-  compconst = FALSE
+  backCast = NULL,
+  compConst = FALSE
 )
 }
 \arguments{
@@ -22,15 +22,15 @@ HEAVYmodel(
 
 \item{q}{a (K x K) matrix containing the lag length for the conditional variances. Position (i, j) in the matrix indicates the number of lags in equation i of the model for conditional variances corresponding to series j. For the traditional heavy model introduced above q is given by matrix( c(1,0,0,1),ncol=2 ) (default).}
 
-\item{startingvalues}{a vector containing the starting values to be used in the optimization to find the optimal parameters estimates.}
+\item{startingValues}{a vector containing the starting values to be used in the optimization to find the optimal parameters estimates.}
 
 \item{LB}{a vector of length K indicating the lower bounds to be used in the estimation. If NULL it is set to a vector of zeros by default.}
 
 \item{UB}{a vector of length K indicating the upper bounds to be used in the estimation. If NULL it is set to a vector of Inf by default.}
 
-\item{backcast}{a vector of length K used to initialize the estimation. If NULL the unconditional estimates are taken.}
+\item{backCast}{a vector of length K used to initialize the estimation. If NULL the unconditional estimates are taken.}
 
-\item{compconst}{a boolean variable. In case TRUE, the omega values are estimated in the optimization. In case FALSE, volatility targeting is done and omega is just 1 minus the sum of all relevant alpha's and beta's multiplied by the unconditional variance.}
+\item{compConst}{a boolean variable. In case TRUE, the omega values are estimated in the optimization. In case FALSE, volatility targeting is done and omega is just 1 minus the sum of all relevant alpha's and beta's multiplied by the unconditional variance.}
 }
 \value{
 A list with the following values:
@@ -65,7 +65,7 @@ Equivalently, they can be presented in terms of matrix notation as below:
 
 In this version, the parameters vector to be estimated is \eqn{\left( w, w_R,\alpha, \alpha_R, \beta, \beta_R \right) }.
 
-In terms of startingvalues, Shephard and Sheppard recommend for this version of the Heavy model to set  \eqn{\beta} be around 0.6 and sum of \eqn{\alpha}+\eqn{\beta} to be close to but slightly less than one.
+In terms of startingValues, Shephard and Sheppard recommend for this version of the Heavy model to set  \eqn{\beta} be around 0.6 and sum of \eqn{\alpha}+\eqn{\beta} to be close to but slightly less than one.
 In general, the lag length for the model innovation and the conditional covariance can be greater than 1. Consider, for example, matrix p is  \eqn{\left( \begin{array}{ccc} 0 & 2 \\ 0 & 1 \end{array} \right)} and matrix q is the same as above. Matrix notation will be as below:
 \deqn{
 \left( \begin{array}{ccc} h_t \\ \mu_t \end{array} \right) = \left( \begin{array}{ccc} w \\ w_R \end{array} \right)  + \left( \begin{array}{ccc} 0 & \alpha_1 \\ 0 & \alpha_R \end{array} \right) \left( \begin{array}{ccc} r^2_{t-1} \\ RM_{t-1} \end{array} \right) +\left( \begin{array}{ccc} 0 & \alpha_2 \\ 0 & 0 \end{array} \right) \left( \begin{array}{ccc} r^2_{t-2} \\ RM_{t-2} \end{array} \right) + \left( \begin{array}{ccc} \beta & 0 \\ 0 & \beta_R \end{array} \right) \left( \begin{array}{ccc} h_{t-1} \\ \mu_{t-1} \end{array} \right)}
@@ -79,19 +79,19 @@ bv      <-  realizedLibrary$bv
 returns <- returns[!is.na(bv)]
 bv <- bv[!is.na(bv)] # Remove NA's
 data <- cbind( returns^2, bv) # Make data matrix with returns and realized measures
-backcast <- matrix(c(var(returns), mean(bv)), ncol = 1)
+backCast <- matrix(c(var(returns), mean(bv)), ncol = 1)
 
 #For traditional (default) version:
 startvalues <- c(0.004,0.02,0.44,0.41,0.74,0.56) # Initial values
-output <- HEAVYmodel(data = as.matrix(data,ncol=2), compconst=FALSE,
-                     startingvalues = startvalues, backcast=backcast)
+output <- HEAVYmodel(data = as.matrix(data,ncol=2), compConst=FALSE,
+                     startingValues = startvalues, backCast=backCast)
 #For general version:
 startvalues <- c(0.004, 0.02, 0.44, 0.4, 0.41, 0.74, 0.56) # Initial values;
 p <- matrix(c(2, 0, 0, 1), ncol = 2)
 q <- matrix(c(1, 0, 0, 1), ncol = 2)
 
-heavy_model <- HEAVYmodel(data = as.matrix(data, ncol = 2), p = p, q = q, compconst = FALSE,
-                      startingvalues = startvalues, backcast = backcast)
+heavy_model <- HEAVYmodel(data = as.matrix(data, ncol = 2), p = p, q = q, compConst = FALSE,
+                      startingValues = startvalues, backCast = backCast)
 
 }
 \references{
