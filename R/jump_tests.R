@@ -431,7 +431,7 @@ intradayJumpTest <- function(pData = NULL, testType = "LM", testingTimes = NULL,
     names(out[["tests"]]) <- dates
     for (date in dates) {
       ## Conduct the testing day-by-day
-      out[["tests"]][[date]] <- intradayJumpTest(pData[date], testType, testingTimes, windowSize, K, alpha, theta, setClass = FALSE)
+      out[["tests"]][[date]] <- merge.xts(pData[date], intradayJumpTest(pData[date], testType, testingTimes, windowSize, K, alpha, theta, setClass = FALSE))
     }
     out[["information"]] <- list("testType" = testType, "isMultiDay" = TRUE)
     class(out) <- c("intradayJumpTest", "list")
@@ -493,37 +493,51 @@ plot.intradayJumpTest <- function(x, ...){
   }
   
   if(testType == "FoF"){
-    testType <- "Fact or Friction"
-    main.text <- paste0("Intraday Jump Test: ", testType, "\nJump Variation:", round(max(0, mean(dat$jumpVariation, na.rm=TRUE)), 4))
+    main.text <- paste0("Intraday Jump Test: Fact or Friction \nJump Variation:", round(max(0, mean(dat$jumpVariation, na.rm=TRUE)), 4))
   }
   
   
   if(isMultiday){
-    
-    
-    
     print("Support for plotting intradayJumpTests when the data spans more than one day is not ready yet.")
     
-    shade <- dat$jumps
-
-    shade <- cbind(upper = shade * as.numeric(max(dat$ts, na.rm = TRUE) +1e5), lower = shade * as.numeric(min(dat$ts, na.rm = TRUE)) -1e5)
-    
-    colnames(shade) <- c("upper", "lower")
-    
-    browser()
-    p1 <- plot(na.locf0(dat[, "ts"]), main = paste0("Intraday Jump Test: ", testType), lty = 2, observation.based = TRUE)
-    ## Add shaded region to the plot where we detect jumps
-    
-    foo <- na.omit(shade)
-    foo <- foo[foo$upper!=0]
-    p1 <- addPolygon(foo, on = -1, col = "red", new = TRUE)
-    plot(p1)
-    
+    for(day in dates){ # We loop through all the days and ask the user whether we should continue or stop
+      thisDat <- dat[day]
+      shade <- thisDat$jumps
+      
+      
+      if(testType == "FoF"){
+        # Here we update the jump variation in the main text in the case of the FoF test.
+        main.text <- paste0("Intraday Jump Test: Fact or Friction \nJump Variation:", round(max(0, mean(thisDat$jumpVariation, na.rm=TRUE)), 4))
+      }
+      
+      
+      shade <- cbind(upper = shade * as.numeric(max(thisDat$pData, na.rm = TRUE) +1e5), lower = shade * as.numeric(min(thisDat$pData, na.rm = TRUE)) -1e5)
+      
+      colnames(shade) <- c("upper", "lower")
+      
+      p1 <- plot(na.locf0(thisDat[, 1]), main = main.text, lty = 2)
+      ## Add shaded region to the plot where we detect jumps
+      if(testType == "Lee-Mykland"){
+        p1 <- lines(na.locf0(thisDat$ts), col = "blue", lwd = 2)
+        p1 <- addLegend(legend.loc = 'topleft', legend.names = c("Actual prices", "Sub-sampled prices", "Jump detection zone"), lwd = c(2,2,0), pch=c(NA,NA,15), col =c(1, "blue", 2))
+      } else {
+        p1 <- addLegend(legend.loc = 'topleft', legend.names = c("Actual prices", "Jump detection zone"), lwd = c(2,0), pch=c(NA,15), col =c(1, 2))
+      }
+      
+      
+      shade <- na.omit(shade)
+      p1 <- addPolygon(shade, on = -1, col = 2)
+      plot(p1)
+      
+      if(readline("Press Enter for next figure or 0 to exit:\n") == "0"){
+        break # We break out of the for loop of plotting
+      }
+      
+    }
     
   } else {
     
     shade <- dat$jumps
-    #shade <- shade + na.omit(lag(shade,-1))
     shade <- cbind(upper = shade * as.numeric(max(dat$pData, na.rm = TRUE) +1e5), lower = shade * as.numeric(min(dat$pData, na.rm = TRUE)) -1e5)
     colnames(shade) <- c("upper", "lower")
     
