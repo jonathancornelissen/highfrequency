@@ -783,7 +783,7 @@ makeReturns <- function(ts) {
 #' tqdata <- matchTradesQuotes(sample_tdata, sampleQData)
 #' head(tqdata)
 #' # multi-day input allowed
-#' tqdata <- matchTradesQuotes(sample_tdata_microseconds, sampleQData_microseconds)
+#' tqdata <- matchTradesQuotes(sample_tdata_microseconds, sampleQDataMicroseconds)
 #' @importFrom lubridate seconds
 #' @export
 matchTradesQuotes <- function(tdata, qdata, adjustment = 2) {

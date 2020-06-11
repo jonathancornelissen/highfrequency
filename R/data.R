@@ -116,7 +116,7 @@
 #' @format data.table object
 #' 
 #' @keywords datasets
-"sampleQData_microseconds"
+"sampleQDataMicroseconds"
 
 #' Sample of raw quotes for stock XXX for 2 days measured in microseconds
 #' @description  An imaginary xts object containing the raw quotes for stock XXX for 2 days, in the typical NYSE TAQ database format.

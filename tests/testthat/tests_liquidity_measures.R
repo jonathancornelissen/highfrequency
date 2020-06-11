@@ -8,7 +8,7 @@ expect_equal(
 )
 
 expect_equal(
-  {tqdata <- matchTradesQuotes(sample_tdata_microseconds, sampleQData_microseconds)
+  {tqdata <- matchTradesQuotes(sample_tdata_microseconds, sampleQDataMicroseconds)
   directions <- getTradeDirection(tqdata)
   sum(directions)},
   -1403
