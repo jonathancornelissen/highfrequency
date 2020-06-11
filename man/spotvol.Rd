@@ -301,7 +301,7 @@ Along with the spot volatility estimates, this method will return the
 \examples{
 # Default method, deterministic periodicity
 
-vol1 <- spotvol(sample_real5minprices)
+vol1 <- spotvol(sampleReal5MinPrices)
 plot(vol1)
 
 # Compare to stochastic periodicity
@@ -312,17 +312,17 @@ init <- list(sigma = 0.03, sigma_mu = 0.005, sigma_h = 0.007,
              delta_s = c(-1.2, 0.11, 0.26, -0.03, 0.08))
 
 # next method will take around 110 iterations
-vol2 <- spotvol(sample_real5minprices, method = "stochper", init = init)
+vol2 <- spotvol(sampleReal5MinPrices, method = "stochper", init = init)
 plot(as.numeric(vol1$spot[1:780]), type="l")
 lines(as.numeric(vol2$spot[1:780]), col="red")
 legend("topright", c("detper", "stochper"), col = c("black", "red"), lty=1)}
 
 # Various kernel estimates
 \donttest{
-h1 <- bw.nrd0((1:nrow(sample_real5minprices))*(5*60))
-vol3 <- spotvol(sample_real5minprices, method = "kernel", h = h1)
-vol4 <- spotvol(sample_real5minprices, method = "kernel", est = "quarticity")
-vol5 <- spotvol(sample_real5minprices, method = "kernel", est = "cv")
+h1 <- bw.nrd0((1:nrow(sampleReal5MinPrices))*(5*60))
+vol3 <- spotvol(sampleReal5MinPrices, method = "kernel", h = h1)
+vol4 <- spotvol(sampleReal5MinPrices, method = "kernel", est = "quarticity")
+vol5 <- spotvol(sampleReal5MinPrices, method = "kernel", est = "cv")
 plot(vol3, length = 2880)
 lines(as.numeric(t(vol4$spot))[1:2880], col = "red")
 lines(as.numeric(t(vol5$spot))[1:2880], col = "blue")
@@ -340,8 +340,8 @@ plot(vol6)}
 
 # Compare regular GARCH(1,1) model to eGARCH, both with external regressors
 \donttest{
-vol7 <- spotvol(sample_real5minprices, method = "garch", model = "sGARCH")
-vol8 <- spotvol(sample_real5minprices, method = "garch", model = "eGARCH")
+vol7 <- spotvol(sampleReal5MinPrices, method = "garch", model = "sGARCH")
+vol8 <- spotvol(sampleReal5MinPrices, method = "garch", model = "eGARCH")
 plot(as.numeric(t(vol7$spot)), type = "l")
 lines(as.numeric(t(vol8$spot)), col = "red")
 legend("topleft", c("GARCH", "eGARCH"), col = c("black", "red"), lty=1)

@@ -90,7 +90,7 @@
 #' @format xts object
 #' 
 #' @keywords datasets
-"sample_real5minprices"
+"sampleReal5MinPrices"
 
 #' Sample of cleaned quotes for stock XXX for 1 day
 #' 
