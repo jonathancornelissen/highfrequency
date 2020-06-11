@@ -296,7 +296,7 @@ medRV <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
 #' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
 #' 
 #' @examples 
-#' a <- list(sample5MinPrices_jumps["2010-01-04",1], sample5MinPrices_jumps["2010-01-04",2])
+#' a <- list(sample5MinPricesJumps["2010-01-04",1], sample5MinPricesJumps["2010-01-04",2])
 #' MRC(a, pairwise = TRUE, makePsd = TRUE)
 #' 
 #' @keywords highfrequency preaveraging
@@ -644,8 +644,8 @@ rAVGCov <- function(rdata, cor = FALSE, align.by = "minutes", align.period = 5, 
 #' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
 #' 
 #' @examples 
-#' a <- sample5MinPrices_jumps['2010-01-04', 1]
-#' b <- sample5MinPrices_jumps['2010-01-04', 2]
+#' a <- sample5MinPricesJumps['2010-01-04', 1]
+#' b <- sample5MinPricesJumps['2010-01-04', 2]
 #' rBeta(a, b, RCOVestimator = "rBPCov", RVestimator = "minRV", makeReturns = TRUE)
 #' 
 #' @keywords highfrequency rBeta
@@ -772,7 +772,7 @@ rBeta <- function(rdata, rindex, RCOVestimator = "rCov", RVestimator = "RV", mak
 #' rbpv 
 #'  
 #' # Multivariate: 
-#' rbpc <- rBPCov(rdata = sample5MinPrices_jumps['2010-01-04'], makeReturns = TRUE, makePsd = TRUE)
+#' rbpc <- rBPCov(rdata = sample5MinPricesJumps['2010-01-04'], makeReturns = TRUE, makePsd = TRUE)
 #' rbpc
 #'  
 #' @keywords volatility
@@ -872,7 +872,7 @@ rBPCov <- function(rdata, cor = FALSE, align.by = NULL, align.period = NULL, mak
 #' # Realized Variance/Covariance for prices aligned   
 #' # at 5 minutes.
 #' data(sample_tdata)
-#' data(sample5MinPrices_jumps)
+#' data(sample5MinPricesJumps)
 #' 
 #' # Univariate: 
 #' rv = rCov(rdata = sample_tdata$PRICE, align.by = "minutes", 
@@ -880,7 +880,7 @@ rBPCov <- function(rdata, cor = FALSE, align.by = NULL, align.period = NULL, mak
 #' rv 
 #' 
 #' # Multivariate: 
-#' rc = rCov(rdata = sample5MinPrices_jumps['2010-01-04'], makeReturns=TRUE)
+#' rc = rCov(rdata = sample5MinPricesJumps['2010-01-04'], makeReturns=TRUE)
 #' rc
 #' @keywords volatility
 #' @export
@@ -1339,7 +1339,7 @@ rMPV <- function(rdata, m = 2, p = 2, align.by = NULL, align.period = NULL, make
 #' rvoutw 
 #' 
 #' # Multivariate: 
-#' rcoutw <- rOWCov(rdata = sample5MinPrices_jumps['2010-01-04'], makeReturns = TRUE)
+#' rcoutw <- rOWCov(rdata = sample5MinPricesJumps['2010-01-04'], makeReturns = TRUE)
 #' rcoutw
 #' 
 #' @keywords volatility

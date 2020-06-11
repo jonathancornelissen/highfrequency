@@ -140,7 +140,7 @@ harInsanityFilter <- function(fittedValues, lower, upper, replacement) {
 #'
 #' @examples
 #' ##### Example 1: HARRVCJ #####
-#' dat <- sample5MinPrices_jumps$stock1
+#' dat <- sample5MinPricesJumps$stock1
 #' dat <- makeReturns(dat) #Get the high-frequency return data
 #'
 #' x <- HARmodel(dat, periods = c(1,5,10), periodsJ = c(1,5,10),
@@ -168,7 +168,7 @@ harInsanityFilter <- function(fittedValues, lower, upper, replacement) {
 #'
 #'
 #' ##### Example 3: HARRVQ #####
-#' dat <- sample5MinPrices_jumps$stock1
+#' dat <- sample5MinPricesJumps$stock1
 #' dat <- makeReturns(dat) #Get the high-frequency return data
 #' #
 #' x <- HARmodel(dat, periods = c(1,5,10), periodsJ = c(1,5,10),

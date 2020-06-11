@@ -80,7 +80,7 @@
 #' Boudt, K., C. Croux, and S. Laurent (2008). Outlyingness weighted covariation. Mimeo.
 #' 
 #' @keywords datasets
-"sample5MinPrices_jumps"
+"sample5MinPricesJumps"
 
 #' Sample of imaginary price data for 61 days
 #'

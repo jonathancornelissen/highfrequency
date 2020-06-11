@@ -1,12 +1,12 @@
 expect_equal(
-  formatC(sum(sum(HARmodel(makeReturns(sample5MinPrices_jumps[, 1]), periods = c(1, 5, 10), periodsJ = c(1, 5, 10),
+  formatC(sum(sum(HARmodel(makeReturns(sample5MinPricesJumps[, 1]), periods = c(1, 5, 10), periodsJ = c(1, 5, 10),
                            RVest = c("rCov", "rBPCov"), type = "HARRVCJ", transform = "sqrt", inputType = "returns")$coefficients)), 
           digits = 5),
   "7.6406"
 )
 
 expect_identical(
-  {blub <- HARmodel(makeReturns(sample5MinPrices_jumps[, 1]), periods = c(1, 5, 10), periodsJ = c(1, 5, 10),
+  {blub <- HARmodel(makeReturns(sample5MinPricesJumps[, 1]), periods = c(1, 5, 10), periodsJ = c(1, 5, 10),
                     RVest = c("rCov", "rBPCov"), type = "HARRVCJ", transform = "sqrt", inputType = "returns")
   blub2 <- plot(blub)
   blub2$get_xlim()},
@@ -14,7 +14,7 @@ expect_identical(
 )
 
 expect_identical(
-  {blub <- HARmodel(makeReturns(sample5MinPrices_jumps[, 1]), periods = c(1, 5, 10), periodsJ = c(1, 5, 10),
+  {blub <- HARmodel(makeReturns(sample5MinPricesJumps[, 1]), periods = c(1, 5, 10), periodsJ = c(1, 5, 10),
                     RVest = c("rCov", "rBPCov"), type = "HARRVCJ", transform = "sqrt", inputType = "returns")
   blub2 <- plot(blub)
   blub2$get_xlim()},

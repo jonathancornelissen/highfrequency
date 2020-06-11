@@ -42,7 +42,7 @@ Then, the rCov is given by
 # Realized Variance/Covariance for prices aligned   
 # at 5 minutes.
 data(sample_tdata)
-data(sample5MinPrices_jumps)
+data(sample5MinPricesJumps)
 
 # Univariate: 
 rv = rCov(rdata = sample_tdata$PRICE, align.by = "minutes", 
@@ -50,7 +50,7 @@ rv = rCov(rdata = sample_tdata$PRICE, align.by = "minutes",
 rv 
 
 # Multivariate: 
-rc = rCov(rdata = sample5MinPrices_jumps['2010-01-04'], makeReturns=TRUE)
+rc = rCov(rdata = sample5MinPricesJumps['2010-01-04'], makeReturns=TRUE)
 rc
 }
 \author{

@@ -88,7 +88,7 @@ rvoutw <- rOWCov(rdata = sample_tdata$PRICE, align.by = "minutes",
 rvoutw 
 
 # Multivariate: 
-rcoutw <- rOWCov(rdata = sample5MinPrices_jumps['2010-01-04'], makeReturns = TRUE)
+rcoutw <- rOWCov(rdata = sample5MinPricesJumps['2010-01-04'], makeReturns = TRUE)
 rcoutw
 
 }

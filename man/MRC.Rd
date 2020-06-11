@@ -60,7 +60,7 @@ where \eqn{\hat{\Psi}_N = \frac{1}{2N}\sum_{i=1}^N \boldsymbol{r}_{\tau_i}(\bold
 }
 }
 \examples{
-a <- list(sample5MinPrices_jumps["2010-01-04",1], sample5MinPrices_jumps["2010-01-04",2])
+a <- list(sample5MinPricesJumps["2010-01-04",1], sample5MinPricesJumps["2010-01-04",2])
 MRC(a, pairwise = TRUE, makePsd = TRUE)
 
 }
