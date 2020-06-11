@@ -630,7 +630,7 @@ autoSelectExchangeQuotes <- function(qData) {
 #' Extract data from an xts object for the Exchange Hours Only
 #' 
 #' @description The function returns data within exchange trading hours
-#' "dayBegin" and "dayend". By default, dayBegin and dayend
+#' "dayBegin" and "dayEnd". By default, dayBegin and dayEnd
 #' are set to "09:30:00" and "16:00:00" respectively (see Brownlees and Gallo (2006) for more information on good choices for these arguments).
 #' 
 #' @param data a data.table or xts object containing the time series data. 
@@ -638,7 +638,7 @@ autoSelectExchangeQuotes <- function(qData) {
 #' @param dayBegin character in the format of \"HH:MM:SS\",
 #' specifying the starting hour, minute and second of an exhange
 #' trading day.
-#' @param dayend character in the format of \"HH:MM:SS\^",
+#' @param dayEnd character in the format of \"HH:MM:SS\^",
 #' specifying the closing hour, minute and second of an exchange
 #' trading day.
 #' 
@@ -652,7 +652,7 @@ autoSelectExchangeQuotes <- function(qData) {
 #' @importFrom lubridate tz
 #' @importFrom lubridate ymd_hms
 #' @export
-exchangeHoursOnly <- function(data, dayBegin = "09:30:00", dayend = "16:00:00") {
+exchangeHoursOnly <- function(data, dayBegin = "09:30:00", dayEnd = "16:00:00") {
   DT = NULL # needed for data table (otherwise notes pop up in check())
   data <- checkColumnNames(data)
   
@@ -671,7 +671,7 @@ exchangeHoursOnly <- function(data, dayBegin = "09:30:00", dayend = "16:00:00") 
   }
   
   data <- data[DT >= ymd_hms(paste(as.Date(data$DT), dayBegin), tz = tz(data$DT))]
-  data <- data[DT <= ymd_hms(paste(as.Date(data$DT), dayend), tz = tz(data$DT))]
+  data <- data[DT <= ymd_hms(paste(as.Date(data$DT), dayEnd), tz = tz(data$DT))]
   
   if (dummy_was_xts == TRUE) {
     return(xts(as.matrix(data[, -c("DT")]), order.by = data$DT, tzone = tz(data$DT)))
