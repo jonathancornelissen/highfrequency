@@ -27,7 +27,7 @@ The function returns data within exchange trading hours
 are set to "09:30:00" and "16:00:00" respectively (see Brownlees and Gallo (2006) for more information on good choices for these arguments).
 }
 \examples{
-exchangeHoursOnly(sampleTDataRawMicroseconds)
+exchangeHoursOnly(sampletDataRawMicroseconds)
 }
 \references{
 Brownlees, C.T. and Gallo, G.M. (2006). Financial econometric analysis at ultra-high frequency: Data handling concerns. Computational Statistics & Data Analysis, 51, pages 2232-2245.

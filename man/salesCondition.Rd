@@ -4,10 +4,10 @@
 \alias{salesCondition}
 \title{Delete entries with abnormal Sale Condition.}
 \usage{
-salesCondition(tdata)
+salesCondition(tData)
 }
 \arguments{
-\item{tdata}{an xts or data.table object containing the time series data, with 
+\item{tData}{an xts or data.table object containing the time series data, with 
 one column named "COND" indicating the Sale Condition.}
 }
 \value{

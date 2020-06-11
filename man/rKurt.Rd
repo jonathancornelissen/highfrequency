@@ -31,8 +31,8 @@ Then, the rKurt is given by
  in which \eqn{RV_t:} realized variance
 }
 \examples{
-data(sampleTData)
-rKurt(sampleTData$PRICE, align.by = "minutes", align.period = 5, makeReturns = TRUE)
+data(sampletData)
+rKurt(sampletData$PRICE, align.by = "minutes", align.period = 5, makeReturns = TRUE)
 
 }
 \references{

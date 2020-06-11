@@ -1,6 +1,6 @@
 
 expect_equal(
-  unique(autoSelectExchangeTrades(sampleTDataRaw)$EX),
+  unique(autoSelectExchangeTrades(sampletDataRaw)$EX),
   "N"
 )
 
@@ -15,7 +15,7 @@ expect_equal(
 )
 
 expect_equal(
-  formatC(sum(head(aggregatePrice(sampleTData$PRICE, on = "secs", k = 30))), digits = 10),
+  formatC(sum(head(aggregatePrice(sampletData$PRICE, on = "secs", k = 30))), digits = 10),
   "   1157.465"
 )
 
@@ -30,7 +30,7 @@ expect_equal(
 )
 
 expect_equal(
-  dim(rmTradeOutliersUsingQuotes(selectExchange(sampleTDataRaw, "W"), selectExchange(sampleqDataRaw, "W"))),
+  dim(rmTradeOutliersUsingQuotes(selectExchange(sampletDataRaw, "W"), selectExchange(sampleqDataRaw, "W"))),
   c(203, 8)
 )
 
@@ -55,12 +55,12 @@ expect_equal(
 )
 
 expect_equal(
-  dim(tradesCleanupUsingQuotes(tdata = sampleTData, qData = sampleqData)),
+  dim(tradesCleanupUsingQuotes(tData = sampletData, qData = sampleqData)),
   c(8153, 8)
 )
 
 expect_equal(
-  dim(tradesCleanup(tdataraw = sampleTDataRaw, exchanges = "N", report = FALSE)),
+  dim(tradesCleanup(tDataraw = sampletDataRaw, exchanges = "N", report = FALSE)),
   c(9104, 3)
 )
 

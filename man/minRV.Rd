@@ -29,8 +29,8 @@ Then, the minRV is given by
 }
 }
 \examples{
-data(sampleTData)
-minrv <- minRV(rdata = sampleTData$PRICE, align.by = "minutes",
+data(sampletData)
+minrv <- minRV(rdata = sampletData$PRICE, align.by = "minutes",
                align.period = 5, makeReturns = TRUE)
 minrv 
 

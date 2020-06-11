@@ -5,7 +5,7 @@
 \title{Aggregate a data.table or xts object containing trades data}
 \usage{
 aggregateTrades(
-  tdata,
+  tData,
   on = "minutes",
   k = 5,
   marketOpen = "09:30:00",
@@ -14,7 +14,7 @@ aggregateTrades(
 )
 }
 \arguments{
-\item{tdata}{data.table or xts object to be aggregated, containing the intraday price series of a stock for possibly multiple days.}
+\item{tData}{data.table or xts object to be aggregated, containing the intraday price series of a stock for possibly multiple days.}
 
 \item{on}{character, indicating the time scale in which "k" is expressed. Possible values are: "secs", "seconds", "mins", "minutes", "hours".}
 
@@ -51,8 +51,8 @@ the last observation up to that point, including the value at 09:35:00 itself.
 }
 \examples{
 # aggregate trade data to 5 minute frequency
-tdata_aggregated <- aggregateTrades(sampleTData, on = "minutes", k = 5)
-head(tdata_aggregated)
+tData_aggregated <- aggregateTrades(sampletData, on = "minutes", k = 5)
+head(tData_aggregated)
 }
 \author{
 Jonathan Cornelissen, Kris Boudt and Onno Kleen.

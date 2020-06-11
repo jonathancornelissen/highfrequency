@@ -8,7 +8,7 @@ tradesCleanup(
   datasource = NULL,
   datadestination = NULL,
   exchanges,
-  tdataraw = NULL,
+  tDataraw = NULL,
   report = TRUE,
   selection = "median",
   saveasxts = TRUE
@@ -37,7 +37,7 @@ The possible exchange symbols are:
 \item Z: BATS
 }}
 
-\item{tdataraw}{xts object containing (for ONE stock only) raw trade data. This argument is NULL by default. Enabling it means the arguments
+\item{tDataraw}{xts object containing (for ONE stock only) raw trade data. This argument is NULL by default. Enabling it means the arguments
 from, to, datasource and datadestination will be ignored. (only advisable for small chunks of data)}
 
 \item{report}{boolean and TRUE by default. In case it is true the function returns (also) a vector indicating how many trades remained after each cleaning step.}
@@ -51,14 +51,14 @@ For each day an xts or data.table object is saved into the folder of that date, 
 This procedure is performed for each stock in "ticker".
 The function returns a vector indicating how many trades remained after each cleaning step.
 
-In case you supply the argument "rawtdata", the on-disk functionality is ignored
+In case you supply the argument "rawtData", the on-disk functionality is ignored
 and the function returns a list with the cleaned trades as xts object (see examples).
 }
 \description{
 This is a wrapper function for cleaning the trade data of all stock data inside the folder datasource. 
 The result is saved in the folder datadestination. 
 
-In case you supply the argument "rawtdata", the on-disk functionality is ignored. The function returns a vector
+In case you supply the argument "rawtData", the on-disk functionality is ignored. The function returns a vector
 indicating how many trades were removed at each cleaning step in this case.
 and the function returns an xts or data.table object.
 
@@ -72,11 +72,11 @@ there is a seperate wrapper called \code{\link{tradesCleanupUsingQuotes}}.
 }
 \examples{
 # Consider you have raw trade data for 1 stock for 2 days 
-head(sampleTDataRawMicroseconds)
-dim(sampleTDataRawMicroseconds)
-tdata_afterfirstcleaning <- tradesCleanup(tdataraw = sampleTDataRaw, exchanges = list("N"))
-tdata_afterfirstcleaning$report
-dim(tdata_afterfirstcleaning$tdata)
+head(sampletDataRawMicroseconds)
+dim(sampletDataRawMicroseconds)
+tData_afterfirstcleaning <- tradesCleanup(tDataraw = sampletDataRaw, exchanges = list("N"))
+tData_afterfirstcleaning$report
+dim(tData_afterfirstcleaning$tData)
 
 #In case you have more data it is advised to use the on-disk functionality
 #via "from","to","datasource",etc. arguments

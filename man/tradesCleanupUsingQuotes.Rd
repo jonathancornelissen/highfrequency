@@ -7,7 +7,7 @@
 tradesCleanupUsingQuotes(
   datasource = NULL,
   datadestination = NULL,
-  tdata = NULL,
+  tData = NULL,
   qData = NULL
 )
 }
@@ -16,7 +16,7 @@ tradesCleanupUsingQuotes(
 
 \item{datadestination}{character indicating the folder in which the cleaned data is stored, folder of datasource by default.}
 
-\item{tdata}{data.table or xts object containing (ONE day and for ONE stock only) trade data cleaned by \code{\link{tradesCleanup}}. This argument is NULL by default. Enabling it, means the arguments
+\item{tData}{data.table or xts object containing (ONE day and for ONE stock only) trade data cleaned by \code{\link{tradesCleanup}}. This argument is NULL by default. Enabling it, means the arguments
 from, to, datasource and datadestination will be ignored. (only advisable for small chunks of data)}
 
 \item{qData}{data.table or xts object containing (ONE day and for ONE stock only) cleaned quote data. This argument is NULL by default. Enabling it means the arguments
@@ -25,7 +25,7 @@ from, to, datasource, datadestination will be ignored. (only advisable for small
 \value{
 For each day an xts object is saved into the folder of that date, containing the cleaned data.
 
-In case you supply the arguments "tdata" and "qData", the on-disk functionality is ignored
+In case you supply the arguments "tData" and "qData", the on-disk functionality is ignored
 and the function returns cleaned trades as a data.table or xts object (see examples).
 }
 \description{
@@ -37,16 +37,16 @@ and \code{\link{quotesCleanup}}.
 }
 \examples{
 # Consider you have raw trade data for 1 stock for 2 days 
-tdata_afterfirstcleaning <- tradesCleanup(tdataraw = sampleTDataRawMicroseconds, 
+tData_afterfirstcleaning <- tradesCleanup(tDataraw = sampletDataRawMicroseconds, 
                                           exchanges = "N", report = FALSE)
 # 
 qData <- quotesCleanup(qDataraw = sampleqDataRawMicroseconds, 
                        exchanges = "N", report = FALSE)
-dim(tdata_afterfirstcleaning)
-tdata_afterfinalcleaning <- 
+dim(tData_afterfirstcleaning)
+tData_afterfinalcleaning <- 
   tradesCleanupUsingQuotes(qData = qData[as.Date(DT) == "2018-01-02"],
-                           tdata = tdata_afterfirstcleaning[as.Date(DT) == "2018-01-02"])
-dim(tdata_afterfinalcleaning)
+                           tData = tData_afterfirstcleaning[as.Date(DT) == "2018-01-02"])
+dim(tData_afterfinalcleaning)
 #In case you have more data it is advised to use the on-disk functionality
 #via "from","to","datasource", etc. arguments
 }

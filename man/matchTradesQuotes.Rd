@@ -4,10 +4,10 @@
 \alias{matchTradesQuotes}
 \title{Match trade and quote data}
 \usage{
-matchTradesQuotes(tdata, qData, adjustment = 2)
+matchTradesQuotes(tData, qData, adjustment = 2)
 }
 \arguments{
-\item{tdata}{data.table or xts-object containing the trade data (multiple days possible).}
+\item{tData}{data.table or xts-object containing the trade data (multiple days possible).}
 
 \item{qData}{data.table or xts-object containing the quote data (multiple days possible).}
 
@@ -23,10 +23,10 @@ Function matches the trades and quotes and returns an xts-object containing both
 }
 \examples{
 # match the trade and quote data
-tqData <- matchTradesQuotes(sampleTData, sampleqData)
+tqData <- matchTradesQuotes(sampletData, sampleqData)
 head(tqData)
 # multi-day input allowed
-tqData <- matchTradesQuotes(sampleTDataMicroseconds, sampleqDataMicroseconds)
+tqData <- matchTradesQuotes(sampletDataMicroseconds, sampleqDataMicroseconds)
 }
 \references{
 Vergote, O. (2005). How to match trades and quotes for NYSE stocks?

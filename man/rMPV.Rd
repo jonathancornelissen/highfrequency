@@ -50,8 +50,8 @@ Function returns the rMPV, defined in Andersen et al. (2012).
   and \eqn{m} > \eqn{p/2}.
 }
 \examples{
-data(sampleTData)
-rMPV(sampleTData$PRICE, m = 2, p = 3, align.by = "minutes", align.period = 5, makeReturns = TRUE)
+data(sampletData)
+rMPV(sampletData$PRICE, m = 2, p = 3, align.by = "minutes", align.period = 5, makeReturns = TRUE)
 
 }
 \references{

@@ -30,7 +30,7 @@ Function returns the medRQ, defined in Andersen et al. (2012).
 }
 \examples{
 \dontrun{
-medRQ(rdata = sampleTData$PRICE, align.by = "minutes", align.period = 5, makeReturns = TRUE)
+medRQ(rdata = sampletData$PRICE, align.by = "minutes", align.period = 5, makeReturns = TRUE)
 medRQ
 }
 }

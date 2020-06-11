@@ -291,19 +291,19 @@ hasQty <- function(x, which = FALSE) {
 #' @importFrom data.table is.data.table
 #' @importFrom xts is.xts
 #' @keywords internal
-checktdata <- function(tdata) {
-  if (is.xts(tdata) == FALSE & is.data.table(tdata) == FALSE) {
-    stop("The argument tdata should be a data.table or xts object.")
+checktData <- function(tData) {
+  if (is.xts(tData) == FALSE & is.data.table(tData) == FALSE) {
+    stop("The argument tData should be a data.table or xts object.")
   }
-  if (any(colnames(tdata) == "PRICE") == FALSE) {
-    stop("The argument tdata should have a column containing the PRICE. Could not find that column.")
+  if (any(colnames(tData) == "PRICE") == FALSE) {
+    stop("The argument tData should have a column containing the PRICE. Could not find that column.")
   }
-  if (any(colnames(tdata) == "SYMBOL") == FALSE) {
-    stop("The argument tdata should have a column containing SYMBOL. Could not find that column.")
+  if (any(colnames(tData) == "SYMBOL") == FALSE) {
+    stop("The argument tData should have a column containing SYMBOL. Could not find that column.")
   }
   
-  if (is.data.table(tdata) == TRUE) {
-    if (typeof(tdata$PRICE) != "double") {
+  if (is.data.table(tData) == TRUE) {
+    if (typeof(tData$PRICE) != "double") {
       stop("Column PRICE should be of type double.")
     }
   }

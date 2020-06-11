@@ -140,26 +140,26 @@
 #' Sample of cleaned trades for stock XXX for 1 day
 #' 
 #' @description An xts object containing the trades for the imaginary stock XXX for 1 day, in the typical NYSE TAQ database format.
-#' This is the cleaned version of the data sample \code{\link{sampleTDataRaw}}, using \code{tradesCleanup}.
+#' This is the cleaned version of the data sample \code{\link{sampletDataRaw}}, using \code{tradesCleanup}.
 #' 
 #' @docType data
 #'
 #' @format A large \code{xts} object.
 #' 
 #' @keywords datasets
-"sampleTData"
+"sampletData"
 
 #' Sample of cleaned trades for stock XXX for 2 days
 #' 
 #' @description An data.table object containing the trades for the imaginary stock XXX for 2 days, in the typical NYSE TAQ database format.
-#' This is the cleaned version of the data sample \code{\link{sampleTDataRawMicroseconds}}, using \code{tradesCleanup}.
+#' This is the cleaned version of the data sample \code{\link{sampletDataRawMicroseconds}}, using \code{tradesCleanup}.
 #' 
 #' @docType data
 #'
 #' @format A data.table object.
 #' 
 #' @keywords datasets
-"sampleTDataMicroseconds"
+"sampletDataMicroseconds"
 
 #' Sample of raw trades for stock XXX for 1 day
 #' 
@@ -170,7 +170,7 @@
 #' @format A large \code{xts} object.
 #' 
 #' @keywords datasets
-"sampleTDataRaw"
+"sampletDataRaw"
 
 #' Sample of raw trades for stock XXX for 2 days
 #' 
@@ -181,7 +181,7 @@
 #' @format A data.table object.
 #' 
 #' @keywords datasets
-"sampleTDataRawMicroseconds"
+"sampletDataRawMicroseconds"
 
 #' Starbucks Data
 #' 

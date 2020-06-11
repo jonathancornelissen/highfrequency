@@ -98,7 +98,7 @@ IV <- function(IVestimator, iq) {
 #' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
 #' 
 #' @examples 
-#' ivInference(sampleTData$PRICE, IVestimator= "minRV", IQestimator = "medRQ",
+#' ivInference(sampletData$PRICE, IVestimator= "minRV", IQestimator = "medRQ",
 #'             confidence = 0.95, makeReturns = TRUE)
 #' @keywords highfrequency ivInference
 #' @export 
