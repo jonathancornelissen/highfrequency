@@ -184,12 +184,12 @@ aggregatets <- function (ts, FUN = "previoustick", on = "minutes", k = 1, weight
 #' @keywords data manipulation
 #' @examples 
 #' # aggregate price data to the 30 second frequency
-#' aggregatePrice(sampleTData_microseconds, on = "secs", k = 30)
+#' aggregatePrice(sampleTDataMicroseconds, on = "secs", k = 30)
 #' # aggregate price data to the 30 second frequency including zero return price changes
-#' aggregatePrice(sampleTData_microseconds, on = "secs", k = 30)
+#' aggregatePrice(sampleTDataMicroseconds, on = "secs", k = 30)
 #' 
 #' # aggregate price data to half a second frequency including zero return price changes
-#' aggregatePrice(sampleTData_microseconds, on = "milliseconds", k = 500, fill = TRUE)
+#' aggregatePrice(sampleTDataMicroseconds, on = "milliseconds", k = 500, fill = TRUE)
 #' @keywords internal
 #' @importFrom xts last
 #' @export
@@ -783,7 +783,7 @@ makeReturns <- function(ts) {
 #' tqdata <- matchTradesQuotes(sampleTData, sampleQData)
 #' head(tqdata)
 #' # multi-day input allowed
-#' tqdata <- matchTradesQuotes(sampleTData_microseconds, sampleQDataMicroseconds)
+#' tqdata <- matchTradesQuotes(sampleTDataMicroseconds, sampleQDataMicroseconds)
 #' @importFrom lubridate seconds
 #' @export
 matchTradesQuotes <- function(tdata, qdata, adjustment = 2) {

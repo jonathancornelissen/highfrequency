@@ -8,7 +8,7 @@ expect_identical(
 
 
 expect_identical(
-  {dat <- data.table::copy(sampleTData_microseconds)
+  {dat <- data.table::copy(sampleTDataMicroseconds)
   dat[, SYMBOL := NULL]
   meandrift <- spotDrift(data = dat, k = 1, tz = "EST")
   formatC(meandrift$mu[1:10], digits = 5)},
@@ -16,11 +16,11 @@ expect_identical(
 )
 
 expect_identical(
-  {dat <- data.table::copy(sampleTData_microseconds)
+  {dat <- data.table::copy(sampleTDataMicroseconds)
   dat[, SYMBOL := NULL]
   meandrift1 <- spotDrift(data = dat, k = 10, on =  "seconds", tz = "EST")
   formatC(meandrift1$mu[11:40], digits = 5)},
-  {dat <- data.table::copy(sampleTData_microseconds)
+  {dat <- data.table::copy(sampleTDataMicroseconds)
   dat[, SYMBOL := NULL]
   meandrift2 <- spotDrift(data = dat, k = 10000, on =  "milliseconds", tz = "EST")
   formatC(meandrift2$mu[11:40], digits = 5)}

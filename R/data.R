@@ -159,7 +159,7 @@
 #' @format A data.table object.
 #' 
 #' @keywords datasets
-"sampleTData_microseconds"
+"sampleTDataMicroseconds"
 
 #' Sample of raw trades for stock XXX for 1 day
 #' 

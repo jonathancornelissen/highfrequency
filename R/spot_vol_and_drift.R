@@ -24,8 +24,8 @@
 #'
 #' @examples
 #' # Example 1: Rolling mean and median estimators for 2 days
-#' meandrift <- spotDrift(data = sampleTData_microseconds, k = 1, tz = "EST")
-#' mediandrift <- spotDrift(data = sampleTData_microseconds, method = "driftMedian", 
+#' meandrift <- spotDrift(data = sampleTDataMicroseconds, k = 1, tz = "EST")
+#' mediandrift <- spotDrift(data = sampleTDataMicroseconds, method = "driftMedian", 
 #'                          on = "seconds", k = 30, tz = "EST")
 #' plot(meandrift)
 #' plot(mediandrift)
