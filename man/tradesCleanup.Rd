@@ -72,9 +72,9 @@ there is a seperate wrapper called \code{\link{tradesCleanupUsingQuotes}}.
 }
 \examples{
 # Consider you have raw trade data for 1 stock for 2 days 
-head(sampleTDataraw_microseconds)
-dim(sampleTDataraw_microseconds)
-tdata_afterfirstcleaning <- tradesCleanup(tdataraw = sampleTDataraw, exchanges = list("N"))
+head(sampleTDataRaw_microseconds)
+dim(sampleTDataRaw_microseconds)
+tdata_afterfirstcleaning <- tradesCleanup(tdataraw = sampleTDataRaw, exchanges = list("N"))
 tdata_afterfirstcleaning$report
 dim(tdata_afterfirstcleaning$tdata)
 

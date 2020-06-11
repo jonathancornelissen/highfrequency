@@ -22,13 +22,13 @@ We start by loading the highfrequency package and printing the head of one examp
 
 ```{r}
 library(highfrequency)
-head(sampleTDataraw_microseconds)
+head(sampleTDataRaw_microseconds)
 ```
 
 A quick look via summary into the data let's us see that there are trades listed in the data set out of the bounds of the regular trading hours that are 9:30 to 16:00 on regular work days.
 
 ```{r eval = TRUE}
-summary(sampleTDataraw_microseconds[, c("DT", "SIZE", "PRICE")])
+summary(sampleTDataRaw_microseconds[, c("DT", "SIZE", "PRICE")])
 ```
 
 Next, we will use one of three main cleaning functions called tradesCleanup. It implements the steps laid out in the seminal paper of Barndorff-Nielsen et al. (2009). It processes the given data by
@@ -39,7 +39,7 @@ Next, we will use one of three main cleaning functions called tradesCleanup. It 
 - summarizing trades that have the same time stamp. The default is to take the median price and summed-up volume of the different trades.
 
 ```{r eval = TRUE}
-tdata_cleaned <- tradesCleanup(tdataraw = sampleTDataraw_microseconds, exchange = "N")
+tdata_cleaned <- tradesCleanup(tdataraw = sampleTDataRaw_microseconds, exchange = "N")
 ```
 
 When using tradesCleanup, the return value is a list of two. It contains a report about the number of observations after each cleaning step and the cleaned data itself.

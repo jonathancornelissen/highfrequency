@@ -1,6 +1,6 @@
 
 expect_equal(
-  unique(autoSelectExchangeTrades(sampleTDataraw)$EX),
+  unique(autoSelectExchangeTrades(sampleTDataRaw)$EX),
   "N"
 )
 
@@ -30,7 +30,7 @@ expect_equal(
 )
 
 expect_equal(
-  dim(rmTradeOutliersUsingQuotes(selectExchange(sampleTDataraw, "W"), selectExchange(sampleQDataRaw, "W"))),
+  dim(rmTradeOutliersUsingQuotes(selectExchange(sampleTDataRaw, "W"), selectExchange(sampleQDataRaw, "W"))),
   c(203, 8)
 )
 
@@ -60,7 +60,7 @@ expect_equal(
 )
 
 expect_equal(
-  dim(tradesCleanup(tdataraw = sampleTDataraw, exchanges = "N", report = FALSE)),
+  dim(tradesCleanup(tdataraw = sampleTDataRaw, exchanges = "N", report = FALSE)),
   c(9104, 3)
 )
 
