@@ -5,12 +5,12 @@ expect_equal(
 )
 
 expect_equal(
-  unique(autoSelectExchangeQuotes(sampleQDataRaw)$EX),
+  unique(autoSelectExchangeQuotes(sampleqDataRaw)$EX),
   "N"
 )
 
 expect_equal(
-  quotesCleanup(qdataraw = sampleQDataRaw, exchanges = "N")$report["remove_outliers"],
+  quotesCleanup(qDataraw = sampleqDataRaw, exchanges = "N")$report["remove_outliers"],
   c(remove_outliers = 7706)
 )
 
@@ -20,42 +20,42 @@ expect_equal(
 )
 
 expect_equal(
-  unique(selectExchange(sampleQDataRaw, c("N", "W"))$EX),
+  unique(selectExchange(sampleqDataRaw, c("N", "W"))$EX),
   c("N", "W")
 )
 
 expect_equal(
-  dim(rmOutliersQuotes(selectExchange(sampleQDataRaw, "W"))),
-  dim(rmOutliersQuotes(selectExchange(sampleQDataRaw, "W"), type = "standard"))
+  dim(rmOutliersQuotes(selectExchange(sampleqDataRaw, "W"))),
+  dim(rmOutliersQuotes(selectExchange(sampleqDataRaw, "W"), type = "standard"))
 )
 
 expect_equal(
-  dim(rmTradeOutliersUsingQuotes(selectExchange(sampleTDataRaw, "W"), selectExchange(sampleQDataRaw, "W"))),
+  dim(rmTradeOutliersUsingQuotes(selectExchange(sampleTDataRaw, "W"), selectExchange(sampleqDataRaw, "W"))),
   c(203, 8)
 )
 
 expect_equal(
-  dim(rmLargeSpread(selectExchange(sampleQDataRaw, "N"))),
+  dim(rmLargeSpread(selectExchange(sampleqDataRaw, "N"))),
   c(9794, 7)
 )
 
 expect_equal(
-  dim(mergeQuotesSameTimestamp(selectExchange(sampleQDataRaw, "N"), selection = "max.volume")),
+  dim(mergeQuotesSameTimestamp(selectExchange(sampleqDataRaw, "N"), selection = "max.volume")),
   c(7707, 5)
 )
 
 expect_equal(
-  dim(mergeQuotesSameTimestamp(selectExchange(sampleQDataRaw, "N"), selection = "weighted.average")),
+  dim(mergeQuotesSameTimestamp(selectExchange(sampleqDataRaw, "N"), selection = "weighted.average")),
   c(7707, 5)
 )
 
 expect_equal(
-  dim(noZeroQuotes(selectExchange(sampleQDataRaw, "N"))),
+  dim(noZeroQuotes(selectExchange(sampleqDataRaw, "N"))),
   c(9792, 7)
 )
 
 expect_equal(
-  dim(tradesCleanupUsingQuotes(tdata = sampleTData, qdata = sampleQData)),
+  dim(tradesCleanupUsingQuotes(tdata = sampleTData, qData = sampleqData)),
   c(8153, 8)
 )
 

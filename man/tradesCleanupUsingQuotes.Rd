@@ -8,7 +8,7 @@ tradesCleanupUsingQuotes(
   datasource = NULL,
   datadestination = NULL,
   tdata = NULL,
-  qdata = NULL
+  qData = NULL
 )
 }
 \arguments{
@@ -19,13 +19,13 @@ tradesCleanupUsingQuotes(
 \item{tdata}{data.table or xts object containing (ONE day and for ONE stock only) trade data cleaned by \code{\link{tradesCleanup}}. This argument is NULL by default. Enabling it, means the arguments
 from, to, datasource and datadestination will be ignored. (only advisable for small chunks of data)}
 
-\item{qdata}{data.table or xts object containing (ONE day and for ONE stock only) cleaned quote data. This argument is NULL by default. Enabling it means the arguments
+\item{qData}{data.table or xts object containing (ONE day and for ONE stock only) cleaned quote data. This argument is NULL by default. Enabling it means the arguments
 from, to, datasource, datadestination will be ignored. (only advisable for small chunks of data)}
 }
 \value{
 For each day an xts object is saved into the folder of that date, containing the cleaned data.
 
-In case you supply the arguments "tdata" and "qdata", the on-disk functionality is ignored
+In case you supply the arguments "tdata" and "qData", the on-disk functionality is ignored
 and the function returns cleaned trades as a data.table or xts object (see examples).
 }
 \description{
@@ -40,11 +40,11 @@ and \code{\link{quotesCleanup}}.
 tdata_afterfirstcleaning <- tradesCleanup(tdataraw = sampleTDataRawMicroseconds, 
                                           exchanges = "N", report = FALSE)
 # 
-qdata <- quotesCleanup(qdataraw = sampleQDataRawMicroseconds, 
+qData <- quotesCleanup(qDataraw = sampleqDataRawMicroseconds, 
                        exchanges = "N", report = FALSE)
 dim(tdata_afterfirstcleaning)
 tdata_afterfinalcleaning <- 
-  tradesCleanupUsingQuotes(qdata = qdata[as.Date(DT) == "2018-01-02"],
+  tradesCleanupUsingQuotes(qData = qData[as.Date(DT) == "2018-01-02"],
                            tdata = tdata_afterfirstcleaning[as.Date(DT) == "2018-01-02"])
 dim(tdata_afterfinalcleaning)
 #In case you have more data it is advised to use the on-disk functionality

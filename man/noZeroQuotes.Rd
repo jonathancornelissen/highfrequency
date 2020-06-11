@@ -4,10 +4,10 @@
 \alias{noZeroQuotes}
 \title{Delete the observations where the bid or ask is zero}
 \usage{
-noZeroQuotes(qdata)
+noZeroQuotes(qData)
 }
 \arguments{
-\item{qdata}{an xts or data.table object at least containing the columns "BID" and "OFR".}
+\item{qData}{an xts or data.table object at least containing the columns "BID" and "OFR".}
 }
 \value{
 xts object or data.table depending on type of input

@@ -316,9 +316,9 @@ aggregatePrice <- function(pData, on = "minutes", k = 1, marketOpen = "09:30:00"
 #' Aggregate a data.table or xts object containing quote data
 #' 
 #' @description Function returns a data.table or xts object containing the aggregated quote data with columns "SYMBOL", "EX", "BID","BIDSIZ","OFR","OFRSIZ". 
-#' See \code{\link{sampleQData}} for an example of the argument qdata.
+#' See \code{\link{sampleqData}} for an example of the argument qData.
 #' 
-#' @param qdata data.table or xts object to be aggregated, containing the intraday quote data of a stock for one day.
+#' @param qData data.table or xts object to be aggregated, containing the intraday quote data of a stock for one day.
 #' @param on character, indicating the time scale in which "k" is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".
 #' xts object to the 5 minute frequency, set k=5 and on = "minutes".
 #' @param k positive integer, indicating the number of periods to aggregate over. E.g. to aggregate an
@@ -344,19 +344,19 @@ aggregatePrice <- function(pData, on = "minutes", k = 1, marketOpen = "09:30:00"
 #' 
 #' @examples
 #' # aggregate quote data to the 30 second frequency
-#' qdata_aggregated <- aggregateQuotes(sampleQData, on = "seconds", k = 30)
-#' head(qdata_aggregated)
+#' qData_aggregated <- aggregateQuotes(sampleqData, on = "seconds", k = 30)
+#' head(qData_aggregated)
 #' @export
-aggregateQuotes <- function(qdata, on = "minutes", k = 5, marketOpen = "09:30:00", marketClose = "16:00:00", tz = "GMT") {
+aggregateQuotes <- function(qData, on = "minutes", k = 5, marketOpen = "09:30:00", marketClose = "16:00:00", tz = "GMT") {
   DATE = BID = OFR = BIDSIZ = OFRSIZ = DT = FIRST_DT = DT_ROUND = LAST_DT = SYMBOL = NULL
   
-  qdata <- checkColumnNames(qdata)
-  checkqdata(qdata)
+  qData <- checkColumnNames(qData)
+  checkqData(qData)
   
   dummy_was_xts <- FALSE
-  if (is.data.table(qdata) == FALSE) {
-    if (is.xts(qdata) == TRUE) {
-      qdata <- setnames(as.data.table(qdata)[, BID := as.numeric(as.character(BID))][
+  if (is.data.table(qData) == FALSE) {
+    if (is.xts(qData) == TRUE) {
+      qData <- setnames(as.data.table(qData)[, BID := as.numeric(as.character(BID))][
         , OFR := as.numeric(as.character(OFR))][
           , BIDSIZ := as.numeric(as.character(BIDSIZ))][
             , OFRSIZ := as.numeric(as.character(OFRSIZ))], old = "index", new = "DT")
@@ -365,33 +365,33 @@ aggregateQuotes <- function(qdata, on = "minutes", k = 5, marketOpen = "09:30:00
       stop("Input has to be data.table or xts.")
     }
   } else {
-    if (("DT" %in% colnames(qdata)) == FALSE) {
+    if (("DT" %in% colnames(qData)) == FALSE) {
       stop("Data.table neeeds DT column.")
     }
   }
   
-  if ("SYMBOL" %in% colnames(qdata)) {
-    if (length(unique(qdata$SYMBOL)) > 1) {
+  if ("SYMBOL" %in% colnames(qData)) {
+    if (length(unique(qData$SYMBOL)) > 1) {
       stop("Please provide only one symbol at a time.")
     }
   }
   
-  qdata[, DATE := as.Date(DT)]
-  qdata[, FIRST_DT := min(DT), by = "DATE"]
-  qdata[, DT_ROUND := ifelse(DT == FIRST_DT,
+  qData[, DATE := as.Date(DT)]
+  qData[, FIRST_DT := min(DT), by = "DATE"]
+  qData[, DT_ROUND := ifelse(DT == FIRST_DT,
                              floor_date(ymd_hms(DT), unit = paste(k, on)),
                              ceiling_date(ymd_hms(DT), unit = paste(k, on), change_on_boundary = FALSE))]
-  qdata[, DT_ROUND := as_datetime(DT_ROUND)]
-  qdata[, LAST_DT := max(DT), by = "DT_ROUND"]
-  qdata[, OFRSIZ := sum(OFRSIZ), by = "DT_ROUND"]
-  qdata[, BIDSIZ := sum(BIDSIZ), by = "DT_ROUND"]
+  qData[, DT_ROUND := as_datetime(DT_ROUND)]
+  qData[, LAST_DT := max(DT), by = "DT_ROUND"]
+  qData[, OFRSIZ := sum(OFRSIZ), by = "DT_ROUND"]
+  qData[, BIDSIZ := sum(BIDSIZ), by = "DT_ROUND"]
   
-  qdata <- qdata[DT == LAST_DT][, DT := DT_ROUND][, c("DT", "SYMBOL", "BID", "BIDSIZ", "OFR", "OFRSIZ")]
+  qData <- qData[DT == LAST_DT][, DT := DT_ROUND][, c("DT", "SYMBOL", "BID", "BIDSIZ", "OFR", "OFRSIZ")]
   
   if (dummy_was_xts == TRUE) {
-    return(xts(as.matrix(qdata[, -c("DT")]), order.by = qdata$DT, tzone = tz))
+    return(xts(as.matrix(qData[, -c("DT")]), order.by = qData$DT, tzone = tz))
   } else {
-    return(qdata)
+    return(qData)
   }
 }
 
@@ -553,7 +553,7 @@ autoSelectExchangeTrades <- function(tdata) {
 #' of the exchange with highest
 #' value for the sum of "BIDSIZ" and "OFRSIZ", i.e. the highest quote volume.
 #' 
-#' @param qdata a data.table or xts object with at least a column "EX", indicating the exchange symbol 
+#' @param qData a data.table or xts object with at least a column "EX", indicating the exchange symbol 
 #' and columns "BIDSIZ" and "OFRSIZ", indicating 
 #' the volume available at the bid and ask respectively.
 #' The chosen exchange is printed on the console.
@@ -576,53 +576,53 @@ autoSelectExchangeTrades <- function(tdata) {
 #' @return data.table or xts object depending on input
 #' 
 #' @examples 
-#' autoSelectExchangeQuotes(sampleQDataRawMicroseconds)
+#' autoSelectExchangeQuotes(sampleqDataRawMicroseconds)
 #'
 #' @author Jonathan Cornelissen, Kris Boudt and Onno Kleen
 #' 
 #' @keywords cleaning
 #' @export
-autoSelectExchangeQuotes <- function(qdata) {
+autoSelectExchangeQuotes <- function(qData) {
   
   BIDSIZ = OFRSIZ = DT = EX = SUMVOL = NULL
   
   exchanges = c("Q","A","P","B","C","N","D","X","I","M","W","Z");
   exchangenames = c("NASDAQ","AMEX","ARCA","Boston","NSX","NYSE","NASD ADF and TRF","Philadelphia","ISE","Chicago","CBOE","BATS");
   
-  qdata <- checkColumnNames(qdata)
-  checkqdata(qdata)
+  qData <- checkColumnNames(qData)
+  checkqData(qData)
   
   dummy_was_xts <- FALSE
-  if (is.data.table(qdata) == FALSE) {
-    if (is.xts(qdata) == TRUE) {
-      qdata <- setnames(as.data.table(qdata)[, BIDSIZ := as.numeric(as.character(BIDSIZ))][
+  if (is.data.table(qData) == FALSE) {
+    if (is.xts(qData) == TRUE) {
+      qData <- setnames(as.data.table(qData)[, BIDSIZ := as.numeric(as.character(BIDSIZ))][
             , OFRSIZ := as.numeric(as.character(OFRSIZ))], old = "index", new = "DT")
       dummy_was_xts <- TRUE
     } else {
       stop("Input has to be data.table or xts.")
     }
   } else {
-    if (("DT" %in% colnames(qdata)) == FALSE) {
+    if (("DT" %in% colnames(qData)) == FALSE) {
       stop("Data.table neeeds DT column.")
     }
   }
   
-  if (length(unique(qdata$SYMBOL)) > 1) {
+  if (length(unique(qData$SYMBOL)) > 1) {
     stop("Please provide only one symbol at a time.")
   }
   
-  qdata[, SUMVOL := sum(BIDSIZ + OFRSIZ), by = "EX"]
-  qdata <- qdata[SUMVOL == max(SUMVOL)][, -c("SUMVOL")]
+  qData[, SUMVOL := sum(BIDSIZ + OFRSIZ), by = "EX"]
+  qData <- qData[SUMVOL == max(SUMVOL)][, -c("SUMVOL")]
   
-  exch <- unique(qdata$EX)
+  exch <- unique(qData$EX)
   
   namechosen <- exchangenames[exch == exchanges]  
   print(paste("The ", namechosen, "is the exchange with the highest volume."))
   
   if (dummy_was_xts == TRUE) {
-    return(xts(as.matrix(qdata[, -c("DT")]), order.by = qdata$DT, tzone = tz(qdata$DT)))
+    return(xts(as.matrix(qData[, -c("DT")]), order.by = qData$DT, tzone = tz(qData$DT)))
   } else {
-    return(qdata)
+    return(qData)
   }
 }
 
@@ -764,7 +764,7 @@ makeReturns <- function(ts) {
 #' @description Function matches the trades and quotes and returns an xts-object containing both.
 #' 
 #' @param tdata data.table or xts-object containing the trade data (multiple days possible).
-#' @param qdata data.table or xts-object containing the quote data (multiple days possible).
+#' @param qData data.table or xts-object containing the quote data (multiple days possible).
 #' @param adjustment numeric, number of seconds the quotes are registered faster than
 #' the trades (should be round and positive). Based on the research of
 #' Vergote (2005), we set 2 seconds as the default.
@@ -780,23 +780,23 @@ makeReturns <- function(ts) {
 #' 
 #' @examples 
 #' # match the trade and quote data
-#' tqdata <- matchTradesQuotes(sampleTData, sampleQData)
-#' head(tqdata)
+#' tqData <- matchTradesQuotes(sampleTData, sampleqData)
+#' head(tqData)
 #' # multi-day input allowed
-#' tqdata <- matchTradesQuotes(sampleTDataMicroseconds, sampleQDataMicroseconds)
+#' tqData <- matchTradesQuotes(sampleTDataMicroseconds, sampleqDataMicroseconds)
 #' @importFrom lubridate seconds
 #' @export
-matchTradesQuotes <- function(tdata, qdata, adjustment = 2) {
+matchTradesQuotes <- function(tdata, qData, adjustment = 2) {
   
   PRICE = BID = OFR = PFR = DATE = DT = FIRST_DT = DT_ROUND = SYMBOL = NULL
   
   tdata <- checkColumnNames(tdata)
-  qdata <- checkColumnNames(qdata)
-  checkqdata(qdata)
+  qData <- checkColumnNames(qData)
+  checkqData(qData)
   checktdata(tdata)
   
-  if (any(class(tdata) != class(qdata))) {
-    stop("tdata and qdata should be of the same data type, either xts or data.table.")
+  if (any(class(tdata) != class(qData))) {
+    stop("tdata and qData should be of the same data type, either xts or data.table.")
   }
   
   dummy_was_xts <- FALSE
@@ -804,7 +804,7 @@ matchTradesQuotes <- function(tdata, qdata, adjustment = 2) {
     if (is.xts(tdata) == TRUE) {
       tdata <- setnames(as.data.table(tdata)[, PRICE := as.numeric(as.character(PRICE))], 
                         old = "index", new = "DT")
-      qdata <- setnames(as.data.table(qdata)[, BID := as.numeric(as.character(BID))][, OFR := as.numeric(as.character(OFR))], 
+      qData <- setnames(as.data.table(qData)[, BID := as.numeric(as.character(BID))][, OFR := as.numeric(as.character(OFR))], 
                         old = "index", new = "DT")
       dummy_was_xts <- TRUE
     } else {
@@ -816,23 +816,23 @@ matchTradesQuotes <- function(tdata, qdata, adjustment = 2) {
     }
   }
   
-  qdata[, DATE := as.Date(DT)]
-  qdata[, FIRST_DT := min(DT), by = "DATE"]
-  qdata[, DT_ROUND := ifelse(DT == FIRST_DT, ymd_hms(DT), ymd_hms(DT) + seconds(2))]
+  qData[, DATE := as.Date(DT)]
+  qData[, FIRST_DT := min(DT), by = "DATE"]
+  qData[, DT_ROUND := ifelse(DT == FIRST_DT, ymd_hms(DT), ymd_hms(DT) + seconds(2))]
   
-  qdata <- qdata[, DT := ifelse(DT != min(DT), DT + seconds(2), DT)] 
-  qdata <- qdata[, DT := as_datetime(DT_ROUND)][, -c("FIRST_DT", "DT_ROUND", "DATE")]
+  qData <- qData[, DT := ifelse(DT != min(DT), DT + seconds(2), DT)] 
+  qData <- qData[, DT := as_datetime(DT_ROUND)][, -c("FIRST_DT", "DT_ROUND", "DATE")]
   
   setkey(tdata, SYMBOL, DT)
-  setkey(qdata, SYMBOL, DT)
+  setkey(qData, SYMBOL, DT)
   
   tdata <- tdata[, c("DT", "SYMBOL", "PRICE", "SIZE")]
-  tqdata <- qdata[tdata, roll = TRUE, on = c("SYMBOL", "DT")]
+  tqData <- qData[tdata, roll = TRUE, on = c("SYMBOL", "DT")]
   
   if (dummy_was_xts == TRUE) {
-    return(xts(as.matrix(tqdata[, -c("DT")]), order.by = tqdata$DT))
+    return(xts(as.matrix(tqData[, -c("DT")]), order.by = tqData$DT))
   } else {
-    return(tqdata)
+    return(tqData)
   }
 }
 
@@ -841,7 +841,7 @@ matchTradesQuotes <- function(tdata, qdata, adjustment = 2) {
 #' @description Function replaces multiple quote entries that have the same time stamp 
 #' by a single one and returns an xts object with unique time stamps only.
 #' 
-#' @param qdata an xts object or data.table containing the time series data, with 
+#' @param qData an xts object or data.table containing the time series data, with 
 #' at least two columns named "BID" and "OFR" indicating the bid and ask price 
 #' and two columns "BIDSIZ", "OFRSIZ" indicating the number of round lots available at these 
 #' prices. For data.table an additional column "DT" is necessary that stores the date/time information.
@@ -860,10 +860,10 @@ matchTradesQuotes <- function(tdata, qdata, adjustment = 2) {
 #' @author Jonathan Cornelissen and Kris Boudt
 #' @keywords cleaning 
 #' @export
-mergeQuotesSameTimestamp <- function(qdata, selection = "median") {
+mergeQuotesSameTimestamp <- function(qData, selection = "median") {
   BID = OFR = DT = SYMBOL = .SD = BIDSIZ = OFRSIZ = MAXBID = MAXOFR = NULL 
-  qdata <- checkColumnNames(qdata)
-  checkqdata(qdata)
+  qData <- checkColumnNames(qData)
+  checkqData(qData)
   
   condition <- selection == "median" | selection == "max.volume" | selection == "weighted.average"
   if (condition == FALSE) {
@@ -871,9 +871,9 @@ mergeQuotesSameTimestamp <- function(qdata, selection = "median") {
   }
   
   dummy_was_xts <- FALSE
-  if (is.data.table(qdata) == FALSE) {
-    if (is.xts(qdata) == TRUE) {
-      qdata <- setnames(as.data.table(qdata)[, BID := as.numeric(as.character(BID))][, OFR := as.numeric(as.character(OFR))]
+  if (is.data.table(qData) == FALSE) {
+    if (is.xts(qData) == TRUE) {
+      qData <- setnames(as.data.table(qData)[, BID := as.numeric(as.character(BID))][, OFR := as.numeric(as.character(OFR))]
                         [, BIDSIZ := as.numeric(as.character(BIDSIZ))][, OFRSIZ := as.numeric(as.character(OFRSIZ))], 
                         old = "index", new = "DT")
       dummy_was_xts <- TRUE
@@ -881,21 +881,21 @@ mergeQuotesSameTimestamp <- function(qdata, selection = "median") {
       stop("Input has to be data.table or xts.")
     }
   } else {
-    if (("DT" %in% colnames(qdata)) == FALSE) {
+    if (("DT" %in% colnames(qData)) == FALSE) {
       stop("Data.table neeeds DT column (date-time).")
     }
   }
-  # qdata <- sampleQDataRawMicroseconds
-  # qdata <- checkColumnNames(qdata)
+  # qData <- sampleqDataRawMicroseconds
+  # qData <- checkColumnNames(qData)
   
   # keep summed size columns
-  qdata_size <- qdata[, lapply(.SD, sum), by = list(DT, SYMBOL), .SDcols = c("BIDSIZ", "OFRSIZ")]
+  qData_size <- qData[, lapply(.SD, sum), by = list(DT, SYMBOL), .SDcols = c("BIDSIZ", "OFRSIZ")]
   if (selection == "median") {
-    qdata <- qdata[,  lapply(.SD, median), by = list(DT, SYMBOL), .SDcols = c("BID", "OFR")]
+    qData <- qData[,  lapply(.SD, median), by = list(DT, SYMBOL), .SDcols = c("BID", "OFR")]
   }
   
   if (selection == "max.volume") {
-    qdata <- qdata[, MAXBID := max(BIDSIZ), by = list(DT, SYMBOL)][, MAXOFR := max(OFRSIZ), by = "DT"][
+    qData <- qData[, MAXBID := max(BIDSIZ), by = list(DT, SYMBOL)][, MAXOFR := max(OFRSIZ), by = "DT"][
       , BIDSIZ := ifelse(BIDSIZ == MAXBID, 1, 0)][
       , OFRSIZ := ifelse(OFRSIZ == MAXOFR, 1, 0)][
       , BID := BID * BIDSIZ][
@@ -904,21 +904,21 @@ mergeQuotesSameTimestamp <- function(qdata, selection = "median") {
       , lapply(.SD, unique), by = list(DT, SYMBOL), .SDcols = c("BID", "OFR")]
   }
   if (selection == "weighted.average") {
-    qdata <- qdata[, `:=` (BIDSIZ = BIDSIZ / sum(BIDSIZ), OFRSIZ = OFRSIZ / sum(OFRSIZ)), by = list(DT, SYMBOL)][
+    qData <- qData[, `:=` (BIDSIZ = BIDSIZ / sum(BIDSIZ), OFRSIZ = OFRSIZ / sum(OFRSIZ)), by = list(DT, SYMBOL)][
       , `:=` (BID = sum(BID * BIDSIZ), OFR = sum(OFR * OFRSIZ)), by = list(DT, SYMBOL)][
         , -c("BIDSIZ", "OFRSIZ")][
         , lapply(.SD, unique), by = list(DT, SYMBOL), .SDcols = c("BID", "OFR")]
   }
-  qdata <- merge(qdata, qdata_size)
+  qData <- merge(qData, qData_size)
   
   if (dummy_was_xts == TRUE) {
-    return(xts(as.matrix(qdata[, -c("DT")]), order.by = qdata$DT))
+    return(xts(as.matrix(qData[, -c("DT")]), order.by = qData$DT))
   } else {
-    return(qdata)
+    return(qData)
   }
 }
-# microbenchmark::microbenchmark(quotesCleanup(qdataraw = sampleQDataRaw, exchanges = "N", selection = "max.volume"), times = 10, unit = "s")
-# microbenchmark::microbenchmark(quotesCleanup(qdataraw = sampleQDataRaw, exchanges = "N", selection = "maxvolume"), times = 10, unit = "s")
+# microbenchmark::microbenchmark(quotesCleanup(qDataraw = sampleqDataRaw, exchanges = "N", selection = "max.volume"), times = 10, unit = "s")
+# microbenchmark::microbenchmark(quotesCleanup(qDataraw = sampleqDataRaw, exchanges = "N", selection = "maxvolume"), times = 10, unit = "s")
 
 #' Merge multiple transactions with the same time stamp
 #' 
@@ -1046,38 +1046,38 @@ noZeroPrices <- function(tdata) {
 #' Delete the observations where the bid or ask is zero
 #' @description Function deletes the observations where the bid or ask is zero.
 #' 
-#' @param qdata an xts or data.table object at least containing the columns "BID" and "OFR".
+#' @param qData an xts or data.table object at least containing the columns "BID" and "OFR".
 #' 
 #' @return xts object or data.table depending on type of input
 #' 
 #' @author Jonathan Cornelissen and Kris Boudt
 #' @keywords cleaning
 #' @export
-noZeroQuotes <- function(qdata) {
+noZeroQuotes <- function(qData) {
   BID = OFR = DT = NULL
-  qdata <- checkColumnNames(qdata)
-  checkqdata(qdata)
+  qData <- checkColumnNames(qData)
+  checkqData(qData)
   
   dummy_was_xts <- FALSE
-  if (is.data.table(qdata) == FALSE) {
-    if (is.xts(qdata) == TRUE) {
-      qdata <- setnames(as.data.table(qdata)[, BID := as.numeric(as.character(BID))][, OFR := as.numeric(as.character(OFR))], old = "index", new = "DT")
+  if (is.data.table(qData) == FALSE) {
+    if (is.xts(qData) == TRUE) {
+      qData <- setnames(as.data.table(qData)[, BID := as.numeric(as.character(BID))][, OFR := as.numeric(as.character(OFR))], old = "index", new = "DT")
       dummy_was_xts <- TRUE
     } else {
       stop("Input has to be data.table or xts.")
     }
   } else {
-    if (("DT" %in% colnames(qdata)) == FALSE) {
+    if (("DT" %in% colnames(qData)) == FALSE) {
       stop("Data.table neeeds DT column.")
     }
   }
   
-  qdata <- qdata[BID != 0 & OFR != 0]
+  qData <- qData[BID != 0 & OFR != 0]
   
   if (dummy_was_xts == TRUE) {
-    return(xts(as.matrix(qdata[, -c("DT")]), order.by = qdata$DT))
+    return(xts(as.matrix(qData[, -c("DT")]), order.by = qData$DT))
   } else {
-    return(qdata)
+    return(qData)
   }
 }
 
@@ -1087,7 +1087,7 @@ noZeroQuotes <- function(qdata) {
 #' @description This is a wrapper function for cleaning the quote data in the entire folder datasource. 
 #' The result is saved in the folder datadestination. 
 #' 
-#' In case you supply the argument "qdataraw", the on-disk functionality is ignored
+#' In case you supply the argument "qDataraw", the on-disk functionality is ignored
 #' and the function returns the cleaned quotes as xts or data.table object (see examples).
 #' 
 #' The following cleaning steps are performed sequentially:
@@ -1112,7 +1112,7 @@ noZeroQuotes <- function(qdata) {
 #' \item W: CBOE
 #' \item Z: BATS
 #' }
-#' @param qdataraw xts or data.table object containing (ONE stock only) raw quote data. This argument is NULL by default. Enabling it means the arguments
+#' @param qDataraw xts or data.table object containing (ONE stock only) raw quote data. This argument is NULL by default. Enabling it means the arguments
 #' from, to, datasource and datadestination will be ignored. (only advisable for small chunks of data)
 #' @param report boolean and TRUE by default. In case it is true the function returns (also) a vector indicating how many quotes remained after each cleaning step.
 #' @param selection argument to be passed on to the cleaning routine \code{\link{mergeQuotesSameTimestamp}}. The default is "median".
@@ -1125,7 +1125,7 @@ noZeroQuotes <- function(qdata) {
 #' @return The function converts every csv file in datasource into multiple xts or data.table files.
 #' In datadestination, there will be one folder for each symbol containing .rds files with cleaned data stored either in data.table or xts format.
 #' 
-#' In case you supply the argument "qdataraw", the on-disk functionality is ignored
+#' In case you supply the argument "qDataraw", the on-disk functionality is ignored
 #' and the function returns a list with the cleaned quotes as an xts or data.table object depending on input (see examples).
 #' 
 #' @references Barndorff-Nielsen, O. E., P. R. Hansen, A. Lunde, and N. Shephard (2009). Realized kernels in practice: Trades and quotes. Econometrics Journal 12, C1-C32.
@@ -1136,11 +1136,11 @@ noZeroQuotes <- function(qdata) {
 #' 
 #' @examples
 #' # Consider you have raw quote data for 1 stock for 2 days
-#' head(sampleQDataRawMicroseconds)
-#' dim(sampleQDataRawMicroseconds)
-#' qdata_aftercleaning <- quotesCleanup(qdataraw = sampleQDataRawMicroseconds, exchanges = "N")
-#' qdata_aftercleaning$report
-#' dim(qdata_aftercleaning$qdata)
+#' head(sampleqDataRawMicroseconds)
+#' dim(sampleqDataRawMicroseconds)
+#' qData_aftercleaning <- quotesCleanup(qDataraw = sampleqDataRawMicroseconds, exchanges = "N")
+#' qData_aftercleaning$report
+#' dim(qData_aftercleaning$qData)
 #' 
 #' # In case you have more data it is advised to use the on-disk functionality
 #' # via "from","to","datasource",etc. arguments
@@ -1148,7 +1148,7 @@ noZeroQuotes <- function(qdata) {
 #' @importFrom readr read_csv
 #' @keywords cleaning
 #' @export
-quotesCleanup <- function(datasource = NULL, datadestination = NULL, exchanges, qdataraw = NULL, report = TRUE, 
+quotesCleanup <- function(datasource = NULL, datadestination = NULL, exchanges, qDataraw = NULL, report = TRUE, 
                           selection = "median", maxi = 50, window = 50, type = "advanced", rmoutliersmaxi = 10, saveasxts = TRUE) {
   
   BID = OFR = DT = SPREAD = SPREAD_MEDIAN = EX = DATE = BIDSIZ = OFRSIZ = TIME_M  = NULL
@@ -1160,26 +1160,26 @@ quotesCleanup <- function(datasource = NULL, datadestination = NULL, exchanges, 
                merge_same_timestamp = 0,
                remove_outliers = 0)
   
-  if (is.null(qdataraw) == TRUE) {
+  if (is.null(qDataraw) == TRUE) {
     try(dir.create(datadestination), silent = TRUE)
     
     quotesfiles <- list.files(datasource, recursive = TRUE)[grepl("quotes", list.files(datasource, recursive = TRUE))]
     for (ii in quotesfiles) {
       readdata <- try(as.data.table(read_csv(paste0(datasource, "/", ii))), silent = TRUE)
       readdata <- try(readdata[, DT := as.POSIXct(substring(paste(as.character(DATE), TIME_M, sep = " "), 1, 20), tz = "EST", format = "%Y%m%d %H:%M:%OS")], silent = TRUE)
-      qdata <- try(quotesCleanup(qdataraw = readdata,
+      qData <- try(quotesCleanup(qDataraw = readdata,
                                  selection = selection,
                                  exchanges = exchanges,
                                  maxi = maxi,
                                  window = window,
                                  type = type,
-                                 rmoutliersmaxi = rmoutliersmaxi))$qdata
+                                 rmoutliersmaxi = rmoutliersmaxi))$qData
       
-      qdata <- qdata[, DATE := as.Date(DT, tz = "EST")]
-      qdata <- split(qdata, by = "DATE")
+      qData <- qData[, DATE := as.Date(DT, tz = "EST")]
+      qData <- split(qData, by = "DATE")
       
       try(dir.create(paste0(datadestination, "/", strsplit(ii, "/")[[1]][1])), silent = TRUE)
-      for (jj in qdata) {
+      for (jj in qData) {
         if (saveasxts == TRUE) {
           df_result <- xts(as.matrix(jj[, -c("DT", "DATE")]), order.by = jj$DT)
         } else {
@@ -1191,48 +1191,48 @@ quotesCleanup <- function(datasource = NULL, datadestination = NULL, exchanges, 
     }
   }
   
-  if (is.null(qdataraw) == FALSE) {
+  if (is.null(qDataraw) == FALSE) {
     
-    qdataraw <- checkColumnNames(qdataraw)
-    checkqdata(qdataraw)
+    qDataraw <- checkColumnNames(qDataraw)
+    checkqData(qDataraw)
     
     dummy_was_xts <- FALSE
-    if (is.data.table(qdataraw) == FALSE) {
-      if (is.xts(qdataraw) == TRUE) {
-        qdataraw <- setnames(as.data.table(qdataraw)[, BID := as.numeric(as.character(BID))][, OFR := as.numeric(as.character(OFR))]
+    if (is.data.table(qDataraw) == FALSE) {
+      if (is.xts(qDataraw) == TRUE) {
+        qDataraw <- setnames(as.data.table(qDataraw)[, BID := as.numeric(as.character(BID))][, OFR := as.numeric(as.character(OFR))]
                              [, BIDSIZ := as.numeric(as.character(BIDSIZ))][, OFRSIZ := as.numeric(as.character(OFRSIZ))], old = "index", new = "DT")
         dummy_was_xts <- TRUE
       } else {
         stop("Input has to be data.table or xts.")
       }
     } else {
-      if (("DT" %in% colnames(qdataraw)) == FALSE) {
+      if (("DT" %in% colnames(qDataraw)) == FALSE) {
         stop("Data.table neeeds DT column.")
       }
     }
     
-    nresult[1] <- dim(qdataraw)[1] 
-    qdataraw <- qdataraw[BID != 0 & OFR != 0]
-    nresult[2] <- dim(qdataraw)[1] 
-    qdataraw <- qdataraw[EX %in% exchanges]
-    nresult[3] <- dim(qdataraw)[1] 
-    qdataraw <- qdataraw[OFR > BID][, SPREAD := OFR - BID][, DATE := as.Date(DT)][, SPREAD_MEDIAN := median(SPREAD), by = "DATE"]
-    nresult[4] <- dim(qdataraw)[1] 
-    qdataraw <- qdataraw[SPREAD < (SPREAD_MEDIAN * maxi)]
-    nresult[5] <- dim(qdataraw)[1]
-    qdataraw <- mergeQuotesSameTimestamp(qdata = qdataraw, selection = selection)
-    nresult[6] <- dim(qdataraw)[1]
+    nresult[1] <- dim(qDataraw)[1] 
+    qDataraw <- qDataraw[BID != 0 & OFR != 0]
+    nresult[2] <- dim(qDataraw)[1] 
+    qDataraw <- qDataraw[EX %in% exchanges]
+    nresult[3] <- dim(qDataraw)[1] 
+    qDataraw <- qDataraw[OFR > BID][, SPREAD := OFR - BID][, DATE := as.Date(DT)][, SPREAD_MEDIAN := median(SPREAD), by = "DATE"]
+    nresult[4] <- dim(qDataraw)[1] 
+    qDataraw <- qDataraw[SPREAD < (SPREAD_MEDIAN * maxi)]
+    nresult[5] <- dim(qDataraw)[1]
+    qDataraw <- mergeQuotesSameTimestamp(qData = qDataraw, selection = selection)
+    nresult[6] <- dim(qDataraw)[1]
     
-    qdataraw <- rmOutliersQuotes(qdataraw, window = window, type = "advanced", maxi = rmoutliersmaxi)
-    nresult[7] <- dim(qdataraw)[1]
+    qDataraw <- rmOutliersQuotes(qDataraw, window = window, type = "advanced", maxi = rmoutliersmaxi)
+    nresult[7] <- dim(qDataraw)[1]
     if (dummy_was_xts == TRUE) {
-      df_result <- xts(as.matrix(qdataraw[, -c("DT",  "DATE")]), order.by = qdataraw$DT)
+      df_result <- xts(as.matrix(qDataraw[, -c("DT",  "DATE")]), order.by = qDataraw$DT)
     } else {
-      df_result <- qdataraw[, -c( "DATE")]
+      df_result <- qDataraw[, -c( "DATE")]
     }
     
     if (report == TRUE) {
-      return(list(qdata = df_result, report = nresult))
+      return(list(qData = df_result, report = nresult))
     } else {
       return(df_result)
     }
@@ -1244,7 +1244,7 @@ quotesCleanup <- function(datasource = NULL, datadestination = NULL, exchanges, 
 #' @description Function deletes entries for which the spread is more than "maxi" times the median
 #' spread on that day.
 #' 
-#' @param qdata an xts or data.table object at least containing the columns "BID" and "OFR".
+#' @param qData an xts or data.table object at least containing the columns "BID" and "OFR".
 #' @param maxi an integer. By default maxi = "50", which means that entries are deleted 
 #' if the spread is more than 50 times the median spread on that day.
 #' 
@@ -1252,79 +1252,79 @@ quotesCleanup <- function(datasource = NULL, datadestination = NULL, exchanges, 
 #' 
 #' @author Jonathan Cornelissen and Kris Boudt
 #' @keywords cleaning
-rmLargeSpread <- function(qdata, maxi = 50) {
+rmLargeSpread <- function(qData, maxi = 50) {
   BID = OFR = DATE = DT = SPREAD = SPREAD_MEDIAN = NULL
-  qdata <- checkColumnNames(qdata)
-  checkqdata(qdata)
+  qData <- checkColumnNames(qData)
+  checkqData(qData)
   dummy_was_xts <- FALSE
-  if (is.data.table(qdata) == FALSE) {
-    if (is.xts(qdata) == TRUE) {
-      qdata <- setnames(as.data.table(qdata)[, BID := as.numeric(as.character(BID))][, OFR := as.numeric(as.character(OFR))], old = "index", new = "DT")
+  if (is.data.table(qData) == FALSE) {
+    if (is.xts(qData) == TRUE) {
+      qData <- setnames(as.data.table(qData)[, BID := as.numeric(as.character(BID))][, OFR := as.numeric(as.character(OFR))], old = "index", new = "DT")
       dummy_was_xts <- TRUE
     } else {
       stop("Input has to be data.table or xts.")
     }
   } 
   
-  qdata <- qdata[, DATE := as.Date(DT)][
+  qData <- qData[, DATE := as.Date(DT)][
     , SPREAD := OFR - BID][
     , SPREAD_MEDIAN := median(SPREAD), by = "DATE"][SPREAD < (SPREAD_MEDIAN * maxi)]
   
   if (dummy_was_xts == TRUE) {
-    return(xts(as.matrix(qdata[, -c("DT", "DATE", "SPREAD", "SPREAD_MEDIAN")]), order.by = qdata$DT))
+    return(xts(as.matrix(qData[, -c("DT", "DATE", "SPREAD", "SPREAD_MEDIAN")]), order.by = qData$DT))
   } else {
-    return(qdata[, -c("DATE", "SPREAD", "SPREAD_MEDIAN")])
+    return(qData[, -c("DATE", "SPREAD", "SPREAD_MEDIAN")])
   }
 }
 
 #' Delete entries for which the spread is negative
 #' @description Function deletes entries for which the spread is negative.
 #' 
-#' @param qdata an xts object at least containing the columns "BID" and "OFR".
+#' @param qData an xts object at least containing the columns "BID" and "OFR".
 #' 
 #' @return data.table or xts object
 #' 
 #' @author Jonathan Cornelissen, Kris Boudt and Onno Kleen
 #' 
 #' @examples 
-#' rmNegativeSpread(sampleQDataRawMicroseconds)
+#' rmNegativeSpread(sampleqDataRawMicroseconds)
 #' 
 #' @keywords cleaning
 #' @export
-rmNegativeSpread <- function(qdata) {
+rmNegativeSpread <- function(qData) {
   BID = OFR = DATE = DT = NULL
-  qdata <- checkColumnNames(qdata)
-  checkqdata(qdata)
+  qData <- checkColumnNames(qData)
+  checkqData(qData)
   dummy_was_xts <- FALSE
-  if (is.data.table(qdata) == FALSE) {
-    if (is.xts(qdata) == TRUE) {
-      qdata <- setnames(as.data.table(qdata), old = "index", new = "DT")
-      qdata[, BID := as.numeric(as.character(BID))]
-      qdata[, OFR := as.numeric(as.character(OFR))]
+  if (is.data.table(qData) == FALSE) {
+    if (is.xts(qData) == TRUE) {
+      qData <- setnames(as.data.table(qData), old = "index", new = "DT")
+      qData[, BID := as.numeric(as.character(BID))]
+      qData[, OFR := as.numeric(as.character(OFR))]
       dummy_was_xts <- TRUE
     } else {
       stop("Input has to be data.table or xts.")
     }
   } 
   
-  qdata <- qdata[OFR > BID]
+  qData <- qData[OFR > BID]
   
   if (dummy_was_xts == TRUE) {
-    return(xts(as.matrix(qdata[, -c("DT")]), order.by = qdata$DT))
+    return(xts(as.matrix(qData[, -c("DT")]), order.by = qData$DT))
   } else {
-    return(qdata)
+    return(qData)
   }
 }
 
 #' Delete transactions with unlikely transaction prices
 #' @description Deprecated - use rmTradeOutliers instead.
 #' @param tdata a data.table or xts object containing the time series data, with at least the column "PRICE", containing the transaction price (ONE DAY ONLY).
-#' @param qdata a data.table or xts object containing the time series data with at least the columns "BID" and "OFR", containing the bid and ask prices (ONE DAY ONLY).
+#' @param qData a data.table or xts object containing the time series data with at least the columns "BID" and "OFR", containing the bid and ask prices (ONE DAY ONLY).
 #' @return xts or data.table object depending on input
 #' @export
-rmTradeOutliers <- function(tdata, qdata) {
+rmTradeOutliers <- function(tdata, qData) {
   warning("Renamed as rmTradeOutliersUsingQuotes. Will be deprecated in future releases.")
-  rmTradeOutliersUsingQuotes(tdata, qdata)
+  rmTradeOutliersUsingQuotes(tdata, qData)
 }
 
 #' Delete transactions with unlikely transaction prices
@@ -1333,10 +1333,10 @@ rmTradeOutliers <- function(tdata, qdata) {
 #' Similar for entries with prices below the bid minus the bid-ask spread.
 #' 
 #' @param tdata a data.table or xts object containing the time series data, with at least the column "PRICE", containing the transaction price (ONE DAY ONLY).
-#' @param qdata a data.table or xts object containing the time series data with at least the columns "BID" and "OFR", containing the bid and ask prices (ONE DAY ONLY).
+#' @param qData a data.table or xts object containing the time series data with at least the columns "BID" and "OFR", containing the bid and ask prices (ONE DAY ONLY).
 #' 
 #' @details Note: in order to work correctly, the input data of this function should be
-#' cleaned trade (tdata) and quote (qdata) data respectively.
+#' cleaned trade (tdata) and quote (qData) data respectively.
 #' 
 #' @return xts or data.table object depending on input
 #' 
@@ -1344,15 +1344,15 @@ rmTradeOutliers <- function(tdata, qdata) {
 #' @keywords cleaning
 #' @importFrom data.table setkey
 #' @export
-rmTradeOutliersUsingQuotes <- function(tdata, qdata) {
+rmTradeOutliersUsingQuotes <- function(tdata, qData) {
   SPREAD = DT = PRICE = BID = OFR = SYMBOL = 0
   tdata <- checkColumnNames(tdata)
-  qdata <- checkColumnNames(qdata)
-  checkqdata(qdata)
+  qData <- checkColumnNames(qData)
+  checkqData(qData)
   checktdata(tdata)
   
-  if (any(class(tdata) != class(qdata))) {
-    stop("tdata and qdata should be of the same data type, either xts or data.table.")
+  if (any(class(tdata) != class(qData))) {
+    stop("tdata and qData should be of the same data type, either xts or data.table.")
   }
   
   dummy_was_xts <- FALSE
@@ -1360,7 +1360,7 @@ rmTradeOutliersUsingQuotes <- function(tdata, qdata) {
     if (is.xts(tdata) == TRUE) {
       tdata <- setnames(as.data.table(tdata)[, PRICE := as.numeric(as.character(PRICE))], 
                         old = "index", new = "DT")
-      qdata <- setnames(as.data.table(qdata)[, BID := as.numeric(as.character(BID))][, OFR := as.numeric(as.character(OFR))], 
+      qData <- setnames(as.data.table(qData)[, BID := as.numeric(as.character(BID))][, OFR := as.numeric(as.character(OFR))], 
                         old = "index", new = "DT")
       dummy_was_xts <- TRUE
     } else {
@@ -1376,14 +1376,14 @@ rmTradeOutliersUsingQuotes <- function(tdata, qdata) {
     stop("Both data sets should only include data for one day.")
   }
   
-  qdata <- qdata[, DT := DT + 2]
+  qData <- qData[, DT := DT + 2]
   
   setkey(tdata, SYMBOL, DT)
-  setkey(qdata, SYMBOL, DT)
+  setkey(qData, SYMBOL, DT)
   
   tdata <- tdata[, c("DT", "SYMBOL", "PRICE")]
   
-  tdata <- qdata[tdata, roll = TRUE, on = c("SYMBOL", "DT")]
+  tdata <- qData[tdata, roll = TRUE, on = c("SYMBOL", "DT")]
   
   tdata[is.na(BID)][, "BID"] <- tdata$BID[min(which(is.na(tdata$BID) == FALSE))]
   tdata[is.na(OFR)][, "OFR"] <- tdata$OFR[min(which(is.na(tdata$OFR) == FALSE))]
@@ -1421,7 +1421,7 @@ rmTradeOutliersUsingQuotes <- function(tdata, qdata) {
 #' day. In case it is zero (which can happen if mid-quotes don't change much), 
 #' the median absolute deviation is taken over a subsample without constant mid-quotes.
 #' 
-#' @param qdata a data.table or xts object at least containing the columns "BID" and "OFR".
+#' @param qData a data.table or xts object at least containing the columns "BID" and "OFR".
 #' @param maxi an integer, indicating the maximum number of median absolute deviations allowed.
 #' @param window an integer, indicating the time window for which the "outlyingness" is considered.
 #' @param type should be "standard" or "advanced" (see description).
@@ -1442,7 +1442,7 @@ rmTradeOutliersUsingQuotes <- function(tdata, qdata) {
 #' @importFrom xts is.xts as.xts
 #' @importFrom RcppRoll roll_median
 #' @export
-rmOutliersQuotes <- function (qdata, maxi = 10, window = 50, type = "advanced") {
+rmOutliersQuotes <- function (qData, maxi = 10, window = 50, type = "advanced") {
   # NOTE: Median Absolute deviation chosen contrary to Barndorff-Nielsen et al.
   # Setting those variables equal NULL is for suppressing NOTES in devtools::check
   # References inside data.table-operations throw "no visible binding for global variable ..." error
@@ -1451,24 +1451,24 @@ rmOutliersQuotes <- function (qdata, maxi = 10, window = 50, type = "advanced") 
     stop("Window size can't be odd.")
   }
   
-  qdata <- checkColumnNames(qdata)
-  checkqdata(qdata)
+  qData <- checkColumnNames(qData)
+  checkqData(qData)
   
   dummy_was_xts <- FALSE
-  if (is.data.table(qdata) == FALSE) {
-    if (is.xts(qdata) == TRUE) {
-      qdata <- setnames(as.data.table(qdata)[, BID := as.numeric(as.character(BID))][, OFR := as.numeric(as.character(OFR))], old = "index", new = "DT")
+  if (is.data.table(qData) == FALSE) {
+    if (is.xts(qData) == TRUE) {
+      qData <- setnames(as.data.table(qData)[, BID := as.numeric(as.character(BID))][, OFR := as.numeric(as.character(OFR))], old = "index", new = "DT")
       dummy_was_xts <- TRUE
     } else {
       stop("Input has to be data.table or xts.")
     }
   } else {
-    if (("DT" %in% colnames(qdata)) == FALSE) {
+    if (("DT" %in% colnames(qData)) == FALSE) {
       stop("Data.table neeeds DT column.")
     }
   }
   
-  if (length(unique(qdata$SYMBOL)) > 1) {
+  if (length(unique(qData$SYMBOL)) > 1) {
     stop("Please provide only one symbol at a time.")
   }
   
@@ -1481,24 +1481,24 @@ rmOutliersQuotes <- function (qdata, maxi = 10, window = 50, type = "advanced") 
   weights_med_follow  <- c(0 , rep(1, times = window))
   weights_med_trail    <- c(rep(1, times = window), 0)
   
-  qdata <- qdata[, MIDQUOTE := (BID + OFR) / 2][, DATE := as.Date(DT)][, MADALL := mad(MIDQUOTE), by = "DATE"]
+  qData <- qData[, MIDQUOTE := (BID + OFR) / 2][, DATE := as.Date(DT)][, MADALL := mad(MIDQUOTE), by = "DATE"]
   
   if (type == "standard") {
-    qdata <- qdata[ , CRITERION := abs(MIDQUOTE - rollingMedianInclEnds(MIDQUOTE, window = window, weights = weights_med_center_excl))][
+    qData <- qData[ , CRITERION := abs(MIDQUOTE - rollingMedianInclEnds(MIDQUOTE, window = window, weights = weights_med_center_excl))][
       CRITERION < maxi * MADALL]
     
   }
   if (type == "advanced") {
-    qdata <- qdata[, CRITERION := pmin(abs(MIDQUOTE - rollingMedianInclEnds(MIDQUOTE, window = window, weights = weights_med_center_excl, direction = "center")),
+    qData <- qData[, CRITERION := pmin(abs(MIDQUOTE - rollingMedianInclEnds(MIDQUOTE, window = window, weights = weights_med_center_excl, direction = "center")),
                                        abs(MIDQUOTE - rollingMedianInclEnds(MIDQUOTE, window = window, weights = weights_med_trail, direction = "left")),
                                        abs(MIDQUOTE - rollingMedianInclEnds(MIDQUOTE, window = window, weights = weights_med_follow, direction = "right")),
                                        na.rm = TRUE)][
                                          CRITERION < maxi * MADALL]
   }
   if (dummy_was_xts == TRUE) {
-    return(xts(as.matrix(qdata[, -c("DT", "DATE", "MADALL", "CRITERION", "MIDQUOTE")]), order.by = qdata$DT))
+    return(xts(as.matrix(qData[, -c("DT", "DATE", "MADALL", "CRITERION", "MIDQUOTE")]), order.by = qData$DT))
   } else {
-    return(qdata[, -c("MADALL", "CRITERION")])
+    return(qData[, -c("MADALL", "CRITERION")])
   }
 }
 
@@ -1574,7 +1574,7 @@ salesCondition <- function(tdata) {
 selectExchange <- function(data, exch = "N") { 
   EX = NULL
   data <- checkColumnNames(data)
-  # checkqdata(data)
+  # checkqData(data)
   
   if (is.data.table(data) == FALSE) {
     if (is.xts(data) == TRUE) {
@@ -1736,11 +1736,11 @@ tradesCleanup <- function(datasource = NULL, datadestination = NULL, exchanges, 
 }
 
 #' @export
-tradesCleanupUsingQuotes <- function(from, to, datasource, datadestination, ticker, tdata = NULL, qdata = NULL) {
+tradesCleanupUsingQuotes <- function(from, to, datasource, datadestination, ticker, tdata = NULL, qData = NULL) {
   
   ## Deprecated
   warning("Please use tradesCleanupUsingQuotes instead of tradesCleanupFinal.") 
-  tradesCleanupFinal(from, to, datasource, datadestination, ticker, tdata = NULL, qdata = NULL)
+  tradesCleanupFinal(from, to, datasource, datadestination, ticker, tdata = NULL, qData = NULL)
 }
 
 #' Perform a final cleaning procedure on trade data
@@ -1755,12 +1755,12 @@ tradesCleanupUsingQuotes <- function(from, to, datasource, datadestination, tick
 #' @param datadestination character indicating the folder in which the cleaned data is stored, folder of datasource by default.
 #' @param tdata data.table or xts object containing (ONE day and for ONE stock only) trade data cleaned by \code{\link{tradesCleanup}}. This argument is NULL by default. Enabling it, means the arguments
 #' from, to, datasource and datadestination will be ignored. (only advisable for small chunks of data)
-#' @param qdata data.table or xts object containing (ONE day and for ONE stock only) cleaned quote data. This argument is NULL by default. Enabling it means the arguments
+#' @param qData data.table or xts object containing (ONE day and for ONE stock only) cleaned quote data. This argument is NULL by default. Enabling it means the arguments
 #' from, to, datasource, datadestination will be ignored. (only advisable for small chunks of data)
 #' 
 #' @return For each day an xts object is saved into the folder of that date, containing the cleaned data.
 #' 
-#' In case you supply the arguments "tdata" and "qdata", the on-disk functionality is ignored
+#' In case you supply the arguments "tdata" and "qData", the on-disk functionality is ignored
 #' and the function returns cleaned trades as a data.table or xts object (see examples).
 #' 
 #' @references Barndorff-Nielsen, O. E., P. R. Hansen, A. Lunde, and N. Shephard (2009). Realized kernels in practice: Trades and quotes. Econometrics Journal 12, C1-C32.
@@ -1774,29 +1774,29 @@ tradesCleanupUsingQuotes <- function(from, to, datasource, datadestination, tick
 #' tdata_afterfirstcleaning <- tradesCleanup(tdataraw = sampleTDataRawMicroseconds, 
 #'                                           exchanges = "N", report = FALSE)
 #' # 
-#' qdata <- quotesCleanup(qdataraw = sampleQDataRawMicroseconds, 
+#' qData <- quotesCleanup(qDataraw = sampleqDataRawMicroseconds, 
 #'                        exchanges = "N", report = FALSE)
 #' dim(tdata_afterfirstcleaning)
 #' tdata_afterfinalcleaning <- 
-#'   tradesCleanupUsingQuotes(qdata = qdata[as.Date(DT) == "2018-01-02"],
+#'   tradesCleanupUsingQuotes(qData = qData[as.Date(DT) == "2018-01-02"],
 #'                            tdata = tdata_afterfirstcleaning[as.Date(DT) == "2018-01-02"])
 #' dim(tdata_afterfinalcleaning)
 #' #In case you have more data it is advised to use the on-disk functionality
 #' #via "from","to","datasource", etc. arguments
 #' @keywords cleaning
 #' @export
-tradesCleanupUsingQuotes <- function(datasource = NULL, datadestination = NULL, tdata = NULL, qdata = NULL) {
+tradesCleanupUsingQuotes <- function(datasource = NULL, datadestination = NULL, tdata = NULL, qData = NULL) {
   
   if (is.null(datadestination) == TRUE) {
     datadestination <- datasource
   }
   
-  if ((!is.null(tdata)) & (!is.null(qdata))) {
+  if ((!is.null(tdata)) & (!is.null(qData))) {
     tdata <- checkColumnNames(tdata)
-    qdata <- checkColumnNames(qdata)
+    qData <- checkColumnNames(qData)
     
     #1 cleaning procedure that needs cleaned trades and quotes
-    tdata <- rmTradeOutliersUsingQuotes(tdata, qdata)
+    tdata <- rmTradeOutliersUsingQuotes(tdata, qData)
     return(tdata)
   } else {
     ticker <- list.files(datasource)
@@ -1804,10 +1804,10 @@ tradesCleanupUsingQuotes <- function(datasource = NULL, datadestination = NULL, 
       filesforticker <- list.files(paste0(datasource, "/", ii, "/"))
       for (jj in filesforticker[!grepl("quotes", filesforticker)]) {
         tdata <- try(readRDS(paste0(datasource, "/", ii, "/", jj)))
-        qdata <- try(readRDS(paste0(datasource, "/", ii, "/", substring(jj, 1, 10), "quotes.rds")))
+        qData <- try(readRDS(paste0(datasource, "/", ii, "/", substring(jj, 1, 10), "quotes.rds")))
         tdata <- checkColumnNames(tdata)
-        qdata <- checkColumnNames(qdata)
-        saveRDS(rmTradeOutliersUsingQuotes(tdata, qdata), paste0(datadestination, "/", ii, "/", substring(jj, 1, 10), "tradescleanedbyquotes.rds"))
+        qData <- checkColumnNames(qData)
+        saveRDS(rmTradeOutliersUsingQuotes(tdata, qData), paste0(datadestination, "/", ii, "/", substring(jj, 1, 10), "tradescleanedbyquotes.rds"))
       }
     }
   }

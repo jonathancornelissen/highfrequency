@@ -65,15 +65,15 @@ The highfrequency function also brings a similarly-named function for cleaning q
 - removing quotes that may be seen to be outliers.
 
 ```{r eval = TRUE}
-qdata_cleaned <- quotesCleanup(qdataraw = sampleQDataRawMicroseconds, exchange = "N")
+qData_cleaned <- quotesCleanup(qDataraw = sampleqDataRawMicroseconds, exchange = "N")
 ```
 
 quotesCleanup also provides a list with two elements, a report and the cleaned data.
 
 ```{r eval = TRUE}
-qdata_cleaned$report
+qData_cleaned$report
 
-summary(qdata_cleaned$qdata[, c("DT", "OFR", "OFRSIZ", "BID", "BIDSIZ", "MIDQUOTE")])
+summary(qData_cleaned$qData[, c("DT", "OFR", "OFRSIZ", "BID", "BIDSIZ", "MIDQUOTE")])
 ```
 
 ## Cleaning transaction data using cleaned quotes
@@ -81,9 +81,9 @@ summary(qdata_cleaned$qdata[, c("DT", "OFR", "OFRSIZ", "BID", "BIDSIZ", "MIDQUOT
 Given our freshly cleaned trades and quotes data, we now want to filter for trades that are proceeded by a compatible set of quotes. Currently, the tradesCleanupUsingQuotes function only supports submitting trades and quotes data for one day only, Hence, we filter our data set to one of the days.
 
 ```{r eval = TRUE}
-tqdata_cleaned <- tradesCleanupUsingQuotes(tdata = tdata_cleaned$tdata[as.Date(DT) == "2018-01-02"], 
-                                           qdata = qdata_cleaned$qdata[as.Date(DT) == "2018-01-02"])
-tqdata_cleaned
+tqData_cleaned <- tradesCleanupUsingQuotes(tdata = tdata_cleaned$tdata[as.Date(DT) == "2018-01-02"], 
+                                           qData = qData_cleaned$qData[as.Date(DT) == "2018-01-02"])
+tqData_cleaned
 ```
 
 Here, we see that once more half of the trades are filtered out due to non-plausability.

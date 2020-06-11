@@ -4,12 +4,12 @@
 \alias{rmTradeOutliers}
 \title{Delete transactions with unlikely transaction prices}
 \usage{
-rmTradeOutliers(tdata, qdata)
+rmTradeOutliers(tdata, qData)
 }
 \arguments{
 \item{tdata}{a data.table or xts object containing the time series data, with at least the column "PRICE", containing the transaction price (ONE DAY ONLY).}
 
-\item{qdata}{a data.table or xts object containing the time series data with at least the columns "BID" and "OFR", containing the bid and ask prices (ONE DAY ONLY).}
+\item{qData}{a data.table or xts object containing the time series data with at least the columns "BID" and "OFR", containing the bid and ask prices (ONE DAY ONLY).}
 }
 \value{
 xts or data.table object depending on input

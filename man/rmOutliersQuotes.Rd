@@ -4,10 +4,10 @@
 \alias{rmOutliersQuotes}
 \title{Delete entries for which the mid-quote is outlying with respect to surrounding entries}
 \usage{
-rmOutliersQuotes(qdata, maxi = 10, window = 50, type = "advanced")
+rmOutliersQuotes(qData, maxi = 10, window = 50, type = "advanced")
 }
 \arguments{
-\item{qdata}{a data.table or xts object at least containing the columns "BID" and "OFR".}
+\item{qData}{a data.table or xts object at least containing the columns "BID" and "OFR".}
 
 \item{maxi}{an integer, indicating the maximum number of median absolute deviations allowed.}
 

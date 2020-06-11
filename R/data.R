@@ -94,12 +94,12 @@
 
 #' Sample of cleaned quotes for stock XXX for 1 day
 #' 
-#' @description An xts object containing the raw quotes for the imaginary stock XXX for 1 day, in the typical NYSE TAQ database format. This is the cleaned version of the data sample \code{\link{sampleQDataRaw}}, using \code{quotesCleanup}.
+#' @description An xts object containing the raw quotes for the imaginary stock XXX for 1 day, in the typical NYSE TAQ database format. This is the cleaned version of the data sample \code{\link{sampleqDataRaw}}, using \code{quotesCleanup}.
 #' 
 #' @format xts object
 #' 
 #' @keywords datasets
-"sampleQData"
+"sampleqData"
 
 #' Sample of raw quotes for stock XXX for 1 day
 #' @description  An imaginary xts object containing the raw quotes for stock XXX for 1 day, in the typical NYSE TAQ database format.
@@ -107,16 +107,16 @@
 #' @format xts object
 #' 
 #' @keywords datasets
-"sampleQDataRaw"
+"sampleqDataRaw"
 
 #' Sample of cleaned quotes for stock XXX for 2 days measured in microseconds
 #' 
-#' @description A data.table object containing the raw quotes for the imaginary stock XXX for 2 days. This is the cleaned version of the data sample \code{\link{sampleQDataRawMicroseconds}}, using \code{quotesCleanup}.
+#' @description A data.table object containing the raw quotes for the imaginary stock XXX for 2 days. This is the cleaned version of the data sample \code{\link{sampleqDataRawMicroseconds}}, using \code{quotesCleanup}.
 #' 
 #' @format data.table object
 #' 
 #' @keywords datasets
-"sampleQDataMicroseconds"
+"sampleqDataMicroseconds"
 
 #' Sample of raw quotes for stock XXX for 2 days measured in microseconds
 #' @description  An imaginary xts object containing the raw quotes for stock XXX for 2 days, in the typical NYSE TAQ database format.
@@ -124,7 +124,7 @@
 #' @format data.table object
 #' 
 #' @keywords datasets
-"sampleQDataRawMicroseconds"
+"sampleqDataRawMicroseconds"
 
 #' Sample returns data
 #' 

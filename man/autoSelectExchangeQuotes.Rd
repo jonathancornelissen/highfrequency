@@ -4,10 +4,10 @@
 \alias{autoSelectExchangeQuotes}
 \title{Retain only data from the stock exchange with the highest volume}
 \usage{
-autoSelectExchangeQuotes(qdata)
+autoSelectExchangeQuotes(qData)
 }
 \arguments{
-\item{qdata}{a data.table or xts object with at least a column "EX", indicating the exchange symbol 
+\item{qData}{a data.table or xts object with at least a column "EX", indicating the exchange symbol 
 and columns "BIDSIZ" and "OFRSIZ", indicating 
 the volume available at the bid and ask respectively.
 The chosen exchange is printed on the console.
@@ -36,7 +36,7 @@ of the exchange with highest
 value for the sum of "BIDSIZ" and "OFRSIZ", i.e. the highest quote volume.
 }
 \examples{
-autoSelectExchangeQuotes(sampleQDataRawMicroseconds)
+autoSelectExchangeQuotes(sampleqDataRawMicroseconds)
 
 }
 \author{

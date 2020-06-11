@@ -5,7 +5,7 @@
 \title{Aggregate a data.table or xts object containing quote data}
 \usage{
 aggregateQuotes(
-  qdata,
+  qData,
   on = "minutes",
   k = 5,
   marketOpen = "09:30:00",
@@ -14,7 +14,7 @@ aggregateQuotes(
 )
 }
 \arguments{
-\item{qdata}{data.table or xts object to be aggregated, containing the intraday quote data of a stock for one day.}
+\item{qData}{data.table or xts object to be aggregated, containing the intraday quote data of a stock for one day.}
 
 \item{on}{character, indicating the time scale in which "k" is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".
 xts object to the 5 minute frequency, set k=5 and on = "minutes".}
@@ -35,7 +35,7 @@ A data.table or an xts object containing the aggregated quote data.
 }
 \description{
 Function returns a data.table or xts object containing the aggregated quote data with columns "SYMBOL", "EX", "BID","BIDSIZ","OFR","OFRSIZ". 
-See \code{\link{sampleQData}} for an example of the argument qdata.
+See \code{\link{sampleqData}} for an example of the argument qData.
 }
 \details{
 The output "BID" and "OFR" columns are constructed using previous tick aggregation.
@@ -48,8 +48,8 @@ Please note: Returned objects always contain the first observation (i.e. opening
 }
 \examples{
 # aggregate quote data to the 30 second frequency
-qdata_aggregated <- aggregateQuotes(sampleQData, on = "seconds", k = 30)
-head(qdata_aggregated)
+qData_aggregated <- aggregateQuotes(sampleqData, on = "seconds", k = 30)
+head(qData_aggregated)
 }
 \author{
 Jonathan Cornelissen, Kris Boudt and Onno Kleen

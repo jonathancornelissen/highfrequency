@@ -4,10 +4,10 @@
 \alias{rmNegativeSpread}
 \title{Delete entries for which the spread is negative}
 \usage{
-rmNegativeSpread(qdata)
+rmNegativeSpread(qData)
 }
 \arguments{
-\item{qdata}{an xts object at least containing the columns "BID" and "OFR".}
+\item{qData}{an xts object at least containing the columns "BID" and "OFR".}
 }
 \value{
 data.table or xts object
@@ -16,7 +16,7 @@ data.table or xts object
 Function deletes entries for which the spread is negative.
 }
 \examples{
-rmNegativeSpread(sampleQDataRawMicroseconds)
+rmNegativeSpread(sampleqDataRawMicroseconds)
 
 }
 \author{
