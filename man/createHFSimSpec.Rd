@@ -5,9 +5,9 @@
 \title{create high frequency simulation spec}
 \usage{
 createHFSimSpec(
-  volatilityModel = list(modelType = "constant", variance = 0.2, burstMultiplier = 3,
-    includeDiurnality = FALSE, diurnalModel = list(C = 0.88929198, A = 0.75, B = 0.25, a
-    = 10, b = 10)),
+  volatilityModel = list(modelType = "constant", variance = 0.2, burstModel =
+    list(NULL), includeDiurnality = FALSE, diurnalModel = list(C = 0.88929198, A = 0.75,
+    B = 0.25, a = 10, b = 10)),
   driftModel = list(modelType = "constant", drift = 0),
   jumpModel = list(modelType = "none", jumpComponent = 1/5, jumpTime = c(0.5, 17/32)),
   noiseModel = list(noiseType = "constant with interday change", signalToNoiseRatio =

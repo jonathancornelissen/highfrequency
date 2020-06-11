@@ -22,7 +22,7 @@ volatilityModel <- list(modelType = "constant", variance = 1, burstModel = list(
                         includeDiurnality = FALSE, diurnalModel = list(C = 0.88929198, A = 0.75, B = 0.25, a = 10, b = 10))
 driftModel <- list(modelType = "constant", drift = 0)
 nSeries <- 1
-nDays <- 10
+nDays <- 100
 nObs <- 23401
 timeSettings  <- list(tradingStart = 34200, tradingEnd = 57600, origin = "1970-01-01" , sampling = "equidistant")
 discretize <- FALSE
@@ -64,16 +64,16 @@ if(nSeries == 1){
 ####### LM jump test #######
 # or equivalently we can specify the jumps in seconds after midnight.
 testingTimes <- seq(34200 + 10*300, 57600 - 3600, 300) + 3600
-#LMtest <- intradayJumpTest(pData = exp(sim$prices), testType = "LM", testingTimes = testingTimes, windowSize = 5, K = 10)
+LMtest <- intradayJumpTest(pData = exp(sim$prices), testType = "LM", testingTimes = testingTimes, windowSize = 5, K = 10)
 
 LMtest1Day <- intradayJumpTest(pData = exp(sim$prices)["1970-01-01"], testType = "LM", testingTimes = testingTimes, windowSize = 5, K = 10)
 
 ### Testing place
 #plot(LMtest1Day)
-#plot(LMtest)
+plot(LMtest)
 
 
-#FoFtest <- intradayJumpTest(pData = exp(sim$prices), testType = "FoF", K = 50, theta = 0.5)
+FoFtest <- intradayJumpTest(pData = exp(sim$prices), testType = "FoF", K = 50, theta = 0.5)
 FoFtest1Day <- intradayJumpTest(pData = exp(sim$prices)["1970-01-01"], testType = "FoF", K = 50, theta = 0.5)
 #plot(FoFtest1Day)
 
@@ -82,3 +82,7 @@ par(mfrow = c(2,1))
 
 plot(LMtest1Day)
 plot(FoFtest1Day)
+
+
+par(mfrow = c(1,1))
+plot(FoFtest)

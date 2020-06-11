@@ -25,7 +25,8 @@ hfsim.do <- function(hfSimSpec){
   ### Returns coming from mu(t)
   
   driftReturns <- switch(hfSimSpec$driftModel$modelType,
-                         constant = hfSimSpec$driftModel$drift * 1/nObs
+                         constant = hfSimSpec$driftModel$drift * 1/nObs,
+                         `drift burst` = singularityDriftBurst(nObs, drift, driftBurstTimeInterval, alpha, a)
                          )
   
   ### Returns coming from sigma(t)
@@ -65,7 +66,7 @@ hfsim.do <- function(hfSimSpec){
   return(out)
   
   
-  ### NO longer used.
+  ### NO longer used:
   
   ## First we generate a drift path
   driftPath <- switch (model$driftModel,
@@ -161,7 +162,7 @@ listAvailableDriftModels <- function(){
 #'    \item
 #' }
 #' @export
-createHFSimSpec <- function(volatilityModel = list(modelType = "constant", variance = 0.2, burstMultiplier = 3, includeDiurnality = FALSE, 
+createHFSimSpec <- function(volatilityModel = list(modelType = "constant", variance = 0.2, burstModel = list(NULL), includeDiurnality = FALSE, 
                                                    diurnalModel = list(C = 0.88929198, A = 0.75, B = 0.25, a = 10, b = 10)),
                             driftModel = list(modelType = "constant", drift = 0),
                             jumpModel = list(modelType = "none", jumpComponent = 1 / 5, jumpTime = c(0.5, 17/32)),
@@ -184,6 +185,7 @@ createHFSimSpec <- function(volatilityModel = list(modelType = "constant", varia
   if(is.null(volatilityModel$modelType)) volatilityModel$modelType <- "constant"
   if(is.null(volatilityModel$variance)) volatilityModel$variance <- 0.2
   if(is.null(volatilityModel$includeDiurnality)) volatilityModel$includeDiurnality <- FALSE
+  
   # In case we have not received a diurnal model at all
   if(volatilityModel$includeDiurnality && is.null(volatilityModel$diurnalModel)) volatilityModel$diurnalModel <- list(C = 0.88929198, A = 0.75, B = 0.25, a = 10, b = 10)
   
@@ -396,8 +398,8 @@ BrownianMotionWithJumps <- function(nDays, nObs, nSeries, drift, variance, jumpP
 
 simulateDrift <- function(model, nDays, nSeries, nObs){
   if(model$driftModel == "constant"){
-    out <- model$drift
-  }
+    out <- model$drift / nObs
+  } else 
   
   
   return(out)
@@ -437,20 +439,38 @@ FoFVolatilitySim <- function(model, nDays, nSeries, nObs){
 
 #' @importFrom data.table between
 #' @keywords internal
-singularityDriftBurst <- function(nObs, drift, driftBurstTimeInterval, alpha, a){
-  driftBurstTimeInterval <- c(0.475, 0.525)
+singularityVolBurst <- function(nObs, vol, volBurstTimeInterval, beta){
+  volBurstTimeInterval <- c(0.475, 0.525)
+  pivot <- mean(volBurstTimeInterval)
   timestamps <- 1:nObs/nObs
-  alpha <- 0.3
+  burstVol <- vol * 1/abs(timestamps - pivot)^beta
+  vol[between(timestamps, volBurstTimeInterval[1], volBurstTimeInterval[2])] <- vol[between(timestamps, volBurstTimeInterval[1], volBurstTimeInterval[2])]
+  return(vol)
+  
+}
+
+
+
+#' @importFrom data.table between
+#' @keywords internal
+singularityDriftBurst <- function(nObs, drift, driftBurstTimeInterval, alpha, a){
+  
+  driftBurstTimeInterval <- c(0.475, 0.525)
+  pivot <- mean(driftBurstTimeInterval) # we use this pivot so we can move our drift burst around on the day
+  timestamps <- 1:nObs/nObs
+  alpha <- 0.65
   a <- 3
   drift <- 0
   drift <- rep(drift, nObs)
-  driftDB <- drift * sign(timestamps - 0.5)/abs(0.5 - timestamps)^alpha
+  driftDB <- a * sign(timestamps - pivot)/abs(pivot - timestamps)^alpha
   drift[between(timestamps, driftBurstTimeInterval[1], driftBurstTimeInterval[2])] <- driftDB[between(timestamps, driftBurstTimeInterval[1], driftBurstTimeInterval[2])]
   
-  plot.ts(drift)
   
+  return(drift)
   
 }
+
+
 
 
 
