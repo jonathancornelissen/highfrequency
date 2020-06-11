@@ -380,7 +380,7 @@ JOjumptest <- function(pdata, power = 4, ...) {
 #' General framework for testing for jumps on an intraday basis
 #' 
 #' @param pData (currently only xts) of the price data in levels. This data can (and should in some cases) be tick-level data
-#' @param testType type of test to use. Currently supports "LM" as "Lee-Mykland" test of Lee and Mykland (2018), and "FoF" as "Fact or Friction" test from Christensen, Oomen, and Podolskij (2014)
+#' @param testType type of test to use. Currently supports "LM" test of Lee and Mykland (2018), and "FoF" as "Fact or Friction" test from Christensen, Oomen, and Podolskij (2014)
 #' @param testingTimes a character vector of times to test for jumps, for example  \code{c("11:30", "11:35", "14:30")}. 
 #' This argument can also be a numeric vector containing times to test in seconds after midnight. For example, using \code{seq(39200, 57600, 300)}, 
 #' where testing will take place every five minutes, starting fifty minutes after opening. (On when open is 09:30). This argument is not used in the FoF type test.
@@ -431,7 +431,7 @@ intradayJumpTest <- function(pData = NULL, testType = "LM", testingTimes = NULL,
     names(out[["tests"]]) <- dates
     for (date in dates) {
       ## Conduct the testing day-by-day
-      out[["tests"]][[date]] <- intradayJumpTest(pData[date], testType, testingTimes, windowSize, K, alpha, theta, extraArgs, setClass = FALSE)
+      out[["tests"]][[date]] <- intradayJumpTest(pData[date], testType, testingTimes, windowSize, K, alpha, theta, setClass = FALSE)
     }
     out[["information"]] <- list("testType" = testType, "isMultiDay" = TRUE)
     class(out) <- c("intradayJumpTest", "list")
@@ -499,16 +499,15 @@ plot.intradayJumpTest <- function(x, ...){
   
   
   if(isMultiday){
-    #####
-    #For loop????
-    #####
-    #Plot the data
+    
+    
+    
     print("Support for plotting intradayJumpTests when the data spans more than one day is not ready yet.")
-    #return(0)
     
     shade <- dat$jumps
-    #shade <- shade + na.omit(lag(shade,-1))
+
     shade <- cbind(upper = shade * as.numeric(max(dat$ts, na.rm = TRUE) +1e5), lower = shade * as.numeric(min(dat$ts, na.rm = TRUE)) -1e5)
+    
     colnames(shade) <- c("upper", "lower")
     
     browser()
@@ -630,7 +629,7 @@ LeeMyklandtest <- function(testData, testingTimes, windowSize, K, alpha){
 
 
 
-
+#' @keywords internal
 FoFJumpTest <- function(pData, theta, M, alpha){
 
   # Users will not directly control the testing times, instead they can choose the M parameter.

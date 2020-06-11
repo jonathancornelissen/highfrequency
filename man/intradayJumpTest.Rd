@@ -18,7 +18,7 @@ intradayJumpTest(
 \arguments{
 \item{pData}{(currently only xts) of the price data in levels. This data can (and should in some cases) be tick-level data}
 
-\item{testType}{type of test to use. Currently supports "LM" as "Lee-Mykland" test of Lee and Mykland (2018), and "FoF" as "Fact or Friction" test from Christensen, Oomen, and Podolskij (2014)}
+\item{testType}{type of test to use. Currently supports "LM" test of Lee and Mykland (2018), and "FoF" as "Fact or Friction" test from Christensen, Oomen, and Podolskij (2014)}
 
 \item{testingTimes}{a character vector of times to test for jumps, for example  \code{c("11:30", "11:35", "14:30")}. 
 This argument can also be a numeric vector containing times to test in seconds after midnight. For example, using \code{seq(39200, 57600, 300)}, 
