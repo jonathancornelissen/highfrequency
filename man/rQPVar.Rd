@@ -29,8 +29,8 @@ Function returns the realized quad-power variation, defined in Andersen et al. (
  }
 }
 \examples{
-data(sample_tdata)
-rQPVar(rdata= sample_tdata$PRICE, align.by= "minutes", align.period =5, makeReturns= TRUE)
+data(sampleTData)
+rQPVar(rdata= sampleTData$PRICE, align.by= "minutes", align.period =5, makeReturns= TRUE)
 rQPVar
 
 }

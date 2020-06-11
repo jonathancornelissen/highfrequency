@@ -39,8 +39,8 @@ can lead to more precise volatility forecasts,
 as shown in Andersen et al. (2007) and Corsi et al. (2010).
 }
 \examples{
-data(sample_tdata);
-medrv <- medRV(rdata = sample_tdata$PRICE, align.by = "minutes", 
+data(sampleTData);
+medrv <- medRV(rdata = sampleTData$PRICE, align.by = "minutes", 
                align.period = 5, makeReturns = TRUE)
 medrv 
  

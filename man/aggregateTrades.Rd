@@ -51,7 +51,7 @@ the last observation up to that point, including the value at 09:35:00 itself.
 }
 \examples{
 # aggregate trade data to 5 minute frequency
-tdata_aggregated <- aggregateTrades(sample_tdata, on = "minutes", k = 5)
+tdata_aggregated <- aggregateTrades(sampleTData, on = "minutes", k = 5)
 head(tdata_aggregated)
 }
 \author{

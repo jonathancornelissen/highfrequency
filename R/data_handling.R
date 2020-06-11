@@ -38,7 +38,7 @@
 #' 
 #' @examples 
 #' #load sample price data
-#' ts <- sample_tdata$PRICE
+#' ts <- sampleTData$PRICE
 #' 
 #' #Previous tick aggregation to the 5-minute sampling frequency:
 #' tsagg5min <- aggregatets(ts, on = "minutes", k = 5)
@@ -184,12 +184,12 @@ aggregatets <- function (ts, FUN = "previoustick", on = "minutes", k = 1, weight
 #' @keywords data manipulation
 #' @examples 
 #' # aggregate price data to the 30 second frequency
-#' aggregatePrice(sample_tdata_microseconds, on = "secs", k = 30)
+#' aggregatePrice(sampleTData_microseconds, on = "secs", k = 30)
 #' # aggregate price data to the 30 second frequency including zero return price changes
-#' aggregatePrice(sample_tdata_microseconds, on = "secs", k = 30)
+#' aggregatePrice(sampleTData_microseconds, on = "secs", k = 30)
 #' 
 #' # aggregate price data to half a second frequency including zero return price changes
-#' aggregatePrice(sample_tdata_microseconds, on = "milliseconds", k = 500, fill = TRUE)
+#' aggregatePrice(sampleTData_microseconds, on = "milliseconds", k = 500, fill = TRUE)
 #' @keywords internal
 #' @importFrom xts last
 #' @export
@@ -428,7 +428,7 @@ aggregateQuotes <- function(qdata, on = "minutes", k = 5, marketopen = "09:30:00
 #' 
 #' @examples 
 #' # aggregate trade data to 5 minute frequency
-#' tdata_aggregated <- aggregateTrades(sample_tdata, on = "minutes", k = 5)
+#' tdata_aggregated <- aggregateTrades(sampleTData, on = "minutes", k = 5)
 #' head(tdata_aggregated)
 #' @importFrom lubridate floor_date
 #' @importFrom lubridate ceiling_date
@@ -500,7 +500,7 @@ aggregateTrades <- function(tdata, on = "minutes", k = 5, marketopen = "09:30:00
 #' }
 #' @return data.table or xts object depending on input
 #' 
-#' @examples autoSelectExchangeTrades(sample_tdataraw_microseconds)
+#' @examples autoSelectExchangeTrades(sampleTDataraw_microseconds)
 #' 
 #' @author Jonathan Cornelissen, Kris Boudt and Onno Kleen
 #' 
@@ -647,7 +647,7 @@ autoSelectExchangeQuotes <- function(qdata) {
 #' @references Brownlees, C.T. and Gallo, G.M. (2006). Financial econometric analysis at ultra-high frequency: Data handling concerns. Computational Statistics & Data Analysis, 51, pages 2232-2245.
 #' @author Jonathan Cornelissen, Kris Boudt and Onno Kleen.
 #' @examples 
-#' exchangeHoursOnly(sample_tdataraw_microseconds)
+#' exchangeHoursOnly(sampleTDataraw_microseconds)
 #' @keywords cleaning
 #' @importFrom lubridate tz
 #' @importFrom lubridate ymd_hms
@@ -780,10 +780,10 @@ makeReturns <- function(ts) {
 #' 
 #' @examples 
 #' # match the trade and quote data
-#' tqdata <- matchTradesQuotes(sample_tdata, sampleQData)
+#' tqdata <- matchTradesQuotes(sampleTData, sampleQData)
 #' head(tqdata)
 #' # multi-day input allowed
-#' tqdata <- matchTradesQuotes(sample_tdata_microseconds, sampleQDataMicroseconds)
+#' tqdata <- matchTradesQuotes(sampleTData_microseconds, sampleQDataMicroseconds)
 #' @importFrom lubridate seconds
 #' @export
 matchTradesQuotes <- function(tdata, qdata, adjustment = 2) {
@@ -1643,9 +1643,9 @@ selectExchange <- function(data, exch = "N") {
 #' 
 #' @examples 
 #' # Consider you have raw trade data for 1 stock for 2 days 
-#' head(sample_tdataraw_microseconds)
-#' dim(sample_tdataraw_microseconds)
-#' tdata_afterfirstcleaning <- tradesCleanup(tdataraw = sample_tdataraw, exchanges = list("N"))
+#' head(sampleTDataraw_microseconds)
+#' dim(sampleTDataraw_microseconds)
+#' tdata_afterfirstcleaning <- tradesCleanup(tdataraw = sampleTDataraw, exchanges = list("N"))
 #' tdata_afterfirstcleaning$report
 #' dim(tdata_afterfirstcleaning$tdata)
 #' 
@@ -1771,7 +1771,7 @@ tradesCleanupUsingQuotes <- function(from, to, datasource, datadestination, tick
 #' 
 #' @examples 
 #' # Consider you have raw trade data for 1 stock for 2 days 
-#' tdata_afterfirstcleaning <- tradesCleanup(tdataraw = sample_tdataraw_microseconds, 
+#' tdata_afterfirstcleaning <- tradesCleanup(tdataraw = sampleTDataraw_microseconds, 
 #'                                           exchanges = "N", report = FALSE)
 #' # 
 #' qdata <- quotesCleanup(qdataraw = sampleQDataRawMicroseconds, 

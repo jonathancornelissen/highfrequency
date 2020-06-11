@@ -70,7 +70,7 @@ The theoretical framework is the logarithmic price process \eqn{X_t} belongs to 
 where \eqn{a} is the drift term, \eqn{\sigma} denotes the spot volatility process, \eqn{W} is a standard Brownian motion (assume that there are no jumps).
 }
 \examples{
-ivInference(sample_tdata$PRICE, IVestimator= "minRV", IQestimator = "medRQ",
+ivInference(sampleTData$PRICE, IVestimator= "minRV", IQestimator = "medRQ",
             confidence = 0.95, makeReturns = TRUE)
 }
 \references{

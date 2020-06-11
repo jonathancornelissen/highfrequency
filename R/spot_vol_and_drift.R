@@ -24,14 +24,14 @@
 #'
 #' @examples
 #' # Example 1: Rolling mean and median estimators for 2 days
-#' meandrift <- spotDrift(data = sample_tdata_microseconds, k = 1, tz = "EST")
-#' mediandrift <- spotDrift(data = sample_tdata_microseconds, method = "driftMedian", 
+#' meandrift <- spotDrift(data = sampleTData_microseconds, k = 1, tz = "EST")
+#' mediandrift <- spotDrift(data = sampleTData_microseconds, method = "driftMedian", 
 #'                          on = "seconds", k = 30, tz = "EST")
 #' plot(meandrift)
 #' plot(mediandrift)
 #'
 #' # Example 2: Kernel based estimator for one day
-#' price <- sample_tdata$PRICE
+#' price <- sampleTData$PRICE
 #' storage.mode(price) <- "numeric"
 #' #kerneldrift <- spotDrift(price, method = "driftKernel", on = "minutes", k = 1)
 #' #plot(kerneldrift)

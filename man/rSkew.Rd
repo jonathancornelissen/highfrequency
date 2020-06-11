@@ -32,8 +32,8 @@ in which
 \eqn{RV_{t}:} realized variance
 }
 \examples{
-data(sample_tdata)
-rSkew(sample_tdata$PRICE,align.by ="minutes", align.period =5, makeReturns = TRUE)
+data(sampleTData)
+rSkew(sampleTData$PRICE,align.by ="minutes", align.period =5, makeReturns = TRUE)
 
 }
 \references{

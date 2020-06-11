@@ -47,12 +47,12 @@ the last observation up to that point, including the value at 09:35:00 itself.
 }
 \examples{
 # aggregate price data to the 30 second frequency
-aggregatePrice(sample_tdata_microseconds, on = "secs", k = 30)
+aggregatePrice(sampleTData_microseconds, on = "secs", k = 30)
 # aggregate price data to the 30 second frequency including zero return price changes
-aggregatePrice(sample_tdata_microseconds, on = "secs", k = 30)
+aggregatePrice(sampleTData_microseconds, on = "secs", k = 30)
 
 # aggregate price data to half a second frequency including zero return price changes
-aggregatePrice(sample_tdata_microseconds, on = "milliseconds", k = 500, fill = TRUE)
+aggregatePrice(sampleTData_microseconds, on = "milliseconds", k = 500, fill = TRUE)
 }
 \author{
 Jonathan Cornelissen, Kris Boudt and Onno Kleen.

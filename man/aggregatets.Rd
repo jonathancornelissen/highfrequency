@@ -57,7 +57,7 @@ tick aggregation it makes sense to fill these NA's by the function \code{na.locf
 }
 \examples{
 #load sample price data
-ts <- sample_tdata$PRICE
+ts <- sampleTData$PRICE
 
 #Previous tick aggregation to the 5-minute sampling frequency:
 tsagg5min <- aggregatets(ts, on = "minutes", k = 5)

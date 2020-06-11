@@ -30,8 +30,8 @@ Assume there is \eqn{N} equispaced returns in period \eqn{t}. Let \eqn{r_{t,i}} 
 }
 \examples{
 \dontrun{
-data(sample_tdata)
-rQuar(rdata = sample_tdata$PRICE, align.by = "minutes", align.period = 5, makeReturns = TRUE)
+data(sampleTData)
+rQuar(rdata = sampleTData$PRICE, align.by = "minutes", align.period = 5, makeReturns = TRUE)
 }
 }
 \references{
