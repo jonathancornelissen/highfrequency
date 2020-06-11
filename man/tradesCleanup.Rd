@@ -5,7 +5,7 @@
 \title{Cleans trade data}
 \usage{
 tradesCleanup(
-  datasource = NULL,
+  dataSource = NULL,
   datadestination = NULL,
   exchanges,
   tDataraw = NULL,
@@ -15,11 +15,11 @@ tradesCleanup(
 )
 }
 \arguments{
-\item{datasource}{character indicating the folder in which the original data is stored.}
+\item{dataSource}{character indicating the folder in which the original data is stored.}
 
 \item{datadestination}{character indicating the folder in which the cleaned data is stored.}
 
-\item{exchanges}{vector of stock exchange symbols for all data in datasource, 
+\item{exchanges}{vector of stock exchange symbols for all data in dataSource, 
 e.g. exchanges = c("T","N") retrieves all stock market data from both NYSE and NASDAQ.
 The possible exchange symbols are:
 \itemize{
@@ -38,7 +38,7 @@ The possible exchange symbols are:
 }}
 
 \item{tDataraw}{xts object containing (for ONE stock only) raw trade data. This argument is NULL by default. Enabling it means the arguments
-from, to, datasource and datadestination will be ignored. (only advisable for small chunks of data)}
+from, to, dataSource and datadestination will be ignored. (only advisable for small chunks of data)}
 
 \item{report}{boolean and TRUE by default. In case it is true the function returns (also) a vector indicating how many trades remained after each cleaning step.}
 
@@ -55,7 +55,7 @@ In case you supply the argument "rawtData", the on-disk functionality is ignored
 and the function returns a list with the cleaned trades as xts object (see examples).
 }
 \description{
-This is a wrapper function for cleaning the trade data of all stock data inside the folder datasource. 
+This is a wrapper function for cleaning the trade data of all stock data inside the folder dataSource. 
 The result is saved in the folder datadestination. 
 
 In case you supply the argument "rawtData", the on-disk functionality is ignored. The function returns a vector
@@ -79,7 +79,7 @@ tData_afterfirstcleaning$report
 dim(tData_afterfirstcleaning$tData)
 
 #In case you have more data it is advised to use the on-disk functionality
-#via "from","to","datasource",etc. arguments
+#via "from","to","dataSource",etc. arguments
 
 }
 \references{

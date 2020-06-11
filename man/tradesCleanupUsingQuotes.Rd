@@ -5,22 +5,22 @@
 \title{Perform a final cleaning procedure on trade data}
 \usage{
 tradesCleanupUsingQuotes(
-  datasource = NULL,
+  dataSource = NULL,
   datadestination = NULL,
   tData = NULL,
   qData = NULL
 )
 }
 \arguments{
-\item{datasource}{character indicating the folder in which the original data is stored.}
+\item{dataSource}{character indicating the folder in which the original data is stored.}
 
-\item{datadestination}{character indicating the folder in which the cleaned data is stored, folder of datasource by default.}
+\item{datadestination}{character indicating the folder in which the cleaned data is stored, folder of dataSource by default.}
 
 \item{tData}{data.table or xts object containing (ONE day and for ONE stock only) trade data cleaned by \code{\link{tradesCleanup}}. This argument is NULL by default. Enabling it, means the arguments
-from, to, datasource and datadestination will be ignored. (only advisable for small chunks of data)}
+from, to, dataSource and datadestination will be ignored. (only advisable for small chunks of data)}
 
 \item{qData}{data.table or xts object containing (ONE day and for ONE stock only) cleaned quote data. This argument is NULL by default. Enabling it means the arguments
-from, to, datasource, datadestination will be ignored. (only advisable for small chunks of data)}
+from, to, dataSource, datadestination will be ignored. (only advisable for small chunks of data)}
 }
 \value{
 For each day an xts object is saved into the folder of that date, containing the cleaned data.
@@ -48,7 +48,7 @@ tData_afterfinalcleaning <-
                            tData = tData_afterfirstcleaning[as.Date(DT) == "2018-01-02"])
 dim(tData_afterfinalcleaning)
 #In case you have more data it is advised to use the on-disk functionality
-#via "from","to","datasource", etc. arguments
+#via "from","to","dataSource", etc. arguments
 }
 \references{
 Barndorff-Nielsen, O. E., P. R. Hansen, A. Lunde, and N. Shephard (2009). Realized kernels in practice: Trades and quotes. Econometrics Journal 12, C1-C32.

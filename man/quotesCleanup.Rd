@@ -5,7 +5,7 @@
 \title{Cleans quote data}
 \usage{
 quotesCleanup(
-  datasource = NULL,
+  dataSource = NULL,
   datadestination = NULL,
   exchanges,
   qDataraw = NULL,
@@ -19,11 +19,11 @@ quotesCleanup(
 )
 }
 \arguments{
-\item{datasource}{character indicating the folder in which the original data is stored.}
+\item{dataSource}{character indicating the folder in which the original data is stored.}
 
 \item{datadestination}{character indicating the folder in which the cleaned data is stored.}
 
-\item{exchanges}{vector of stock exchange symbols for all data in datasource, 
+\item{exchanges}{vector of stock exchange symbols for all data in dataSource, 
 e.g. exchanges = c("T","N") retrieves all stock market data from both NYSE and NASDAQ.
 The possible exchange symbols are:
 \itemize{
@@ -42,7 +42,7 @@ The possible exchange symbols are:
 }}
 
 \item{qDataraw}{xts or data.table object containing (ONE stock only) raw quote data. This argument is NULL by default. Enabling it means the arguments
-from, to, datasource and datadestination will be ignored. (only advisable for small chunks of data)}
+from, to, dataSource and datadestination will be ignored. (only advisable for small chunks of data)}
 
 \item{report}{boolean and TRUE by default. In case it is true the function returns (also) a vector indicating how many quotes remained after each cleaning step.}
 
@@ -59,14 +59,14 @@ from, to, datasource and datadestination will be ignored. (only advisable for sm
 \item{saveasxts}{indicates whether data should be saved in xts format instead of data.table when using on-disk functionality. TRUE by default.}
 }
 \value{
-The function converts every csv file in datasource into multiple xts or data.table files.
+The function converts every csv file in dataSource into multiple xts or data.table files.
 In datadestination, there will be one folder for each symbol containing .rds files with cleaned data stored either in data.table or xts format.
 
 In case you supply the argument "qDataraw", the on-disk functionality is ignored
 and the function returns a list with the cleaned quotes as an xts or data.table object depending on input (see examples).
 }
 \description{
-This is a wrapper function for cleaning the quote data in the entire folder datasource. 
+This is a wrapper function for cleaning the quote data in the entire folder dataSource. 
 The result is saved in the folder datadestination. 
 
 In case you supply the argument "qDataraw", the on-disk functionality is ignored
@@ -85,7 +85,7 @@ qData_aftercleaning$report
 dim(qData_aftercleaning$qData)
 
 # In case you have more data it is advised to use the on-disk functionality
-# via "from","to","datasource",etc. arguments
+# via "from","to","dataSource",etc. arguments
 
 }
 \references{
