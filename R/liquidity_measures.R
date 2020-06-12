@@ -1,5 +1,3 @@
-
-
 #' @title Compute Liquidity Measure
 #' 
 #' Function returns an xts or data.table object containing 23 liquidity measures. Please see details below.

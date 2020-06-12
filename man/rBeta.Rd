@@ -6,7 +6,7 @@
 \usage{
 rBeta(
   rData,
-  rindex,
+  rIndex,
   RCOVestimator = "rCov",
   RVestimator = "RV",
   makeReturns = FALSE
@@ -15,11 +15,11 @@ rBeta(
 \arguments{
 \item{rData}{a zoo/xts object containing all returns in period t for one asset.}
 
-\item{rindex}{a zoo/xts object containing return in period t for an index.}
+\item{rIndex}{a zoo/xts object containing return in period t for an index.}
 
 \item{RCOVestimator}{can be chosen among realized covariance estimators: rCov, rAVGCov, rBPCov, rHYCov, rKernelCov, rOWCov, rRTSCov, rThresholdCov and rTSCov. rCov by default.}
 
-\item{RVestimator}{can be chosen among realized variance estimators: RV, minRV and medRV. RV by default. In case of missing RVestimator, RCOVestimator function applying for rindex will be used.}
+\item{RVestimator}{can be chosen among realized variance estimators: RV, minRV and medRV. RV by default. In case of missing RVestimator, RCOVestimator function applying for rIndex will be used.}
 
 \item{makeReturns}{boolean, should be TRUE when rData contains prices instead of returns. FALSE by  default.}
 }

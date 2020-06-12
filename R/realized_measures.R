@@ -618,9 +618,9 @@ rAVGCov <- function(rData, cor = FALSE, alignBy = "minutes", alignPeriod = 5, ma
 #' \eqn{RVestimator:} Realized variance of market index m. 
 #' 
 #' @param rData a zoo/xts object containing all returns in period t for one asset.
-#' @param rindex a zoo/xts object containing return in period t for an index.
+#' @param rIndex a zoo/xts object containing return in period t for an index.
 #' @param RCOVestimator can be chosen among realized covariance estimators: rCov, rAVGCov, rBPCov, rHYCov, rKernelCov, rOWCov, rRTSCov, rThresholdCov and rTSCov. rCov by default.
-#' @param RVestimator can be chosen among realized variance estimators: RV, minRV and medRV. RV by default. In case of missing RVestimator, RCOVestimator function applying for rindex will be used.
+#' @param RVestimator can be chosen among realized variance estimators: RV, minRV and medRV. RV by default. In case of missing RVestimator, RCOVestimator function applying for rIndex will be used.
 #' @param makeReturns boolean, should be TRUE when rData contains prices instead of returns. FALSE by  default.
 #' 
 #' @return numeric
@@ -652,14 +652,14 @@ rAVGCov <- function(rData, cor = FALSE, alignBy = "minutes", alignPeriod = 5, ma
 #' @importFrom methods hasArg
 #' @importFrom utils data
 #' @export
-rBeta <- function(rData, rindex, RCOVestimator = "rCov", RVestimator = "RV", makeReturns = FALSE) {
+rBeta <- function(rData, rIndex, RCOVestimator = "rCov", RVestimator = "RV", makeReturns = FALSE) {
   if (hasArg(data)) {
     rData <- data
   }
   
   if (RCOVestimator != "rRTSCov" & RCOVestimator != "rTSCov" &  makeReturns) {
     rData <- makeReturns(rData)
-    rindex <- makeReturns(rindex)
+    rIndex <- makeReturns(rIndex)
   }
   
   if(!makeReturns) {
@@ -668,9 +668,9 @@ rBeta <- function(rData, rindex, RCOVestimator = "rCov", RVestimator = "RV", mak
         print("when using rRTSCov, rTSCov, introduce price data - transformation to price data done")
         rData <- exp(cumsum(rData))
       }
-      if( min(rindex) <0 ){
+      if( min(rIndex) <0 ){
         print("when using rRTSCov, rTSCov, introduce price data - transformation to price data done")
-        rindex <- exp(cumsum(rindex))
+        rIndex <- exp(cumsum(rIndex))
       }       
     }
   }
@@ -680,43 +680,43 @@ rBeta <- function(rData, rindex, RCOVestimator = "rCov", RVestimator = "RV", mak
   if (multixts) {
     print("No support for multiple days")
   } else {
-    rcovfun <- function(rData, rindex, RCOVestimator) {
+    rcovfun <- function(rData, rIndex, RCOVestimator) {
       
       switch(RCOVestimator,
-             rCov = rCov(cbind(rData,rindex) ),
-             rAVGCov = rAVGCov(list(rData, rindex) ),
-             rBPCov = rBPCov(cbind(rData, rindex) ),
-             rHYCov = rHYCov(list(rData, rindex) ),
-             rKernelCov = rKernelCov(list(rData, rindex) ),
-             rOWCov = rOWCov(cbind(rData, rindex) ),
-             rRTSCov = rRTSCov(list(rData, rindex)),
-             rThresholdCov = rThresholdCov(cbind(rData, rindex) ),
-             rTSCov = rTSCov(list(rData, rindex)))
+             rCov = rCov(cbind(rData,rIndex) ),
+             rAVGCov = rAVGCov(list(rData, rIndex) ),
+             rBPCov = rBPCov(cbind(rData, rIndex) ),
+             rHYCov = rHYCov(list(rData, rIndex) ),
+             rKernelCov = rKernelCov(list(rData, rIndex) ),
+             rOWCov = rOWCov(cbind(rData, rIndex) ),
+             rRTSCov = rRTSCov(list(rData, rIndex)),
+             rThresholdCov = rThresholdCov(cbind(rData, rIndex) ),
+             rTSCov = rTSCov(list(rData, rIndex)))
     }
     
-    rcov <- rcovfun(rData,rindex,RCOVestimator)
+    rcov <- rcovfun(rData,rIndex,RCOVestimator)
     
     if (RVestimator == RCOVestimator || is.null(RVestimator)) {
       rbeta <- rcov[1,2] / rcov[2,2]
     } else {
-      rvfun <- function(rindex, RVestimator) {
+      rvfun <- function(rIndex, RVestimator) {
         
         switch(RVestimator,
-               rCov = rCov(rindex ) ,
-               RV = RV(rindex),
-               BV = RBPVar(rindex),
-               minRV = minRV(rindex ),
-               medRV = medRV(rindex ),
-               rAVGCov = rAVGCov(rindex ) ,
-               rBPCov = rBPCov(rindex ) ,
-               rHYCov = rHYCov(rindex ) ,
-               rKernelCov = rKernelCov(rindex ) ,
-               rOWCov = rOWCov(rindex ) ,
-               rRTSCov = rRTSCov(rindex) ,
-               rThresholdCov = rThresholdCov(rindex ) ,
-               rTSCov = rTSCov(rindex))
+               rCov = rCov(rIndex ) ,
+               RV = RV(rIndex),
+               BV = RBPVar(rIndex),
+               minRV = minRV(rIndex ),
+               medRV = medRV(rIndex ),
+               rAVGCov = rAVGCov(rIndex ) ,
+               rBPCov = rBPCov(rIndex ) ,
+               rHYCov = rHYCov(rIndex ) ,
+               rKernelCov = rKernelCov(rIndex ) ,
+               rOWCov = rOWCov(rIndex ) ,
+               rRTSCov = rRTSCov(rIndex) ,
+               rThresholdCov = rThresholdCov(rIndex ) ,
+               rTSCov = rTSCov(rIndex))
       }
-      rv <- rvfun(rindex,RVestimator)
+      rv <- rvfun(rIndex,RVestimator)
       rbeta <- rcov[1,2] / rv
     }
     return(rbeta)
