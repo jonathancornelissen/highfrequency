@@ -491,5 +491,3 @@ preAnnouncedJumpSim <- function(model, nDays, nSeries, nObs){
   return(out)
 }
 
-
-

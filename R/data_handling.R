@@ -917,8 +917,8 @@ mergeQuotesSameTimestamp <- function(qData, selection = "median") {
     return(qData)
   }
 }
-# microbenchmark::microbenchmark(quotesCleanup(qDataraw = sampleQDataRaw, exchanges = "N", selection = "max.volume"), times = 10, unit = "s")
-# microbenchmark::microbenchmark(quotesCleanup(qDataraw = sampleQDataRaw, exchanges = "N", selection = "maxvolume"), times = 10, unit = "s")
+# microbenchmark::microbenchmark(quotesCleanup(qDataRaw = sampleQDataRaw, exchanges = "N", selection = "max.volume"), times = 10, unit = "s")
+# microbenchmark::microbenchmark(quotesCleanup(qDataRaw = sampleQDataRaw, exchanges = "N", selection = "maxvolume"), times = 10, unit = "s")
 
 #' Merge multiple transactions with the same time stamp
 #' 
@@ -1087,7 +1087,7 @@ noZeroQuotes <- function(qData) {
 #' @description This is a wrapper function for cleaning the quote data in the entire folder dataSource. 
 #' The result is saved in the folder dataDestination. 
 #' 
-#' In case you supply the argument "qDataraw", the on-disk functionality is ignored
+#' In case you supply the argument "qDataRaw", the on-disk functionality is ignored
 #' and the function returns the cleaned quotes as xts or data.table object (see examples).
 #' 
 #' The following cleaning steps are performed sequentially:
@@ -1112,7 +1112,7 @@ noZeroQuotes <- function(qData) {
 #' \item W: CBOE
 #' \item Z: BATS
 #' }
-#' @param qDataraw xts or data.table object containing (ONE stock only) raw quote data. This argument is NULL by default. Enabling it means the arguments
+#' @param qDataRaw xts or data.table object containing (ONE stock only) raw quote data. This argument is NULL by default. Enabling it means the arguments
 #' from, to, dataSource and dataDestination will be ignored. (only advisable for small chunks of data)
 #' @param report boolean and TRUE by default. In case it is true the function returns (also) a vector indicating how many quotes remained after each cleaning step.
 #' @param selection argument to be passed on to the cleaning routine \code{\link{mergeQuotesSameTimestamp}}. The default is "median".
@@ -1125,7 +1125,7 @@ noZeroQuotes <- function(qData) {
 #' @return The function converts every csv file in dataSource into multiple xts or data.table files.
 #' In dataDestination, there will be one folder for each symbol containing .rds files with cleaned data stored either in data.table or xts format.
 #' 
-#' In case you supply the argument "qDataraw", the on-disk functionality is ignored
+#' In case you supply the argument "qDataRaw", the on-disk functionality is ignored
 #' and the function returns a list with the cleaned quotes as an xts or data.table object depending on input (see examples).
 #' 
 #' @references Barndorff-Nielsen, O. E., P. R. Hansen, A. Lunde, and N. Shephard (2009). Realized kernels in practice: Trades and quotes. Econometrics Journal 12, C1-C32.
@@ -1138,7 +1138,7 @@ noZeroQuotes <- function(qData) {
 #' # Consider you have raw quote data for 1 stock for 2 days
 #' head(sampleQDataRawMicroseconds)
 #' dim(sampleQDataRawMicroseconds)
-#' qData_aftercleaning <- quotesCleanup(qDataraw = sampleQDataRawMicroseconds, exchanges = "N")
+#' qData_aftercleaning <- quotesCleanup(qDataRaw = sampleQDataRawMicroseconds, exchanges = "N")
 #' qData_aftercleaning$report
 #' dim(qData_aftercleaning$qData)
 #' 
@@ -1148,7 +1148,7 @@ noZeroQuotes <- function(qData) {
 #' @importFrom readr read_csv
 #' @keywords cleaning
 #' @export
-quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, qDataraw = NULL, report = TRUE, 
+quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, qDataRaw = NULL, report = TRUE, 
                           selection = "median", maxi = 50, window = 50, type = "advanced", rmoutliersmaxi = 10, saveasxts = TRUE) {
   
   BID = OFR = DT = SPREAD = SPREAD_MEDIAN = EX = DATE = BIDSIZ = OFRSIZ = TIME_M  = NULL
@@ -1160,14 +1160,14 @@ quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, 
                merge_same_timestamp = 0,
                remove_outliers = 0)
   
-  if (is.null(qDataraw) == TRUE) {
+  if (is.null(qDataRaw) == TRUE) {
     try(dir.create(dataDestination), silent = TRUE)
     
     quotesfiles <- list.files(dataSource, recursive = TRUE)[grepl("quotes", list.files(dataSource, recursive = TRUE))]
     for (ii in quotesfiles) {
       readdata <- try(as.data.table(read_csv(paste0(dataSource, "/", ii))), silent = TRUE)
       readdata <- try(readdata[, DT := as.POSIXct(substring(paste(as.character(DATE), TIME_M, sep = " "), 1, 20), tz = "EST", format = "%Y%m%d %H:%M:%OS")], silent = TRUE)
-      qData <- try(quotesCleanup(qDataraw = readdata,
+      qData <- try(quotesCleanup(qDataRaw = readdata,
                                  selection = selection,
                                  exchanges = exchanges,
                                  maxi = maxi,
@@ -1191,44 +1191,44 @@ quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, 
     }
   }
   
-  if (is.null(qDataraw) == FALSE) {
+  if (is.null(qDataRaw) == FALSE) {
     
-    qDataraw <- checkColumnNames(qDataraw)
-    checkqData(qDataraw)
+    qDataRaw <- checkColumnNames(qDataRaw)
+    checkqData(qDataRaw)
     
     dummy_was_xts <- FALSE
-    if (is.data.table(qDataraw) == FALSE) {
-      if (is.xts(qDataraw) == TRUE) {
-        qDataraw <- setnames(as.data.table(qDataraw)[, BID := as.numeric(as.character(BID))][, OFR := as.numeric(as.character(OFR))]
+    if (is.data.table(qDataRaw) == FALSE) {
+      if (is.xts(qDataRaw) == TRUE) {
+        qDataRaw <- setnames(as.data.table(qDataRaw)[, BID := as.numeric(as.character(BID))][, OFR := as.numeric(as.character(OFR))]
                              [, BIDSIZ := as.numeric(as.character(BIDSIZ))][, OFRSIZ := as.numeric(as.character(OFRSIZ))], old = "index", new = "DT")
         dummy_was_xts <- TRUE
       } else {
         stop("Input has to be data.table or xts.")
       }
     } else {
-      if (("DT" %in% colnames(qDataraw)) == FALSE) {
+      if (("DT" %in% colnames(qDataRaw)) == FALSE) {
         stop("Data.table neeeds DT column.")
       }
     }
     
-    nresult[1] <- dim(qDataraw)[1] 
-    qDataraw <- qDataraw[BID != 0 & OFR != 0]
-    nresult[2] <- dim(qDataraw)[1] 
-    qDataraw <- qDataraw[EX %in% exchanges]
-    nresult[3] <- dim(qDataraw)[1] 
-    qDataraw <- qDataraw[OFR > BID][, SPREAD := OFR - BID][, DATE := as.Date(DT)][, SPREAD_MEDIAN := median(SPREAD), by = "DATE"]
-    nresult[4] <- dim(qDataraw)[1] 
-    qDataraw <- qDataraw[SPREAD < (SPREAD_MEDIAN * maxi)]
-    nresult[5] <- dim(qDataraw)[1]
-    qDataraw <- mergeQuotesSameTimestamp(qData = qDataraw, selection = selection)
-    nresult[6] <- dim(qDataraw)[1]
+    nresult[1] <- dim(qDataRaw)[1] 
+    qDataRaw <- qDataRaw[BID != 0 & OFR != 0]
+    nresult[2] <- dim(qDataRaw)[1] 
+    qDataRaw <- qDataRaw[EX %in% exchanges]
+    nresult[3] <- dim(qDataRaw)[1] 
+    qDataRaw <- qDataRaw[OFR > BID][, SPREAD := OFR - BID][, DATE := as.Date(DT)][, SPREAD_MEDIAN := median(SPREAD), by = "DATE"]
+    nresult[4] <- dim(qDataRaw)[1] 
+    qDataRaw <- qDataRaw[SPREAD < (SPREAD_MEDIAN * maxi)]
+    nresult[5] <- dim(qDataRaw)[1]
+    qDataRaw <- mergeQuotesSameTimestamp(qData = qDataRaw, selection = selection)
+    nresult[6] <- dim(qDataRaw)[1]
     
-    qDataraw <- rmOutliersQuotes(qDataraw, window = window, type = "advanced", maxi = rmoutliersmaxi)
-    nresult[7] <- dim(qDataraw)[1]
+    qDataRaw <- rmOutliersQuotes(qDataRaw, window = window, type = "advanced", maxi = rmoutliersmaxi)
+    nresult[7] <- dim(qDataRaw)[1]
     if (dummy_was_xts == TRUE) {
-      df_result <- xts(as.matrix(qDataraw[, -c("DT",  "DATE")]), order.by = qDataraw$DT)
+      df_result <- xts(as.matrix(qDataRaw[, -c("DT",  "DATE")]), order.by = qDataRaw$DT)
     } else {
-      df_result <- qDataraw[, -c( "DATE")]
+      df_result <- qDataRaw[, -c( "DATE")]
     }
     
     if (report == TRUE) {
@@ -1774,7 +1774,7 @@ tradesCleanupUsingQuotes <- function(from, to, dataSource, dataDestination, tick
 #' tData_afterfirstcleaning <- tradesCleanup(tDataraw = sampleTDataRawMicroseconds, 
 #'                                           exchanges = "N", report = FALSE)
 #' # 
-#' qData <- quotesCleanup(qDataraw = sampleQDataRawMicroseconds, 
+#' qData <- quotesCleanup(qDataRaw = sampleQDataRawMicroseconds, 
 #'                        exchanges = "N", report = FALSE)
 #' dim(tData_afterfirstcleaning)
 #' tData_afterfinalcleaning <- 

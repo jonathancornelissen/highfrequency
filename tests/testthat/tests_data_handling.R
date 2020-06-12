@@ -10,7 +10,7 @@ expect_equal(
 )
 
 expect_equal(
-  quotesCleanup(qDataraw = sampleQDataRaw, exchanges = "N")$report["remove_outliers"],
+  quotesCleanup(qDataRaw = sampleQDataRaw, exchanges = "N")$report["remove_outliers"],
   c(remove_outliers = 7706)
 )
 

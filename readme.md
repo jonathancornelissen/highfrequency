@@ -28,7 +28,7 @@ library(highfrequency)
 # Print raw quotes data to console
 sampleQDataRawMicroseconds
 # Cleanup quotes leaves 46566 out of 464221 observations.
-quotesCleanup(qDataraw = sampleQDataRawMicroseconds, exchanges = "N")
+quotesCleanup(qDataRaw = sampleQDataRawMicroseconds, exchanges = "N")
 ```
 
 ## Special thanks

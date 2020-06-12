@@ -8,7 +8,7 @@ quotesCleanup(
   dataSource = NULL,
   dataDestination = NULL,
   exchanges,
-  qDataraw = NULL,
+  qDataRaw = NULL,
   report = TRUE,
   selection = "median",
   maxi = 50,
@@ -41,7 +41,7 @@ The possible exchange symbols are:
 \item Z: BATS
 }}
 
-\item{qDataraw}{xts or data.table object containing (ONE stock only) raw quote data. This argument is NULL by default. Enabling it means the arguments
+\item{qDataRaw}{xts or data.table object containing (ONE stock only) raw quote data. This argument is NULL by default. Enabling it means the arguments
 from, to, dataSource and dataDestination will be ignored. (only advisable for small chunks of data)}
 
 \item{report}{boolean and TRUE by default. In case it is true the function returns (also) a vector indicating how many quotes remained after each cleaning step.}
@@ -62,14 +62,14 @@ from, to, dataSource and dataDestination will be ignored. (only advisable for sm
 The function converts every csv file in dataSource into multiple xts or data.table files.
 In dataDestination, there will be one folder for each symbol containing .rds files with cleaned data stored either in data.table or xts format.
 
-In case you supply the argument "qDataraw", the on-disk functionality is ignored
+In case you supply the argument "qDataRaw", the on-disk functionality is ignored
 and the function returns a list with the cleaned quotes as an xts or data.table object depending on input (see examples).
 }
 \description{
 This is a wrapper function for cleaning the quote data in the entire folder dataSource. 
 The result is saved in the folder dataDestination. 
 
-In case you supply the argument "qDataraw", the on-disk functionality is ignored
+In case you supply the argument "qDataRaw", the on-disk functionality is ignored
 and the function returns the cleaned quotes as xts or data.table object (see examples).
 
 The following cleaning steps are performed sequentially:
@@ -80,7 +80,7 @@ The following cleaning steps are performed sequentially:
 # Consider you have raw quote data for 1 stock for 2 days
 head(sampleQDataRawMicroseconds)
 dim(sampleQDataRawMicroseconds)
-qData_aftercleaning <- quotesCleanup(qDataraw = sampleQDataRawMicroseconds, exchanges = "N")
+qData_aftercleaning <- quotesCleanup(qDataRaw = sampleQDataRawMicroseconds, exchanges = "N")
 qData_aftercleaning$report
 dim(qData_aftercleaning$qData)
 

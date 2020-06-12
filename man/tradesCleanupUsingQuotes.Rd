@@ -40,7 +40,7 @@ and \code{\link{quotesCleanup}}.
 tData_afterfirstcleaning <- tradesCleanup(tDataraw = sampleTDataRawMicroseconds, 
                                           exchanges = "N", report = FALSE)
 # 
-qData <- quotesCleanup(qDataraw = sampleQDataRawMicroseconds, 
+qData <- quotesCleanup(qDataRaw = sampleQDataRawMicroseconds, 
                        exchanges = "N", report = FALSE)
 dim(tData_afterfirstcleaning)
 tData_afterfinalcleaning <- 
