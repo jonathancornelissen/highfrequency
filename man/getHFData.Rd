@@ -9,7 +9,7 @@ getHFData(
   interval = "5min",
   outputType = "xts",
   apiKey = NULL,
-  do.sleep = TRUE,
+  doSleep = TRUE,
   ...
 )
 }
@@ -22,7 +22,7 @@ getHFData(
 
 \item{apiKey}{string with the api key provided by Alpha Vantage.}
 
-\item{do.sleep}{logical when the length of symbols > 5 the function will sleep for 12 seconds by default.}
+\item{doSleep}{logical when the length of symbols > 5 the function will sleep for 12 seconds by default.}
 }
 \value{
 An object of type xts or data.table in case the length of symbols is 1. If the lenght of symbols > 1 the xts and 
@@ -32,7 +32,7 @@ data.table objects will be put into a list.
 Function to retrieve high frequency data from Alpha Vantage - wrapper around quantMods' getSymbols.av function
 }
 \details{
-#' The do.sleep argument is set to true as default because Alpha Vantage has a limit of five calls per minute. 
+#' The doSleep argument is set to true as default because Alpha Vantage has a limit of five calls per minute. 
 The function does not try to extract when the last API call was made which means that if
 you made successive calls to get 3 symbols in rapid succession, the function may not retrieve all the data.
 }

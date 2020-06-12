@@ -6,13 +6,13 @@
 #' @param interval the sampling interval of the data retrieved. Should be one of one of "1min", "5min", "15min", "30min", or "60min"
 #' @param outputType string either "xts" or "DT" to denote the type of output wanted. "xts" will yield an xts object, "DT" will yield a data.table object.
 #' @param apiKey string with the api key provided by Alpha Vantage. 
-#' @param do.sleep logical when the length of symbols > 5 the function will sleep for 12 seconds by default. 
+#' @param doSleep logical when the length of symbols > 5 the function will sleep for 12 seconds by default. 
 #' 
 #' @importFrom quantmod getSymbols.av getDefaults
 #' @importFrom data.table as.data.table setnames
 #' @keywords data
 #' 
-#' @details #' The do.sleep argument is set to true as default because Alpha Vantage has a limit of five calls per minute. 
+#' @details #' The doSleep argument is set to true as default because Alpha Vantage has a limit of five calls per minute. 
 #' The function does not try to extract when the last API call was made which means that if
 #' you made successive calls to get 3 symbols in rapid succession, the function may not retrieve all the data.
 #' 
@@ -35,7 +35,7 @@
 #' }
 #' 
 #' @export
-getHFData <- function(symbols = NULL, interval = "5min", outputType = "xts", apiKey = NULL, do.sleep = TRUE, ...){
+getHFData <- function(symbols = NULL, interval = "5min", outputType = "xts", apiKey = NULL, doSleep = TRUE, ...){
   # Check for API key set in quantmod if it is not present, we kindly remind the user to get it.
   if(is.null(getDefaults(getSymbols.av, "api.key")$api.key) & is.null(apiKey)){
     stop("Your AlphaVantage API key is not set in the quantmod package and no API key was provided. 
@@ -70,7 +70,7 @@ getHFData <- function(symbols = NULL, interval = "5min", outputType = "xts", api
       }
       data[[symbol]] <- singleSymbol
       
-      if(length(symbols) > 5 && do.sleep){
+      if(length(symbols) > 5 && doSleep){
         print("Sleeping for 12 seconds because the length of symbols > 5.")
         Sys.sleep(12)
       }
