@@ -2,11 +2,11 @@
 
 S3method(plot,harModel)
 S3method(plot,intradayJumpTest)
-S3method(plot,spotdrift)
+S3method(plot,spotDrift)
 S3method(plot,spotVol)
 S3method(predict,harModel)
 S3method(print,harModel)
-S3method(print,spotdrift)
+S3method(print,spotDrift)
 S3method(summary,harModel)
 export(AJjumpTest)
 export(BNSjumptest)

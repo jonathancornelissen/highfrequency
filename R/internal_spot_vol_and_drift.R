@@ -31,7 +31,7 @@ driftKernel <- function(data, intraday, options) {
   }
   mu = as.matrix(mu * bandwidth, ncol = 1)
   out = list("mu" = mu)
-  class(out) <- "spotdrift"
+  class(out) <- "spotDrift"
   return(out)
 }
 
@@ -51,7 +51,7 @@ driftMean <- function(mR, options){
     colnames(mu) <- "mu"
   }
   out <- list("mu" = mu)
-  class(out) <- "spotdrift"
+  class(out) <- "spotDrift"
   return(out)
 }
 
@@ -72,12 +72,12 @@ driftMedian <- function(mR, options){
   }
 
   out <- list("mu" = mu)
-  class(out) <- "spotdrift"
+  class(out) <- "spotDrift"
   return(out)
 }
 
 #' @export
-plot.spotdrift <- function(x, ...) {
+plot.spotDrift <- function(x, ...) {
   mu <- x$mu
   if (dim(mu)[2] > 1) {
     #browser()
@@ -89,7 +89,7 @@ plot.spotdrift <- function(x, ...) {
 }
 
 #' @export
-print.spotdrift <- function(x, ...){
+print.spotDrift <- function(x, ...){
   print(x$mu)
 }
 

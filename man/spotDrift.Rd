@@ -35,7 +35,7 @@ Standard is minutes}
 \item{tz}{Time zone, standard is "GMT"}
 }
 \value{
-An object of class "spotdrift" containing at least the estimated spot drift process. Input on what this class should contain and methods for it is welcome.
+An object of class "spotDrift" containing at least the estimated spot drift process. Input on what this class should contain and methods for it is welcome.
 }
 \description{
 Function used to estimate the spot drift of intraday (tick) stock prices/returns

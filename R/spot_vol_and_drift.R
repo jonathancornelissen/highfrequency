@@ -12,7 +12,7 @@
 #' @param marketClose Closing time of the market, standard is "16:00:00"
 #' @param tz Time zone, standard is "GMT"
 #'
-#' @return An object of class "spotdrift" containing at least the estimated spot drift process. Input on what this class should contain and methods for it is welcome.
+#' @return An object of class "spotDrift" containing at least the estimated spot drift process. Input on what this class should contain and methods for it is welcome.
 #'
 #' @details The additional arguments for the mean and median methods are: \code{periods} for the rolling window length which is 5 by standard and
 #' \code{align} to allow for control of the alignment, should one wish to do so, the standard is \code{"right"}
