@@ -37,7 +37,7 @@ and \code{\link{quotesCleanup}}.
 }
 \examples{
 # Consider you have raw trade data for 1 stock for 2 days 
-tData_afterfirstcleaning <- tradesCleanup(tDataraw = sampleTDataRawMicroseconds, 
+tData_afterfirstcleaning <- tradesCleanup(tDataRaw = sampleTDataRawMicroseconds, 
                                           exchanges = "N", report = FALSE)
 # 
 qData <- quotesCleanup(qDataRaw = sampleQDataRawMicroseconds, 

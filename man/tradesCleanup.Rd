@@ -8,7 +8,7 @@ tradesCleanup(
   dataSource = NULL,
   dataDestination = NULL,
   exchanges,
-  tDataraw = NULL,
+  tDataRaw = NULL,
   report = TRUE,
   selection = "median",
   saveasxts = TRUE
@@ -37,7 +37,7 @@ The possible exchange symbols are:
 \item Z: BATS
 }}
 
-\item{tDataraw}{xts object containing (for ONE stock only) raw trade data. This argument is NULL by default. Enabling it means the arguments
+\item{tDataRaw}{xts object containing (for ONE stock only) raw trade data. This argument is NULL by default. Enabling it means the arguments
 from, to, dataSource and dataDestination will be ignored. (only advisable for small chunks of data)}
 
 \item{report}{boolean and TRUE by default. In case it is true the function returns (also) a vector indicating how many trades remained after each cleaning step.}
@@ -74,7 +74,7 @@ there is a seperate wrapper called \code{\link{tradesCleanupUsingQuotes}}.
 # Consider you have raw trade data for 1 stock for 2 days 
 head(sampleTDataRawMicroseconds)
 dim(sampleTDataRawMicroseconds)
-tData_afterfirstcleaning <- tradesCleanup(tDataraw = sampleTDataRaw, exchanges = list("N"))
+tData_afterfirstcleaning <- tradesCleanup(tDataRaw = sampleTDataRaw, exchanges = list("N"))
 tData_afterfirstcleaning$report
 dim(tData_afterfirstcleaning$tData)
 

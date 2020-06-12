@@ -39,7 +39,7 @@ Next, we will use one of three main cleaning functions called tradesCleanup. It 
 - summarizing trades that have the same time stamp. The default is to take the median price and summed-up volume of the different trades.
 
 ```{r eval = TRUE}
-tData_cleaned <- tradesCleanup(tDataraw = sampleTDataRawMicroseconds, exchange = "N")
+tData_cleaned <- tradesCleanup(tDataRaw = sampleTDataRawMicroseconds, exchange = "N")
 ```
 
 When using tradesCleanup, the return value is a list of two. It contains a report about the number of observations after each cleaning step and the cleaned data itself.

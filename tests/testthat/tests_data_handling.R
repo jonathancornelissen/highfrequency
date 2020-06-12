@@ -60,7 +60,7 @@ expect_equal(
 )
 
 expect_equal(
-  dim(tradesCleanup(tDataraw = sampleTDataRaw, exchanges = "N", report = FALSE)),
+  dim(tradesCleanup(tDataRaw = sampleTDataRaw, exchanges = "N", report = FALSE)),
   c(9104, 3)
 )
 

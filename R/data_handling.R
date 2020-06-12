@@ -1628,7 +1628,7 @@ selectExchange <- function(data, exch = "N") {
 #' \item Z: BATS
 #' }
 #' 
-#' @param tDataraw xts object containing (for ONE stock only) raw trade data. This argument is NULL by default. Enabling it means the arguments
+#' @param tDataRaw xts object containing (for ONE stock only) raw trade data. This argument is NULL by default. Enabling it means the arguments
 #' from, to, dataSource and dataDestination will be ignored. (only advisable for small chunks of data)
 #' @param report boolean and TRUE by default. In case it is true the function returns (also) a vector indicating how many trades remained after each cleaning step.
 #' @param selection argument to be passed on to the cleaning routine \code{\link{mergeTradesSameTimestamp}}. The default is "median".
@@ -1645,7 +1645,7 @@ selectExchange <- function(data, exch = "N") {
 #' # Consider you have raw trade data for 1 stock for 2 days 
 #' head(sampleTDataRawMicroseconds)
 #' dim(sampleTDataRawMicroseconds)
-#' tData_afterfirstcleaning <- tradesCleanup(tDataraw = sampleTDataRaw, exchanges = list("N"))
+#' tData_afterfirstcleaning <- tradesCleanup(tDataRaw = sampleTDataRaw, exchanges = list("N"))
 #' tData_afterfirstcleaning$report
 #' dim(tData_afterfirstcleaning$tData)
 #' 
@@ -1659,17 +1659,17 @@ selectExchange <- function(data, exch = "N") {
 #' @author Jonathan Cornelissen and Kris Boudt
 #' @keywords cleaning
 #' @export
-tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, tDataraw = NULL, report = TRUE, selection = "median", saveasxts = TRUE) {
+tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, tDataRaw = NULL, report = TRUE, selection = "median", saveasxts = TRUE) {
   PRICE = EX = COND = DT = DATE = TIME_M = NULL
   
-  if (is.null(tDataraw) == TRUE) {
+  if (is.null(tDataRaw) == TRUE) {
     try(dir.create(dataDestination), silent = TRUE)
     
     tradesfiles <- list.files(dataSource, recursive = TRUE)[!grepl("quotes", list.files(dataSource, recursive = TRUE))]
     for (ii in tradesfiles) {
       readdata <- try(as.data.table(read_csv(paste0(dataSource, "/", ii))), silent = TRUE)
       readdata <- try(readdata[, DT := as.POSIXct(substring(paste(as.character(DATE), TIME_M, sep = " "), 1, 20), tz = "EST", format = "%Y%m%d %H:%M:%OS")], silent = TRUE)
-      tData <- try(tradesCleanup(tDataraw = readdata,
+      tData <- try(tradesCleanup(tDataRaw = readdata,
                                  selection = selection,
                                  exchanges = exchanges))$tData
       tData <- tData[, DATE := as.Date(DT, tz = "EST")]
@@ -1688,43 +1688,43 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, 
     }
   }
   
-  if (is.null(tDataraw) == FALSE) {
+  if (is.null(tDataRaw) == FALSE) {
     nresult <- c(initial_number = 0,
                  no_zero_trades = 0,
                  select_exchange = 0,
                  remove_sales_condition = 0,
                  merge_same_timestamp = 0)
     
-    tDataraw <- checkColumnNames(tDataraw)
-    checktData(tDataraw)
+    tDataRaw <- checkColumnNames(tDataRaw)
+    checktData(tDataRaw)
     
     dummy_was_xts <- FALSE
-    if (is.data.table(tDataraw) == FALSE) {
-      if (is.xts(tDataraw) == TRUE) {
-        tDataraw <- setnames(as.data.table(tDataraw)[, PRICE := as.numeric(as.character(PRICE))], old = "index", new = "DT")
+    if (is.data.table(tDataRaw) == FALSE) {
+      if (is.xts(tDataRaw) == TRUE) {
+        tDataRaw <- setnames(as.data.table(tDataRaw)[, PRICE := as.numeric(as.character(PRICE))], old = "index", new = "DT")
         dummy_was_xts <- TRUE
       } else {
         stop("Input has to be data.table or xts.")
       }
     } else {
-      if (("DT" %in% colnames(tDataraw)) == FALSE) {
+      if (("DT" %in% colnames(tDataRaw)) == FALSE) {
         stop("Data.table neeeds DT column.")
       }
     }
-    nresult[1] <- dim(tDataraw)[1] 
-    tDataraw <- tDataraw[PRICE != 0]
-    nresult[2] <- dim(tDataraw)[1] 
-    tDataraw <- tDataraw[EX %in% exchanges]
-    nresult[3] <- dim(tDataraw)[1] 
-    tDataraw <- tDataraw[COND %in% c("E", "F")]
-    nresult[4] <- dim(tDataraw)[1] 
-    tDataraw <- mergeTradesSameTimestamp(tDataraw, selection = selection)
-    nresult[5] <- dim(tDataraw)[1] 
+    nresult[1] <- dim(tDataRaw)[1] 
+    tDataRaw <- tDataRaw[PRICE != 0]
+    nresult[2] <- dim(tDataRaw)[1] 
+    tDataRaw <- tDataRaw[EX %in% exchanges]
+    nresult[3] <- dim(tDataRaw)[1] 
+    tDataRaw <- tDataRaw[COND %in% c("E", "F")]
+    nresult[4] <- dim(tDataRaw)[1] 
+    tDataRaw <- mergeTradesSameTimestamp(tDataRaw, selection = selection)
+    nresult[5] <- dim(tDataRaw)[1] 
     
     if (dummy_was_xts == TRUE) {
-      df_result <- xts(as.matrix(tDataraw[, -c("DT")]), order.by = tDataraw$DT)
+      df_result <- xts(as.matrix(tDataRaw[, -c("DT")]), order.by = tDataRaw$DT)
     } else {
-      df_result <- tDataraw
+      df_result <- tDataRaw
     }
     
     if (report == TRUE) {
@@ -1771,7 +1771,7 @@ tradesCleanupUsingQuotes <- function(from, to, dataSource, dataDestination, tick
 #' 
 #' @examples 
 #' # Consider you have raw trade data for 1 stock for 2 days 
-#' tData_afterfirstcleaning <- tradesCleanup(tDataraw = sampleTDataRawMicroseconds, 
+#' tData_afterfirstcleaning <- tradesCleanup(tDataRaw = sampleTDataRawMicroseconds, 
 #'                                           exchanges = "N", report = FALSE)
 #' # 
 #' qData <- quotesCleanup(qDataRaw = sampleQDataRawMicroseconds, 
