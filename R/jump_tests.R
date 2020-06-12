@@ -63,7 +63,7 @@ ABDJumptest <- function(RV, BPV, TQ) { # Compute jump detection stat mentioned i
 #' @param k can be chosen among 2 or 3 or 4. The author suggests 2. 2 by default.
 #' @param alignBy a string, align the tick data to "seconds"|"minutes"|"hours"
 #' @param alignPeriod an integer, align the tick data to this many [seconds|minutes|hours].
-#' @param alpha.multiplier alpha multiplier
+#' @param alphaMultiplier alpha multiplier
 #' @param makeReturns boolean, should be TRUE when rdata contains prices instead of returns. FALSE by default.
 #' @param ... additional arguments.
 #' 
@@ -97,7 +97,7 @@ ABDJumptest <- function(RV, BPV, TQ) { # Compute jump detection stat mentioned i
 #' @importFrom stats qnorm
 #' @importFrom stats pnorm
 #' @export
-AJjumpTest <- function(pData, p = 4 , k = 2, alignBy = NULL, alignPeriod = NULL, alpha.multiplier = 4, makeReturns = FALSE, ...) {
+AJjumpTest <- function(pData, p = 4 , k = 2, alignBy = NULL, alignPeriod = NULL, alphaMultiplier = 4, makeReturns = FALSE, ...) {
 
   if (checkMultiDays(pData) == TRUE) {
     result <- apply.daily(pData, AJjumpTest, alignBy, alignPeriod, makeReturns)
@@ -110,7 +110,7 @@ AJjumpTest <- function(pData, p = 4 , k = 2, alignBy = NULL, alignPeriod = NULL,
   p <- as.numeric(p)
   k <- as.numeric(k)
 
-  alpha <- alpha.multiplier * sqrt(rCov(pData, alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = makeReturns))
+  alpha <- alphaMultiplier * sqrt(rCov(pData, alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = makeReturns))
   w <- 0.47
   cvalue <- alpha * (1/N)^w
 
