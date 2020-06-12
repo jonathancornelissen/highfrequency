@@ -1011,7 +1011,7 @@ rHYCov <- function(rData, cor = FALSE, period = 1, alignBy = "seconds", alignPer
         cov[j, i] <- cov[i, j]  
         
         # kernelEstimator(as.double(rData[, i]), as.double(rData[, j]), as.integer(length(rData[, i])),
-        #                 as.integer(kernelParam), as.integer(ifelse(kernel.dofadj, 1, 0)),
+        #                 as.integer(kernelParam), as.integer(ifelse(kernelDOFadj, 1, 0)),
         #                 as.integer(type), ab = double(kernelParam + 1),
         #                 ab2 = double(kernelParam + 1))
         
@@ -1049,7 +1049,7 @@ rHYCov <- function(rData, cor = FALSE, period = 1, alignBy = "seconds", alignPer
 #' @param makeReturns Convert to Returns
 #' @param kernelType Kernel name (or number)
 #' @param kernelParam Kernel parameter (usually lags)
-#' @param kernel.dofadj Kernel Degree of freedom adjustment
+#' @param kernelDOFadj Kernel Degree of freedom adjustment
 #'
 #' @details The different types of kernels can be found using \code{\link{listAvailableKernels}}.
 #' 
@@ -1078,7 +1078,7 @@ rHYCov <- function(rData, cor = FALSE, period = 1, alignBy = "seconds", alignPer
 #' @export
 rKernelCov <- function(rData, cor = FALSE,  alignBy = "seconds", alignPeriod = 1,
                        makeReturns = FALSE, kernelType = "rectangular", kernelParam = 1,
-                       kernel.dofadj = TRUE) {
+                       kernelDOFadj = TRUE) {
   
   multixts <- multixts(rData)
   if (multixts == TRUE) {
@@ -1104,7 +1104,7 @@ rKernelCov <- function(rData, cor = FALSE,  alignBy = "seconds", alignPeriod = 1
                            as.double(rData),
                            as.integer(length(rData)),
                            as.integer(kernelParam),
-                           as.integer(ifelse(kernel.dofadj, 1, 0)),
+                           as.integer(ifelse(kernelDOFadj, 1, 0)),
                            as.integer(type),
                            ab = double(kernelParam + 1),
                            ab2 = double(kernelParam + 1)))
@@ -1116,7 +1116,7 @@ rKernelCov <- function(rData, cor = FALSE,  alignBy = "seconds", alignPeriod = 1
     for (i in 1:n) {
       diagonal[i] <- 
         kernelEstimator(as.double(rData[, i]), as.double(rData[, i]), as.integer(length(rData[, i])),
-                        as.integer(kernelParam), as.integer(ifelse(kernel.dofadj, 1, 0)),
+                        as.integer(kernelParam), as.integer(ifelse(kernelDOFadj, 1, 0)),
                         as.integer(type), ab = double(kernelParam + 1),
                         ab2 = double(kernelParam + 1))
     }
@@ -1125,7 +1125,7 @@ rKernelCov <- function(rData, cor = FALSE,  alignBy = "seconds", alignPeriod = 1
     for (i in 2:n) {
       for (j in 1:(i - 1)) {
         cov[i, j] = cov[j, i] = kernelEstimator(as.double(rData[, i]), as.double(rData[, j]), as.integer(length(rData[, i])),
-                                   as.integer(kernelParam), as.integer(ifelse(kernel.dofadj, 1, 0)),
+                                   as.integer(kernelParam), as.integer(ifelse(kernelDOFadj, 1, 0)),
                                    as.integer(type), ab = double(kernelParam + 1),
                                    ab2 = double(kernelParam + 1))
       }
