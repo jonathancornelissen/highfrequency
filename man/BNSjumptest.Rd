@@ -9,7 +9,7 @@ BNSjumptest(
   IVestimator = "BV",
   IQestimator = "TP",
   type = "linear",
-  logtransform = FALSE,
+  logTransform = FALSE,
   max = FALSE,
   alignBy = NULL,
   alignPeriod = NULL,
@@ -25,7 +25,7 @@ BNSjumptest(
 
 \item{type}{a method of BNS testing: can be linear or ratio. Linear by default.}
 
-\item{logtransform}{boolean, should be TRUE when QVestimator and IVestimator are in logarith form. FALSE by default.}
+\item{logTransform}{boolean, should be TRUE when QVestimator and IVestimator are in logarith form. FALSE by default.}
 
 \item{max}{boolean, should be TRUE when max adjustment in SE. FALSE by default.}
 

@@ -171,7 +171,7 @@ AJjumpTest <- function(pData, p = 4 , k = 2, alignBy = NULL, alignPeriod = NULL,
 #' @param IVestimator can be chosen among jump robust integrated variance estimators: BV, minRV, medRV and corrected threshold bipower variation (CTBV). If CTBV is chosen, an argument of \eqn{startV}, start point of auxiliary estimators in threshold estimation (Corsi et al. (2010) can be included. BV by default.
 #' @param IQestimator can be chosen among jump robust integrated quarticity estimators: TP, QP, minRQ and medRQ. TP by default.
 #' @param type a method of BNS testing: can be linear or ratio. Linear by default.
-#' @param logtransform boolean, should be TRUE when QVestimator and IVestimator are in logarith form. FALSE by default.
+#' @param logTransform boolean, should be TRUE when QVestimator and IVestimator are in logarith form. FALSE by default.
 #' @param max boolean, should be TRUE when max adjustment in SE. FALSE by default.
 #' @param alignBy a string, align the tick data to "seconds"|"minutes"|"hours".
 #' @param alignPeriod an integer, align the tick data to this many [seconds|minutes|hours].
@@ -208,7 +208,7 @@ AJjumpTest <- function(pData, p = 4 , k = 2, alignBy = NULL, alignPeriod = NULL,
 #' @keywords highfrequency BNSjumptest
 #' @export
 BNSjumptest <- function (rData, IVestimator = "BV", IQestimator = "TP", type = "linear",
-                         logtransform = FALSE, max = FALSE, alignBy = NULL, alignPeriod = NULL,
+                         logTransform = FALSE, max = FALSE, alignBy = NULL, alignPeriod = NULL,
                          makeReturns = FALSE) {
   if (checkMultiDays(rData) == TRUE) {
     result <- apply.daily(rData, BNSjumptest, alignBy, alignPeriod, makeReturns)
@@ -226,11 +226,11 @@ BNSjumptest <- function (rData, IVestimator = "BV", IQestimator = "TP", type = "
     theta <- tt(IVestimator)
     hatIQ <- hatIQ(rData, IQestimator)
     if (type == "linear") {
-      if (logtransform) {
+      if (logTransform) {
         hatQV <- log(RV(rData))
         hatIV <- log(hatIV(rData, IVestimator))
       }
-      if (!logtransform) {
+      if (!logTransform) {
         hatQV <- RV(rData)
         hatIV <- hatIV(rData, IVestimator)
       }
