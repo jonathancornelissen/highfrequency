@@ -4,16 +4,16 @@
 \alias{rKurt}
 \title{Realized kurtosis of highfrequency return series.}
 \usage{
-rKurt(rdata, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE)
+rKurt(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE)
 }
 \arguments{
-\item{rdata}{a zoo/xts object containing all returns in period t for one asset.}
+\item{rData}{a zoo/xts object containing all returns in period t for one asset.}
 
 \item{alignBy}{a string, align the tick data to "seconds"|"minutes"|"hours".}
 
 \item{alignPeriod}{an integer, align the tick data to this many [seconds|minutes|hours].}
 
-\item{makeReturns}{boolean, should be TRUE when rdata contains prices instead of returns. FALSE by   default.}
+\item{makeReturns}{boolean, should be TRUE when rData contains prices instead of returns. FALSE by   default.}
 }
 \value{
 numeric

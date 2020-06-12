@@ -461,7 +461,7 @@ spotvol <- function(data, method = "detper", ..., on = "minutes", k = 5,
   datad[, DATE := as.Date(DT, tz = tz(datad$DT))]
   setkeyv(datad, "DT")
   datad <- datad[, RETURN := log(PRICE) - shift(log(PRICE), type = "lag"), by = "DATE"][is.na(RETURN) == FALSE]
-  rdata <- xts(datad$RETURN, order.by = datad$DT)
+  rData <- xts(datad$RETURN, order.by = datad$DT)
   datad <- split(datad, by = "DATE")
   mR <- matrix(unlist(lapply(datad, FUN = function(x) as.numeric(x$RETURN))), ncol = length(datad[[1]]$RETURN), byrow = TRUE)
   
@@ -476,10 +476,10 @@ spotvol <- function(data, method = "detper", ..., on = "minutes", k = 5,
   
   options <- list(...)
   out <- switch(method,
-                detper = detper(mR, rdata = rdata, options = options),
-                stochper = stochper(mR, rdata = rdata, options = options),
-                kernel = kernelestim(mR, rdata = rdata, delta, options = options),
-                piecewise = piecewise(mR, rdata = rdata, options = options),
-                garch = garch_s(mR, rdata = rdata, options = options))
+                detper = detper(mR, rData = rData, options = options),
+                stochper = stochper(mR, rData = rData, options = options),
+                kernel = kernelestim(mR, rData = rData, delta, options = options),
+                piecewise = piecewise(mR, rData = rData, options = options),
+                garch = garch_s(mR, rData = rData, options = options))
   return(out)
 }

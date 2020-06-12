@@ -5,7 +5,7 @@
 \title{Function returns the value, the standard error and the confidence band of the integrated variance (IV) estimator.}
 \usage{
 ivInference(
-  rdata,
+  rData,
   IVestimator = "RV",
   IQestimator = "rQuar",
   confidence = 0.95,
@@ -16,7 +16,7 @@ ivInference(
 )
 }
 \arguments{
-\item{rdata}{zoo/xts object containing all returns in period t for one asset.}
+\item{rData}{zoo/xts object containing all returns in period t for one asset.}
 
 \item{IVestimator}{can be chosen among integrated variance estimators: RV, BV, TV, minRV or medRV. RV by default.}
 
@@ -28,7 +28,7 @@ ivInference(
 
 \item{alignPeriod}{an integer, align the tick data to this many [seconds|minutes|hours].}
 
-\item{makeReturns}{boolean, should be TRUE when rdata contains prices instead of returns. FALSE by  default.}
+\item{makeReturns}{boolean, should be TRUE when rData contains prices instead of returns. FALSE by  default.}
 
 \item{...}{additional arguments.}
 }

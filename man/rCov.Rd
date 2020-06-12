@@ -5,7 +5,7 @@
 \title{Realized Covariance}
 \usage{
 rCov(
-  rdata,
+  rData,
   cor = FALSE,
   alignBy = NULL,
   alignPeriod = NULL,
@@ -13,7 +13,7 @@ rCov(
 )
 }
 \arguments{
-\item{rdata}{a \eqn{(M x N)} matrix/zoo/xts object containing the \eqn{N}
+\item{rData}{a \eqn{(M x N)} matrix/zoo/xts object containing the \eqn{N}
 return series over period \eqn{t}, with \eqn{M} observations during \eqn{t}.
 In case of a matrix, no multi-day adjustment is possible.}
 
@@ -23,7 +23,7 @@ In case of a matrix, no multi-day adjustment is possible.}
 
 \item{alignPeriod}{an integer, align the tick data to this many [seconds|minutes|hours].}
 
-\item{makeReturns}{boolean, should be TRUE when rdata contains prices instead of returns. FALSE by default.}
+\item{makeReturns}{boolean, should be TRUE when rData contains prices instead of returns. FALSE by default.}
 }
 \value{
 an \eqn{N x N} matrix
@@ -45,12 +45,12 @@ data(sampleTData)
 data(sample5MinPricesJumps)
 
 # Univariate: 
-rv = rCov(rdata = sampleTData$PRICE, alignBy = "minutes", 
+rv = rCov(rData = sampleTData$PRICE, alignBy = "minutes", 
                    alignPeriod = 5, makeReturns = TRUE)
 rv 
 
 # Multivariate: 
-rc = rCov(rdata = sample5MinPricesJumps['2010-01-04'], makeReturns=TRUE)
+rc = rCov(rData = sample5MinPricesJumps['2010-01-04'], makeReturns=TRUE)
 rc
 }
 \author{

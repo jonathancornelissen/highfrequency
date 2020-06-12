@@ -4,16 +4,16 @@
 \alias{medRV}
 \title{medRV}
 \usage{
-medRV(rdata, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE)
+medRV(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE)
 }
 \arguments{
-\item{rdata}{a zoo/xts object containing all returns in period t for one asset.}
+\item{rData}{a zoo/xts object containing all returns in period t for one asset.}
 
 \item{alignBy}{a string, align the tick data to "seconds"|"minutes"|"hours".}
 
 \item{alignPeriod}{an integer, align the tick data to this many [seconds|minutes|hours].}
 
-\item{makeReturns}{boolean, should be TRUE when rdata contains prices instead of returns. FALSE by   default.}
+\item{makeReturns}{boolean, should be TRUE when rData contains prices instead of returns. FALSE by   default.}
 }
 \value{
 numeric
@@ -40,7 +40,7 @@ as shown in Andersen et al. (2007) and Corsi et al. (2010).
 }
 \examples{
 data(sampleTData);
-medrv <- medRV(rdata = sampleTData$PRICE, alignBy = "minutes", 
+medrv <- medRV(rData = sampleTData$PRICE, alignBy = "minutes", 
                alignPeriod = 5, makeReturns = TRUE)
 medrv 
  

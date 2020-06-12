@@ -71,24 +71,24 @@ conhuber <- function(di, alpha = 0.05) {
 }
 
 #' @keywords internal
-ctBV <- function(rdata, startV = NULL) {
+ctBV <- function(rData, startV = NULL) {
   
-  N <- length(rdata)
+  N <- length(rData)
 
   if (is.null(startV)) {
-    hatV <- medRV(rdata)
+    hatV <- medRV(rData)
   } else {
     hatV <- startV
   }
   v  <- 3^2 * hatV
   z1 <- rep(0, N - 1);
   for (i in 2:N) {
-    z1[i-1] <- zgamma(rdata[i], v, gamma_power = 1)
+    z1[i-1] <- zgamma(rData[i], v, gamma_power = 1)
   }
 
   z2 <- rep(0, N - 1);
   for (j in 1:(N - 1)) {
-    z2[j] <- zgamma(rdata[j], v, gamma_power = 1)
+    z2[j] <- zgamma(rData[j], v, gamma_power = 1)
   }
   ctbv <- (pi/2) * sum(z1 * z2)
   return(ctbv)
@@ -98,28 +98,28 @@ ctBV <- function(rdata, startV = NULL) {
 
 
 #' @keywords internal
-ctTPV <- function (rdata, startV = NULL){
-  q <- as.numeric(rdata)
-  N <- length(rdata);
+ctTPV <- function (rData, startV = NULL){
+  q <- as.numeric(rData)
+  N <- length(rData);
 
   if (is.null(startV)) {
-    hatV <- medRV(rdata)
+    hatV <- medRV(rData)
   } else {
     hatV <- startV
   }
   v <- 3^2 * hatV
   z1 <- rep(0, N - 2)
   for (i in 3:N) {
-    z1[i-2] <- zgamma(rdata[i], v, gamma_power = 4/3)
+    z1[i-2] <- zgamma(rData[i], v, gamma_power = 4/3)
   }
 
   z2 <- rep(0, N - 2);
   for (j in 2:(N - 1)) {
-    z2[j-1] <- zgamma(rdata[j], v, gamma_power = 4/3)
+    z2[j-1] <- zgamma(rData[j], v, gamma_power = 4/3)
   }
   z3 <- rep(0, N - 2);
   for (l in 1:(N-2)) {
-    z3[l] <- zgamma(rdata[l], v, gamma_power = 4/3)
+    z3[l] <- zgamma(rData[l], v, gamma_power = 4/3)
   }
   cttpv <- 0.8309^(-3) * sum(z1^(4/3) * z2^(4/3) * z3^(4/3))
   return(cttpv)
@@ -247,9 +247,9 @@ multixts <- function(x, y = NULL) {
 
 # Check data:
 #' @keywords internal
-rdatacheck <- function (rdata, multi = FALSE) {
-  if ((dim(rdata)[2] < 2) & (multi)) {
-    stop("Your rdata object should have at least 2 columns")
+rdatacheck <- function (rData, multi = FALSE) {
+  if ((dim(rData)[2] < 2) & (multi)) {
+    stop("Your rData object should have at least 2 columns")
   }
 }
 
@@ -330,9 +330,9 @@ RBPCov_bi <- function(ts1, ts2) {
 }
 
 #' @keywords internal
-RBPVar <- function(rdata) {
+RBPVar <- function(rData) {
   
-  returns <- as.vector(as.numeric(rdata))
+  returns <- as.vector(as.numeric(rData))
   n <- length(returns)
   rbpvar <- (pi/2) * sum(abs(returns[1:(n-1)]) * abs(returns[2:n]))
   return(rbpvar)
@@ -406,28 +406,28 @@ thetaROWVar <- function(alpha = 0.001 , alphaMCD = 0.5) {
 
 #' @importFrom robustbase covMcd
 #' @keywords internal
-ROWVar <- function(rdata, seasadjR = NULL, wfunction = "HR" , alphaMCD = 0.75, alpha = 0.001) {
+ROWVar <- function(rData, seasadjR = NULL, wfunction = "HR" , alphaMCD = 0.75, alpha = 0.001) {
   
   if (is.null(seasadjR) == TRUE) {
-    seasadjR <- rdata
+    seasadjR <- rData
   }
   
-  rdata <- as.vector(rdata)
+  rData <- as.vector(rData)
   seasadjR <- as.vector(seasadjR)
-  intraT <- length(rdata); N=1
-  MCDcov <- as.vector(covMcd( rdata , use.correction = FALSE )$raw.cov)
+  intraT <- length(rData); N=1
+  MCDcov <- as.vector(covMcd( rData , use.correction = FALSE )$raw.cov)
   outlyingness <- seasadjR^2/MCDcov    
   k <- qchisq(p = 1 - alpha, df = N)
   outlierindic <- outlyingness > k
   weights <- rep(1, intraT)
   if (wfunction == "HR") {
     weights[outlierindic] <- 0
-    wR <- sqrt(weights) * rdata
+    wR <- sqrt(weights) * rData
     return((conHR(di = N, alpha = alpha) * sum(wR^2)) / mean(weights))
   }
   if (wfunction == "SR") {
     weights[outlierindic] <- k/outlyingness[outlierindic]
-    wR <- sqrt(weights) * rdata
+    wR <- sqrt(weights) * rData
     return((conhuber(di = N, alpha = alpha) * sum(wR^2)) / mean(weights))
   }
   

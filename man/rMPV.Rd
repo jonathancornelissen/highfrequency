@@ -5,7 +5,7 @@
 \title{Realized multipower variation (MPV), an estimator of integrated power variation.}
 \usage{
 rMPV(
-  rdata,
+  rData,
   m = 2,
   p = 2,
   alignBy = NULL,
@@ -14,7 +14,7 @@ rMPV(
 )
 }
 \arguments{
-\item{rdata}{a zoo/xts object containing all returns in period t for one asset.}
+\item{rData}{a zoo/xts object containing all returns in period t for one asset.}
 
 \item{m}{the window size of return blocks. 2 by default.}
 
@@ -24,7 +24,7 @@ rMPV(
 
 \item{alignPeriod}{an integer, align the tick data to this many [seconds|minutes|hours].}
 
-\item{makeReturns}{boolean, should be TRUE when rdata contains prices instead of returns. FALSE by  default.}
+\item{makeReturns}{boolean, should be TRUE when rData contains prices instead of returns. FALSE by  default.}
 }
 \value{
 numeric

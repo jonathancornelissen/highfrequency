@@ -5,7 +5,7 @@
 \title{Realized beta: a tool in measuring risk with respect to the market.}
 \usage{
 rBeta(
-  rdata,
+  rData,
   rindex,
   RCOVestimator = "rCov",
   RVestimator = "RV",
@@ -13,7 +13,7 @@ rBeta(
 )
 }
 \arguments{
-\item{rdata}{a zoo/xts object containing all returns in period t for one asset.}
+\item{rData}{a zoo/xts object containing all returns in period t for one asset.}
 
 \item{rindex}{a zoo/xts object containing return in period t for an index.}
 
@@ -21,7 +21,7 @@ rBeta(
 
 \item{RVestimator}{can be chosen among realized variance estimators: RV, minRV and medRV. RV by default. In case of missing RVestimator, RCOVestimator function applying for rindex will be used.}
 
-\item{makeReturns}{boolean, should be TRUE when rdata contains prices instead of returns. FALSE by  default.}
+\item{makeReturns}{boolean, should be TRUE when rData contains prices instead of returns. FALSE by  default.}
 }
 \value{
 numeric

@@ -99,7 +99,7 @@ print.spotdrift <- function(x, ...){
 #
 # Modified spotVol function from highfrequency package
 #' @keywords internal
-detper <- function(mR, rdata = NULL, options = list()) {
+detper <- function(mR, rData = NULL, options = list()) {
   # default options, replace if user-specified
   op <- list(dailyvol = "bipower", periodicvol = "TML", dummies = FALSE,
              P1 = 5, P2 = 5)
@@ -107,23 +107,23 @@ detper <- function(mR, rdata = NULL, options = list()) {
 
   cDays <- nrow(mR)
   M <- ncol(mR)
-  if (cDays == 1 & is.null(rdata)) {
+  if (cDays == 1 & is.null(rData)) {
     mR <- as.numeric(mR)
     estimdailyvol <- switch(op$dailyvol,
                             bipower = rBPCov(mR),
                             medrv = medRV(mR),
                             rv = rCov(mR))
   } else {
-    if (is.null(rdata)) {
+    if (is.null(rData)) {
       estimdailyvol <- switch(op$dailyvol,
                               bipower = apply(mR, 1, "rBPCov"),
                               medrv = apply(mR, 1, "medRV"),
                               rv = apply(mR, 1, "rCov"))
     } else {
       estimdailyvol <- switch(op$dailyvol,
-                              bipower = apply.daily(rdata, rBPCov),
-                              medrv = apply.daily(rdata, medRV),
-                              rv = apply.daily(rdata, rCov))
+                              bipower = apply.daily(rData, rBPCov),
+                              medrv = apply.daily(rData, medRV),
+                              rv = apply.daily(rData, rCov))
       dates = time(estimdailyvol)
     }
   }
@@ -150,12 +150,12 @@ detper <- function(mR, rdata = NULL, options = list()) {
                             rv = apply(mfilteredR, 1, "rCov"))
     spot <- rep(sqrt(as.numeric(estimdailyvol) * (1/M)), each = M) *
       rep(estimperiodicvol, cDays)
-    if (is.null(rdata)) {
+    if (is.null(rData)) {
       spot <- matrix(spot, nrow = cDays, ncol = M, byrow = TRUE)
     } else {
-      spot <- xts(spot, order.by = time(rdata))
+      spot <- xts(spot, order.by = time(rData))
       estimdailyvol <- xts(estimdailyvol, order.by = dates)
-      estimperiodicvol <- xts(estimperiodicvol, order.by = time(rdata[1:M]))
+      estimperiodicvol <- xts(estimperiodicvol, order.by = time(rData[1:M]))
     }
     out <- list(spot = spot, daily = estimdailyvol, periodic = estimperiodicvol)
     class(out) <- "spotvol"
@@ -168,7 +168,7 @@ detper <- function(mR, rdata = NULL, options = list()) {
 # This function estimates the spot volatility by using the stochastic periodcity
 # model of Beltratti & Morana (2001)
 #' @keywords internal
-stochper <- function(mR, rdata = NULL, options = list()) {
+stochper <- function(mR, rData = NULL, options = list()) {
   #require(FKF)
   # default options, replace if user-specified
   op <- list(init = list(), P1 = 5, P2 = 5, control = list(trace=1, maxit=500))
@@ -233,10 +233,10 @@ stochper <- function(mR, rdata = NULL, options = list()) {
                  exp(opt$par["phi"])/(1+exp(opt$par["phi"])),
                  exp(opt$par["rho"])/(1+exp(opt$par["rho"])), opt$par[-(1:6)])
 
-  if (is.null(rdata)) {
+  if (is.null(rData)) {
     spot <- matrix(sigmahat, nrow = days, ncol = N, byrow = TRUE)
   } else {
-    spot <- xts(sigmahat, order.by = time(rdata))
+    spot <- xts(sigmahat, order.by = time(rData))
   }
   out <- list(spot = spot, par = estimates)
   class(out) <- "spotvol"
@@ -309,7 +309,7 @@ ssmodel <- function(par_t, days, N = 288, P1 = 5, P2 = 5) {
 #
 # See Kristensen (2010)
 #' @keywords internal
-kernelestim <- function(mR, rdata = NULL, delta = 300, options = list()) {
+kernelestim <- function(mR, rData = NULL, delta = 300, options = list()) {
   # default options, replace if user-specified
   op <- list(type = "gaussian", h = NULL, est = "cv", lower = NULL,
              upper = NULL)
@@ -354,10 +354,10 @@ kernelestim <- function(mR, rdata = NULL, delta = 300, options = list()) {
     }
   }
   spot <- as.vector(t(sqrt(sigma2hat)))
-  if (is.null(rdata)) {
+  if (is.null(rData)) {
     spot <- matrix(spot, nrow = D, ncol = N, byrow = TRUE)
   } else {
-    spot <- xts(spot, order.by = time(rdata))
+    spot <- xts(spot, order.by = time(rData))
   }
   out <- list(spot = spot, par = list(h = h))
   class(out) <- "spotvol"
@@ -439,7 +439,7 @@ ISE <- function(h, x, delta = 300, type = "gaussian") {
 # See Fried (2012)
 #' @importFrom stats sd
 #' @keywords internal
-piecewise <- function(mR, rdata = NULL, options = list()) {
+piecewise <- function(mR, rData = NULL, options = list()) {
   # default options, replace if user-specified
   op <- list(type = "MDa", m = 40, n = 20, alpha = 0.005, volest = "bipower",
              online = TRUE)
@@ -479,10 +479,10 @@ piecewise <- function(mR, rdata = NULL, options = list()) {
                         tau = robustbase::scaleTau2(vR[from:to]))
     }
   }
-  if (is.null(rdata)) {
+  if (is.null(rData)) {
     spot <- matrix(spot, nrow = D, ncol = N, byrow = TRUE)
   } else {
-    spot <- xts(spot, order.by = time(rdata))
+    spot <- xts(spot, order.by = time(rData))
   }
   out <- list(spot = spot, cp = cp)
   class(out) <- "spotvol"
@@ -574,7 +574,7 @@ MDtest <- function(x, y, alpha = 0.005, type = "MDa") {
 
 # GARCH with seasonality (external regressors)
 #' @keywords internal
-garch_s <- function(mR, rdata = NULL, options = list()) {
+garch_s <- function(mR, rData = NULL, options = list()) {
   # default options, replace if user-specified
   op <- list(model = "eGARCH", order = c(1,1), dist = "norm", P1 = 5,
              P2 = 5, solver.control = list())
@@ -590,7 +590,7 @@ garch_s <- function(mR, rdata = NULL, options = list()) {
                                                     garchOrder = op$order),
                               mean.model = list(include.mean = FALSE),
                               distribution.model = op$dist)
-  if (is.null(rdata)) {
+  if (is.null(rData)) {
     cat(paste("Fitting", op$model, "model..."))
     fit <- tryCatch(rugarch::ugarchfit(spec = spec, data = as.numeric(t(mR)),
                                        solver = "nloptr",
@@ -604,7 +604,7 @@ garch_s <- function(mR, rdata = NULL, options = list()) {
     spot <- as.numeric(rugarch::sigma(fit))
   } else {
     cat(paste("Fitting", op$model, "model..."))
-    fit <- tryCatch(rugarch::ugarchfit(spec = spec, data = rdata,
+    fit <- tryCatch(rugarch::ugarchfit(spec = spec, data = rData,
                                        solver = "nloptr",
                                        solver.control = op$solver.control),
                     error = function(e) e,

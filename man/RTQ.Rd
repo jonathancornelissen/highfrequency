@@ -4,10 +4,10 @@
 \alias{RTQ}
 \title{Calculate the realized tripower quarticity}
 \usage{
-RTQ(rdata)
+RTQ(rData)
 }
 \arguments{
-\item{rdata}{a zoo/xts object containing all returns in period t for one asset.}
+\item{rData}{a zoo/xts object containing all returns in period t for one asset.}
 }
 \value{
 numeric

@@ -5,7 +5,7 @@
 \title{Threshold Covariance}
 \usage{
 rThresholdCov(
-  rdata,
+  rData,
   cor = FALSE,
   alignBy = NULL,
   alignPeriod = NULL,
@@ -13,7 +13,7 @@ rThresholdCov(
 )
 }
 \arguments{
-\item{rdata}{a \eqn{(M x N)} matrix/zoo/xts object containing the \eqn{N}
+\item{rData}{a \eqn{(M x N)} matrix/zoo/xts object containing the \eqn{N}
 return series over period \eqn{t}, with \eqn{M} observations during \eqn{t}.}
 
 \item{cor}{boolean, in case it is TRUE, the correlation is returned. FALSE by default.}
@@ -22,7 +22,7 @@ return series over period \eqn{t}, with \eqn{M} observations during \eqn{t}.}
 
 \item{alignPeriod}{an integer, align the tick data to this many [seconds|minutes|hours].}
 
-\item{makeReturns}{boolean, should be TRUE when rdata contains prices instead of returns. FALSE by default.}
+\item{makeReturns}{boolean, should be TRUE when rData contains prices instead of returns. FALSE by default.}
 }
 \value{
 an \eqn{N x N} matrix

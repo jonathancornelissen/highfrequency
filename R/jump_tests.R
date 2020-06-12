@@ -64,7 +64,7 @@ ABDJumptest <- function(RV, BPV, TQ) { # Compute jump detection stat mentioned i
 #' @param alignBy a string, align the tick data to "seconds"|"minutes"|"hours"
 #' @param alignPeriod an integer, align the tick data to this many [seconds|minutes|hours].
 #' @param alphaMultiplier alpha multiplier
-#' @param makeReturns boolean, should be TRUE when rdata contains prices instead of returns. FALSE by default.
+#' @param makeReturns boolean, should be TRUE when rData contains prices instead of returns. FALSE by default.
 #' @param ... additional arguments.
 #' 
 #' @return list
@@ -167,7 +167,7 @@ AJjumpTest <- function(pData, p = 4 , k = 2, alignBy = NULL, alignPeriod = NULL,
 #' 
 #' \eqn{\theta}: depends on IVestimator (Huang and Tauchen (2005)).
 #' 
-#' @param rdata a zoo/xts object containing all returns in period t for one asset.
+#' @param rData a zoo/xts object containing all returns in period t for one asset.
 #' @param IVestimator can be chosen among jump robust integrated variance estimators: BV, minRV, medRV and corrected threshold bipower variation (CTBV). If CTBV is chosen, an argument of \eqn{startV}, start point of auxiliary estimators in threshold estimation (Corsi et al. (2010) can be included. BV by default.
 #' @param IQestimator can be chosen among jump robust integrated quarticity estimators: TP, QP, minRQ and medRQ. TP by default.
 #' @param type a method of BNS testing: can be linear or ratio. Linear by default.
@@ -175,7 +175,7 @@ AJjumpTest <- function(pData, p = 4 , k = 2, alignBy = NULL, alignPeriod = NULL,
 #' @param max boolean, should be TRUE when max adjustment in SE. FALSE by default.
 #' @param alignBy a string, align the tick data to "seconds"|"minutes"|"hours".
 #' @param alignPeriod an integer, align the tick data to this many [seconds|minutes|hours].
-#' @param makeReturns boolean, should be TRUE when rdata contains prices instead of returns. FALSE by default.
+#' @param makeReturns boolean, should be TRUE when rData contains prices instead of returns. FALSE by default.
 #' 
 #' @return list
 #' 
@@ -207,38 +207,38 @@ AJjumpTest <- function(pData, p = 4 , k = 2, alignBy = NULL, alignPeriod = NULL,
 #' 
 #' @keywords highfrequency BNSjumptest
 #' @export
-BNSjumptest <- function (rdata, IVestimator = "BV", IQestimator = "TP", type = "linear",
+BNSjumptest <- function (rData, IVestimator = "BV", IQestimator = "TP", type = "linear",
                          logtransform = FALSE, max = FALSE, alignBy = NULL, alignPeriod = NULL,
                          makeReturns = FALSE) {
-  if (checkMultiDays(rdata) == TRUE) {
-    result <- apply.daily(rdata, BNSjumptest, alignBy, alignPeriod, makeReturns)
+  if (checkMultiDays(rData) == TRUE) {
+    result <- apply.daily(rData, BNSjumptest, alignBy, alignPeriod, makeReturns)
     return(result)
   } else {
     if ((!is.null(alignBy)) && (!is.null(alignPeriod))) {
-      rdata <- fastTickAgregation(rdata, on = alignBy, k = alignPeriod)
+      rData <- fastTickAgregation(rData, on = alignBy, k = alignPeriod)
     }
     if (makeReturns == TRUE) {
-      rdata <- makeReturns(rdata)
+      rData <- makeReturns(rData)
     }
-    N <- length(rdata)
-    hatQV <- RV(rdata)
-    hatIV <- hatIV(rdata, IVestimator)
+    N <- length(rData)
+    hatQV <- RV(rData)
+    hatIV <- hatIV(rData, IVestimator)
     theta <- tt(IVestimator)
-    hatIQ <- hatIQ(rdata, IQestimator)
+    hatIQ <- hatIQ(rData, IQestimator)
     if (type == "linear") {
       if (logtransform) {
-        hatQV <- log(RV(rdata))
-        hatIV <- log(hatIV(rdata, IVestimator))
+        hatQV <- log(RV(rData))
+        hatIV <- log(hatIV(rData, IVestimator))
       }
       if (!logtransform) {
-        hatQV <- RV(rdata)
-        hatIV <- hatIV(rdata, IVestimator)
+        hatQV <- RV(rData)
+        hatIV <- hatIV(rData, IVestimator)
       }
       if (max) {
-        product <- max(1, hatIQ(rdata, IQestimator)/hatIV(rdata, IVestimator)^2)
+        product <- max(1, hatIQ(rData, IQestimator)/hatIV(rData, IVestimator)^2)
       }
       if (!max) {
-        product <- hatIQ(rdata, IQestimator)
+        product <- hatIQ(rData, IQestimator)
       }
       a <- sqrt(N) * (hatQV - hatIV)/sqrt((theta - 2) * product)
       out <- list()
@@ -249,12 +249,12 @@ BNSjumptest <- function (rdata, IVestimator = "BV", IQestimator = "TP", type = "
     }
     if (type == "ratio") {
       if (max) {
-        product <- max(1, hatIQ(rdata, IQestimator)/hatIV(rdata, IVestimator)^2)
+        product <- max(1, hatIQ(rData, IQestimator)/hatIV(rData, IVestimator)^2)
       }
       if (!max) {
-        product <- hatIQ(rdata, IQestimator)/hatIV(rdata, IVestimator)^2
+        product <- hatIQ(rData, IQestimator)/hatIV(rData, IVestimator)^2
       }
-      a <- sqrt(N) * (1 - hatIV(rdata, IVestimator, N)/RV(rdata))/sqrt((theta - 2) * product)
+      a <- sqrt(N) * (1 - hatIV(rData, IVestimator, N)/RV(rData))/sqrt((theta - 2) * product)
       out <- list()
       out$ztest <- a
       out$critical.value <- qnorm(c(0.025, 0.975))

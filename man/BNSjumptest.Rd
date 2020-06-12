@@ -5,7 +5,7 @@
 \title{Barndorff-Nielsen and Shephard (2006) tests for the presence of jumps in the price series.}
 \usage{
 BNSjumptest(
-  rdata,
+  rData,
   IVestimator = "BV",
   IQestimator = "TP",
   type = "linear",
@@ -17,7 +17,7 @@ BNSjumptest(
 )
 }
 \arguments{
-\item{rdata}{a zoo/xts object containing all returns in period t for one asset.}
+\item{rData}{a zoo/xts object containing all returns in period t for one asset.}
 
 \item{IVestimator}{can be chosen among jump robust integrated variance estimators: BV, minRV, medRV and corrected threshold bipower variation (CTBV). If CTBV is chosen, an argument of \eqn{startV}, start point of auxiliary estimators in threshold estimation (Corsi et al. (2010) can be included. BV by default.}
 
@@ -33,7 +33,7 @@ BNSjumptest(
 
 \item{alignPeriod}{an integer, align the tick data to this many [seconds|minutes|hours].}
 
-\item{makeReturns}{boolean, should be TRUE when rdata contains prices instead of returns. FALSE by default.}
+\item{makeReturns}{boolean, should be TRUE when rData contains prices instead of returns. FALSE by default.}
 }
 \value{
 list

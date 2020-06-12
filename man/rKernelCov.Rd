@@ -5,7 +5,7 @@
 \title{Realized Covariance: Kernel}
 \usage{
 rKernelCov(
-  rdata,
+  rData,
   cor = FALSE,
   alignBy = "seconds",
   alignPeriod = 1,
@@ -16,7 +16,7 @@ rKernelCov(
 )
 }
 \arguments{
-\item{rdata}{a \eqn{(M x N)} matrix/zoo/xts object containing the \eqn{N}
+\item{rData}{a \eqn{(M x N)} matrix/zoo/xts object containing the \eqn{N}
 return series over period \eqn{t}, with \eqn{M} observations during \eqn{t}.}
 
 \item{cor}{boolean, in case it is TRUE, the correlation is returned. FALSE by default.}
@@ -44,12 +44,12 @@ The different types of kernels can be found using \code{\link{listAvailableKerne
 }
 \examples{
 # Univariate:
-rvKernel <- rKernelCov(rdata = sampleTData$PRICE, alignBy = "minutes",
+rvKernel <- rKernelCov(rData = sampleTData$PRICE, alignBy = "minutes",
                        alignPeriod = 5, makeReturns = TRUE)
 rvKernel
 
 # Multivariate:
-rcKernel <- rKernelCov(rdata = cbind(lltc, sbux, fill = 0), alignBy = "minutes",
+rcKernel <- rKernelCov(rData = cbind(lltc, sbux, fill = 0), alignBy = "minutes",
                        alignPeriod = 5, makeReturns = FALSE)
 rcKernel
 }

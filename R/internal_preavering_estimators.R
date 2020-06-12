@@ -13,27 +13,27 @@ crv <- function(pData) {
   psi2kn <- 1 / kn * sum(gfunction((1:kn)/kn)^2)
 
   r1 <- hatreturn(pData,kn=kn)
-  rdata <- makeReturns(pData)
-  crv <- 1 / (sqrt(N) * theta * psi2kn) * sum(r1^2, na.rm = TRUE) - psi1kn  *(1/N) / (2 * theta^2 * psi2kn) * sum(rdata^2, na.rm=TRUE)
+  rData <- makeReturns(pData)
+  crv <- 1 / (sqrt(N) * theta * psi2kn) * sum(r1^2, na.rm = TRUE) - psi1kn  *(1/N) / (2 * theta^2 * psi2kn) * sum(rData^2, na.rm=TRUE)
   return(crv)
 }
 
 #' @keywords internal
 hatreturn <- function(pData, kn) {
-  rdata <- makeReturns(pData)
-  class(rdata) <- "zoo"
+  rData <- makeReturns(pData)
+  class(rData) <- "zoo"
   kn <- as.numeric(kn)
   if (kn == 1) {
-    hatre <- rdata
+    hatre <- rData
   } else {
     x <- (1:(kn-1)) / kn
     x[x > (1-x)] <- (1-x)[x > (1-x)]
     weightedsum <- function(series){
       return(sum(x * series))
     }
-    hatre <- rollapply(rdata, width = kn - 1, FUN = weightedsum, align = "left")
+    hatre <- rollapply(rData, width = kn - 1, FUN = weightedsum, align = "left")
     if (sum(is.na(hatre)) > 0) {
-      hatre[is.na(hatre)] <- rdata[is.na(hatre)]
+      hatre[is.na(hatre)] <- rData[is.na(hatre)]
     }
   }
   return(hatre)

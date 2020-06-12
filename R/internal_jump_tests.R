@@ -85,8 +85,8 @@ simre <- function (pData) {
   return(x)
 }
 
-tqfun <- function(rdata){ #Calculate the realized tripower quarticity
-  returns <- as.vector(as.numeric(rdata));
+tqfun <- function(rData){ #Calculate the realized tripower quarticity
+  returns <- as.vector(as.numeric(rData));
   n <- length(returns);
   mu43 <- 0.8308609; #    2^(2/3)*gamma(7/6) *gamma(1/2)^(-1)   
   tq <- n * ((mu43)^(-3)) *  sum(abs(returns[1:(n - 2)])^(4/3) *abs(returns[2:(n-1)])^(4/3) *abs(returns[3:n])^(4/3));

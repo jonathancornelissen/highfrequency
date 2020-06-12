@@ -52,20 +52,20 @@ expect_equal({
 
 # rBPCov
 expect_equal(
-  formatC(sum(rBPCov(rdata = sample5MinPricesJumps[c('2010-01-04', '2010-01-05'), 1:2], makeReturns=TRUE)[[1]][1:2,1:2]) * 1000000, digits = 5),
-  formatC(sum(rBPCov(rdata = sample5MinPricesJumps[c('2010-01-04'), 1:2], makeReturns=TRUE)[1:2,1:2]) * 1000000, digits = 5),
+  formatC(sum(rBPCov(rData = sample5MinPricesJumps[c('2010-01-04', '2010-01-05'), 1:2], makeReturns=TRUE)[[1]][1:2,1:2]) * 1000000, digits = 5),
+  formatC(sum(rBPCov(rData = sample5MinPricesJumps[c('2010-01-04'), 1:2], makeReturns=TRUE)[1:2,1:2]) * 1000000, digits = 5),
   "29778"
 )
 
 # RBPVar
 expect_equal(
-  formatC(sum(RBPVar(rdata = sample5MinPricesJumps['2010-01-04', 1])), digits = 5),
+  formatC(sum(RBPVar(rData = sample5MinPricesJumps['2010-01-04', 1])), digits = 5),
   "118.93"
 )
 
 # rCov
 expect_equal(
-  formatC(sum(rCov(rdata = sample5MinPricesJumps[c('2010-01-04', '2010-01-05'), 1:2], makeReturns = TRUE)[[1]][1:2,1:2]), digits = 5),
+  formatC(sum(rCov(rData = sample5MinPricesJumps[c('2010-01-04', '2010-01-05'), 1:2], makeReturns = TRUE)[[1]][1:2,1:2]), digits = 5),
   "0.028614"
 )
 
@@ -83,11 +83,11 @@ expect_equal(
 
 # rOWCov
 expect_equal(
-  formatC(rOWCov(rdata = sample5MinPricesJumps['2010-01-04'], makeReturns = TRUE)[1,1], digits = 5),
+  formatC(rOWCov(rData = sample5MinPricesJumps['2010-01-04'], makeReturns = TRUE)[1,1], digits = 5),
   "0.010039"
 )
 expect_equal(
-  formatC(rOWCov(rdata = sample5MinPricesJumps['2010-01-04'], makeReturns = TRUE, wfunction = "SR")[1,1], digits = 3),
+  formatC(rOWCov(rData = sample5MinPricesJumps['2010-01-04'], makeReturns = TRUE, wfunction = "SR")[1,1], digits = 3),
   "0.0101"
 )
 
@@ -103,11 +103,11 @@ expect_equal(
 
 # rKernel
 expect_equal(
-  formatC(rKernelCov(rdata = sampleTData$PRICE, alignBy = "minutes",  alignPeriod = 5, makeReturns = TRUE), digits = 5),
+  formatC(rKernelCov(rData = sampleTData$PRICE, alignBy = "minutes",  alignPeriod = 5, makeReturns = TRUE), digits = 5),
   "0.00059605"
 )
 expect_equal(
-  formatC(sum(rKernelCov(rdata = cbind(lltc, sbux, fill = 0), alignBy = "minutes", alignPeriod = 5, makeReturns = FALSE)) * 1000, digits = 5),
+  formatC(sum(rKernelCov(rData = cbind(lltc, sbux, fill = 0), alignBy = "minutes", alignPeriod = 5, makeReturns = FALSE)) * 1000, digits = 5),
   "0.021378"
 )
 
