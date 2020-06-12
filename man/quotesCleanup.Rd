@@ -15,7 +15,7 @@ quotesCleanup(
   window = 50,
   type = "advanced",
   rmoutliersmaxi = 10,
-  saveasxts = TRUE
+  saveAsXTS = TRUE
 )
 }
 \arguments{
@@ -56,7 +56,7 @@ from, to, dataSource and dataDestination will be ignored. (only advisable for sm
 
 \item{rmoutliersmaxi}{argument to be passed on to the cleaning routine \code{\link{rmOutliersQuotes}}.}
 
-\item{saveasxts}{indicates whether data should be saved in xts format instead of data.table when using on-disk functionality. TRUE by default.}
+\item{saveAsXTS}{indicates whether data should be saved in xts format instead of data.table when using on-disk functionality. TRUE by default.}
 }
 \value{
 The function converts every csv file in dataSource into multiple xts or data.table files.

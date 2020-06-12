@@ -1120,7 +1120,7 @@ noZeroQuotes <- function(qData) {
 #' @param window argument to be passed on to the cleaning routine \code{\link{rmOutliersQuotes}}. 
 #' @param type argument to be passed on to the cleaning routine \code{\link{rmOutliersQuotes}}.
 #' @param rmoutliersmaxi argument to be passed on to the cleaning routine \code{\link{rmOutliersQuotes}}.
-#' @param saveasxts indicates whether data should be saved in xts format instead of data.table when using on-disk functionality. TRUE by default.
+#' @param saveAsXTS indicates whether data should be saved in xts format instead of data.table when using on-disk functionality. TRUE by default.
 #' 
 #' @return The function converts every csv file in dataSource into multiple xts or data.table files.
 #' In dataDestination, there will be one folder for each symbol containing .rds files with cleaned data stored either in data.table or xts format.
@@ -1149,7 +1149,7 @@ noZeroQuotes <- function(qData) {
 #' @keywords cleaning
 #' @export
 quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, qDataRaw = NULL, report = TRUE, 
-                          selection = "median", maxi = 50, window = 50, type = "advanced", rmoutliersmaxi = 10, saveasxts = TRUE) {
+                          selection = "median", maxi = 50, window = 50, type = "advanced", rmoutliersmaxi = 10, saveAsXTS = TRUE) {
   
   BID = OFR = DT = SPREAD = SPREAD_MEDIAN = EX = DATE = BIDSIZ = OFRSIZ = TIME_M  = NULL
   nresult <- c(initial_number = 0,
@@ -1180,7 +1180,7 @@ quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, 
       
       try(dir.create(paste0(dataDestination, "/", strsplit(ii, "/")[[1]][1])), silent = TRUE)
       for (jj in qData) {
-        if (saveasxts == TRUE) {
+        if (saveAsXTS == TRUE) {
           df_result <- xts(as.matrix(jj[, -c("DT", "DATE")]), order.by = jj$DT)
         } else {
           df_result <- jj[, -c( "DATE")]
@@ -1632,7 +1632,7 @@ selectExchange <- function(data, exch = "N") {
 #' from, to, dataSource and dataDestination will be ignored. (only advisable for small chunks of data)
 #' @param report boolean and TRUE by default. In case it is true the function returns (also) a vector indicating how many trades remained after each cleaning step.
 #' @param selection argument to be passed on to the cleaning routine \code{\link{mergeTradesSameTimestamp}}. The default is "median".
-#' @param saveasxts indicates whether data should be saved in xts format instead of data.table when using on-disk functionality. TRUE by default.
+#' @param saveAsXTS indicates whether data should be saved in xts format instead of data.table when using on-disk functionality. TRUE by default.
 #' 
 #' @return For each day an xts or data.table object is saved into the folder of that date, containing the cleaned data.
 #' This procedure is performed for each stock in "ticker".
@@ -1659,7 +1659,7 @@ selectExchange <- function(data, exch = "N") {
 #' @author Jonathan Cornelissen and Kris Boudt
 #' @keywords cleaning
 #' @export
-tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, tDataRaw = NULL, report = TRUE, selection = "median", saveasxts = TRUE) {
+tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, tDataRaw = NULL, report = TRUE, selection = "median", saveAsXTS = TRUE) {
   PRICE = EX = COND = DT = DATE = TIME_M = NULL
   
   if (is.null(tDataRaw) == TRUE) {
@@ -1677,7 +1677,7 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, 
       
       try(dir.create(paste0(dataDestination, "/", strsplit(ii, "/")[[1]][1])), silent = TRUE)
       for (jj in tData) {
-        if (saveasxts == TRUE) {
+        if (saveAsXTS == TRUE) {
           df_result <- xts(as.matrix(jj[, -c("DT", "DATE")]), order.by = jj$DT)
         } else {
           df_result <- jj[, -c( "DATE")]

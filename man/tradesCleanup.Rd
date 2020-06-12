@@ -11,7 +11,7 @@ tradesCleanup(
   tDataRaw = NULL,
   report = TRUE,
   selection = "median",
-  saveasxts = TRUE
+  saveAsXTS = TRUE
 )
 }
 \arguments{
@@ -44,7 +44,7 @@ from, to, dataSource and dataDestination will be ignored. (only advisable for sm
 
 \item{selection}{argument to be passed on to the cleaning routine \code{\link{mergeTradesSameTimestamp}}. The default is "median".}
 
-\item{saveasxts}{indicates whether data should be saved in xts format instead of data.table when using on-disk functionality. TRUE by default.}
+\item{saveAsXTS}{indicates whether data should be saved in xts format instead of data.table when using on-disk functionality. TRUE by default.}
 }
 \value{
 For each day an xts or data.table object is saved into the folder of that date, containing the cleaned data.
