@@ -39,8 +39,8 @@ pData <-  exp(sim$prices)["1970-01-01"]
 #plot(pData)
 gc()
 
-rv <- rCov(exp(sim$prices), makeReturns = TRUE, alignBy = "secs", align.period = 1)
-bpv <- rBPCov(exp(sim$prices), makeReturns = TRUE, alignBy = "secs", align.period = 1)
+rv <- rCov(exp(sim$prices), makeReturns = TRUE, alignBy = "secs", alignPeriod = 1)
+bpv <- rBPCov(exp(sim$prices), makeReturns = TRUE, alignBy = "secs", alignPeriod = 1)
 mean((rv-bpv)/rv)
 mean(rv) # Converges to the quadratic variation
 mean(bpv) # Converges to the integrated variance

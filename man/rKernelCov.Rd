@@ -8,7 +8,7 @@ rKernelCov(
   rdata,
   cor = FALSE,
   alignBy = "seconds",
-  align.period = 1,
+  alignPeriod = 1,
   makeReturns = FALSE,
   kernel.type = "rectangular",
   kernel.param = 1,
@@ -23,7 +23,7 @@ return series over period \eqn{t}, with \eqn{M} observations during \eqn{t}.}
 
 \item{alignBy}{Align the tick data to seconds|minutes|hours}
 
-\item{align.period}{Align the tick data to this many [seconds|minutes|hours]}
+\item{alignPeriod}{Align the tick data to this many [seconds|minutes|hours]}
 
 \item{makeReturns}{Convert to Returns}
 
@@ -45,12 +45,12 @@ The different types of kernels can be found using \code{\link{listAvailableKerne
 \examples{
 # Univariate:
 rvKernel <- rKernelCov(rdata = sampleTData$PRICE, alignBy = "minutes",
-                       align.period = 5, makeReturns = TRUE)
+                       alignPeriod = 5, makeReturns = TRUE)
 rvKernel
 
 # Multivariate:
 rcKernel <- rKernelCov(rdata = cbind(lltc, sbux, fill = 0), alignBy = "minutes",
-                       align.period = 5, makeReturns = FALSE)
+                       alignPeriod = 5, makeReturns = FALSE)
 rcKernel
 }
 \references{

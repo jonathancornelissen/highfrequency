@@ -4,14 +4,14 @@
 \alias{rTPVar}
 \title{Realized tri-power variation estimator of quarticity for a highfrequency return series.}
 \usage{
-rTPVar(rdata, alignBy = NULL, align.period = NULL, makeReturns = FALSE)
+rTPVar(rdata, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE)
 }
 \arguments{
 \item{rdata}{a zoo/xts object containing all returns in period t for one asset.}
 
 \item{alignBy}{a string, align the tick data to "seconds"|"minutes"|"hours".}
 
-\item{align.period}{an integer, align the tick data to this many [seconds|minutes|hours].}
+\item{alignPeriod}{an integer, align the tick data to this many [seconds|minutes|hours].}
 
 \item{makeReturns}{boolean, should be TRUE when rdata contains prices instead of returns. FALSE by   default.}
 }
@@ -30,7 +30,7 @@ Function returns the rTPVar, defined in Andersen et al. (2012).
 }
 \examples{
 data(sampleTData)
-rTPVar(rdata = sampleTData$PRICE, alignBy = "minutes", align.period = 5, makeReturns = TRUE)
+rTPVar(rdata = sampleTData$PRICE, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)
 rTPVar
 
 }

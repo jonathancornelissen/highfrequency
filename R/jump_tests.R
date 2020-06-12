@@ -62,7 +62,7 @@ ABDJumptest <- function(RV, BPV, TQ) { # Compute jump detection stat mentioned i
 #' @param p can be chosen among 2 or 3 or 4. The author suggests 4. 4 by default.
 #' @param k can be chosen among 2 or 3 or 4. The author suggests 2. 2 by default.
 #' @param alignBy a string, align the tick data to "seconds"|"minutes"|"hours"
-#' @param align.period an integer, align the tick data to this many [seconds|minutes|hours].
+#' @param alignPeriod an integer, align the tick data to this many [seconds|minutes|hours].
 #' @param alpha.multiplier alpha multiplier
 #' @param makeReturns boolean, should be TRUE when rdata contains prices instead of returns. FALSE by default.
 #' @param ... additional arguments.
@@ -91,16 +91,16 @@ ABDJumptest <- function(RV, BPV, TQ) { # Compute jump detection stat mentioned i
 #'
 #' @examples
 #' AJjumpTest(sampleTData$PRICE, p = 2, k = 3, alignBy = "seconds", 
-#'   align.period = 5, makeReturns = TRUE)
+#'   alignPeriod = 5, makeReturns = TRUE)
 #' 
 #' @keywords highfrequency AJjumpTest
 #' @importFrom stats qnorm
 #' @importFrom stats pnorm
 #' @export
-AJjumpTest <- function(pData, p = 4 , k = 2, alignBy = NULL, align.period = NULL, alpha.multiplier = 4, makeReturns = FALSE, ...) {
+AJjumpTest <- function(pData, p = 4 , k = 2, alignBy = NULL, alignPeriod = NULL, alpha.multiplier = 4, makeReturns = FALSE, ...) {
 
   if (checkMultiDays(pData) == TRUE) {
-    result <- apply.daily(pData, AJjumpTest, alignBy, align.period, makeReturns)
+    result <- apply.daily(pData, AJjumpTest, alignBy, alignPeriod, makeReturns)
     return(result)
   } else {
     pData <- fastTickAgregation(pData, on = "seconds", k = 1)
@@ -110,11 +110,11 @@ AJjumpTest <- function(pData, p = 4 , k = 2, alignBy = NULL, align.period = NULL
   p <- as.numeric(p)
   k <- as.numeric(k)
 
-  alpha <- alpha.multiplier * sqrt(rCov(pData, alignBy = alignBy, align.period = align.period, makeReturns = makeReturns))
+  alpha <- alpha.multiplier * sqrt(rCov(pData, alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = makeReturns))
   w <- 0.47
   cvalue <- alpha * (1/N)^w
 
-  h <- align.period * scale(alignBy)
+  h <- alignPeriod * scale(alignBy)
   hk <- h * k
 
   seq1 <- seq(1, N, h)
@@ -174,7 +174,7 @@ AJjumpTest <- function(pData, p = 4 , k = 2, alignBy = NULL, align.period = NULL
 #' @param logtransform boolean, should be TRUE when QVestimator and IVestimator are in logarith form. FALSE by default.
 #' @param max boolean, should be TRUE when max adjustment in SE. FALSE by default.
 #' @param alignBy a string, align the tick data to "seconds"|"minutes"|"hours".
-#' @param align.period an integer, align the tick data to this many [seconds|minutes|hours].
+#' @param alignPeriod an integer, align the tick data to this many [seconds|minutes|hours].
 #' @param makeReturns boolean, should be TRUE when rdata contains prices instead of returns. FALSE by default.
 #' 
 #' @return list
@@ -208,14 +208,14 @@ AJjumpTest <- function(pData, p = 4 , k = 2, alignBy = NULL, align.period = NULL
 #' @keywords highfrequency BNSjumptest
 #' @export
 BNSjumptest <- function (rdata, IVestimator = "BV", IQestimator = "TP", type = "linear",
-                         logtransform = FALSE, max = FALSE, alignBy = NULL, align.period = NULL,
+                         logtransform = FALSE, max = FALSE, alignBy = NULL, alignPeriod = NULL,
                          makeReturns = FALSE) {
   if (checkMultiDays(rdata) == TRUE) {
-    result <- apply.daily(rdata, BNSjumptest, alignBy, align.period, makeReturns)
+    result <- apply.daily(rdata, BNSjumptest, alignBy, alignPeriod, makeReturns)
     return(result)
   } else {
-    if ((!is.null(alignBy)) && (!is.null(align.period))) {
-      rdata <- fastTickAgregation(rdata, on = alignBy, k = align.period)
+    if ((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+      rdata <- fastTickAgregation(rdata, on = alignBy, k = alignPeriod)
     }
     if (makeReturns == TRUE) {
       rdata <- makeReturns(rdata)

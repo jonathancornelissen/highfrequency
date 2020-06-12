@@ -79,7 +79,7 @@ IV <- function(IVestimator, iq) {
 #' @param IQestimator can be chosen among integrated quarticity estimators: rQuar, realized tri-power quarticity (TPQ), quad-power quarticity (QPQ), minRQ or medRQ. TPQ by default.
 #' @param confidence confidence level set by users. 0.95 by default. 
 #' @param alignBy a string, align the tick data to "seconds"|"minutes"|"hours"
-#' @param align.period an integer, align the tick data to this many [seconds|minutes|hours].
+#' @param alignPeriod an integer, align the tick data to this many [seconds|minutes|hours].
 #' @param makeReturns boolean, should be TRUE when rdata contains prices instead of returns. FALSE by  default.
 #' @param ... additional arguments.
 #' 
@@ -102,14 +102,14 @@ IV <- function(IVestimator, iq) {
 #'             confidence = 0.95, makeReturns = TRUE)
 #' @keywords highfrequency ivInference
 #' @export 
-ivInference <- function(rdata, IVestimator = "RV", IQestimator = "rQuar", confidence = 0.95, alignBy = NULL, align.period = NULL, makeReturns = FALSE, ...) {
+ivInference <- function(rdata, IVestimator = "RV", IQestimator = "rQuar", confidence = 0.95, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, ...) {
   
   if (checkMultiDays(rdata) == TRUE) { 
-    result <- apply.daily(rdata, ivInference, alignBy, align.period, makeReturns)
+    result <- apply.daily(rdata, ivInference, alignBy, alignPeriod, makeReturns)
     return(result)
   } else {
-    if((!is.null(alignBy)) && (!is.null(align.period))){
-      rdata <- fastTickAgregation(rdata, on = alignBy, k = align.period)
+    if((!is.null(alignBy)) && (!is.null(alignPeriod))){
+      rdata <- fastTickAgregation(rdata, on = alignBy, k = alignPeriod)
     }
     
     if (makeReturns == TRUE) { 

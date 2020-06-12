@@ -9,7 +9,7 @@ rMPV(
   m = 2,
   p = 2,
   alignBy = NULL,
-  align.period = NULL,
+  alignPeriod = NULL,
   makeReturns = FALSE
 )
 }
@@ -22,7 +22,7 @@ rMPV(
 
 \item{alignBy}{a string, align the tick data to "seconds"|"minutes"|"hours".}
 
-\item{align.period}{an integer, align the tick data to this many [seconds|minutes|hours].}
+\item{alignPeriod}{an integer, align the tick data to this many [seconds|minutes|hours].}
 
 \item{makeReturns}{boolean, should be TRUE when rdata contains prices instead of returns. FALSE by  default.}
 }
@@ -51,7 +51,7 @@ Function returns the rMPV, defined in Andersen et al. (2012).
 }
 \examples{
 data(sampleTData)
-rMPV(sampleTData$PRICE, m = 2, p = 3, alignBy = "minutes", align.period = 5, makeReturns = TRUE)
+rMPV(sampleTData$PRICE, m = 2, p = 3, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)
 
 }
 \references{

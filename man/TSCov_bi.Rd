@@ -7,18 +7,18 @@
                      kernel.param = 1,              # Kernel parameter (usually lags)
                      kernel.dofadj = TRUE,          # Kernel Degree of freedom adjustment
                      alignBy = "seconds",          # Align the tick data to [seconds|minutes|hours]
-                     align.period = 1) {            # Align the tick data to this many [seconds|minutes|hours]            
+                     alignPeriod = 1) {            # Align the tick data to this many [seconds|minutes|hours]            
   # Multiday adjustment: 
   multixts <- multixts(x)
   if (multixts == TRUE) {
     result <- apply.daily(x, rv.kernel,kernel.type,kernel.param,kernel.dofadj,
-                          alignBy, align.period, cts, makeReturns)
+                          alignBy, alignPeriod, cts, makeReturns)
     return(result)
   } else { #Daily estimation:
-    align.period <- .getAlignPeriod(align.period, alignBy)         
+    alignPeriod <- .getAlignPeriod(alignPeriod, alignBy)         
     cdata <- .convertData(x, cts = cts, makeReturns = makeReturns)
     x <- cdata$data
-    x <- .alignReturns(x, align.period)
+    x <- .alignReturns(x, alignPeriod)
     type <- kernelCharToInt(kernel.type)
     kernelEstimator(as.double(x), as.double(x), as.integer(length(x)),
                     as.integer(kernel.param), as.integer(ifelse(kernel.dofadj, 1, 0)),
@@ -35,18 +35,18 @@ rvKernel <- function(x,                             # Tick Data
                      kernel.param = 1,              # Kernel parameter (usually lags)
                      kernel.dofadj = TRUE,          # Kernel Degree of freedom adjustment
                      alignBy = "seconds",          # Align the tick data to [seconds|minutes|hours]
-                     align.period = 1) {            # Align the tick data to this many [seconds|minutes|hours]            
+                     alignPeriod = 1) {            # Align the tick data to this many [seconds|minutes|hours]            
   # Multiday adjustment: 
   multixts <- multixts(x)
   if (multixts == TRUE) {
     result <- apply.daily(x, rv.kernel,kernel.type,kernel.param,kernel.dofadj,
-                          alignBy, align.period, cts, makeReturns)
+                          alignBy, alignPeriod, cts, makeReturns)
     return(result)
   } else { #Daily estimation:
-    align.period <- .getAlignPeriod(align.period, alignBy)         
+    alignPeriod <- .getAlignPeriod(alignPeriod, alignBy)         
     cdata <- .convertData(x, cts = cts, makeReturns = makeReturns)
     x <- cdata$data
-    x <- .alignReturns(x, align.period)
+    x <- .alignReturns(x, alignPeriod)
     type <- kernelCharToInt(kernel.type)
     kernelEstimator(as.double(x), as.double(x), as.integer(length(x)),
                     as.integer(kernel.param), as.integer(ifelse(kernel.dofadj, 1, 0)),

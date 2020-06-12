@@ -127,17 +127,17 @@ ctTPV <- function (rdata, startV = NULL){
 
 
 #' @keywords internal
-getAlignPeriod <- function(align.period, alignBy) {   
+getAlignPeriod <- function(alignPeriod, alignBy) {   
   alignBy <- gsub("(^ +)|( +$)", "",alignBy) # Trim White
   
   if(casefold(alignBy) == "min" || casefold(alignBy) == "mins" ||casefold(alignBy) == "minute"||casefold(alignBy) == "minutes"||casefold(alignBy) == "m"){
-    ans <- align.period * 60
+    ans <- alignPeriod * 60
   }
   if(casefold(alignBy) == "sec" || casefold(alignBy) == "secs" ||casefold(alignBy) == "second"||casefold(alignBy) == "seconds"||casefold(alignBy) == "s"||casefold(alignBy) == ""){
-    ans <- align.period
+    ans <- alignPeriod
   }
   if(casefold(alignBy) == "hour" || casefold(alignBy) == "hours" ||casefold(alignBy) == "h"){
-    ans <- align.period * 60 * 60
+    ans <- alignPeriod * 60 * 60
   }
   return(ans)
 }
@@ -179,7 +179,7 @@ multixts <- function(x, y = NULL) {
 #                      kernel.param = 1,              # Kernel parameter (usually lags)
 #                      kernel.dofadj = TRUE,          # Kernel Degree of freedom adjustment
 #                      alignBy = "seconds",            # Align the tick data to [seconds|minutes|hours]
-#                      align.period = 1,              # Align the tick data to this many [seconds|minutes|hours]
+#                      alignPeriod = 1,              # Align the tick data to this many [seconds|minutes|hours]
 #                      cts = TRUE,                    # Calendar Time Sampling is used
 #                      makeReturns = FALSE) {           # Convert to Returns
 #   #
@@ -198,14 +198,14 @@ multixts <- function(x, y = NULL) {
 #     kernel.dofadj <- adj
 #   }
 #   
-#   align.period <- .getAlignPeriod(align.period, alignBy)   
+#   alignPeriod <- .getAlignPeriod(alignPeriod, alignBy)   
 #   cdata <- .convertData(x, cts = cts, makeReturns = makeReturns)
 #   
 #   x <- cdata$data
-#   x <- .alignReturns(x, align.period)
+#   x <- .alignReturns(x, alignPeriod)
 #   cdatay <- .convertData(y, cts = cts, makeReturns = makeReturns)
 #   y <- cdatay$data
-#   y <- .alignReturns(y, align.period)
+#   y <- .alignReturns(y, alignPeriod)
 #   type <- kernelCharToInt(kernel.type)
 #   kernelEstimator(as.double(x), as.double(y), as.integer(length(x)),
 #                   as.integer(kernel.param), as.integer(ifelse(kernel.dofadj, 1, 0)),
@@ -216,8 +216,8 @@ multixts <- function(x, y = NULL) {
 
 
 # # Hayashi-Yoshida helper function:
-# rcHY <- function(x, y, period = 1, alignBy = "seconds", align.period = 1, makeReturns = FALSE) {
-#   align.period = .getAlignPeriod(align.period, alignBy)
+# rcHY <- function(x, y, period = 1, alignBy = "seconds", alignPeriod = 1, makeReturns = FALSE) {
+#   alignPeriod = .getAlignPeriod(alignPeriod, alignBy)
 #   cdata <- .convertData(x, cts=cts, makeReturns=makeReturns)
 #   x <- cdata$data
 #   x.t <- cdata$milliseconds
@@ -233,15 +233,15 @@ multixts <- function(x, y = NULL) {
 #   
 #   sum(pcovcc(
 #          as.double(x), #a
-#          as.double(rep(0,length(x)/(period*align.period)+1)),
+#          as.double(rep(0,length(x)/(period*alignPeriod)+1)),
 #          as.double(y), #b
 #          as.double(x.t), #a
-#          as.double(rep(0,length(x)/(period*align.period)+1)), #a
+#          as.double(rep(0,length(x)/(period*alignPeriod)+1)), #a
 #          as.double(y.t), #b
 #          as.integer(length(x)), #na
-#          as.integer(length(x)/(period*align.period)),
+#          as.integer(length(x)/(period*alignPeriod)),
 #          as.integer(length(y)), #na
-#          as.integer(period*align.period)))
+#          as.integer(period*alignPeriod)))
 # }
 
 
@@ -619,18 +619,18 @@ RTSRV <- function(pData, startIV = NULL, noisevar = NULL, K = 300, J = 1, eta = 
 #'                      kernel.param = 1,              # Kernel parameter (usually lags)
 #'                      kernel.dofadj = TRUE,          # Kernel Degree of freedom adjustment
 #'                      alignBy = "seconds",          # Align the tick data to [seconds|minutes|hours]
-#'                      align.period = 1) {            # Align the tick data to this many [seconds|minutes|hours]            
+#'                      alignPeriod = 1) {            # Align the tick data to this many [seconds|minutes|hours]            
 #'   # Multiday adjustment: 
 #'   multixts <- multixts(x)
 #'   if (multixts == TRUE) {
 #'     result <- apply.daily(x, rv.kernel,kernel.type,kernel.param,kernel.dofadj,
-#'                           alignBy, align.period, cts, makeReturns)
+#'                           alignBy, alignPeriod, cts, makeReturns)
 #'     return(result)
 #'   } else { #Daily estimation:
-#'     align.period <- .getAlignPeriod(align.period, alignBy)         
+#'     alignPeriod <- .getAlignPeriod(alignPeriod, alignBy)         
 #'     cdata <- .convertData(x, cts = cts, makeReturns = makeReturns)
 #'     x <- cdata$data
-#'     x <- .alignReturns(x, align.period)
+#'     x <- .alignReturns(x, alignPeriod)
 #'     type <- kernelCharToInt(kernel.type)
 #'     kernelEstimator(as.double(x), as.double(x), as.integer(length(x)),
 #'                     as.integer(kernel.param), as.integer(ifelse(kernel.dofadj, 1, 0)),

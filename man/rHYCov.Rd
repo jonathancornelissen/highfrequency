@@ -9,7 +9,7 @@ rHYCov(
   cor = FALSE,
   period = 1,
   alignBy = "seconds",
-  align.period = 1,
+  alignPeriod = 1,
   makeReturns = FALSE,
   makePsd = TRUE
 )
@@ -23,7 +23,7 @@ rHYCov(
 
 \item{alignBy}{Align the tick data to seconds|minutes|hours}
 
-\item{align.period}{Align the tick data to this many [seconds|minutes|hours]}
+\item{alignPeriod}{Align the tick data to this many [seconds|minutes|hours]}
 
 \item{makeReturns}{Prices are passed make them into log returns}
 
@@ -42,7 +42,7 @@ Scott Payseur
 
 # Multivariate:
 # realized_cov <- rHYCov(rdata = cbind(lltc, sbux, fill = 0), period = 5, alignBy = "minutes", 
-#                        align.period = 5, makeReturns = FALSE)
+#                        alignPeriod = 5, makeReturns = FALSE)
 # realized_cov 
 Note: for the diagonal elements the rCov is used.
 }

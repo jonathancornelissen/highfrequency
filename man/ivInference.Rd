@@ -10,7 +10,7 @@ ivInference(
   IQestimator = "rQuar",
   confidence = 0.95,
   alignBy = NULL,
-  align.period = NULL,
+  alignPeriod = NULL,
   makeReturns = FALSE,
   ...
 )
@@ -26,7 +26,7 @@ ivInference(
 
 \item{alignBy}{a string, align the tick data to "seconds"|"minutes"|"hours"}
 
-\item{align.period}{an integer, align the tick data to this many [seconds|minutes|hours].}
+\item{alignPeriod}{an integer, align the tick data to this many [seconds|minutes|hours].}
 
 \item{makeReturns}{boolean, should be TRUE when rdata contains prices instead of returns. FALSE by  default.}
 

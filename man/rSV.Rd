@@ -4,14 +4,14 @@
 \alias{rSV}
 \title{Realized semivariance of highfrequency return series.}
 \usage{
-rSV(rdata, alignBy = NULL, align.period = NULL, makeReturns = FALSE)
+rSV(rdata, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE)
 }
 \arguments{
 \item{rdata}{a zoo/xts object containing all returns in period t for one asset.}
 
 \item{alignBy}{a string, align the tick data to "seconds"|"minutes"|"hours".}
 
-\item{align.period}{an integer, align the tick data to this many [seconds|minutes|hours].}
+\item{alignPeriod}{an integer, align the tick data to this many [seconds|minutes|hours].}
 
 \item{makeReturns}{boolean, should be TRUE when rdata contains prices instead of returns. FALSE by   default.}
 }
@@ -36,7 +36,7 @@ Then, the rSV is given by
 \examples{
 \dontrun{
 data(sampleTData)
-rSV(sampleTData$PRICE, alignBy = "minutes", align.period = 5, makeReturns = TRUE)
+rSV(sampleTData$PRICE, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)
 }
 }
 \references{

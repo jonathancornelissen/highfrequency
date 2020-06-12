@@ -8,7 +8,7 @@ rOWCov(
   rdata,
   cor = FALSE,
   alignBy = NULL,
-  align.period = NULL,
+  alignPeriod = NULL,
   makeReturns = FALSE,
   seasadjR = NULL,
   wfunction = "HR",
@@ -24,7 +24,7 @@ return series over period \eqn{t}, with \eqn{M} observations during \eqn{t}.}
 
 \item{alignBy}{a string, align the tick data to "seconds"|"minutes"|"hours".}
 
-\item{align.period}{an integer, align the tick data to this many [seconds|minutes|hours].}
+\item{alignPeriod}{an integer, align the tick data to this many [seconds|minutes|hours].}
 
 \item{makeReturns}{boolean, should be TRUE when rdata contains prices instead of returns. FALSE by default.}
 
@@ -84,7 +84,7 @@ a zero weight, due to which the rOWCov can have a low finite sample efficiency i
 
 # Univariate: 
 rvoutw <- rOWCov(rdata = sampleTData$PRICE, alignBy = "minutes",
-                   align.period = 5, makeReturns = TRUE)
+                   alignPeriod = 5, makeReturns = TRUE)
 rvoutw 
 
 # Multivariate: 
