@@ -115,7 +115,7 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
 #' and/or \code{marketOpen}/ \code{marketClose} belong. Default = \code{"GMT"}.
 #' @param ... method-specific parameters (see 'Details').
 #'
-#' @return A \code{spotvol} object, which is a list containing one or more of the
+#' @return A \code{spotVol} object, which is a list containing one or more of the
 #' following outputs, depending on the method used:
 #'
 #' \code{spot}
@@ -161,9 +161,9 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
 #' package, containing all output from fitting the GARCH model to the data.
 #' Methods that provide this output: \code{"garch"}.
 #'
-#' The \code{spotvol} function offers several methods to estimate spot
+#' The \code{spotVol} function offers several methods to estimate spot
 #' volatility and its intraday seasonality, using high-frequency data. It
-#' returns an object of class \code{spotvol}, which can contain various outputs,
+#' returns an object of class \code{spotVol}, which can contain various outputs,
 #' depending on the method used. See 'Details' for a description of each method.
 #' In any case, the output will contain the spot volatility estimates.
 #'
@@ -331,7 +331,7 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
 #'
 #' Along with the spot volatility estimates, this method will return the
 #' detected change points in the volatility level. When plotting a
-#' \code{spotvol} object containing \code{cp}, these change points will be
+#' \code{spotVol} object containing \code{cp}, these change points will be
 #' visualized.
 #'
 #' \strong{GARCH models with intraday seasonality  (\code{"garch"})}
@@ -369,7 +369,7 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
 #' @examples
 #' # Default method, deterministic periodicity
 #'
-#' vol1 <- spotvol(sampleReal5MinPrices)
+#' vol1 <- spotVol(sampleReal5MinPrices)
 #' plot(vol1)
 #'
 #' # Compare to stochastic periodicity
@@ -380,7 +380,7 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
 #'              delta_s = c(-1.2, 0.11, 0.26, -0.03, 0.08))
 #'
 #' # next method will take around 110 iterations
-#' vol2 <- spotvol(sampleReal5MinPrices, method = "stochper", init = init)
+#' vol2 <- spotVol(sampleReal5MinPrices, method = "stochper", init = init)
 #' plot(as.numeric(vol1$spot[1:780]), type="l")
 #' lines(as.numeric(vol2$spot[1:780]), col="red")
 #' legend("topright", c("detper", "stochper"), col = c("black", "red"), lty=1)}
@@ -388,9 +388,9 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
 #' # Various kernel estimates
 #' \donttest{
 #' h1 <- bw.nrd0((1:nrow(sampleReal5MinPrices))*(5*60))
-#' vol3 <- spotvol(sampleReal5MinPrices, method = "kernel", h = h1)
-#' vol4 <- spotvol(sampleReal5MinPrices, method = "kernel", est = "quarticity")
-#' vol5 <- spotvol(sampleReal5MinPrices, method = "kernel", est = "cv")
+#' vol3 <- spotVol(sampleReal5MinPrices, method = "kernel", h = h1)
+#' vol4 <- spotVol(sampleReal5MinPrices, method = "kernel", est = "quarticity")
+#' vol5 <- spotVol(sampleReal5MinPrices, method = "kernel", est = "cv")
 #' plot(vol3, length = 2880)
 #' lines(as.numeric(t(vol4$spot))[1:2880], col = "red")
 #' lines(as.numeric(t(vol5$spot))[1:2880], col = "blue")
@@ -402,14 +402,14 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
 #' simdata <- matrix(sqrt(5/3)*rt(3000, df = 5), ncol = 500, byrow = TRUE)
 #' simdata <- c(1, 1, 1.5, 1.5, 2, 1)*simdata
 #' # the volatility of the simulated now changes at 1000, 2000 and 2500
-#' vol6 <- spotvol(simdata, method = "piecewise", m = 200, n  = 100,
+#' vol6 <- spotVol(simdata, method = "piecewise", m = 200, n  = 100,
 #'                 online = FALSE)
 #' plot(vol6)}
 #'
 #' # Compare regular GARCH(1,1) model to eGARCH, both with external regressors
 #' \donttest{
-#' vol7 <- spotvol(sampleReal5MinPrices, method = "garch", model = "sGARCH")
-#' vol8 <- spotvol(sampleReal5MinPrices, method = "garch", model = "eGARCH")
+#' vol7 <- spotVol(sampleReal5MinPrices, method = "garch", model = "sGARCH")
+#' vol8 <- spotVol(sampleReal5MinPrices, method = "garch", model = "eGARCH")
 #' plot(as.numeric(t(vol7$spot)), type = "l")
 #' lines(as.numeric(t(vol8$spot)), col = "red")
 #' legend("topleft", c("GARCH", "eGARCH"), col = c("black", "red"), lty=1)
@@ -427,7 +427,7 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
 #'
 #' Taylor, S. J. and X. Xu (1997). The incremental volatility information in one million foreign exchange quotations. Journal of Empirical Finance 4, 317-340.
 #' @export
-spotvol <- function(data, method = "detper", ..., on = "minutes", k = 5,
+spotVol <- function(data, method = "detper", ..., on = "minutes", k = 5,
                       marketOpen = "09:30:00", marketClose = "16:00:00",
                       tz = "GMT") {
   

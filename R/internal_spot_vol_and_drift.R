@@ -158,7 +158,7 @@ detper <- function(mR, rData = NULL, options = list()) {
       estimperiodicvol <- xts(estimperiodicvol, order.by = time(rData[1:M]))
     }
     out <- list(spot = spot, daily = estimdailyvol, periodic = estimperiodicvol)
-    class(out) <- "spotvol"
+    class(out) <- "spotVol"
     return(out)
   }
 }
@@ -239,7 +239,7 @@ stochper <- function(mR, rData = NULL, options = list()) {
     spot <- xts(sigmahat, order.by = time(rData))
   }
   out <- list(spot = spot, par = estimates)
-  class(out) <- "spotvol"
+  class(out) <- "spotVol"
   return(out)
 }
 
@@ -360,7 +360,7 @@ kernelestim <- function(mR, rData = NULL, delta = 300, options = list()) {
     spot <- xts(spot, order.by = time(rData))
   }
   out <- list(spot = spot, par = list(h = h))
-  class(out) <- "spotvol"
+  class(out) <- "spotVol"
   return(out)
 }
 
@@ -485,7 +485,7 @@ piecewise <- function(mR, rData = NULL, options = list()) {
     spot <- xts(spot, order.by = time(rData))
   }
   out <- list(spot = spot, cp = cp)
-  class(out) <- "spotvol"
+  class(out) <- "spotVol"
   return(out)
 }
 
@@ -616,13 +616,13 @@ garch_s <- function(mR, rData = NULL, options = list()) {
     spot <- rugarch::sigma(fit)
   }
   out <- list(spot = spot, ugarchfit = fit)
-  class(out) <- "spotvol"
+  class(out) <- "spotVol"
   return(out)
 }
 
 #' @importFrom graphics abline layout title
 #' @export
-plot.spotvol <- function(x, ...) {
+plot.spotVol <- function(x, ...) {
   options <- list(...)
   plottable <- c("spot", "periodic", "daily")
   elements <- names(x)

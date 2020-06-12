@@ -27,7 +27,7 @@ expect_identical(
 )
 
 expect_identical(
-  formatC(as.numeric(spotvol(sampleReal5MinPrices)$spot[1:10]), digits = 3),
+  formatC(as.numeric(spotVol(sampleReal5MinPrices)$spot[1:10]), digits = 3),
   c("0.004", "0.00373", "0.00348", "0.00325", "0.00306", "0.00288", "0.00274", "0.00262", "0.00251", "0.00241")
 )
 
@@ -36,7 +36,7 @@ expect_identical(
                 sigma_k = 0.06, phi = 0.194, rho = 0.986, mu = c(1.87,-0.42),
                 delta_c = c(0.25, -0.05, -0.2, 0.13, 0.02),
                 delta_s = c(-1.2, 0.11, 0.26, -0.03, 0.08))
-  formatC(as.numeric(spotvol(sampleReal5MinPrices, method = "stochper", init = init)$spot[1:10]), digits = 3)
+  formatC(as.numeric(spotVol(sampleReal5MinPrices, method = "stochper", init = init)$spot[1:10]), digits = 3)
   },
   c("0.00315", "0.00331", "0.00303", "0.00305", "0.0028", "0.00268", "0.00238", "0.00261", "0.00233", "0.00223")
 )
