@@ -11,7 +11,7 @@ rKernelCov(
   alignPeriod = 1,
   makeReturns = FALSE,
   kernelType = "rectangular",
-  kernel.param = 1,
+  kernelParam = 1,
   kernel.dofadj = TRUE
 )
 }
@@ -29,7 +29,7 @@ return series over period \eqn{t}, with \eqn{M} observations during \eqn{t}.}
 
 \item{kernelType}{Kernel name (or number)}
 
-\item{kernel.param}{Kernel parameter (usually lags)}
+\item{kernelParam}{Kernel parameter (usually lags)}
 
 \item{kernel.dofadj}{Kernel Degree of freedom adjustment}
 }

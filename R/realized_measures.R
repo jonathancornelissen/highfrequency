@@ -1011,9 +1011,9 @@ rHYCov <- function(rData, cor = FALSE, period = 1, alignBy = "seconds", alignPer
         cov[j, i] <- cov[i, j]  
         
         # kernelEstimator(as.double(rData[, i]), as.double(rData[, j]), as.integer(length(rData[, i])),
-        #                 as.integer(kernel.param), as.integer(ifelse(kernel.dofadj, 1, 0)),
-        #                 as.integer(type), ab = double(kernel.param + 1),
-        #                 ab2 = double(kernel.param + 1))
+        #                 as.integer(kernelParam), as.integer(ifelse(kernel.dofadj, 1, 0)),
+        #                 as.integer(type), ab = double(kernelParam + 1),
+        #                 ab2 = double(kernelParam + 1))
         
         # rc.hy( x=rData[[i]], y=rData[[j]], period = period,alignBy=alignBy, 
         #        alignPeriod = alignPeriod, cts = cts, makeReturns = makeReturns)
@@ -1048,7 +1048,7 @@ rHYCov <- function(rData, cor = FALSE, period = 1, alignBy = "seconds", alignPer
 #' @param alignPeriod Align the tick data to this many [seconds|minutes|hours]
 #' @param makeReturns Convert to Returns
 #' @param kernelType Kernel name (or number)
-#' @param kernel.param Kernel parameter (usually lags)
+#' @param kernelParam Kernel parameter (usually lags)
 #' @param kernel.dofadj Kernel Degree of freedom adjustment
 #'
 #' @details The different types of kernels can be found using \code{\link{listAvailableKernels}}.
@@ -1077,7 +1077,7 @@ rHYCov <- function(rData, cor = FALSE, period = 1, alignBy = "seconds", alignPer
 #' @keywords volatility
 #' @export
 rKernelCov <- function(rData, cor = FALSE,  alignBy = "seconds", alignPeriod = 1,
-                       makeReturns = FALSE, kernelType = "rectangular", kernel.param = 1,
+                       makeReturns = FALSE, kernelType = "rectangular", kernelParam = 1,
                        kernel.dofadj = TRUE) {
   
   multixts <- multixts(rData)
@@ -1103,11 +1103,11 @@ rKernelCov <- function(rData, cor = FALSE,  alignBy = "seconds", alignPeriod = 1
     return(kernelEstimator(as.double(rData),
                            as.double(rData),
                            as.integer(length(rData)),
-                           as.integer(kernel.param),
+                           as.integer(kernelParam),
                            as.integer(ifelse(kernel.dofadj, 1, 0)),
                            as.integer(type),
-                           ab = double(kernel.param + 1),
-                           ab2 = double(kernel.param + 1)))
+                           ab = double(kernelParam + 1),
+                           ab2 = double(kernelParam + 1)))
   }
   
   if (n > 1) {
@@ -1116,18 +1116,18 @@ rKernelCov <- function(rData, cor = FALSE,  alignBy = "seconds", alignPeriod = 1
     for (i in 1:n) {
       diagonal[i] <- 
         kernelEstimator(as.double(rData[, i]), as.double(rData[, i]), as.integer(length(rData[, i])),
-                        as.integer(kernel.param), as.integer(ifelse(kernel.dofadj, 1, 0)),
-                        as.integer(type), ab = double(kernel.param + 1),
-                        ab2 = double(kernel.param + 1))
+                        as.integer(kernelParam), as.integer(ifelse(kernel.dofadj, 1, 0)),
+                        as.integer(type), ab = double(kernelParam + 1),
+                        ab2 = double(kernelParam + 1))
     }
     diag(cov) <- diagonal
     
     for (i in 2:n) {
       for (j in 1:(i - 1)) {
         cov[i, j] = cov[j, i] = kernelEstimator(as.double(rData[, i]), as.double(rData[, j]), as.integer(length(rData[, i])),
-                                   as.integer(kernel.param), as.integer(ifelse(kernel.dofadj, 1, 0)),
-                                   as.integer(type), ab = double(kernel.param + 1),
-                                   ab2 = double(kernel.param + 1))
+                                   as.integer(kernelParam), as.integer(ifelse(kernel.dofadj, 1, 0)),
+                                   as.integer(type), ab = double(kernelParam + 1),
+                                   ab2 = double(kernelParam + 1))
       }
     }
     if (cor == FALSE) {
