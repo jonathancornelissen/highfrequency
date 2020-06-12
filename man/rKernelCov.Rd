@@ -10,7 +10,7 @@ rKernelCov(
   alignBy = "seconds",
   alignPeriod = 1,
   makeReturns = FALSE,
-  kernel.type = "rectangular",
+  kernelType = "rectangular",
   kernel.param = 1,
   kernel.dofadj = TRUE
 )
@@ -27,7 +27,7 @@ return series over period \eqn{t}, with \eqn{M} observations during \eqn{t}.}
 
 \item{makeReturns}{Convert to Returns}
 
-\item{kernel.type}{Kernel name (or number)}
+\item{kernelType}{Kernel name (or number)}
 
 \item{kernel.param}{Kernel parameter (usually lags)}
 

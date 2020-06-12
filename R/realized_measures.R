@@ -1047,7 +1047,7 @@ rHYCov <- function(rData, cor = FALSE, period = 1, alignBy = "seconds", alignPer
 #' @param alignBy Align the tick data to seconds|minutes|hours
 #' @param alignPeriod Align the tick data to this many [seconds|minutes|hours]
 #' @param makeReturns Convert to Returns
-#' @param kernel.type Kernel name (or number)
+#' @param kernelType Kernel name (or number)
 #' @param kernel.param Kernel parameter (usually lags)
 #' @param kernel.dofadj Kernel Degree of freedom adjustment
 #'
@@ -1077,7 +1077,7 @@ rHYCov <- function(rData, cor = FALSE, period = 1, alignBy = "seconds", alignPer
 #' @keywords volatility
 #' @export
 rKernelCov <- function(rData, cor = FALSE,  alignBy = "seconds", alignPeriod = 1,
-                       makeReturns = FALSE, kernel.type = "rectangular", kernel.param = 1,
+                       makeReturns = FALSE, kernelType = "rectangular", kernel.param = 1,
                        kernel.dofadj = TRUE) {
   
   multixts <- multixts(rData)
@@ -1098,7 +1098,7 @@ rKernelCov <- function(rData, cor = FALSE,  alignBy = "seconds", alignPeriod = 1
   } else {
     n <- dim(rData)[2]
   }
-  type <- kernelCharToInt(kernel.type)
+  type <- kernelCharToInt(kernelType)
   if (n == 1) {
     return(kernelEstimator(as.double(rData),
                            as.double(rData),

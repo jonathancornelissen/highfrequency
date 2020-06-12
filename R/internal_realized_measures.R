@@ -175,7 +175,7 @@ multixts <- function(x, y = NULL) {
 
 # rcKernel <- function(x,                             # Tick Data for first asset
 #                      y,                             # Tick Data for second asset
-#                      kernel.type = "rectangular",   # Kernel name (or number)
+#                      kernelType = "rectangular",   # Kernel name (or number)
 #                      kernel.param = 1,              # Kernel parameter (usually lags)
 #                      kernel.dofadj = TRUE,          # Kernel Degree of freedom adjustment
 #                      alignBy = "seconds",            # Align the tick data to [seconds|minutes|hours]
@@ -186,8 +186,8 @@ multixts <- function(x, y = NULL) {
 #   # Handle deprication
 #   #
 #   if(!is.null(type)){
-#     warning("type is deprecated, use kernel.type")
-#     kernel.type <- type
+#     warning("type is deprecated, use kernelType")
+#     kernelType <- type
 #   }
 #   if(!is.null(q)){
 #     warning("q is deprecated, use kernel.param")
@@ -206,7 +206,7 @@ multixts <- function(x, y = NULL) {
 #   cdatay <- .convertData(y, cts = cts, makeReturns = makeReturns)
 #   y <- cdatay$data
 #   y <- .alignReturns(y, alignPeriod)
-#   type <- kernelCharToInt(kernel.type)
+#   type <- kernelCharToInt(kernelType)
 #   kernelEstimator(as.double(x), as.double(y), as.integer(length(x)),
 #                   as.integer(kernel.param), as.integer(ifelse(kernel.dofadj, 1, 0)),
 #                   as.integer(type), ab=double(kernel.param + 1),
@@ -615,7 +615,7 @@ RTSRV <- function(pData, startIV = NULL, noisevar = NULL, K = 300, J = 1, eta = 
 }
 
 #' rvKernel <- function(x,                             # Tick Data
-#'                      kernel.type = "rectangular",   # Kernel name (or number)
+#'                      kernelType = "rectangular",   # Kernel name (or number)
 #'                      kernel.param = 1,              # Kernel parameter (usually lags)
 #'                      kernel.dofadj = TRUE,          # Kernel Degree of freedom adjustment
 #'                      alignBy = "seconds",          # Align the tick data to [seconds|minutes|hours]
@@ -623,7 +623,7 @@ RTSRV <- function(pData, startIV = NULL, noisevar = NULL, K = 300, J = 1, eta = 
 #'   # Multiday adjustment: 
 #'   multixts <- multixts(x)
 #'   if (multixts == TRUE) {
-#'     result <- apply.daily(x, rv.kernel,kernel.type,kernel.param,kernel.dofadj,
+#'     result <- apply.daily(x, rv.kernel,kernelType,kernel.param,kernel.dofadj,
 #'                           alignBy, alignPeriod, cts, makeReturns)
 #'     return(result)
 #'   } else { #Daily estimation:
@@ -631,7 +631,7 @@ RTSRV <- function(pData, startIV = NULL, noisevar = NULL, K = 300, J = 1, eta = 
 #'     cdata <- .convertData(x, cts = cts, makeReturns = makeReturns)
 #'     x <- cdata$data
 #'     x <- .alignReturns(x, alignPeriod)
-#'     type <- kernelCharToInt(kernel.type)
+#'     type <- kernelCharToInt(kernelType)
 #'     kernelEstimator(as.double(x), as.double(x), as.integer(length(x)),
 #'                     as.integer(kernel.param), as.integer(ifelse(kernel.dofadj, 1, 0)),
 #'                     as.integer(type), ab = double(kernel.param + 1),

@@ -3,7 +3,7 @@
 \name{TSCov_bi}
 \alias{TSCov_bi}
 \title{rvKernel <- function(x,                             # Tick Data
-                     kernel.type = "rectangular",   # Kernel name (or number)
+                     kernelType = "rectangular",   # Kernel name (or number)
                      kernel.param = 1,              # Kernel parameter (usually lags)
                      kernel.dofadj = TRUE,          # Kernel Degree of freedom adjustment
                      alignBy = "seconds",          # Align the tick data to [seconds|minutes|hours]
@@ -11,7 +11,7 @@
   # Multiday adjustment: 
   multixts <- multixts(x)
   if (multixts == TRUE) {
-    result <- apply.daily(x, rv.kernel,kernel.type,kernel.param,kernel.dofadj,
+    result <- apply.daily(x, rv.kernel,kernelType,kernel.param,kernel.dofadj,
                           alignBy, alignPeriod, cts, makeReturns)
     return(result)
   } else { #Daily estimation:
@@ -19,7 +19,7 @@
     cdata <- .convertData(x, cts = cts, makeReturns = makeReturns)
     x <- cdata$data
     x <- .alignReturns(x, alignPeriod)
-    type <- kernelCharToInt(kernel.type)
+    type <- kernelCharToInt(kernelType)
     kernelEstimator(as.double(x), as.double(x), as.integer(length(x)),
                     as.integer(kernel.param), as.integer(ifelse(kernel.dofadj, 1, 0)),
                     as.integer(type), ab = double(kernel.param + 1),
@@ -31,7 +31,7 @@ TSCov_bi(pData1, pData2, K = 300, J = 1)
 }
 \description{
 rvKernel <- function(x,                             # Tick Data
-                     kernel.type = "rectangular",   # Kernel name (or number)
+                     kernelType = "rectangular",   # Kernel name (or number)
                      kernel.param = 1,              # Kernel parameter (usually lags)
                      kernel.dofadj = TRUE,          # Kernel Degree of freedom adjustment
                      alignBy = "seconds",          # Align the tick data to [seconds|minutes|hours]
@@ -39,7 +39,7 @@ rvKernel <- function(x,                             # Tick Data
   # Multiday adjustment: 
   multixts <- multixts(x)
   if (multixts == TRUE) {
-    result <- apply.daily(x, rv.kernel,kernel.type,kernel.param,kernel.dofadj,
+    result <- apply.daily(x, rv.kernel,kernelType,kernel.param,kernel.dofadj,
                           alignBy, alignPeriod, cts, makeReturns)
     return(result)
   } else { #Daily estimation:
@@ -47,7 +47,7 @@ rvKernel <- function(x,                             # Tick Data
     cdata <- .convertData(x, cts = cts, makeReturns = makeReturns)
     x <- cdata$data
     x <- .alignReturns(x, alignPeriod)
-    type <- kernelCharToInt(kernel.type)
+    type <- kernelCharToInt(kernelType)
     kernelEstimator(as.double(x), as.double(x), as.integer(length(x)),
                     as.integer(kernel.param), as.integer(ifelse(kernel.dofadj, 1, 0)),
                     as.integer(type), ab = double(kernel.param + 1),
