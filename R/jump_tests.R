@@ -21,9 +21,9 @@ ABDJumptest <- function(RV, BPV, TQ) { # Compute jump detection stat mentioned i
 #' 
 #' And there is \eqn{N/k} equispaced returns in period \eqn{t}. Let \eqn{y_{t,i}} be a return (with \eqn{i=1, \ldots ,\mbox{N/k}}) in period \eqn{t}.
 #' 
-#'  Then the AJjumptest is given by: 
+#'  Then the AJjumpTest is given by: 
 #'    \deqn{
-#'      \mbox{AJjumptest}_{t,N}= \frac{S_t(p,k,h)-k^{p/2-1}}{\sqrt{V_{t,N}}}
+#'      \mbox{AJjumpTest}_{t,N}= \frac{S_t(p,k,h)-k^{p/2-1}}{\sqrt{V_{t,N}}}
 #'    }
 #'  
 #'  in which, 
@@ -90,17 +90,17 @@ ABDJumptest <- function(RV, BPV, TQ) { # Compute jump detection stat mentioned i
 #' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
 #'
 #' @examples
-#' AJjumptest(sampleTData$PRICE, p = 2, k = 3, align.by = "seconds", 
+#' AJjumpTest(sampleTData$PRICE, p = 2, k = 3, align.by = "seconds", 
 #'   align.period = 5, makeReturns = TRUE)
 #' 
-#' @keywords highfrequency AJjumptest
+#' @keywords highfrequency AJjumpTest
 #' @importFrom stats qnorm
 #' @importFrom stats pnorm
 #' @export
-AJjumptest <- function(pData, p = 4 , k = 2, align.by = NULL, align.period = NULL, alpha.multiplier = 4, makeReturns = FALSE, ...) {
+AJjumpTest <- function(pData, p = 4 , k = 2, align.by = NULL, align.period = NULL, alpha.multiplier = 4, makeReturns = FALSE, ...) {
 
   if (checkMultiDays(pData) == TRUE) {
-    result <- apply.daily(pData, AJjumptest, align.by, align.period, makeReturns)
+    result <- apply.daily(pData, AJjumpTest, align.by, align.period, makeReturns)
     return(result)
   } else {
     pData <- fastTickAgregation(pData, on = "seconds", k = 1)
