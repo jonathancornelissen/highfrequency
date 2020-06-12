@@ -13,7 +13,7 @@ HARmodel(
   RVest = c("rCov", "rBPCov", "rQuar"),
   type = "HARRV",
   inputType = "RM",
-  jumptest = "ABDJumptest",
+  jumpTest = "ABDJumptest",
   alpha = 0.05,
   h = 1,
   transform = NULL,
@@ -41,7 +41,7 @@ By default RVest = c("rCov","rBPCov","rQuar"), i.e. using the Realized Volatilit
 
 \item{inputType}{a string denoting if the input data consists of realized measures or high-frequency returns, default "RM" is the only way to denote realized measures and everything else denotes returns.}
 
-\item{jumptest}{the function name of a function used to test whether the test statistic which determines whether the jump variability is significant that day. By default jumptest = "ABDJumptest", hence using the test statistic in Equation or Equation (18) of Andersen et al. (2007).}
+\item{jumpTest}{the function name of a function used to test whether the test statistic which determines whether the jump variability is significant that day. By default jumpTest = "ABDJumptest", hence using the test statistic in Equation or Equation (18) of Andersen et al. (2007).}
 
 \item{alpha}{a real indicating the confidence level used in testing for jumps. By default alpha = 0.05.}
 

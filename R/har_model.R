@@ -121,7 +121,7 @@ harInsanityFilter <- function(fittedValues, lower, upper, replacement) {
 #' By default RVest = c("rCov","rBPCov","rQuar"), i.e. using the Realized Volatility, Realized Bi-Power Variance, and Realized Quarticity.
 #' @param type a string referring to the type of HAR model you would like to estimate. By default type = "HARRV", the most basic model. Other valid options are type = "HARRVJ", type = "HARRVCJ", type = "HARRVQ", type = "HARRVQJ", type = "CHARRV", or type = "CHARRVQ".
 #' @param inputType a string denoting if the input data consists of realized measures or high-frequency returns, default "RM" is the only way to denote realized measures and everything else denotes returns.
-#' @param jumptest the function name of a function used to test whether the test statistic which determines whether the jump variability is significant that day. By default jumptest = "ABDJumptest", hence using the test statistic in Equation or Equation (18) of Andersen et al. (2007).
+#' @param jumpTest the function name of a function used to test whether the test statistic which determines whether the jump variability is significant that day. By default jumpTest = "ABDJumptest", hence using the test statistic in Equation or Equation (18) of Andersen et al. (2007).
 #' @param alpha a real indicating the confidence level used in testing for jumps. By default alpha = 0.05.
 #' @param h an integer indicating the number over how many days the dependent variable should be aggregated.
 #' By default, h=1, i.e. no aggregation takes place, you just model the daily realized volatility.
@@ -228,7 +228,7 @@ harInsanityFilter <- function(fittedValues, lower, upper, replacement) {
 #' @export
 HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), periodsQ = c(1),
                      leverage=NULL, RVest = c("rCov","rBPCov", "rQuar"), type = "HARRV", inputType = "RM",
-                     jumptest = "ABDJumptest", alpha = 0.05, h = 1, transform = NULL, ...){
+                     jumpTest = "ABDJumptest", alpha = 0.05, h = 1, transform = NULL, ...){
 
   nperiods <- length(periods) # Number of periods to aggregate over
   nest <- length(RVest)      # Number of RV estimators
@@ -383,12 +383,12 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
 
   if (type == "HARRVCJ") {
     # Are the jumps significant? if not set to zero:
-    if (jumptest == "ABDJumptest" ) {
+    if (jumpTest == "ABDJumptest" ) {
       TQ <- apply.daily(data, RTQ)
       J <- J[,1]
       teststats <- ABDJumptest(RV=RM1,BPV=RM2,TQ=TQ )
     } else {
-      jtest <- match.fun(jumptest)
+      jtest <- match.fun(jumpTest)
       teststats <- jtest(data,...)
     }
     Jindicators  <- teststats > qnorm(1-alpha)
@@ -421,7 +421,7 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
     model$type <- "HARRVCJ"
     model$dates <- alldates[(maxp+h):n]
     model$RVest <- RVest
-    model$jumptest <- jumptest
+    model$jumpTest <- jumpTest
     model$alpha_jumps <- alpha
   }
 
@@ -775,12 +775,12 @@ predict.harModel <- function(object, newdata = NULL, warnings = TRUE, ...) {
 
     if (type == "HARRVCJ") {
 
-      if (object$jumptest=="ABDJumptest") {
+      if (object$jumpTest=="ABDJumptest") {
         TQ <- apply.daily(newdata, RTQ)
         J <- J[, 1]
         teststats <- ABDJumptest(RV = RM1, BPV = RM2,TQ = TQ)
       } else {
-        jtest <- match.fun(object$jumptest)
+        jtest <- match.fun(object$jumpTest)
         teststats <- jtest(newdata, ...)
       }
       Jindicators  <- teststats > qnorm(1 - object$alpha_jumps)
