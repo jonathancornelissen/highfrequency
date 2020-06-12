@@ -127,16 +127,16 @@ ctTPV <- function (rdata, startV = NULL){
 
 
 #' @keywords internal
-getAlignPeriod <- function(align.period, align.by) {   
-  align.by <- gsub("(^ +)|( +$)", "",align.by) # Trim White
+getAlignPeriod <- function(align.period, alignBy) {   
+  alignBy <- gsub("(^ +)|( +$)", "",alignBy) # Trim White
   
-  if(casefold(align.by) == "min" || casefold(align.by) == "mins" ||casefold(align.by) == "minute"||casefold(align.by) == "minutes"||casefold(align.by) == "m"){
+  if(casefold(alignBy) == "min" || casefold(alignBy) == "mins" ||casefold(alignBy) == "minute"||casefold(alignBy) == "minutes"||casefold(alignBy) == "m"){
     ans <- align.period * 60
   }
-  if(casefold(align.by) == "sec" || casefold(align.by) == "secs" ||casefold(align.by) == "second"||casefold(align.by) == "seconds"||casefold(align.by) == "s"||casefold(align.by) == ""){
+  if(casefold(alignBy) == "sec" || casefold(alignBy) == "secs" ||casefold(alignBy) == "second"||casefold(alignBy) == "seconds"||casefold(alignBy) == "s"||casefold(alignBy) == ""){
     ans <- align.period
   }
-  if(casefold(align.by) == "hour" || casefold(align.by) == "hours" ||casefold(align.by) == "h"){
+  if(casefold(alignBy) == "hour" || casefold(alignBy) == "hours" ||casefold(alignBy) == "h"){
     ans <- align.period * 60 * 60
   }
   return(ans)
@@ -178,7 +178,7 @@ multixts <- function(x, y = NULL) {
 #                      kernel.type = "rectangular",   # Kernel name (or number)
 #                      kernel.param = 1,              # Kernel parameter (usually lags)
 #                      kernel.dofadj = TRUE,          # Kernel Degree of freedom adjustment
-#                      align.by = "seconds",            # Align the tick data to [seconds|minutes|hours]
+#                      alignBy = "seconds",            # Align the tick data to [seconds|minutes|hours]
 #                      align.period = 1,              # Align the tick data to this many [seconds|minutes|hours]
 #                      cts = TRUE,                    # Calendar Time Sampling is used
 #                      makeReturns = FALSE) {           # Convert to Returns
@@ -198,7 +198,7 @@ multixts <- function(x, y = NULL) {
 #     kernel.dofadj <- adj
 #   }
 #   
-#   align.period <- .getAlignPeriod(align.period, align.by)   
+#   align.period <- .getAlignPeriod(align.period, alignBy)   
 #   cdata <- .convertData(x, cts = cts, makeReturns = makeReturns)
 #   
 #   x <- cdata$data
@@ -216,8 +216,8 @@ multixts <- function(x, y = NULL) {
 
 
 # # Hayashi-Yoshida helper function:
-# rcHY <- function(x, y, period = 1, align.by = "seconds", align.period = 1, makeReturns = FALSE) {
-#   align.period = .getAlignPeriod(align.period, align.by)
+# rcHY <- function(x, y, period = 1, alignBy = "seconds", align.period = 1, makeReturns = FALSE) {
+#   align.period = .getAlignPeriod(align.period, alignBy)
 #   cdata <- .convertData(x, cts=cts, makeReturns=makeReturns)
 #   x <- cdata$data
 #   x.t <- cdata$milliseconds
@@ -618,16 +618,16 @@ RTSRV <- function(pData, startIV = NULL, noisevar = NULL, K = 300, J = 1, eta = 
 #'                      kernel.type = "rectangular",   # Kernel name (or number)
 #'                      kernel.param = 1,              # Kernel parameter (usually lags)
 #'                      kernel.dofadj = TRUE,          # Kernel Degree of freedom adjustment
-#'                      align.by = "seconds",          # Align the tick data to [seconds|minutes|hours]
+#'                      alignBy = "seconds",          # Align the tick data to [seconds|minutes|hours]
 #'                      align.period = 1) {            # Align the tick data to this many [seconds|minutes|hours]            
 #'   # Multiday adjustment: 
 #'   multixts <- multixts(x)
 #'   if (multixts == TRUE) {
 #'     result <- apply.daily(x, rv.kernel,kernel.type,kernel.param,kernel.dofadj,
-#'                           align.by, align.period, cts, makeReturns)
+#'                           alignBy, align.period, cts, makeReturns)
 #'     return(result)
 #'   } else { #Daily estimation:
-#'     align.period <- .getAlignPeriod(align.period, align.by)         
+#'     align.period <- .getAlignPeriod(align.period, alignBy)         
 #'     cdata <- .convertData(x, cts = cts, makeReturns = makeReturns)
 #'     x <- cdata$data
 #'     x <- .alignReturns(x, align.period)

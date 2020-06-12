@@ -7,7 +7,7 @@
 rBPCov(
   rdata,
   cor = FALSE,
-  align.by = NULL,
+  alignBy = NULL,
   align.period = NULL,
   makeReturns = FALSE,
   makePsd = FALSE
@@ -19,7 +19,7 @@ return series over period \eqn{t}, with \eqn{M} observations during \eqn{t}.}
 
 \item{cor}{boolean, in case it is TRUE, the correlation is returned. FALSE by default.}
 
-\item{align.by}{a string, align the tick data to "seconds"|"minutes"|"hours".}
+\item{alignBy}{a string, align the tick data to "seconds"|"minutes"|"hours".}
 
 \item{align.period}{an integer, align the tick data to this many [seconds|minutes|hours].}
 
@@ -54,7 +54,7 @@ Function returns the Realized BiPower Covariance (rBPCov),
 # at 5 minutes.
  
 # Univariate: 
-rbpv <- rBPCov(rdata = sampleTData$PRICE, align.by ="minutes", 
+rbpv <- rBPCov(rdata = sampleTData$PRICE, alignBy ="minutes", 
                align.period = 5, makeReturns = TRUE) 
 rbpv 
  

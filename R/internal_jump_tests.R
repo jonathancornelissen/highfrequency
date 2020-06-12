@@ -67,8 +67,8 @@ calculateV <- function(rse, p, k, N){
 }
 
 #' @keywords internal
-scale <- function (align.by) {
-  switch(align.by,
+scale <- function (alignBy) {
+  switch(alignBy,
          "seconds"= as.numeric(1),
          "minutes"= as.numeric(60),
          "hours"= as.numeric(3600))

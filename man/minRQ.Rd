@@ -4,12 +4,12 @@
 \alias{minRQ}
 \title{An estimator of integrated quarticity from applying the minimum operator on blocks of two returns.}
 \usage{
-minRQ(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE)
+minRQ(rdata, alignBy = NULL, align.period = NULL, makeReturns = FALSE)
 }
 \arguments{
 \item{rdata}{a zoo/xts object containing all returns in period t for one asset.}
 
-\item{align.by}{a string, align the tick data to "seconds"|"minutes"|"hours"}
+\item{alignBy}{a string, align the tick data to "seconds"|"minutes"|"hours"}
 
 \item{align.period}{an integer, align the tick data to this many [seconds|minutes|hours].}
 
@@ -30,7 +30,7 @@ Then, the minRQ is given by
 }
 \examples{
 \dontrun{
-minRQ(rdata = sampleTData$PRICE, align.by = "minutes", align.period = 5, makeReturns = TRUE)
+minRQ(rdata = sampleTData$PRICE, alignBy = "minutes", align.period = 5, makeReturns = TRUE)
 minRQ
 }
 }

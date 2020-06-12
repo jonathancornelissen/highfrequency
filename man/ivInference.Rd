@@ -9,7 +9,7 @@ ivInference(
   IVestimator = "RV",
   IQestimator = "rQuar",
   confidence = 0.95,
-  align.by = NULL,
+  alignBy = NULL,
   align.period = NULL,
   makeReturns = FALSE,
   ...
@@ -24,7 +24,7 @@ ivInference(
 
 \item{confidence}{confidence level set by users. 0.95 by default.}
 
-\item{align.by}{a string, align the tick data to "seconds"|"minutes"|"hours"}
+\item{alignBy}{a string, align the tick data to "seconds"|"minutes"|"hours"}
 
 \item{align.period}{an integer, align the tick data to this many [seconds|minutes|hours].}
 

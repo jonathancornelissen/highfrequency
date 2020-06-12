@@ -7,7 +7,7 @@
 rCov(
   rdata,
   cor = FALSE,
-  align.by = NULL,
+  alignBy = NULL,
   align.period = NULL,
   makeReturns = FALSE
 )
@@ -19,7 +19,7 @@ In case of a matrix, no multi-day adjustment is possible.}
 
 \item{cor}{boolean, in case it is TRUE, the correlation is returned. FALSE by default.}
 
-\item{align.by}{a string, align the tick data to "seconds"|"minutes"|"hours".}
+\item{alignBy}{a string, align the tick data to "seconds"|"minutes"|"hours".}
 
 \item{align.period}{an integer, align the tick data to this many [seconds|minutes|hours].}
 
@@ -45,7 +45,7 @@ data(sampleTData)
 data(sample5MinPricesJumps)
 
 # Univariate: 
-rv = rCov(rdata = sampleTData$PRICE, align.by = "minutes", 
+rv = rCov(rdata = sampleTData$PRICE, alignBy = "minutes", 
                    align.period = 5, makeReturns = TRUE)
 rv 
 

@@ -41,7 +41,7 @@ fastTickAgregation <- function (ts, on = "minutes", k = 1, tz = "GMT") {
 #' @importFrom xts try.xts
 #' @importFrom xts endpoints
 #' @keywords internal
-applyGetList <- function(x, FUN, cor = FALSE, align.by = NULL, align.period = NULL, makeReturns = FALSE, makePsd = NULL,...){
+applyGetList <- function(x, FUN, cor = FALSE, alignBy = NULL, align.period = NULL, makeReturns = FALSE, makePsd = NULL,...){
   on <- "days" 
   k <- 1
   x <- try.xts(x, error = FALSE)
@@ -51,9 +51,9 @@ applyGetList <- function(x, FUN, cor = FALSE, align.by = NULL, align.period = NU
   FUN <- match.fun(FUN)
   for(i in 1:(length(INDEX)-1)){
     if (is.null(makePsd) == TRUE) {
-      result[[i]] <- FUN(x[(INDEX[i] + 1):INDEX[i + 1]], cor, align.by, align.period, makeReturns)
+      result[[i]] <- FUN(x[(INDEX[i] + 1):INDEX[i + 1]], cor, alignBy, align.period, makeReturns)
     } else {
-      result[[i]] <- FUN(x[(INDEX[i] + 1):INDEX[i + 1]], cor, align.by, align.period, makeReturns, makePsd)
+      result[[i]] <- FUN(x[(INDEX[i] + 1):INDEX[i + 1]], cor, alignBy, align.period, makeReturns, makePsd)
     }
     
   }

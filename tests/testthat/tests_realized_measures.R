@@ -1,25 +1,25 @@
 
 # medRV
 expect_equal(
-  formatC(as.numeric(medRV(sample5MinPricesJumps[c('2010-01-04', '2010-01-05'), 1], align.by = "minutes", align.period = 5, makeReturns = TRUE)[1]), digits = 5),
+  formatC(as.numeric(medRV(sample5MinPricesJumps[c('2010-01-04', '2010-01-05'), 1], alignBy = "minutes", align.period = 5, makeReturns = TRUE)[1]), digits = 5),
   "0.013105"
 )
 
 # medRQ
 expect_equal(
-  formatC(medRQ(sampleTData$PRICE,align.by = "minutes", align.period = 5, makeReturns = TRUE) * 1000000, digits = 5),
+  formatC(medRQ(sampleTData$PRICE,alignBy = "minutes", align.period = 5, makeReturns = TRUE) * 1000000, digits = 5),
   "0.23645"
 )
 
 # minRV
 expect_equal(
-  formatC(as.numeric(minRV(sample5MinPricesJumps[c('2010-01-04', '2010-01-05'), 1:2], align.by = "minutes", align.period = 5, makeReturns = TRUE)[1,1]), digits = 5),
+  formatC(as.numeric(minRV(sample5MinPricesJumps[c('2010-01-04', '2010-01-05'), 1:2], alignBy = "minutes", align.period = 5, makeReturns = TRUE)[1,1]), digits = 5),
   "0.013259"
 )
 
 # minRQ
 expect_equal(
-  minRQ(sampleTData$PRICE, align.by = "minutes", align.period = 5, makeReturns = TRUE) * 1000000,
+  minRQ(sampleTData$PRICE, alignBy = "minutes", align.period = 5, makeReturns = TRUE) * 1000000,
   0.13061613812613856456
 )
 
@@ -71,13 +71,13 @@ expect_equal(
 
 # rKurt
 expect_equal(
-  formatC(as.numeric(rKurt(sample5MinPricesJumps[c('2010-01-04', '2010-01-05'), 1], align.by ="minutes", align.period = 5, makeReturns = TRUE))[1], digits = 5),
+  formatC(as.numeric(rKurt(sample5MinPricesJumps[c('2010-01-04', '2010-01-05'), 1], alignBy ="minutes", align.period = 5, makeReturns = TRUE))[1], digits = 5),
   "2.8936"
 )
 
 # rMPV
 expect_equal(
-  formatC(rMPV(sampleTData$PRICE, align.by ="minutes", align.period = 5, makeReturns = TRUE), digits = 5),
+  formatC(rMPV(sampleTData$PRICE, alignBy ="minutes", align.period = 5, makeReturns = TRUE), digits = 5),
   "0.00042328"
 )
 
@@ -103,39 +103,39 @@ expect_equal(
 
 # rKernel
 expect_equal(
-  formatC(rKernelCov(rdata = sampleTData$PRICE, align.by = "minutes",  align.period = 5, makeReturns = TRUE), digits = 5),
+  formatC(rKernelCov(rdata = sampleTData$PRICE, alignBy = "minutes",  align.period = 5, makeReturns = TRUE), digits = 5),
   "0.00059605"
 )
 expect_equal(
-  formatC(sum(rKernelCov(rdata = cbind(lltc, sbux, fill = 0), align.by = "minutes", align.period = 5, makeReturns = FALSE)) * 1000, digits = 5),
+  formatC(sum(rKernelCov(rdata = cbind(lltc, sbux, fill = 0), alignBy = "minutes", align.period = 5, makeReturns = FALSE)) * 1000, digits = 5),
   "0.021378"
 )
 
 # rSkew
 expect_equal(
-  formatC(as.numeric(rSkew(sample5MinPricesJumps[c('2010-01-04', '2010-01-05'), 1], align.by ="minutes", align.period = 5, makeReturns = TRUE))[1], digits = 5),
+  formatC(as.numeric(rSkew(sample5MinPricesJumps[c('2010-01-04', '2010-01-05'), 1], alignBy ="minutes", align.period = 5, makeReturns = TRUE))[1], digits = 5),
   "0.078047"
 )
 
 # rSV
 expect_equal({
-  rSV(sampleTData$PRICE,align.by ="minutes", align.period = 5, makeReturns = TRUE)},
+  rSV(sampleTData$PRICE,alignBy ="minutes", align.period = 5, makeReturns = TRUE)},
   list(rSVdownside = 0.00029125752237359241398, rSVupside = 0.00016310984360246060573)
 )
 
 # rThresholdCov
 expect_equal(
-  formatC(sum(rThresholdCov(cbind(lltc, sbux), align.by = "minutes", align.period = 1)) * 10000, digits = 5),
+  formatC(sum(rThresholdCov(cbind(lltc, sbux), alignBy = "minutes", align.period = 1)) * 10000, digits = 5),
   "0.59455"
 )
 expect_equal(
-  formatC(sum(rThresholdCov(cbind(lltc, sbux), align.by = "minutes", align.period = 1), cor = TRUE), digits = 1),
+  formatC(sum(rThresholdCov(cbind(lltc, sbux), alignBy = "minutes", align.period = 1), cor = TRUE), digits = 1),
   " 1"
 )
 
 # rTPVar
 expect_equal(
-  formatC(rTPVar(sampleTData$PRICE,align.by ="minutes", align.period = 5, makeReturns = TRUE) * 1000000, digits = 5),
+  formatC(rTPVar(sampleTData$PRICE,alignBy ="minutes", align.period = 5, makeReturns = TRUE) * 1000000, digits = 5),
   "0.41334"
 )
 
@@ -158,13 +158,13 @@ expect_equal(
 
 # rQPVar
 expect_equal(
-  formatC(as.numeric(rQPVar(sample5MinPricesJumps[c('2010-01-04', '2010-01-05'), 1], align.by ="minutes", align.period = 5, makeReturns = TRUE))[1] * 1000000, digits = 5),
+  formatC(as.numeric(rQPVar(sample5MinPricesJumps[c('2010-01-04', '2010-01-05'), 1], alignBy ="minutes", align.period = 5, makeReturns = TRUE))[1] * 1000000, digits = 5),
   "115.62"
 )
 
 # rQuar
 expect_equal(
-  formatC(as.numeric(rQuar(sample5MinPricesJumps[c('2010-01-04', '2010-01-05'), 1], align.by ="minutes", align.period = 5, makeReturns = TRUE))[1] * 1000000, digits = 5),
+  formatC(as.numeric(rQuar(sample5MinPricesJumps[c('2010-01-04', '2010-01-05'), 1], alignBy ="minutes", align.period = 5, makeReturns = TRUE))[1] * 1000000, digits = 5),
   "116.57"
 )
 

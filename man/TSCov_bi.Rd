@@ -6,16 +6,16 @@
                      kernel.type = "rectangular",   # Kernel name (or number)
                      kernel.param = 1,              # Kernel parameter (usually lags)
                      kernel.dofadj = TRUE,          # Kernel Degree of freedom adjustment
-                     align.by = "seconds",          # Align the tick data to [seconds|minutes|hours]
+                     alignBy = "seconds",          # Align the tick data to [seconds|minutes|hours]
                      align.period = 1) {            # Align the tick data to this many [seconds|minutes|hours]            
   # Multiday adjustment: 
   multixts <- multixts(x)
   if (multixts == TRUE) {
     result <- apply.daily(x, rv.kernel,kernel.type,kernel.param,kernel.dofadj,
-                          align.by, align.period, cts, makeReturns)
+                          alignBy, align.period, cts, makeReturns)
     return(result)
   } else { #Daily estimation:
-    align.period <- .getAlignPeriod(align.period, align.by)         
+    align.period <- .getAlignPeriod(align.period, alignBy)         
     cdata <- .convertData(x, cts = cts, makeReturns = makeReturns)
     x <- cdata$data
     x <- .alignReturns(x, align.period)
@@ -34,16 +34,16 @@ rvKernel <- function(x,                             # Tick Data
                      kernel.type = "rectangular",   # Kernel name (or number)
                      kernel.param = 1,              # Kernel parameter (usually lags)
                      kernel.dofadj = TRUE,          # Kernel Degree of freedom adjustment
-                     align.by = "seconds",          # Align the tick data to [seconds|minutes|hours]
+                     alignBy = "seconds",          # Align the tick data to [seconds|minutes|hours]
                      align.period = 1) {            # Align the tick data to this many [seconds|minutes|hours]            
   # Multiday adjustment: 
   multixts <- multixts(x)
   if (multixts == TRUE) {
     result <- apply.daily(x, rv.kernel,kernel.type,kernel.param,kernel.dofadj,
-                          align.by, align.period, cts, makeReturns)
+                          alignBy, align.period, cts, makeReturns)
     return(result)
   } else { #Daily estimation:
-    align.period <- .getAlignPeriod(align.period, align.by)         
+    align.period <- .getAlignPeriod(align.period, alignBy)         
     cdata <- .convertData(x, cts = cts, makeReturns = makeReturns)
     x <- cdata$data
     x <- .alignReturns(x, align.period)

@@ -11,7 +11,7 @@ BNSjumptest(
   type = "linear",
   logtransform = FALSE,
   max = FALSE,
-  align.by = NULL,
+  alignBy = NULL,
   align.period = NULL,
   makeReturns = FALSE
 )
@@ -29,7 +29,7 @@ BNSjumptest(
 
 \item{max}{boolean, should be TRUE when max adjustment in SE. FALSE by default.}
 
-\item{align.by}{a string, align the tick data to "seconds"|"minutes"|"hours".}
+\item{alignBy}{a string, align the tick data to "seconds"|"minutes"|"hours".}
 
 \item{align.period}{an integer, align the tick data to this many [seconds|minutes|hours].}
 

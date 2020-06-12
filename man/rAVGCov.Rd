@@ -7,7 +7,7 @@
 rAVGCov(
   rdata,
   cor = FALSE,
-  align.by = "minutes",
+  alignBy = "minutes",
   align.period = 5,
   makeReturns = FALSE
 )
@@ -18,7 +18,7 @@ return series over period \eqn{t}, with \eqn{M} observations during \eqn{t}.}
 
 \item{cor}{boolean, in case it is TRUE, the correlation is returned. FALSE by default.}
 
-\item{align.by}{Align the tick data to seconds|minutes|hours}
+\item{alignBy}{Align the tick data to seconds|minutes|hours}
 
 \item{align.period}{Align the tick data to this many [seconds|minutes|hours]}
 
@@ -35,12 +35,12 @@ Realized Covariance using average subsample.
 # 5 subgrids (5 minutes).
 
 # Univariate
-rvSub <- rAVGCov(rdata = sampleTData$PRICE, align.by = "minutes",
+rvSub <- rAVGCov(rdata = sampleTData$PRICE, alignBy = "minutes",
                  align.period = 5, makeReturns = TRUE) 
 rvSub
 
 # Multivariate:
-rcovSub <- rAVGCov(rdata = cbind(lltc, sbux, fill = 0), align.by = "minutes", 
+rcovSub <- rAVGCov(rdata = cbind(lltc, sbux, fill = 0), alignBy = "minutes", 
                    align.period = 5, makeReturns = FALSE)
 rcovSub
 

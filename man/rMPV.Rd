@@ -8,7 +8,7 @@ rMPV(
   rdata,
   m = 2,
   p = 2,
-  align.by = NULL,
+  alignBy = NULL,
   align.period = NULL,
   makeReturns = FALSE
 )
@@ -20,7 +20,7 @@ rMPV(
 
 \item{p}{the power of the variation. 2 by default.}
 
-\item{align.by}{a string, align the tick data to "seconds"|"minutes"|"hours".}
+\item{alignBy}{a string, align the tick data to "seconds"|"minutes"|"hours".}
 
 \item{align.period}{an integer, align the tick data to this many [seconds|minutes|hours].}
 
@@ -51,7 +51,7 @@ Function returns the rMPV, defined in Andersen et al. (2012).
 }
 \examples{
 data(sampleTData)
-rMPV(sampleTData$PRICE, m = 2, p = 3, align.by = "minutes", align.period = 5, makeReturns = TRUE)
+rMPV(sampleTData$PRICE, m = 2, p = 3, alignBy = "minutes", align.period = 5, makeReturns = TRUE)
 
 }
 \references{

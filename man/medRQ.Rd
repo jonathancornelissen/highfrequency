@@ -4,12 +4,12 @@
 \alias{medRQ}
 \title{An estimator of integrated quarticity from applying the median operator on blocks of three returns.}
 \usage{
-medRQ(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE)
+medRQ(rdata, alignBy = NULL, align.period = NULL, makeReturns = FALSE)
 }
 \arguments{
 \item{rdata}{a zoo/xts object containing all returns in period t for one asset.}
 
-\item{align.by}{a string, align the tick data to "seconds"|"minutes"|"hours".}
+\item{alignBy}{a string, align the tick data to "seconds"|"minutes"|"hours".}
 
 \item{align.period}{an integer, align the tick data to this many [seconds|minutes|hours].}
 
@@ -30,7 +30,7 @@ Function returns the medRQ, defined in Andersen et al. (2012).
 }
 \examples{
 \dontrun{
-medRQ(rdata = sampleTData$PRICE, align.by = "minutes", align.period = 5, makeReturns = TRUE)
+medRQ(rdata = sampleTData$PRICE, alignBy = "minutes", align.period = 5, makeReturns = TRUE)
 medRQ
 }
 }

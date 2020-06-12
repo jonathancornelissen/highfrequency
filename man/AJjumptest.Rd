@@ -8,7 +8,7 @@ AJjumpTest(
   pData,
   p = 4,
   k = 2,
-  align.by = NULL,
+  alignBy = NULL,
   align.period = NULL,
   alpha.multiplier = 4,
   makeReturns = FALSE,
@@ -22,7 +22,7 @@ AJjumpTest(
 
 \item{k}{can be chosen among 2 or 3 or 4. The author suggests 2. 2 by default.}
 
-\item{align.by}{a string, align the tick data to "seconds"|"minutes"|"hours"}
+\item{alignBy}{a string, align the tick data to "seconds"|"minutes"|"hours"}
 
 \item{align.period}{an integer, align the tick data to this many [seconds|minutes|hours].}
 
@@ -98,7 +98,7 @@ The theoretical framework underlying jump test is that the logarithmic price pro
  The Ait-Sahalia and Jacod test is that: Using the convergence properties of power variation and its dependence on the time scale on which it is measured, Ait-Sahalia and Jacod (2009) define a new variable which converges to 1 in the presence of jumps in the underlying return series, or to another deterministic and known number in the absence of jumps. (Theodosiou& Zikes(2009))
 }
 \examples{
-AJjumpTest(sampleTData$PRICE, p = 2, k = 3, align.by = "seconds", 
+AJjumpTest(sampleTData$PRICE, p = 2, k = 3, alignBy = "seconds", 
   align.period = 5, makeReturns = TRUE)
 
 }

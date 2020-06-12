@@ -1,6 +1,6 @@
 
 expect_equal(
-  formatC(AJjumpTest(sampleTData$PRICE, p = 2, k = 3, align.by = "seconds", align.period = 5, makeReturns = TRUE)$ztest, digits = 10),
+  formatC(AJjumpTest(sampleTData$PRICE, p = 2, k = 3, alignBy = "seconds", align.period = 5, makeReturns = TRUE)$ztest, digits = 10),
   "-2.903324467"
 )
 

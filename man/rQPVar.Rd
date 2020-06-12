@@ -4,12 +4,12 @@
 \alias{rQPVar}
 \title{Realized quad-power variation of highfrequency return series.}
 \usage{
-rQPVar(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE)
+rQPVar(rdata, alignBy = NULL, align.period = NULL, makeReturns = FALSE)
 }
 \arguments{
 \item{rdata}{a zoo/xts object containing all returns in period t for one asset.}
 
-\item{align.by}{a string, align the tick data to "seconds"|"minutes"|"hours".}
+\item{alignBy}{a string, align the tick data to "seconds"|"minutes"|"hours".}
 
 \item{align.period}{an integer, align the tick data to this many [seconds|minutes|hours].}
 
@@ -30,7 +30,7 @@ Function returns the realized quad-power variation, defined in Andersen et al. (
 }
 \examples{
 data(sampleTData)
-rQPVar(rdata= sampleTData$PRICE, align.by= "minutes", align.period =5, makeReturns= TRUE)
+rQPVar(rdata= sampleTData$PRICE, alignBy= "minutes", align.period =5, makeReturns= TRUE)
 rQPVar
 
 }

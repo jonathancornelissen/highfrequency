@@ -39,7 +39,7 @@ listAvailableKernels <- function() {
 #'    \mbox{medRQ}_{t}=\frac{3\pi N}{9\pi +72 - 52\sqrt{3}} \left(\frac{N}{N-2}\right) \sum_{i=2}^{N-1} \mbox{med}(|r_{t,i-1}|, |r_{t,i}|, |r_{t,i+1}|)^4
 #'   }
 #' @param rdata a zoo/xts object containing all returns in period t for one asset.
-#' @param align.by a string, align the tick data to "seconds"|"minutes"|"hours".
+#' @param alignBy a string, align the tick data to "seconds"|"minutes"|"hours".
 #' @param align.period an integer, align the tick data to this many [seconds|minutes|hours]. 
 #' @param makeReturns boolean, should be TRUE when rdata contains prices instead of returns. FALSE by  default.
 #' 
@@ -47,22 +47,22 @@ listAvailableKernels <- function() {
 #' 
 #' @examples
 #' \dontrun{
-#' medRQ(rdata = sampleTData$PRICE, align.by = "minutes", align.period = 5, makeReturns = TRUE)
+#' medRQ(rdata = sampleTData$PRICE, alignBy = "minutes", align.period = 5, makeReturns = TRUE)
 #' medRQ
 #' }
 #' @keywords highfrequency medRQ
 #' @references Andersen, T. G., D. Dobrev, and E. Schaumburg (2012). Jump-robust volatility estimation using nearest neighbor truncation. Journal of Econometrics, 169(1), 75- 93.
 #' @importFrom zoo rollmedian
 #' @export
-medRQ <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE) {
+medRQ <- function(rdata, alignBy = NULL, align.period = NULL, makeReturns = FALSE) {
   
   # self-reference for multi-day input
   if (checkMultiDays(rdata) == TRUE) {
-    result <- apply.daily(rdata, medRQ, align.by, align.period, makeReturns) 
+    result <- apply.daily(rdata, medRQ, alignBy, align.period, makeReturns) 
     return(result)
   } else {
-    if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata <- fastTickAgregation(rdata, on = align.by, k = align.period)
+    if ((!is.null(alignBy)) && (!is.null(align.period))) {
+      rdata <- fastTickAgregation(rdata, on = alignBy, k = align.period)
     }
     if (makeReturns == TRUE) {
       rdata <- makeReturns(rdata)
@@ -86,7 +86,7 @@ medRQ <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
 #'   \mbox{minRQ}_{t}=\frac{\pi N}{3 \pi - 8} \left(\frac{N}{N-1}\right) \sum_{i=1}^{N-1} \mbox{min}(|r_{t,i}| ,|r_{t,i+1}|)^4
 #' }
 #' @param rdata a zoo/xts object containing all returns in period t for one asset.
-#' @param align.by a string, align the tick data to "seconds"|"minutes"|"hours"
+#' @param alignBy a string, align the tick data to "seconds"|"minutes"|"hours"
 #' @param align.period an integer, align the tick data to this many [seconds|minutes|hours].
 #' @param makeReturns boolean, should be TRUE when rdata contains prices instead of returns. FALSE by  default.
 #' 
@@ -94,22 +94,22 @@ medRQ <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
 #' 
 #' @examples
 #' \dontrun{
-#' minRQ(rdata = sampleTData$PRICE, align.by = "minutes", align.period = 5, makeReturns = TRUE)
+#' minRQ(rdata = sampleTData$PRICE, alignBy = "minutes", align.period = 5, makeReturns = TRUE)
 #' minRQ
 #' }
 #'@references Andersen, T. G., D. Dobrev, and E. Schaumburg (2012). Jump-robust volatility estimation using nearest neighbor truncation. Journal of Econometrics, 169(1), 75- 93.
 #' @importFrom zoo as.zoo
 #' @importFrom zoo rollapply
 #' @export
-minRQ <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE) {
+minRQ <- function(rdata, alignBy = NULL, align.period = NULL, makeReturns = FALSE) {
   
   # self-reference for multi-day input
   if (checkMultiDays(rdata) == TRUE) {
-    result <- apply.daily(rdata, minRQ, align.by, align.period, makeReturns)
+    result <- apply.daily(rdata, minRQ, alignBy, align.period, makeReturns)
     return(result)
   } else {
-    if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata <- fastTickAgregation(rdata, on = align.by, k = align.period)
+    if ((!is.null(alignBy)) && (!is.null(align.period))) {
+      rdata <- fastTickAgregation(rdata, on = alignBy, k = align.period)
     }
     if (makeReturns == TRUE) {
       rdata = makeReturns(rdata)
@@ -134,7 +134,7 @@ minRQ <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
 #' }
 #' 
 #' @param rdata a zoo/xts object containing all returns in period t for one asset.
-#' @param align.by a string, align the tick data to "seconds"|"minutes"|"hours".
+#' @param alignBy a string, align the tick data to "seconds"|"minutes"|"hours".
 #' @param align.period an integer, align the tick data to this many [seconds|minutes|hours].
 #' @param makeReturns boolean, should be TRUE when rdata contains prices instead of returns. FALSE by default.
 #' 
@@ -147,21 +147,21 @@ minRQ <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
 #' 
 #' @examples
 #' data(sampleTData)
-#' minrv <- minRV(rdata = sampleTData$PRICE, align.by = "minutes",
+#' minrv <- minRV(rdata = sampleTData$PRICE, alignBy = "minutes",
 #'                align.period = 5, makeReturns = TRUE)
 #' minrv 
 #' 
 #' @keywords volatility
 #' @export
-minRV <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE){
+minRV <- function(rdata, alignBy = NULL, align.period = NULL, makeReturns = FALSE){
   
   # self-reference for multi-day input
   if (checkMultiDays(rdata) == TRUE) {
-    result <- apply.daily(rdata, minRV, align.by, align.period, makeReturns)
+    result <- apply.daily(rdata, minRV, alignBy, align.period, makeReturns)
     return(result)
   } else {
-    if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata <- fastTickAgregation(rdata, on = align.by, k = align.period)
+    if ((!is.null(alignBy)) && (!is.null(align.period))) {
+      rdata <- fastTickAgregation(rdata, on = alignBy, k = align.period)
     } 
     if (makeReturns) {
       rdata <- makeReturns(rdata)
@@ -187,7 +187,7 @@ minRV <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
 #' }
 #'  
 #' @param rdata a zoo/xts object containing all returns in period t for one asset.
-#' @param align.by a string, align the tick data to "seconds"|"minutes"|"hours".
+#' @param alignBy a string, align the tick data to "seconds"|"minutes"|"hours".
 #' @param align.period an integer, align the tick data to this many [seconds|minutes|hours].
 #' @param makeReturns boolean, should be TRUE when rdata contains prices instead of returns. FALSE by   default.
 #'  
@@ -213,21 +213,21 @@ minRV <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
 #' 
 #' @examples 
 #' data(sampleTData);
-#' medrv <- medRV(rdata = sampleTData$PRICE, align.by = "minutes", 
+#' medrv <- medRV(rdata = sampleTData$PRICE, alignBy = "minutes", 
 #'                align.period = 5, makeReturns = TRUE)
 #' medrv 
 #'  
 #' @keywords volatility
 #' @export
-medRV <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE){
+medRV <- function(rdata, alignBy = NULL, align.period = NULL, makeReturns = FALSE){
   
   # self-reference for multi-day input
   if (checkMultiDays(rdata) == TRUE) {
-    result <- apply.daily(rdata, medRV, align.by, align.period, makeReturns)
+    result <- apply.daily(rdata, medRV, alignBy, align.period, makeReturns)
     return(result)
   } else {
-    if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata <- fastTickAgregation(rdata, on = align.by, k = align.period)
+    if ((!is.null(alignBy)) && (!is.null(align.period))) {
+      rdata <- fastTickAgregation(rdata, on = alignBy, k = align.period)
     }
     if (makeReturns == TRUE) {
       rdata <- makeReturns(rdata)
@@ -379,7 +379,7 @@ MRC <- function(pData, pairwise = FALSE, makePsd = FALSE) {
 #' @param rdata a \eqn{(M x N)} matrix/zoo/xts object containing the \eqn{N}
 #' return series over period \eqn{t}, with \eqn{M} observations during \eqn{t}.
 #' @param cor boolean, in case it is TRUE, the correlation is returned. FALSE by default.
-#' @param align.by Align the tick data to seconds|minutes|hours
+#' @param alignBy Align the tick data to seconds|minutes|hours
 #' @param align.period Align the tick data to this many [seconds|minutes|hours]
 #' @param makeReturns Prices are passed make them into log returns
 #' 
@@ -397,12 +397,12 @@ MRC <- function(pData, pairwise = FALSE, makePsd = FALSE) {
 #' # 5 subgrids (5 minutes).
 #' 
 #' # Univariate
-#' rvSub <- rAVGCov(rdata = sampleTData$PRICE, align.by = "minutes",
+#' rvSub <- rAVGCov(rdata = sampleTData$PRICE, alignBy = "minutes",
 #'                  align.period = 5, makeReturns = TRUE) 
 #' rvSub
 #' 
 #' # Multivariate:
-#' rcovSub <- rAVGCov(rdata = cbind(lltc, sbux, fill = 0), align.by = "minutes", 
+#' rcovSub <- rAVGCov(rdata = cbind(lltc, sbux, fill = 0), alignBy = "minutes", 
 #'                    align.period = 5, makeReturns = FALSE)
 #' rcovSub
 #' 
@@ -410,7 +410,7 @@ MRC <- function(pData, pairwise = FALSE, makePsd = FALSE) {
 #' @keywords volatility
 #' @export
 #' 
-rAVGCov <- function(rdata, cor = FALSE, align.by = "minutes", align.period = 5, makeReturns = FALSE) {
+rAVGCov <- function(rdata, cor = FALSE, alignBy = "minutes", align.period = 5, makeReturns = FALSE) {
   
   DT = DT_ROUND = DT_SUBSAMPLE = FIRST_DT = MAXDT = RETURN = RETURN1 = RETURN2 = NULL
   
@@ -431,8 +431,8 @@ rAVGCov <- function(rdata, cor = FALSE, align.by = "minutes", align.period = 5, 
     rdata[, FIRST_DT := min(DT)]
     if (makeReturns == TRUE) {
       rdata[, DT_ROUND := ifelse(DT == FIRST_DT,
-                                 floor_date(ymd_hms(DT), unit =  paste0(1, " ", align.by)),
-                                 ceiling_date(ymd_hms(DT), unit = paste0(1, " ", align.by), change_on_boundary = FALSE))]
+                                 floor_date(ymd_hms(DT), unit =  paste0(1, " ", alignBy)),
+                                 ceiling_date(ymd_hms(DT), unit = paste0(1, " ", alignBy), change_on_boundary = FALSE))]
       rdata[, DT_ROUND := as_datetime(DT_ROUND)]
       rdata[, MAXDT := max(DT), by = "DT_ROUND"]
       rdata <- rdata[DT == MAXDT]
@@ -440,16 +440,16 @@ rAVGCov <- function(rdata, cor = FALSE, align.by = "minutes", align.period = 5, 
       rdata <- rdata[is.na(RETURN) == FALSE]
       rdata <- rdata[, c("DT_ROUND", "RETURN")]
     } else {
-      rdata[, DT_ROUND := ceiling_date(ymd_hms(DT), unit = paste0(1, " ", align.by), change_on_boundary = FALSE)]
+      rdata[, DT_ROUND := ceiling_date(ymd_hms(DT), unit = paste0(1, " ", alignBy), change_on_boundary = FALSE)]
       rdata[, DT_ROUND := as_datetime(DT_ROUND)]
     }
-    rvavg <- sum(rdata[, DT_SUBSAMPLE := ceiling_date(DT_ROUND, unit = paste0(align.period, " ", align.by), change_on_boundary = FALSE)
+    rvavg <- sum(rdata[, DT_SUBSAMPLE := ceiling_date(DT_ROUND, unit = paste0(align.period, " ", alignBy), change_on_boundary = FALSE)
                   ][, list(RETURN = sum(RETURN)), by = list(DT_SUBSAMPLE)]$RETURN^2)
     
     for (ii in c(1:(align.period - 1))) {
       rdatasub <- rdata[-c(1:ii, (dim(rdata)[1]-align.period + ii + 1):dim(rdata)[1]), ]
-      rdatasub[, DT_ROUND := DT_ROUND - eval(parse(text = paste0("lubridate::", align.by, "(", ii, ")")))]
-      rvavg <- rvavg + sum(rdatasub[, DT_SUBSAMPLE := ceiling_date(DT_ROUND, unit = paste0(align.period, " ", align.by), change_on_boundary = FALSE)
+      rdatasub[, DT_ROUND := DT_ROUND - eval(parse(text = paste0("lubridate::", alignBy, "(", ii, ")")))]
+      rvavg <- rvavg + sum(rdatasub[, DT_SUBSAMPLE := ceiling_date(DT_ROUND, unit = paste0(align.period, " ", alignBy), change_on_boundary = FALSE)
                                     ][, list(RETURN = sum(RETURN)), by = list(DT_SUBSAMPLE)]$RETURN^2) * (dim(rdatasub)[1]/align.period + 1) / (dim(rdatasub)[1]/align.period)
     }
     return(rvavg / align.period)
@@ -458,7 +458,7 @@ rAVGCov <- function(rdata, cor = FALSE, align.by = "minutes", align.period = 5, 
   if (n > 1) {
     rdatamatrix <- matrix(0, nrow = n, ncol = n)
     for (ii in c(1:n)) {
-      rdatamatrix[ii, ii] <- rAVGCov(rdata[, ii], cor = cor, align.by = align.by, align.period = align.period, makeReturns = makeReturns)
+      rdatamatrix[ii, ii] <- rAVGCov(rdata[, ii], cor = cor, alignBy = alignBy, align.period = align.period, makeReturns = makeReturns)
       if (ii < n) {
         for (jj in c((ii+1):n)) {
           # browser()
@@ -466,8 +466,8 @@ rAVGCov <- function(rdata, cor = FALSE, align.by = "minutes", align.period = 5, 
           rdatabackup[, FIRST_DT := min(DT)]
           if (makeReturns == TRUE) {
             rdatabackup[, DT_ROUND := ifelse(DT == FIRST_DT,
-                                             floor_date(ymd_hms(DT), unit =  paste0(1, " ", align.by)),
-                                             ceiling_date(ymd_hms(DT), unit = paste0(1, " ", align.by), change_on_boundary = FALSE))]
+                                             floor_date(ymd_hms(DT), unit =  paste0(1, " ", alignBy)),
+                                             ceiling_date(ymd_hms(DT), unit = paste0(1, " ", alignBy), change_on_boundary = FALSE))]
             rdatabackup[, DT_ROUND := as_datetime(DT_ROUND)]
             rdatabackup[, MAXDT := max(DT), by = "DT_ROUND"]
             rdatabackup <- rdatabackup[DT == MAXDT]
@@ -476,20 +476,20 @@ rAVGCov <- function(rdata, cor = FALSE, align.by = "minutes", align.period = 5, 
             rdatabackup <- rdatabackup[is.na(RETURN1) == FALSE][is.na(RETURN2) == FALSE]
             rdatabackup <- rdatabackup[, c("DT_ROUND", "RETURN1", "RETURN2")]
           } else {
-            rdatabackup[, DT_ROUND := ceiling_date(ymd_hms(DT), unit = paste0(1, " ", align.by), change_on_boundary = FALSE)]
+            rdatabackup[, DT_ROUND := ceiling_date(ymd_hms(DT), unit = paste0(1, " ", alignBy), change_on_boundary = FALSE)]
             rdatabackup[, DT_ROUND := as_datetime(DT_ROUND)]
           }
-          returns <- rdatabackup[, DT_SUBSAMPLE := ceiling_date(DT_ROUND, unit = paste0(align.period, " ", align.by), change_on_boundary = FALSE)
+          returns <- rdatabackup[, DT_SUBSAMPLE := ceiling_date(DT_ROUND, unit = paste0(align.period, " ", alignBy), change_on_boundary = FALSE)
                                  ][, list(RETURN1 = sum(RETURN1), RETURN2 = sum(RETURN2)), by = list(DT_SUBSAMPLE)]
           covavg <- t(returns$RETURN1) %*% returns$RETURN2
           
           for (kk in c(1:(align.period - 1))) {
-            returns <- rdatabackup[, DT_SUBSAMPLE := ceiling_date(DT_ROUND, unit = paste0(1, " ", align.by), change_on_boundary = FALSE)
+            returns <- rdatabackup[, DT_SUBSAMPLE := ceiling_date(DT_ROUND, unit = paste0(1, " ", alignBy), change_on_boundary = FALSE)
                                    ][, list(RETURN1 = sum(RETURN1), RETURN2 = sum(RETURN2)), by = list(DT_SUBSAMPLE)]
             rdatasub <- returns[-c(1:kk, (dim(returns)[1]-align.period + kk + 1):dim(returns)[1]), ]
-            rdatasub[, DT_SUBSAMPLE:= DT_SUBSAMPLE - eval(parse(text = paste0("lubridate::", align.by, "(", kk, ")")))]
+            rdatasub[, DT_SUBSAMPLE:= DT_SUBSAMPLE - eval(parse(text = paste0("lubridate::", alignBy, "(", kk, ")")))]
             # returns <- 
-            returns <- rdatasub[, DT_SUBSAMPLE := ceiling_date(DT_SUBSAMPLE, unit = paste0(align.period, " ", align.by), change_on_boundary = FALSE)
+            returns <- rdatasub[, DT_SUBSAMPLE := ceiling_date(DT_SUBSAMPLE, unit = paste0(align.period, " ", alignBy), change_on_boundary = FALSE)
                                 ][, list(RETURN1 = sum(RETURN1), RETURN2 = sum(RETURN2)), by = list(DT_SUBSAMPLE)]
             covavg <- covavg + t(returns$RETURN1) %*% returns$RETURN2
           }
@@ -504,12 +504,12 @@ rAVGCov <- function(rdata, cor = FALSE, align.by = "minutes", align.period = 5, 
   # 
   # r# Aggregate:
   # if (makeReturns == TRUE) {
-  #   if((!is.null(align.by)) && (!is.null(align.period))) {
-  #     rdata <- fastTickAgregation(rdata, on = align.by, k = 1)
+  #   if((!is.null(alignBy)) && (!is.null(align.period))) {
+  #     rdata <- fastTickAgregation(rdata, on = alignBy, k = 1)
   #   }
   #   rdata <- makeReturns(rdata)
   # } else {
-  #   rdata <- aggregateTS(rdata, FUN = "sum", on = align.by, k = 1)
+  #   rdata <- aggregateTS(rdata, FUN = "sum", on = alignBy, k = 1)
   # }
   # 
   # if (is.null(dim(rdata))) {
@@ -518,25 +518,25 @@ rAVGCov <- function(rdata, cor = FALSE, align.by = "minutes", align.period = 5, 
   #   n <- dim(rdata)[2]
   # }
   # 
-  # zoo::index(rdata) <- index(rdata) - eval(parse(text = paste0("lubridate::", align.by, "(", 1, ")"))) # shift due to change on boundary in aggregateTS
+  # zoo::index(rdata) <- index(rdata) - eval(parse(text = paste0("lubridate::", alignBy, "(", 1, ")"))) # shift due to change on boundary in aggregateTS
   # if (n == 1) {
-  #   rvavg <- rCov(aggregateTS(rdata, FUN = "sum", on = align.by, k = align.period))
+  #   rvavg <- rCov(aggregateTS(rdata, FUN = "sum", on = alignBy, k = align.period))
   #   for (ii in c(1:(align.period - 1))) {
   #     rdatasub <- rdata[-c(1:ii, (length(rdata)-align.period + ii):length(rdata)), ]
-  #     zoo::index(rdatasub) <-  ymd_hms(index(rdatasub), tz = tz(index(rdatasub))) - eval(parse(text = paste0("lubridate::", align.by, "(", ii, ")")))
-  #     n_obs <- length(fastTickAgregation(rdatasub, on = align.by, k = align.period))
-  #     rvavg <- rvavg + rCov(aggregateTS(rdatasub, FUN = "sum", on = align.by, k = align.period)) #* (n_obs + 1) / (n_obs) # correction term for one observation less
+  #     zoo::index(rdatasub) <-  ymd_hms(index(rdatasub), tz = tz(index(rdatasub))) - eval(parse(text = paste0("lubridate::", alignBy, "(", ii, ")")))
+  #     n_obs <- length(fastTickAgregation(rdatasub, on = alignBy, k = align.period))
+  #     rvavg <- rvavg + rCov(aggregateTS(rdatasub, FUN = "sum", on = alignBy, k = align.period)) #* (n_obs + 1) / (n_obs) # correction term for one observation less
   #   }
   #   return(rvavg / align.period)
   # } else {
   #   rdatamatrix <- matrix(0, nrow = n, ncol = n)
   #   for (ii in c(1:n)) {
-  #     rvavg <- rCov(aggregateTS(rdata[, ii], FUN = "sum", on = align.by, k = align.period))
+  #     rvavg <- rCov(aggregateTS(rdata[, ii], FUN = "sum", on = alignBy, k = align.period))
   #     for (jj in c(1:(align.period - 1))) {
   #       rdatasub <- rdata[-c(1:jj, (length(rdata[,ii])-align.period + jj):length(rdata[,ii])), ii]
-  #       zoo::index(rdatasub) <- ymd_hms(index(rdatasub), tz = tz(index(rdatasub))) - eval(parse(text = paste0("lubridate::", align.by, "(", ii, ")")))
-  #       n_obs <- length(fastTickAgregation(rdatasub, on = align.by, k = align.period))
-  #       rvavg <- rvavg + rCov(aggregateTS(rdatasub, FUN = "sum", on = align.by, k = align.period)) #* (n_obs + 1) / (n_obs) # correction term for one observation less
+  #       zoo::index(rdatasub) <- ymd_hms(index(rdatasub), tz = tz(index(rdatasub))) - eval(parse(text = paste0("lubridate::", alignBy, "(", ii, ")")))
+  #       n_obs <- length(fastTickAgregation(rdatasub, on = alignBy, k = align.period))
+  #       rvavg <- rvavg + rCov(aggregateTS(rdatasub, FUN = "sum", on = alignBy, k = align.period)) #* (n_obs + 1) / (n_obs) # correction term for one observation less
   #     }
   #     rdatamatrix[ii, ii] <- rvavg / align.period
   #     if (ii < n) {
@@ -555,7 +555,7 @@ rAVGCov <- function(rdata, cor = FALSE, align.by = "minutes", align.period = 5, 
   # 
   # if (n == 1) {
   #   
-  #   rollingwindow <- aggregateTS(rdata, FUN = "sum", on = align.by, k = align.period)
+  #   rollingwindow <- aggregateTS(rdata, FUN = "sum", on = alignBy, k = align.period)
   #   
   #   rollingwindow <- period.apply(rdata, INDEX = rep(c(1:(length(rdata) / align.period)), each = align.p), FUN = "sum")
   #   
@@ -748,7 +748,7 @@ rBeta <- function(rdata, rindex, RCOVestimator = "rCov", RVestimator = "RV", mak
 #' @param rdata a \eqn{(M x N)} matrix/zoo/xts object containing the \eqn{N}
 #'    return series over period \eqn{t}, with \eqn{M} observations during \eqn{t}.
 #' @param cor boolean, in case it is TRUE, the correlation is returned. FALSE by default.
-#' @param align.by a string, align the tick data to "seconds"|"minutes"|"hours".
+#' @param alignBy a string, align the tick data to "seconds"|"minutes"|"hours".
 #' @param align.period an integer, align the tick data to this many [seconds|minutes|hours]. 
 #' @param makeReturns boolean, should be TRUE when rdata contains prices instead of returns. FALSE by default.
 #' @param makePsd boolean, in case it is TRUE, the positive definite version of rBPCov is returned. FALSE by default.
@@ -767,7 +767,7 @@ rBeta <- function(rdata, rindex, RCOVestimator = "rCov", RVestimator = "RV", mak
 #' # at 5 minutes.
 #'  
 #' # Univariate: 
-#' rbpv <- rBPCov(rdata = sampleTData$PRICE, align.by ="minutes", 
+#' rbpv <- rBPCov(rdata = sampleTData$PRICE, alignBy ="minutes", 
 #'                align.period = 5, makeReturns = TRUE) 
 #' rbpv 
 #'  
@@ -777,7 +777,7 @@ rBeta <- function(rdata, rindex, RCOVestimator = "rCov", RVestimator = "RV", mak
 #'  
 #' @keywords volatility
 #' @export
-rBPCov <- function(rdata, cor = FALSE, align.by = NULL, align.period = NULL, makeReturns = FALSE, makePsd = FALSE) {
+rBPCov <- function(rdata, cor = FALSE, alignBy = NULL, align.period = NULL, makeReturns = FALSE, makePsd = FALSE) {
   
   # self-reference for multi-day input
   if (checkMultiDays(rdata) == TRUE) { 
@@ -787,15 +787,15 @@ rBPCov <- function(rdata, cor = FALSE, align.by = NULL, align.period = NULL, mak
       n <- dim(rdata)[2] 
     }
     if (n == 1){ 
-      result <- apply.daily(rdata, rBPCov, align.by = align.by, align.period = align.period, makeReturns = makeReturns, makePsd) 
+      result <- apply.daily(rdata, rBPCov, alignBy = alignBy, align.period = align.period, makeReturns = makeReturns, makePsd) 
     }
     if (n > 1) { 
-      result <- applyGetList(rdata, rBPCov, cor = cor, align.by = align.by, align.period = align.period, makeReturns = makeReturns, makePsd) 
+      result <- applyGetList(rdata, rBPCov, cor = cor, alignBy = alignBy, align.period = align.period, makeReturns = makeReturns, makePsd) 
     }    
     return(result)
   } else { #single day code
-    if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata <- fastTickAgregation(rdata, on = align.by, k = align.period);
+    if ((!is.null(alignBy)) && (!is.null(align.period))) {
+      rdata <- fastTickAgregation(rdata, on = alignBy, k = align.period);
     } 
     if (makeReturns) {  
       rdata <- makeReturns(rdata) 
@@ -860,7 +860,7 @@ rBPCov <- function(rdata, cor = FALSE, align.by = NULL, align.period = NULL, mak
 #' return series over period \eqn{t}, with \eqn{M} observations during \eqn{t}.
 #' In case of a matrix, no multi-day adjustment is possible.
 #' @param cor boolean, in case it is TRUE, the correlation is returned. FALSE by default.
-#' @param align.by a string, align the tick data to "seconds"|"minutes"|"hours".
+#' @param alignBy a string, align the tick data to "seconds"|"minutes"|"hours".
 #' @param align.period an integer, align the tick data to this many [seconds|minutes|hours].
 #' @param makeReturns boolean, should be TRUE when rdata contains prices instead of returns. FALSE by default.
 #' 
@@ -875,7 +875,7 @@ rBPCov <- function(rdata, cor = FALSE, align.by = NULL, align.period = NULL, mak
 #' data(sample5MinPricesJumps)
 #' 
 #' # Univariate: 
-#' rv = rCov(rdata = sampleTData$PRICE, align.by = "minutes", 
+#' rv = rCov(rdata = sampleTData$PRICE, alignBy = "minutes", 
 #'                    align.period = 5, makeReturns = TRUE)
 #' rv 
 #' 
@@ -884,7 +884,7 @@ rBPCov <- function(rdata, cor = FALSE, align.by = NULL, align.period = NULL, mak
 #' rc
 #' @keywords volatility
 #' @export
-rCov <- function(rdata, cor = FALSE, align.by = NULL, align.period = NULL, makeReturns = FALSE) {
+rCov <- function(rdata, cor = FALSE, alignBy = NULL, align.period = NULL, makeReturns = FALSE) {
   
   # Multiday adjustment: 
   if (checkMultiDays(rdata) == TRUE) { 
@@ -894,16 +894,16 @@ rCov <- function(rdata, cor = FALSE, align.by = NULL, align.period = NULL, makeR
       n <- dim(rdata)[2]
     }
     if (n == 1) { 
-      result <- apply.daily(rdata, rCov, align.by = align.by, align.period = align.period, makeReturns = makeReturns) 
+      result <- apply.daily(rdata, rCov, alignBy = alignBy, align.period = align.period, makeReturns = makeReturns) 
     }
     if (n > 1) { 
-      result <- applyGetList(rdata, rCov, cor=cor, align.by = align.by, align.period = align.period, makeReturns = makeReturns) 
+      result <- applyGetList(rdata, rCov, cor=cor, alignBy = alignBy, align.period = align.period, makeReturns = makeReturns) 
     }    
     return(result)
   } else {
     #single day code
-    if((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata <- fastTickAgregation(rdata, on = align.by, k = align.period)
+    if((!is.null(alignBy)) && (!is.null(align.period))) {
+      rdata <- fastTickAgregation(rdata, on = alignBy, k = align.period)
     } 
     if (makeReturns) {  
       rdata <- makeReturns(rdata) 
@@ -939,7 +939,7 @@ rCov <- function(rdata, cor = FALSE, align.by = NULL, align.period = NULL, makeR
 #' @param rdata a possibly multivariate xts object.
 #' @param cor boolean, in case it is TRUE, the correlation is returned. FALSE by default.
 #' @param period Sampling period 
-#' @param align.by Align the tick data to seconds|minutes|hours
+#' @param alignBy Align the tick data to seconds|minutes|hours
 #' @param align.period Align the tick data to this many [seconds|minutes|hours]
 #' @param makeReturns Prices are passed make them into log returns
 #' @param makePsd boolean, in case it is TRUE, the positive definite version of rHYCov is returned. FALSE by default.
@@ -951,14 +951,14 @@ rCov <- function(rdata, cor = FALSE, align.by = NULL, align.period = NULL, makeR
 #' # Average Hayashi-Yoshida Covariance estimator is calculated on five-minute returns
 #' 
 #' # Multivariate:
-#' # realized_cov <- rHYCov(rdata = cbind(lltc, sbux, fill = 0), period = 5, align.by = "minutes", 
+#' # realized_cov <- rHYCov(rdata = cbind(lltc, sbux, fill = 0), period = 5, alignBy = "minutes", 
 #' #                        align.period = 5, makeReturns = FALSE)
 #' # realized_cov 
 #' Note: for the diagonal elements the rCov is used.
 #' 
 #' @keywords volatility
 #' @export
-rHYCov <- function(rdata, cor = FALSE, period = 1, align.by = "seconds", align.period = 1, makeReturns = FALSE, makePsd = TRUE) {
+rHYCov <- function(rdata, cor = FALSE, period = 1, alignBy = "seconds", align.period = 1, makeReturns = FALSE, makePsd = TRUE) {
   
   multixts <- multixts(rdata)
   if (multixts == TRUE) {
@@ -967,7 +967,7 @@ rHYCov <- function(rdata, cor = FALSE, period = 1, align.by = "seconds", align.p
   
   rdata <- fastTickAgregation(rdata, on = "seconds", k = 1)
   rdata <- rdata[-dim(rdata)[1], ]
-  aggrdata <- fastTickAgregation(rdata, on = align.by, k = align.period)
+  aggrdata <- fastTickAgregation(rdata, on = alignBy, k = align.period)
   
   if (makeReturns == TRUE) {  
     rdata <- makeReturns(rdata) 
@@ -993,7 +993,7 @@ rHYCov <- function(rdata, cor = FALSE, period = 1, align.by = "seconds", align.p
       diagonal[i] <- rCov(aggrdata[, i])#t(rdata[, i]) %*% rdata[, i]
     }
     diag(cov) <- diagonal
-    align.period <- getAlignPeriod(align.period, align.by)
+    align.period <- getAlignPeriod(align.period, alignBy)
     for (i in 2:n) {
       for (j in 1:(i - 1)) {
         cov[i, j] <- 
@@ -1015,7 +1015,7 @@ rHYCov <- function(rdata, cor = FALSE, period = 1, align.by = "seconds", align.p
         #                 as.integer(type), ab = double(kernel.param + 1),
         #                 ab2 = double(kernel.param + 1))
         
-        # rc.hy( x=rdata[[i]], y=rdata[[j]], period = period,align.by=align.by, 
+        # rc.hy( x=rdata[[i]], y=rdata[[j]], period = period,alignBy=alignBy, 
         #        align.period = align.period, cts = cts, makeReturns = makeReturns)
       }
     }
@@ -1044,7 +1044,7 @@ rHYCov <- function(rdata, cor = FALSE, period = 1, align.by = "seconds", align.p
 #' @param rdata a \eqn{(M x N)} matrix/zoo/xts object containing the \eqn{N}
 #' return series over period \eqn{t}, with \eqn{M} observations during \eqn{t}.
 #' @param cor boolean, in case it is TRUE, the correlation is returned. FALSE by default.
-#' @param align.by Align the tick data to seconds|minutes|hours
+#' @param alignBy Align the tick data to seconds|minutes|hours
 #' @param align.period Align the tick data to this many [seconds|minutes|hours]
 #' @param makeReturns Convert to Returns
 #' @param kernel.type Kernel name (or number)
@@ -1066,17 +1066,17 @@ rHYCov <- function(rdata, cor = FALSE, period = 1, align.by = "seconds", align.p
 #'
 #' @examples
 #' # Univariate:
-#' rvKernel <- rKernelCov(rdata = sampleTData$PRICE, align.by = "minutes",
+#' rvKernel <- rKernelCov(rdata = sampleTData$PRICE, alignBy = "minutes",
 #'                        align.period = 5, makeReturns = TRUE)
 #' rvKernel
 #'
 #' # Multivariate:
-#' rcKernel <- rKernelCov(rdata = cbind(lltc, sbux, fill = 0), align.by = "minutes",
+#' rcKernel <- rKernelCov(rdata = cbind(lltc, sbux, fill = 0), alignBy = "minutes",
 #'                        align.period = 5, makeReturns = FALSE)
 #' rcKernel
 #' @keywords volatility
 #' @export
-rKernelCov <- function(rdata, cor = FALSE,  align.by = "seconds", align.period = 1,
+rKernelCov <- function(rdata, cor = FALSE,  alignBy = "seconds", align.period = 1,
                        makeReturns = FALSE, kernel.type = "rectangular", kernel.param = 1,
                        kernel.dofadj = TRUE) {
   
@@ -1086,8 +1086,8 @@ rKernelCov <- function(rdata, cor = FALSE,  align.by = "seconds", align.period =
   }
   
   # # Aggregate:
-  if ((!is.null(align.by)) && (!is.null(align.period))) {
-    rdata <- fastTickAgregation(rdata, on = align.by, k = align.period)
+  if ((!is.null(alignBy)) && (!is.null(align.period))) {
+    rdata <- fastTickAgregation(rdata, on = alignBy, k = align.period)
   }
   if (makeReturns == TRUE) {
     rdata <- makeReturns(rdata)
@@ -1156,7 +1156,7 @@ rKernelCov <- function(rdata, cor = FALSE,  align.by = "seconds", align.period =
 #'  in which \eqn{RV_t:} realized variance
 #'   
 #' @param rdata a zoo/xts object containing all returns in period t for one asset.
-#' @param align.by a string, align the tick data to "seconds"|"minutes"|"hours".
+#' @param alignBy a string, align the tick data to "seconds"|"minutes"|"hours".
 #' @param align.period an integer, align the tick data to this many [seconds|minutes|hours].
 #' @param makeReturns boolean, should be TRUE when rdata contains prices instead of returns. FALSE by   default.
 #'
@@ -1168,20 +1168,20 @@ rKernelCov <- function(rdata, cor = FALSE,  align.by = "seconds", align.period =
 #' 
 #' @examples 
 #' data(sampleTData)
-#' rKurt(sampleTData$PRICE, align.by = "minutes", align.period = 5, makeReturns = TRUE)
+#' rKurt(sampleTData$PRICE, alignBy = "minutes", align.period = 5, makeReturns = TRUE)
 #' 
 #' @keywords highfrequency rKurt
 #' @importFrom xts apply.daily
 #' @export
-rKurt <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE) {
+rKurt <- function(rdata, alignBy = NULL, align.period = NULL, makeReturns = FALSE) {
   
   # self-reference for multi-day input
   if (checkMultiDays(rdata) == TRUE) { 
-    result <- apply.daily(rdata, rKurt, align.by, align.period, makeReturns)
+    result <- apply.daily(rdata, rKurt, alignBy, align.period, makeReturns)
     return(result)
   } else {
-    if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata <- fastTickAgregation(rdata, on = align.by, k = align.period)
+    if ((!is.null(alignBy)) && (!is.null(align.period))) {
+      rdata <- fastTickAgregation(rdata, on = alignBy, k = align.period)
     }
     if (makeReturns == TRUE) {
       rdata <- makeReturns(rdata)
@@ -1224,7 +1224,7 @@ rKurt <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
 #' @param rdata a zoo/xts object containing all returns in period t for one asset.
 #' @param m the window size of return blocks. 2 by default.
 #' @param p the power of the variation. 2 by default.
-#' @param align.by a string, align the tick data to "seconds"|"minutes"|"hours".
+#' @param alignBy a string, align the tick data to "seconds"|"minutes"|"hours".
 #' @param align.period an integer, align the tick data to this many [seconds|minutes|hours].
 #' @param makeReturns boolean, should be TRUE when rdata contains prices instead of returns. FALSE by  default.
 #'
@@ -1236,19 +1236,19 @@ rKurt <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
 #' 
 #' @examples
 #' data(sampleTData)
-#' rMPV(sampleTData$PRICE, m = 2, p = 3, align.by = "minutes", align.period = 5, makeReturns = TRUE)
+#' rMPV(sampleTData$PRICE, m = 2, p = 3, alignBy = "minutes", align.period = 5, makeReturns = TRUE)
 #' 
 #' @keywords highfrequency rMPV
 #' @export
-rMPV <- function(rdata, m = 2, p = 2, align.by = NULL, align.period = NULL, makeReturns = FALSE) {
+rMPV <- function(rdata, m = 2, p = 2, alignBy = NULL, align.period = NULL, makeReturns = FALSE) {
   
   # self-reference for multi-day input
   if (checkMultiDays(rdata) == TRUE) { 
-    result <- apply.daily(rdata, rMPV, align.by, align.period, makeReturns)
+    result <- apply.daily(rdata, rMPV, alignBy, align.period, makeReturns)
     return(result)
   } else {
-    if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata <- fastTickAgregation(rdata, on = align.by, k = align.period)
+    if ((!is.null(alignBy)) && (!is.null(align.period))) {
+      rdata <- fastTickAgregation(rdata, on = alignBy, k = align.period)
     }
     if (makeReturns) {
       rdata <- makeReturns(rdata)
@@ -1294,7 +1294,7 @@ rMPV <- function(rdata, m = 2, p = 2, align.by = NULL, align.period = NULL, make
 #' @param rdata a \eqn{(M x N)} matrix/zoo/xts object containing the \eqn{N}
 #' return series over period \eqn{t}, with \eqn{M} observations during \eqn{t}.
 #' @param cor boolean, in case it is TRUE, the correlation is returned. FALSE by default.
-#' @param align.by a string, align the tick data to "seconds"|"minutes"|"hours".
+#' @param alignBy a string, align the tick data to "seconds"|"minutes"|"hours".
 #' @param align.period an integer, align the tick data to this many [seconds|minutes|hours]. 
 #' @param makeReturns boolean, should be TRUE when rdata contains prices instead of returns. FALSE by default.
 #' @param seasadjR a \eqn{(M x N)} matrix/zoo/xts object containing 
@@ -1334,7 +1334,7 @@ rMPV <- function(rdata, m = 2, p = 2, align.by = NULL, align.period = NULL, make
 #' # at 5 minutes.
 #' 
 #' # Univariate: 
-#' rvoutw <- rOWCov(rdata = sampleTData$PRICE, align.by = "minutes",
+#' rvoutw <- rOWCov(rdata = sampleTData$PRICE, alignBy = "minutes",
 #'                    align.period = 5, makeReturns = TRUE)
 #' rvoutw 
 #' 
@@ -1344,7 +1344,7 @@ rMPV <- function(rdata, m = 2, p = 2, align.by = NULL, align.period = NULL, make
 #' 
 #' @keywords volatility
 #' @export
-rOWCov <- function (rdata, cor = FALSE, align.by = NULL, align.period = NULL, makeReturns = FALSE, seasadjR = NULL, wfunction = "HR" , alphaMCD = 0.75, alpha = 0.001){
+rOWCov <- function (rdata, cor = FALSE, alignBy = NULL, align.period = NULL, makeReturns = FALSE, seasadjR = NULL, wfunction = "HR" , alphaMCD = 0.75, alpha = 0.001){
   
   if (is.null(seasadjR) == TRUE) { 
     seasadjR <- rdata 
@@ -1355,9 +1355,9 @@ rOWCov <- function (rdata, cor = FALSE, align.by = NULL, align.period = NULL, ma
   }
   
   # Aggregate:
-  if ((!is.null(align.by))&&(!is.null(align.period))) {
-    rdata <- fastTickAgregation(rdata, on = align.by, k = align.period)
-    seasadjR <- fastTickAgregation(seasadjR, on = align.by, k = align.period)
+  if ((!is.null(alignBy))&&(!is.null(align.period))) {
+    rdata <- fastTickAgregation(rdata, on = alignBy, k = align.period)
+    seasadjR <- fastTickAgregation(seasadjR, on = alignBy, k = align.period)
   }     
   if (makeReturns == TRUE) { 
     rdata <- makeReturns(rdata)
@@ -1450,7 +1450,7 @@ rOWCov <- function (rdata, cor = FALSE, align.by = NULL, align.period = NULL, ma
 #' \eqn{RV_{t}:} realized variance
 #' 
 #' @param rdata a zoo/xts object containing all returns in period t for one asset.
-#' @param align.by a string, align the tick data to "seconds"|"minutes"|"hours".
+#' @param alignBy a string, align the tick data to "seconds"|"minutes"|"hours".
 #' @param align.period an integer, align the tick data to this many [seconds|minutes|hours].
 #' @param makeReturns boolean, should be TRUE when rdata contains prices instead of returns. FALSE by   default.
 #' 
@@ -1462,19 +1462,19 @@ rOWCov <- function (rdata, cor = FALSE, align.by = NULL, align.period = NULL, ma
 #' 
 #' @examples 
 #' data(sampleTData)
-#' rSkew(sampleTData$PRICE,align.by ="minutes", align.period =5, makeReturns = TRUE)
+#' rSkew(sampleTData$PRICE,alignBy ="minutes", align.period =5, makeReturns = TRUE)
 #' 
 #' @keywords highfrequency rSkew
 #' @export
-rSkew <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE) {
+rSkew <- function(rdata, alignBy = NULL, align.period = NULL, makeReturns = FALSE) {
   
   # self-reference for multi-day input
   if (checkMultiDays(rdata) == TRUE) { 
-    result <- apply.daily(rdata, rSkew, align.by, align.period, makeReturns)
+    result <- apply.daily(rdata, rSkew, alignBy, align.period, makeReturns)
     return(result)
   } else {
-    if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata <- fastTickAgregation(rdata, on = align.by, k = align.period)
+    if ((!is.null(alignBy)) && (!is.null(align.period))) {
+      rdata <- fastTickAgregation(rdata, on = alignBy, k = align.period)
     }
     if (makeReturns) {
       rdata <- makeReturns(rdata)
@@ -1505,29 +1505,29 @@ rSkew <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FAL
 #'   \mbox{rSVupside}_{t}= \sum_{i=1}^{N} (r_{t,i})^2 \ \times \ I [ r_{t,i} >0 ]
 #' }
 #' @param rdata a zoo/xts object containing all returns in period t for one asset.
-#' @param align.by a string, align the tick data to "seconds"|"minutes"|"hours".
+#' @param alignBy a string, align the tick data to "seconds"|"minutes"|"hours".
 #' @param align.period an integer, align the tick data to this many [seconds|minutes|hours].
 #' @param makeReturns boolean, should be TRUE when rdata contains prices instead of returns. FALSE by   default.
 #' @return list with to arguments. The realized positive and negative semivariance.
 #' @examples 
 #' \dontrun{
 #' data(sampleTData)
-#' rSV(sampleTData$PRICE, align.by = "minutes", align.period = 5, makeReturns = TRUE)
+#' rSV(sampleTData$PRICE, alignBy = "minutes", align.period = 5, makeReturns = TRUE)
 #' }
 #' @references Barndorff-Nielsen, O.E., Kinnebrock, S. and Shephard N. (2008). Measuring downside risk - realized semivariance. CREATES research paper. p. 3-5.
 #' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
 #' @keywords  highfrequency rSV
 #' @export
-rSV <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE) {
+rSV <- function(rdata, alignBy = NULL, align.period = NULL, makeReturns = FALSE) {
   
   # self-reference for multi-day input
   if (checkMultiDays(rdata) == TRUE) {
-    result <- apply.daily(rdata, rSV, align.by, align.period, makeReturns)
+    result <- apply.daily(rdata, rSV, alignBy, align.period, makeReturns)
     return(result)
   } else {
     
-    if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata <- fastTickAgregation(rdata, on = align.by, k = align.period)
+    if ((!is.null(alignBy)) && (!is.null(align.period))) {
+      rdata <- fastTickAgregation(rdata, on = alignBy, k = align.period)
     }
     if (makeReturns)  {
       rdata <- makeReturns(rdata)
@@ -1565,7 +1565,7 @@ rSV <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE
 #' @param rdata a \eqn{(M x N)} matrix/zoo/xts object containing the \eqn{N}
 #' return series over period \eqn{t}, with \eqn{M} observations during \eqn{t}.
 #' @param cor boolean, in case it is TRUE, the correlation is returned. FALSE by default.
-#' @param align.by a string, align the tick data to "seconds"|"minutes"|"hours".
+#' @param alignBy a string, align the tick data to "seconds"|"minutes"|"hours".
 #' @param align.period an integer, align the tick data to this many [seconds|minutes|hours].
 #' @param makeReturns boolean, should be TRUE when rdata contains prices instead of returns. FALSE by default.
 #' 
@@ -1582,12 +1582,12 @@ rSV <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE
 #' 
 #' @examples # Realized threshold  Variance/Covariance: 
 #' # Multivariate:
-#' rcThreshold <- rThresholdCov(cbind(lltc, sbux), align.by = "minutes", align.period = 1) 
+#' rcThreshold <- rThresholdCov(cbind(lltc, sbux), alignBy = "minutes", align.period = 1) 
 #' rcThreshold  
 #' 
 #' @keywords volatility
 #' @export
-rThresholdCov <- function(rdata, cor = FALSE, align.by = NULL, align.period = NULL, makeReturns = FALSE) {
+rThresholdCov <- function(rdata, cor = FALSE, alignBy = NULL, align.period = NULL, makeReturns = FALSE) {
   rdatacheck(rdata, multi = TRUE)
   # Multiday adjustment: 
   multixts <- multixts(rdata)
@@ -1598,17 +1598,17 @@ rThresholdCov <- function(rdata, cor = FALSE, align.by = NULL, align.period = NU
       n <- dim(rdata)[2] 
     }
     if (n == 1) { 
-      result <- apply.daily(rdata, rThresholdCov, cor = cor, align.by = align.by, 
+      result <- apply.daily(rdata, rThresholdCov, cor = cor, alignBy = alignBy, 
                             align.period = align.period, makeReturns = makeReturns) 
     }
     if (n > 1) { 
-      result <- applyGetList(rdata, rThresholdCov, cor = cor, align.by = align.by,
+      result <- applyGetList(rdata, rThresholdCov, cor = cor, alignBy = alignBy,
                               align.period = align.period, makeReturns = makeReturns)
     }    
     return(result)
   } else { #single day code
-    if ((is.null(align.by) == FALSE) && (!is.null(align.period))) {
-      rdata <- fastTickAgregation(rdata, on = align.by, k = align.period)
+    if ((is.null(alignBy) == FALSE) && (!is.null(align.period))) {
+      rdata <- fastTickAgregation(rdata, on = alignBy, k = align.period)
     } 
     if (makeReturns == TRUE) { 
       rdata <- makeReturns(rdata) 
@@ -1840,7 +1840,7 @@ RV <- function(rdata) {
 #'  }
 #'  
 #' @param rdata a zoo/xts object containing all returns in period t for one asset.
-#' @param align.by a string, align the tick data to "seconds"|"minutes"|"hours".
+#' @param alignBy a string, align the tick data to "seconds"|"minutes"|"hours".
 #' @param align.period an integer, align the tick data to this many [seconds|minutes|hours].  
 #' @param makeReturns boolean, should be TRUE when rdata contains prices instead of returns. FALSE by   default.
 #'  
@@ -1852,21 +1852,21 @@ RV <- function(rdata) {
 #'  
 #' @examples 
 #' data(sampleTData)
-#' rTPVar(rdata = sampleTData$PRICE, align.by = "minutes", align.period = 5, makeReturns = TRUE)
+#' rTPVar(rdata = sampleTData$PRICE, alignBy = "minutes", align.period = 5, makeReturns = TRUE)
 #' rTPVar
 #' 
 #' @importFrom zoo rollapply
 #' @keywords highfrequency rTPVar
 #' @export
-rTPVar <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE) {
+rTPVar <- function(rdata, alignBy = NULL, align.period = NULL, makeReturns = FALSE) {
   
   # self-reference for multi-day input
   if (checkMultiDays(rdata) == TRUE) { 
-    result <- apply.daily(rdata, rTPVar, align.by, align.period, makeReturns)
+    result <- apply.daily(rdata, rTPVar, alignBy, align.period, makeReturns)
     return(result)
   } else {
-    if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata <- fastTickAgregation(rdata, on = align.by, k = align.period)
+    if ((!is.null(alignBy)) && (!is.null(align.period))) {
+      rdata <- fastTickAgregation(rdata, on = alignBy, k = align.period)
     }
     if (makeReturns) {
       rdata <- makeReturns(rdata)
@@ -1905,7 +1905,7 @@ RTQ <- function(rdata) {
 #'  }
 #'
 #' @param rdata a zoo/xts object containing all returns in period t for one asset.
-#' @param align.by a string, align the tick data to "seconds"|"minutes"|"hours".
+#' @param alignBy a string, align the tick data to "seconds"|"minutes"|"hours".
 #' @param align.period an integer, align the tick data to this many [seconds|minutes|hours].  
 #' @param makeReturns boolean, should be TRUE when rdata contains prices instead of returns. FALSE by default.
 #'
@@ -1916,20 +1916,20 @@ RTQ <- function(rdata) {
 #' 
 #' @examples 
 #' data(sampleTData)
-#' rQPVar(rdata= sampleTData$PRICE, align.by= "minutes", align.period =5, makeReturns= TRUE)
+#' rQPVar(rdata= sampleTData$PRICE, alignBy= "minutes", align.period =5, makeReturns= TRUE)
 #' rQPVar
 #' 
 #' @keywords highfrequency rQPVar
 #' @export
-rQPVar <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE) {
+rQPVar <- function(rdata, alignBy = NULL, align.period = NULL, makeReturns = FALSE) {
   
   # self-reference for multi-day input
   if (checkMultiDays(rdata) == TRUE) { 
-    result <- apply.daily(rdata, rQPVar, align.by, align.period, makeReturns)
+    result <- apply.daily(rdata, rQPVar, alignBy, align.period, makeReturns)
     return(result)
   } else {
-    if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata <-fastTickAgregation(rdata, on = align.by, k = align.period)
+    if ((!is.null(alignBy)) && (!is.null(align.period))) {
+      rdata <-fastTickAgregation(rdata, on = alignBy, k = align.period)
     }
     if (makeReturns) {
       rdata <- makeReturns(rdata)
@@ -1953,7 +1953,7 @@ rQPVar <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FA
 #'  }
 #'  
 #' @param rdata a zoo/xts object containing all returns in period t for one asset.
-#' @param align.by a string, align the tick data to "seconds"|"minutes"|"hours".
+#' @param alignBy a string, align the tick data to "seconds"|"minutes"|"hours".
 #' @param align.period an integer, align the tick data to this many [seconds|minutes|hours].
 #' @param makeReturns boolean, should be TRUE when rdata contains prices instead of returns. FALSE by default.
 #' 
@@ -1964,19 +1964,19 @@ rQPVar <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FA
 #' @examples 
 #' \dontrun{
 #' data(sampleTData)
-#' rQuar(rdata = sampleTData$PRICE, align.by = "minutes", align.period = 5, makeReturns = TRUE)
+#' rQuar(rdata = sampleTData$PRICE, alignBy = "minutes", align.period = 5, makeReturns = TRUE)
 #' }
 #' @keywords  highfrequency rQuar
 #' @export
-rQuar <- function(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE) {
+rQuar <- function(rdata, alignBy = NULL, align.period = NULL, makeReturns = FALSE) {
   
   # self-reference for multi-day input
   if (checkMultiDays(rdata) == TRUE) { 
-    result <- apply.daily(rdata, rQuar, align.by, align.period, makeReturns)
+    result <- apply.daily(rdata, rQuar, alignBy, align.period, makeReturns)
     return(result)
   } else {
-    if ((!is.null(align.by)) && (!is.null(align.period))) {
-      rdata <- fastTickAgregation(rdata, on = align.by, k = align.period)
+    if ((!is.null(alignBy)) && (!is.null(align.period))) {
+      rdata <- fastTickAgregation(rdata, on = alignBy, k = align.period)
     }
     if (makeReturns == TRUE) {
       rdata <- makeReturns(rdata)

@@ -7,7 +7,7 @@
 rThresholdCov(
   rdata,
   cor = FALSE,
-  align.by = NULL,
+  alignBy = NULL,
   align.period = NULL,
   makeReturns = FALSE
 )
@@ -18,7 +18,7 @@ return series over period \eqn{t}, with \eqn{M} observations during \eqn{t}.}
 
 \item{cor}{boolean, in case it is TRUE, the correlation is returned. FALSE by default.}
 
-\item{align.by}{a string, align the tick data to "seconds"|"minutes"|"hours".}
+\item{alignBy}{a string, align the tick data to "seconds"|"minutes"|"hours".}
 
 \item{align.period}{an integer, align the tick data to this many [seconds|minutes|hours].}
 
@@ -46,7 +46,7 @@ as suggested in Jacod and Todorov (2009).
 \examples{
 # Realized threshold  Variance/Covariance: 
 # Multivariate:
-rcThreshold <- rThresholdCov(cbind(lltc, sbux), align.by = "minutes", align.period = 1) 
+rcThreshold <- rThresholdCov(cbind(lltc, sbux), alignBy = "minutes", align.period = 1) 
 rcThreshold  
 
 }
