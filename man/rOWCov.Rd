@@ -11,7 +11,7 @@ rOWCov(
   alignPeriod = NULL,
   makeReturns = FALSE,
   seasadjR = NULL,
-  wfunction = "HR",
+  wFunction = "HR",
   alphaMCD = 0.75,
   alpha = 0.001
 )
@@ -31,11 +31,11 @@ return series over period \eqn{t}, with \eqn{M} observations during \eqn{t}.}
 \item{seasadjR}{a \eqn{(M x N)} matrix/zoo/xts object containing 
 the seasonaly adjusted returns. This is an optional argument.}
 
-\item{wfunction}{determines whether 
+\item{wFunction}{determines whether 
 a zero-one weight function (one if no jump is detected based on \eqn{d_{t,i}} and 0 otherwise)
 or 
 Soft Rejection ("SR") weight function is to be used.
-By default a zero-one weight function (wfunction = "HR") is used.}
+By default a zero-one weight function (wFunction = "HR") is used.}
 
 \item{alphaMCD}{a numeric parameter, controlling the size of 
 the subsets over which the determinant is minimized. 

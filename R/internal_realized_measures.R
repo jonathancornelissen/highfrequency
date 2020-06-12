@@ -406,7 +406,7 @@ thetaROWVar <- function(alpha = 0.001 , alphaMCD = 0.5) {
 
 #' @importFrom robustbase covMcd
 #' @keywords internal
-ROWVar <- function(rData, seasadjR = NULL, wfunction = "HR" , alphaMCD = 0.75, alpha = 0.001) {
+ROWVar <- function(rData, seasadjR = NULL, wFunction = "HR" , alphaMCD = 0.75, alpha = 0.001) {
   
   if (is.null(seasadjR) == TRUE) {
     seasadjR <- rData
@@ -420,12 +420,12 @@ ROWVar <- function(rData, seasadjR = NULL, wfunction = "HR" , alphaMCD = 0.75, a
   k <- qchisq(p = 1 - alpha, df = N)
   outlierindic <- outlyingness > k
   weights <- rep(1, intraT)
-  if (wfunction == "HR") {
+  if (wFunction == "HR") {
     weights[outlierindic] <- 0
     wR <- sqrt(weights) * rData
     return((conHR(di = N, alpha = alpha) * sum(wR^2)) / mean(weights))
   }
-  if (wfunction == "SR") {
+  if (wFunction == "SR") {
     weights[outlierindic] <- k/outlyingness[outlierindic]
     wR <- sqrt(weights) * rData
     return((conhuber(di = N, alpha = alpha) * sum(wR^2)) / mean(weights))

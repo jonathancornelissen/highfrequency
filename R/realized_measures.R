@@ -1299,11 +1299,11 @@ rMPV <- function(rData, m = 2, p = 2, alignBy = NULL, alignPeriod = NULL, makeRe
 #' @param makeReturns boolean, should be TRUE when rData contains prices instead of returns. FALSE by default.
 #' @param seasadjR a \eqn{(M x N)} matrix/zoo/xts object containing 
 #' the seasonaly adjusted returns. This is an optional argument.
-#' @param wfunction determines whether 
+#' @param wFunction determines whether 
 #' a zero-one weight function (one if no jump is detected based on \eqn{d_{t,i}} and 0 otherwise)
 #' or 
 #' Soft Rejection ("SR") weight function is to be used.
-#' By default a zero-one weight function (wfunction = "HR") is used.
+#' By default a zero-one weight function (wFunction = "HR") is used.
 #' @param alphaMCD a numeric parameter, controlling the size of 
 #' the subsets over which the determinant is minimized. 
 #' Allowed values are between 0.5 and 1 and 
@@ -1344,7 +1344,8 @@ rMPV <- function(rData, m = 2, p = 2, alignBy = NULL, alignPeriod = NULL, makeRe
 #' 
 #' @keywords volatility
 #' @export
-rOWCov <- function (rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, seasadjR = NULL, wfunction = "HR" , alphaMCD = 0.75, alpha = 0.001){
+rOWCov <- function (rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, seasadjR = NULL,
+                    wFunction = "HR" , alphaMCD = 0.75, alpha = 0.001){
   
   if (is.null(seasadjR) == TRUE) { 
     seasadjR <- rData 
@@ -1373,7 +1374,7 @@ rOWCov <- function (rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, make
   }        
   
   if (n == 1) { 
-    return(ROWVar(rData, seasadjR = seasadjR, wfunction = wfunction, alphaMCD = alphaMCD, alpha = alpha ))
+    return(ROWVar(rData, seasadjR = seasadjR, wFunction = wFunction, alphaMCD = alphaMCD, alpha = alpha ))
   }
   
   if (n > 1) { 
@@ -1407,7 +1408,7 @@ rOWCov <- function (rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, make
     outlierindic <- outlyingness > k
     weights <- rep(1, intraT)
     
-    if (wfunction == "HR") {
+    if (wFunction == "HR") {
       weights[outlierindic] = 0
       wR <- sqrt(weights) * rData
       covariance <- (conHR(di = N, alpha = alpha) * t(wR) %*% wR) / mean(weights)
@@ -1420,7 +1421,7 @@ rOWCov <- function (rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, make
         return(rcor)
       }
     }
-    if (wfunction == "SR") {
+    if (wFunction == "SR") {
       weights[outlierindic] <- k/outlyingness[outlierindic]
       wR <- sqrt(weights) * rData
       covariance <- (conhuber(di = N, alpha = alpha) * t(wR) %*% wR) / mean(weights)

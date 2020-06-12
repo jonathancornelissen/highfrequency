@@ -87,7 +87,7 @@ expect_equal(
   "0.010039"
 )
 expect_equal(
-  formatC(rOWCov(rData = sample5MinPricesJumps['2010-01-04'], makeReturns = TRUE, wfunction = "SR")[1,1], digits = 3),
+  formatC(rOWCov(rData = sample5MinPricesJumps['2010-01-04'], makeReturns = TRUE, wFunction = "SR")[1,1], digits = 3),
   "0.0101"
 )
 
