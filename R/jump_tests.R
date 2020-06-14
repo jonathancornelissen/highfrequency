@@ -277,9 +277,9 @@ BNSjumpTest <- function (rData, IVestimator = "BV", IQestimator = "TP", type = "
 #'  
 #'  Let \eqn{R_{t,i}} be a simple return (with \eqn{i=1, \ldots,N}) in period \eqn{t}.
 #'  
-#'  Then the JOjumptest is given by: 
+#'  Then the JOjumpTest is given by: 
 #'    \deqn{
-#'      \mbox{JOjumptest}_{t,N}= \frac{N BV_{t}}{\sqrt{\Omega_{SwV}} \left(1-\frac{RV_{t}}{SwV_{t}} \right)}
+#'      \mbox{JOjumpTest}_{t,N}= \frac{N BV_{t}}{\sqrt{\Omega_{SwV}} \left(1-\frac{RV_{t}}{SwV_{t}} \right)}
 #'    }
 #'  in which, 
 #'  \eqn{BV}: bipower variance;
@@ -328,14 +328,14 @@ BNSjumpTest <- function (rData, IVestimator = "BV", IQestimator = "TP", type = "
 #' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
 #' 
 #' @examples
-#' JOjumptest(sample5MinPricesJumps$stock1, power = 6)
+#' JOjumpTest(sample5MinPricesJumps$stock1, power = 6)
 #' 
-#' @keywords highfrequency JOjumptest
+#' @keywords highfrequency JOjumpTest
 #' @importFrom stats qnorm
 #' @importFrom stats pnorm
 #' @importFrom zoo as.zoo
 #' @export
-JOjumptest <- function(pData, power = 4, ...) {
+JOjumpTest <- function(pData, power = 4, ...) {
 
   R  <- as.zoo(simre(pData))
   r  <- as.zoo(makeReturns(pData))

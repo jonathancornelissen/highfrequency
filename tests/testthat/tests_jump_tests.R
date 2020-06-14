@@ -13,12 +13,12 @@ test_that("AJjumpTest unit test",{
 context("JO jump test unit test")
 test_that("JO jump test unit test",{
   expect_equal(
-    formatC(JOjumptest(sample5MinPricesJumps[,1], power = 6)$ztest, digits = 10),
+    formatC(JOjumpTest(sample5MinPricesJumps[,1], power = 6)$ztest, digits = 10),
     "8.998787842"
   )
   
   expect_equal(
-    formatC(JOjumptest(sample5MinPricesJumps[,1], power = 4)$ztest, digits = 4),
+    formatC(JOjumpTest(sample5MinPricesJumps[,1], power = 4)$ztest, digits = 4),
     "7.832"
   )
 })
