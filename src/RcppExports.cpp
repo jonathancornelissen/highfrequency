@@ -59,8 +59,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // heavy_likelihoodR_
-List heavy_likelihoodR_(NumericVector h, NumericVector O, NumericVector A, NumericVector B, int TT, int K, int pMax, int qMax, NumericVector data, NumericVector backcast, NumericVector LB, NumericVector UB, NumericVector llRM, NumericVector lls);
-RcppExport SEXP _highfrequency_heavy_likelihoodR_(SEXP hSEXP, SEXP OSEXP, SEXP ASEXP, SEXP BSEXP, SEXP TTSEXP, SEXP KSEXP, SEXP pMaxSEXP, SEXP qMaxSEXP, SEXP dataSEXP, SEXP backcastSEXP, SEXP LBSEXP, SEXP UBSEXP, SEXP llRMSEXP, SEXP llsSEXP) {
+List heavy_likelihoodR_(NumericVector h, NumericVector O, NumericVector A, NumericVector B, int TT, int K, int pMax, int qMax, NumericVector data, NumericVector backCast, NumericVector LB, NumericVector UB, NumericVector llRM, NumericVector lls);
+RcppExport SEXP _highfrequency_heavy_likelihoodR_(SEXP hSEXP, SEXP OSEXP, SEXP ASEXP, SEXP BSEXP, SEXP TTSEXP, SEXP KSEXP, SEXP pMaxSEXP, SEXP qMaxSEXP, SEXP dataSEXP, SEXP backCastSEXP, SEXP LBSEXP, SEXP UBSEXP, SEXP llRMSEXP, SEXP llsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -73,12 +73,12 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type pMax(pMaxSEXP);
     Rcpp::traits::input_parameter< int >::type qMax(qMaxSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type data(dataSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type backcast(backcastSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type backCast(backCastSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type LB(LBSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type UB(UBSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type llRM(llRMSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type lls(llsSEXP);
-    rcpp_result_gen = Rcpp::wrap(heavy_likelihoodR_(h, O, A, B, TT, K, pMax, qMax, data, backcast, LB, UB, llRM, lls));
+    rcpp_result_gen = Rcpp::wrap(heavy_likelihoodR_(h, O, A, B, TT, K, pMax, qMax, data, backCast, LB, UB, llRM, lls));
     return rcpp_result_gen;
 END_RCPP
 }
