@@ -158,9 +158,9 @@ AJjumpTest <- function(pData, p = 4 , k = 2, alignBy = NULL, alignPeriod = NULL,
 #' 
 #' Let \eqn{r_{t,i}} be a return (with \eqn{i=1, \ldots,N}) in period \eqn{t}. 
 #' 
-#' Then the BNSjumptest is given by: 
+#' Then the BNSjumpTest is given by: 
 #' \deqn{
-#' \mbox{BNSjumptest}= \frac{RV - IVestimator}{\sqrt{(\theta-2)\frac{1}{N} {IQestimator}}}
+#' \mbox{BNSjumpTest}= \frac{RV - IVestimator}{\sqrt{(\theta-2)\frac{1}{N} {IQestimator}}}
 #' }
 #' in which, \eqn{IVestimator} can be: bipower variance (BV), minRV, medRV. 
 #' \eqn{IQestimator} can be: tripower quarticity (TP), quadpower quarticity (QP), minRQ, medRQ.
@@ -202,16 +202,16 @@ AJjumpTest <- function(pData, p = 4 , k = 2, alignBy = NULL, alignPeriod = NULL,
 #' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
 #' 
 #' @examples 
-#' BNSjumptest(sampleTData$PRICE, IVestimator= "minRV", 
+#' BNSjumpTest(sampleTData$PRICE, IVestimator= "minRV", 
 #'             IQestimator = "medRQ", type= "linear", makeReturns = TRUE)
 #' 
-#' @keywords highfrequency BNSjumptest
+#' @keywords highfrequency BNSjumpTest
 #' @export
-BNSjumptest <- function (rData, IVestimator = "BV", IQestimator = "TP", type = "linear",
+BNSjumpTest <- function (rData, IVestimator = "BV", IQestimator = "TP", type = "linear",
                          logTransform = FALSE, max = FALSE, alignBy = NULL, alignPeriod = NULL,
                          makeReturns = FALSE) {
   if (checkMultiDays(rData) == TRUE) {
-    result <- apply.daily(rData, BNSjumptest, alignBy, alignPeriod, makeReturns)
+    result <- apply.daily(rData, BNSjumpTest, alignBy, alignPeriod, makeReturns)
     return(result)
   } else {
     if ((!is.null(alignBy)) && (!is.null(alignPeriod))) {
@@ -462,6 +462,7 @@ intradayJumpTest <- function(pData = NULL, testType = "LM", testingTimes = NULL,
 
 
 #' @importFrom xts addPolygon
+#' @importFrom zoo na.locf0
 #' @export
 plot.intradayJumpTest <- function(x, ...){
   #unpack values
@@ -538,18 +539,18 @@ plot.intradayJumpTest <- function(x, ...){
   } else {
 
     shade <- dat$jumps
-    shade <- cbind(upper = shade * as.numeric(max(dat$pData, na.rm = TRUE) +1e5), lower = shade * as.numeric(min(dat$pData, na.rm = TRUE)) -1e5)
+    shade <- cbind(upper = shade * as.numeric(max(dat[, 1], na.rm = TRUE) +1e5), lower = shade * as.numeric(min(dat[, 1], na.rm = TRUE)) -1e5)
     colnames(shade) <- c("upper", "lower")
 
 
     paste0("Intraday Jump Test: ", testType)
 
 
-    p1 <- plot(na.locf0(dat[, "pData"]), main = main.text, lty = ifelse(testType == "LM", 2, 1))
+    p1 <- plot(na.locf0(dat[, 1]), main = main.text, lty = ifelse(testType == "LM", 2, 1))
 
 
     if(testType == "Lee-Mykland"){
-      p1 <- lines(na.locf0(dat$ts), col = "blue", lwd = 2)
+      p1 <- lines(na.locf0(dat[,2]), col = "blue", lwd = 2)
       p1 <- addLegend(legend.loc = 'topleft', legend.names = c("Actual prices", "Sub-sampled prices", "Jump detection zone"), lwd = c(2,2,0), pch=c(NA,NA,15), col =c(1, "blue", 2))
     } else {
       p1 <- addLegend(legend.loc = 'topleft', legend.names = c("Actual prices", "Jump detection zone"), lwd = c(2,0), pch=c(NA,15), col =c(1, 2))
@@ -578,7 +579,7 @@ LeeMyklandtest <- function(testData, testingTimes, windowSize, K, alpha){
 
   oldK <- K
   const <- 0.7978846 # c in formula 10 in the paper
-  Cn <- Sn <- L <- numeric(length(testingTimes))
+  spotBPV <- Cn <- Sn <- L <- numeric(length(testingTimes))
   betastar <- -log(-log(1-alpha))
   dateOfData <- as.character(as.Date(index(testData[1])))
 
@@ -621,10 +622,10 @@ LeeMyklandtest <- function(testData, testingTimes, windowSize, K, alpha){
 
     returns <- diff(log(thisData[-length(thisData)]))
     n <- length(returns)
-    spotBPV <- 1/(K-2) * sum(abs(returns[1:(n-1)] * returns[2:n]))
+    spotBPV[i] <- 1/(K-2) * sum(abs(returns[1:(n-1)] * returns[2:n]))
 
 
-    L[i] <- return/sqrt(spotBPV)
+    L[i] <- return/sqrt(spotBPV[i])
     # We have Cn and Sn as vectors as the size of these may change.
     Cn[i] <- sqrt(2 * log(n))/const - (log(pi) + log( log(n) ))/(2 * const*sqrt((2 * log(n))))
     Sn[i] <- 1/sqrt(const * 2 * log(n))
@@ -635,7 +636,7 @@ LeeMyklandtest <- function(testData, testingTimes, windowSize, K, alpha){
   jumps <- (abs(L) - Cn)/Sn > betastar
 
   jumps <- xts(jumps, as.POSIXct(paste(dateOfData, testingTimes)))
-  out <- merge.xts(testData, merge.xts(jumps, L))
+  out <- merge.xts(testData, merge.xts(jumps, L, spotBPV))
   return(out)
 
 }
