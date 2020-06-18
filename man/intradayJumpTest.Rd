@@ -6,12 +6,17 @@
 \usage{
 intradayJumpTest(
   pData = NULL,
+  rData = NULL,
   testType = "LM",
   testingTimes = NULL,
   windowSize = 5,
   K = 10,
   alpha = 0.05,
   theta = 0.5,
+  r = 1,
+  BoxCox = 1,
+  nBoot = 1000,
+  dontTestAtBoundaries = TRUE,
   ...
 )
 }

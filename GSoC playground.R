@@ -21,13 +21,13 @@ if(FALSE)
 volatilityModel <- list(modelType = "constant", variance = 1, burstModel = list(burstMultiplier = 3, burstInterval = c(16/32, 17/32)),
                         includeDiurnality = FALSE, diurnalModel = list(C = 0.88929198, A = 0.75, B = 0.25, a = 10, b = 10))
 driftModel <- list(modelType = "constant", drift = 0)
-nSeries <- 1
-nDays <- 100
-nObs <- 23401
+nSeries <- 10
+nDays <- 50
+nObs <- 4681
 timeSettings  <- list(tradingStart = 34200, tradingEnd = 57600, origin = "1970-01-01" , sampling = "equidistant")
 discretize <- FALSE
 
-jumpModel  <- list(modelType = "PA", jumpComponent = 1 / 4, jumpTime = c(0.25, 0.75), includeJumps = TRUE) #includeJumps should be automated in the creation of the spec
+jumpModel  <- list(modelType = "PA", jumpComponent = 1 / 4, jumpTime = c(16/32, 17/32), includeJumps = TRUE) #includeJumps should be automated in the creation of the spec
 
 hfSimSpec <- createHFSimSpec(volatilityModel = volatilityModel, driftModel = driftModel, jumpModel = jumpModel, nDays = nDays, nSeries = nSeries, nObs = nObs)
 sim <- hfsim.do(hfSimSpec)
@@ -41,9 +41,6 @@ gc()
 
 rv <- rCov(exp(sim$prices), makeReturns = TRUE, alignBy = "secs", alignPeriod = 1)
 bpv <- rBPCov(exp(sim$prices), makeReturns = TRUE, alignBy = "secs", alignPeriod = 1)
-mean((rv-bpv)/rv)
-mean(rv) # Converges to the quadratic variation
-mean(bpv) # Converges to the integrated variance
 
 jumpVariation <- matrix(0, nrow = nDays, ncol = nSeries)
 jumpComponent <- 0
@@ -86,3 +83,61 @@ plot(FoFtest1Day)
 
 par(mfrow = c(1,1))
 plot(FoFtest)
+
+
+volatilityModel <- list(modelType = "constant", variance = 1, burstModel = list(burstMultiplier = 3, burstInterval = c(16/32, 17/32)),
+                        includeDiurnality = FALSE, diurnalModel = list(C = 0.88929198, A = 0.75, B = 0.25, a = 10, b = 10))
+driftModel <- list(modelType = "constant", drift = 0)
+nSeries <- 10
+nDays <- 50
+nObs <- 4681
+timeSettings  <- list(tradingStart = 34200, tradingEnd = 57600, origin = "1970-01-01" , sampling = "equidistant")
+discretize <- FALSE
+
+jumpModel  <- list(modelType = "PA", jumpComponent = 1/4, jumpTime = c((16*8)/(128*4), (17*8)/(128*4)), includeJumps = TRUE) 
+
+hfSimSpec <- createHFSimSpec(volatilityModel = volatilityModel, driftModel = driftModel, jumpModel = jumpModel, nDays = nDays, nSeries = nSeries, nObs = nObs)
+sim <- hfsim.do(hfSimSpec)
+
+plot(100+sim$prices["1970-01-02"], observation.based = T)
+
+rankTest <- intradayJumpTest(pData = 100 + sim$prices, testType = "rank", windowSize = 1, K = 30, alpha = c(7,4))
+
+plot(rankTest)
+
+
+library(data.table)
+library(xts)
+library(anytime)
+### Rank test at jump events
+rm(list = ls())
+
+
+dat <- fread("/home/emil/Dropbox/GSOC/code_from_papers/OnlineSoftware/dz.csv")
+dx <- as.matrix(fread("/home/emil/Dropbox/GSOC/code_from_papers/OnlineSoftware/dx.csv"))
+
+
+
+nDays <- nrow(dat)/390
+timestamps <- rep(seq(34260, 57600, 60), nDays) + rep(0:(nDays-1) * 86400, each = 390)
+marketReturns <- xts(as.numeric(dat$V1), anytime(timestamps))
+
+
+
+
+stockReturns <- xts(dx, anytime(timestamps))
+
+alpha = c(7, 4)
+
+alpha = c(7,4)
+
+K = 10
+kn = 30
+r = 1
+BoxCox = 1
+nBoot = 1000
+dontTestAtBoundaries = FALSE
+
+rankTest <- intradayJumpTest(rData = cbind(marketReturns, stockReturns), testType = "rank", windowSize = 1, K = 30, alpha = c(7,4))
+
+plot(rankTest)

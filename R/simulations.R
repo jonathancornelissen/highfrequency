@@ -49,7 +49,10 @@ hfsim.do <- function(hfSimSpec){
   # If we need to include jumps, then we do it here
   if(includeJumps){
     jumps$jumpIndices <- jumps$jumpIndices + 0:(nDays-1) * nObs
-    returns[jumps$jumpIndices] <- returns[jumps$jumpIndices] + jumps$jumps
+    for (j in 1:nSeries){
+      returns[jumps$jumpIndices[, j], j] <- returns[jumps$jumpIndices[, j], j] + abs(jumps$jumps[,j])
+    }
+    print(" remove abs from jumps")
   }
   
   
@@ -485,7 +488,6 @@ preAnnouncedJumpSim <- function(model, nDays, nSeries, nObs){
   # make sure the jumps don't happen during trading and not after (i.e. we try to put it in to indices that dont exits)
   jumpIndices <- matrix(apply(jumpIndices, 2, FUN = function(x) pmin.int(x, nObs)), ncol = nSeries)
   jumpIndices <- matrix(apply(jumpIndices, 2, FUN = function(x) pmax.int(x, 1)), ncol = nSeries)
-  
   
   out <- list("jumps" = jumps, "jumpIndices" = jumpIndices)
   return(out)

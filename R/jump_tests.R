@@ -475,18 +475,35 @@ intradayJumpTest <- function(pData = NULL, rData = NULL, testType = "LM", testin
     out <- switch (testType,
       LM = LeeMyklandtest(testData, testingTimes, windowSize, K, alpha),
       FoF = FoFJumpTest(pData, theta, K, alpha),
-      rank = rankJumpTest(testData[,1], testData[,-1], alpha, K, windowSize,
+      rank = rankJumpTest(testData[,1], testData[,-1], alpha = alpha, K = windowSize, kn = K,
                           r = r, BoxCox = BoxCox, nBoot = nBoot, 
                           dontTestAtBoundaries = dontTestAtBoundaries)
       
     )
-
     if(setClass){
       
       if(testType == "rank"){
-        out <- list("tests" = testData, "information" = list("testType" = testType, "isMultiDay" = isMultiDay, 
-                                                             "criticalValues" = out$criticalValues ,"K" = K, "kn" = kn),
-                    "jumpIndices" = out$jumpIndices)
+        #browser()
+        tmp <- list() # So we don't override the output list.
+        if(is.null(pData)){
+          tmp[["tests"]] <- cbind(testData, c(out$jumpIndices, rep(NA, nrow(testData) - length(out$jumpIndices))))
+        } else {
+          
+          print("ask Onno, Kris, and Nabil about best action")
+          temp <- NULL
+          for (date in dates){
+            temp <- rbind(temp, aggregateTS(pData[date], on = "minutes", k = windowSize))
+          }
+          tmp[["tests"]] <- cbind(temp, c(out$jumpIndices, rep(NA, nrow(temp) - length(out$jumpIndices)))) 
+        }
+        
+        
+        #"tests" = cbind(ifelse(is.null(pData), testData, pData), c(out$jumpIndices, rep(NA, ifelse(is.null(pData), nrow(testData), nrow(pData)) - length(out$jumpIndices))))
+        tmp[["information"]] <- list("testType" = testType, "isMultiDay" = isMultiDay, 
+                                                             "criticalValues" = out$criticalValues ,"K" = K, 
+                                                             "kn" = K, "testStatistic" = out$testStatistic)
+        colnames(tmp[["tests"]]) <- c(colnames(tmp[["tests"]])[1:(ncol(tmp[["tests"]]) -1 )], "jumps")
+        out <- tmp
       }
       else {
         out <- list("tests" = merge.xts(pData, out), "information" = list("testType" = testType, "isMultiDay" = isMultiDay))
@@ -505,22 +522,37 @@ intradayJumpTest <- function(pData = NULL, rData = NULL, testType = "LM", testin
 }
 
 
-#' @importFrom xts addPolygon
+#' @importFrom xts addPolygon xts
 #' @importFrom zoo na.locf0
 #' @export
 plot.intradayJumpTest <- function(x, ...){
   #unpack values
   isMultiday <- x[["information"]][["isMultiDay"]]
+  dat <- NULL
+  testType <- x[["information"]][["testType"]]
   # Here, we have more than one day
   if(isMultiday){
-    dates <- names(x[["tests"]])
+    dates <- index(x[["tests"]])
+    if(testType == "rank"){ # Here we only plot some of the days.
+      
+      idx <- sort(c(as.numeric(na.omit(x[["tests"]][,"jumps"]))-1, as.numeric(na.omit(x[["tests"]][,"jumps"]))))
+      if(is.null(idx)){
+        print("no jumps detected with the rank test, no events to plot.")
+        invisible(0)
+      }
+      jumps <- xts(x[["tests"]][idx,1], index(na.omit(x[["tests"]][idx,1])))
+      dates <- as.character(as.Date(dates[na.omit(x[["tests"]][,"jumps"])]))  # We use as.Date to lose the hours and minutes and transform into character so we can use it
+    } else{
+      dates <- as.character(unique(as.Date(dates)))
+    }
+    
     dat <- NULL
 
     for (i in 1:length(dates)) {
       if(is.null(dat)){
-        dat <- x[["tests"]][[i]]
+        dat <- x[["tests"]][dates[i]]
       } else {
-        dat <- rbind(dat, x[["tests"]][[i]])
+        dat <- rbind(dat, x[["tests"]][dates[i]])
       }
     }
   } else {
@@ -530,7 +562,7 @@ plot.intradayJumpTest <- function(x, ...){
   # Make the shade to show where we detect jumps
 
 
-  testType <- x[["information"]][["testType"]]
+  
 
   if(testType == "LM"){
     testType <- "Lee-Mykland"
@@ -540,34 +572,48 @@ plot.intradayJumpTest <- function(x, ...){
   if(testType == "FoF"){
     main.text <- paste0("Intraday Jump Test: Fact or Friction \nJump Variation:", round(max(0, mean(dat$jumpVariation, na.rm=TRUE)), 4))
   }
+  
+  if(testType == "rank"){
+    main.text <- paste0("rank test")
+  }
 
 
   if(isMultiday){
     print("Support for plotting intradayJumpTests when the data spans more than one day is not ready yet.")
 
-    for(day in dates){ # We loop through all the days and ask the user whether we should continue or stop
+    for(day in as.character(dates)){ # We loop through all the days and ask the user whether we should continue or stop
       thisDat <- dat[day]
-      shade <- thisDat$jumps
-
-
+      
       if(testType == "FoF"){
         # Here we update the jump variation in the main text in the case of the FoF test.
         main.text <- paste0("Intraday Jump Test: Fact or Friction \nJump Variation:", round(max(0, mean(thisDat$jumpVariation, na.rm=TRUE)), 4))
       }
-
-
-      shade <- cbind(upper = shade * as.numeric(max(thisDat$pData, na.rm = TRUE) +1e5), lower = shade * as.numeric(min(thisDat$pData, na.rm = TRUE)) -1e5)
-
-      colnames(shade) <- c("upper", "lower")
-
-      p1 <- plot(na.locf0(thisDat[, 1]), main = main.text, lty = 2)
+      
+      shade <- thisDat$jumps
+            
       ## Add shaded region to the plot where we detect jumps
       if(testType == "Lee-Mykland"){
-        p1 <- lines(na.locf0(thisDat$ts), col = "blue", lwd = 2)
+        p1 <- plot(na.locf0(thisDat[, 1]), main = main.text, lty = 2)
+        
+        p1 <- lines(na.locf0(thisDat[,2]), col = "blue", lwd = 2)
+        
         p1 <- addLegend(legend.loc = 'topleft', legend.names = c("Actual prices", "Sub-sampled prices", "Jump detection zone"), lwd = c(2,2,0), pch=c(NA,NA,15), col =c(1, "blue", 2))
-      } else {
+        
+      } else if(testType == "FoF") {
+        p1 <- plot(na.locf0(thisDat[, 1]), main = main.text, lty = 2)
+        
         p1 <- addLegend(legend.loc = 'topleft', legend.names = c("Actual prices", "Jump detection zone"), lwd = c(2,0), pch=c(NA,15), col =c(1, 2))
+        
+      }else if(testType == "rank"){
+        
+        shade <- na.omit(jumps[day])
+        
+        p1 <- plot(na.locf0(thisDat[, 1:(ncol(thisDat)-1)]), main = main.text, lty = 1)        
       }
+      
+      shade <- cbind(upper = shade * as.numeric(max(thisDat[,1], na.rm = TRUE) +1e5), lower = shade * as.numeric(min(thisDat[,1], na.rm = TRUE)) -1e5)
+      colnames(shade) <- c("upper", "lower")
+      
 
 
       shade <- na.omit(shade)
@@ -596,8 +642,10 @@ plot.intradayJumpTest <- function(x, ...){
     if(testType == "Lee-Mykland"){
       p1 <- lines(na.locf0(dat[,2]), col = "blue", lwd = 2)
       p1 <- addLegend(legend.loc = 'topleft', legend.names = c("Actual prices", "Sub-sampled prices", "Jump detection zone"), lwd = c(2,2,0), pch=c(NA,NA,15), col =c(1, "blue", 2))
-    } else {
+    } else if(testType == "FoF") {
       p1 <- addLegend(legend.loc = 'topleft', legend.names = c("Actual prices", "Jump detection zone"), lwd = c(2,0), pch=c(NA,15), col =c(1, 2))
+    } else if(testType == "rank"){
+      browser()
     }
     ## Add shaded region to the plot where we detect jumps
     shade <- na.omit(shade)
@@ -766,7 +814,7 @@ timeOfDayAdjustments <- function(returns, n, m, polyOrder){
   #timeOfDayScatter <- matrix(1.249531 * rowMeans(abs(returns[,1:(m-2)]) ^ (2/3) * abs(returns[,2:(m-1)])^ (2/3) * abs(returns[,3:m])^ (2/3)))
   #
   
-  timeOfDayScatter <- 1.249531 * rowMeans(abs(returns[,1:(m-2)]* returns[,2:(m-1)] * returns[,3:m])^ (2/3))
+  timeOfDayScatter <- 1.249531 * rowMeans((abs(returns[,1:(m-2)])* abs(returns[,2:(m-1)]) * abs(returns[,3:m]))^(2/3))
   
   
   
@@ -795,7 +843,6 @@ jumpDetection <- function(returns, alpha, nRets, nDays){
   bpv <- pi/2 * colSums(abs(returns[1:(nRets-1),]) * abs(returns[2:nRets,]))
   rv <- colSums(returns^2)
   TODadjustments <- timeOfDayAdjustments(returns, n=nRets,  m = nDays, polyOrder = 2)
-  
   Un <- alpha * sqrt(kronecker(pmin(bpv,rv), TODadjustments$timeOfDayFit)) * (1/nRets) ^0.49
   
   jumpIndices <- which(abs(as.numeric(returns)) > Un) # Where does a jump in the market occur?
@@ -830,6 +877,7 @@ rankJumpTest <- function(marketReturns, stockReturns, alpha = c(7,4), K = 10, kn
   if(any(alpha< 1)){
     warning("alpha should be specified in terms of standard deviations in the rank jump test.")
   }
+  
   nDays <- ndays(marketReturns)
   nRets <- nrow(marketReturns)/nDays
   marketJumpDetection <- jumpDetection(marketReturns, alpha[1], nRets = nRets, nDays = nDays)
@@ -843,7 +891,6 @@ rankJumpTest <- function(marketReturns, stockReturns, alpha = c(7,4), K = 10, kn
   for(j in 1:nAssets){
     stockJumpDetections[, j] <- jumpDetection(stockJumpDetections[,j], alpha[2], nRets = nRets, nDays = nDays)[["Un"]]
   }
-  
   
   jumps <- matrix(coredata(stockReturns)[jumpIndices,], ncol = ncol(stockReturns), byrow = FALSE)
   
