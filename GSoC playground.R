@@ -22,7 +22,7 @@ volatilityModel <- list(modelType = "constant", variance = 1, burstModel = list(
                         includeDiurnality = FALSE, diurnalModel = list(C = 0.88929198, A = 0.75, B = 0.25, a = 10, b = 10))
 driftModel <- list(modelType = "constant", drift = 0)
 nSeries <- 10
-nDays <- 50
+nDays <- 2
 nObs <- 4681
 timeSettings  <- list(tradingStart = 34200, tradingEnd = 57600, origin = "1970-01-01" , sampling = "equidistant")
 discretize <- FALSE
@@ -61,17 +61,17 @@ if(nSeries == 1){
 ####### LM jump test #######
 # or equivalently we can specify the jumps in seconds after midnight.
 testingTimes <- seq(34200 + 10*300, 57600 - 3600, 300) + 3600
-LMtest <- intradayJumpTest(pData = exp(sim$prices), testType = "LM", testingTimes = testingTimes, windowSize = 5, K = 10)
+LMtest <- intradayJumpTest(pData = exp(sim$prices[,1]), testType = "LM", testingTimes = testingTimes, windowSize = 5, K = 10)
 
-LMtest1Day <- intradayJumpTest(pData = exp(sim$prices)["1970-01-01"], testType = "LM", testingTimes = testingTimes, windowSize = 5, K = 10)
+LMtest1Day <- intradayJumpTest(pData = exp(sim$prices)["1970-01-01",1], testType = "LM", testingTimes = testingTimes, windowSize = 5, K = 10)
 
 ### Testing place
 #plot(LMtest1Day)
 plot(LMtest)
 
 
-FoFtest <- intradayJumpTest(pData = exp(sim$prices), testType = "FoF", K = 50, theta = 0.5)
-FoFtest1Day <- intradayJumpTest(pData = exp(sim$prices)["1970-01-01"], testType = "FoF", K = 50, theta = 0.5)
+FoFtest <- intradayJumpTest(pData = exp(sim$prices[,1]), testType = "FoF", K = 50, theta = 0.5)
+FoFtest1Day <- intradayJumpTest(pData = exp(sim$prices[,1])["1970-01-01"], testType = "FoF", K = 50, theta = 0.5)
 #plot(FoFtest1Day)
 
 
@@ -89,7 +89,7 @@ volatilityModel <- list(modelType = "constant", variance = 1, burstModel = list(
                         includeDiurnality = FALSE, diurnalModel = list(C = 0.88929198, A = 0.75, B = 0.25, a = 10, b = 10))
 driftModel <- list(modelType = "constant", drift = 0)
 nSeries <- 10
-nDays <- 50
+nDays <- 10
 nObs <- 4681
 timeSettings  <- list(tradingStart = 34200, tradingEnd = 57600, origin = "1970-01-01" , sampling = "equidistant")
 discretize <- FALSE
@@ -99,9 +99,7 @@ jumpModel  <- list(modelType = "PA", jumpComponent = 1/4, jumpTime = c((16*8)/(1
 hfSimSpec <- createHFSimSpec(volatilityModel = volatilityModel, driftModel = driftModel, jumpModel = jumpModel, nDays = nDays, nSeries = nSeries, nObs = nObs)
 sim <- hfsim.do(hfSimSpec)
 
-plot(100+sim$prices["1970-01-02"], observation.based = T)
-
-rankTest <- intradayJumpTest(pData = 100 + sim$prices, testType = "rank", windowSize = 1, K = 30, alpha = c(7,4))
+rankTest <- intradayJumpTest(pData = 10 + sim$prices, testType = "rank", windowSize = 1, K = 30, alpha = c(7,4))
 
 plot(rankTest)
 

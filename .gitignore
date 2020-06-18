@@ -36,3 +36,4 @@ tests/testthat/Rplots.pdf
 doc
 Meta
 .idea
+pickle_reader.py
