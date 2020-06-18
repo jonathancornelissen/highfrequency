@@ -50,7 +50,7 @@ hfsim.do <- function(hfSimSpec){
   if(includeJumps){
     jumps$jumpIndices <- jumps$jumpIndices + 0:(nDays-1) * nObs
     for (j in 1:nSeries){
-      returns[jumps$jumpIndices[, j], j] <- returns[jumps$jumpIndices[, j], j] + abs(jumps$jumps[,j])
+      returns[jumps$jumpIndices[, j], j] <- returns[jumps$jumpIndices[, j], j] + jumps$jumps[,j]
     }
     print(" remove abs from jumps")
   }
