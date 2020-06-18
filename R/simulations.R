@@ -52,7 +52,6 @@ hfsim.do <- function(hfSimSpec){
     for (j in 1:nSeries){
       returns[jumps$jumpIndices[, j], j] <- returns[jumps$jumpIndices[, j], j] + jumps$jumps[,j]
     }
-    print(" remove abs from jumps")
   }
   
   
@@ -69,39 +68,7 @@ hfsim.do <- function(hfSimSpec){
   return(out)
   
   
-  ### NO longer used:
-  
-  ## First we generate a drift path
-  driftPath <- switch (model$driftModel,
-                       constant = matrix(model$drift,1,1)
-  )
-  
-  ## We generate a volatility path
-  volatilityModel <- switch (model$volatilityModel,
-                             constant = matrix(model$variance,1,1)
-  )
-  
-  ## We generate a jump
-  jumpPath <- switch (jumpModel$modelType,
-                       none = matrix(0,1,nSeries),
-                       PA = matrix(rnorm(nDays * nSeries, sd = jumpVolatility) , ncol = nSeries)
-  )
-  
-  jumpIndices <- switch(jumpModel$modelType,
-                         none = matrix(1, 1, nSeries),
-                         PA = round(matrix(sample((jumpModel$jumpTime[1] * nObs):(jumpModel$jumpTime[2] * nObs),
-                                                  nSeries * nDays, replace = TRUE), nDays))
-  )
-  # make sure the jumps don't happen 
-  jumpIndices <- matrix(apply(jumpIndices, 2, FUN = function(x) pmin.int(x, nObs)), ncol = nSeries)
-  jumpIndices <- matrix(apply(jumpIndices, 2, FUN = function(x) pmax.int(x, 1)), ncol = nSeries)
- 
-  
-  sim <- switch (model$modelType,
-                 BM = BrownianMotion(nDays, nObs, nSeries, drift = model$drift, variance = model$variance),
-                 BMJ = BrownianMotionWithJumps(nDays, nObs, nSeries, drift = model$drift, variance = model$variance, jumpPath, jumpIndices)
-  )
-  
+
 
 }
 
