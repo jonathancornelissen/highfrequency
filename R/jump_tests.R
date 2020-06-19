@@ -211,7 +211,14 @@ BNSjumpTest <- function (rData, IVestimator = "BV", IQestimator = "TP", type = "
                          logTransform = FALSE, max = FALSE, alignBy = NULL, alignPeriod = NULL,
                          makeReturns = FALSE) {
   if (checkMultiDays(rData) == TRUE) {
-    result <- apply.daily(rData, BNSjumpTest, alignBy, alignPeriod, makeReturns)
+    
+    result <- apply.daily(rData, function(x){
+        tmp <- BNSjumpTest(x, IVestimator, IQestimator, type, logTransform, max, alignBy, alignPeriod, makeReturns)
+        return(cbind(tmp[[1]], tmp[[2]][1], tmp[[2]][2], tmp[[3]]))
+      })
+    
+    colnames(result) <- c("ztest", "lower", "upper", "p-value")
+    
     return(result)
   } else {
     if ((!is.null(alignBy)) && (!is.null(alignPeriod))) {
@@ -420,8 +427,7 @@ intradayJumpTest <- function(pData = NULL, rData = NULL, testType = "LM", testin
     returnData <- internals[["returnData"]]
   }
   isMultiDay <- FALSE
-  print(" Need to make sure we test sucj that we allow the users to provide price and returns data")
-
+  print(" Need to make sure we test such that we allow the users to provide price and returns data")
   if(!is.null(pData) && checkMultiDays(pData) && testType != "rank"){ #Rank test deals with this case internally
     isMultiDay <- TRUE
     dates <- as.character(unique(as.Date(index(pData)))) # We will need to loop over all days in the sample
@@ -429,11 +435,13 @@ intradayJumpTest <- function(pData = NULL, rData = NULL, testType = "LM", testin
     names(out) <- c("tests", "information")
 
     out[["tests"]] <- vector(mode = "list", length = length(dates))
-
+    
     names(out[["tests"]]) <- dates
     for (date in dates) {
       ## Conduct the testing day-by-day
-      out[["tests"]][[date]] <- merge.xts(pData[date], intradayJumpTest(pData[date], testType, testingTimes, windowSize, K, alpha, theta, setClass = FALSE))
+      
+      out[["tests"]][[date]] <- merge.xts(pData[date], intradayJumpTest(pData[date], testType = testType, testingTimes= testingTimes, 
+                                                                        windowSize = windowSize, K = K, alpha = alpha, theta = theta, setClass = FALSE))
     }
     out[["information"]] <- list("testType" = testType, "isMultiDay" = TRUE)
     class(out) <- c("intradayJumpTest", "list")
@@ -470,8 +478,6 @@ intradayJumpTest <- function(pData = NULL, rData = NULL, testType = "LM", testin
       
     }
     
-    
-
     out <- switch (testType,
       LM = LeeMyklandtest(testData, testingTimes, windowSize, K, alpha),
       FoF = FoFJumpTest(pData, theta, K, alpha),
