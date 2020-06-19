@@ -176,6 +176,7 @@ AJjumpTest <- function(pData, p = 4 , k = 2, alignBy = NULL, alignPeriod = NULL,
 #' @param alignBy a string, align the tick data to "seconds"|"minutes"|"hours".
 #' @param alignPeriod an integer, align the tick data to this many [seconds|minutes|hours].
 #' @param makeReturns boolean, should be TRUE when rData contains prices instead of returns. FALSE by default.
+#' @param alpha numeric of length one with the significance level to use for the jump test(s). Defaults to 0.975.
 #' 
 #' @return list
 #' 
@@ -209,11 +210,11 @@ AJjumpTest <- function(pData, p = 4 , k = 2, alignBy = NULL, alignPeriod = NULL,
 #' @export
 BNSjumpTest <- function (rData, IVestimator = "BV", IQestimator = "TP", type = "linear",
                          logTransform = FALSE, max = FALSE, alignBy = NULL, alignPeriod = NULL,
-                         makeReturns = FALSE) {
+                         makeReturns = FALSE, alpha = 0.975) {
   if (checkMultiDays(rData) == TRUE) {
     
     result <- apply.daily(rData, function(x){
-        tmp <- BNSjumpTest(x, IVestimator, IQestimator, type, logTransform, max, alignBy, alignPeriod, makeReturns)
+        tmp <- BNSjumpTest(x, IVestimator, IQestimator, type, logTransform, max, alignBy, alignPeriod, makeReturns, alpha)
         return(cbind(tmp[[1]], tmp[[2]][1], tmp[[2]][2], tmp[[3]]))
       })
     
@@ -250,7 +251,7 @@ BNSjumpTest <- function (rData, IVestimator = "BV", IQestimator = "TP", type = "
       a <- sqrt(N) * (hatQV - hatIV)/sqrt((theta - 2) * product)
       out <- list()
       out$ztest <- a
-      out$critical.value <- qnorm(c(0.025, 0.975))
+      out$critical.value <- qnorm(c(1-alpha, alpha))
       out$pvalue <- 2 * pnorm(-abs(a))
       return(out)
     }
@@ -264,7 +265,7 @@ BNSjumpTest <- function (rData, IVestimator = "BV", IQestimator = "TP", type = "
       a <- sqrt(N) * (1 - hatIV(rData, IVestimator, N)/RV(rData))/sqrt((theta - 2) * product)
       out <- list()
       out$ztest <- a
-      out$critical.value <- qnorm(c(0.025, 0.975))
+      out$critical.value <- qnorm(c(1- alpha, alpha))
       out$pvalue <- 2 * pnorm(-abs(a))
       return(out)
     }
@@ -538,29 +539,33 @@ plot.intradayJumpTest <- function(x, ...){
   testType <- x[["information"]][["testType"]]
   # Here, we have more than one day
   if(isMultiday){
-    dates <- index(x[["tests"]])
+    
     if(testType == "rank"){ # Here we only plot some of the days.
-      
+      dates <- names(x[["tests"]])
       idx <- sort(c(as.numeric(na.omit(x[["tests"]][,"jumps"]))-1, as.numeric(na.omit(x[["tests"]][,"jumps"]))))
-      if(is.null(idx)){
+      if(length(idx) == 0){
         print("no jumps detected with the rank test, no events to plot.")
-        invisible(0)
+        return(0)
       }
       jumps <- xts(x[["tests"]][idx,1], index(na.omit(x[["tests"]][idx,1])))
       dates <- as.character(as.Date(dates[na.omit(x[["tests"]][,"jumps"])]))  # We use as.Date to lose the hours and minutes and transform into character so we can use it
-    } else{
+    } else{ # Here we have either the FoF or LM test.
+      
+      dates <- names(x[["tests"]])
+      
       dates <- as.character(unique(as.Date(dates)))
     }
     
     dat <- NULL
-
+    
     for (i in 1:length(dates)) {
       if(is.null(dat)){
-        dat <- x[["tests"]][dates[i]]
+        dat <- x[["tests"]][[dates[i]]]
       } else {
-        dat <- rbind(dat, x[["tests"]][dates[i]])
+        dat <- rbind(dat, x[["tests"]][[dates[i]]])
       }
     }
+    
   } else {
     dat <- x[["tests"]]
   }
@@ -580,13 +585,12 @@ plot.intradayJumpTest <- function(x, ...){
   }
   
   if(testType == "rank"){
-    main.text <- paste0("rank test")
+    main.text <- paste0("Intraday Jump Test: ", testType)
   }
 
 
   if(isMultiday){
     print("Support for plotting intradayJumpTests when the data spans more than one day is not ready yet.")
-
     for(day in as.character(dates)){ # We loop through all the days and ask the user whether we should continue or stop
       thisDat <- dat[day]
       
@@ -606,7 +610,7 @@ plot.intradayJumpTest <- function(x, ...){
         p1 <- addLegend(legend.loc = 'topleft', legend.names = c("Actual prices", "Sub-sampled prices", "Jump detection zone"), lwd = c(2,2,0), pch=c(NA,NA,15), col =c(1, "blue", 2))
         
       } else if(testType == "FoF") {
-        p1 <- plot(na.locf0(thisDat[, 1]), main = main.text, lty = 2)
+        p1 <- plot(na.locf0(thisDat[, 1]), main = main.text, lty = 1)
         
         p1 <- addLegend(legend.loc = 'topleft', legend.names = c("Actual prices", "Jump detection zone"), lwd = c(2,0), pch=c(NA,15), col =c(1, 2))
         
@@ -637,9 +641,6 @@ plot.intradayJumpTest <- function(x, ...){
     shade <- dat$jumps
     shade <- cbind(upper = shade * as.numeric(max(dat[, 1], na.rm = TRUE) +1e5), lower = shade * as.numeric(min(dat[, 1], na.rm = TRUE)) -1e5)
     colnames(shade) <- c("upper", "lower")
-
-
-    paste0("Intraday Jump Test: ", testType)
 
 
     p1 <- plot(na.locf0(dat[, 1]), main = main.text, lty = ifelse(testType == "LM", 2, 1))
@@ -754,11 +755,10 @@ FoFJumpTest <- function(pData, theta, M, alpha){
   kn <- round(theta * sqrt(nObs))
   kn <- kn + kn%%2
 
-  const <- 0.7978846
+  const <- 0.7978846 # = sqrt(2/pi)
   Cn <- sqrt(2 * log(kn))/const - (log(pi) + log( log(kn) ))/(2 * const*sqrt((2 * log(kn))))
   Sn <- 1/sqrt(const * 2 * log(kn))
-
-
+  criticalValue <- Cn + Sn * betastar
 
   # Measuring jump variation during the entire day.
   preAveragedReturns <- hatreturn(pData, kn)
@@ -777,8 +777,10 @@ FoFJumpTest <- function(pData, theta, M, alpha){
   preAveragedRealizedVariance <- nObs/(nObs - kn + 2) * 1/(kn * psi2kn) * sum(preAveragedReturns^2, na.rm= TRUE) - biasCorrection
   preAveragedBipowerVariation <- nObs/(nObs - 2*kn + 2) * 1/(kn * psi2kn) * pi/2 * sum(abs(preAveragedReturns[1:(nObs-2*kn)]) * abs(preAveragedReturns[1:(nObs-2*kn) + kn])) - biasCorrection
 
-
-
+  browser()
+  
+  ## We need to compute the variance covariance matrix to get 
+  
   jumpVariation <- (preAveragedRealizedVariance - preAveragedBipowerVariation)/preAveragedRealizedVariance
 
 
@@ -788,23 +790,66 @@ FoFJumpTest <- function(pData, theta, M, alpha){
 
   ind <- 1
   for (i in testingIndices) {
-
     PABPV[ind] <- pi/2 * 1/(M-2) * sum(abs(preAveragedReturns[(i - M + 2):(i-1)]) * abs(preAveragedReturns[(i-M+2-kn):(i-1-kn)]))
-
     ind <- ind + 1 # increment index
   }
-
 
 
   L <- preAveragedReturns[testingIndices]/sqrt(PABPV)
 
 
-  jumps <- (abs(L) - Cn)/Sn > betastar
-
-  jumps <- xts(jumps, index(pData)[testingIndices])
+  jumps <- xts((abs(L) > criticalValue), index(pData)[testingIndices])
+  
   out <-  merge.xts(jumps, L, jumpVariation)
   return(out)
 
+}
+
+
+### Adjusted FoF test in Pierre Bajgrowicz, Olivier Scaillet, Adrien Treccani (2016)
+### They use a slightly different version than the FoF test.
+#' @keywords internal
+FDRtest <- function(pData, theta, M, alpha){
+  
+  # Users will not directly control the testing times, instead they can choose the M parameter.
+  dateOfData <- as.character(as.Date(index(pData[1])))
+  betastar <- -log(-log(1-alpha))
+  nObs <- length(pData)
+  
+  ## We need to ensure kn is even, thus we round half and multiply by 2
+  kn <- round(theta * sqrt(nObs))
+  kn <- kn + kn%%2
+  
+  const <- 0.7978846 # = sqrt(2/pi)
+  Cn <- sqrt(2 * log(kn))/const - (log(pi) + log( log(kn) ))/(2 * const*sqrt((2 * log(kn))))
+  Sn <- 1/sqrt(const * 2 * log(kn))
+  criticalValue <- Cn + Sn * betastar
+  
+  # Measuring jump variation during the entire day.
+  preAveragedReturns <- hatreturn(pData, kn)
+  preAveragedReturns <- c(as.numeric(preAveragedReturns), rep(NA, length(pData) - length(preAveragedReturns)))#, as.POSIXct(index(pData), origin = dateOfData)) # maybe we want to add back in xts, but it's removed for now...
+  # 
+  # psi1kn <- kn * sum((gfunction((1:kn)/kn) - gfunction(( (1:kn) - 1 )/kn ) )^2)
+  # 
+  # psi2kn <- 1 / kn * sum(gfunction((1:kn)/kn)^2)
+  # 
+  # psi2kn <- (1 + (2*kn)^-2)/12
+  # returns <- diff(log(pData))
+  # omegaHat <- -1/(nObs-1) * sum(returns[2:nObs] * returns[1:(nObs-1)])
+  # 
+  # biasCorrection <- omegaHat^2/theta^2 * psi1kn/psi2kn
+  # 
+  # preAveragedRealizedVariance <- nObs/(nObs - kn + 2) * 1/(kn * psi2kn) * sum(preAveragedReturns^2, na.rm= TRUE) - biasCorrection
+  # preAveragedBipowerVariation <- nObs/(nObs - 2*kn + 2) * 1/(kn * psi2kn) * pi/2 * sum(abs(preAveragedReturns[1:(nObs-2*kn)]) * abs(preAveragedReturns[1:(nObs-2*kn) + kn])) - biasCorrection
+  # 
+  # 
+  
+  # jumpVariation <- (preAveragedRealizedVariance - preAveragedBipowerVariation)/preAveragedRealizedVariance
+  
+  
+
+  return(out)
+  
 }
 
 

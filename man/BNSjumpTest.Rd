@@ -13,7 +13,8 @@ BNSjumpTest(
   max = FALSE,
   alignBy = NULL,
   alignPeriod = NULL,
-  makeReturns = FALSE
+  makeReturns = FALSE,
+  alpha = 0.975
 )
 }
 \arguments{
@@ -34,6 +35,8 @@ BNSjumpTest(
 \item{alignPeriod}{an integer, align the tick data to this many [seconds|minutes|hours].}
 
 \item{makeReturns}{boolean, should be TRUE when rData contains prices instead of returns. FALSE by default.}
+
+\item{alpha}{numeric of length one with the significance level to use for the jump test(s). Defaults to 0.975.}
 }
 \value{
 list
