@@ -1223,7 +1223,7 @@ quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, 
     qDataRaw <- mergeQuotesSameTimestamp(qData = qDataRaw, selection = selection)
     nresult[6] <- dim(qDataRaw)[1]
     
-    qDataRaw <- rmOutliersQuotes(qDataRaw, window = window, type = "advanced", maxi = rmoutliersmaxi)
+    qDataRaw <- rmOutliersQuotes(qDataRaw, window = window, type = type, maxi = rmoutliersmaxi)
     nresult[7] <- dim(qDataRaw)[1]
     if (dummy_was_xts == TRUE) {
       df_result <- xts(as.matrix(qDataRaw[, -c("DT",  "DATE")]), order.by = qDataRaw$DT)
