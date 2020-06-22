@@ -42,7 +42,9 @@ Function used to estimate the spot drift of intraday (tick) stock prices/returns
 }
 \details{
 The additional arguments for the mean and median methods are: \code{periods} for the rolling window length which is 5 by standard and
-\code{align} to allow for control of the alignment, should one wish to do so, the standard is \code{"right"}
+\code{align} to allow for control of the alignment, should one wish to do so, the standard is \code{"right"}. 
+For the kernel mean estimator, the arguments \code{meanBandwidth} can be used to control the bandwidth of the drift estimator and the \code{preAverage} argument, which can be used to control the pre-averaging horizon. 
+These arguments default to 300 and 5 respectively.
 }
 \examples{
 # Example 1: Rolling mean and median estimators for 2 days

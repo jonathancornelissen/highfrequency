@@ -403,12 +403,18 @@ JOjumpTest <- function(pData, power = 4, ...) {
 #' @references COP2014, LM 2008
 #' @importFrom zoo index
 #' @export
-intradayJumpTest <- function(pData = NULL, rData = NULL, testType = "LM", testingTimes = NULL, windowSize = 5, K = 10, alpha = 0.05, theta = 0.5,
-                             r = 1, BoxCox = 1, nBoot = 1000, dontTestAtBoundaries = TRUE, ...){
+# intradayJumpTest <- function(pData = NULL, rData = NULL, testType = "LM", testingTimes = NULL, windowSize = 5, k = 10, alpha = 0.05, theta = 0.5,
+#                              r = 1, BoxCox = 1, nBoot = 1000, dontTestAtBoundaries = TRUE, ...){
 
-
+intradayJumpTest <- function(pData, volEstimator = "RM", driftEstimator = "none", alpha = 0.95, ..., on = "minutes", k = 5,
+                             marketOpen = "09:30:00", marketClose = "16:00:00",
+                             tz = "GMT"){
+  
   print("make pData able to use data.table")
-
+  K <- 10
+  windowSize = 5
+  testType <- "LM"
+  
   ## Make space for data preparation
   if(ncol(pData) >1 && testType != "rank"){
     print("multiple assets are not supported for LM and FoF tests yet. -> working on it!")
@@ -436,90 +442,156 @@ intradayJumpTest <- function(pData = NULL, rData = NULL, testType = "LM", testin
     names(out) <- c("tests", "information")
 
     out[["tests"]] <- vector(mode = "list", length = length(dates))
-    
+
     names(out[["tests"]]) <- dates
     for (date in dates) {
       ## Conduct the testing day-by-day
-      
-      out[["tests"]][[date]] <- merge.xts(pData[date], intradayJumpTest(pData[date], testType = testType, testingTimes= testingTimes, 
-                                                                        windowSize = windowSize, K = K, alpha = alpha, theta = theta, setClass = FALSE))
+
+      out[["tests"]][[date]] <- merge.xts(pData[date], intradayJumpTest(pData[date], testType = testType, testingTimes= testingTimes,
+                                                                        windowSize = windowSize, k = k, alpha = alpha, theta = theta, setClass = FALSE))
     }
     out[["information"]] <- list("testType" = testType, "isMultiDay" = TRUE)
     class(out) <- c("intradayJumpTest", "list")
 
   } else {
-    
+
     if( testType == "LM"){ # Here we only have one day
       testData <- aggregateTS(pData, on = "minutes", k = windowSize)
-    }  
+    }
     if(testType == "rank"){ # Here we may have more days.
-      
+
       testData <- NULL
       if(!is.null(pData)){
         dates <- as.character(unique(as.Date(index(pData))))
-        
-        if(length(dates) > 1) isMultiDay <- TRUE 
-         
-        
+
+        if(length(dates) > 1) isMultiDay <- TRUE
+
+
         for (date in dates){
           testData <-  rbind(testData, makeReturns(aggregateTS(pData[date], on = "minutes", k = windowSize)))
         }
-        
+
       } else {
         dates <- as.character(unique(as.Date(index(rData))))
-        
-        if(length(dates) > 1) isMultiDay <- TRUE 
-        
+
+        if(length(dates) > 1) isMultiDay <- TRUE
+
         testData <- rData
       }
-      
-      
 
-      
-      
     }
+  }
+
+  PRICE = DATE = RETURN = DT = NULL
+  
+  if ("PRICE" %in% colnames(pData) == FALSE) {
+    if (dim(pData)[2] == 1) {
+      names(pData) <- "PRICE"
+    } else {
+      stop("data.table or xts needs column named PRICE.")
+    }
+  }
     
-    out <- switch (testType,
+  dummy_was_xts <- FALSE
+  if (is.data.table(pData) == FALSE) {
+    if (is.xts(pData) == TRUE) {
+      pData <- setnames(as.data.table(pData), old = "index", new = "DT")
+      pData[, PRICE := as.numeric(PRICE)]
+      dummy_was_xts <- TRUE
+    } else {
+      stop("Input has to be data.table or xts.")
+    }
+  } else {
+    if (("DT" %in% colnames(pData)) == FALSE) {
+      stop("Data.table needs DT column containing the time-stamps of the trades.") # added the timestamp comment for verbosity.
+    }
+  }
+  
+  
+  vol <- spotVol(pData, method = volEstimator, on = on, k = k, marketOpen = marketOpen, marketClose = marketClose, tz = tz, ...)
+  ## What is different here?? Check against old implementation
+  if(volEstimator == "RM"){
+    op <- list(RM = "rBPCov", lookbackPeriod = 10)
+    options <- list(...)
+    op[names(options)] <- options
+    
+    vol$spot <- (vol$spot / sqrt(pi/2)) * 1/(op$lookbackPeriod - 2)  
+  }
+  
+  if(driftEstimator != "none"){
+    drift <- spotDrift(pData, method = driftEstimator, on = on, k = k, marketOpen = marketOpen, marketClose = marketClose, tz = tz, ...)
+  } else {
+    drift <- 0
+  }
+  
+  
+  prices <- aggregatePrice(pData, on = on, k = k , marketOpen = marketOpen,
+                 marketClose = marketClose, tz = tz, fill = TRUE)    
+  setkeyv(prices, "DT")
+  prices[, DATE := as.Date(DT, tz = tz(prices$DT))]
+  returns <- prices[, RETURN := log(PRICE) - shift(log(PRICE), type = "lag"), by = "DATE"][is.na(RETURN) == FALSE]
+  
+  tests <- (returns$RETURN - drift)/(vol$spot)
+  
+  
+  # Calculating the critical value of the test.
+  const <- 0.7978846 # = sqrt(2/pi)
+  n <- length(returns)
+  Cn <- sqrt(2 * log(n))/const - (log(pi) + log( log(n) ))/(2 * const*sqrt((2 * log(n))))
+  Sn <- 1/sqrt(const * 2 * log(n))
+  betastar <- -log(-log(1-alpha))
+  criticalValue <- Cn + Sn * betastar
+  
+  out <- list("ztest" = tests,  "criticalValue" = criticalValue)
+  
+  
+  browser()
+  testingTimes <- trimws(gsub("1970-01-01", "", index(vol$spot)))
+
+    foo <- switch (testType,
       LM = LeeMyklandtest(testData, testingTimes, windowSize, K, alpha),
       FoF = FoFJumpTest(pData, theta, K, alpha),
       rank = rankJumpTest(testData[,1], testData[,-1], alpha = alpha, K = windowSize, kn = K,
-                          r = r, BoxCox = BoxCox, nBoot = nBoot, 
-                          dontTestAtBoundaries = dontTestAtBoundaries)
-      
-    )
-    if(setClass){
-      
-      if(testType == "rank"){
-        #browser()
-        tmp <- list() # So we don't override the output list.
-        if(is.null(pData)){
-          tmp[["tests"]] <- cbind(testData, c(out$jumpIndices, rep(NA, nrow(testData) - length(out$jumpIndices))))
-        } else {
-          
-          print("ask Onno, Kris, and Nabil about best action")
-          temp <- NULL
-          for (date in dates){
-            temp <- rbind(temp, aggregateTS(pData[date], on = "minutes", k = windowSize))
-          }
-          tmp[["tests"]] <- cbind(temp, c(out$jumpIndices, rep(NA, nrow(temp) - length(out$jumpIndices)))) 
-        }
-        
-        
-        #"tests" = cbind(ifelse(is.null(pData), testData, pData), c(out$jumpIndices, rep(NA, ifelse(is.null(pData), nrow(testData), nrow(pData)) - length(out$jumpIndices))))
-        tmp[["information"]] <- list("testType" = testType, "isMultiDay" = isMultiDay, 
-                                                             "criticalValues" = out$criticalValues ,"K" = K, 
-                                                             "kn" = K, "testStatistic" = out$testStatistic)
-        colnames(tmp[["tests"]]) <- c(colnames(tmp[["tests"]])[1:(ncol(tmp[["tests"]]) -1 )], "jumps")
-        out <- tmp
-      }
-      else {
-        out <- list("tests" = merge.xts(pData, out), "information" = list("testType" = testType, "isMultiDay" = isMultiDay))
-      }
-      class(out) <- c( "intradayJumpTest", "list")
-
-    }
-
-  }
+                          r = r, BoxCox = BoxCox, nBoot = nBoot,
+                          dontTestAtBoundaries = dontTestAtBoundaries))
+  sqrt(as.numeric(foo$spotBPV))[!is.na(as.numeric(foo$spotBPV))]/ as.numeric(vol$spot)
+  foo$L - tests
+  
+  #     
+  #   )
+  #   if(setClass){
+  #     
+  #     if(testType == "rank"){
+  #       #browser()
+  #       tmp <- list() # So we don't override the output list.
+  #       if(is.null(pData)){
+  #         tmp[["tests"]] <- cbind(testData, c(out$jumpIndices, rep(NA, nrow(testData) - length(out$jumpIndices))))
+  #       } else {
+  #         
+  #         print("ask Onno, Kris, and Nabil about best action")
+  #         temp <- NULL
+  #         for (date in dates){
+  #           temp <- rbind(temp, aggregateTS(pData[date], on = "minutes", k = windowSize))
+  #         }
+  #         tmp[["tests"]] <- cbind(temp, c(out$jumpIndices, rep(NA, nrow(temp) - length(out$jumpIndices)))) 
+  #       }
+  #       
+  #       
+  #       #"tests" = cbind(ifelse(is.null(pData), testData, pData), c(out$jumpIndices, rep(NA, ifelse(is.null(pData), nrow(testData), nrow(pData)) - length(out$jumpIndices))))
+  #       tmp[["information"]] <- list("testType" = testType, "isMultiDay" = isMultiDay, 
+  #                                                            "criticalValues" = out$criticalValues ,"K" = K, 
+  #                                                            "kn" = K, "testStatistic" = out$testStatistic)
+  #       colnames(tmp[["tests"]]) <- c(colnames(tmp[["tests"]])[1:(ncol(tmp[["tests"]]) -1 )], "jumps")
+  #       out <- tmp
+  #     }
+  #     else {
+  #       out <- list("tests" = merge.xts(pData, out), "information" = list("testType" = testType, "isMultiDay" = isMultiDay))
+  #     }
+  #     class(out) <- c( "intradayJumpTest", "list")
+  # 
+  #   }
+  # 
+  # }
 
 
 
@@ -721,7 +793,7 @@ LeeMyklandtest <- function(testData, testingTimes, windowSize, K, alpha){
 
     returns <- diff(log(thisData[-length(thisData)]))
     n <- length(returns)
-    spotBPV[i] <- 1/(K-2) * sum(abs(returns[1:(n-1)] * returns[2:n]))
+    spotBPV[i] <- 1/(K-2) * sum(abs(returns[1:(n-1)]) * abs(returns[2:n]))
 
 
     L[i] <- return/sqrt(spotBPV[i])
@@ -777,8 +849,6 @@ FoFJumpTest <- function(pData, theta, M, alpha){
   preAveragedRealizedVariance <- nObs/(nObs - kn + 2) * 1/(kn * psi2kn) * sum(preAveragedReturns^2, na.rm= TRUE) - biasCorrection
   preAveragedBipowerVariation <- nObs/(nObs - 2*kn + 2) * 1/(kn * psi2kn) * pi/2 * sum(abs(preAveragedReturns[1:(nObs-2*kn)]) * abs(preAveragedReturns[1:(nObs-2*kn) + kn])) - biasCorrection
 
-  browser()
-  
   ## We need to compute the variance covariance matrix to get 
   
   jumpVariation <- (preAveragedRealizedVariance - preAveragedBipowerVariation)/preAveragedRealizedVariance
@@ -804,54 +874,6 @@ FoFJumpTest <- function(pData, theta, M, alpha){
   return(out)
 
 }
-
-
-### Adjusted FoF test in Pierre Bajgrowicz, Olivier Scaillet, Adrien Treccani (2016)
-### They use a slightly different version than the FoF test.
-#' @keywords internal
-FDRtest <- function(pData, theta, M, alpha){
-  
-  # Users will not directly control the testing times, instead they can choose the M parameter.
-  dateOfData <- as.character(as.Date(index(pData[1])))
-  betastar <- -log(-log(1-alpha))
-  nObs <- length(pData)
-  
-  ## We need to ensure kn is even, thus we round half and multiply by 2
-  kn <- round(theta * sqrt(nObs))
-  kn <- kn + kn%%2
-  
-  const <- 0.7978846 # = sqrt(2/pi)
-  Cn <- sqrt(2 * log(kn))/const - (log(pi) + log( log(kn) ))/(2 * const*sqrt((2 * log(kn))))
-  Sn <- 1/sqrt(const * 2 * log(kn))
-  criticalValue <- Cn + Sn * betastar
-  
-  # Measuring jump variation during the entire day.
-  preAveragedReturns <- hatreturn(pData, kn)
-  preAveragedReturns <- c(as.numeric(preAveragedReturns), rep(NA, length(pData) - length(preAveragedReturns)))#, as.POSIXct(index(pData), origin = dateOfData)) # maybe we want to add back in xts, but it's removed for now...
-  # 
-  # psi1kn <- kn * sum((gfunction((1:kn)/kn) - gfunction(( (1:kn) - 1 )/kn ) )^2)
-  # 
-  # psi2kn <- 1 / kn * sum(gfunction((1:kn)/kn)^2)
-  # 
-  # psi2kn <- (1 + (2*kn)^-2)/12
-  # returns <- diff(log(pData))
-  # omegaHat <- -1/(nObs-1) * sum(returns[2:nObs] * returns[1:(nObs-1)])
-  # 
-  # biasCorrection <- omegaHat^2/theta^2 * psi1kn/psi2kn
-  # 
-  # preAveragedRealizedVariance <- nObs/(nObs - kn + 2) * 1/(kn * psi2kn) * sum(preAveragedReturns^2, na.rm= TRUE) - biasCorrection
-  # preAveragedBipowerVariation <- nObs/(nObs - 2*kn + 2) * 1/(kn * psi2kn) * pi/2 * sum(abs(preAveragedReturns[1:(nObs-2*kn)]) * abs(preAveragedReturns[1:(nObs-2*kn) + kn])) - biasCorrection
-  # 
-  # 
-  
-  # jumpVariation <- (preAveragedRealizedVariance - preAveragedBipowerVariation)/preAveragedRealizedVariance
-  
-  
-
-  return(out)
-  
-}
-
 
 
 

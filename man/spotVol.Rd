@@ -6,7 +6,7 @@
 \usage{
 spotVol(
   data,
-  method = "detper",
+  method = "detPer",
   ...,
   on = "minutes",
   k = 5,
@@ -21,7 +21,7 @@ observations are allowed. They will be aggregated to the level specified by
 parameters \code{on} and \code{k}.}
 
 \item{method}{specifies which method will be used to estimate the spot
-volatility. Options include \code{"detper"} and \code{"stochper"}.
+volatility. Options include \code{"detPer"} and \code{"stochper"}.
 See 'Details'.}
 
 \item{...}{method-specific parameters (see 'Details').}
@@ -58,7 +58,7 @@ and \code{on}. Methods that provide this output: All.
 An \code{xts} or \code{numeric} object (depending on the input) containing
 estimates of the daily volatility levels for each day \eqn{t} in \code{data},
 if the used method decomposed spot volatility into a daily and an intraday
-component. Methods that provide this output: \code{"detper"}.
+component. Methods that provide this output: \code{"detPer"}.
 
 \code{periodic}
 
@@ -68,7 +68,7 @@ between \code{marketOpen} and \code{marketClose}, if the spot volatility was
 decomposed into a daily and an intraday component. If the output is in
 \code{xts} format, this periodicity factor will be dated to the first day of
 the input data, but it is identical for each day in the sample. Methods that
-provide this output: \code{"detper"}.
+provide this output: \code{"detPer"}.
 
 \code{par}
 
@@ -106,7 +106,7 @@ Spot volatility estimation
 \details{
 The following estimation methods can be specified in \code{method}:
 
-\strong{Deterministic periodicity method (\code{"detper"})}
+\strong{Deterministic periodicity method (\code{"detPer"})}
 
 Parameters:
   \tabular{ll}{
@@ -315,7 +315,7 @@ init <- list(sigma = 0.03, sigma_mu = 0.005, sigma_h = 0.007,
 vol2 <- spotVol(sampleReal5MinPrices, method = "stochper", init = init)
 plot(as.numeric(vol1$spot[1:780]), type="l")
 lines(as.numeric(vol2$spot[1:780]), col="red")
-legend("topright", c("detper", "stochper"), col = c("black", "red"), lty=1)}
+legend("topright", c("detPer", "stochper"), col = c("black", "red"), lty=1)}
 
 # Various kernel estimates
 \donttest{

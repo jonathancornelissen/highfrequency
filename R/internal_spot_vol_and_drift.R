@@ -7,29 +7,29 @@ driftKernel <- function(data, intraday, options) {
     stop("driftKernel method currently only accepts single day tick data as it relies on the time-stamps of the trades.")
   }
 
-  op <- list(init = list(), PreAverage = 5, bandwidth = 300)
+  op <- list(init = list(), preAverage = 5, meanBandwidth = 300)
   op[names(options)] <- options
   datap          <- log(data$PRICE)
   #vX             <- c(0,diff(datap)[-1])
-  k              <- op$PreAverage
-  bandwidth      <- op$bandwidth
+  k              <- op$preAverage
+  meanBandwidth      <- op$meanBandwidth
   iT             <- length(datap)
-  vPreAveraged   <- rep(0 , iT-1) 
+  vpreAveraged   <- rep(0 , iT-1) 
   mu             <- numeric(length(intraday))
   mu[1]          <- 0
-  vPreAveraged[(k*2-1):(iT-1)] <- filter(x = as.numeric(datap), c(rep(1,k),rep(-1,k)))[k:(iT-k)]
-  vPreAveraged <- c(0, vPreAveraged)
+  vpreAveraged[(k*2-1):(iT-1)] <- filter(x = as.numeric(datap), c(rep(1,k),rep(-1,k)))[k:(iT-k)]
+  vpreAveraged <- c(0, vpreAveraged)
   time <- as.numeric(data$DT)
   # time <- time - as.numeric(data$DT)[1]
   #estimtimes <- intraday #c(34200, as.numeric(intraday) * 86400)
 
   for (i in 1:length(intraday)) {
     x     <- time - intraday[i]
-    vWm   <- exp(-abs(x/bandwidth)) * (x <= 0)    ##left sided exponential kernel
+    vWm   <- exp(-abs(x/meanBandwidth)) * (x <= 0)    ##left sided exponential kernel
     idx   <- sum(x <= 0)                        # makes sure we don't include future data!
-    mu[i] <- (sum(vWm[1:idx] * vPreAveraged[1:idx])) / bandwidth
+    mu[i] <- (sum(vWm[1:idx] * vpreAveraged[1:idx])) / meanBandwidth
   }
-  mu = as.matrix(mu * bandwidth, ncol = 1)
+  mu = as.matrix(mu * meanBandwidth, ncol = 1)
   out = list("mu" = mu)
   class(out) <- "spotDrift"
   return(out)
@@ -99,7 +99,7 @@ print.spotDrift <- function(x, ...){
 #
 # Modified spotVol function from highfrequency package
 #' @keywords internal
-detper <- function(mR, rData = NULL, options = list()) {
+detPer <- function(mR, rData = NULL, options = list()) {
   # default options, replace if user-specified
   op <- list(dailyvol = "bipower", periodicvol = "TML", dummies = FALSE,
              P1 = 5, P2 = 5)
@@ -168,7 +168,7 @@ detper <- function(mR, rData = NULL, options = list()) {
 # This function estimates the spot volatility by using the stochastic periodcity
 # model of Beltratti & Morana (2001)
 #' @keywords internal
-stochper <- function(mR, rData = NULL, options = list()) {
+stochPer <- function(mR, rData = NULL, options = list()) {
   #require(FKF)
   # default options, replace if user-specified
   op <- list(init = list(), P1 = 5, P2 = 5, control = list(trace=1, maxit=500))
@@ -505,9 +505,9 @@ changePoints <- function(vR, type = "MDa", alpha = 0.005, m = 40, n = 20) {
       reference <- logR[(t - N + 1):(t - n)]
       testperiod <- logR[(t - n + 1):t]
       if(switch(type,
-                MDa <- MDtest(reference, testperiod, type = type, alpha = alpha),
-                MDb <- MDtest(reference, testperiod, type = type, alpha = alpha),
-                DM  <- DMtest(reference, testperiod, alpha = alpha))) {
+                MDa = MDtest(reference, testperiod, type = type, alpha = alpha),
+                MDb = MDtest(reference, testperiod, type = type, alpha = alpha),
+                DM  = DMtest(reference, testperiod, alpha = alpha))) {
         points <- c(points, t - n)
         np <- np + 1
         cat(paste("Change detected at observation", points[np], "...\n"))
@@ -938,3 +938,46 @@ center <- function() {
 #   return(ts3)
 # }
 
+
+
+realizedMeasureSpotVol <- function(mR, rData, options = list()){
+  
+  # Make sure there are sensible standard inputs
+  op <- list(RM = "rBPCov", lookbackPeriod = 10)
+  # replace standards with user supplied inputs
+  op[names(options)] <- options
+  D <- nrow(mR)
+  N <- ncol(mR)
+  lookbackPeriod <- op$lookbackPeriod
+  sigma2hat <- matrix(0, D, N)
+  idx <- seq(lookbackPeriod + 1, N)
+  
+  # compute spot variances
+  for (j in idx) {
+    for (i in 1:D) {
+      sigma2hat[i, j] <- switch(op$RM,
+                          rBPCov = RBPVar(mR[i,(j-lookbackPeriod):j]),
+                          medRV = medRV(mR[i,(j-lookbackPeriod):j])
+        
+      )
+    }
+    
+  }
+  
+  # Adjust the matrix and take square-root
+  spot <- as.vector(t(sqrt(sigma2hat)))
+  
+  if (is.null(rData)) {
+    spot <- matrix(spot, nrow = D, ncol = N, byrow = TRUE)
+  } else {
+    spot <- xts(spot, order.by = time(rData))
+  }
+  
+  
+  out <- list("spot" = spot, "estimator" = op$RM)
+  return(out)
+  
+  
+  
+  
+}

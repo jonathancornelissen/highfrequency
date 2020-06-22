@@ -15,7 +15,9 @@
 #' @return An object of class "spotDrift" containing at least the estimated spot drift process. Input on what this class should contain and methods for it is welcome.
 #'
 #' @details The additional arguments for the mean and median methods are: \code{periods} for the rolling window length which is 5 by standard and
-#' \code{align} to allow for control of the alignment, should one wish to do so, the standard is \code{"right"}
+#' \code{align} to allow for control of the alignment, should one wish to do so, the standard is \code{"right"}. 
+#' For the kernel mean estimator, the arguments \code{meanBandwidth} can be used to control the bandwidth of the drift estimator and the \code{preAverage} argument, which can be used to control the pre-averaging horizon. 
+#' These arguments default to 300 and 5 respectively.
 #'
 #'
 #' @references Christensen, Oomen and Reno (2018) <DOI:10.2139/ssrn.2842535>.
@@ -100,7 +102,7 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
 #' parameters \code{on} and \code{k}.
 #'
 #' @param method specifies which method will be used to estimate the spot
-#' volatility. Options include \code{"detper"} and \code{"stochper"}.
+#' volatility. Options include \code{"detPer"} and \code{"stochper"}.
 #' See 'Details'.
 #' @param on string indicating the time scale in which \code{k} is expressed.
 #' Possible values are: \code{"secs", "seconds", "mins", "minutes", "hours"}.
@@ -130,7 +132,7 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
 #' An \code{xts} or \code{numeric} object (depending on the input) containing
 #' estimates of the daily volatility levels for each day \eqn{t} in \code{data},
 #' if the used method decomposed spot volatility into a daily and an intraday
-#' component. Methods that provide this output: \code{"detper"}.
+#' component. Methods that provide this output: \code{"detPer"}.
 #'
 #' \code{periodic}
 #'
@@ -140,7 +142,7 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
 #' decomposed into a daily and an intraday component. If the output is in
 #' \code{xts} format, this periodicity factor will be dated to the first day of
 #' the input data, but it is identical for each day in the sample. Methods that
-#' provide this output: \code{"detper"}.
+#' provide this output: \code{"detPer"}.
 #'
 #' \code{par}
 #'
@@ -174,7 +176,7 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
 #'
 #' @details The following estimation methods can be specified in \code{method}:
 #'
-#' \strong{Deterministic periodicity method (\code{"detper"})}
+#' \strong{Deterministic periodicity method (\code{"detPer"})}
 #'
 #' Parameters:
 #'   \tabular{ll}{
@@ -383,7 +385,7 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
 #' vol2 <- spotVol(sampleReal5MinPrices, method = "stochper", init = init)
 #' plot(as.numeric(vol1$spot[1:780]), type="l")
 #' lines(as.numeric(vol2$spot[1:780]), col="red")
-#' legend("topright", c("detper", "stochper"), col = c("black", "red"), lty=1)}
+#' legend("topright", c("detPer", "stochper"), col = c("black", "red"), lty=1)}
 #'
 #' # Various kernel estimates
 #' \donttest{
@@ -427,7 +429,7 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
 #'
 #' Taylor, S. J. and X. Xu (1997). The incremental volatility information in one million foreign exchange quotations. Journal of Empirical Finance 4, 317-340.
 #' @export
-spotVol <- function(data, method = "detper", ..., on = "minutes", k = 5,
+spotVol <- function(data, method = "detPer", ..., on = "minutes", k = 5,
                       marketOpen = "09:30:00", marketClose = "16:00:00",
                       tz = "GMT") {
   
@@ -476,10 +478,12 @@ spotVol <- function(data, method = "detper", ..., on = "minutes", k = 5,
   
   options <- list(...)
   out <- switch(method,
-                detper = detper(mR, rData = rData, options = options),
-                stochper = stochper(mR, rData = rData, options = options),
+                detPer = detPer(mR, rData = rData, options = options),
+                stochper = stochPer(mR, rData = rData, options = options),
                 kernel = kernelestim(mR, rData = rData, delta, options = options),
                 piecewise = piecewise(mR, rData = rData, options = options),
-                garch = garch_s(mR, rData = rData, options = options))
+                garch = garch_s(mR, rData = rData, options = options),
+                RM = realizedMeasureSpotVol(mR, rData = rData, options = options))
+  
   return(out)
 }

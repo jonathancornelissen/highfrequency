@@ -5,23 +5,24 @@
 \title{General framework for testing for jumps on an intraday basis}
 \usage{
 intradayJumpTest(
-  pData = NULL,
-  rData = NULL,
-  testType = "LM",
-  testingTimes = NULL,
-  windowSize = 5,
-  K = 10,
-  alpha = 0.05,
-  theta = 0.5,
-  r = 1,
-  BoxCox = 1,
-  nBoot = 1000,
-  dontTestAtBoundaries = TRUE,
-  ...
+  pData,
+  volEstimator = "RM",
+  driftEstimator = "none",
+  alpha = 0.95,
+  ...,
+  on = "minutes",
+  k = 5,
+  marketOpen = "09:30:00",
+  marketClose = "16:00:00",
+  tz = "GMT"
 )
 }
 \arguments{
 \item{pData}{(currently only xts) of the price data in levels. This data can (and should in some cases) be tick-level data. This data can span more than one day}
+
+\item{alpha}{numeric significance level to use for the jump tests.}
+
+\item{...}{used internally. Don't set this parameter.}
 
 \item{testType}{type of test to use. Currently supports "LM" test of Lee and Mykland (2018), and "FoF" as "Fact or Friction" test from Christensen, Oomen, and Podolskij (2014)}
 
@@ -34,12 +35,8 @@ where testing will take place every five minutes, starting fifty minutes after o
 \item{K}{In the LM test, K, is the amount of windowSizes to use for estimation of the local variance. 
 In case of the FoF test K will be used as M in eqn: 21 in the paper, which changes the meaning into how many non-overlapping pre-averaged returns should be used in each test.}
 
-\item{alpha}{numeric significance level to use for the jump tests.}
-
 \item{theta}{numeric parameter in determining the pre-averaging horizon. Default = 0.5. The pre-averaging horizon is \code{round(theta * sqrt(n))}, where n is the number of observations. 
 This parameter will also help determine the testing times as the test is done on non-overlapping pre-averaged returns.}
-
-\item{...}{used internally. Don't set this parameter.}
 }
 \description{
 General framework for testing for jumps on an intraday basis
