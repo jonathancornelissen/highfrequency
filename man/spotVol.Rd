@@ -297,6 +297,45 @@ is then employed to estimate the specified GARCH(1,1) model.
 
 Along with the spot volatility estimates, this method will return the
 \code{ugarchfit} object used by the \code{rugarch} package.
+
+
+\strong{Realized Measures (\code{"RM"})}
+
+Parameters:
+\tabular{ll}{
+\code{RM} \tab String denoting which realized measure to use to estimate the local volatility. Possible values are: "bipower", "medrv", "minrv", "rv"
+Default = "BPV" \cr
+\code{lookBackPeriod} \tab positive integer denoting the amount of sub-sampled returns to use for the estimation of the local volatility. Default = 10. \cr
+\code{dontIncludeLast} \tab logical indicating whether to omit the last return in the calculation of the local volatility. This is done in e.g. Lee-Mykland (2008) to produce jump-robust estimates of spot volatility. 
+Setting this to TRUE will then use lookBackPeriod - 1 returns in the construction of the realized measures. Default = FALSE\cr
+}
+
+Outputs (see 'Value' for a full description of each component):
+\itemize{
+\item{\code{spot}}
+\item{\code{RM}}
+\item{\code{lookBackPeriod}}
+}
+
+This method returns the estimates of the spot volatility, a string containing the realized measure used, and the lookBackPeriod.
+
+
+\strong{(Non-overlapping) Pre-Averaged Realized Measures (\code{"PARM"})}
+
+Parameters:
+\tabular{ll}{
+\code{RM} \tab String denoting which realized measure to use to estimate the local volatility. Possible values are: "bipower", "medrv", "minrv", "rv"
+Default = "BPV"\cr
+\code{lookBackPeriod} \tab positive integer denoting the amount of sub-sampled returns to use for the estimation of the local volatility. Default = 50.\cr
+}
+
+Outputs (see 'Value' for a full description of each component):
+\itemize{
+\item{\code{spot}}
+\item{\code{RM}}
+\item{\code{lookBackPeriod}}
+\item{\code{kn}}
+}
 }
 \examples{
 # Default method, deterministic periodicity

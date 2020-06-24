@@ -368,6 +368,45 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
 #' Along with the spot volatility estimates, this method will return the
 #' \code{ugarchfit} object used by the \code{rugarch} package.
 #'
+#'
+#' \strong{Realized Measures (\code{"RM"})}
+#' 
+#' Parameters:
+#' \tabular{ll}{
+#' \code{RM} \tab String denoting which realized measure to use to estimate the local volatility. Possible values are: "bipower", "medrv", "minrv", "rv"
+#' Default = "BPV" \cr
+#' \code{lookBackPeriod} \tab positive integer denoting the amount of sub-sampled returns to use for the estimation of the local volatility. Default = 10. \cr
+#' \code{dontIncludeLast} \tab logical indicating whether to omit the last return in the calculation of the local volatility. This is done in e.g. Lee-Mykland (2008) to produce jump-robust estimates of spot volatility. 
+#' Setting this to TRUE will then use lookBackPeriod - 1 returns in the construction of the realized measures. Default = FALSE\cr
+#' }
+#'
+#' Outputs (see 'Value' for a full description of each component):
+#' \itemize{
+#' \item{\code{spot}}
+#' \item{\code{RM}}
+#' \item{\code{lookBackPeriod}}
+#' }
+#'
+#' This method returns the estimates of the spot volatility, a string containing the realized measure used, and the lookBackPeriod.
+#'
+#'
+#' \strong{(Non-overlapping) Pre-Averaged Realized Measures (\code{"PARM"})}
+#' 
+#' Parameters:
+#' \tabular{ll}{
+#' \code{RM} \tab String denoting which realized measure to use to estimate the local volatility. Possible values are: "bipower", "medrv", "minrv", "rv"
+#' Default = "BPV"\cr
+#' \code{lookBackPeriod} \tab positive integer denoting the amount of sub-sampled returns to use for the estimation of the local volatility. Default = 50.\cr
+#' }
+#' 
+#' Outputs (see 'Value' for a full description of each component):
+#' \itemize{
+#' \item{\code{spot}}
+#' \item{\code{RM}}
+#' \item{\code{lookBackPeriod}}
+#' \item{\code{kn}}
+#' }
+#'
 #' @examples
 #' # Default method, deterministic periodicity
 #'
@@ -458,24 +497,25 @@ spotVol <- function(data, method = "detPer", ..., on = "minutes", k = 5,
     }
   }
   
-  datad <- aggregatePrice(data, on = on, k = k , marketOpen = marketOpen,
-                          marketClose = marketClose, tz = tz, fill = TRUE)
-  datad[, DATE := as.Date(DT, tz = tz(datad$DT))]
-  setkeyv(datad, "DT")
-  datad <- datad[, RETURN := log(PRICE) - shift(log(PRICE), type = "lag"), by = "DATE"][is.na(RETURN) == FALSE]
-  rData <- xts(datad$RETURN, order.by = datad$DT)
-  datad <- split(datad, by = "DATE")
-  mR <- matrix(unlist(lapply(datad, FUN = function(x) as.numeric(x$RETURN))), ncol = length(datad[[1]]$RETURN), byrow = TRUE)
-  
-  if (method == "kernel") {
-    if (on == "seconds" | on == "secs")
-      delta <- k
-    if (on == "minutes" | on == "mins")
-      delta <- k * 60
-    if (on == "hours")
-      delta <- k * 3600
+  if( method != "PARM"){
+    datad <- aggregatePrice(data, on = on, k = k , marketOpen = marketOpen,
+                            marketClose = marketClose, tz = tz, fill = TRUE)
+    datad[, DATE := as.Date(DT, tz = tz(datad$DT))]
+    setkeyv(datad, "DT")
+    datad <- datad[, RETURN := log(PRICE) - shift(log(PRICE), type = "lag"), by = "DATE"][is.na(RETURN) == FALSE]
+    rData <- xts(datad$RETURN, order.by = datad$DT)
+    datad <- split(datad, by = "DATE")
+    mR <- matrix(unlist(lapply(datad, FUN = function(x) as.numeric(x$RETURN))), ncol = length(datad[[1]]$RETURN), byrow = TRUE)
+    
+    if (method == "kernel") {
+      if (on == "seconds" | on == "secs")
+        delta <- k
+      if (on == "minutes" | on == "mins")
+        delta <- k * 60
+      if (on == "hours")
+        delta <- k * 3600
+    }
   }
-  
   options <- list(...)
   out <- switch(method,
                 detPer = detPer(mR, rData = rData, options = options),
@@ -483,7 +523,9 @@ spotVol <- function(data, method = "detPer", ..., on = "minutes", k = 5,
                 kernel = kernelestim(mR, rData = rData, delta, options = options),
                 piecewise = piecewise(mR, rData = rData, options = options),
                 garch = garch_s(mR, rData = rData, options = options),
-                RM = realizedMeasureSpotVol(mR, rData = rData, options = options))
+                RM = realizedMeasureSpotVol(mR, rData = rData, options = options),
+                PARM = preAveragedRealizedMeasureSpotVol(data, options = options)
+                )
   
   return(out)
 }

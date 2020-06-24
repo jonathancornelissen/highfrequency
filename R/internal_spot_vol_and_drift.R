@@ -939,31 +939,54 @@ center <- function() {
 # }
 
 
-
+#' @keywords internal
 realizedMeasureSpotVol <- function(mR, rData, options = list()){
   
   # Make sure there are sensible standard inputs
-  op <- list(RM = "rBPCov", lookbackPeriod = 10)
+  op <- list(RM = "bipower", lookBackPeriod = 10L, dontIncludeLast = FALSE)
   # replace standards with user supplied inputs
   op[names(options)] <- options
   D <- nrow(mR)
   N <- ncol(mR)
-  lookbackPeriod <- op$lookbackPeriod
+  lookBackPeriod <- op$lookBackPeriod
+  if((lookBackPeriod %% 1 != 0) | (lookBackPeriod <= 0)){ #lookBackPeriod must be a positive integer
+    stop("lookBackPeriod must be a positive integer.")
+  }
   sigma2hat <- matrix(0, D, N)
-  idx <- seq(lookbackPeriod + 1, N)
-  
-  # compute spot variances
-  for (j in idx) {
-    for (i in 1:D) {
-      sigma2hat[i, j] <- switch(op$RM,
-                          rBPCov = RBPVar(mR[i,(j-lookbackPeriod):j]),
-                          medRV = medRV(mR[i,(j-lookbackPeriod):j])
-        
-      )
+  idx <- seq(lookBackPeriod+1, N)
+  if(!op$dontIncludeLast){
+    # compute spot variances
+    for (j in idx) {
+      for (i in 1:D) {
+        sigma2hat[i, j] <- switch(op$RM,
+                            bipower = RBPVar(mR[i,(j-lookBackPeriod+1):j]),
+                            rv = RV(mR[i,(j-lookBackPeriod+1):j]),
+                            medrv = medRV(mR[i,(j-lookBackPeriod+1):j]),
+                            minrv = minRV(mR[i,(j-lookBackPeriod+1):j])
+          
+        )
+      }
+      
+    }
+    
+  } else {
+    ### Special considerations for the LM type test
+    for (j in idx) {
+      for (i in 1:D) {
+        sigma2hat[i, j] <- switch(op$RM,
+                                    bipower = RBPVar(mR[i,(j-lookBackPeriod+1):(j-1)]),
+                                    rv = RV(mR[i,(j-lookBackPeriod+1):(j-1)]),
+                                    medrv = medRV(mR[i,(j-lookBackPeriod+1):(j-1)]),
+                                    minrv = minRV(mR[i,(j-lookBackPeriod+1):(j-1)])
+                                    
+        )
+      }
+      
     }
     
   }
   
+  #print(mR[i,(j-lookBackPeriod+1):(j - 1)-1])
   # Adjust the matrix and take square-root
   spot <- as.vector(t(sqrt(sigma2hat)))
   
@@ -974,10 +997,64 @@ realizedMeasureSpotVol <- function(mR, rData, options = list()){
   }
   
   
-  out <- list("spot" = spot, "estimator" = op$RM)
+  out <- list("spot" = spot, "estimator" = op$RM, "lookBackPeriod" = lookBackPeriod)
   return(out)
   
   
+}
+
+#' @keywords internal
+#' @importFrom data.table as.xts.data.table
+preAveragedRealizedMeasureSpotVol <- function(data, options = list()){
   
+  
+  # Make sure there are sensible standard inputs
+  op <- list(RM = "bipower", lookBackPeriod = 50, dontIncludeLast = FALSE, theta = 0.5)
+  # replace standards with user supplied inputs
+  op[names(options)] <- options
+  M <- op$lookBackPeriod
+  nObs <- length(data$PRICE)
+  theta <- op$theta
+  ## We need to ensure kn is even, thus we round half and multiply by 2
+  kn <- round(theta * sqrt(nObs))
+  kn <- kn + kn%%2
+  idx <- NULL
+  if(op$RM != "rv"){
+    idx <- spot <- seq(M - 2 + kn + 1, nObs - kn, by = kn) # initialize indices to loop over and the container to have the post esitmates.
+  } else {
+    idx <- spot <- seq(M - 2 + 1, nObs - kn, by = kn) # Here we have one more estimate than the other cases.
+  }
+  # Measuring jump variation during the entire day.
+  preAveragedReturns <- hatreturn(as.xts.data.table(data), kn) # 
+  preAveragedReturns <- c(as.numeric(preAveragedReturns), rep(NA, nObs - length(preAveragedReturns)))#, as.POSIXct(index(pData), origin = dateOfData)) # maybe we want to add back in xts, but it's removed for now...
+  
+  
+  ind <- 1
+  for (i in idx) {
+    
+    
+    
+    if( op$RM == "bipower" ){    
+      
+      spot[ind] <- pi/2 * sum(abs(preAveragedReturns[(i - M + 2):(i-1)]) * abs(preAveragedReturns[(i-M+2-kn):(i-1-kn)]))
+      
+    } else if( op$RM == "medrv" ){
+      spot[ind] <- (pi / (6 - 4 * sqrt(3) + pi)) * sum(apply(cbind(preAveragedReturns[(i-M+2-kn):(i-1-kn)] , preAveragedReturns[(i-M+2):(i-1)] , preAveragedReturns[(i-M+2+kn):(i-1+kn)]), 1, median) ^2)
+      
+    } else if( op$RM == "minrv"){
+      spot[ind] <- 2.751938 * sum(pmin(preAveragedReturns[(i - M + 2):(i-1)], preAveragedReturns[(i-M+2-kn):(i-1-kn)]) ^2)
+    } else if( op$RM == "rv"){
+      spot[ind] <- sum(preAveragedReturns[(i - M + 2):(i-1)] ^ 2)
+    }
+    ind <- ind + 1 # increment index
+  }
+  
+  
+  spot <- na.omit(xts(sqrt(spot), order.by = data[idx]$DT))
+  
+  
+  out <- list("spot" = spot, "kn" = kn)
+  
+  return(out)  
   
 }
