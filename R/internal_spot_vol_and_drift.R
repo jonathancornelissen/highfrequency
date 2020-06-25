@@ -7,7 +7,7 @@ driftKernel <- function(data, intraday, options) {
     stop("driftKernel method currently only accepts single day tick data as it relies on the time-stamps of the trades.")
   }
 
-  op <- list(init = list(), preAverage = 5, meanBandwidth = 300)
+  op <- list(preAverage = 5, meanBandwidth = 300)
   op[names(options)] <- options
   datap          <- log(data$PRICE)
   #vX             <- c(0,diff(datap)[-1])
@@ -38,7 +38,7 @@ driftKernel <- function(data, intraday, options) {
 #' @keywords internal
 #' @importFrom zoo rollmean
 driftMean <- function(mR, options){
-  op <- list(init = list(), periods = 5, align = "right")
+  op <- list(periods = 5, align = "right")
   op[names(options)] <- options
   periods <- op$periods
   align   <- op$align
@@ -58,7 +58,7 @@ driftMean <- function(mR, options){
 #' @keywords internal
 #' @importFrom zoo rollmedian
 driftMedian <- function(mR, options){
-  op <- list(init = list(), periods = 5, align = "right")
+  op <- list(periods = 5, align = "right")
   op[names(options)] <- options
   periods <- op$periods
   align   <- op$align
@@ -962,7 +962,7 @@ realizedMeasureSpotVol <- function(mR, rData, options = list()){
                             bipower = RBPVar(mR[i,(j-lookBackPeriod+1):j]),
                             rv = RV(mR[i,(j-lookBackPeriod+1):j]),
                             medrv = medRV(mR[i,(j-lookBackPeriod+1):j]),
-                            minrv = minRV(mR[i,(j-lookBackPeriod+1):j])
+                            minrv = minRV(matrix(mR[i,(j-lookBackPeriod+1):j], ncol = 1))
           
         )
       }
@@ -977,7 +977,7 @@ realizedMeasureSpotVol <- function(mR, rData, options = list()){
                                     bipower = RBPVar(mR[i,(j-lookBackPeriod+1):(j-1)]),
                                     rv = RV(mR[i,(j-lookBackPeriod+1):(j-1)]),
                                     medrv = medRV(mR[i,(j-lookBackPeriod+1):(j-1)]),
-                                    minrv = minRV(mR[i,(j-lookBackPeriod+1):(j-1)])
+                                    minrv = minRV(matrix(mR[i,(j-lookBackPeriod+1):(j-1)], ncol = 1))
                                     
         )
       }
@@ -998,62 +998,106 @@ realizedMeasureSpotVol <- function(mR, rData, options = list()){
   
   
   out <- list("spot" = spot, "estimator" = op$RM, "lookBackPeriod" = lookBackPeriod)
+  class(out) <- "spotVol"
   return(out)
   
   
 }
 
 #' @keywords internal
-#' @importFrom data.table as.xts.data.table
+#' @importFrom xts as.xts
 preAveragedRealizedMeasureSpotVol <- function(data, options = list()){
   
   
-  # Make sure there are sensible standard inputs
-  op <- list(RM = "bipower", lookBackPeriod = 50, dontIncludeLast = FALSE, theta = 0.5)
-  # replace standards with user supplied inputs
-  op[names(options)] <- options
-  M <- op$lookBackPeriod
-  nObs <- length(data$PRICE)
-  theta <- op$theta
-  ## We need to ensure kn is even, thus we round half and multiply by 2
-  kn <- round(theta * sqrt(nObs))
-  kn <- kn + kn%%2
-  idx <- NULL
-  if(op$RM != "rv"){
-    idx <- spot <- seq(M - 2 + kn + 1, nObs - kn, by = kn) # initialize indices to loop over and the container to have the post esitmates.
-  } else {
-    idx <- spot <- seq(M - 2 + 1, nObs - kn, by = kn) # Here we have one more estimate than the other cases.
-  }
-  # Measuring jump variation during the entire day.
-  preAveragedReturns <- hatreturn(as.xts.data.table(data), kn) # 
-  preAveragedReturns <- c(as.numeric(preAveragedReturns), rep(NA, nObs - length(preAveragedReturns)))#, as.POSIXct(index(pData), origin = dateOfData)) # maybe we want to add back in xts, but it's removed for now...
+  ## Considerations for the multiday case:::::##########!#!#!#!#!#!#
+  D <- ndays(data)
   
-  
-  ind <- 1
-  for (i in idx) {
-    
-    
-    
-    if( op$RM == "bipower" ){    
-      
-      spot[ind] <- pi/2 * sum(abs(preAveragedReturns[(i - M + 2):(i-1)]) * abs(preAveragedReturns[(i-M+2-kn):(i-1-kn)]))
-      
-    } else if( op$RM == "medrv" ){
-      spot[ind] <- (pi / (6 - 4 * sqrt(3) + pi)) * sum(apply(cbind(preAveragedReturns[(i-M+2-kn):(i-1-kn)] , preAveragedReturns[(i-M+2):(i-1)] , preAveragedReturns[(i-M+2+kn):(i-1+kn)]), 1, median) ^2)
-      
-    } else if( op$RM == "minrv"){
-      spot[ind] <- 2.751938 * sum(pmin(preAveragedReturns[(i - M + 2):(i-1)], preAveragedReturns[(i-M+2-kn):(i-1-kn)]) ^2)
-    } else if( op$RM == "rv"){
-      spot[ind] <- sum(preAveragedReturns[(i - M + 2):(i-1)] ^ 2)
+  if( D > 1 ){
+    dates <- NULL 
+    if(is.data.table(data)){
+      dates <- unique(as.Date(data$DT))
+    } else {
+      dates <- unique(as.Date(index(data)))
     }
-    ind <- ind + 1 # increment index
+    
+    spot <- NULL
+    nObs <- kn <- numeric(D)
+    
+    for (d in 1:D) {
+      res <- preAveragedRealizedMeasureSpotVol(data[as.Date(data$DT) == dates[d]], options)
+      spot <- rbind(spot, res$spot)
+      kn[d] <- res$kn
+      nObs[d] <- res$nObs
+    }
+    
+    out <- list("spot" = spot, "kn" = kn, "nObs" = nObs)
+    class(out) <- "spotVol"
+    
+  } else {
+    # Make sure there are sensible standard inputs
+    op <- list(RM = "bipower", lookBackPeriod = 50, dontIncludeLast = FALSE, theta = 0.5)
+    # replace standards with user supplied inputs
+    op[names(options)] <- options
+    M <- op$lookBackPeriod
+    nObs <- length(data$PRICE)
+    theta <- op$theta
+    
+    dummyWasXts <- FALSE
+    if(is.xts(data)){
+      dummyWasXts <- TRUE  
+    }
+    
+    ## We need to ensure kn is even, thus we round half and multiply by 2
+    kn <- round(theta * sqrt(nObs))
+    kn <- kn + kn%%2
+    idx <- NULL
+    if(op$RM != "rv"){
+      idx <- spot <- seq(M - 2 + kn + 1, nObs - kn, by = kn) # initialize indices to loop over and the container to have the post esitmates.
+    } else {
+      idx <- spot <- seq(M - 2 + 1, nObs - kn, by = kn) # Here we have one more estimate than the other cases.
+    }
+    # Measuring jump variation during the entire day.
+    preAveragedReturns <- hatreturn(as.xts(data), kn) 
+    preAveragedReturns <- c(as.numeric(preAveragedReturns), rep(NA, nObs - length(preAveragedReturns)))#, as.POSIXct(index(pData), origin = dateOfData)) # maybe we want to add back in xts, but it's removed for now...
+    
+    
+    ind <- 1
+    for (i in idx) {
+      
+      
+      
+      if( op$RM == "bipower" ){    
+        
+        spot[ind] <- pi/2 * sum(abs(preAveragedReturns[(i - M + 2):(i-1)]) * abs(preAveragedReturns[(i-M+2-kn):(i-1-kn)]))
+        
+      } else if( op$RM == "medrv" ){
+        
+        spot[ind] <- (pi / (6 - 4 * sqrt(3) + pi)) * sum(apply(cbind(preAveragedReturns[(i-M+2-kn):(i-1-kn)] , preAveragedReturns[(i-M+2):(i-1)] , preAveragedReturns[(i-M+2+kn):(i-1+kn)]), 1, median) ^2)
+        
+      } else if( op$RM == "minrv"){
+        
+        spot[ind] <- 2.751938 * sum(pmin(preAveragedReturns[(i - M + 2):(i-1)], preAveragedReturns[(i-M+2-kn):(i-1-kn)]) ^2)
+        
+      } else if( op$RM == "rv"){
+        
+        spot[ind] <- sum(preAveragedReturns[(i - M + 2):(i-1)] ^ 2)
+        
+      }
+      
+      ind <- ind + 1 # increment index
+      
+    }
+    
+    
+    if(dummyWasXts){
+      spot <- na.omit(xts(sqrt(spot), order.by = time(data[idx])))
+    } else {
+      spot <- na.omit(xts(sqrt(spot), order.by = data[idx, DT]))
+    }
+    
+    out <- list("spot" = spot, "kn" = kn, "nObs" = nObs)
+    class(out) <- "spotVol"
   }
-  
-  
-  spot <- na.omit(xts(sqrt(spot), order.by = data[idx]$DT))
-  
-  
-  out <- list("spot" = spot, "kn" = kn)
   
   return(out)  
   

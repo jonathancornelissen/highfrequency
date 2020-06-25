@@ -27,7 +27,7 @@ nObs <- 23401
 timeSettings  <- list(tradingStart = 34200, tradingEnd = 57600, origin = "1970-01-01" , sampling = "equidistant")
 discretize <- FALSE
 
-jumpModel  <- list(modelType = "PA", jumpComponent = 1 / 2, jumpTime = c(16/32, 17/32), includeJumps = TRUE) #includeJumps should be automated in the creation of the spec
+jumpModel  <- list(modelType = "PA", jumpComponent = 1 / 5, jumpTime = c(16/32, 17/32), includeJumps = TRUE) #includeJumps should be automated in the creation of the spec
 
 hfSimSpec <- createHFSimSpec(volatilityModel = volatilityModel, driftModel = driftModel, jumpModel = jumpModel, nDays = nDays, nSeries = nSeries, nObs = nObs)
 sim <- hfsim.do(hfSimSpec)
@@ -70,13 +70,19 @@ sim <- hfsim.do(hfSimSpec)
 
 
 options(error = recover)
-
-LMtest <- intradayJumpTest(pData = exp(sim$prices)[,1], volEstimator = "RM",  # PRE-AVERAGED REALIZED MEASURE
+pData <- exp(sim$prices)[,1]
+pData <- setnames(as.data.table(pData), old = "index", new = "DT")
+names(pData) <- c("DT", "PRICE")
+pData[, PRICE := as.numeric(PRICE)]
+LMtest <- intradayJumpTest(pData, volEstimator = "RM",  # PRE-AVERAGED REALIZED MEASURE
                            driftEstimator = "none", on = "minutes", alpha = 0.95, k = 5, 
                            RM = "bipower", lookBackPeriod = 10, tz = "GMT", marketOpen = "10:30:00", marketClose = "17:00:00",
                            dontIncludeLast = TRUE)
 
-plt <- plot(LMtest)
+
+
+plot(LMtest)
+
 
 
 
