@@ -387,8 +387,7 @@ JOjumpTest <- function(pData, power = 4, ...) {
 
 #' General framework for testing for jumps on an intraday basis
 #' 
-#' @param pData (currently only xts) of the price data in levels. This data can (and should in some cases) be tick-level data. This data can span more than one day
-#' @param pData (currently only xts) of the price data in levels. This data can (and should in some cases) be tick-level data. This data can span more than one day
+#' @param pData xts or data.table of the price data in levels. This data can (and should in some cases) be tick-level data. This data can span more than one day
 #' @param testType type of test to use. Currently supports "LM" test of Lee and Mykland (2018), and "FoF" as "Fact or Friction" test from Christensen, Oomen, and Podolskij (2014)
 #' @param testingTimes a character vector of times to test for jumps, for example  \code{c("11:30", "11:35", "14:30")}. 
 #' This argument can also be a numeric vector containing times to test in seconds after midnight. For example, using \code{seq(39200, 57600, 300)}, 
@@ -514,15 +513,17 @@ intradayJumpTest <- function(pData, volEstimator = "RM", driftEstimator = "none"
   } 
   
   vol <- spotVol(pData, method = volEstimator, on = on, k = k, marketOpen = marketOpen, marketClose = marketClose, tz = tz, ...)
-  ## What is different here?? Check against old implementation
+
   if(volEstimator == "RM"){
     
-    op <- list(RM = "rBPCov", lookBackPeriod = 10)
+    op <- list(RM = "bipower", lookBackPeriod = 10)
     options <- list(...)
     op[names(options)] <- options
     op$lookBackPeriod
     #vol$spot <- lag(vol$spot)
-    vol$spot <- sqrt((vol$spot^2  / (pi/2) * 1/(op$lookBackPeriod-2)))
+    if(op$RM == "bipower"){
+      vol$spot <- sqrt((vol$spot^2  / (pi/2))) 
+    }
     
   }
 
@@ -537,7 +538,7 @@ intradayJumpTest <- function(pData, volEstimator = "RM", driftEstimator = "none"
   } else { # volEstimator == "PARM" i.e. we have pre-averaged realized measures
     nObs <- length(pData$PRICE)
     
-    op <- list(RM = "rBPCov", lookBackPeriod = 50)
+    op <- list(RM = "bipower", lookBackPeriod = 50)
     options <- list(...)
     op[names(options)] <- options
     op$lookBackPeriod
@@ -577,10 +578,10 @@ intradayJumpTest <- function(pData, volEstimator = "RM", driftEstimator = "none"
     }
     
     
-    vol$spot <- sqrt(vol$spot^2  * 1/(op$lookBackPeriod-2))
     
     prices <- NULL
   }
+  
   
   if(driftEstimator != "none"){
     if(volEstimator == "PARM"){
@@ -592,6 +593,11 @@ intradayJumpTest <- function(pData, volEstimator = "RM", driftEstimator = "none"
   } else {
     drift <- 0
   }
+  
+  
+  
+  vol$spot <- sqrt(vol$spot^2  * 1/(op$lookBackPeriod-2))
+  
   tests <- (returns$RETURN - drift)/(vol$spot)
   
   tests[is.infinite(tests)] <- NA
@@ -767,138 +773,175 @@ plot.intradayJumpTest <- function(x, ...){
 
 
 
-
-
-###### All the functions under this comment will be moved to internal_jump_tests but for working purposes, I keep them here to have them near where they're used.
-
-#' @importFrom xts xts
-#' @keywords internal
-LeeMyklandtest <- function(testData, testingTimes, windowSize, K, alpha){
-
-  oldK <- K
-  const <- 0.7978846 # c in formula 10 in the paper
-  return <- spotBPV <- Cn <- Sn <- L <- numeric(length(testingTimes))
-  betastar <- -log(-log(1-alpha))
-  dateOfData <- as.character(as.Date(index(testData[1])))
-
-  # The testingTimes can be provided in terms of seconds after midnight. 
-  if(is.numeric(testingTimes)){
-    testingTimes <- as.POSIXct(testingTimes, origin = dateOfData)
-    testingTimes <- trimws(gsub(dateOfData, '', testingTimes)) # We only want hours:mins:sec
+#' General framework for testing for jumps on an intraday basis
+#' 
+#' @param marketReturns data.table or xts containing the 
+#' @param testType type of test to use. Currently supports "LM" test of Lee and Mykland (2018), and "FoF" as "Fact or Friction" test from Christensen, Oomen, and Podolskij (2014)
+#' @param testingTimes a character vector of times to test for jumps, for example  \code{c("11:30", "11:35", "14:30")}. 
+#' This argument can also be a numeric vector containing times to test in seconds after midnight. For example, using \code{seq(39200, 57600, 300)}, 
+#' where testing will take place every five minutes, starting fifty minutes after opening. (On when open is 09:30). This argument is not used in the FoF type test.
+#' @param alpha numeric significance level to use for the jump tests.
+#' @param theta numeric parameter in determining the pre-averaging horizon. Default = 0.5. The pre-averaging horizon is \code{round(theta * sqrt(n))}, where n is the number of observations. 
+#' This parameter will also help determine the testing times as the test is done on non-overlapping pre-averaged returns.
+#' @param ... used internally. Don't set this parameter.
+#' 
+#' @details 
+#' 
+#' @export
+#' @importFrom zoo coredata
+rankJumpTest <- function(marketPrice, stockPrices, alpha = c(5,3), K = 10, kn = 30, r = 1, BoxCox = 1, nBoot = 1000, dontTestAtBoundaries = TRUE, on = "minutes", k = 5,
+                         marketOpen = "09:30:00", marketClose = "16:00:00",
+                         tz = "GMT"){
+  
+  PRICE = DATE = RETURN = DT = NULL
+  
+  if(!all.equal(class(marketPrice), class(stockPrices[[1]]))){
+    stop("Please provide marketPrice and stockPrice as the same class (either xts or data.table)")
   }
-
-  for (i in (K+1):length(testingTimes)) {
-    # Here we keep only the data needed for this test.
-    thisData <- testData[paste0("/", dateOfData, ' ', testingTimes[i])]
-
-
-    # here we check if enough data is available to conduct this test. If not we have to truncate K. 
-    # In the else clause we simply set K to the user selected value such that we only use a 'wrong' K when there is not enough data.
-    # This means that the generalization to more dates should be easier.
-
-    if (K > length(thisData)){
-      # Here it is not possible to construct a test.
-      if(length(thisData) < 5){
-        L[i] <- 0
-        Cn[i] <- 0
-        Sn[i] <- 0
-        warning(paste0("Not enough data to test at time ", testingTimes[i], " Skipping!\n This happened on test ", i))
-        # We need to reset K so we can have more than one test fail.
-        K <- oldK
-        next
-      }
-      warning(paste0("The window K mandates using more data than is available in the data provided\n using less data. This happened on test ", i))
-      K <- length(thisData) -1
+  
+  if (!"PRICE" %in% colnames(marketPrice)) {
+    if (dim(marketPrice)[2] == 1) {
+      names(marketPrice) <- "PRICE"
+    } else {
+      stop("data.table or xts needs column named PRICE.")
     }
-
-
-    # We can drop the xts attribute so we don't have to use as.numeric multiple times below
-    thisData <- as.numeric(thisData[(length(thisData)-K):length(thisData)])
-
-    return[i] <- log(thisData[length(thisData)] / thisData[length(thisData) - 1])
-
-    returns <- diff(log(thisData[-length(thisData)]))
-    n <- length(returns)
-    spotBPV[i] <- 1/(K-2) * sum(abs(returns[1:(n-1)]) * abs(returns[2:n]))
-
-    L[i] <- return[i]/sqrt(spotBPV[i])
-    # We have Cn and Sn as vectors as the size of these may change.
-    Cn[i] <- sqrt(2 * log(n))/const - (log(pi) + log( log(n) ))/(2 * const*sqrt((2 * log(n))))
-    Sn[i] <- 1/sqrt(const * 2 * log(n))
+  }
+  
+  dummyWasXts <- FALSE
+  if (!is.data.table(marketPrice)) {
+    if (is.xts(marketPrice) == TRUE) {
+      marketPrice <- setnames(as.data.table(marketPrice), old = "index", new = "DT")
+      marketPrice[, PRICE := as.numeric(PRICE)]
+      
+      dummy_was_xts <- TRUE
+    } else {
+      stop("Input has to be data.table or xts.")
+    }
+  } else {
+    if (!("DT" %in% colnames(marketPrice))) {
+      stop("Data.table needs DT column containing the time-stamps of the trades.") # added the timestamp comment for verbosity.
+    }
     
-    K <- oldK
-  }
-  jumps <- (abs(L) - Cn)/Sn > betastar
-
-  jumps <- xts(jumps, as.POSIXct(paste(dateOfData, testingTimes)))
-  out <- merge.xts(testData, merge.xts(jumps, L, spotBPV, return))
-  return(out)
-
-}
-
-
-
-
-#' @keywords internal
-FoFJumpTest <- function(pData, theta, M, alpha){
-
-  # Users will not directly control the testing times, instead they can choose the M parameter.
-  dateOfData <- as.character(as.Date(index(pData[1])))
-  betastar <- -log(-log(1-alpha))
-  nObs <- length(pData)
-
-  ## We need to ensure kn is even, thus we round half and multiply by 2
-  kn <- round(theta * sqrt(nObs))
-  kn <- kn + kn%%2
-
-  const <- 0.7978846 # = sqrt(2/pi)
-  Cn <- sqrt(2 * log(kn))/const - (log(pi) + log( log(kn) ))/(2 * const*sqrt((2 * log(kn))))
-  Sn <- 1/sqrt(const * 2 * log(kn))
-  criticalValue <- Cn + Sn * betastar
-
-  # Measuring jump variation during the entire day.
-  preAveragedReturns <- hatreturn(pData, kn)
-  preAveragedReturns <- c(as.numeric(preAveragedReturns), rep(NA, length(pData) - length(preAveragedReturns)))#, as.POSIXct(index(pData), origin = dateOfData)) # maybe we want to add back in xts, but it's removed for now...
-
-  psi1kn <- kn * sum((gfunction((1:kn)/kn) - gfunction(( (1:kn) - 1 )/kn ) )^2)
-
-  psi2kn <- 1 / kn * sum(gfunction((1:kn)/kn)^2)
-
-  psi2kn <- (1 + (2*kn)^-2)/12
-  returns <- diff(log(pData))
-  omegaHat <- -1/(nObs-1) * sum(returns[2:nObs] * returns[1:(nObs-1)])
-
-  biasCorrection <- omegaHat^2/theta^2 * psi1kn/psi2kn
-
-  preAveragedRealizedVariance <- nObs/(nObs - kn + 2) * 1/(kn * psi2kn) * sum(preAveragedReturns^2, na.rm= TRUE) - biasCorrection
-  preAveragedBipowerVariation <- nObs/(nObs - 2*kn + 2) * 1/(kn * psi2kn) * pi/2 * sum(abs(preAveragedReturns[1:(nObs-2*kn)]) * abs(preAveragedReturns[1:(nObs-2*kn) + kn])) - biasCorrection
-
-  ## We need to compute the variance covariance matrix to get 
-  
-  jumpVariation <- (preAveragedRealizedVariance - preAveragedBipowerVariation)/preAveragedRealizedVariance
-
-
-  testingIndices <- seq(M - 2 + kn +1, nObs-kn, by = kn)# + 1  to account for edge-effect!
-  PABPV <- PAreturns <- numeric(length(testingIndices))
-
-
-  ind <- 1
-  for (i in testingIndices) {
-    PABPV[ind] <- pi/2 * 1/(M-2) * sum(abs(preAveragedReturns[(i - M + 2):(i-1)]) * abs(preAveragedReturns[(i-M+2-kn):(i-1-kn)]))
-    ind <- ind + 1 # increment index
   }
 
-
-  L <- preAveragedReturns[testingIndices]/sqrt(PABPV)
-
-
-  jumps <- xts((abs(L) > criticalValue), index(pData)[testingIndices])
+  marketPrice <- aggregatePrice(marketPrice, on = on, k = k , marketOpen = marketOpen,
+                          marketClose = marketClose, tz = tz, fill = TRUE)
+  marketPrice[, DATE := as.Date(DT, tz = tz(marketPrice$DT))]
+  setkeyv(marketPrice, "DT")
+  marketPrice <- marketPrice[, RETURN := log(PRICE) - shift(log(PRICE), type = "lag"), by = "DATE"][!is.na(RETURN)]
+  marketReturns <- xts(marketPrice$RETURN, order.by = marketPrice$DT)
   
-  out <-  merge.xts(jumps, L, jumpVariation, PABPV)
+  stockReturns <- NULL
+  for (stock in 1:length(stockPrices)) {
+    tmp <- setnames(as.data.table(stockPrices[[stock]]), old = "index", new = "DT")
+    colnames(tmp) <- c("DT", "PRICE")
+    tmp <- aggregatePrice(tmp, on = on, k = k , marketOpen = marketOpen,
+                                 marketClose = marketClose, tz = tz, fill = TRUE)
+    tmp[, DATE := as.Date(DT, tz = tz(tmp$DT))]
+    setkeyv(tmp, "DT")
+    
+    tmp <- tmp[, RETURN := log(PRICE) - shift(log(PRICE), type = "lag"), by = "DATE"][!is.na(RETURN)]
+    stockReturns <- cbind(stockReturns, as.xts(tmp[,.(DT, PRICE)])$PRICE)
+  }
+
+  
+  if(!is.numeric(alpha)){
+    stop("alpha must be a numeric and should be of length one or two")
+  }
+  if(length(alpha) == 1){
+    alpha = rep(alpha,2)
+  } else if(length(alpha) > 2){
+    warning("alpha should be a numeric of length one or two")
+    alpha = alpha[1:2]
+  }
+  
+  if(any(alpha< 1)){
+    warning("alpha should be specified in terms of standard deviations in the rank jump test.")
+  }
+  
+  nDays <- ndays(marketReturns)
+  nRets <- nrow(marketReturns)/nDays
+  marketJumpDetection <- jumpDetection(marketReturns, alpha[1], nRets = nRets, nDays = nDays)
+  jumpIndices <- marketJumpDetection$jumpIndices
+  if(length(jumpIndices) == 0){ # We detected no jumps, we can just skip. and return all NULL's
+    return(list("criticalValues" = NULL, "testStatistic" = NULL, "dimensions" = NULL,
+                "marketJumpDetections" = NULL, "stockJumpDetections" = NULL, "jumpIndices" = NULL))
+  }
+  nAssets <- ncol(stockReturns)
+  stockJumpDetections <- stockReturns
+  for(j in 1:nAssets){
+    stockJumpDetections[, j] <- jumpDetection(stockJumpDetections[,j], alpha[2], nRets = nRets, nDays = nDays)[["Un"]]
+  }
+  
+  jumps <- matrix(coredata(stockReturns)[jumpIndices,], ncol = ncol(stockReturns), byrow = FALSE)
+  
+  for(i in 1:(K-1)){
+    jumps <- jumps + matrix(stockReturns[jumpIndices + i, ], ncol = ncol(stockReturns), byrow = FALSE)
+  }
+  
+  jumps <- t(jumps) # Transpose here so we don't have to transpose every time in the loop.
+  
+  # Set nu and nv because we need full SVD (see https://stackoverflow.com/questions/41972419/different-svd-result-in-r-and-matlab)
+  decomp <- svd(jumps, nu = nrow(jumps), nv = ncol(jumps))
+  U2 <- decomp$u[, (r+1):ncol(decomp$u)]
+  V2 <- decomp$v[, (r+1):ncol(decomp$v)]
+  
+  singularValues <- decomp$d[(r+1):length(decomp$d)]^2
+  
+  testStatistic <- numeric(length(BoxCox))
+  for (i in 1:length(BoxCox)) {
+    a <- BoxCox[i]
+    testStatistic[i] <- sum(BoxCox__(singularValues, a))
+  }
+  
+  
+  
+  
+  ## Start bootstrapping of the critical values
+  
+  p <- ncol(jumps)
+  dxc <- pmax(pmin(coredata(stockReturns), coredata(stockJumpDetections)), -coredata(stockJumpDetections))
+  siumulatedTestStatistics <- numeric(nBoot)
+  
+  for (b in 1:nBoot) {
+    zetaStar <- matrix(0, nrow = nAssets, ncol = p)
+    for (i in 1:p) {
+      jmp <- jumpIndices[i] 
+      
+      if(dontTestAtBoundaries){
+        # We need to make sure that we don't take data from the previous day
+        pos <- ((jmp - 1) %% nRets) + 1
+        leftKN <- min(kn, pos-1)
+        rightKN <- min(kn, nRets - pos)
+      } else {
+        leftKN <- kn
+        rightKN <- kn
+      }
+      
+      jumpLeft <- ceiling(runif(1) * leftKN)
+      jumpRight <- ceiling(runif(1) * rightKN)
+      
+      dxcLeft <- t(dxc[jmp - jumpLeft,])
+      dxcRight <- t(dxc[jmp + jumpRight,])
+      
+      kappaStar <- runif(1)
+      
+      zetaStar[,i]  <- sqrt(kappaStar) * dxcLeft + sqrt(K - kappaStar) * dxcRight
+      
+    }
+    
+    tmp <- t(U2) %*% zetaStar %*% V2
+    siumulatedTestStatistics[b] <- t(as.numeric(tmp)) %*% as.numeric(tmp)
+    
+  }
+  
+  criticalValues <- quantile(siumulatedTestStatistics, c(0.9, 0.95, 0.99))
+  
+  out <- list("criticalValues" = criticalValues, "testStatistic" = testStatistic, "dimensions" = dim(jumps),
+              "marketJumpDetections" = marketJumpDetection, "stockJumpDetections" = stockJumpDetections, "jumpIndices" = jumpIndices)
+  
   return(out)
-
 }
-
 
 
 #' @keywords internal
@@ -957,104 +1000,133 @@ BoxCox__ <- function(x, lambda){
     return(((1+x)^lambda - 1)/lambda)
 }
 
-#' @keywords internal
-#' @importFrom zoo coredata
-rankJumpTest <- function(marketReturns, stockReturns, alpha = c(7,4), K = 10, kn = 30, r = 1, BoxCox = 1, nBoot = 1000, dontTestAtBoundaries = TRUE){
 
-  if(!is.numeric(alpha)){
-    stop("alpha must be a numeric and should be of length one or two")
-  }
-  if(length(alpha) == 1){
-    alpha = rep(alpha,2)
-  } else if(length(alpha) > 2){
-    warning("alpha should be a numeric of length one or two")
-    alpha = alpha[1:2]
-  }
-  
-  if(any(alpha< 1)){
-    warning("alpha should be specified in terms of standard deviations in the rank jump test.")
-  }
-  
-  nDays <- ndays(marketReturns)
-  nRets <- nrow(marketReturns)/nDays
-  marketJumpDetection <- jumpDetection(marketReturns, alpha[1], nRets = nRets, nDays = nDays)
-  jumpIndices <- marketJumpDetection$jumpIndices
-  if(length(jumpIndices) == 0){ # We detected no jumps, we can just skip. and return all NULL's
-    return(list("criticalValues" = NULL, "testStatistic" = NULL, "dimensions" = NULL,
-                "marketJumpDetections" = NULL, "stockJumpDetections" = NULL, "jumpIndices" = NULL))
-  }
-  nAssets <- ncol(stockReturns)
-  stockJumpDetections <- stockReturns
-  for(j in 1:nAssets){
-    stockJumpDetections[, j] <- jumpDetection(stockJumpDetections[,j], alpha[2], nRets = nRets, nDays = nDays)[["Un"]]
-  }
-  
-  jumps <- matrix(coredata(stockReturns)[jumpIndices,], ncol = ncol(stockReturns), byrow = FALSE)
-  
-  for(i in 1:(K-1)){
-    jumps <- jumps + matrix(stockReturns[jumpIndices + i, ], ncol = ncol(stockReturns), byrow = FALSE)
-  }
-  
-  jumps <- t(jumps) # Transpose here so we don't have to transpose every time in the loop.
 
-  # Set nu and nv because we need full SVD (see https://stackoverflow.com/questions/41972419/different-svd-result-in-r-and-matlab)
-  decomp <- svd(jumps, nu = nrow(jumps), nv = ncol(jumps)) 
-  U2 <- decomp$u[, (r+1):ncol(decomp$u)]
-  V2 <- decomp$v[, (r+1):ncol(decomp$v)]
-  
-  singularValues <- decomp$d[(r+1):length(decomp$d)]^2
-  
-  testStatistic <- numeric(length(BoxCox))
-  for (i in 1:length(BoxCox)) {
-    a <- BoxCox[i]
-    testStatistic[i] <- sum(BoxCox__(singularValues, a))
-  }
-  
-  
-  
-  ## Start bootstrapping of the critical values
-  
-  p <- ncol(jumps)
-  dxc <- pmax(pmin(coredata(stockReturns), coredata(stockJumpDetections)), -coredata(stockJumpDetections))
-  siumulatedTestStatistics <- numeric(nBoot)
-  
-  for (b in 1:nBoot) {
-    zetaStar <- matrix(0, nrow = nAssets, ncol = p)
-    for (i in 1:p) {
-      jmp <- jumpIndices[i] 
-      
-      if(dontTestAtBoundaries){
-        # We need to make sure that we don't take data from the previous day
-        pos <- ((jmp - 1) %% nRets) + 1
-        leftKN <- min(kn, pos-1)
-        rightKN <- min(kn, nRets - pos)
-      } else {
-        leftKN <- kn
-        rightKN <- kn
-      }
-      
-      jumpLeft <- ceiling(runif(1) * leftKN)
-      jumpRight <- ceiling(runif(1) * rightKN)
-      
-      dxcLeft <- t(dxc[jmp - jumpLeft,])
-      dxcRight <- t(dxc[jmp + jumpRight,])
-      
-      kappaStar <- runif(1)
-      
-      zetaStar[,i]  <- sqrt(kappaStar) * dxcLeft + sqrt(K - kappaStar) * dxcRight
-      
-    }
-    
-    tmp <- t(U2) %*% zetaStar %*% V2
-    siumulatedTestStatistics[b] <- t(as.numeric(tmp)) %*% as.numeric(tmp)
-    
-  }
-  
-  criticalValues <- quantile(siumulatedTestStatistics, c(0.9, 0.95, 0.99))
-  
-  out <- list("criticalValues" = criticalValues, "testStatistic" = testStatistic, "dimensions" = dim(jumps),
-              "marketJumpDetections" = marketJumpDetection, "stockJumpDetections" = stockJumpDetections, "jumpIndices" = jumpIndices)
-  
-  return(out)
-}
-
+#' #' @importFrom xts xts
+#' #' @keywords internal
+#' LeeMyklandtest <- function(testData, testingTimes, windowSize, K, alpha){
+#' 
+#'   oldK <- K
+#'   const <- 0.7978846 # c in formula 10 in the paper
+#'   return <- spotBPV <- Cn <- Sn <- L <- numeric(length(testingTimes))
+#'   betastar <- -log(-log(1-alpha))
+#'   dateOfData <- as.character(as.Date(index(testData[1])))
+#' 
+#'   # The testingTimes can be provided in terms of seconds after midnight. 
+#'   if(is.numeric(testingTimes)){
+#'     testingTimes <- as.POSIXct(testingTimes, origin = dateOfData)
+#'     testingTimes <- trimws(gsub(dateOfData, '', testingTimes)) # We only want hours:mins:sec
+#'   }
+#' 
+#'   for (i in (K+1):length(testingTimes)) {
+#'     # Here we keep only the data needed for this test.
+#'     thisData <- testData[paste0("/", dateOfData, ' ', testingTimes[i])]
+#' 
+#' 
+#'     # here we check if enough data is available to conduct this test. If not we have to truncate K. 
+#'     # In the else clause we simply set K to the user selected value such that we only use a 'wrong' K when there is not enough data.
+#'     # This means that the generalization to more dates should be easier.
+#' 
+#'     if (K > length(thisData)){
+#'       # Here it is not possible to construct a test.
+#'       if(length(thisData) < 5){
+#'         L[i] <- 0
+#'         Cn[i] <- 0
+#'         Sn[i] <- 0
+#'         warning(paste0("Not enough data to test at time ", testingTimes[i], " Skipping!\n This happened on test ", i))
+#'         # We need to reset K so we can have more than one test fail.
+#'         K <- oldK
+#'         next
+#'       }
+#'       warning(paste0("The window K mandates using more data than is available in the data provided\n using less data. This happened on test ", i))
+#'       K <- length(thisData) -1
+#'     }
+#' 
+#' 
+#'     # We can drop the xts attribute so we don't have to use as.numeric multiple times below
+#'     thisData <- as.numeric(thisData[(length(thisData)-K):length(thisData)])
+#' 
+#'     return[i] <- log(thisData[length(thisData)] / thisData[length(thisData) - 1])
+#' 
+#'     returns <- diff(log(thisData[-length(thisData)]))
+#'     n <- length(returns)
+#'     spotBPV[i] <- 1/(K-2) * sum(abs(returns[1:(n-1)]) * abs(returns[2:n]))
+#' 
+#'     L[i] <- return[i]/sqrt(spotBPV[i])
+#'     # We have Cn and Sn as vectors as the size of these may change.
+#'     Cn[i] <- sqrt(2 * log(n))/const - (log(pi) + log( log(n) ))/(2 * const*sqrt((2 * log(n))))
+#'     Sn[i] <- 1/sqrt(const * 2 * log(n))
+#'     
+#'     K <- oldK
+#'   }
+#'   jumps <- (abs(L) - Cn)/Sn > betastar
+#' 
+#'   jumps <- xts(jumps, as.POSIXct(paste(dateOfData, testingTimes)))
+#'   out <- merge.xts(testData, merge.xts(jumps, L, spotBPV, return))
+#'   return(out)
+#' 
+#' }
+#' 
+#' 
+#' 
+#' 
+#' #' @keywords internal
+#' FoFJumpTest <- function(pData, theta, M, alpha){
+#' 
+#'   # Users will not directly control the testing times, instead they can choose the M parameter.
+#'   dateOfData <- as.character(as.Date(index(pData[1])))
+#'   betastar <- -log(-log(1-alpha))
+#'   nObs <- length(pData)
+#' 
+#'   ## We need to ensure kn is even, thus we round half and multiply by 2
+#'   kn <- round(theta * sqrt(nObs))
+#'   kn <- kn + kn%%2
+#' 
+#'   const <- 0.7978846 # = sqrt(2/pi)
+#'   Cn <- sqrt(2 * log(kn))/const - (log(pi) + log( log(kn) ))/(2 * const*sqrt((2 * log(kn))))
+#'   Sn <- 1/sqrt(const * 2 * log(kn))
+#'   criticalValue <- Cn + Sn * betastar
+#' 
+#'   # Measuring jump variation during the entire day.
+#'   preAveragedReturns <- hatreturn(pData, kn)
+#'   preAveragedReturns <- c(as.numeric(preAveragedReturns), rep(NA, length(pData) - length(preAveragedReturns)))#, as.POSIXct(index(pData), origin = dateOfData)) # maybe we want to add back in xts, but it's removed for now...
+#' 
+#'   psi1kn <- kn * sum((gfunction((1:kn)/kn) - gfunction(( (1:kn) - 1 )/kn ) )^2)
+#' 
+#'   psi2kn <- 1 / kn * sum(gfunction((1:kn)/kn)^2)
+#' 
+#'   psi2kn <- (1 + (2*kn)^-2)/12
+#'   returns <- diff(log(pData))
+#'   omegaHat <- -1/(nObs-1) * sum(returns[2:nObs] * returns[1:(nObs-1)])
+#' 
+#'   biasCorrection <- omegaHat^2/theta^2 * psi1kn/psi2kn
+#' 
+#'   preAveragedRealizedVariance <- nObs/(nObs - kn + 2) * 1/(kn * psi2kn) * sum(preAveragedReturns^2, na.rm= TRUE) - biasCorrection
+#'   preAveragedBipowerVariation <- nObs/(nObs - 2*kn + 2) * 1/(kn * psi2kn) * pi/2 * sum(abs(preAveragedReturns[1:(nObs-2*kn)]) * abs(preAveragedReturns[1:(nObs-2*kn) + kn])) - biasCorrection
+#' 
+#'   ## We need to compute the variance covariance matrix to get 
+#'   
+#'   jumpVariation <- (preAveragedRealizedVariance - preAveragedBipowerVariation)/preAveragedRealizedVariance
+#' 
+#' 
+#'   testingIndices <- seq(M - 2 + kn +1, nObs-kn, by = kn)# + 1  to account for edge-effect!
+#'   PABPV <- PAreturns <- numeric(length(testingIndices))
+#' 
+#' 
+#'   ind <- 1
+#'   for (i in testingIndices) {
+#'     PABPV[ind] <- pi/2 * 1/(M-2) * sum(abs(preAveragedReturns[(i - M + 2):(i-1)]) * abs(preAveragedReturns[(i-M+2-kn):(i-1-kn)]))
+#'     ind <- ind + 1 # increment index
+#'   }
+#' 
+#' 
+#'   L <- preAveragedReturns[testingIndices]/sqrt(PABPV)
+#' 
+#' 
+#'   jumps <- xts((abs(L) > criticalValue), index(pData)[testingIndices])
+#'   
+#'   out <-  merge.xts(jumps, L, jumpVariation, PABPV)
+#'   return(out)
+#' 
+#' }
+#' 
