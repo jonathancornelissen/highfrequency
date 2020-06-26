@@ -7,7 +7,7 @@
 rankJumpTest(
   marketPrice,
   stockPrices,
-  alpha = c(7, 4),
+  alpha = c(5, 3),
   K = 10,
   kn = 30,
   r = 1,
@@ -24,9 +24,6 @@ rankJumpTest(
 \arguments{
 \item{alpha}{numeric significance level to use for the jump tests.}
 
-\item{K}{In the LM test, K, is the amount of windowSizes to use for estimation of the local variance. 
-In case of the FoF test K will be used as M in eqn: 21 in the paper, which changes the meaning into how many non-overlapping pre-averaged returns should be used in each test.}
-
 \item{marketReturns}{data.table or xts containing the}
 
 \item{testType}{type of test to use. Currently supports "LM" test of Lee and Mykland (2018), and "FoF" as "Fact or Friction" test from Christensen, Oomen, and Podolskij (2014)}
@@ -34,8 +31,6 @@ In case of the FoF test K will be used as M in eqn: 21 in the paper, which chang
 \item{testingTimes}{a character vector of times to test for jumps, for example  \code{c("11:30", "11:35", "14:30")}. 
 This argument can also be a numeric vector containing times to test in seconds after midnight. For example, using \code{seq(39200, 57600, 300)}, 
 where testing will take place every five minutes, starting fifty minutes after opening. (On when open is 09:30). This argument is not used in the FoF type test.}
-
-\item{windowSize}{the size of the window to test for jumps in, in minutes. Default = 5. Not used in the FoF type test.}
 
 \item{theta}{numeric parameter in determining the pre-averaging horizon. Default = 0.5. The pre-averaging horizon is \code{round(theta * sqrt(n))}, where n is the number of observations. 
 This parameter will also help determine the testing times as the test is done on non-overlapping pre-averaged returns.}
