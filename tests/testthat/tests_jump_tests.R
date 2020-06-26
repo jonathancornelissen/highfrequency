@@ -34,32 +34,33 @@ test_that("BNSjumpTest", {
 context("intradayJumpTest")
 test_that("LM test",{
   ## Extract the prices and set the time-zone to the local time-zone
-  ## thus we should be able to run this test on computers in other countires with reproducible results
   library(xts)
-  dat <- sample5MinPricesJumps["2010-01-04", 5]
-  tzone(dat) = Sys.timezone()
-  storage.mode(dat) <- "numeric"
-  jumpTest <- intradayJumpTest(pData = dat, testType = "LM", windowSize = 5, K = 20, testingTimes = seq(34200 + 20 * 300, 57600, 300))
+  dat <- sampleTDataMicroseconds[as.Date(DT) == "2018-01-02", .(DT, PRICE)]
+  
+  jumpTest <- intradayJumpTest(pData = dat, volEstimator = "RM", driftEstimator = "none", alpha = 0.95, RM = "bipower", 
+                               lookBackPeriod = 10, dontIncludeLast = TRUE, on = "minutes", k = 5,
+                               marketOpen = "9:30:00", marketClose = "16:00:00", tz = "GMT")
+  
   P1 <- plot(jumpTest)
   lims <- P1$get_xlim()
   expect_equal(
-    lims[1], as.numeric(as.POSIXlt("2010-01-04 10:30:00"))  
+    lims[1], as.numeric(as.POSIXlt(dat[1,DT]))  
   )
   expect_equal(
-    lims[2], as.numeric(as.POSIXlt("2010-01-04 17:00:00"))  
+    lims[2], as.numeric(as.POSIXlt(dat[nrow(dat),DT]))  
   )
-  # In the five minute jump case we expect the data itself to be returned
-  expect_true(all(jumpTest$tests[,1] == dat))
-  expect_equal(sum(jumpTest$tests$jumps, na.rm = TRUE), 2) # The same jump is detected twice
   
   
 })
 
 test_that("FoF test",{
   dat <- sampleTData$PRICE
-  tzone(dat) <- Sys.timezone()
+  tzone(dat) <- "GMT"
   storage.mode(dat) <- "numeric"
-  FoFtest <- intradayJumpTest(pData = dat, testType = "FoF", K = 25, theta = 0.5)
+  FoFtest <- intradayJumpTest(pData = dat, volEstimator = "PARM", driftEstimator = "none", alpha = 0.95, RM = "bipower", 
+                              theta = 1, lookBackPeriod = 50, marketOpen = "9:30:00", marketClose = "16:00:00", tz = "GMT")
+  
+  
   P1 <- plot(FoFtest)
   lims <- P1$get_xlim()
   
@@ -69,8 +70,5 @@ test_that("FoF test",{
   expect_equal(
     lims[2], as.numeric(index(dat))[nrow(dat)]
   )
-  expect_equal(sum(FoFtest$tests$jumps, na.rm = TRUE), 2) # two jumps detected.
-  
-  expect_equal(dat$PRICE, FoFtest$tests$PRICE)
   
 })

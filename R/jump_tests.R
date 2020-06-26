@@ -178,7 +178,7 @@ AJjumpTest <- function(pData, p = 4 , k = 2, alignBy = NULL, alignPeriod = NULL,
 #' @param makeReturns boolean, should be TRUE when rData contains prices instead of returns. FALSE by default.
 #' @param alpha numeric of length one with the significance level to use for the jump test(s). Defaults to 0.975.
 #' 
-#' @return list
+#' @return list or xts (the latter in the multi day case.)
 #' 
 #' @details The theoretical framework underlying jump test is that the logarithmic price process \eqn{X_t} belongs to the class of Brownian semimartingales, which can be written as:
 #' \deqn{
@@ -219,6 +219,12 @@ BNSjumpTest <- function (rData, IVestimator = "BV", IQestimator = "TP", type = "
       })
     
     colnames(result) <- c("ztest", "lower", "upper", "p-value")
+    browser()
+    
+    universalThreshold <- 2 * pnorm(-sqrt(log(ndays(result$ztest) * 2)))
+    result$universalThreshold <- qnorm(universalThreshold) * c(-1, 1)
+    
+    
     
     return(result)
   } else {
@@ -267,6 +273,7 @@ BNSjumpTest <- function (rData, IVestimator = "BV", IQestimator = "TP", type = "
       out$ztest <- a
       out$critical.value <- qnorm(c(1- alpha, alpha))
       out$pvalue <- 2 * pnorm(-abs(a))
+      
       return(out)
     }
   }
@@ -559,7 +566,7 @@ intradayJumpTest <- function(pData, volEstimator = "RM", driftEstimator = "none"
       for (d in 1:D) {
         tmp <- seq(op$lookBackPeriod - 2 + vol$kn[d] +1, vol$nObs[d]-vol$kn[d], by = vol$kn[d]) + sum(vol$nObs[0:(d-1)])
         
-        if(op$RM == "medRV"){ # We can expand this if need be. 
+        if(op$RM == "medrv"){ # We can expand this if need be. 
           tmp <- tmp[-length(tmp)]
         } 
         testingIndices <- c(testingIndices, tmp)
@@ -570,7 +577,7 @@ intradayJumpTest <- function(pData, volEstimator = "RM", driftEstimator = "none"
       
     } else {
       testingIndices <- seq(op$lookBackPeriod - 2 + vol$kn +1, nObs-vol$kn, by = vol$kn)
-      if(op$RM == "medRV"){ # We can expand this if need be. 
+      if(op$RM == "medrv"){ # We can expand this if need be. 
         testingIndices <- testingIndices[-length(testingIndices)]
       }
       
@@ -742,16 +749,23 @@ plot.intradayJumpTest <- function(x, ...){
 
   } else {
     shade <- abs( x$ztest ) > x$criticalValue
-    shade <- cbind(upper = shade * as.numeric(max(x$pData, na.rm = TRUE) +1e5), lower = shade * as.numeric(min(x$pData, na.rm = TRUE)) -1e5)
+    
+    if(!is.xts(x$pData)){
+      shade <- cbind(upper = shade * as.numeric(max(x$pData$PRICE, na.rm = TRUE) +1e5), lower = shade * as.numeric(min(x$pData$PRICE, na.rm = TRUE)) -1e5)
+    } else {
+      shade <- cbind(upper = shade * as.numeric(max(x$pData, na.rm = TRUE) +1e5), lower = shade * as.numeric(min(x$pData, na.rm = TRUE)) -1e5)
+    }
+    
+    
     colnames(shade) <- c("upper", "lower")
     
 
-    p1 <- plot(na.locf0(x$pData), main = "intraday jump test", lty = ifelse(is.null(x$prices), 1, 2))
+    p1 <- plot(na.locf0(as.xts(x$pData)), main = "intraday jump test", lty = ifelse(is.null(x$prices), 1, 2))
 
 
     if(!is.null(x$prices)){
       if(!is.xts(x$prices)){
-        p1 <- lines(na.locf0(cbind(x$pData, as.xts.data.table(x$prices[,c("DT","PRICE")])))[ ,2], col = "blue", lwd = 2)
+        p1 <- lines(na.locf0(cbind(as.xts(x$pData), as.xts(x$prices[,c("DT","PRICE")])))[ ,2], col = "blue", lwd = 2)
       } else {
         p1 <- lines(na.locf0(cbind(x$pData, x$prices))[ ,2], col = "blue", lwd = 2)
       }
@@ -790,8 +804,7 @@ plot.intradayJumpTest <- function(x, ...){
 #' @export
 #' @importFrom zoo coredata
 rankJumpTest <- function(marketPrice, stockPrices, alpha = c(5,3), K = 10, kn = 30, r = 1, BoxCox = 1, nBoot = 1000, dontTestAtBoundaries = TRUE, on = "minutes", k = 5,
-                         marketOpen = "09:30:00", marketClose = "16:00:00",
-                         tz = "GMT"){
+                         marketOpen = "09:30:00", marketClose = "16:00:00", tz = "GMT"){
   
   PRICE = DATE = RETURN = DT = NULL
   
