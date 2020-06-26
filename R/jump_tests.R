@@ -67,7 +67,7 @@ ABDJumptest <- function(RV, BPV, TQ) { # Compute jump detection stat mentioned i
 #' @param makeReturns boolean, should be TRUE when rData contains prices instead of returns. FALSE by default.
 #' @param ... additional arguments.
 #' 
-#' @return list
+#' @return list or xts in case the input prices span more than one day.
 #' 
 #' @details 
 #'  The theoretical framework underlying jump test is that the logarithmic price process \eqn{X_t} belongs to the class of Brownian semimartingales, which can be written as:
@@ -100,7 +100,18 @@ ABDJumptest <- function(RV, BPV, TQ) { # Compute jump detection stat mentioned i
 AJjumpTest <- function(pData, p = 4 , k = 2, alignBy = NULL, alignPeriod = NULL, alphaMultiplier = 4, makeReturns = FALSE, ...) {
 
   if (checkMultiDays(pData) == TRUE) {
-    result <- apply.daily(pData, AJjumpTest, alignBy, alignPeriod, makeReturns)
+    
+    result <- apply.daily(pData, function(x){
+      tmp <- AJjumpTest(x, p = p, k = k, alignBy = alignBy, alignPeriod = alignPeriod, alphaMultiplier = alphaMultiplier, makeReturns = makeReturns, ...)
+      return(cbind(tmp[[1]], tmp[[2]][1], tmp[[2]][2], tmp[[3]]))
+      
+    })
+    colnames(result) <- c("ztest", "lower", "upper", "p-value")
+    universalThreshold <- 2 * pnorm(-sqrt(log(ndays(result$ztest) * 2)))
+    
+    result$universalThresholdLower <- qnorm(universalThreshold)
+    result$universalThresholdUpper <- -qnorm(universalThreshold)
+    
     return(result)
   } else {
     pData <- fastTickAgregation(pData, on = "seconds", k = 1)
@@ -178,7 +189,7 @@ AJjumpTest <- function(pData, p = 4 , k = 2, alignBy = NULL, alignPeriod = NULL,
 #' @param makeReturns boolean, should be TRUE when rData contains prices instead of returns. FALSE by default.
 #' @param alpha numeric of length one with the significance level to use for the jump test(s). Defaults to 0.975.
 #' 
-#' @return list or xts (the latter in the multi day case.)
+#' @return list or xts in case the input prices span more than one day.
 #' 
 #' @details The theoretical framework underlying jump test is that the logarithmic price process \eqn{X_t} belongs to the class of Brownian semimartingales, which can be written as:
 #' \deqn{
@@ -218,12 +229,16 @@ BNSjumpTest <- function (rData, IVestimator = "BV", IQestimator = "TP", type = "
         return(cbind(tmp[[1]], tmp[[2]][1], tmp[[2]][2], tmp[[3]]))
       })
     
+    # browser()
     colnames(result) <- c("ztest", "lower", "upper", "p-value")
     
     universalThreshold <- 2 * pnorm(-sqrt(log(ndays(result$ztest) * 2)))
-    result$universalThreshold <- qnorm(universalThreshold) * c(-1, 1)
+    result$universalThresholdLower <- qnorm(universalThreshold)
+    result$universalThresholdUpper <- -qnorm(universalThreshold)
     
-    
+    # p.adjust(as.numeric(result$`p-value`), "fdr")
+    # qnorm(p.adjust(as.numeric(result$`p-value`), "fdr"))
+    # result$ztest
     
     return(result)
   } else {
@@ -315,7 +330,10 @@ BNSjumpTest <- function (rData, IVestimator = "BV", IQestimator = "TP", type = "
 #'  
 #' @param pData a zoo/xts object containing all prices in period t for one asset.
 #' @param power can be chosen among 4 or 6. 4 by default.
-#' @param ... additional arguments.
+#' @param alignBy a string, align the tick data to "seconds"|"minutes"|"hours". Defaults to NULL, denoting testing by using tick by tick returns
+#' @param alignPeriod an integer, align the tick data to this many [seconds|minutes|hours]. Defaults to NULL, denoting testing by using tick by tick returns or if the returns are already aligned as 
+#' @param alpha numeric of length one with the significance level to use for the jump test(s). Defaults to 0.975.
+#' @param ... additional arguments. (Currently unused)
 #'
 #' @return list
 #' 
@@ -349,8 +367,27 @@ BNSjumpTest <- function (rData, IVestimator = "BV", IQestimator = "TP", type = "
 #' @importFrom stats pnorm
 #' @importFrom zoo as.zoo
 #' @export
-JOjumpTest <- function(pData, power = 4, ...) {
-
+JOjumpTest <- function(pData, power = 4, alignBy = NULL, alignPeriod = NULL, alpha, ...) {
+  
+  if (checkMultiDays(pData)) {
+    
+    result <- apply.daily(pData, function(x){
+      tmp <- JOjumpTest(x, power, alignBy, alignPeriod, alpha, ...)
+      return(cbind(tmp[[1]], tmp[[2]][1], tmp[[2]][2], tmp[[3]]))
+    })
+    colnames(result) <- c("ztest", "lower", "upper", "p-value")
+    
+    universalThreshold <- 2 * pnorm(-sqrt(log(ndays(result$ztest) * 2)))
+    result$universalThresholdLower <- qnorm(universalThreshold)
+    result$universalThresholdUpper <- -qnorm(universalThreshold)
+    
+    return(result)
+  }
+  
+  if ((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+    pData <- fastTickAgregation(pData, on = alignBy, k = alignPeriod)
+  }
+  
   R  <- as.zoo(simre(pData))
   r  <- as.zoo(makeReturns(pData))
   N  <- length(pData) - 1
@@ -369,7 +406,7 @@ JOjumpTest <- function(pData, power = 4, ...) {
 
     out                <- {}
     out$ztest          <- JOtest
-    out$critical.value <- qnorm(c(0.025, 0.975))
+    out$critical.value <- qnorm(c(1-alpha, alpha))
     out$pvalue         <- 2 * pnorm(-abs(JOtest))
     return(out)
   }
@@ -382,7 +419,7 @@ JOjumpTest <- function(pData, power = 4, ...) {
 
     out                <- {}
     out$ztest          <- JOtest
-    out$critical.value <- qnorm(c(0.025,0.975))
+    out$critical.value <- qnorm(c(1-alpha,alpha))
     out$pvalue         <- 2*pnorm(-abs(JOtest))
     return(out)
   }

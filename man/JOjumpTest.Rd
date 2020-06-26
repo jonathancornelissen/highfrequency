@@ -4,14 +4,20 @@
 \alias{JOjumpTest}
 \title{Jiang and Oomen (2008) tests for the presence of jumps in the price series.}
 \usage{
-JOjumpTest(pData, power = 4, ...)
+JOjumpTest(pData, power = 4, alignBy = NULL, alignPeriod = NULL, alpha, ...)
 }
 \arguments{
 \item{pData}{a zoo/xts object containing all prices in period t for one asset.}
 
 \item{power}{can be chosen among 4 or 6. 4 by default.}
 
-\item{...}{additional arguments.}
+\item{alignBy}{a string, align the tick data to "seconds"|"minutes"|"hours". Defaults to NULL, denoting testing by using tick by tick returns}
+
+\item{alignPeriod}{an integer, align the tick data to this many [seconds|minutes|hours]. Defaults to NULL, denoting testing by using tick by tick returns or if the returns are already aligned as}
+
+\item{alpha}{numeric of length one with the significance level to use for the jump test(s). Defaults to 0.975.}
+
+\item{...}{additional arguments. (Currently unused)}
 }
 \value{
 list
