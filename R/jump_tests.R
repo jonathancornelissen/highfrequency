@@ -219,7 +219,6 @@ BNSjumpTest <- function (rData, IVestimator = "BV", IQestimator = "TP", type = "
       })
     
     colnames(result) <- c("ztest", "lower", "upper", "p-value")
-    browser()
     
     universalThreshold <- 2 * pnorm(-sqrt(log(ndays(result$ztest) * 2)))
     result$universalThreshold <- qnorm(universalThreshold) * c(-1, 1)
