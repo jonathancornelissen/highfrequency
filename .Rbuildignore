@@ -16,3 +16,4 @@ notes.R
 ^doc$
 ^Meta$
 GSoC playground.R
+^.Rprofvis
