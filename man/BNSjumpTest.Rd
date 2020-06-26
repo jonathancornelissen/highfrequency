@@ -39,7 +39,7 @@ BNSjumpTest(
 \item{alpha}{numeric of length one with the significance level to use for the jump test(s). Defaults to 0.975.}
 }
 \value{
-list
+list or xts (the latter in the multi day case.)
 }
 \description{
 This test examines the presence of jumps in highfrequency price series. It is based on theory of Barndorff- Nielsen and Shephard (BNS). The null hypothesis is no jumps. 
