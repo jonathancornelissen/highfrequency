@@ -27,7 +27,7 @@ nObs <- 23401
 timeSettings  <- list(tradingStart = 34200, tradingEnd = 57600, origin = "1970-01-01" , sampling = "equidistant")
 discretize <- FALSE
 
-jumpModel  <- list(modelType = "PA", jumpComponent = 1 / 2, jumpTime = c(16/32, 17/32), includeJumps = TRUE) #includeJumps should be automated in the creation of the spec
+jumpModel  <- list(modelType = "PA", jumpComponent = 1 / 2, jumpTime = c(320/640, 321/640), includeJumps = TRUE) #includeJumps should be automated in the creation of the spec
 
 hfSimSpec <- createHFSimSpec(volatilityModel = volatilityModel, driftModel = driftModel, jumpModel = jumpModel, nDays = nDays, nSeries = nSeries, nObs = nObs)
 sim <- hfsim.do(hfSimSpec)
@@ -81,7 +81,7 @@ jumpTest <- intradayJumpTest(pData, volEstimator = "RM",  # PRE-AVERAGED REALIZE
 
 
 
-plot(jumpTest)
+#plot(jumpTest)
 
 library(data.table)
 library(xts)
@@ -121,8 +121,7 @@ for (i in 1:(ncol(sim$prices)-1)) {
 #stockPrice <- exp(sim$prices)[,-1]
 
 options(error = recover)
-rankTest <- rankJumpTest(marketPrice, stockPrice, K = 30, k = 1, alpha = c(7,4), tz = "GMT", marketOpen = "10:30:00", marketClose = "17:00:00")
-
+rankTest <- rankJumpTest(marketPrice, stockPrice, K = 30, k = 1, alpha = c(5,3), tz = "GMT", marketOpen = "10:30:00", marketClose = "17:00:00")
 
 
 
