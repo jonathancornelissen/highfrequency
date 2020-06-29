@@ -18,29 +18,42 @@ intradayJumpTest(
 )
 }
 \arguments{
-\item{pData}{xts or data.table of the price data in levels. This data can (and should in some cases) be tick-level data. This data can span more than one day}
+\item{pData}{xts or data.table of the price data in levels. This data can (and should in some cases) be tick-level data. The data can span more than one day.}
 
-\item{alpha}{numeric significance level to use for the jump tests.}
+\item{volEstimator}{character denoting which volatility estimator to use for the tests. See \link{spotVol}. Default = \code{"RM"} denoting realized measures.}
 
-\item{...}{used internally. Don't set this parameter.}
+\item{driftEstimator}{character denoting which drift estimator to use for the tests. See \link{spotDrift}. Default = \code{"none"} denoting no drift esitmation.}
 
-\item{testType}{type of test to use. Currently supports "LM" test of Lee and Mykland (2018), and "FoF" as "Fact or Friction" test from Christensen, Oomen, and Podolskij (2014)}
+\item{on}{string indicating the time scale in which \code{k} is expressed.
+Possible values are: \code{"secs", "seconds", "mins", "minutes", "hours"}.}
 
-\item{testingTimes}{a character vector of times to test for jumps, for example  \code{c("11:30", "11:35", "14:30")}. 
-This argument can also be a numeric vector containing times to test in seconds after midnight. For example, using \code{seq(39200, 57600, 300)}, 
-where testing will take place every five minutes, starting fifty minutes after opening. (On when open is 09:30). This argument is not used in the FoF type test.}
+\item{k}{positive integer, indicating the number of periods to aggregate
+over. E.g. to aggregate an \code{xts} object to the 5 minute frequency, set
+\code{k = 5} and \code{on = "minutes"}.}
 
-\item{windowSize}{the size of the window to test for jumps in, in minutes. Default = 5. Not used in the FoF type test.}
+\item{marketOpen}{the market opening time. This should be in the time zone
+specified by \code{tz}. By default, \code{marketOpen = "09:30:00"}.}
 
-\item{K}{In the LM test, K, is the amount of windowSizes to use for estimation of the local variance. 
-In case of the FoF test K will be used as M in eqn: 21 in the paper, which changes the meaning into how many non-overlapping pre-averaged returns should be used in each test.}
+\item{marketClose}{the market closing time. This should be in the time zone
+specified by \code{tz}. By default, \code{marketClose = "16:00:00"}.}
 
-\item{theta}{numeric parameter in determining the pre-averaging horizon. Default = 0.5. The pre-averaging horizon is \code{round(theta * sqrt(n))}, where n is the number of observations. 
-This parameter will also help determine the testing times as the test is done on non-overlapping pre-averaged returns.}
+\item{tz}{string specifying the time zone to which the times in \code{data}
+and/or \code{marketOpen}/ \code{marketClose} belong. Default = \code{"GMT"}.}
 }
 \description{
-General framework for testing for jumps on an intraday basis
+This function can be used to  test for jumps in intraday price paths.
+ The tests are of the form:
+ L(t) = (R(t) - mu(t))/sigma(t) 
+
+The null hypothesis of the tests in this function is that
 }
-\references{
-COP2014, LM 2008
+\examples{
+\dontrun{
+# We can easily make a Lee-Mykland jump test.
+LMtest <- intradayJumpTest(pData = sampleTDataMicroseconds[, .(DT, PRICE)], volEstimator = "RM", driftEstimator = "none",
+                           RM = "bipower", lookBackPeriod = 10,
+                           on = "minutes", k = 5, marketOpen = "09:30:00", marketClose = "16:00:00")
+plot(LMtest)
+}
+
 }

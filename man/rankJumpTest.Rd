@@ -8,9 +8,9 @@ rankJumpTest(
   marketPrice,
   stockPrices,
   alpha = c(5, 3),
-  K = 10,
-  kn = 30,
-  r = 1,
+  coarseFreq = 10,
+  localWindow = 30,
+  rank = 1,
   BoxCox = 1,
   nBoot = 1000,
   dontTestAtBoundaries = TRUE,
@@ -22,20 +22,40 @@ rankJumpTest(
 )
 }
 \arguments{
-\item{alpha}{numeric significance level to use for the jump tests.}
+\item{marketPrice}{data.table or xts containing the market prices in levels}
 
-\item{marketReturns}{data.table or xts containing the}
+\item{stockPrices}{list containing the individual stock prices in either data.table or xts format. The format should be the the same as \code{marketPrice}}
 
-\item{testType}{type of test to use. Currently supports "LM" test of Lee and Mykland (2018), and "FoF" as "Fact or Friction" test from Christensen, Oomen, and Podolskij (2014)}
+\item{alpha}{signicance level (in standard deviations) to use for the jump detections. Default is \code{c(5,3)} for 5 and 3 in the market and stocks respectively.}
 
-\item{testingTimes}{a character vector of times to test for jumps, for example  \code{c("11:30", "11:35", "14:30")}. 
-This argument can also be a numeric vector containing times to test in seconds after midnight. For example, using \code{seq(39200, 57600, 300)}, 
-where testing will take place every five minutes, starting fifty minutes after opening. (On when open is 09:30). This argument is not used in the FoF type test.}
+\item{coarseFreq}{numeric denoting the coarse sampling frequency. Default is \code{10}}
 
-\item{theta}{numeric parameter in determining the pre-averaging horizon. Default = 0.5. The pre-averaging horizon is \code{round(theta * sqrt(n))}, where n is the number of observations. 
+\item{localWindow}{numeric denoting the local window for the bootstrap algorithm. Default is \code{30}}
+
+\item{rank}{rank of the jump matrix under the null hypothesis. Default is \code{1}}
+
+\item{BoxCox}{numeric of exponents for the Box-Cox transformation, default is \code{1}}
+
+\item{nBoot}{numeric denoting how many replications to be used for the bootstrap algorithm. Default is \code{1000}}
+
+\item{on}{string indicating the time scale in which \code{k} is expressed.
+Possible values are: \code{"secs", "seconds", "mins", "minutes", "hours"}.}
+
+\item{k}{positive integer, indicating the number of periods to aggregate
+over. E.g. to aggregate an \code{xts} object to the 5 minute frequency, set
+\code{k = 5} and \code{on = "minutes"}.}
+
+\item{marketOpen}{the market opening time. This should be in the time zone
+specified by \code{tz}. By default, \code{marketOpen = "09:30:00"}.}
+
+\item{marketClose}{the market closing time. This should be in the time zone
+specified by \code{tz}. By default, \code{marketClose = "16:00:00"}.}
+
+\item{tz}{string specifying the time zone to which the times in \code{data}
+and/or \code{marketOpen}/ \code{marketClose} belong. Default = \code{"GMT"}.}
+
+\item{...}{method-specific parameters (see 'Details').
 This parameter will also help determine the testing times as the test is done on non-overlapping pre-averaged returns.}
-
-\item{...}{used internally. Don't set this parameter.}
 }
 \description{
 General framework for testing for jumps on an intraday basis

@@ -1,3 +1,12 @@
+Changes in version 0.7.0
+ - New naming convention.
+ - Bugfix in BNSjumpTest, JOjumpTest, AJjumpTest. These functions behaved in an unexpected and inconsistent manner when the input spanned more than one day
+ - Bugfix in aggregateTS function which in edge cases returned data from AFTER the input data
+ - Implement intradayJumpTest function which allows for flexible Lee-Mykland style jump tests
+ - Implement rankJumpTest to test for the rank of the jump matrix
+ - Implement new features in spotVol. Now the local volatility can be estimated with realized measures, they can also be used with pre-averaged realized measures.
+
+
 Changes in version 0.6.5
  - Bug fix for kernelCov if cor = TRUE
  - Compatibility with lubridate 1.7.8
