@@ -39,15 +39,15 @@ Next, we will use one of three main cleaning functions called tradesCleanup. It 
 - summarizing trades that have the same time stamp. The default is to take the median price and summed-up volume of the different trades.
 
 ```{r eval = TRUE}
-tData_cleaned <- tradesCleanup(tDataRaw = sampleTDataRawMicroseconds, exchange = "N")
+tDataCleaned <- tradesCleanup(tDataRaw = sampleTDataRawMicroseconds, exchange = "N")
 ```
 
 When using tradesCleanup, the return value is a list of two. It contains a report about the number of observations after each cleaning step and the cleaned data itself.
 
 ```{r eval = TRUE}
-tData_cleaned$report
+tDataCleaned$report
 
-summary(tData_cleaned$tData[, c("DT", "SIZE", "PRICE")])
+summary(tDataCleaned$tData[, c("DT", "SIZE", "PRICE")])
 ```
 
 As just one example, one can see that all trades that had time stamps outside the openinig hours of the NYSE. The report of the cleaning procedure shows us that most of the observations are removed either due to originating from another exchange or having irregular sales conditions.
@@ -65,15 +65,15 @@ The highfrequency function also brings a similarly-named function for cleaning q
 - removing quotes that may be seen to be outliers.
 
 ```{r eval = TRUE}
-qData_cleaned <- quotesCleanup(qDataRaw = sampleQDataRawMicroseconds, exchange = "N")
+qDataCleaned <- quotesCleanup(qDataRaw = sampleQDataRawMicroseconds, exchange = "N")
 ```
 
 quotesCleanup also provides a list with two elements, a report and the cleaned data.
 
 ```{r eval = TRUE}
-qData_cleaned$report
+qDataCleaned$report
 
-summary(qData_cleaned$qData[, c("DT", "OFR", "OFRSIZ", "BID", "BIDSIZ", "MIDQUOTE")])
+summary(qDataCleaned$qData[, c("DT", "OFR", "OFRSIZ", "BID", "BIDSIZ", "MIDQUOTE")])
 ```
 
 ## Cleaning transaction data using cleaned quotes
@@ -81,9 +81,9 @@ summary(qData_cleaned$qData[, c("DT", "OFR", "OFRSIZ", "BID", "BIDSIZ", "MIDQUOT
 Given our freshly cleaned trades and quotes data, we now want to filter for trades that are proceeded by a compatible set of quotes. Currently, the tradesCleanupUsingQuotes function only supports submitting trades and quotes data for one day only, Hence, we filter our data set to one of the days.
 
 ```{r eval = TRUE}
-tqData_cleaned <- tradesCleanupUsingQuotes(tData = tData_cleaned$tData[as.Date(DT) == "2018-01-02"], 
-                                           qData = qData_cleaned$qData[as.Date(DT) == "2018-01-02"])
-tqData_cleaned
+tqDataCleaned <- tradesCleanupUsingQuotes(tData = tDataCleaned$tData[as.Date(DT) == "2018-01-02"], 
+                                           qData = qDataCleaned$qData[as.Date(DT) == "2018-01-02"])
+tqDataCleaned
 ```
 
 Here, we see that once more half of the trades are filtered out due to non-plausability.
