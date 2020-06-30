@@ -501,18 +501,18 @@ intradayJumpTest <- function(pData, volEstimator = "RM", driftEstimator = "none"
     op <- list(RM = "bipower", lookBackPeriod = 10)
     options <- list(...)
     op[names(options)] <- options
-    op$lookBackPeriod
+    
     #vol$spot <- lag(vol$spot)
-    if(op$RM == "bipower"){
-      vol$spot <- sqrt((vol$spot^2  / (pi/2))) 
-    }
+    # if(op$RM == "bipower"){
+    #   vol$spot <- sqrt((vol$spot^2  / (pi/2))) 
+    # }
     
   }
 
   
   if(volEstimator != "PARM"){
     prices <- aggregatePrice(pData, on = on, k = k , marketOpen = marketOpen,
-                   marketClose = marketClose, tz = tz, fill = TRUE)    
+                   marketClose = marketClose, tz = tz, fill = TRUE)
     setkeyv(prices, "DT")
     prices[, DATE := as.Date(DT, tz = tz(prices$DT))]
     returns <- prices[, RETURN := log(PRICE) - shift(log(PRICE), type = "lag"), by = "DATE"][is.na(RETURN) == FALSE]
@@ -523,9 +523,6 @@ intradayJumpTest <- function(pData, volEstimator = "RM", driftEstimator = "none"
     op <- list(RM = "bipower", lookBackPeriod = 50)
     options <- list(...)
     op[names(options)] <- options
-    op$lookBackPeriod
-    
-    
     
     if(isMultiDay){
       dates <- NULL 
