@@ -5,7 +5,7 @@ Changes in version 0.7.0
  - Implement intradayJumpTest function which allows for flexible Lee-Mykland style jump tests
  - Implement rankJumpTest to test for the rank of the jump matrix
  - Implement new features in spotVol. Now the local volatility can be estimated with realized measures, they can also be used with pre-averaged realized measures.
-
+ - Implement a wrapper around quantmod's getSymbols.av function
 
 Changes in version 0.6.5
  - Bug fix for kernelCov if cor = TRUE
