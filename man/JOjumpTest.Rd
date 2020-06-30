@@ -4,7 +4,14 @@
 \alias{JOjumpTest}
 \title{Jiang and Oomen (2008) tests for the presence of jumps in the price series.}
 \usage{
-JOjumpTest(pData, power = 4, alignBy = NULL, alignPeriod = NULL, alpha, ...)
+JOjumpTest(
+  pData,
+  power = 4,
+  alignBy = NULL,
+  alignPeriod = NULL,
+  alpha = 0.975,
+  ...
+)
 }
 \arguments{
 \item{pData}{a zoo/xts object containing all prices in period t for one asset.}

@@ -367,7 +367,7 @@ BNSjumpTest <- function (rData, IVestimator = "BV", IQestimator = "TP", type = "
 #' @importFrom stats pnorm
 #' @importFrom zoo as.zoo
 #' @export
-JOjumpTest <- function(pData, power = 4, alignBy = NULL, alignPeriod = NULL, alpha, ...) {
+JOjumpTest <- function(pData, power = 4, alignBy = NULL, alignPeriod = NULL, alpha = 0.975, ...) {
   
   if (checkMultiDays(pData)) {
     
