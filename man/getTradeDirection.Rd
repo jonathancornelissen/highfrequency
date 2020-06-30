@@ -4,10 +4,10 @@
 \alias{getTradeDirection}
 \title{Get trade direction}
 \usage{
-getTradeDirection(tqdata)
+getTradeDirection(tqData)
 }
 \arguments{
-\item{tqdata}{data.table or xts object, containing joined trades and quotes (e.g. using \code{\link{matchTradesQuotes}})}
+\item{tqData}{data.table or xts object, containing joined trades and quotes (e.g. using \code{\link{matchTradesQuotes}})}
 }
 \value{
 A vector which has values 1 or (-1) if the inferred trade direction
@@ -23,8 +23,8 @@ for the first (second) observation.
 }
 \examples{
 # generate matched trades and quote data set
-tqdata <- matchTradesQuotes(sample_tdata, sample_qdata)
-directions <- getTradeDirection(tqdata)
+tqData <- matchTradesQuotes(sampleTData, sampleQData)
+directions <- getTradeDirection(tqData)
 head(directions)
 
 }

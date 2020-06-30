@@ -291,19 +291,19 @@ hasQty <- function(x, which = FALSE) {
 #' @importFrom data.table is.data.table
 #' @importFrom xts is.xts
 #' @keywords internal
-checktdata <- function(tdata) {
-  if (is.xts(tdata) == FALSE & is.data.table(tdata) == FALSE) {
-    stop("The argument tdata should be a data.table or xts object.")
+checktData <- function(tData) {
+  if (is.xts(tData) == FALSE & is.data.table(tData) == FALSE) {
+    stop("The argument tData should be a data.table or xts object.")
   }
-  if (any(colnames(tdata) == "PRICE") == FALSE) {
-    stop("The argument tdata should have a column containing the PRICE. Could not find that column.")
+  if (any(colnames(tData) == "PRICE") == FALSE) {
+    stop("The argument tData should have a column containing the PRICE. Could not find that column.")
   }
-  if (any(colnames(tdata) == "SYMBOL") == FALSE) {
-    stop("The argument tdata should have a column containing SYMBOL. Could not find that column.")
+  if (any(colnames(tData) == "SYMBOL") == FALSE) {
+    stop("The argument tData should have a column containing SYMBOL. Could not find that column.")
   }
   
-  if (is.data.table(tdata) == TRUE) {
-    if (typeof(tdata$PRICE) != "double") {
+  if (is.data.table(tData) == TRUE) {
+    if (typeof(tData$PRICE) != "double") {
       stop("Column PRICE should be of type double.")
     }
   }
@@ -312,24 +312,24 @@ checktdata <- function(tdata) {
 #' @importFrom data.table is.data.table
 #' @importFrom xts is.xts
 #' @keywords internal
-checkqdata <- function(qdata) {
-  if (is.xts(qdata) == FALSE & is.data.table(qdata) == FALSE) {
-    stop("The argument qdata should be an data.table or xts object.")
+checkqData <- function(qData) {
+  if (is.xts(qData) == FALSE & is.data.table(qData) == FALSE) {
+    stop("The argument qData should be an data.table or xts object.")
   }
-  if (any(colnames(qdata) == "BID") == FALSE) {
-    stop("The argument qdata should have a column containing the BID. Could not find that column.")
+  if (any(colnames(qData) == "BID") == FALSE) {
+    stop("The argument qData should have a column containing the BID. Could not find that column.")
   }
-  if (any(colnames(qdata) == "OFR") == FALSE) {
-    stop("The argument qdata should have a column containing the ASK / OFR. Could not find that column.")
+  if (any(colnames(qData) == "OFR") == FALSE) {
+    stop("The argument qData should have a column containing the ASK / OFR. Could not find that column.")
   }
-  if (any(colnames(qdata) == "SYMBOL") == FALSE) {
-    stop("The argument qdata should have a column containing SYMBOL. Could not find that column.")
+  if (any(colnames(qData) == "SYMBOL") == FALSE) {
+    stop("The argument qData should have a column containing SYMBOL. Could not find that column.")
   }
-  if (is.data.table(qdata) == TRUE) {
-    if (typeof(qdata$BID) != "double") {
+  if (is.data.table(qData) == TRUE) {
+    if (typeof(qData$BID) != "double") {
       stop("Column BID should be of type double.")
     }
-    if (typeof(qdata$OFR) != "double") {
+    if (typeof(qData$OFR) != "double") {
       stop("Column OFR should be of type double.")
     }
   }

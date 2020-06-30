@@ -7,38 +7,38 @@ driftKernel <- function(data, intraday, options) {
     stop("driftKernel method currently only accepts single day tick data as it relies on the time-stamps of the trades.")
   }
 
-  op <- list(init = list(), PreAverage = 5, bandwidth = 300)
+  op <- list(preAverage = 5, meanBandwidth = 300)
   op[names(options)] <- options
   datap          <- log(data$PRICE)
   #vX             <- c(0,diff(datap)[-1])
-  k              <- op$PreAverage
-  bandwidth      <- op$bandwidth
+  k              <- op$preAverage
+  meanBandwidth      <- op$meanBandwidth
   iT             <- length(datap)
-  vPreAveraged   <- rep(0 , iT-1)
+  vpreAveraged   <- rep(0 , iT-1) 
   mu             <- numeric(length(intraday))
   mu[1]          <- 0
-  vPreAveraged[(k*2-1):(iT-1)] <- filter(x = as.numeric(datap), c(rep(1,k),rep(-1,k)))[k:(iT-k)]
-  vPreAveraged <- c(0, vPreAveraged)
+  vpreAveraged[(k*2-1):(iT-1)] <- filter(x = as.numeric(datap), c(rep(1,k),rep(-1,k)))[k:(iT-k)]
+  vpreAveraged <- c(0, vpreAveraged)
   time <- as.numeric(data$DT)
   # time <- time - as.numeric(data$DT)[1]
   #estimtimes <- intraday #c(34200, as.numeric(intraday) * 86400)
 
   for (i in 1:length(intraday)) {
     x     <- time - intraday[i]
-    vWm   <- exp(-abs(x/bandwidth)) * (x <= 0)    ##left sided exponential kernel
+    vWm   <- exp(-abs(x/meanBandwidth)) * (x <= 0)    ##left sided exponential kernel
     idx   <- sum(x <= 0)                        # makes sure we don't include future data!
-    mu[i] <- (sum(vWm[1:idx] * vPreAveraged[1:idx])) / bandwidth
+    mu[i] <- (sum(vWm[1:idx] * vpreAveraged[1:idx])) / meanBandwidth
   }
-  mu = as.matrix(mu * bandwidth, ncol = 1)
+  mu = as.matrix(mu * meanBandwidth, ncol = 1)
   out = list("mu" = mu)
-  class(out) <- "spotdrift"
+  class(out) <- "spotDrift"
   return(out)
 }
 
 #' @keywords internal
 #' @importFrom zoo rollmean
 driftMean <- function(mR, options){
-  op <- list(init = list(), periods = 5, align = "right")
+  op <- list(periods = 5, align = "right")
   op[names(options)] <- options
   periods <- op$periods
   align   <- op$align
@@ -51,14 +51,14 @@ driftMean <- function(mR, options){
     colnames(mu) <- "mu"
   }
   out <- list("mu" = mu)
-  class(out) <- "spotdrift"
+  class(out) <- "spotDrift"
   return(out)
 }
 
 #' @keywords internal
 #' @importFrom zoo rollmedian
 driftMedian <- function(mR, options){
-  op <- list(init = list(), periods = 5, align = "right")
+  op <- list(periods = 5, align = "right")
   op[names(options)] <- options
   periods <- op$periods
   align   <- op$align
@@ -72,12 +72,12 @@ driftMedian <- function(mR, options){
   }
 
   out <- list("mu" = mu)
-  class(out) <- "spotdrift"
+  class(out) <- "spotDrift"
   return(out)
 }
 
 #' @export
-plot.spotdrift <- function(x, ...) {
+plot.spotDrift <- function(x, ...) {
   mu <- x$mu
   if (dim(mu)[2] > 1) {
     #browser()
@@ -89,7 +89,7 @@ plot.spotdrift <- function(x, ...) {
 }
 
 #' @export
-print.spotdrift <- function(x, ...){
+print.spotDrift <- function(x, ...){
   print(x$mu)
 }
 
@@ -99,7 +99,7 @@ print.spotdrift <- function(x, ...){
 #
 # Modified spotVol function from highfrequency package
 #' @keywords internal
-detper <- function(mR, rdata = NULL, options = list()) {
+detPer <- function(mR, rData = NULL, options = list()) {
   # default options, replace if user-specified
   op <- list(dailyvol = "bipower", periodicvol = "TML", dummies = FALSE,
              P1 = 5, P2 = 5)
@@ -107,23 +107,23 @@ detper <- function(mR, rdata = NULL, options = list()) {
 
   cDays <- nrow(mR)
   M <- ncol(mR)
-  if (cDays == 1 & is.null(rdata)) {
+  if (cDays == 1 & is.null(rData)) {
     mR <- as.numeric(mR)
     estimdailyvol <- switch(op$dailyvol,
                             bipower = rBPCov(mR),
                             medrv = medRV(mR),
                             rv = rCov(mR))
   } else {
-    if (is.null(rdata)) {
+    if (is.null(rData)) {
       estimdailyvol <- switch(op$dailyvol,
                               bipower = apply(mR, 1, "rBPCov"),
                               medrv = apply(mR, 1, "medRV"),
                               rv = apply(mR, 1, "rCov"))
     } else {
       estimdailyvol <- switch(op$dailyvol,
-                              bipower = apply.daily(rdata, rBPCov),
-                              medrv = apply.daily(rdata, medRV),
-                              rv = apply.daily(rdata, rCov))
+                              bipower = apply.daily(rData, rBPCov),
+                              medrv = apply.daily(rData, medRV),
+                              rv = apply.daily(rData, rCov))
       dates = time(estimdailyvol)
     }
   }
@@ -150,15 +150,15 @@ detper <- function(mR, rdata = NULL, options = list()) {
                             rv = apply(mfilteredR, 1, "rCov"))
     spot <- rep(sqrt(as.numeric(estimdailyvol) * (1/M)), each = M) *
       rep(estimperiodicvol, cDays)
-    if (is.null(rdata)) {
+    if (is.null(rData)) {
       spot <- matrix(spot, nrow = cDays, ncol = M, byrow = TRUE)
     } else {
-      spot <- xts(spot, order.by = time(rdata))
+      spot <- xts(spot, order.by = time(rData))
       estimdailyvol <- xts(estimdailyvol, order.by = dates)
-      estimperiodicvol <- xts(estimperiodicvol, order.by = time(rdata[1:M]))
+      estimperiodicvol <- xts(estimperiodicvol, order.by = time(rData[1:M]))
     }
     out <- list(spot = spot, daily = estimdailyvol, periodic = estimperiodicvol)
-    class(out) <- "spotvol"
+    class(out) <- "spotVol"
     return(out)
   }
 }
@@ -168,7 +168,7 @@ detper <- function(mR, rdata = NULL, options = list()) {
 # This function estimates the spot volatility by using the stochastic periodcity
 # model of Beltratti & Morana (2001)
 #' @keywords internal
-stochper <- function(mR, rdata = NULL, options = list()) {
+stochPer <- function(mR, rData = NULL, options = list()) {
   #require(FKF)
   # default options, replace if user-specified
   op <- list(init = list(), P1 = 5, P2 = 5, control = list(trace=1, maxit=500))
@@ -233,13 +233,13 @@ stochper <- function(mR, rdata = NULL, options = list()) {
                  exp(opt$par["phi"])/(1+exp(opt$par["phi"])),
                  exp(opt$par["rho"])/(1+exp(opt$par["rho"])), opt$par[-(1:6)])
 
-  if (is.null(rdata)) {
+  if (is.null(rData)) {
     spot <- matrix(sigmahat, nrow = days, ncol = N, byrow = TRUE)
   } else {
-    spot <- xts(sigmahat, order.by = time(rdata))
+    spot <- xts(sigmahat, order.by = time(rData))
   }
   out <- list(spot = spot, par = estimates)
-  class(out) <- "spotvol"
+  class(out) <- "spotVol"
   return(out)
 }
 
@@ -309,7 +309,7 @@ ssmodel <- function(par_t, days, N = 288, P1 = 5, P2 = 5) {
 #
 # See Kristensen (2010)
 #' @keywords internal
-kernelestim <- function(mR, rdata = NULL, delta = 300, options = list()) {
+kernelestim <- function(mR, rData = NULL, delta = 300, options = list()) {
   # default options, replace if user-specified
   op <- list(type = "gaussian", h = NULL, est = "cv", lower = NULL,
              upper = NULL)
@@ -354,13 +354,13 @@ kernelestim <- function(mR, rdata = NULL, delta = 300, options = list()) {
     }
   }
   spot <- as.vector(t(sqrt(sigma2hat)))
-  if (is.null(rdata)) {
+  if (is.null(rData)) {
     spot <- matrix(spot, nrow = D, ncol = N, byrow = TRUE)
   } else {
-    spot <- xts(spot, order.by = time(rdata))
+    spot <- xts(spot, order.by = time(rData))
   }
   out <- list(spot = spot, par = list(h = h))
-  class(out) <- "spotvol"
+  class(out) <- "spotVol"
   return(out)
 }
 
@@ -439,7 +439,7 @@ ISE <- function(h, x, delta = 300, type = "gaussian") {
 # See Fried (2012)
 #' @importFrom stats sd
 #' @keywords internal
-piecewise <- function(mR, rdata = NULL, options = list()) {
+piecewise <- function(mR, rData = NULL, options = list()) {
   # default options, replace if user-specified
   op <- list(type = "MDa", m = 40, n = 20, alpha = 0.005, volest = "bipower",
              online = TRUE)
@@ -479,13 +479,13 @@ piecewise <- function(mR, rdata = NULL, options = list()) {
                         tau = robustbase::scaleTau2(vR[from:to]))
     }
   }
-  if (is.null(rdata)) {
+  if (is.null(rData)) {
     spot <- matrix(spot, nrow = D, ncol = N, byrow = TRUE)
   } else {
-    spot <- xts(spot, order.by = time(rdata))
+    spot <- xts(spot, order.by = time(rData))
   }
   out <- list(spot = spot, cp = cp)
-  class(out) <- "spotvol"
+  class(out) <- "spotVol"
   return(out)
 }
 
@@ -505,9 +505,9 @@ changePoints <- function(vR, type = "MDa", alpha = 0.005, m = 40, n = 20) {
       reference <- logR[(t - N + 1):(t - n)]
       testperiod <- logR[(t - n + 1):t]
       if(switch(type,
-                MDa <- MDtest(reference, testperiod, type = type, alpha = alpha),
-                MDb <- MDtest(reference, testperiod, type = type, alpha = alpha),
-                DM  <- DMtest(reference, testperiod, alpha = alpha))) {
+                MDa = MDtest(reference, testperiod, type = type, alpha = alpha),
+                MDb = MDtest(reference, testperiod, type = type, alpha = alpha),
+                DM  = DMtest(reference, testperiod, alpha = alpha))) {
         points <- c(points, t - n)
         np <- np + 1
         cat(paste("Change detected at observation", points[np], "...\n"))
@@ -574,7 +574,7 @@ MDtest <- function(x, y, alpha = 0.005, type = "MDa") {
 
 # GARCH with seasonality (external regressors)
 #' @keywords internal
-garch_s <- function(mR, rdata = NULL, options = list()) {
+garch_s <- function(mR, rData = NULL, options = list()) {
   # default options, replace if user-specified
   op <- list(model = "eGARCH", order = c(1,1), dist = "norm", P1 = 5,
              P2 = 5, solver.control = list())
@@ -590,7 +590,7 @@ garch_s <- function(mR, rdata = NULL, options = list()) {
                                                     garchOrder = op$order),
                               mean.model = list(include.mean = FALSE),
                               distribution.model = op$dist)
-  if (is.null(rdata)) {
+  if (is.null(rData)) {
     cat(paste("Fitting", op$model, "model..."))
     fit <- tryCatch(rugarch::ugarchfit(spec = spec, data = as.numeric(t(mR)),
                                        solver = "nloptr",
@@ -604,7 +604,7 @@ garch_s <- function(mR, rdata = NULL, options = list()) {
     spot <- as.numeric(rugarch::sigma(fit))
   } else {
     cat(paste("Fitting", op$model, "model..."))
-    fit <- tryCatch(rugarch::ugarchfit(spec = spec, data = rdata,
+    fit <- tryCatch(rugarch::ugarchfit(spec = spec, data = rData,
                                        solver = "nloptr",
                                        solver.control = op$solver.control),
                     error = function(e) e,
@@ -616,13 +616,13 @@ garch_s <- function(mR, rdata = NULL, options = list()) {
     spot <- rugarch::sigma(fit)
   }
   out <- list(spot = spot, ugarchfit = fit)
-  class(out) <- "spotvol"
+  class(out) <- "spotVol"
   return(out)
 }
 
 #' @importFrom graphics abline layout title
 #' @export
-plot.spotvol <- function(x, ...) {
+plot.spotVol <- function(x, ...) {
   options <- list(...)
   plottable <- c("spot", "periodic", "daily")
   elements <- names(x)
@@ -919,17 +919,17 @@ center <- function() {
 }
 
 # # modified version of 'aggregatePrice' from highfrequency package
-# aggregatePrice <- function (ts, FUN = "previoustick", on = "minutes", k = 1, marketopen = "09:30:00", marketclose = "16:00:00", tz = "GMT") {
-#   ts2 = aggregatets(ts, FUN = FUN, on, k)
+# aggregatePrice <- function (ts, FUN = "previoustick", on = "minutes", k = 1, marketOpen = "09:30:00", marketClose = "16:00:00", tz = "GMT") {
+#   ts2 = aggregateTS(ts, FUN = FUN, on, k)
 #   date = strsplit(as.character(index(ts)), " ")[[1]][1]
 #
 #   #open
-#   a = as.POSIXct(paste(date, marketopen), tz = tz)
+#   a = as.POSIXct(paste(date, marketOpen), tz = tz)
 #   b = as.xts(matrix(as.numeric(ts[1]),nrow=1), a)
 #   ts3 = c(b, ts2)
 #
 #   #close
-#   aa = as.POSIXct(paste(date, marketclose), tz = tz)
+#   aa = as.POSIXct(paste(date, marketClose), tz = tz)
 #   condition = index(ts3) < aa
 #   ts3 = ts3[condition]
 #   bb = as.xts(matrix(as.numeric(last(ts)),nrow=1), aa)
@@ -938,3 +938,167 @@ center <- function() {
 #   return(ts3)
 # }
 
+
+#' @keywords internal
+realizedMeasureSpotVol <- function(mR, rData, options = list()){
+  
+  # Make sure there are sensible standard inputs
+  op <- list(RM = "bipower", lookBackPeriod = 10L, dontIncludeLast = FALSE)
+  # replace standards with user supplied inputs
+  op[names(options)] <- options
+  D <- nrow(mR)
+  N <- ncol(mR)
+  lookBackPeriod <- op$lookBackPeriod
+  if((lookBackPeriod %% 1 != 0) | (lookBackPeriod <= 0)){ #lookBackPeriod must be a positive integer
+    stop("lookBackPeriod must be a positive integer.")
+  }
+  sigma2hat <- matrix(0, D, N)
+  idx <- seq(lookBackPeriod+1, N)
+  if(!op$dontIncludeLast){
+    # compute spot variances
+    for (j in idx) {
+      for (i in 1:D) {
+        sigma2hat[i, j] <- switch(op$RM,
+                            bipower = RBPVar(mR[i,(j-lookBackPeriod+1):j]),
+                            rv = RV(mR[i,(j-lookBackPeriod+1):j]),
+                            medrv = medRV(mR[i,(j-lookBackPeriod+1):j]),
+                            minrv = minRV(matrix(mR[i,(j-lookBackPeriod+1):j], ncol = 1))
+          
+        )
+      }
+      
+    }
+    
+  } else {
+    ### Special considerations for the LM type test
+    for (j in idx) {
+      for (i in 1:D) {
+        sigma2hat[i, j] <- switch(op$RM,
+                                    bipower = RBPVar(mR[i,(j-lookBackPeriod+1):(j-1)]),
+                                    rv = RV(mR[i,(j-lookBackPeriod+1):(j-1)]),
+                                    medrv = medRV(mR[i,(j-lookBackPeriod+1):(j-1)]),
+                                    minrv = minRV(matrix(mR[i,(j-lookBackPeriod+1):(j-1)], ncol = 1))
+                                    
+        )
+      }
+      
+    }
+    
+  }
+  
+  #print(mR[i,(j-lookBackPeriod+1):(j - 1)-1])
+  # Adjust the matrix and take square-root
+  spot <- as.vector(t(sqrt(sigma2hat)))
+  
+  if (is.null(rData)) {
+    spot <- matrix(spot, nrow = D, ncol = N, byrow = TRUE)
+  } else {
+    spot <- xts(spot, order.by = time(rData))
+  }
+  
+  
+  out <- list("spot" = spot, "estimator" = op$RM, "lookBackPeriod" = lookBackPeriod)
+  class(out) <- "spotVol"
+  return(out)
+  
+  
+}
+
+#' @keywords internal
+#' @importFrom xts as.xts
+preAveragedRealizedMeasureSpotVol <- function(data, options = list()){
+  
+  
+  ## Considerations for the multiday case:::::##########!#!#!#!#!#!#
+  D <- ndays(data)
+  
+  if( D > 1 ){
+    dates <- NULL 
+    if(is.data.table(data)){
+      dates <- unique(as.Date(data$DT))
+    } else {
+      dates <- unique(as.Date(index(data)))
+    }
+    
+    spot <- NULL
+    nObs <- kn <- numeric(D)
+    
+    for (d in 1:D) {
+      res <- preAveragedRealizedMeasureSpotVol(data[as.Date(data$DT) == dates[d]], options)
+      spot <- rbind(spot, res$spot)
+      kn[d] <- res$kn
+      nObs[d] <- res$nObs
+    }
+    
+    out <- list("spot" = spot, "kn" = kn, "nObs" = nObs)
+    class(out) <- "spotVol"
+    
+  } else {
+    # Make sure there are sensible standard inputs
+    op <- list(RM = "bipower", lookBackPeriod = 50, dontIncludeLast = FALSE, theta = 0.5)
+    # replace standards with user supplied inputs
+    op[names(options)] <- options
+    M <- op$lookBackPeriod
+    nObs <- length(data$PRICE)
+    theta <- op$theta
+    
+    dummyWasXts <- FALSE
+    if(is.xts(data)){
+      dummyWasXts <- TRUE  
+    }
+    
+    ## We need to ensure kn is even, thus we round half and multiply by 2
+    kn <- round(theta * sqrt(nObs))
+    kn <- kn + kn%%2
+    idx <- NULL
+    if(op$RM != "rv"){
+      idx <- spot <- seq(M - 2 + kn + 1, nObs - kn, by = kn) # initialize indices to loop over and the container to have the post esitmates.
+    } else {
+      idx <- spot <- seq(M - 2 + 1, nObs - kn, by = kn) # Here we have one more estimate than the other cases.
+    }
+    # Measuring jump variation during the entire day.
+    preAveragedReturns <- hatreturn(as.xts(data), kn) 
+    preAveragedReturns <- c(as.numeric(preAveragedReturns), rep(NA, nObs - length(preAveragedReturns)))#, as.POSIXct(index(pData), origin = dateOfData)) # maybe we want to add back in xts, but it's removed for now...
+    
+    
+    ind <- 1
+    for (i in idx) {
+      
+      
+      
+      if( op$RM == "bipower" ){    
+        
+        spot[ind] <- pi/2 * sum(abs(preAveragedReturns[(i - M + 2):(i-1)]) * abs(preAveragedReturns[(i-M+2-kn):(i-1-kn)]))
+        
+      } else if( op$RM == "medrv" ){
+        
+        spot[ind] <- (pi / (6 - 4 * sqrt(3) + pi)) * sum(apply(cbind(preAveragedReturns[(i-M+2-kn):(i-1-kn)] , preAveragedReturns[(i-M+2):(i-1)] , preAveragedReturns[(i-M+2+kn):(i-1+kn)]), 1, median) ^2)
+        
+      } else if( op$RM == "minrv"){
+        
+        spot[ind] <- 2.751938 * sum(pmin(preAveragedReturns[(i - M + 2):(i-1)], preAveragedReturns[(i-M+2-kn):(i-1-kn)]) ^2)
+        
+      } else if( op$RM == "rv"){
+        
+        spot[ind] <- sum(preAveragedReturns[(i - M + 2):(i-1)] ^ 2)
+        
+      }
+      
+      ind <- ind + 1 # increment index
+      
+    }
+    
+    
+    if(dummyWasXts){
+      spot <- na.omit(xts(sqrt(spot), order.by = time(data[idx])))
+    } else {
+      spot <- na.omit(xts(sqrt(spot), order.by = data[idx, DT]))
+    }
+    
+    out <- list("spot" = spot, "kn" = kn, "nObs" = nObs)
+    class(out) <- "spotVol"
+  }
+  
+  return(out)  
+  
+}

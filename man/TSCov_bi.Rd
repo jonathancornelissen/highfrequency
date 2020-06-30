@@ -3,55 +3,55 @@
 \name{TSCov_bi}
 \alias{TSCov_bi}
 \title{rvKernel <- function(x,                             # Tick Data
-                     kernel.type = "rectangular",   # Kernel name (or number)
-                     kernel.param = 1,              # Kernel parameter (usually lags)
-                     kernel.dofadj = TRUE,          # Kernel Degree of freedom adjustment
-                     align.by = "seconds",          # Align the tick data to [seconds|minutes|hours]
-                     align.period = 1) {            # Align the tick data to this many [seconds|minutes|hours]            
+                     kernelType = "rectangular",   # Kernel name (or number)
+                     kernelParam = 1,              # Kernel parameter (usually lags)
+                     kernelDOFadj = TRUE,          # Kernel Degree of freedom adjustment
+                     alignBy = "seconds",          # Align the tick data to [seconds|minutes|hours]
+                     alignPeriod = 1) {            # Align the tick data to this many [seconds|minutes|hours]            
   # Multiday adjustment: 
   multixts <- multixts(x)
   if (multixts == TRUE) {
-    result <- apply.daily(x, rv.kernel,kernel.type,kernel.param,kernel.dofadj,
-                          align.by, align.period, cts, makeReturns)
+    result <- apply.daily(x, rv.kernel,kernelType,kernelParam,kernelDOFadj,
+                          alignBy, alignPeriod, cts, makeReturns)
     return(result)
   } else { #Daily estimation:
-    align.period <- .getAlignPeriod(align.period, align.by)         
+    alignPeriod <- .getAlignPeriod(alignPeriod, alignBy)         
     cdata <- .convertData(x, cts = cts, makeReturns = makeReturns)
     x <- cdata$data
-    x <- .alignReturns(x, align.period)
-    type <- kernelCharToInt(kernel.type)
+    x <- .alignReturns(x, alignPeriod)
+    type <- kernelCharToInt(kernelType)
     kernelEstimator(as.double(x), as.double(x), as.integer(length(x)),
-                    as.integer(kernel.param), as.integer(ifelse(kernel.dofadj, 1, 0)),
-                    as.integer(type), ab = double(kernel.param + 1),
-                    ab2 = double(kernel.param + 1))
+                    as.integer(kernelParam), as.integer(ifelse(kernelDOFadj, 1, 0)),
+                    as.integer(type), ab = double(kernelParam + 1),
+                    ab2 = double(kernelParam + 1))
   }
 }}
 \usage{
-TSCov_bi(pdata1, pdata2, K = 300, J = 1)
+TSCov_bi(pData1, pData2, K = 300, J = 1)
 }
 \description{
 rvKernel <- function(x,                             # Tick Data
-                     kernel.type = "rectangular",   # Kernel name (or number)
-                     kernel.param = 1,              # Kernel parameter (usually lags)
-                     kernel.dofadj = TRUE,          # Kernel Degree of freedom adjustment
-                     align.by = "seconds",          # Align the tick data to [seconds|minutes|hours]
-                     align.period = 1) {            # Align the tick data to this many [seconds|minutes|hours]            
+                     kernelType = "rectangular",   # Kernel name (or number)
+                     kernelParam = 1,              # Kernel parameter (usually lags)
+                     kernelDOFadj = TRUE,          # Kernel Degree of freedom adjustment
+                     alignBy = "seconds",          # Align the tick data to [seconds|minutes|hours]
+                     alignPeriod = 1) {            # Align the tick data to this many [seconds|minutes|hours]            
   # Multiday adjustment: 
   multixts <- multixts(x)
   if (multixts == TRUE) {
-    result <- apply.daily(x, rv.kernel,kernel.type,kernel.param,kernel.dofadj,
-                          align.by, align.period, cts, makeReturns)
+    result <- apply.daily(x, rv.kernel,kernelType,kernelParam,kernelDOFadj,
+                          alignBy, alignPeriod, cts, makeReturns)
     return(result)
   } else { #Daily estimation:
-    align.period <- .getAlignPeriod(align.period, align.by)         
+    alignPeriod <- .getAlignPeriod(alignPeriod, alignBy)         
     cdata <- .convertData(x, cts = cts, makeReturns = makeReturns)
     x <- cdata$data
-    x <- .alignReturns(x, align.period)
-    type <- kernelCharToInt(kernel.type)
+    x <- .alignReturns(x, alignPeriod)
+    type <- kernelCharToInt(kernelType)
     kernelEstimator(as.double(x), as.double(x), as.integer(length(x)),
-                    as.integer(kernel.param), as.integer(ifelse(kernel.dofadj, 1, 0)),
-                    as.integer(type), ab = double(kernel.param + 1),
-                    ab2 = double(kernel.param + 1))
+                    as.integer(kernelParam), as.integer(ifelse(kernelDOFadj, 1, 0)),
+                    as.integer(type), ab = double(kernelParam + 1),
+                    ab2 = double(kernelParam + 1))
   }
 }
 }

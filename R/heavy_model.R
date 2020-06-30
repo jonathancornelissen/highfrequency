@@ -5,11 +5,11 @@
 #' @param data a (T x K) matrix containing the data, with T the number of days. For the traditional HEAVY model: K = 2, the first column contains the squared daily demeaned returns, the second column contains the realized measures.
 #' @param p a (K x K) matrix containing the lag length for the model innovations. Position (i, j) in the matrix indicates the number of lags in equation i of the model for the innovations in data column j. For the traditional heavy model p is given by matrix(c(0,0,1,1), ncol = 2) (default).
 #' @param q a (K x K) matrix containing the lag length for the conditional variances. Position (i, j) in the matrix indicates the number of lags in equation i of the model for conditional variances corresponding to series j. For the traditional heavy model introduced above q is given by matrix( c(1,0,0,1),ncol=2 ) (default).
-#' @param startingvalues a vector containing the starting values to be used in the optimization to find the optimal parameters estimates.
+#' @param startingValues a vector containing the starting values to be used in the optimization to find the optimal parameters estimates.
 #' @param LB a vector of length K indicating the lower bounds to be used in the estimation. If NULL it is set to a vector of zeros by default.
 #' @param UB a vector of length K indicating the upper bounds to be used in the estimation. If NULL it is set to a vector of Inf by default.
-#' @param backcast a vector of length K used to initialize the estimation. If NULL the unconditional estimates are taken.
-#' @param compconst a boolean variable. In case TRUE, the omega values are estimated in the optimization. In case FALSE, volatility targeting is done and omega is just 1 minus the sum of all relevant alpha's and beta's multiplied by the unconditional variance.
+#' @param backCast a vector of length K used to initialize the estimation. If NULL the unconditional estimates are taken.
+#' @param compConst a boolean variable. In case TRUE, the omega values are estimated in the optimization. In case FALSE, volatility targeting is done and omega is just 1 minus the sum of all relevant alpha's and beta's multiplied by the unconditional variance.
 #'
 #' @details Assume there are \eqn{T} daily returns and realized measures in the period \eqn{t}. Let \eqn{r_i} and \eqn{RM_i} be the \eqn{i^{th}} daily return and daily realized measure respectively (with \eqn{i=1, \ldots,T}).
 #'
@@ -28,7 +28,7 @@
 #'
 #' In this version, the parameters vector to be estimated is \eqn{\left( w, w_R,\alpha, \alpha_R, \beta, \beta_R \right) }.
 #'
-#' In terms of startingvalues, Shephard and Sheppard recommend for this version of the Heavy model to set  \eqn{\beta} be around 0.6 and sum of \eqn{\alpha}+\eqn{\beta} to be close to but slightly less than one.
+#' In terms of startingValues, Shephard and Sheppard recommend for this version of the Heavy model to set  \eqn{\beta} be around 0.6 and sum of \eqn{\alpha}+\eqn{\beta} to be close to but slightly less than one.
 #' In general, the lag length for the model innovation and the conditional covariance can be greater than 1. Consider, for example, matrix p is  \eqn{\left( \begin{array}{ccc} 0 & 2 \\ 0 & 1 \end{array} \right)} and matrix q is the same as above. Matrix notation will be as below:
 #' \deqn{
 #' \left( \begin{array}{ccc} h_t \\ \mu_t \end{array} \right) = \left( \begin{array}{ccc} w \\ w_R \end{array} \right)  + \left( \begin{array}{ccc} 0 & \alpha_1 \\ 0 & \alpha_R \end{array} \right) \left( \begin{array}{ccc} r^2_{t-1} \\ RM_{t-1} \end{array} \right) +\left( \begin{array}{ccc} 0 & \alpha_2 \\ 0 & 0 \end{array} \right) \left( \begin{array}{ccc} r^2_{t-2} \\ RM_{t-2} \end{array} \right) + \left( \begin{array}{ccc} \beta & 0 \\ 0 & \beta_R \end{array} \right) \left( \begin{array}{ccc} h_{t-1} \\ \mu_{t-1} \end{array} \right)}
@@ -50,30 +50,30 @@
 #'
 #' @examples
 #' # Implementation of the heavy model on DJI:
-#' returns <-  realized_library$open_to_close
-#' bv      <-  realized_library$bv
+#' returns <-  realizedLibrary$open_to_close
+#' bv      <-  realizedLibrary$bv
 #' returns <- returns[!is.na(bv)]
 #' bv <- bv[!is.na(bv)] # Remove NA's
 #' data <- cbind( returns^2, bv) # Make data matrix with returns and realized measures
-#' backcast <- matrix(c(var(returns), mean(bv)), ncol = 1)
+#' backCast <- matrix(c(var(returns), mean(bv)), ncol = 1)
 #'
 #' #For traditional (default) version:
 #' startvalues <- c(0.004,0.02,0.44,0.41,0.74,0.56) # Initial values
-#' output <- heavyModel(data = as.matrix(data,ncol=2), compconst=FALSE,
-#'                      startingvalues = startvalues, backcast=backcast)
+#' output <- HEAVYmodel(data = as.matrix(data,ncol=2), compConst=FALSE,
+#'                      startingValues = startvalues, backCast=backCast)
 #' #For general version:
 #' startvalues <- c(0.004, 0.02, 0.44, 0.4, 0.41, 0.74, 0.56) # Initial values;
 #' p <- matrix(c(2, 0, 0, 1), ncol = 2)
 #' q <- matrix(c(1, 0, 0, 1), ncol = 2)
 #'
-#' heavy_model <- heavyModel(data = as.matrix(data, ncol = 2), p = p, q = q, compconst = FALSE,
-#'                       startingvalues = startvalues, backcast = backcast)
+#' heavy_model <- HEAVYmodel(data = as.matrix(data, ncol = 2), p = p, q = q, compConst = FALSE,
+#'                       startingValues = startvalues, backCast = backCast)
 #'
 #' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt and Onno Kleen.
 #' @importFrom stats optim
 #' @export
-heavyModel <- function(data, p = matrix(c(0, 0, 1, 1), ncol = 2), q = matrix(c(1, 0, 0, 1), ncol = 2), 
-                       startingvalues = NULL, LB = NULL, UB = NULL, backcast = NULL, compconst = FALSE) {
+HEAVYmodel <- function(data, p = matrix(c(0, 0, 1, 1), ncol = 2), q = matrix(c(1, 0, 0, 1), ncol = 2), 
+                       startingValues = NULL, LB = NULL, UB = NULL, backCast = NULL, compConst = FALSE) {
     K  <- ncol(data)
     TT <- nrow(data)
     means <- c(colMeans(data))
@@ -88,29 +88,29 @@ heavyModel <- function(data, p = matrix(c(0, 0, 1, 1), ncol = 2), q = matrix(c(1
       UB <- rep(10^6, K)
     }
 
-    if (is.null(startingvalues) == TRUE) {
-      startingvalues <- rep(NA, K + sum(p) + sum(q))
-      startingvalues[1:K] <- 0.1
+    if (is.null(startingValues) == TRUE) {
+      startingValues <- rep(NA, K + sum(p) + sum(q))
+      startingValues[1:K] <- 0.1
       start <- K + 1
       end <- K + sum(p)
-      startingvalues[start:end] <- 0.3
+      startingValues[start:end] <- 0.3
       start <- end + 1
       end <- start + sum(q) - 1
-      startingvalues[start:end] <- 0.6
+      startingValues[start:end] <- 0.6
     }
 
-    if (is.null(backcast) == TRUE) {
-      backcast <- t(t(colMeans(data)))
+    if (is.null(backCast) == TRUE) {
+      backCast <- t(t(colMeans(data)))
     }
 
-    KKK <- length(startingvalues)
+    KKK <- length(startingValues)
     ui  <- diag(rep(1, KKK))
     ci  <- rep(0, dim(ui)[2])
 
-    splittedparams <- transToSplit(startingvalues, p, q)[[1]]
+    splittedparams <- transToSplit(startingValues, p, q)[[1]]
     
     x <- try(optim(par = splittedparams, fn = heavyLikelihoodllC, data = data, p = p, q = q,
-                  backcast = backcast, LB = LB, UB = UB, compconst = compconst,
+                  backCast = backCast, LB = LB, UB = UB, compConst = compConst,
                   return.only.llh = TRUE,
                   method = "L-BFGS-B"))
 
@@ -128,7 +128,7 @@ heavyModel <- function(data, p = matrix(c(0, 0, 1, 1), ncol = 2), q = matrix(c(1
     
     xx <- heavyLikelihoodllC(splittedparams = x$par, 
                              data = data, p = p, q = q,
-                             backcast = backcast, LB = LB, UB = UB, compconst = compconst,
+                             backCast = backCast, LB = LB, UB = UB, compConst = compConst,
                              return.only.llh = FALSE)
 
     if (is.null(rownames(data)) == FALSE) {
@@ -154,7 +154,7 @@ getParamNames <- function(estparams, p, q) {
 }
 
 #' @keywords internal
-heavyLikelihoodllC <- function(splittedparams, data, p, q, backcast, LB, UB, compconst = FALSE, return.only.llh = FALSE) {
+heavyLikelihoodllC <- function(splittedparams, data, p, q, backCast, LB, UB, compConst = FALSE, return.only.llh = FALSE) {
   K  <- ncol(data)
   TT <- nrow(data)
   means <- c(colMeans(data))
@@ -173,10 +173,10 @@ heavyLikelihoodllC <- function(splittedparams, data, p, q, backcast, LB, UB, com
     q = as.integer(q),
     pMax = as.integer(maxp),
     qMax = as.integer(maxq),
-           backcast = as.double(t(backcast)),
+           backCast = as.double(t(backCast)),
            LB = as.double(LB),
            UB = as.double(UB),
-           compconst = as.integer(compconst),
+           compConst = as.integer(compConst),
            h = as.double(matrix(rep(0, K * TT), nrow = K, ncol = TT)),
            lls = as.double(rep(0, TT)),
            llRM = as.double(rep(0, K)))
@@ -190,7 +190,7 @@ heavyLikelihoodllC <- function(splittedparams, data, p, q, backcast, LB, UB, com
 
 #' @keywords internal
 heavy_likelihoodR <- function(parameters, data, T1, K, means, p, q, pMax, qMax,
-                              backcast, LB, UB, compconst, h, lls, llRM) {
+                              backCast, LB, UB, compConst, h, lls, llRM) {
   ll = 0
   # int i,j,t,l,k;
   sum = 0.0
@@ -199,7 +199,7 @@ heavy_likelihoodR <- function(parameters, data, T1, K, means, p, q, pMax, qMax,
   lll = 0.0
   # htemp
   
-  # int K, T, pMax, qMax, compconst;
+  # int K, T, pMax, qMax, compConst;
   TT = T1
   
   O <- rep(0, times = K)
@@ -221,7 +221,7 @@ heavy_likelihoodR <- function(parameters, data, T1, K, means, p, q, pMax, qMax,
   }
   # list(ll = sum(parameters^2))
   # browser()
-  if(compconst == 1) {
+  if(compConst == 1) {
     transform <- heavy_parameter_transformR_(parameters, K, p, q, O, A, B,pMax,qMax)
     A <- transform$A
     B <- transform$B
@@ -238,7 +238,7 @@ heavy_likelihoodR <- function(parameters, data, T1, K, means, p, q, pMax, qMax,
     }
   }
   
-  blub <- heavy_likelihoodR_(h = h, O = O, A = A, B = B, TT = TT, K = K, pMax = pMax, qMax = qMax, data = data, backcast = backcast, 
+  blub <- heavy_likelihoodR_(h = h, O = O, A = A, B = B, TT = TT, K = K, pMax = pMax, qMax = qMax, data = data, backCast = backCast, 
                              LB = LB, UB = UB, llRM = llRM, lls = lls)
   
   

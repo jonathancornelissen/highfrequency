@@ -7,28 +7,28 @@
 
 ## hatIV
 #' @keywords internal
-hatIV <- function(rdata, IVestimator, startV = NULL) {
+hatIV <- function(rData, IVestimator, startV = NULL) {
   switch(IVestimator,
-         RV = RV(rdata),
-         BV = RBPVar(rdata),
-         TV = rTPVar(rdata),
-         minRV = minRV(rdata),
-         medRV = medRV(rdata),
-         ROWvar = rOWCov(rdata),
-         CTBV = ctBV(rdata, startV = startV))
+         RV = RV(rData),
+         BV = RBPVar(rData),
+         TV = rTPVar(rData),
+         minRV = minRV(rData),
+         medRV = medRV(rData),
+         ROWvar = rOWCov(rData),
+         CTBV = ctBV(rData, startV = startV))
 }
 
 ### ivInference help functions:
 ##IQ estimator:
 #' @keywords internal
-hatIQ <- function (rdata, IQestimator) {
+hatIQ <- function (rData, IQestimator) {
   switch(IQestimator,
-         rQuar = rQuar(rdata),
-         QP = rQPVar(rdata),
-         TP = rTPVar(rdata),
-         minRQ = minRQ(rdata),
-         medRQ = medRQ(rdata),
-         CTTPV = ctTPV(rdata))
+         rQuar = rQuar(rData),
+         QP = rQPVar(rData),
+         TP = rTPVar(rData),
+         minRQ = minRQ(rData),
+         medRQ = medRQ(rData),
+         CTTPV = ctTPV(rData))
 }
 
 
@@ -74,13 +74,13 @@ IV <- function(IVestimator, iq) {
 #' 
 #' \eqn{\hat{IQ}} integrated quarticity estimator.
 #' 
-#' @param rdata zoo/xts object containing all returns in period t for one asset.
+#' @param rData zoo/xts object containing all returns in period t for one asset.
 #' @param IVestimator can be chosen among integrated variance estimators: RV, BV, TV, minRV or medRV. RV by default.
 #' @param IQestimator can be chosen among integrated quarticity estimators: rQuar, realized tri-power quarticity (TPQ), quad-power quarticity (QPQ), minRQ or medRQ. TPQ by default.
 #' @param confidence confidence level set by users. 0.95 by default. 
-#' @param align.by a string, align the tick data to "seconds"|"minutes"|"hours"
-#' @param align.period an integer, align the tick data to this many [seconds|minutes|hours].
-#' @param makeReturns boolean, should be TRUE when rdata contains prices instead of returns. FALSE by  default.
+#' @param alignBy a string, align the tick data to "seconds"|"minutes"|"hours"
+#' @param alignPeriod an integer, align the tick data to this many [seconds|minutes|hours].
+#' @param makeReturns boolean, should be TRUE when rData contains prices instead of returns. FALSE by  default.
 #' @param ... additional arguments.
 #' 
 #' @return list
@@ -98,31 +98,31 @@ IV <- function(IVestimator, iq) {
 #' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
 #' 
 #' @examples 
-#' ivInference(sample_tdata$PRICE, IVestimator= "minRV", IQestimator = "medRQ",
+#' ivInference(sampleTData$PRICE, IVestimator= "minRV", IQestimator = "medRQ",
 #'             confidence = 0.95, makeReturns = TRUE)
 #' @keywords highfrequency ivInference
 #' @export 
-ivInference <- function(rdata, IVestimator = "RV", IQestimator = "rQuar", confidence = 0.95, align.by = NULL, align.period = NULL, makeReturns = FALSE, ...) {
+ivInference <- function(rData, IVestimator = "RV", IQestimator = "rQuar", confidence = 0.95, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, ...) {
   
-  if (checkMultiDays(rdata) == TRUE) { 
-    result <- apply.daily(rdata, ivInference, align.by, align.period, makeReturns)
+  if (checkMultiDays(rData) == TRUE) { 
+    result <- apply.daily(rData, ivInference, alignBy, alignPeriod, makeReturns)
     return(result)
   } else {
-    if((!is.null(align.by)) && (!is.null(align.period))){
-      rdata <- fastTickAgregation(rdata, on = align.by, k = align.period)
+    if((!is.null(alignBy)) && (!is.null(alignPeriod))){
+      rData <- fastTickAgregation(rData, on = alignBy, k = alignPeriod)
     }
     
     if (makeReturns == TRUE) { 
-      rdata <- makeReturns(rdata)  
+      rData <- makeReturns(rData)  
     }
     
-    N <- length(rdata)
+    N <- length(rData)
     p <- as.numeric(confidence)
     
-    iq <- hatIQ(rdata,IQestimator)
+    iq <- hatIQ(rData,IQestimator)
     iv <- IV(IVestimator, iq)
     
-    hatIV  <- hatIV(rdata, IVestimator, N)
+    hatIV  <- hatIV(rData, IVestimator, N)
     stderr <- 1 / sqrt(N) * iv
     
     ##confidence band

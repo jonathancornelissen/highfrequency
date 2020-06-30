@@ -2,6 +2,7 @@
 #' @importFrom stats start end
 #' @keywords internal
 fastTickAgregation <- function (ts, on = "minutes", k = 1, tz = "GMT") {
+  
   if (on == "secs" | on == "seconds") {
     secs <- k
     tby <- paste(k, "sec", sep = " ")
@@ -14,6 +15,7 @@ fastTickAgregation <- function (ts, on = "minutes", k = 1, tz = "GMT") {
     secs <- 3600 * k
     tby <- paste(3600 * k, "sec", sep = " ")
   } 
+  
   g <- base::seq(start(ts), end(ts), by = tby)
   rawg <- as.numeric(as.POSIXct(g, tz = tz))
   newg <- rawg + (secs - rawg %% secs)
@@ -22,9 +24,9 @@ fastTickAgregation <- function (ts, on = "minutes", k = 1, tz = "GMT") {
   return(ts)
 }
 
-# system.time(aggregatets(sample_tdata$PRICE, k = 5))
+# system.time(aggregateTS(sampleTData$PRICE, k = 5))
 # # 
-# system.time({blub <- sample_tdata$PRICE[endpoints(index(sample_tdata$PRICE), on = "minutes", k = 5), ]
+# system.time({blub <- sampleTData$PRICE[endpoints(index(sampleTData$PRICE), on = "minutes", k = 5), ]
 # blub <- xts(blub, order.by = ceiling_date(index(blub), unit = paste(5, "minutes")))})
 # blub[1]
 # 
@@ -39,7 +41,7 @@ fastTickAgregation <- function (ts, on = "minutes", k = 1, tz = "GMT") {
 #' @importFrom xts try.xts
 #' @importFrom xts endpoints
 #' @keywords internal
-applyGetList <- function(x, FUN, cor = FALSE, align.by = NULL, align.period = NULL, makeReturns = FALSE, makePsd = NULL,...){
+applyGetList <- function(x, FUN, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, makePsd = NULL,...){
   on <- "days" 
   k <- 1
   x <- try.xts(x, error = FALSE)
@@ -49,9 +51,9 @@ applyGetList <- function(x, FUN, cor = FALSE, align.by = NULL, align.period = NU
   FUN <- match.fun(FUN)
   for(i in 1:(length(INDEX)-1)){
     if (is.null(makePsd) == TRUE) {
-      result[[i]] <- FUN(x[(INDEX[i] + 1):INDEX[i + 1]], cor, align.by, align.period, makeReturns)
+      result[[i]] <- FUN(x[(INDEX[i] + 1):INDEX[i + 1]], cor, alignBy, alignPeriod, makeReturns)
     } else {
-      result[[i]] <- FUN(x[(INDEX[i] + 1):INDEX[i + 1]], cor, align.by, align.period, makeReturns, makePsd)
+      result[[i]] <- FUN(x[(INDEX[i] + 1):INDEX[i + 1]], cor, alignBy, alignPeriod, makeReturns, makePsd)
     }
     
   }

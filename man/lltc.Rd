@@ -4,7 +4,9 @@
 \name{lltc}
 \alias{lltc}
 \title{LLTC Data}
-\format{xts object}
+\format{
+xts object
+}
 \usage{
 lltc
 }

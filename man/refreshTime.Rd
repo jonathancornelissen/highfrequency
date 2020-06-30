@@ -4,10 +4,10 @@
 \alias{refreshTime}
 \title{Synchronize (multiple) irregular timeseries by refresh time}
 \usage{
-refreshTime(pdata)
+refreshTime(pData)
 }
 \arguments{
-\item{pdata}{a list. Each list-item contains an xts object
+\item{pData}{a list. Each list-item contains an xts object
 containing the original time series (one day only and typically a price series).}
 }
 \value{

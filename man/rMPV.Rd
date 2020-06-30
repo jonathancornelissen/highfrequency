@@ -5,26 +5,26 @@
 \title{Realized multipower variation (MPV), an estimator of integrated power variation.}
 \usage{
 rMPV(
-  rdata,
+  rData,
   m = 2,
   p = 2,
-  align.by = NULL,
-  align.period = NULL,
+  alignBy = NULL,
+  alignPeriod = NULL,
   makeReturns = FALSE
 )
 }
 \arguments{
-\item{rdata}{a zoo/xts object containing all returns in period t for one asset.}
+\item{rData}{a zoo/xts object containing all returns in period t for one asset.}
 
 \item{m}{the window size of return blocks. 2 by default.}
 
 \item{p}{the power of the variation. 2 by default.}
 
-\item{align.by}{a string, align the tick data to "seconds"|"minutes"|"hours".}
+\item{alignBy}{a string, align the tick data to "seconds"|"minutes"|"hours".}
 
-\item{align.period}{an integer, align the tick data to this many [seconds|minutes|hours].}
+\item{alignPeriod}{an integer, align the tick data to this many [seconds|minutes|hours].}
 
-\item{makeReturns}{boolean, should be TRUE when rdata contains prices instead of returns. FALSE by  default.}
+\item{makeReturns}{boolean, should be TRUE when rData contains prices instead of returns. FALSE by  default.}
 }
 \value{
 numeric
@@ -50,8 +50,8 @@ Function returns the rMPV, defined in Andersen et al. (2012).
   and \eqn{m} > \eqn{p/2}.
 }
 \examples{
-data(sample_tdata)
-rMPV(sample_tdata$PRICE, m = 2, p = 3, align.by = "minutes", align.period = 5, makeReturns = TRUE)
+data(sampleTData)
+rMPV(sampleTData$PRICE, m = 2, p = 3, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)
 
 }
 \references{

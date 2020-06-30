@@ -5,26 +5,26 @@
 \title{Aggregate a time series but keep first and last observation}
 \usage{
 aggregatePrice(
-  pdata,
+  pData,
   on = "minutes",
   k = 1,
-  marketopen = "09:30:00",
-  marketclose = "16:00:00",
+  marketOpen = "09:30:00",
+  marketClose = "16:00:00",
   fill = FALSE,
   tz = NULL
 )
 }
 \arguments{
-\item{pdata}{data.table or xts object to be aggregated containing the intraday price series, possibly across multiple days.}
+\item{pData}{data.table or xts object to be aggregated containing the intraday price series, possibly across multiple days.}
 
 \item{on}{character, indicating the time scale in which "k" is expressed. Possible values are: "milliseconds", "secs", "seconds", "mins", "minutes","hours".}
 
 \item{k}{positive integer, indicating the number of periods to aggregate over; e.g. to aggregate a 
 xts object to the 5 minute frequency set k = 5 and on = "minutes".}
 
-\item{marketopen}{the market opening time, by default: marketopen = "09:30:00".}
+\item{marketOpen}{the market opening time, by default: marketOpen = "09:30:00".}
 
-\item{marketclose}{the market closing time, by default: marketclose = "16:00:00".}
+\item{marketClose}{the market closing time, by default: marketClose = "16:00:00".}
 
 \item{fill}{indicates whether rows without trades should be added with the most recent value, FALSE by default.}
 
@@ -47,12 +47,12 @@ the last observation up to that point, including the value at 09:35:00 itself.
 }
 \examples{
 # aggregate price data to the 30 second frequency
-aggregatePrice(sample_tdata_microseconds, on = "secs", k = 30)
+aggregatePrice(sampleTDataMicroseconds, on = "secs", k = 30)
 # aggregate price data to the 30 second frequency including zero return price changes
-aggregatePrice(sample_tdata_microseconds, on = "secs", k = 30)
+aggregatePrice(sampleTDataMicroseconds, on = "secs", k = 30)
 
 # aggregate price data to half a second frequency including zero return price changes
-aggregatePrice(sample_tdata_microseconds, on = "milliseconds", k = 500, fill = TRUE)
+aggregatePrice(sampleTDataMicroseconds, on = "milliseconds", k = 500, fill = TRUE)
 }
 \author{
 Jonathan Cornelissen, Kris Boudt and Onno Kleen.

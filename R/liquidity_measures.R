@@ -1,5 +1,3 @@
-
-
 #' @title Compute Liquidity Measure
 #' 
 #' Function returns an xts or data.table object containing 23 liquidity measures. Please see details below.
@@ -7,7 +5,7 @@
 #' Note that this assumes a regular time grid. The Lee + Ready measure
 #' uses two lags for the Tick Rule.
 #'
-#' @param tqdata A \code{data.table} or xts object as in the \pkg{highfrequency} merged
+#' @param tqData A \code{data.table} or xts object as in the \pkg{highfrequency} merged
 #' trades and quotes data (that is included).
 #' @param win A windows length for the forward-prices used for \sQuote{realized}
 #' spread
@@ -219,12 +217,12 @@
 #' Venkataraman, K. (2001). Automated versus floor trading: An analysis of execution costs on the paris and new york exchanges. The Journal of Finance, 56, 1445-1485.
 #' 
 #' @examples
-#' tqdata <- matchTradesQuotes(sample_tdata, sample_qdata)
-#' res <- getLiquidityMeasures(tqdata)
+#' tqData <- matchTradesQuotes(sampleTData, sampleQData)
+#' res <- getLiquidityMeasures(tqData)
 #' head(res)
 #' @importFrom data.table shift
 #' @export
-getLiquidityMeasures <- function(tqdata, win = 300, type = NULL) {
+getLiquidityMeasures <- function(tqData, win = 300, type = NULL) {
   
   BID = PRICE = OFR = SIZE = OFRSIZ = BIDSIZ = NULL
   
@@ -234,80 +232,80 @@ getLiquidityMeasures <- function(tqdata, win = 300, type = NULL) {
   squaredLogReturn = absLogReturn = quotedSpread = proportionalQuotedSpread = logQuotedSpread = logQuotedSize = NULL
   quotedSlope = logQSlope = midQuoteSquaredReturn = midQuoteAbsReturn = signedTradeSize = NULL
   
-  tqdata <- checkColumnNames(tqdata)
-  checktdata(tqdata)
-  checkqdata(tqdata)
+  tqData <- checkColumnNames(tqData)
+  checktData(tqData)
+  checkqData(tqData)
   
   dummy_was_xts <- FALSE
-  if (is.data.table(tqdata) == FALSE) {
-    if (is.xts(tqdata) == TRUE) {
-      tqdata <- setnames(as.data.table(tqdata), old = "index", new = "DT")
+  if (is.data.table(tqData) == FALSE) {
+    if (is.xts(tqData) == TRUE) {
+      tqData <- setnames(as.data.table(tqData), old = "index", new = "DT")
       dummy_was_xts <- TRUE
     } else {
       stop("Input has to be data.table or xts.")
     }
   } else {
-    if (("DT" %in% colnames(tqdata)) == FALSE) {
+    if (("DT" %in% colnames(tqData)) == FALSE) {
       
       stop("Data.table neeeds DT column (date-time ).")
     }
   }
   
-  tqdata[, BID := as.numeric(as.character(BID))]
-  tqdata[, PRICE := as.numeric(as.character(PRICE))] # just for being sure
-  tqdata[, OFR := as.numeric(as.character(OFR))]      # if one converts from xts back and forth.
-  tqdata[, SIZE := as.numeric(as.character(SIZE))]
-  tqdata[, OFRSIZ := as.numeric(as.character(OFRSIZ))]
-  tqdata[, BIDSIZ := as.numeric(as.character(BIDSIZ))]
+  tqData[, BID := as.numeric(as.character(BID))]
+  tqData[, PRICE := as.numeric(as.character(PRICE))] # just for being sure
+  tqData[, OFR := as.numeric(as.character(OFR))]      # if one converts from xts back and forth.
+  tqData[, SIZE := as.numeric(as.character(SIZE))]
+  tqData[, OFRSIZ := as.numeric(as.character(OFRSIZ))]
+  tqData[, BIDSIZ := as.numeric(as.character(BIDSIZ))]
   
-  tqdata[, midpoints := 0.5 * (BID + OFR)]
+  tqData[, midpoints := 0.5 * (BID + OFR)]
 
-  tqdata[, direction := getTradeDirection(tqdata)]
-  tqdata[, effectiveSpread := 2 * direction * (PRICE - midpoints)]
+  tqData[, direction := getTradeDirection(tqData)]
+  tqData[, effectiveSpread := 2 * direction * (PRICE - midpoints)]
   
-  tqdata[, realizedSpread := 2 * direction * (PRICE - shift(midpoints, win, type = "lead"))]
+  tqData[, realizedSpread := 2 * direction * (PRICE - shift(midpoints, win, type = "lead"))]
 
-  tqdata[, valueTrade := SIZE * PRICE]
-  tqdata[, signedValueTrade := direction * valueTrade]
+  tqData[, valueTrade := SIZE * PRICE]
+  tqData[, signedValueTrade := direction * valueTrade]
 
-  tqdata[, depthImbalanceDifference := direction * (OFRSIZ - BIDSIZ) / (OFRSIZ + BIDSIZ)]
+  tqData[, depthImbalanceDifference := direction * (OFRSIZ - BIDSIZ) / (OFRSIZ + BIDSIZ)]
 
-  tqdata[, depthImbalanceRatio := (direction * OFRSIZ / BIDSIZ) ^ direction]
+  tqData[, depthImbalanceRatio := (direction * OFRSIZ / BIDSIZ) ^ direction]
 
-  tqdata[, proportionalEffectiveSpread := effectiveSpread/midpoints]
-  tqdata[, proportionalRealizedSpread := realizedSpread/midpoints]
+  tqData[, proportionalEffectiveSpread := effectiveSpread/midpoints]
+  tqData[, proportionalRealizedSpread := realizedSpread/midpoints]
 
-  tqdata[, priceImpact := (effectiveSpread - realizedSpread)/2]
-  tqdata[, proportionalPriceImpact := priceImpact / midpoints]
+  tqData[, priceImpact := (effectiveSpread - realizedSpread)/2]
+  tqData[, proportionalPriceImpact := priceImpact / midpoints]
 
-  tqdata[, halfTradedSpread := direction*(PRICE-midpoints)]
-  tqdata[, proportionalHalfTradedSpread := halfTradedSpread/midpoints]
+  tqData[, halfTradedSpread := direction*(PRICE-midpoints)]
+  tqData[, proportionalHalfTradedSpread := halfTradedSpread/midpoints]
 
-  tqdata[, squaredLogReturn := (log(PRICE) - log(shift(PRICE, 1, type = "lag")))^2]
-  tqdata[, absLogReturn := abs(log(PRICE) - log(shift(PRICE, 1, type = "lag")))]
+  tqData[, squaredLogReturn := (log(PRICE) - log(shift(PRICE, 1, type = "lag")))^2]
+  tqData[, absLogReturn := abs(log(PRICE) - log(shift(PRICE, 1, type = "lag")))]
 
-  tqdata[, quotedSpread := OFR - BID]
-  tqdata[, proportionalQuotedSpread := quotedSpread/midpoints]
+  tqData[, quotedSpread := OFR - BID]
+  tqData[, proportionalQuotedSpread := quotedSpread/midpoints]
 
-  tqdata[, logQuotedSpread := log(OFR/BID)]
-  tqdata[, logQuotedSize := log(OFRSIZ) - log(BIDSIZ)]
+  tqData[, logQuotedSpread := log(OFR/BID)]
+  tqData[, logQuotedSize := log(OFRSIZ) - log(BIDSIZ)]
 
-  tqdata[, quotedSlope := quotedSpread/logQuotedSize]
-  tqdata[, logQSlope := logQuotedSpread/logQuotedSize]
+  tqData[, quotedSlope := quotedSpread/logQuotedSize]
+  tqData[, logQSlope := logQuotedSpread/logQuotedSize]
 
-  tqdata[, midQuoteSquaredReturn := (log(midpoints) - log(shift(midpoints,1, type = "lag")))^2]
-  tqdata[, midQuoteAbsReturn := abs(log(midpoints) - log(shift(midpoints,1, type = "lag")))]
+  tqData[, midQuoteSquaredReturn := (log(midpoints) - log(shift(midpoints,1, type = "lag")))^2]
+  tqData[, midQuoteAbsReturn := abs(log(midpoints) - log(shift(midpoints,1, type = "lag")))]
 
-  tqdata[, signedTradeSize := direction * SIZE]
+  tqData[, signedTradeSize := direction * SIZE]
   
   if (dummy_was_xts == TRUE) {
     if (is.null(type) == TRUE) {
-      return(xts(as.matrix(tqdata[, -c("DT")]), order.by = tqdata$DT))
+      return(xts(as.matrix(tqData[, -c("DT")]), order.by = tqData$DT))
     } else {
-      return(xts(as.matrix(tqdata[, -c("DT")]), order.by = tqdata$DT)[, type])
+      return(xts(as.matrix(tqData[, -c("DT")]), order.by = tqData$DT)[, type])
     }
   } else {
-    return(tqdata)
+    return(tqData)
   }
 }
 
@@ -316,7 +314,7 @@ getLiquidityMeasures <- function(tqdata, win = 300, type = NULL) {
 #' @description Function returns a vector with the inferred trade direction which is 
 #' determined using the Lee and Ready algorithym (Lee and Ready, 1991). 
 #' 
-#' @param tqdata data.table or xts object, containing joined trades and quotes (e.g. using \code{\link{matchTradesQuotes}})
+#' @param tqData data.table or xts object, containing joined trades and quotes (e.g. using \code{\link{matchTradesQuotes}})
 #' 
 #' @details NOTE: The value of the first (and second) observation of the output should be ignored if price == midpoint
 #' for the first (second) observation.
@@ -330,33 +328,33 @@ getLiquidityMeasures <- function(tqdata, win = 300, type = NULL) {
 #' 
 #' @examples 
 #' # generate matched trades and quote data set
-#' tqdata <- matchTradesQuotes(sample_tdata, sample_qdata)
-#' directions <- getTradeDirection(tqdata)
+#' tqData <- matchTradesQuotes(sampleTData, sampleQData)
+#' directions <- getTradeDirection(tqData)
 #' head(directions)
 #' 
 #' @keywords liquidity
 #' @export
-getTradeDirection <- function(tqdata) {
+getTradeDirection <- function(tqData) {
   
   BID = OFR = PRICE = NULL
   
-  tqdata <- checkColumnNames(tqdata)
-  checktdata(tqdata)
-  checkqdata(tqdata)
+  tqData <- checkColumnNames(tqData)
+  checktData(tqData)
+  checkqData(tqData)
 
   dummy_was_xts <- FALSE
-  if (is.data.table(tqdata) == FALSE) {
-    if (is.xts(tqdata) == TRUE) {
-      tqdata <- setnames(as.data.table(tqdata), old = "index", new = "DT")
-      tqdata[, BID := as.numeric(as.character(BID))]
-      tqdata[, PRICE := as.numeric(as.character(PRICE))]
-      tqdata[, OFR := as.numeric(as.character(OFR))]
+  if (is.data.table(tqData) == FALSE) {
+    if (is.xts(tqData) == TRUE) {
+      tqData <- setnames(as.data.table(tqData), old = "index", new = "DT")
+      tqData[, BID := as.numeric(as.character(BID))]
+      tqData[, PRICE := as.numeric(as.character(PRICE))]
+      tqData[, OFR := as.numeric(as.character(OFR))]
       dummy_was_xts <- TRUE
     } else {
       stop("Input has to be data.table or xts.")
     }
   } else {
-    if (("DT" %in% colnames(tqdata)) == FALSE) {
+    if (("DT" %in% colnames(tqData)) == FALSE) {
       stop("Data.table neeeds DT column (date-time ).")
     }
   }
@@ -364,10 +362,10 @@ getTradeDirection <- function(tqdata) {
   ## Function returns a vector with the inferred trade direction:
   ## NOTE: the value of the first (and second) observation should be
   ## ignored if price == midpoint for the first (second) observation.
-  bid <- tqdata[, BID]
-  offer <- tqdata[, OFR]
+  bid <- tqData[, BID]
+  offer <- tqData[, OFR]
   midpoints <- (bid + offer)/2
-  price <- tqdata[, PRICE]
+  price <- tqData[, PRICE]
   
   buy1 <- price > midpoints           # definitely a buy
   equal <- price == midpoints

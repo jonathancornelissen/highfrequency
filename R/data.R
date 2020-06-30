@@ -16,7 +16,7 @@
 #' 
 #' @description A data.frame object containing the daily open-close returns, daily realized variances based on 
 #' five-minute intraday returns and daily realized kernels ranging from 2000-01-03 up to 2019-06-10 for the S&P 500. 
-#' Use \code{colnames(realized_library)} to see which realized measures. 
+#' Use \code{colnames(realizedLibrary)} to see which realized measures. 
 #' The full library of the Oxford-Man Institute of Quantitative Finance can be found on their website: \url{http://realized.oxford-man.ox.ac.uk}.
 #'  
 #' @references  
@@ -26,7 +26,7 @@
 #' 
 #' @format data.frame
 #' @keywords datasets
-"realized_library"
+"realizedLibrary"
 
 
 #' Ten artificial time series for the NYSE trading days during January 2010
@@ -52,7 +52,7 @@
 #' trading. Journal of Econometrics, 162, 149-169.
 #' 
 #' @keywords datasets        
-"sample_5minprices"
+"sample5MinPrices"
 
 #' Ten artificial time series (including jumps) for the NYSE trading days during January 2010
 #' 
@@ -80,7 +80,7 @@
 #' Boudt, K., C. Croux, and S. Laurent (2008). Outlyingness weighted covariation. Mimeo.
 #' 
 #' @keywords datasets
-"sample_5minprices_jumps"
+"sample5MinPricesJumps"
 
 #' Sample of imaginary price data for 61 days
 #'
@@ -90,16 +90,16 @@
 #' @format xts object
 #' 
 #' @keywords datasets
-"sample_real5minprices"
+"sampleReal5MinPrices"
 
 #' Sample of cleaned quotes for stock XXX for 1 day
 #' 
-#' @description An xts object containing the raw quotes for the imaginary stock XXX for 1 day, in the typical NYSE TAQ database format. This is the cleaned version of the data sample \code{\link{sample_qdataraw}}, using \code{quotesCleanup}.
+#' @description An xts object containing the raw quotes for the imaginary stock XXX for 1 day, in the typical NYSE TAQ database format. This is the cleaned version of the data sample \code{\link{sampleQDataRaw}}, using \code{quotesCleanup}.
 #' 
 #' @format xts object
 #' 
 #' @keywords datasets
-"sample_qdata"
+"sampleQData"
 
 #' Sample of raw quotes for stock XXX for 1 day
 #' @description  An imaginary xts object containing the raw quotes for stock XXX for 1 day, in the typical NYSE TAQ database format.
@@ -107,16 +107,16 @@
 #' @format xts object
 #' 
 #' @keywords datasets
-"sample_qdataraw"
+"sampleQDataRaw"
 
 #' Sample of cleaned quotes for stock XXX for 2 days measured in microseconds
 #' 
-#' @description A data.table object containing the raw quotes for the imaginary stock XXX for 2 days. This is the cleaned version of the data sample \code{\link{sample_qdataraw_microseconds}}, using \code{quotesCleanup}.
+#' @description A data.table object containing the raw quotes for the imaginary stock XXX for 2 days. This is the cleaned version of the data sample \code{\link{sampleQDataRawMicroseconds}}, using \code{quotesCleanup}.
 #' 
 #' @format data.table object
 #' 
 #' @keywords datasets
-"sample_qdata_microseconds"
+"sampleQDataMicroseconds"
 
 #' Sample of raw quotes for stock XXX for 2 days measured in microseconds
 #' @description  An imaginary xts object containing the raw quotes for stock XXX for 2 days, in the typical NYSE TAQ database format.
@@ -124,7 +124,7 @@
 #' @format data.table object
 #' 
 #' @keywords datasets
-"sample_qdataraw_microseconds"
+"sampleQDataRawMicroseconds"
 
 #' Sample returns data
 #' 
@@ -135,31 +135,31 @@
 #' @format A large \code{xts} object.
 #' 
 #' @keywords datasets
-"sample_returns_5min"
+"sampleReturns5Min"
 
 #' Sample of cleaned trades for stock XXX for 1 day
 #' 
 #' @description An xts object containing the trades for the imaginary stock XXX for 1 day, in the typical NYSE TAQ database format.
-#' This is the cleaned version of the data sample \code{\link{sample_tdataraw}}, using \code{tradesCleanup}.
+#' This is the cleaned version of the data sample \code{\link{sampleTDataRaw}}, using \code{tradesCleanup}.
 #' 
 #' @docType data
 #'
 #' @format A large \code{xts} object.
 #' 
 #' @keywords datasets
-"sample_tdata"
+"sampleTData"
 
 #' Sample of cleaned trades for stock XXX for 2 days
 #' 
 #' @description An data.table object containing the trades for the imaginary stock XXX for 2 days, in the typical NYSE TAQ database format.
-#' This is the cleaned version of the data sample \code{\link{sample_tdataraw_microseconds}}, using \code{tradesCleanup}.
+#' This is the cleaned version of the data sample \code{\link{sampleTDataRawMicroseconds}}, using \code{tradesCleanup}.
 #' 
 #' @docType data
 #'
 #' @format A data.table object.
 #' 
 #' @keywords datasets
-"sample_tdata_microseconds"
+"sampleTDataMicroseconds"
 
 #' Sample of raw trades for stock XXX for 1 day
 #' 
@@ -170,7 +170,7 @@
 #' @format A large \code{xts} object.
 #' 
 #' @keywords datasets
-"sample_tdataraw"
+"sampleTDataRaw"
 
 #' Sample of raw trades for stock XXX for 2 days
 #' 
@@ -181,7 +181,7 @@
 #' @format A data.table object.
 #' 
 #' @keywords datasets
-"sample_tdataraw_microseconds"
+"sampleTDataRawMicroseconds"
 
 #' Starbucks Data
 #' 

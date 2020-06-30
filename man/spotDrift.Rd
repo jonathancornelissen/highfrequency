@@ -10,8 +10,8 @@ spotDrift(
   ...,
   on = "minutes",
   k = 5,
-  marketopen = "09:30:00",
-  marketclose = "16:00:00",
+  marketOpen = "09:30:00",
+  marketClose = "16:00:00",
   tz = "GMT"
 )
 }
@@ -28,32 +28,34 @@ Standard is minutes}
 
 \item{k}{How often should the estimation take place? If \code{k} is 5 the estimation will be done every fifth unit of \code{on}.}
 
-\item{marketopen}{Opening time of the market, standard is "09:30:00"}
+\item{marketOpen}{Opening time of the market, standard is "09:30:00"}
 
-\item{marketclose}{Closing time of the market, standard is "16:00:00"}
+\item{marketClose}{Closing time of the market, standard is "16:00:00"}
 
 \item{tz}{Time zone, standard is "GMT"}
 }
 \value{
-An object of class "spotdrift" containing at least the estimated spot drift process. Input on what this class should contain and methods for it is welcome.
+An object of class "spotDrift" containing at least the estimated spot drift process. Input on what this class should contain and methods for it is welcome.
 }
 \description{
 Function used to estimate the spot drift of intraday (tick) stock prices/returns
 }
 \details{
 The additional arguments for the mean and median methods are: \code{periods} for the rolling window length which is 5 by standard and
-\code{align} to allow for control of the alignment, should one wish to do so, the standard is \code{"right"}
+\code{align} to allow for control of the alignment, should one wish to do so, the standard is \code{"right"}. 
+For the kernel mean estimator, the arguments \code{meanBandwidth} can be used to control the bandwidth of the drift estimator and the \code{preAverage} argument, which can be used to control the pre-averaging horizon. 
+These arguments default to 300 and 5 respectively.
 }
 \examples{
 # Example 1: Rolling mean and median estimators for 2 days
-meandrift <- spotDrift(data = sample_tdata_microseconds, k = 1, tz = "EST")
-mediandrift <- spotDrift(data = sample_tdata_microseconds, method = "driftMedian", 
+meandrift <- spotDrift(data = sampleTDataMicroseconds, k = 1, tz = "EST")
+mediandrift <- spotDrift(data = sampleTDataMicroseconds, method = "driftMedian", 
                          on = "seconds", k = 30, tz = "EST")
 plot(meandrift)
 plot(mediandrift)
 
 # Example 2: Kernel based estimator for one day
-price <- sample_tdata$PRICE
+price <- sampleTData$PRICE
 storage.mode(price) <- "numeric"
 #kerneldrift <- spotDrift(price, method = "driftKernel", on = "minutes", k = 1)
 #plot(kerneldrift)

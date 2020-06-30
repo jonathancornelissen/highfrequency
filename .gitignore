@@ -11,7 +11,6 @@ notes.R
 man/.Rapp.history
 .Rbuildignore
 _man/*.Rd
-
 taqdata/*
 taqdataconverted/*
 speed_comparison.html
@@ -36,3 +35,8 @@ CRAN-RELEASE
 tests/testthat/Rplots.pdf
 doc
 Meta
+.idea
+pickle_reader.py
+BAbrajgowicz - spelling?.R
+prices.rda
+BAprices.rda

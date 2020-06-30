@@ -4,7 +4,9 @@
 \name{sbux}
 \alias{sbux}
 \title{Starbucks Data}
-\format{xts object}
+\format{
+xts object
+}
 \usage{
 sbux
 }

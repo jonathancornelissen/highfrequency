@@ -1,6 +1,6 @@
 #' @keywords internal
-crv <- function(pdata) {
-  N <- nrow(pdata)
+crv <- function(pData) {
+  N <- nrow(pData)
   theta <- 0.8 ##recommendation by Hautsch and Podolskij
   kn <- floor(theta*sqrt(N))
 
@@ -12,28 +12,28 @@ crv <- function(pdata) {
 
   psi2kn <- 1 / kn * sum(gfunction((1:kn)/kn)^2)
 
-  r1 <- hatreturn(pdata,kn=kn)
-  rdata <- makeReturns(pdata)
-  crv <- 1 / (sqrt(N) * theta * psi2kn) * sum(r1^2, na.rm = TRUE) - psi1kn  *(1/N) / (2 * theta^2 * psi2kn) * sum(rdata^2, na.rm=TRUE)
+  r1 <- hatreturn(pData,kn=kn)
+  rData <- makeReturns(pData)
+  crv <- 1 / (sqrt(N) * theta * psi2kn) * sum(r1^2, na.rm = TRUE) - psi1kn  *(1/N) / (2 * theta^2 * psi2kn) * sum(rData^2, na.rm=TRUE)
   return(crv)
 }
 
 #' @keywords internal
-hatreturn <- function(pdata, kn) {
-  rdata <- makeReturns(pdata)
-  class(rdata) <- "zoo"
+hatreturn <- function(pData, kn) {
+  rData <- makeReturns(pData)
+  class(rData) <- "zoo"
   kn <- as.numeric(kn)
   if (kn == 1) {
-    hatre <- rdata
+    hatre <- rData
   } else {
     x <- (1:(kn-1)) / kn
     x[x > (1-x)] <- (1-x)[x > (1-x)]
     weightedsum <- function(series){
       return(sum(x * series))
     }
-    hatre <- rollapply(rdata, width = kn - 1, FUN = weightedsum, align = "left")
+    hatre <- rollapply(rData, width = kn - 1, FUN = weightedsum, align = "left")
     if (sum(is.na(hatre)) > 0) {
-      hatre[is.na(hatre)] <- rdata[is.na(hatre)]
+      hatre[is.na(hatre)] <- rData[is.na(hatre)]
     }
   }
   return(hatre)
@@ -42,14 +42,14 @@ hatreturn <- function(pdata, kn) {
 #' @keywords internal
 gfunction <- function(x) {
   # returns the minimum of x and 1-x
-  # whenevr x > 1-x , replace with 1-x
+  # whenever x > 1-x , replace with 1-x
   x[x > (1-x)] <- (1-x)[x > (1-x)]
   return(x)
 }
 
 #' @keywords internal
-preavbi <- function(pdata1, pdata2) {
-  x <- refreshTime(list(pdata1, pdata2))
+preavbi <- function(pData1, pData2) {
+  x <- refreshTime(list(pData1, pData2))
   newprice1 <- x[, 1]
   newprice2 <- x[, 2]
 

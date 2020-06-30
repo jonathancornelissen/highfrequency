@@ -101,7 +101,7 @@ List heavy_parameter_transform_RetrackR_(NumericVector parameters, int K,  Integ
 }
 
 //[[Rcpp::export]]
-List heavy_likelihoodR_(NumericVector h, NumericVector O, NumericVector A, NumericVector B, int TT, int K, int pMax, int qMax, NumericVector data, NumericVector backcast,
+List heavy_likelihoodR_(NumericVector h, NumericVector O, NumericVector A, NumericVector B, int TT, int K, int pMax, int qMax, NumericVector data, NumericVector backCast,
                         NumericVector LB, NumericVector UB, NumericVector llRM, NumericVector lls) {
   int t, i, j, k, l;
   double sum, htemp;
@@ -133,7 +133,7 @@ List heavy_likelihoodR_(NumericVector h, NumericVector O, NumericVector A, Numer
         for (l = 0; l < K; l++) {
           sum = 0.0;
           for (k = 0; k < K; k++) {
-            sum = sum + A[K * K * j + K * k + l] * backcast[k];
+            sum = sum + A[K * K * j + K * k + l] * backCast[k];
           }
           h[t*K + l] = h[t * K + l] + sum;
         }
@@ -154,7 +154,7 @@ List heavy_likelihoodR_(NumericVector h, NumericVector O, NumericVector A, Numer
         for (l = 0;l < K; l++) {
           sum = 0.0;
           for (k=0;k<K;k++) {
-            sum = sum + B[K*K*j + K*k + l] * backcast[k];
+            sum = sum + B[K*K*j + K*k + l] * backCast[k];
           }
           h[t*K + l] = h[t*K+l]+sum;
         }
