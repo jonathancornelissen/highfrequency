@@ -22,6 +22,10 @@ colCumsum <- function(x) {
     .Call(`_highfrequency_colCumsum`, x)
 }
 
+refreshTimeMathing <- function(x, idx) {
+    .Call(`_highfrequency_refreshTimeMathing`, x, idx)
+}
+
 nsmaller <- function(times, lengths, start, end, max) {
     .Call(`_highfrequency_nsmaller`, times, lengths, start, end, max)
 }

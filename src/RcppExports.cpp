@@ -93,6 +93,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// refreshTimeMathing
+Rcpp::List refreshTimeMathing(const arma::mat& x, arma::vec& idx);
+RcppExport SEXP _highfrequency_refreshTimeMathing(SEXP xSEXP, SEXP idxSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::mat& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type idx(idxSEXP);
+    rcpp_result_gen = Rcpp::wrap(refreshTimeMathing(x, idx));
+    return rcpp_result_gen;
+END_RCPP
+}
 // nsmaller
 int nsmaller(IntegerVector times, IntegerVector lengths, int start, int end, int max);
 RcppExport SEXP _highfrequency_nsmaller(SEXP timesSEXP, SEXP lengthsSEXP, SEXP startSEXP, SEXP endSEXP, SEXP maxSEXP) {
@@ -182,6 +194,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_highfrequency_heavy_parameter_transform_RetrackR_", (DL_FUNC) &_highfrequency_heavy_parameter_transform_RetrackR_, 10},
     {"_highfrequency_heavy_likelihoodR_", (DL_FUNC) &_highfrequency_heavy_likelihoodR_, 14},
     {"_highfrequency_colCumsum", (DL_FUNC) &_highfrequency_colCumsum, 1},
+    {"_highfrequency_refreshTimeMathing", (DL_FUNC) &_highfrequency_refreshTimeMathing, 2},
     {"_highfrequency_nsmaller", (DL_FUNC) &_highfrequency_nsmaller, 5},
     {"_highfrequency_KK", (DL_FUNC) &_highfrequency_KK, 2},
     {"_highfrequency_kernelEstimator", (DL_FUNC) &_highfrequency_kernelEstimator, 8},
