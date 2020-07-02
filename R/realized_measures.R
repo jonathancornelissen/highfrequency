@@ -2148,3 +2148,89 @@ rTSCov <- function (pData, cor = FALSE, K = 300, J = 1, K_cov = NULL, J_cov = NU
 }
 
 
+
+#' Cholesky based realized covariance
+#' @export
+rCholCov <- function(pData, criterion = "squared duration", delta = 0.1, theta = 1){
+  
+  if(!is.list(pData)){
+    stop("pData must be a list of atleast length one")
+  }
+  if(!all(as.logical(lapply(pData, is.xts)))){
+    stop("All the series in pData must be xts objects")
+  }
+  if(criterion == "squared duration"){
+    criterion <- function(x) sum(as.numeric(diff(index(x)))^2)
+  } else if( criterion == "duration"){
+    criterion <- function(x) sum(as.numeric(diff(index(x))))
+  } else {
+    stop("Criterion must be either 'squared duration' or 'duration'")
+  }
+  vec <- sort(sapply(pData, criterion), index.return = TRUE)$ix
+  nameVec <- names(pData)[vec]
+  
+  D <- length(pData)
+  
+  G <- matrix(0, D, D)
+  Ltemp <- L <- diag(1,D,D)
+  
+  G[1,1] <- rCov(exp(pData[[vec[1]]]), makeReturns = TRUE)
+  counter = 1
+  for (d in 1:D) {
+    
+    dat <- refreshTime(lapply(vec[1:d], function(x) pData[[x]]))
+    returns <- diff(dat)[-1,]
+    f <- matrix(0, nrow(returns), d)
+    f[,1] <- returns[,1]
+    if(d>1){ # We shouldn't do this on the first pass.
+      for (l in 2:d) {
+        
+        for (m in 1:(l-1)) {
+          
+          COV <- cholCovMRC(as.matrix(coredata(cbind(returns[,l], f[,m]))), delta = delta, theta = theta)
+          
+          Ltemp[l,m] <- COV[1,2]/COV[2,2]
+          
+        }
+        
+        f[,l] <- returns[,l] - f[,1:(l)] %*% Ltemp[l,1:(l)]
+        
+      }
+    }
+    
+    L[d ,] <- Ltemp[d,]
+    
+    G[d,d] <- cholCovMRC(as.matrix(coredata(f[,d])) , delta = delta, theta = theta)
+  }
+  
+  CholCov <- L %*% G %*% L
+  
+  out <- list("CholCov" = CholCov, "L" = L, "G" = G)
+  return(out)
+  
+}
+
+
+#' @keywords internal
+cholCovMRC <- function(returns, delta = 0.1, theta = 1){
+  
+  nObs <- nrow(returns) + 1 
+  kn <- floor(theta * nObs ^(1/2 + delta))
+  
+  
+  preAveragedReturns <- preAveragingReturnsInternal(returns, kn)
+  x <- (1:(kn-1)) / kn
+  x[x > (1-x)] <- (1-x)[x > (1-x)]
+  
+  psi1 <- kn * sum((gfunction((1:kn)/kn) - gfunction(((1:kn) - 1 )/kn))^2)
+  
+  psi2 <- mean(c(0,x,0)^2)
+  #print(psi2)
+  psi <- (t(returns) %*% returns) / (2 * nObs)
+  
+  # Just called factor in the Ox code
+  correctionFactor <- nObs/(nObs - kn + 2) * (1/( psi2 * kn))
+  return(correctionFactor * (t(preAveragedReturns) %*% preAveragedReturns))
+  
+}
+

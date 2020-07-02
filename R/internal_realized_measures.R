@@ -301,7 +301,7 @@ refreshTime <- function (pData, sort = FALSE, criterion = "squared duration") {
   }
   
   if (length(pData) < 1) {
-    stop("pData should contain at least two time series.")
+    stop("pData should contain at least two time series")
   }
   if( length(pData) == 1){
     return(pData[[1]])
@@ -315,7 +315,7 @@ refreshTime <- function (pData, sort = FALSE, criterion = "squared duration") {
     } else if( criterion == "duration"){
       criterion <- function(x) sum(as.numeric(diff(index(x))))
     } else {
-      stop("Criterion must be either 'squared duration' or 'duration'.")
+      stop("Criterion must be either 'squared duration' or 'duration'")
     }
     
     vec <- sort(sapply(pData, criterion), index.return = TRUE)$ix
