@@ -105,6 +105,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// preAveragingReturnsInternal
+arma::mat preAveragingReturnsInternal(arma::mat ret, const int kn);
+RcppExport SEXP _highfrequency_preAveragingReturnsInternal(SEXP retSEXP, SEXP knSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type ret(retSEXP);
+    Rcpp::traits::input_parameter< const int >::type kn(knSEXP);
+    rcpp_result_gen = Rcpp::wrap(preAveragingReturnsInternal(ret, kn));
+    return rcpp_result_gen;
+END_RCPP
+}
 // nsmaller
 int nsmaller(IntegerVector times, IntegerVector lengths, int start, int end, int max);
 RcppExport SEXP _highfrequency_nsmaller(SEXP timesSEXP, SEXP lengthsSEXP, SEXP startSEXP, SEXP endSEXP, SEXP maxSEXP) {
@@ -195,6 +207,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_highfrequency_heavy_likelihoodR_", (DL_FUNC) &_highfrequency_heavy_likelihoodR_, 14},
     {"_highfrequency_colCumsum", (DL_FUNC) &_highfrequency_colCumsum, 1},
     {"_highfrequency_refreshTimeMathing", (DL_FUNC) &_highfrequency_refreshTimeMathing, 2},
+    {"_highfrequency_preAveragingReturnsInternal", (DL_FUNC) &_highfrequency_preAveragingReturnsInternal, 2},
     {"_highfrequency_nsmaller", (DL_FUNC) &_highfrequency_nsmaller, 5},
     {"_highfrequency_KK", (DL_FUNC) &_highfrequency_KK, 2},
     {"_highfrequency_kernelEstimator", (DL_FUNC) &_highfrequency_kernelEstimator, 8},

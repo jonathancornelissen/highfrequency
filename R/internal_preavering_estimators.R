@@ -28,16 +28,15 @@ hatreturn <- function(pData, kn) {
   } else {
     x <- (1:(kn-1)) / kn
     x[x > (1-x)] <- (1-x)[x > (1-x)]
-    weightedsum <- function(series){
-      return(sum(x * series))
-    }
-    hatre <- rollapply(rData, width = kn - 1, FUN = weightedsum, align = "left")
+    hatre <- preAveragingReturnsInternal(coredata(rData), kn)
     if (sum(is.na(hatre)) > 0) {
       hatre[is.na(hatre)] <- rData[is.na(hatre)]
     }
   }
   return(hatre)
 }
+
+
 
 #' @keywords internal
 gfunction <- function(x) {

@@ -69,9 +69,39 @@ Rcpp::List refreshTimeMathing(const arma::mat& x, arma::vec& idx) {
   
   return Rcpp::List::create(Rcpp::Named("data") = tmp,
                             Rcpp::Named("indices") = idx);
-  //Rcpp::List lOut = Rcpp::List::create(1);
-  //Rcpp::List lOut = Rcpp::List::create(idx.elem(keep));
   
 }
 
 
+//' @keywords internal
+inline double weightedSumPreAveragingInternal(const arma::vec x, const arma::vec series){
+  
+  return(arma::dot(x,series));
+}
+
+
+// [[Rcpp::export]]
+arma::mat preAveragingReturnsInternal(arma::mat ret, const int kn){
+  
+  const int N = ret.n_rows + 1;
+  const int D = ret.n_cols;
+  arma::mat out(N-kn + 1, D);
+  
+  arma::vec weights = arma::linspace(1,kn-1, kn-1)/kn;
+  arma::vec foo = 1-weights;
+  
+  weights(find(weights > (1-weights))) = foo(find(weights > (1-weights)));
+
+
+
+  for(int i = 0; i < N - kn + 1; i++) {
+    // Do column wise multiplication of our weights on the returns.
+    out.row(i) = sum(ret(span(i,i+kn-2), span(0, D-1)).each_col() % weights , 0);
+
+  }
+
+  
+  return(out);
+  
+  
+}

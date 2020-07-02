@@ -18,12 +18,19 @@ heavy_likelihoodR_ <- function(h, O, A, B, TT, K, pMax, qMax, data, backCast, LB
 }
 
 #' @keywords internal
+NULL
+
+#' @keywords internal
 colCumsum <- function(x) {
     .Call(`_highfrequency_colCumsum`, x)
 }
 
 refreshTimeMathing <- function(x, idx) {
     .Call(`_highfrequency_refreshTimeMathing`, x, idx)
+}
+
+preAveragingReturnsInternal <- function(ret, kn) {
+    .Call(`_highfrequency_preAveragingReturnsInternal`, ret, kn)
 }
 
 nsmaller <- function(times, lengths, start, end, max) {
