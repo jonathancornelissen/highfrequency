@@ -1594,7 +1594,7 @@ rThresholdCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL
   multixts <- multixts(rData)
   if (multixts == TRUE) { 
     if (is.null(dim(rData))) {  
-      n < 1
+      n <- 1
     } else { 
       n <- dim(rData)[2] 
     }
