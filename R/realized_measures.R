@@ -2151,7 +2151,7 @@ rTSCov <- function (pData, cor = FALSE, K = 300, J = 1, K_cov = NULL, J_cov = NU
 
 #' Cholesky based realized covariance
 #' @export
-rCholCov <- function(pData, criterion = "squared duration", delta = 0.1, theta = 1){
+rCholCov <- function(pData, type = ".", criterion = "squared duration", delta = 0.1, theta = 1){
   
   if(!is.list(pData)){
     stop("pData must be a list of atleast length one")
@@ -2175,35 +2175,75 @@ rCholCov <- function(pData, criterion = "squared duration", delta = 0.1, theta =
   Ltemp <- L <- diag(1,D,D)
   
   G[1,1] <- rCov(exp(pData[[vec[1]]]), makeReturns = TRUE)
-  counter = 1
-  for (d in 1:D) {
-    
-    dat <- refreshTime(lapply(vec[1:d], function(x) pData[[x]]))
-    returns <- diff(dat)[-1,]
-    f <- matrix(0, nrow(returns), d)
-    f[,1] <- returns[,1]
-    if(d>1){ # We shouldn't do this on the first pass.
-      for (l in 2:d) {
-        
-        for (m in 1:(l-1)) {
+  
+  
+  # if(type == "star"){
+  #   
+  #   for(d in 2:D){
+  #     
+  #     for(j in 1:(d-1)){
+  #       
+  #       dat <- refreshTime(lapply(c(1:j,d), function(x) pData[[x]]))
+  #       returns <- diff(dat)[-1,]
+  #       f <- matrix(0, nrow(returns), d)
+  #       f[,1] <- returns[,1]
+  #       
+  #       for(l in 2:d){
+  #         
+  #         for(m in 1:(l-1)){
+  #           
+  #           COV <- cholCovMRC(as.matrix(coredata(cbind(returns[,l], f[,m]))), delta = delta, theta = theta)
+  #           Ltemp[l,m] <- COV[1,2]/COV[2,2]
+  #           
+  #         }
+  #         
+  #         f[,l] <- returns[,l] - f[, 1:l] %*% Ltemp[l, 1:l]
+  #         
+  #       }
+  #       
+  #       L[d ,] <- Ltemp[d,]
+  #       
+  #       G[d,d] <- cholCovMRC(as.matrix(coredata(f[,d])) , delta = delta, theta = theta)
+  #       
+  #     }
+  #     
+  #     
+  #   }
+  #   
+  #   
+  # } else {
+    for (d in 1:D) {
+      
+      dat <- refreshTime(lapply(vec[1:d], function(x) pData[[x]]))
+      returns <- diff(dat)[-1,]
+      f <- matrix(0, nrow(returns), d)
+      f[,1] <- returns[,1]
+      if(d>1){ # We shouldn't do this on the first pass.
+        for (l in 2:d) {
           
-          COV <- cholCovMRC(as.matrix(coredata(cbind(returns[,l], f[,m]))), delta = delta, theta = theta)
+          for (m in 1:(l-1)) {
+            
+            COV <- cholCovMRC(as.matrix(coredata(cbind(returns[,l], f[,m]))), delta = delta, theta = theta)
+            
+            Ltemp[l,m] <- COV[1,2]/COV[2,2]
+            
+          }
           
-          Ltemp[l,m] <- COV[1,2]/COV[2,2]
+          f[,l] <- returns[,l] - f[,1:l] %*% Ltemp[l,1:l]
           
         }
-        
-        f[,l] <- returns[,l] - f[,1:(l)] %*% Ltemp[l,1:(l)]
-        
       }
+      
+      L[d ,] <- Ltemp[d,]
+      
+      G[d,d] <- cholCovMRC(as.matrix(coredata(f[,d])) , delta = delta, theta = theta)
     }
     
-    L[d ,] <- Ltemp[d,]
-    
-    G[d,d] <- cholCovMRC(as.matrix(coredata(f[,d])) , delta = delta, theta = theta)
-  }
+  # }
   
-  CholCov <- L %*% G %*% L
+  CholCov <- L %*% G %*% t(L)
+  
+  colnames(L) <- rownames(L) <- colnames(G) <- rownames(G) <- colnames(CholCov) <- rownames(CholCov) <- nameVec
   
   out <- list("CholCov" = CholCov, "L" = L, "G" = G)
   return(out)
