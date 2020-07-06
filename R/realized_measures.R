@@ -355,11 +355,11 @@ MRC <- function(pData, pairwise = FALSE, makePsd = FALSE) {
       psi1kn <- kn * sum((gfunction((1:kn)/kn) - gfunction(((1:kn) - 1) / kn))^2 )
       psi2kn <- 1 / kn * sum(gfunction((1:kn) / kn)^2)
       
-      preavreturn <- c()
-      for (i in 1:ncol(x)) {
-        preavreturn <- cbind(preavreturn, as.numeric(hatreturn(x[,i],kn)))
-      }
-      
+      # preavreturn <- c()
+      # for (i in 1:ncol(x)) {
+      #   preavreturn <- cbind(preavreturn, as.numeric(hatreturn(x[,i],kn)))
+      # }
+      preavreturn <- as.matrix(hatreturn(x, kn), ncol = ncol(x))
       S <- rCov(preavreturn)
       
       mrc <- N / (N - kn + 2) * 1/(psi2 * kn) * S
