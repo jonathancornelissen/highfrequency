@@ -251,6 +251,32 @@ aggregatePrice <- function(pData, on = "minutes", k = 1, marketOpen = "09:30:00"
       stop("Data.table neeeds PRICE column (date-time).")
     }
   }
+  # browser()
+  # system.time({
+  #   x <- paste(as.Date(pData$DT, tz = tz(pData$DT)), marketOpen)
+  # })
+  # 
+  # 
+  # 
+  # 
+  # 
+  # 
+  #  
+  # # Hours, minutes, seconds
+  # system.time({
+  #   marketOpenNumeric <- as.numeric(strptime(paste("1970-01-01", marketOpen), format = "%Y-%m-%d %H:%M:%OS", tz = tz(pData$DT)))
+  #   marketCloseNumeric <- as.numeric(strptime(paste("1970-01-01", marketClose), format = "%Y-%m-%d %H:%M:%OS", tz = tz(pData$DT)))
+  #   x <- as.numeric(as.Date(pData$DT, tz = tz(pData$DT))) + marketOpenNumeric
+  # })
+  # 
+  
+  
+  #Get time after as numeric so we avoid paste, which is slow
+  # marketOpenNumeric <- as.numeric(strptime(paste("1970-01-01", marketOpen), format = "%Y-%m-%d %H:%M:%OS", tz = tz(pData$DT)))
+  # marketCloseNumeric <- as.numeric(strptime(paste("1970-01-01", marketClose), format = "%Y-%m-%d %H:%M:%OS", tz = tz(pData$DT)))
+  # 
+  # pData <- pData[as.numeric(DT) >= as.numeric(as.Date(pData$DT, tz = tz(pData$DT))) * 86400 + marketOpenNumeric]
+  # pData <- pData[as.numeric(DT) <= as.numeric(as.Date(pData$DT, tz = tz(pData$DT))) * 86400 + marketCloseNumeric]
   
   pData <- pData[DT >= ymd_hms(paste(as.Date(pData$DT, tz = tz(pData$DT)), marketOpen), tz = tz(pData$DT))]
   pData <- pData[DT <= ymd_hms(paste(as.Date(pData$DT, tz = tz(pData$DT)), marketClose), tz = tz(pData$DT))]

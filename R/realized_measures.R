@@ -2206,8 +2206,6 @@ rCholCov <- function(pData, IVest = "MRC", COVest = "MRC", criterion = "squared 
   
   #G[1,1] <- rCov(exp(pData[[vec[1]]]), makeReturns = TRUE)
   
-  
-
     for (d in 1:D) {
       
       dat <- refreshTime(lapply(vec[1:d], function(x) pData[[x]]))
@@ -2245,6 +2243,4 @@ rCholCov <- function(pData, IVest = "MRC", COVest = "MRC", criterion = "squared 
   return(out)
   
 }
-
-
 
