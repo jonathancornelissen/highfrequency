@@ -2,16 +2,36 @@
 % Please edit documentation in R/realized_measures.R
 \name{rCholCov}
 \alias{rCholCov}
-\title{Cholesky based realized covariance}
+\title{rCholCov positive semi-definite covariance estimation using the CholCov algorithm}
 \usage{
 rCholCov(
   pData,
-  type = ".",
+  IVest = "MRC",
+  COVest = "MRC",
   criterion = "squared duration",
-  delta = 0.1,
-  theta = 1
+  ...
 )
 }
+\arguments{
+\item{pData}{a list. Each list-item i contains an xts object with the intraday price data 
+of stock i for day t. The order of the data does not matter as it will be sorted according to the criterion specified in the \code{criterion} argument}
+
+\item{IVest}{integrated variance estimator}
+
+\item{COVest}{covariance estimator}
+
+\item{criterion}{criterion to use for sorting the data according to liquidity. Possible values are ["squared duration"|"duration"|"count"], defaults to \code{"squared duration"}.}
+
+\item{...}{additional arguments to pass to IVest and COVest. See details.}
+}
+\value{
+a list containing the covariance matrix "CholCov", and the Cholesky Decomposition of "L" "G"
+such that L * G * L' = CholCov
+}
 \description{
-Cholesky based realized covariance
+Function that estimates the integrated covariance matrix using the CholCov algorithm
+}
+\details{
+delta = 0.1
+theta = 1
 }

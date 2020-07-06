@@ -260,3 +260,41 @@ test_that("refreshTime", {
 })
 
 
+context("rCholCov")
+test_that("rCholCov", {
+  
+  set.seed(123)
+  iT <- 23400 * 2
+  
+  rets <- mvtnorm::rmvnorm(iT * 3 + 1, mean = rep(0,4), 
+                           sigma = matrix(c(1, -0.5 , 0.7, 0.8,
+                                            -0.5, 3, -0.4, 0.7,
+                                            0.7, -0.4, 2, 0.6,  
+                                            0.8, 0.7, 0.6, 4), ncol = 4))
+  
+  w1 <- rets[,1]
+  w2 <- rets[sort(sample(1:nrow(rets), size = nrow(rets) * 0.75)), 2]
+  w3 <- rets[sort(sample(1:nrow(rets), size = nrow(rets) * 0.65)), 3]
+  w4 <- rets[sort(sample(1:nrow(rets), size = nrow(rets) * 0.8)), 4] # Here we make stock 4 the second most liquid asset, which will function to test the ordering
+  
+  timestamps1 <- seq(34200, 57600, length.out =  length(w1))
+  timestamps2 <- seq(34200, 57600, length.out =  length(w2))
+  timestamps3 <- seq(34200, 57600, length.out =  length(w3))
+  timestamps4 <- seq(34200, 57600, length.out =  length(w4))
+  
+  
+  p1  <- xts(cumsum(w1) * c(0,sqrt(diff(timestamps1) / (max(timestamps1) - min(timestamps1)))), as.POSIXct(timestamps1, origin = "1970-01-01"))
+  p2  <- xts(cumsum(w2) * c(0,sqrt(diff(timestamps2) / (max(timestamps2) - min(timestamps2)))), as.POSIXct(timestamps2, origin = "1970-01-01"))
+  p3  <- xts(cumsum(w3) * c(0,sqrt(diff(timestamps3) / (max(timestamps3) - min(timestamps3)))), as.POSIXct(timestamps3, origin = "1970-01-01"))
+  p4  <- xts(cumsum(w4) * c(0,sqrt(diff(timestamps4) / (max(timestamps4) - min(timestamps4)))), as.POSIXct(timestamps4, origin = "1970-01-01"))
+  
+  rCC <- rCholCov(list("market" = p1, "stock1" = p2, "stock2" =p3 , "stock3" = p4))
+  
+  expect_equal(colnames(rCC$CholCov) , c("market", "stock3", "stock1", "stock2"))
+  expect_equal(round(as.numeric(rCC$CholCov), 6) , round(c(0.8570523 ,  0.8326273, -0.2399617,   0.4726952,0.8326273 ,  4.6763568, 
+                                                           0.8359081  , 0.6736803,-0.2399617 ,  0.8359081,  2.9427983 , -0.4344481,0.4726952 ,  0.6736803, -0.4344481,   1.9089227) , 6))
+  expect_equal(colnames(rCC$L), colnames(rCC$G))
+  
+  
+})
+

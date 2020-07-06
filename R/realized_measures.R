@@ -2149,9 +2149,24 @@ rTSCov <- function (pData, cor = FALSE, K = 300, J = 1, K_cov = NULL, J_cov = NU
 
 
 
-#' Cholesky based realized covariance
+#' rCholCov positive semi-definite covariance estimation using the CholCov algorithm
+#' @description Function that estimates the integrated covariance matrix using the CholCov algorithm
+#' @param pData a list. Each list-item i contains an xts object with the intraday price data 
+#' of stock i for day t. The order of the data does not matter as it will be sorted according to the criterion specified in the \code{criterion} argument
+#' @param IVest integrated variance estimator
+#' @param COVest covariance estimator
+#' @param criterion criterion to use for sorting the data according to liquidity. Possible values are ["squared duration"|"duration"|"count"], defaults to \code{"squared duration"}.
+#' @param ... additional arguments to pass to IVest and COVest. See details.
+#' 
+#' @return a list containing the covariance matrix "CholCov", and the Cholesky Decomposition of "L" "G"
+#' such that L * G * L' = CholCov
+#' 
+#' @details 
+#' 
+#' delta = 0.1
+#' theta = 1
 #' @export
-rCholCov <- function(pData, criterion = "squared duration", delta = 0.1, theta = 1){
+rCholCov <- function(pData, IVest = "MRC", COVest = "MRC", criterion = "squared duration", ...){
   
   if(!is.list(pData)){
     stop("pData must be a list of atleast length one")
@@ -2163,9 +2178,24 @@ rCholCov <- function(pData, criterion = "squared duration", delta = 0.1, theta =
     criterion <- function(x) sum(as.numeric(diff(index(x)))^2)
   } else if( criterion == "duration"){
     criterion <- function(x) sum(as.numeric(diff(index(x))))
+  } else if( criterion == "count"){
+    criterion <- function(x) length(x)
   } else {
-    stop("Criterion must be either 'squared duration' or 'duration'")
+    stop("Criterion must be either 'squared duration' or 'duration' or 'count'")
   }
+  
+  options <- list(...)
+  op <- list("delta" = 0.1, "theta" = 1)
+  op[names(options)] <- options
+  delta <- op[["delta"]]
+  theta <- op[["theta"]]
+  if(length(delta) != 1 | !is.numeric(delta)){
+    stop("delta must be a numeric of length one")
+  }
+  if(length(theta) != 1 | !is.numeric(theta)){
+    stop("theta must be a numeric of length one")
+  }
+  
   vec <- sort(sapply(pData, criterion), index.return = TRUE)$ix
   nameVec <- names(pData)[vec]
   
@@ -2174,7 +2204,7 @@ rCholCov <- function(pData, criterion = "squared duration", delta = 0.1, theta =
   G <- matrix(0, D, D)
   Ltemp <- L <- diag(1,D,D)
   
-  G[1,1] <- rCov(exp(pData[[vec[1]]]), makeReturns = TRUE)
+  #G[1,1] <- rCov(exp(pData[[vec[1]]]), makeReturns = TRUE)
   
   
 
@@ -2217,26 +2247,4 @@ rCholCov <- function(pData, criterion = "squared duration", delta = 0.1, theta =
 }
 
 
-#' @keywords internal
-cholCovMRC <- function(returns, delta = 0.1, theta = 1){
-  
-  nObs <- nrow(returns) + 1 
-  kn <- floor(theta * nObs ^(1/2 + delta))
-  
-  
-  preAveragedReturns <- preAveragingReturnsInternal(returns, kn)
-  x <- (1:(kn-1)) / kn
-  x[x > (1-x)] <- (1-x)[x > (1-x)]
-  
-  psi1 <- kn * sum((gfunction((1:kn)/kn) - gfunction(((1:kn) - 1 )/kn))^2)
-  
-  psi2 <- mean(c(0,x,0)^2)
-  #print(psi2)
-  psi <- (t(returns) %*% returns) / (2 * nObs)
-  
-  # Just called factor in the Ox code
-  correctionFactor <- nObs/(nObs - kn + 2) * (1/( psi2 * kn))
-  return(correctionFactor * (t(preAveragedReturns) %*% preAveragedReturns))
-  
-}
 
