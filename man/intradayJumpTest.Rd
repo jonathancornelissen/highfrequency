@@ -50,9 +50,11 @@ The null hypothesis of the tests in this function is that
 \examples{
 \dontrun{
 # We can easily make a Lee-Mykland jump test.
-LMtest <- intradayJumpTest(pData = sampleTDataMicroseconds[, .(DT, PRICE)], volEstimator = "RM", driftEstimator = "none",
+LMtest <- intradayJumpTest(pData = sampleTDataMicroseconds[, .(DT, PRICE)], 
+                           volEstimator = "RM", driftEstimator = "none",
                            RM = "bipower", lookBackPeriod = 10,
-                           on = "minutes", k = 5, marketOpen = "09:30:00", marketClose = "16:00:00")
+                           on = "minutes", k = 5, marketOpen = "09:30:00", 
+                           marketClose = "16:00:00")
 plot(LMtest)
 }
 

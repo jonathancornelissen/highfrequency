@@ -990,7 +990,7 @@ rHYCov <- function(rData, cor = FALSE, period = 1, alignBy = "seconds", alignPer
     cov <- matrix(rep(0, n * n), ncol = n)
     diagonal <- c()
     for (i in 1:n) {
-      diagonal[i] <- rCov(aggrdata[, i])#t(rData[, i]) %*% rData[, i]
+      diagonal[i] <- rCov(aggrdata[, i])
     }
     diag(cov) <- diagonal
     alignPeriod <- getAlignPeriod(alignPeriod, alignBy)
@@ -1025,8 +1025,7 @@ rHYCov <- function(rData, cor = FALSE, period = 1, alignBy = "seconds", alignPer
         cov <- makePsd(cov)
       }
       return(cov)
-    }
-    if(cor==TRUE){
+    } else {
       sdmatrix <- sqrt(diag(diag(cov)))
       rcor <- solve(sdmatrix) %*% cov %*% solve(sdmatrix)
       if (makePsd == TRUE) {

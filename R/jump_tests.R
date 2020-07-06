@@ -367,7 +367,7 @@ BNSjumpTest <- function (rData, IVestimator = "BV", IQestimator = "TP", type = "
 #' @importFrom stats pnorm
 #' @importFrom zoo as.zoo
 #' @export
-JOjumpTest <- function(pData, power = 4, alignBy = NULL, alignPeriod = NULL, alpha, ...) {
+JOjumpTest <- function(pData, power = 4, alignBy = NULL, alignPeriod = NULL, alpha = 0.975, ...) {
   
   if (checkMultiDays(pData)) {
     
@@ -451,9 +451,11 @@ JOjumpTest <- function(pData, power = 4, alignBy = NULL, alignPeriod = NULL, alp
 #' @examples 
 #' \dontrun{
 #' # We can easily make a Lee-Mykland jump test.
-#' LMtest <- intradayJumpTest(pData = sampleTDataMicroseconds[, .(DT, PRICE)], volEstimator = "RM", driftEstimator = "none",
+#' LMtest <- intradayJumpTest(pData = sampleTDataMicroseconds[, .(DT, PRICE)], 
+#'                            volEstimator = "RM", driftEstimator = "none",
 #'                            RM = "bipower", lookBackPeriod = 10,
-#'                            on = "minutes", k = 5, marketOpen = "09:30:00", marketClose = "16:00:00")
+#'                            on = "minutes", k = 5, marketOpen = "09:30:00", 
+#'                            marketClose = "16:00:00")
 #' plot(LMtest)
 #' }
 #' 
@@ -782,6 +784,8 @@ plot.intradayJumpTest <- function(x, ...){
 #' 
 #' @details 
 #' 
+#' @importFrom graphics lines
+#' @importFrom stats na.omit quantile runif
 #' @export
 #' @importFrom zoo coredata
 rankJumpTest <- function(marketPrice, stockPrices, alpha = c(5,3), coarseFreq = 10, localWindow = 30, rank = 1, BoxCox = 1, nBoot = 1000, dontTestAtBoundaries = TRUE, on = "minutes", k = 5,

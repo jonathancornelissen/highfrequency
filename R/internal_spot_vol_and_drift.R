@@ -1008,6 +1008,7 @@ realizedMeasureSpotVol <- function(mR, rData, options = list()){
 #' @importFrom xts as.xts
 preAveragedRealizedMeasureSpotVol <- function(data, options = list()){
   
+  DT <- NULL;
   
   ## Considerations for the multiday case:::::##########!#!#!#!#!#!#
   D <- ndays(data)
