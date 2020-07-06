@@ -8,7 +8,7 @@ Changes in version 0.7.0
  - Implement a wrapper around quantmod's getSymbols.av function
 
 Changes in version 0.6.5
- - bug fix for kernelCov if cor = TRUE and aggregatets
+ - bug fix for kernelCov if cor = TRUE
  - compatibility with lubridate 1.7.8
 
 Changes in version 0.6.4
