@@ -368,12 +368,9 @@ lines(as.numeric(t(vol5$spot))[1:2880], col = "blue")
 legend("topright", c("h = simple estimate", "h = quarticity corrected",
                      "h = crossvalidated"), col = c("black", "red", "blue"), lty=1)}
 
-# Piecewise constant volatility, using an example from Fried (2012)
+# Piecewise constant volatility
 \donttest{
-simdata <- matrix(sqrt(5/3)*rt(3000, df = 5), ncol = 500, byrow = TRUE)
-simdata <- c(1, 1, 1.5, 1.5, 2, 1)*simdata
-# the volatility of the simulated now changes at 1000, 2000 and 2500
-vol6 <- spotVol(simdata, method = "piecewise", m = 200, n  = 100,
+vol6 <- spotVol(sampleReal5MinPrices, method = "piecewise", m = 200, n  = 100,
                 online = FALSE)
 plot(vol6)}
 

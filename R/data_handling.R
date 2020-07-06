@@ -255,7 +255,7 @@ aggregatePrice <- function(pData, on = "minutes", k = 1, marketOpen = "09:30:00"
   pData <- pData[DT >= ymd_hms(paste(as.Date(pData$DT, tz = tz(pData$DT)), marketOpen), tz = tz(pData$DT))]
   pData <- pData[DT <= ymd_hms(paste(as.Date(pData$DT, tz = tz(pData$DT)), marketClose), tz = tz(pData$DT))]
 
-  pData[, DATE := as.Date(DT, tz = tz(pData))]
+  pData[, DATE := as.Date(DT, tz = tz(pData$DT))]
   pData[, FIRST_DT := min(DT), by = "DATE"]
   pData[, DT_ROUND := ifelse(DT == FIRST_DT,
                              floor_date(ymd_hms(DT), unit = paste(k, on)),
