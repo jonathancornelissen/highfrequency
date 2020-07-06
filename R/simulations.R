@@ -410,7 +410,7 @@ FoFVolatilitySim <- function(model, nDays, nSeries, nObs){
 #' @importFrom data.table between
 #' @keywords internal
 singularityVolBurst <- function(nObs, vol, volBurstTimeInterval, beta){
-  volBurstTimeInterval <- c(0.475, 0.525)
+  volBurstTimeInterval <- c(0.475, 0.525) ##### TODO: THIS MUST be removed
   pivot <- mean(volBurstTimeInterval)
   timestamps <- 1:nObs/nObs
   burstVol <- vol * 1/abs(timestamps - pivot)^beta
@@ -425,7 +425,7 @@ singularityVolBurst <- function(nObs, vol, volBurstTimeInterval, beta){
 #' @keywords internal
 singularityDriftBurst <- function(nObs, drift, driftBurstTimeInterval, alpha, a){
   
-  driftBurstTimeInterval <- c(0.475, 0.525)
+  driftBurstTimeInterval <- c(0.475, 0.525)##### TODO: THIS MUST be removed
   pivot <- mean(driftBurstTimeInterval) # we use this pivot so we can move our drift burst around on the day
   timestamps <- 1:nObs/nObs
   alpha <- 0.65
