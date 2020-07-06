@@ -5,18 +5,18 @@
 \title{Function returns the value, the standard error and the confidence band of the integrated variance (IV) estimator.}
 \usage{
 ivInference(
-  rdata,
+  rData,
   IVestimator = "RV",
   IQestimator = "rQuar",
   confidence = 0.95,
-  align.by = NULL,
-  align.period = NULL,
+  alignBy = NULL,
+  alignPeriod = NULL,
   makeReturns = FALSE,
   ...
 )
 }
 \arguments{
-\item{rdata}{zoo/xts object containing all returns in period t for one asset.}
+\item{rData}{zoo/xts object containing all returns in period t for one asset.}
 
 \item{IVestimator}{can be chosen among integrated variance estimators: RV, BV, TV, minRV or medRV. RV by default.}
 
@@ -24,11 +24,11 @@ ivInference(
 
 \item{confidence}{confidence level set by users. 0.95 by default.}
 
-\item{align.by}{a string, align the tick data to "seconds"|"minutes"|"hours"}
+\item{alignBy}{a string, align the tick data to "seconds"|"minutes"|"hours"}
 
-\item{align.period}{an integer, align the tick data to this many [seconds|minutes|hours].}
+\item{alignPeriod}{an integer, align the tick data to this many [seconds|minutes|hours].}
 
-\item{makeReturns}{boolean, should be TRUE when rdata contains prices instead of returns. FALSE by  default.}
+\item{makeReturns}{boolean, should be TRUE when rData contains prices instead of returns. FALSE by  default.}
 
 \item{...}{additional arguments.}
 }
@@ -70,7 +70,7 @@ The theoretical framework is the logarithmic price process \eqn{X_t} belongs to 
 where \eqn{a} is the drift term, \eqn{\sigma} denotes the spot volatility process, \eqn{W} is a standard Brownian motion (assume that there are no jumps).
 }
 \examples{
-ivInference(sample_tdata$PRICE, IVestimator= "minRV", IQestimator = "medRQ",
+ivInference(sampleTData$PRICE, IVestimator= "minRV", IQestimator = "medRQ",
             confidence = 0.95, makeReturns = TRUE)
 }
 \references{

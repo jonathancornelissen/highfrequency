@@ -4,17 +4,17 @@
 \alias{exchangeHoursOnly}
 \title{Extract data from an xts object for the Exchange Hours Only}
 \usage{
-exchangeHoursOnly(data, daybegin = "09:30:00", dayend = "16:00:00")
+exchangeHoursOnly(data, dayBegin = "09:30:00", dayEnd = "16:00:00")
 }
 \arguments{
 \item{data}{a data.table or xts object containing the time series data. 
 Multiple days of input are allowed.}
 
-\item{daybegin}{character in the format of \"HH:MM:SS\",
+\item{dayBegin}{character in the format of \"HH:MM:SS\",
 specifying the starting hour, minute and second of an exhange
 trading day.}
 
-\item{dayend}{character in the format of \"HH:MM:SS\^",
+\item{dayEnd}{character in the format of \"HH:MM:SS\^",
 specifying the closing hour, minute and second of an exchange
 trading day.}
 }
@@ -23,11 +23,11 @@ xts or data.table object depending on input
 }
 \description{
 The function returns data within exchange trading hours
-"daybegin" and "dayend". By default, daybegin and dayend
+"dayBegin" and "dayEnd". By default, dayBegin and dayEnd
 are set to "09:30:00" and "16:00:00" respectively (see Brownlees and Gallo (2006) for more information on good choices for these arguments).
 }
 \examples{
-exchangeHoursOnly(sample_tdataraw_microseconds)
+exchangeHoursOnly(sampleTDataRawMicroseconds)
 }
 \references{
 Brownlees, C.T. and Gallo, G.M. (2006). Financial econometric analysis at ultra-high frequency: Data handling concerns. Computational Statistics & Data Analysis, 51, pages 2232-2245.

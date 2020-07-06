@@ -5,23 +5,23 @@
 \title{Realized beta: a tool in measuring risk with respect to the market.}
 \usage{
 rBeta(
-  rdata,
-  rindex,
+  rData,
+  rIndex,
   RCOVestimator = "rCov",
   RVestimator = "RV",
   makeReturns = FALSE
 )
 }
 \arguments{
-\item{rdata}{a zoo/xts object containing all returns in period t for one asset.}
+\item{rData}{a zoo/xts object containing all returns in period t for one asset.}
 
-\item{rindex}{a zoo/xts object containing return in period t for an index.}
+\item{rIndex}{a zoo/xts object containing return in period t for an index.}
 
 \item{RCOVestimator}{can be chosen among realized covariance estimators: rCov, rAVGCov, rBPCov, rHYCov, rKernelCov, rOWCov, rRTSCov, rThresholdCov and rTSCov. rCov by default.}
 
-\item{RVestimator}{can be chosen among realized variance estimators: RV, minRV and medRV. RV by default. In case of missing RVestimator, RCOVestimator function applying for rindex will be used.}
+\item{RVestimator}{can be chosen among realized variance estimators: RV, minRV and medRV. RV by default. In case of missing RVestimator, RCOVestimator function applying for rIndex will be used.}
 
-\item{makeReturns}{boolean, should be TRUE when rdata contains prices instead of returns. FALSE by  default.}
+\item{makeReturns}{boolean, should be TRUE when rData contains prices instead of returns. FALSE by  default.}
 }
 \value{
 numeric
@@ -53,8 +53,8 @@ By default, the RCov is used and the realized beta coefficient is computed as:
 Note: It is worth to note that the function does not support to calculate for data of multiple days.
 }
 \examples{
-a <- sample_5minprices_jumps['2010-01-04', 1]
-b <- sample_5minprices_jumps['2010-01-04', 2]
+a <- sample5MinPricesJumps['2010-01-04', 1]
+b <- sample5MinPricesJumps['2010-01-04', 2]
 rBeta(a, b, RCOVestimator = "rBPCov", RVestimator = "minRV", makeReturns = TRUE)
 
 }

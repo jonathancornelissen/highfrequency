@@ -4,10 +4,10 @@
 \alias{mergeQuotesSameTimestamp}
 \title{Merge multiple quote entries with the same time stamp}
 \usage{
-mergeQuotesSameTimestamp(qdata, selection = "median")
+mergeQuotesSameTimestamp(qData, selection = "median")
 }
 \arguments{
-\item{qdata}{an xts object or data.table containing the time series data, with 
+\item{qData}{an xts object or data.table containing the time series data, with 
 at least two columns named "BID" and "OFR" indicating the bid and ask price 
 and two columns "BIDSIZ", "OFRSIZ" indicating the number of round lots available at these 
 prices. For data.table an additional column "DT" is necessary that stores the date/time information.}

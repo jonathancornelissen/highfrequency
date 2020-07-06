@@ -1,69 +1,94 @@
+context("autoSelectExchangeTrades")
+test_that("autoSelectExchangeTrades", {
+  expect_equal(
+    unique(autoSelectExchangeTrades(sampleTDataRaw)$EX),
+    "N"
+  )
+  
+  expect_equal(
+    unique(autoSelectExchangeQuotes(sampleQDataRaw)$EX),
+    "N"
+  )
 
-expect_equal(
-  unique(autoSelectExchangeTrades(sample_tdataraw)$EX),
-  "N"
-)
+})
 
-expect_equal(
-  unique(autoSelectExchangeQuotes(sample_qdataraw)$EX),
-  "N"
-)
 
-expect_equal(
-  quotesCleanup(qdataraw = sample_qdataraw, exchanges = "N")$report["remove_outliers"],
-  c(remove_outliers = 7706)
-)
+context("quotesCleanup")
+test_that("quotesCleanup", {
+  expect_equal(
+    quotesCleanup(qDataRaw = sampleQDataRaw, exchanges = "N")$report["remove_outliers"],
+    c(remove_outliers = 7706)
+  )
+})
 
-expect_equal(
-  formatC(sum(head(aggregatePrice(sample_tdata$PRICE, on = "secs", k = 30))), digits = 10),
-  "   1157.465"
-)
 
-expect_equal(
-  unique(selectExchange(sample_qdataraw, c("N", "W"))$EX),
-  c("N", "W")
-)
+context("aggregatePrice")
+test_that("aggregatePrice", {
+  expect_equal(
+    formatC(sum(head(aggregatePrice(sampleTData$PRICE, on = "secs", k = 30))), digits = 10),
+    "   1157.465"
+  )
+})
 
-expect_equal(
-  dim(rmOutliersQuotes(selectExchange(sample_qdataraw, "W"))),
-  dim(rmOutliersQuotes(selectExchange(sample_qdataraw, "W"), type = "standard"))
-)
-
-expect_equal(
-  dim(rmTradeOutliersUsingQuotes(selectExchange(sample_tdataraw, "W"), selectExchange(sample_qdataraw, "W"))),
-  c(203, 8)
-)
-
-expect_equal(
-  dim(rmLargeSpread(selectExchange(sample_qdataraw, "N"))),
-  c(9794, 7)
-)
-
-expect_equal(
-  dim(mergeQuotesSameTimestamp(selectExchange(sample_qdataraw, "N"), selection = "max.volume")),
-  c(7707, 5)
-)
-
-expect_equal(
-  dim(mergeQuotesSameTimestamp(selectExchange(sample_qdataraw, "N"), selection = "weighted.average")),
-  c(7707, 5)
-)
-
-expect_equal(
-  dim(noZeroQuotes(selectExchange(sample_qdataraw, "N"))),
-  c(9792, 7)
-)
-
-expect_equal(
-  dim(tradesCleanupUsingQuotes(tdata = sample_tdata, qdata = sample_qdata)),
+context("selectExchange and data cleaning functions")
+test_that("selectExchange and data cleaning functions", {
+  expect_equal(
+    unique(selectExchange(sampleQDataRaw, c("N", "W"))$EX),
+    c("N", "W")
+  )
+  
+  expect_equal(
+    dim(rmOutliersQuotes(selectExchange(sampleQDataRaw, "W"))),
+    dim(rmOutliersQuotes(selectExchange(sampleQDataRaw, "W"), type = "standard"))
+  )
+  
+  expect_equal(
+    dim(rmTradeOutliersUsingQuotes(selectExchange(sampleTDataRaw, "W"), selectExchange(sampleQDataRaw, "W"))),
+    c(203, 8)
+  )
+  
+  expect_equal(
+    dim(rmLargeSpread(selectExchange(sampleQDataRaw, "N"))),
+    c(9794, 7)
+  )
+  
+  expect_equal(
+    dim(mergeQuotesSameTimestamp(selectExchange(sampleQDataRaw, "N"), selection = "max.volume")),
+    c(7707, 5)
+  )
+  
+  expect_equal(
+    dim(mergeQuotesSameTimestamp(selectExchange(sampleQDataRaw, "N"), selection = "weighted.average")),
+    c(7707, 5)
+  )
+  
+  expect_equal(
+    dim(noZeroQuotes(selectExchange(sampleQDataRaw, "N"))),
+    c(9792, 7)
+  )
+  
+  
+  expect_equal(
+  dim(tradesCleanupUsingQuotes(tData = sampleTData, qData = sampleQData)),
   c(8153, 8)
-)
-
-expect_equal(
-  dim(tradesCleanup(tdataraw = sample_tdataraw, exchanges = "N", report = FALSE)),
+  )
+  
+  expect_equal(
+  dim(tradesCleanup(tDataRaw = sampleTDataRaw, exchanges = "N", report = FALSE)),
   c(9104, 3)
-)
+  )
+})
 
+context("aggregateTS edge cases")
+test_that("aggregateTS edge cases", {
+  # Test edge cases of aggregateTS
+  expect_equal(index(aggregateTS(xts(1:23400, as.POSIXct(seq(34200, 57600, length.out = 23400), origin = '1970-01-01')))),
+                     index(aggregateTS(xts(1:23400, as.POSIXct(seq(34200, 57599, length.out = 23400), origin = '1970-01-01'))))
+  )
+  
+  expect_true(
+    max(index(aggregateTS(xts(1:23400, as.POSIXct(seq(34200, 57600, length.out = 23400), origin = '1970-01-01')))))<
+    max(index(aggregateTS(xts(1:23400, as.POSIXct(seq(34200, 57601, length.out = 23400), origin = '1970-01-01')))))
+  )
 
-
-
+})

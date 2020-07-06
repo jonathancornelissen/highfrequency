@@ -4,16 +4,16 @@
 \alias{rSV}
 \title{Realized semivariance of highfrequency return series.}
 \usage{
-rSV(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE)
+rSV(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE)
 }
 \arguments{
-\item{rdata}{a zoo/xts object containing all returns in period t for one asset.}
+\item{rData}{a zoo/xts object containing all returns in period t for one asset.}
 
-\item{align.by}{a string, align the tick data to "seconds"|"minutes"|"hours".}
+\item{alignBy}{a string, align the tick data to "seconds"|"minutes"|"hours".}
 
-\item{align.period}{an integer, align the tick data to this many [seconds|minutes|hours].}
+\item{alignPeriod}{an integer, align the tick data to this many [seconds|minutes|hours].}
 
-\item{makeReturns}{boolean, should be TRUE when rdata contains prices instead of returns. FALSE by   default.}
+\item{makeReturns}{boolean, should be TRUE when rData contains prices instead of returns. FALSE by   default.}
 }
 \value{
 list with to arguments. The realized positive and negative semivariance.
@@ -35,8 +35,8 @@ Then, the rSV is given by
 }
 \examples{
 \dontrun{
-data(sample_tdata)
-rSV(sample_tdata$PRICE, align.by = "minutes", align.period = 5, makeReturns = TRUE)
+data(sampleTData)
+rSV(sampleTData$PRICE, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)
 }
 }
 \references{

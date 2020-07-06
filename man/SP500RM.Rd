@@ -4,7 +4,9 @@
 \name{SP500RM}
 \alias{SP500RM}
 \title{SP500 Realized Measures calculated with 5 minute sampling}
-\format{A large \code{xts} object.}
+\format{
+A large \code{xts} object.
+}
 \source{
 \url{http://public.econ.duke.edu/~ap172/code.html}
 }

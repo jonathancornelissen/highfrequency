@@ -5,50 +5,50 @@
 \title{Perform a final cleaning procedure on trade data}
 \usage{
 tradesCleanupUsingQuotes(
-  datasource = NULL,
-  datadestination = NULL,
-  tdata = NULL,
-  qdata = NULL
+  dataSource = NULL,
+  dataDestination = NULL,
+  tData = NULL,
+  qData = NULL
 )
 }
 \arguments{
-\item{datasource}{character indicating the folder in which the original data is stored.}
+\item{dataSource}{character indicating the folder in which the original data is stored.}
 
-\item{datadestination}{character indicating the folder in which the cleaned data is stored, folder of datasource by default.}
+\item{dataDestination}{character indicating the folder in which the cleaned data is stored, folder of dataSource by default.}
 
-\item{tdata}{data.table or xts object containing (ONE day and for ONE stock only) trade data cleaned by \code{\link{tradesCleanup}}. This argument is NULL by default. Enabling it, means the arguments
-from, to, datasource and datadestination will be ignored. (only advisable for small chunks of data)}
+\item{tData}{data.table or xts object containing (ONE day and for ONE stock only) trade data cleaned by \code{\link{tradesCleanup}}. This argument is NULL by default. Enabling it, means the arguments
+from, to, dataSource and dataDestination will be ignored. (only advisable for small chunks of data)}
 
-\item{qdata}{data.table or xts object containing (ONE day and for ONE stock only) cleaned quote data. This argument is NULL by default. Enabling it means the arguments
-from, to, datasource, datadestination will be ignored. (only advisable for small chunks of data)}
+\item{qData}{data.table or xts object containing (ONE day and for ONE stock only) cleaned quote data. This argument is NULL by default. Enabling it means the arguments
+from, to, dataSource, dataDestination will be ignored. (only advisable for small chunks of data)}
 }
 \value{
 For each day an xts object is saved into the folder of that date, containing the cleaned data.
 
-In case you supply the arguments "tdata" and "qdata", the on-disk functionality is ignored
+In case you supply the arguments "tData" and "qData", the on-disk functionality is ignored
 and the function returns cleaned trades as a data.table or xts object (see examples).
 }
 \description{
 Function performs cleaning procedure \code{\link{rmTradeOutliersUsingQuotes}} 
-for the trades of all stocks data in "datadestination". 
+for the trades of all stocks data in "dataDestination". 
 Note that preferably the input data for this function 
 is trade and quote data cleaned by respectively e.g. \code{\link{tradesCleanup}}
 and \code{\link{quotesCleanup}}.
 }
 \examples{
 # Consider you have raw trade data for 1 stock for 2 days 
-tdata_afterfirstcleaning <- tradesCleanup(tdataraw = sample_tdataraw_microseconds, 
+tData_afterfirstcleaning <- tradesCleanup(tDataRaw = sampleTDataRawMicroseconds, 
                                           exchanges = "N", report = FALSE)
 # 
-qdata <- quotesCleanup(qdataraw = sample_qdataraw_microseconds, 
+qData <- quotesCleanup(qDataRaw = sampleQDataRawMicroseconds, 
                        exchanges = "N", report = FALSE)
-dim(tdata_afterfirstcleaning)
-tdata_afterfinalcleaning <- 
-  tradesCleanupUsingQuotes(qdata = qdata[as.Date(DT) == "2018-01-02"],
-                           tdata = tdata_afterfirstcleaning[as.Date(DT) == "2018-01-02"])
-dim(tdata_afterfinalcleaning)
+dim(tData_afterfirstcleaning)
+tData_afterfinalcleaning <- 
+  tradesCleanupUsingQuotes(qData = qData[as.Date(DT) == "2018-01-02"],
+                           tData = tData_afterfirstcleaning[as.Date(DT) == "2018-01-02"])
+dim(tData_afterfinalcleaning)
 #In case you have more data it is advised to use the on-disk functionality
-#via "from","to","datasource", etc. arguments
+#via "from","to","dataSource", etc. arguments
 }
 \references{
 Barndorff-Nielsen, O. E., P. R. Hansen, A. Lunde, and N. Shephard (2009). Realized kernels in practice: Trades and quotes. Econometrics Journal 12, C1-C32.

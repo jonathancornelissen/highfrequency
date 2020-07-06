@@ -4,10 +4,10 @@
 \alias{noZeroPrices}
 \title{Delete the observations where the price is zero}
 \usage{
-noZeroPrices(tdata)
+noZeroPrices(tData)
 }
 \arguments{
-\item{tdata}{an xts or data.table object at least containing a column "PRICE".}
+\item{tData}{an xts or data.table object at least containing a column "PRICE".}
 }
 \value{
 an xts or data.table object depending on input

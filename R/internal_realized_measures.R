@@ -71,24 +71,24 @@ conhuber <- function(di, alpha = 0.05) {
 }
 
 #' @keywords internal
-ctBV <- function(rdata, startV = NULL) {
+ctBV <- function(rData, startV = NULL) {
   
-  N <- length(rdata)
+  N <- length(rData)
 
   if (is.null(startV)) {
-    hatV <- medRV(rdata)
+    hatV <- medRV(rData)
   } else {
     hatV <- startV
   }
   v  <- 3^2 * hatV
   z1 <- rep(0, N - 1);
   for (i in 2:N) {
-    z1[i-1] <- zgamma(rdata[i], v, gamma_power = 1)
+    z1[i-1] <- zgamma(rData[i], v, gamma_power = 1)
   }
 
   z2 <- rep(0, N - 1);
   for (j in 1:(N - 1)) {
-    z2[j] <- zgamma(rdata[j], v, gamma_power = 1)
+    z2[j] <- zgamma(rData[j], v, gamma_power = 1)
   }
   ctbv <- (pi/2) * sum(z1 * z2)
   return(ctbv)
@@ -98,28 +98,28 @@ ctBV <- function(rdata, startV = NULL) {
 
 
 #' @keywords internal
-ctTPV <- function (rdata, startV = NULL){
-  q <- as.numeric(rdata)
-  N <- length(rdata);
+ctTPV <- function (rData, startV = NULL){
+  q <- as.numeric(rData)
+  N <- length(rData);
 
   if (is.null(startV)) {
-    hatV <- medRV(rdata)
+    hatV <- medRV(rData)
   } else {
     hatV <- startV
   }
   v <- 3^2 * hatV
   z1 <- rep(0, N - 2)
   for (i in 3:N) {
-    z1[i-2] <- zgamma(rdata[i], v, gamma_power = 4/3)
+    z1[i-2] <- zgamma(rData[i], v, gamma_power = 4/3)
   }
 
   z2 <- rep(0, N - 2);
   for (j in 2:(N - 1)) {
-    z2[j-1] <- zgamma(rdata[j], v, gamma_power = 4/3)
+    z2[j-1] <- zgamma(rData[j], v, gamma_power = 4/3)
   }
   z3 <- rep(0, N - 2);
   for (l in 1:(N-2)) {
-    z3[l] <- zgamma(rdata[l], v, gamma_power = 4/3)
+    z3[l] <- zgamma(rData[l], v, gamma_power = 4/3)
   }
   cttpv <- 0.8309^(-3) * sum(z1^(4/3) * z2^(4/3) * z3^(4/3))
   return(cttpv)
@@ -127,17 +127,17 @@ ctTPV <- function (rdata, startV = NULL){
 
 
 #' @keywords internal
-getAlignPeriod <- function(align.period, align.by) {   
-  align.by <- gsub("(^ +)|( +$)", "",align.by) # Trim White
+getAlignPeriod <- function(alignPeriod, alignBy) {   
+  alignBy <- gsub("(^ +)|( +$)", "",alignBy) # Trim White
   
-  if(casefold(align.by) == "min" || casefold(align.by) == "mins" ||casefold(align.by) == "minute"||casefold(align.by) == "minutes"||casefold(align.by) == "m"){
-    ans <- align.period * 60
+  if(casefold(alignBy) == "min" || casefold(alignBy) == "mins" ||casefold(alignBy) == "minute"||casefold(alignBy) == "minutes"||casefold(alignBy) == "m"){
+    ans <- alignPeriod * 60
   }
-  if(casefold(align.by) == "sec" || casefold(align.by) == "secs" ||casefold(align.by) == "second"||casefold(align.by) == "seconds"||casefold(align.by) == "s"||casefold(align.by) == ""){
-    ans <- align.period
+  if(casefold(alignBy) == "sec" || casefold(alignBy) == "secs" ||casefold(alignBy) == "second"||casefold(alignBy) == "seconds"||casefold(alignBy) == "s"||casefold(alignBy) == ""){
+    ans <- alignPeriod
   }
-  if(casefold(align.by) == "hour" || casefold(align.by) == "hours" ||casefold(align.by) == "h"){
-    ans <- align.period * 60 * 60
+  if(casefold(alignBy) == "hour" || casefold(alignBy) == "hours" ||casefold(alignBy) == "h"){
+    ans <- alignPeriod * 60 * 60
   }
   return(ans)
 }
@@ -175,49 +175,49 @@ multixts <- function(x, y = NULL) {
 
 # rcKernel <- function(x,                             # Tick Data for first asset
 #                      y,                             # Tick Data for second asset
-#                      kernel.type = "rectangular",   # Kernel name (or number)
-#                      kernel.param = 1,              # Kernel parameter (usually lags)
-#                      kernel.dofadj = TRUE,          # Kernel Degree of freedom adjustment
-#                      align.by = "seconds",            # Align the tick data to [seconds|minutes|hours]
-#                      align.period = 1,              # Align the tick data to this many [seconds|minutes|hours]
+#                      kernelType = "rectangular",   # Kernel name (or number)
+#                      kernelParam = 1,              # Kernel parameter (usually lags)
+#                      kernelDOFadj = TRUE,          # Kernel Degree of freedom adjustment
+#                      alignBy = "seconds",            # Align the tick data to [seconds|minutes|hours]
+#                      alignPeriod = 1,              # Align the tick data to this many [seconds|minutes|hours]
 #                      cts = TRUE,                    # Calendar Time Sampling is used
 #                      makeReturns = FALSE) {           # Convert to Returns
 #   #
 #   # Handle deprication
 #   #
 #   if(!is.null(type)){
-#     warning("type is deprecated, use kernel.type")
-#     kernel.type <- type
+#     warning("type is deprecated, use kernelType")
+#     kernelType <- type
 #   }
 #   if(!is.null(q)){
-#     warning("q is deprecated, use kernel.param")
-#     kernel.param <- q
+#     warning("q is deprecated, use kernelParam")
+#     kernelParam <- q
 #   }
 #   if(!is.null(adj)){
-#     warning("adj is deprecated, use kernel.dofadj")
-#     kernel.dofadj <- adj
+#     warning("adj is deprecated, use kernelDOFadj")
+#     kernelDOFadj <- adj
 #   }
 #   
-#   align.period <- .getAlignPeriod(align.period, align.by)   
+#   alignPeriod <- .getAlignPeriod(alignPeriod, alignBy)   
 #   cdata <- .convertData(x, cts = cts, makeReturns = makeReturns)
 #   
 #   x <- cdata$data
-#   x <- .alignReturns(x, align.period)
+#   x <- .alignReturns(x, alignPeriod)
 #   cdatay <- .convertData(y, cts = cts, makeReturns = makeReturns)
 #   y <- cdatay$data
-#   y <- .alignReturns(y, align.period)
-#   type <- kernelCharToInt(kernel.type)
+#   y <- .alignReturns(y, alignPeriod)
+#   type <- kernelCharToInt(kernelType)
 #   kernelEstimator(as.double(x), as.double(y), as.integer(length(x)),
-#                   as.integer(kernel.param), as.integer(ifelse(kernel.dofadj, 1, 0)),
-#                   as.integer(type), ab=double(kernel.param + 1),
-#                   ab2 = double(kernel.param + 1))
+#                   as.integer(kernelParam), as.integer(ifelse(kernelDOFadj, 1, 0)),
+#                   as.integer(type), ab=double(kernelParam + 1),
+#                   ab2 = double(kernelParam + 1))
 # }
 
 
 
 # # Hayashi-Yoshida helper function:
-# rcHY <- function(x, y, period = 1, align.by = "seconds", align.period = 1, makeReturns = FALSE) {
-#   align.period = .getAlignPeriod(align.period, align.by)
+# rcHY <- function(x, y, period = 1, alignBy = "seconds", alignPeriod = 1, makeReturns = FALSE) {
+#   alignPeriod = .getAlignPeriod(alignPeriod, alignBy)
 #   cdata <- .convertData(x, cts=cts, makeReturns=makeReturns)
 #   x <- cdata$data
 #   x.t <- cdata$milliseconds
@@ -233,23 +233,23 @@ multixts <- function(x, y = NULL) {
 #   
 #   sum(pcovcc(
 #          as.double(x), #a
-#          as.double(rep(0,length(x)/(period*align.period)+1)),
+#          as.double(rep(0,length(x)/(period*alignPeriod)+1)),
 #          as.double(y), #b
 #          as.double(x.t), #a
-#          as.double(rep(0,length(x)/(period*align.period)+1)), #a
+#          as.double(rep(0,length(x)/(period*alignPeriod)+1)), #a
 #          as.double(y.t), #b
 #          as.integer(length(x)), #na
-#          as.integer(length(x)/(period*align.period)),
+#          as.integer(length(x)/(period*alignPeriod)),
 #          as.integer(length(y)), #na
-#          as.integer(period*align.period)))
+#          as.integer(period*alignPeriod)))
 # }
 
 
 # Check data:
 #' @keywords internal
-rdatacheck <- function (rdata, multi = FALSE) {
-  if ((dim(rdata)[2] < 2) & (multi)) {
-    stop("Your rdata object should have at least 2 columns")
+rdatacheck <- function (rData, multi = FALSE) {
+  if ((dim(rData)[2] < 2) & (multi)) {
+    stop("Your rData object should have at least 2 columns")
   }
 }
 
@@ -261,7 +261,7 @@ rdatacheck <- function (rdata, multi = FALSE) {
 #' The subsequent refresh time is defined as the first time when all stocks have traded again.
 #' This process is repeated untill the end of one time series is reached.
 #' 
-#' @param pdata a list. Each list-item contains an xts object  
+#' @param pData a list. Each list-item contains an xts object  
 #' containing the original time series (one day only and typically a price series).
 #' 
 #' @return An xts object containing the synchronized time series.
@@ -285,13 +285,13 @@ rdatacheck <- function (rdata, multi = FALSE) {
 #' @keywords data manipulation
 #' @importFrom xts as.xts
 #' @export
-refreshTime <- function (pdata) {
-  if (length(pdata) < 1) {
-    stop("pdata should contain at least two time series.")
+refreshTime <- function (pData) {
+  if (length(pData) < 1) {
+    stop("pData should contain at least two time series.")
   }
-  temp <- pdata[[1]]
-  for (i in 2:length(pdata)) {
-    temp <- merge(temp, pdata[[i]])
+  temp <- pData[[1]]
+  for (i in 2:length(pData)) {
+    temp <- merge(temp, pData[[i]])
   }
   
   temp2 <- xts(matrix(NA, nrow = dim(temp)[1], ncol = dim(temp)[2]), order.by = index(temp))
@@ -330,9 +330,9 @@ RBPCov_bi <- function(ts1, ts2) {
 }
 
 #' @keywords internal
-RBPVar <- function(rdata) {
+RBPVar <- function(rData) {
   
-  returns <- as.vector(as.numeric(rdata))
+  returns <- as.vector(as.numeric(rData))
   n <- length(returns)
   rbpvar <- (pi/2) * sum(abs(returns[1:(n-1)]) * abs(returns[2:n]))
   return(rbpvar)
@@ -406,35 +406,35 @@ thetaROWVar <- function(alpha = 0.001 , alphaMCD = 0.5) {
 
 #' @importFrom robustbase covMcd
 #' @keywords internal
-ROWVar <- function(rdata, seasadjR = NULL, wfunction = "HR" , alphaMCD = 0.75, alpha = 0.001) {
+ROWVar <- function(rData, seasadjR = NULL, wFunction = "HR" , alphaMCD = 0.75, alpha = 0.001) {
   
   if (is.null(seasadjR) == TRUE) {
-    seasadjR <- rdata
+    seasadjR <- rData
   }
   
-  rdata <- as.vector(rdata)
+  rData <- as.vector(rData)
   seasadjR <- as.vector(seasadjR)
-  intraT <- length(rdata); N=1
-  MCDcov <- as.vector(covMcd( rdata , use.correction = FALSE )$raw.cov)
+  intraT <- length(rData); N=1
+  MCDcov <- as.vector(covMcd( rData , use.correction = FALSE )$raw.cov)
   outlyingness <- seasadjR^2/MCDcov    
   k <- qchisq(p = 1 - alpha, df = N)
   outlierindic <- outlyingness > k
   weights <- rep(1, intraT)
-  if (wfunction == "HR") {
+  if (wFunction == "HR") {
     weights[outlierindic] <- 0
-    wR <- sqrt(weights) * rdata
+    wR <- sqrt(weights) * rData
     return((conHR(di = N, alpha = alpha) * sum(wR^2)) / mean(weights))
   }
-  if (wfunction == "SR") {
+  if (wFunction == "SR") {
     weights[outlierindic] <- k/outlyingness[outlierindic]
-    wR <- sqrt(weights) * rdata
+    wR <- sqrt(weights) * rData
     return((conhuber(di = N, alpha = alpha) * sum(wR^2)) / mean(weights))
   }
   
 }
 
 #' @keywords internal
-RTSCov_bi <- function (pdata1, pdata2, startIV1 = NULL, startIV2 = NULL, noisevar1 = NULL, 
+RTSCov_bi <- function (pData1, pData2, startIV1 = NULL, startIV2 = NULL, noisevar1 = NULL, 
                        noisevar2 = NULL, K = 300, J = 1,
                        K_cov = NULL, J_cov = NULL,
                        K_var1 = NULL, K_var2 = NULL,
@@ -462,7 +462,7 @@ RTSCov_bi <- function (pdata1, pdata2, startIV1 = NULL, startIV2 = NULL, noiseva
   
   # Calculation of the noise variance and TSRV for the truncation
   if (is.null(noisevar1) == TRUE) {
-    logprices1 <- log(as.numeric(pdata1))
+    logprices1 <- log(as.numeric(pData1))
     n_var1     <- length(logprices1)
     nbarK_var1 <- (n_var1 - K_var1 + 1)/(K_var1)
     nbarJ_var1 <- (n_var1 - J_var1 + 1)/(J_var1)
@@ -478,11 +478,11 @@ RTSCov_bi <- function (pdata1, pdata2, startIV1 = NULL, startIV2 = NULL, noiseva
       logreturns_J1 <- c(logreturns_J1, diff(logprices1[sel.avg]))
     }   
     if (is.null(noisevar1)) {
-      noisevar1 <- max(0,1/(2 * nbarJ_var1) * (sum(logreturns_J1^2)/J_var1 - TSRV(pdata1,K=K_var1,J=J_var1)))
+      noisevar1 <- max(0,1/(2 * nbarJ_var1) * (sum(logreturns_J1^2)/J_var1 - TSRV(pData1,K=K_var1,J=J_var1)))
     }
   }
   if (is.null(noisevar2)) {
-    logprices2 = log(as.numeric(pdata2))
+    logprices2 = log(as.numeric(pData2))
     n_var2 = length(logprices2)
     nbarK_var2 = (n_var2 - K_var2 + 1)/(K_var2)
     nbarJ_var2 = (n_var2 - J_var2 + 1)/(J_var2)
@@ -497,23 +497,23 @@ RTSCov_bi <- function (pdata1, pdata2, startIV1 = NULL, startIV2 = NULL, noiseva
       sel.avg = seq(j, n_var2, J_var2)
       logreturns_J2 = c(logreturns_J2, diff(logprices2[sel.avg]))
     }        
-    noisevar2 = max(0,1/(2 * nbarJ_var2) * (sum(logreturns_J2^2)/J_var2 - TSRV(pdata2,K=K_var2,J=J_var2)))
+    noisevar2 = max(0,1/(2 * nbarJ_var2) * (sum(logreturns_J2^2)/J_var2 - TSRV(pData2,K=K_var2,J=J_var2)))
   }    
   
   if (!is.null(startIV1)) {
     RTSRV1 = startIV1
   } else {
-    RTSRV1 <- RTSRV(pdata=pdata1, noisevar = noisevar1, K = K_var1, J = J_var1, eta = eta)      
+    RTSRV1 <- RTSRV(pData=pData1, noisevar = noisevar1, K = K_var1, J = J_var1, eta = eta)      
   }
   if (is.null(startIV2) == FALSE) {
     RTSRV2 <- startIV2
   }else{
-    RTSRV2 <- RTSRV(pdata = pdata2, noisevar = noisevar2, K = K_var2, J = J_var2, eta = eta)      
+    RTSRV2 <- RTSRV(pData = pData2, noisevar = noisevar2, K = K_var2, J = J_var2, eta = eta)      
   }
   
   # Refresh time is for the covariance calculation
   
-  x <- refreshTime(list(pdata1, pdata2))
+  x <- refreshTime(list(pData1, pData2))
   newprice1 <- x[, 1]
   newprice2 <- x[, 2]
   logprices1 <- log(as.numeric(newprice1))
@@ -564,14 +564,14 @@ RTSCov_bi <- function (pdata1, pdata2, startIV1 = NULL, startIV2 = NULL, noiseva
 }
 
 #' @keywords internal
-RTSRV <- function(pdata, startIV = NULL, noisevar = NULL, K = 300, J = 1, eta = 9) {
-  logprices <- log(as.numeric(pdata))
+RTSRV <- function(pData, startIV = NULL, noisevar = NULL, K = 300, J = 1, eta = 9) {
+  logprices <- log(as.numeric(pData))
   n <- length(logprices)
   nbarK <- (n - K + 1)/(K)
   nbarJ <- (n - J + 1)/(J)
   adj <- (1 - (nbarK/nbarJ))^-1
   zeta <- 1/pchisq(eta, 3)
-  seconds <- as.numeric(as.POSIXct(index(pdata)))
+  seconds <- as.numeric(as.POSIXct(index(pData)))
   secday <- last(seconds) - first(seconds)
   logreturns_K = vdelta_K = logreturns_J = vdelta_J = c()
   for (k in 1:K) {
@@ -585,7 +585,7 @@ RTSRV <- function(pdata, startIV = NULL, noisevar = NULL, K = 300, J = 1, eta = 
     vdelta_J <- c(vdelta_J, diff(seconds[sel])/secday)
   }
   if (is.null(noisevar)) {
-    noisevar <- max(0,1/(2 * nbarJ) * (sum(logreturns_J^2)/J - TSRV(pdata=pdata,K=K,J=J)))        
+    noisevar <- max(0,1/(2 * nbarJ) * (sum(logreturns_J^2)/J - TSRV(pData=pData,K=K,J=J)))        
   }
   if (!is.null(startIV)) {
     RTSRV <- startIV
@@ -615,34 +615,34 @@ RTSRV <- function(pdata, startIV = NULL, noisevar = NULL, K = 300, J = 1, eta = 
 }
 
 #' rvKernel <- function(x,                             # Tick Data
-#'                      kernel.type = "rectangular",   # Kernel name (or number)
-#'                      kernel.param = 1,              # Kernel parameter (usually lags)
-#'                      kernel.dofadj = TRUE,          # Kernel Degree of freedom adjustment
-#'                      align.by = "seconds",          # Align the tick data to [seconds|minutes|hours]
-#'                      align.period = 1) {            # Align the tick data to this many [seconds|minutes|hours]            
+#'                      kernelType = "rectangular",   # Kernel name (or number)
+#'                      kernelParam = 1,              # Kernel parameter (usually lags)
+#'                      kernelDOFadj = TRUE,          # Kernel Degree of freedom adjustment
+#'                      alignBy = "seconds",          # Align the tick data to [seconds|minutes|hours]
+#'                      alignPeriod = 1) {            # Align the tick data to this many [seconds|minutes|hours]            
 #'   # Multiday adjustment: 
 #'   multixts <- multixts(x)
 #'   if (multixts == TRUE) {
-#'     result <- apply.daily(x, rv.kernel,kernel.type,kernel.param,kernel.dofadj,
-#'                           align.by, align.period, cts, makeReturns)
+#'     result <- apply.daily(x, rv.kernel,kernelType,kernelParam,kernelDOFadj,
+#'                           alignBy, alignPeriod, cts, makeReturns)
 #'     return(result)
 #'   } else { #Daily estimation:
-#'     align.period <- .getAlignPeriod(align.period, align.by)         
+#'     alignPeriod <- .getAlignPeriod(alignPeriod, alignBy)         
 #'     cdata <- .convertData(x, cts = cts, makeReturns = makeReturns)
 #'     x <- cdata$data
-#'     x <- .alignReturns(x, align.period)
-#'     type <- kernelCharToInt(kernel.type)
+#'     x <- .alignReturns(x, alignPeriod)
+#'     type <- kernelCharToInt(kernelType)
 #'     kernelEstimator(as.double(x), as.double(x), as.integer(length(x)),
-#'                     as.integer(kernel.param), as.integer(ifelse(kernel.dofadj, 1, 0)),
-#'                     as.integer(type), ab = double(kernel.param + 1),
-#'                     ab2 = double(kernel.param + 1))
+#'                     as.integer(kernelParam), as.integer(ifelse(kernelDOFadj, 1, 0)),
+#'                     as.integer(type), ab = double(kernelParam + 1),
+#'                     ab2 = double(kernelParam + 1))
 #'   }
 #' }
 
 #' @importFrom xts first
 #' @keywords internal
-TSCov_bi <- function (pdata1, pdata2, K = 300, J = 1) {
-  x <- refreshTime(list(pdata1, pdata2))
+TSCov_bi <- function (pData1, pData2, K = 300, J = 1) {
+  x <- refreshTime(list(pData1, pData2))
   newprice1 <- x[, 1]
   newprice2 <- x[, 2]
   logprices1 <- log(as.numeric(newprice1))
@@ -677,9 +677,9 @@ TSCov_bi <- function (pdata1, pdata2, K = 300, J = 1) {
 }
 
 #' @keywords internal
-TSRV <- function(pdata , K = 300 , J = 1) {
+TSRV <- function(pData , K = 300 , J = 1) {
   # based on rv.timescale
-  logprices <- log(as.numeric(pdata))
+  logprices <- log(as.numeric(pData))
   n <- length(logprices) 
   nbarK <- (n - K + 1)/(K) # average number of obs in 1 K-grid
   nbarJ <- (n - J + 1)/(J)

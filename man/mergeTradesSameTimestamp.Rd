@@ -4,10 +4,10 @@
 \alias{mergeTradesSameTimestamp}
 \title{Merge multiple transactions with the same time stamp}
 \usage{
-mergeTradesSameTimestamp(tdata, selection = "median")
+mergeTradesSameTimestamp(tData, selection = "median")
 }
 \arguments{
-\item{tdata}{an xts object containing the time series data, with 
+\item{tData}{an xts object containing the time series data, with 
 one column named "PRICE" indicating the transaction price 
 and one column "SIZE" indicating the number of shares traded.}
 

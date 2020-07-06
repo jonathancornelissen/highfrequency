@@ -5,33 +5,33 @@
 \title{Realized Covariance: Kernel}
 \usage{
 rKernelCov(
-  rdata,
+  rData,
   cor = FALSE,
-  align.by = "seconds",
-  align.period = 1,
+  alignBy = "seconds",
+  alignPeriod = 1,
   makeReturns = FALSE,
-  kernel.type = "rectangular",
-  kernel.param = 1,
-  kernel.dofadj = TRUE
+  kernelType = "rectangular",
+  kernelParam = 1,
+  kernelDOFadj = TRUE
 )
 }
 \arguments{
-\item{rdata}{a \eqn{(M x N)} matrix/zoo/xts object containing the \eqn{N}
+\item{rData}{a \eqn{(M x N)} matrix/zoo/xts object containing the \eqn{N}
 return series over period \eqn{t}, with \eqn{M} observations during \eqn{t}.}
 
 \item{cor}{boolean, in case it is TRUE, the correlation is returned. FALSE by default.}
 
-\item{align.by}{Align the tick data to seconds|minutes|hours}
+\item{alignBy}{Align the tick data to seconds|minutes|hours}
 
-\item{align.period}{Align the tick data to this many [seconds|minutes|hours]}
+\item{alignPeriod}{Align the tick data to this many [seconds|minutes|hours]}
 
 \item{makeReturns}{Convert to Returns}
 
-\item{kernel.type}{Kernel name (or number)}
+\item{kernelType}{Kernel name (or number)}
 
-\item{kernel.param}{Kernel parameter (usually lags)}
+\item{kernelParam}{Kernel parameter (usually lags)}
 
-\item{kernel.dofadj}{Kernel Degree of freedom adjustment}
+\item{kernelDOFadj}{Kernel Degree of freedom adjustment}
 }
 \value{
 Kernel estimate of realized covariance.
@@ -44,13 +44,13 @@ The different types of kernels can be found using \code{\link{listAvailableKerne
 }
 \examples{
 # Univariate:
-rvKernel <- rKernelCov(rdata = sample_tdata$PRICE, align.by = "minutes",
-                       align.period = 5, makeReturns = TRUE)
+rvKernel <- rKernelCov(rData = sampleTData$PRICE, alignBy = "minutes",
+                       alignPeriod = 5, makeReturns = TRUE)
 rvKernel
 
 # Multivariate:
-rcKernel <- rKernelCov(rdata = cbind(lltc, sbux, fill = 0), align.by = "minutes",
-                       align.period = 5, makeReturns = FALSE)
+rcKernel <- rKernelCov(rData = cbind(lltc, sbux, fill = 0), alignBy = "minutes",
+                       alignPeriod = 5, makeReturns = FALSE)
 rcKernel
 }
 \references{

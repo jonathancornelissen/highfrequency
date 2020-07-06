@@ -67,8 +67,8 @@ calculateV <- function(rse, p, k, N){
 }
 
 #' @keywords internal
-scale <- function (align.by) {
-  switch(align.by,
+scale <- function (alignBy) {
+  switch(alignBy,
          "seconds"= as.numeric(1),
          "minutes"= as.numeric(60),
          "hours"= as.numeric(3600))
@@ -76,17 +76,17 @@ scale <- function (align.by) {
 
 #Function to calculate simple returns#
 #' @keywords internal
-simre <- function (pdata) {
-  l <- dim(pdata)[1]
-  x <- matrix(as.numeric(pdata), nrow = l)
+simre <- function (pData) {
+  l <- dim(pData)[1]
+  x <- matrix(as.numeric(pData), nrow = l)
   x[(2:l), ] <- x[(2:l), ]/x[(1:(l - 1)), ]-1
-  x[1, ] <- rep(0, dim(pdata)[2])
-  x <- xts(x, order.by = index(pdata))
+  x[1, ] <- rep(0, dim(pData)[2])
+  x <- xts(x, order.by = index(pData))
   return(x)
 }
 
-tqfun <- function(rdata){ #Calculate the realized tripower quarticity
-  returns <- as.vector(as.numeric(rdata));
+tqfun <- function(rData){ #Calculate the realized tripower quarticity
+  returns <- as.vector(as.numeric(rData));
   n <- length(returns);
   mu43 <- 0.8308609; #    2^(2/3)*gamma(7/6) *gamma(1/2)^(-1)   
   tq <- n * ((mu43)^(-3)) *  sum(abs(returns[1:(n - 2)])^(4/3) *abs(returns[2:(n-1)])^(4/3) *abs(returns[3:n])^(4/3));

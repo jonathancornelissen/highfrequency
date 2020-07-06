@@ -5,21 +5,21 @@
 \title{Cleans trade data}
 \usage{
 tradesCleanup(
-  datasource = NULL,
-  datadestination = NULL,
+  dataSource = NULL,
+  dataDestination = NULL,
   exchanges,
-  tdataraw = NULL,
+  tDataRaw = NULL,
   report = TRUE,
   selection = "median",
-  saveasxts = TRUE
+  saveAsXTS = TRUE
 )
 }
 \arguments{
-\item{datasource}{character indicating the folder in which the original data is stored.}
+\item{dataSource}{character indicating the folder in which the original data is stored.}
 
-\item{datadestination}{character indicating the folder in which the cleaned data is stored.}
+\item{dataDestination}{character indicating the folder in which the cleaned data is stored.}
 
-\item{exchanges}{vector of stock exchange symbols for all data in datasource, 
+\item{exchanges}{vector of stock exchange symbols for all data in dataSource, 
 e.g. exchanges = c("T","N") retrieves all stock market data from both NYSE and NASDAQ.
 The possible exchange symbols are:
 \itemize{
@@ -37,28 +37,28 @@ The possible exchange symbols are:
 \item Z: BATS
 }}
 
-\item{tdataraw}{xts object containing (for ONE stock only) raw trade data. This argument is NULL by default. Enabling it means the arguments
-from, to, datasource and datadestination will be ignored. (only advisable for small chunks of data)}
+\item{tDataRaw}{xts object containing (for ONE stock only) raw trade data. This argument is NULL by default. Enabling it means the arguments
+from, to, dataSource and dataDestination will be ignored. (only advisable for small chunks of data)}
 
 \item{report}{boolean and TRUE by default. In case it is true the function returns (also) a vector indicating how many trades remained after each cleaning step.}
 
 \item{selection}{argument to be passed on to the cleaning routine \code{\link{mergeTradesSameTimestamp}}. The default is "median".}
 
-\item{saveasxts}{indicates whether data should be saved in xts format instead of data.table when using on-disk functionality. TRUE by default.}
+\item{saveAsXTS}{indicates whether data should be saved in xts format instead of data.table when using on-disk functionality. TRUE by default.}
 }
 \value{
 For each day an xts or data.table object is saved into the folder of that date, containing the cleaned data.
 This procedure is performed for each stock in "ticker".
 The function returns a vector indicating how many trades remained after each cleaning step.
 
-In case you supply the argument "rawtdata", the on-disk functionality is ignored
+In case you supply the argument "rawtData", the on-disk functionality is ignored
 and the function returns a list with the cleaned trades as xts object (see examples).
 }
 \description{
-This is a wrapper function for cleaning the trade data of all stock data inside the folder datasource. 
-The result is saved in the folder datadestination. 
+This is a wrapper function for cleaning the trade data of all stock data inside the folder dataSource. 
+The result is saved in the folder dataDestination. 
 
-In case you supply the argument "rawtdata", the on-disk functionality is ignored. The function returns a vector
+In case you supply the argument "rawtData", the on-disk functionality is ignored. The function returns a vector
 indicating how many trades were removed at each cleaning step in this case.
 and the function returns an xts or data.table object.
 
@@ -72,14 +72,14 @@ there is a seperate wrapper called \code{\link{tradesCleanupUsingQuotes}}.
 }
 \examples{
 # Consider you have raw trade data for 1 stock for 2 days 
-head(sample_tdataraw_microseconds)
-dim(sample_tdataraw_microseconds)
-tdata_afterfirstcleaning <- tradesCleanup(tdataraw = sample_tdataraw, exchanges = list("N"))
-tdata_afterfirstcleaning$report
-dim(tdata_afterfirstcleaning$tdata)
+head(sampleTDataRawMicroseconds)
+dim(sampleTDataRawMicroseconds)
+tData_afterfirstcleaning <- tradesCleanup(tDataRaw = sampleTDataRaw, exchanges = list("N"))
+tData_afterfirstcleaning$report
+dim(tData_afterfirstcleaning$tData)
 
 #In case you have more data it is advised to use the on-disk functionality
-#via "from","to","datasource",etc. arguments
+#via "from","to","dataSource",etc. arguments
 
 }
 \references{

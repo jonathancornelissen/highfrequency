@@ -4,16 +4,16 @@
 \alias{medRV}
 \title{medRV}
 \usage{
-medRV(rdata, align.by = NULL, align.period = NULL, makeReturns = FALSE)
+medRV(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE)
 }
 \arguments{
-\item{rdata}{a zoo/xts object containing all returns in period t for one asset.}
+\item{rData}{a zoo/xts object containing all returns in period t for one asset.}
 
-\item{align.by}{a string, align the tick data to "seconds"|"minutes"|"hours".}
+\item{alignBy}{a string, align the tick data to "seconds"|"minutes"|"hours".}
 
-\item{align.period}{an integer, align the tick data to this many [seconds|minutes|hours].}
+\item{alignPeriod}{an integer, align the tick data to this many [seconds|minutes|hours].}
 
-\item{makeReturns}{boolean, should be TRUE when rdata contains prices instead of returns. FALSE by   default.}
+\item{makeReturns}{boolean, should be TRUE when rData contains prices instead of returns. FALSE by   default.}
 }
 \value{
 numeric
@@ -39,9 +39,9 @@ can lead to more precise volatility forecasts,
 as shown in Andersen et al. (2007) and Corsi et al. (2010).
 }
 \examples{
-data(sample_tdata);
-medrv <- medRV(rdata = sample_tdata$PRICE, align.by = "minutes", 
-               align.period = 5, makeReturns = TRUE)
+data(sampleTData);
+medrv <- medRV(rData = sampleTData$PRICE, alignBy = "minutes", 
+               alignPeriod = 5, makeReturns = TRUE)
 medrv 
  
 }

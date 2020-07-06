@@ -5,37 +5,37 @@
 \title{Realized Outlyingness Weighted Covariance}
 \usage{
 rOWCov(
-  rdata,
+  rData,
   cor = FALSE,
-  align.by = NULL,
-  align.period = NULL,
+  alignBy = NULL,
+  alignPeriod = NULL,
   makeReturns = FALSE,
   seasadjR = NULL,
-  wfunction = "HR",
+  wFunction = "HR",
   alphaMCD = 0.75,
   alpha = 0.001
 )
 }
 \arguments{
-\item{rdata}{a \eqn{(M x N)} matrix/zoo/xts object containing the \eqn{N}
+\item{rData}{a \eqn{(M x N)} matrix/zoo/xts object containing the \eqn{N}
 return series over period \eqn{t}, with \eqn{M} observations during \eqn{t}.}
 
 \item{cor}{boolean, in case it is TRUE, the correlation is returned. FALSE by default.}
 
-\item{align.by}{a string, align the tick data to "seconds"|"minutes"|"hours".}
+\item{alignBy}{a string, align the tick data to "seconds"|"minutes"|"hours".}
 
-\item{align.period}{an integer, align the tick data to this many [seconds|minutes|hours].}
+\item{alignPeriod}{an integer, align the tick data to this many [seconds|minutes|hours].}
 
-\item{makeReturns}{boolean, should be TRUE when rdata contains prices instead of returns. FALSE by default.}
+\item{makeReturns}{boolean, should be TRUE when rData contains prices instead of returns. FALSE by default.}
 
 \item{seasadjR}{a \eqn{(M x N)} matrix/zoo/xts object containing 
 the seasonaly adjusted returns. This is an optional argument.}
 
-\item{wfunction}{determines whether 
+\item{wFunction}{determines whether 
 a zero-one weight function (one if no jump is detected based on \eqn{d_{t,i}} and 0 otherwise)
 or 
 Soft Rejection ("SR") weight function is to be used.
-By default a zero-one weight function (wfunction = "HR") is used.}
+By default a zero-one weight function (wFunction = "HR") is used.}
 
 \item{alphaMCD}{a numeric parameter, controlling the size of 
 the subsets over which the determinant is minimized. 
@@ -83,12 +83,12 @@ a zero weight, due to which the rOWCov can have a low finite sample efficiency i
 # at 5 minutes.
 
 # Univariate: 
-rvoutw <- rOWCov(rdata = sample_tdata$PRICE, align.by = "minutes",
-                   align.period = 5, makeReturns = TRUE)
+rvoutw <- rOWCov(rData = sampleTData$PRICE, alignBy = "minutes",
+                   alignPeriod = 5, makeReturns = TRUE)
 rvoutw 
 
 # Multivariate: 
-rcoutw <- rOWCov(rdata = sample_5minprices_jumps['2010-01-04'], makeReturns = TRUE)
+rcoutw <- rOWCov(rData = sample5MinPricesJumps['2010-01-04'], makeReturns = TRUE)
 rcoutw
 
 }

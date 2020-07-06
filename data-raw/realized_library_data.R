@@ -7,7 +7,7 @@ download.file("https://realized.oxford-man.ox.ac.uk/images/oxfordmanrealizedvola
               destfile = "data-raw/OxfordManRealizedVolatilityIndices.zip")
 system("unzip -o data-raw/OxfordManRealizedVolatilityIndices.zip -d data-raw/")
 
-realized_library <-
+realizedLibrary <-
   read_csv("data-raw/oxfordmanrealizedvolatilityindices.csv") %>%
   filter(Symbol == ".SPX") %>%
   mutate(X1 = as.Date(substring(X1, 1, 10))) %>%
@@ -16,4 +16,4 @@ realized_library <-
   mutate(symbol = as.character(symbol)) %>%
   filter(date <= "2019-12-31")
 
-save(realized_library, file = "data/realized_library.rda")
+save(realizedLibrary, file = "data/realizedLibrary.rda")

@@ -5,25 +5,25 @@
 \title{Cleans quote data}
 \usage{
 quotesCleanup(
-  datasource = NULL,
-  datadestination = NULL,
+  dataSource = NULL,
+  dataDestination = NULL,
   exchanges,
-  qdataraw = NULL,
+  qDataRaw = NULL,
   report = TRUE,
   selection = "median",
   maxi = 50,
   window = 50,
   type = "advanced",
   rmoutliersmaxi = 10,
-  saveasxts = TRUE
+  saveAsXTS = TRUE
 )
 }
 \arguments{
-\item{datasource}{character indicating the folder in which the original data is stored.}
+\item{dataSource}{character indicating the folder in which the original data is stored.}
 
-\item{datadestination}{character indicating the folder in which the cleaned data is stored.}
+\item{dataDestination}{character indicating the folder in which the cleaned data is stored.}
 
-\item{exchanges}{vector of stock exchange symbols for all data in datasource, 
+\item{exchanges}{vector of stock exchange symbols for all data in dataSource, 
 e.g. exchanges = c("T","N") retrieves all stock market data from both NYSE and NASDAQ.
 The possible exchange symbols are:
 \itemize{
@@ -41,8 +41,8 @@ The possible exchange symbols are:
 \item Z: BATS
 }}
 
-\item{qdataraw}{xts or data.table object containing (ONE stock only) raw quote data. This argument is NULL by default. Enabling it means the arguments
-from, to, datasource and datadestination will be ignored. (only advisable for small chunks of data)}
+\item{qDataRaw}{xts or data.table object containing (ONE stock only) raw quote data. This argument is NULL by default. Enabling it means the arguments
+from, to, dataSource and dataDestination will be ignored. (only advisable for small chunks of data)}
 
 \item{report}{boolean and TRUE by default. In case it is true the function returns (also) a vector indicating how many quotes remained after each cleaning step.}
 
@@ -56,20 +56,20 @@ from, to, datasource and datadestination will be ignored. (only advisable for sm
 
 \item{rmoutliersmaxi}{argument to be passed on to the cleaning routine \code{\link{rmOutliersQuotes}}.}
 
-\item{saveasxts}{indicates whether data should be saved in xts format instead of data.table when using on-disk functionality. TRUE by default.}
+\item{saveAsXTS}{indicates whether data should be saved in xts format instead of data.table when using on-disk functionality. TRUE by default.}
 }
 \value{
-The function converts every csv file in datasource into multiple xts or data.table files.
-In datadestination, there will be one folder for each symbol containing .rds files with cleaned data stored either in data.table or xts format.
+The function converts every csv file in dataSource into multiple xts or data.table files.
+In dataDestination, there will be one folder for each symbol containing .rds files with cleaned data stored either in data.table or xts format.
 
-In case you supply the argument "qdataraw", the on-disk functionality is ignored
+In case you supply the argument "qDataRaw", the on-disk functionality is ignored
 and the function returns a list with the cleaned quotes as an xts or data.table object depending on input (see examples).
 }
 \description{
-This is a wrapper function for cleaning the quote data in the entire folder datasource. 
-The result is saved in the folder datadestination. 
+This is a wrapper function for cleaning the quote data in the entire folder dataSource. 
+The result is saved in the folder dataDestination. 
 
-In case you supply the argument "qdataraw", the on-disk functionality is ignored
+In case you supply the argument "qDataRaw", the on-disk functionality is ignored
 and the function returns the cleaned quotes as xts or data.table object (see examples).
 
 The following cleaning steps are performed sequentially:
@@ -78,14 +78,14 @@ The following cleaning steps are performed sequentially:
 }
 \examples{
 # Consider you have raw quote data for 1 stock for 2 days
-head(sample_qdataraw_microseconds)
-dim(sample_qdataraw_microseconds)
-qdata_aftercleaning <- quotesCleanup(qdataraw = sample_qdataraw_microseconds, exchanges = "N")
-qdata_aftercleaning$report
-dim(qdata_aftercleaning$qdata)
+head(sampleQDataRawMicroseconds)
+dim(sampleQDataRawMicroseconds)
+qData_aftercleaning <- quotesCleanup(qDataRaw = sampleQDataRawMicroseconds, exchanges = "N")
+qData_aftercleaning$report
+dim(qData_aftercleaning$qData)
 
 # In case you have more data it is advised to use the on-disk functionality
-# via "from","to","datasource",etc. arguments
+# via "from","to","dataSource",etc. arguments
 
 }
 \references{

@@ -19,6 +19,13 @@ The highfrequency package provides numerous tools for analyzing financial (highf
 To learn more about highfrequency, start with the vignettes:
 `browseVignettes(package = "highfrequency")`
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/jonathancornelissen/highfrequency}
+}
+
+}
 \author{
 Kris Boudt, Jonathan Cornelissen, Scott Payseur
 

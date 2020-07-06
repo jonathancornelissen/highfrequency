@@ -4,10 +4,10 @@
 \alias{MRC}
 \title{Modulated Realized Covariance (MRC): Return univariate or multivariate preaveraged estimator.}
 \usage{
-MRC(pdata, pairwise = FALSE, makePsd = FALSE)
+MRC(pData, pairwise = FALSE, makePsd = FALSE)
 }
 \arguments{
-\item{pdata}{a list. Each list-item contains an xts object with the intraday price data of a stock.}
+\item{pData}{a list. Each list-item contains an xts object with the intraday price data of a stock.}
 
 \item{pairwise}{boolean, should be TRUE when refresh times are based on pairs of assets. FALSE by default.}
 
@@ -60,7 +60,7 @@ where \eqn{\hat{\Psi}_N = \frac{1}{2N}\sum_{i=1}^N \boldsymbol{r}_{\tau_i}(\bold
 }
 }
 \examples{
-a <- list(sample_5minprices_jumps["2010-01-04",1], sample_5minprices_jumps["2010-01-04",2])
+a <- list(sample5MinPricesJumps["2010-01-04",1], sample5MinPricesJumps["2010-01-04",2])
 MRC(a, pairwise = TRUE, makePsd = TRUE)
 
 }
