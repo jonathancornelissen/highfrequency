@@ -653,6 +653,7 @@ intradayJumpTest <- function(pData, volEstimator = "RM", driftEstimator = "none"
 
 
 #' @importFrom xts addPolygon xts
+#' @importFrom graphics lines
 #' @importFrom zoo na.locf0
 #' @export
 plot.intradayJumpTest <- function(x, ...){
@@ -784,7 +785,7 @@ plot.intradayJumpTest <- function(x, ...){
 #' 
 #' @details 
 #' 
-#' @importFrom graphics lines
+
 #' @importFrom stats na.omit quantile runif
 #' @export
 #' @importFrom zoo coredata
