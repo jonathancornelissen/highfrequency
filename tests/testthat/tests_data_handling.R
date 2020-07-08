@@ -92,3 +92,42 @@ test_that("aggregateTS edge cases", {
   )
 
 })
+
+
+
+context("aggregatePrice edge cases")
+test_that("aggregatePrice edge cases", {
+  dat <- data.table(DT = as.POSIXct(c(34150 ,34201, 34500, 34500 + 1e-9, 34799, 34801, 34803, 35099), origin = "1970-01-01", tz = "GMT"), PRICE = 0:7)
+  output <- aggregatePrice(dat, on = "minutes", k = 5, marketOpen = "09:30:00", marketClose = "16:00:00", fill = FALSE)
+  
+  target <- data.table(DT = as.POSIXct(c(34200, 34500, 34800, 35100), origin = "1970-01-01", tz = "GMT"), PRICE = c(1,2,4,7))
+  setkeyv(target, c("DT", "PRICE"))
+  expect_equal(output, target)
+})
+
+
+
+context("aggregatePrice milliseconds vs seconds")
+test_that("aggregatePrice milliseconds vs seconds", {
+  dat <- data.table(DT = as.POSIXct(c(34150 ,34201, 34500, 34500 + 1e-9, 34799, 34801, 34803, 35099), origin = "1970-01-01", tz = "GMT"), PRICE = 0:7)
+  expect_equal(aggregatePrice(dat, on = "milliseconds", k = 5000, marketOpen = "09:30:00", marketClose = "16:00:00", fill = TRUE),
+               aggregatePrice(dat, on = "secs", k = 5, marketOpen = "09:30:00", marketClose = "16:00:00", fill = TRUE))
+  
+})
+
+context("aggregatePrice filling correctly")
+test_that("aggregatePrice filling correctly", {
+  dat <- data.table(DT = as.POSIXct(c(34150 ,34201, 34800, 45500, 45799, 50801, 50803, 57599.01, 57601), origin = "1970-01-01", tz = "GMT"), PRICE = 0:8)
+  output <- aggregatePrice(dat, on = "milliseconds", k = 1000, marketOpen = "09:30:00", marketClose = "16:00:00", fill = TRUE)
+  expect_equal(sum(output$PRICE == 0), 0) # This should be removed since it happens before the market opens
+  expect_equal(sum(output$PRICE == 1), 60 * 10) # 1 is the prevaling price for 10 minutes (It is also the opening price!!!!!)
+  expect_equal(sum(output$PRICE == 2), 2 * 60 * 60 + 58 * 60 + 20) # 2 is the prevailing price for 2 hours, 58 minutes and 20 seconds 
+  expect_equal(sum(output$PRICE == 3), 4 * 60 + 59) #3 is the prevailiing price for 4 min 59 sec
+  expect_equal(sum(output$PRICE == 4), 1 * 60 * 60 + 23 * 60 + 22) # 4 is the prevailiing price for 1 hour, 23 minutes and 22 seconds
+  expect_equal(sum(output$PRICE == 5), 2) # 5 is the prevailing price for 2 sec
+  expect_equal(sum(output$PRICE == 6), 1 * 60 * 60 + 53 * 60 + 17) # 6 is the prevailing price for 1 hour, 53 mins and 17 sec
+  expect_equal(sum(output$PRICE == 7), 1) # 7 only happens once
+  expect_equal(sum(output$PRICE == 8), 0) # 8 should be removed since it happens 1 sec after market closes.
+  expect_equal(nrow(output), 23401)
+})
+

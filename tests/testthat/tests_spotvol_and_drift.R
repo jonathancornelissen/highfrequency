@@ -1,3 +1,6 @@
+library(highfrequency)
+library(testthat)
+
 
 context("spotDrift")
 test_that("spotDrift",{
@@ -9,13 +12,11 @@ test_that("spotDrift",{
     c("-0.070876", "-0.1145", "-0.072902", "0.020546", "0.078481", "0.089241")
   )
   
-  
-  expect_identical(
-    {dat <- data.table::copy(sampleTDataMicroseconds)
-    dat[, SYMBOL := NULL]
-    meandrift <- spotDrift(data = dat, k = 1, tz = "EST")
-    formatC(meandrift$mu[1:10], digits = 5)},
-    c("    NA", "    NA", "    NA", "    NA", "0.00040961", "0.00046663", "0.00060476", "0.00051623", "0.00050264", "-2.5183e-05")
+  dat <- data.table::copy(sampleTDataMicroseconds)
+  dat[, SYMBOL := NULL]
+  meandrift <- spotDrift(data = dat, k = 1, tz = "EST")
+  expect_identical(formatC(meandrift$mu[1:10], digits = 5),
+    c("    NA", "    NA", "    NA", "    NA", "0.00040961", "0.000454", "0.00060476", "0.00051623", "0.00050264", "-2.5183e-05")
   )
   
   expect_identical(
