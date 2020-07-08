@@ -18,7 +18,7 @@
 #' @param dropna boolean, which determines whether empty intervals should be dropped.
 #' By default, an NA is returned in case an interval is empty, except when the user opts
 #' for previous tick aggregation, by setting FUN = "previoustick" (default).
-#' 
+#' @param tz character denoting which timezone the output should be in. Defaults to "GMT"
 #' @details The timestamps of the new time series are the closing times and/or days of the intervals. 
 #' E.g. for a weekly aggregation the new timestamp is the last day in that particular week (namely sunday).
 #' 
@@ -49,9 +49,9 @@
 #' 
 #' @importFrom zoo zoo na.locf
 #' @importFrom stats start end
-#' @importFrom xts period.apply	
+#' @importFrom xts period.apply tzone	
 #' @export
-aggregateTS <- function (ts, FUN = "previoustick", on = "minutes", k = 1, weights = NULL, dropna = FALSE) {
+aggregateTS <- function (ts, FUN = "previoustick", on = "minutes", k = 1, weights = NULL, dropna = FALSE, tz = NULL) {
   
   makethispartbetter <- ((!is.null(weights))| on=="days"| on=="weeks" | (FUN!="previoustick") | dropna)
   
@@ -59,6 +59,10 @@ aggregateTS <- function (ts, FUN = "previoustick", on = "minutes", k = 1, weight
     FUN <- previoustick 
   } else {
     FUN <- match.fun(FUN)
+  }
+  
+  if(is.null(tz)){
+    tz <- tzone(ts)
   }
   
   if (makethispartbetter == TRUE)  {
@@ -85,23 +89,23 @@ aggregateTS <- function (ts, FUN = "previoustick", on = "minutes", k = 1, weight
         secs <- k
       }
       a <- index(ts2) + (secs - as.numeric(index(ts2)) %% secs)
-      ts3 <- xts(ts2, a, tzone = "GMT")
+      ts3 <- xts(ts2, a, tzone = tz)
     }
     if (on == "hours") {
       secs = 3600
       a <- index(ts2) + (secs - as.numeric(index(ts2)) %% secs)
-      ts3 <- xts(ts2, a, tzone = "GMT")
+      ts3 <- xts(ts2, a, tzone = tz)
     }
     if (on == "days") {
       secs = 24 * 3600
       a   <- index(ts2) + (secs - as.numeric(index(ts2)) %% secs) - (24 * 3600)
-      ts3 <- xts(ts2, a, tzone = "GMT")
+      ts3 <- xts(ts2, a, tzone = tz)
     }
     if (on == "weeks") {
       secs = 24 * 3600 * 7
       a <- (index(ts2) + (secs - (index(ts2) + (3L * 86400L)) %% secs)) - 
         (24 * 3600)
-      ts3 <- xts(ts2, a, tzone = "GMT")
+      ts3 <- xts(ts2, a, tzone = tz)
     }
     
     if (dropna == FALSE) {
@@ -122,7 +126,7 @@ aggregateTS <- function (ts, FUN = "previoustick", on = "minutes", k = 1, weight
       }
     }
     
-    ts3 <- xts(ts3, as.POSIXct(index(ts3)))
+    ts3 <- xts(ts3, as.POSIXct(index(ts3)), tzone = tz)
     return(ts3)
   }
   
@@ -194,42 +198,52 @@ aggregateTS <- function (ts, FUN = "previoustick", on = "minutes", k = 1, weight
 #' @importFrom xts last
 #' @export
 aggregatePrice <- function(pData, on = "minutes", k = 1, marketOpen = "09:30:00", marketClose = "16:00:00" , fill = FALSE, tz = NULL) {
-  
+  pData <- data.table::copy(pData) # cop
   DATE = DT = FIRST_DT = DT_ROUND = LAST_DT = SYMBOL = PRICE = NULL
   
   on_true <- NULL
-
+  
   if ("PRICE" %in% colnames(pData) == FALSE) {
     stop("data.table or xts needs column named PRICE.")
   }
-  
   if (on == "milliseconds") {
     on_true <- "milliseconds"
     on <- "secs"
     k <- k / 1000
   }
+  if(on == "secs" | on == "seconds"){
+    scaleFactor <- k
+  }
+  if(on == "mins" | on == "minutes"){
+    scaleFactor <- k * 60
+  }
+  if(on == "hours"){
+    scaleFactor <- k * 60 * 60
+  }
+  
+  
   
   dummy_was_xts <- FALSE
-  if (is.data.table(pData) == FALSE) {
-    if (is.xts(pData) == TRUE) {
+  if (!is.data.table(pData)) {
+    if (is.xts(pData)) {
       
       dummy_was_xts <- TRUE
       # If there is only one day of input and input is xts,
       # use old code because it's faster
       # However, multi-day input not possible
-      if (length(unique(as.Date(index(pData)))) == 1) {
-        if (is.null(tz) == TRUE) {
-          tz <-tz(pData)
+      if (ndays(pData) == 1) {
+        if (is.null(tz)) {
+          tz <- tz(pData)
         }
         ts2 <- fastTickAgregation(pData, on, k, tz)
         date <- strsplit(as.character(index(pData)), " ")[[1]][1]
-
+        
         #open
         a <- as.POSIXct(paste(date, marketOpen), tz = tz)
         b <- as.xts(matrix(as.numeric(pData[1]), nrow = 1), a)
         storage.mode(ts2) <- "numeric"
         ts3 <- c(b, ts2)
-
+        
         #close
         aa <- as.POSIXct(paste(date, marketClose), tz = tz)
         condition <- index(ts3) < aa
