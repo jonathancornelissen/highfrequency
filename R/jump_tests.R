@@ -516,7 +516,7 @@ intradayJumpTest <- function(pData, volEstimator = "RM", driftEstimator = "none"
     prices <- aggregatePrice(pData, on = on, k = k , marketOpen = marketOpen,
                    marketClose = marketClose, tz = tz, fill = TRUE)
     setkeyv(prices, "DT")
-    prices[, DATE := as.Date(DT, tz = tz(prices$DT))]
+    prices[, DATE := as.Date(DT, tz = tzone(prices$DT))]
     returns <- prices[, RETURN := log(PRICE) - shift(log(PRICE), type = "lag"), by = "DATE"][is.na(RETURN) == FALSE]
     
   } else { # volEstimator == "PARM" i.e. we have pre-averaged realized measures
@@ -780,12 +780,10 @@ plot.intradayJumpTest <- function(x, ...){
 #' specified by \code{tz}. By default, \code{marketClose = "16:00:00"}.
 #' @param tz string specifying the time zone to which the times in \code{data}
 #' and/or \code{marketOpen}/ \code{marketClose} belong. Default = \code{"GMT"}.
-#' @param ... method-specific parameters (see 'Details').
 #' This parameter will also help determine the testing times as the test is done on non-overlapping pre-averaged returns.
 #' 
 #' @details 
 #' 
-
 #' @importFrom stats na.omit quantile runif
 #' @export
 #' @importFrom zoo coredata
@@ -827,7 +825,7 @@ rankJumpTest <- function(marketPrice, stockPrices, alpha = c(5,3), coarseFreq = 
 
   marketPrice <- aggregatePrice(marketPrice, on = on, k = k , marketOpen = marketOpen,
                           marketClose = marketClose, tz = tz, fill = TRUE)
-  marketPrice[, DATE := as.Date(DT, tz = tz(marketPrice$DT))]
+  marketPrice[, DATE := as.Date(DT, tz = tzone(marketPrice$DT))]
   setkeyv(marketPrice, "DT")
   marketPrice <- marketPrice[, RETURN := log(PRICE) - shift(log(PRICE), type = "lag"), by = "DATE"][!is.na(RETURN)]
   marketReturns <- xts(marketPrice$RETURN, order.by = marketPrice$DT)
@@ -838,7 +836,7 @@ rankJumpTest <- function(marketPrice, stockPrices, alpha = c(5,3), coarseFreq = 
     colnames(tmp) <- c("DT", "PRICE")
     tmp <- aggregatePrice(tmp, on = on, k = k , marketOpen = marketOpen,
                                  marketClose = marketClose, tz = tz, fill = TRUE)
-    tmp[, DATE := as.Date(DT, tz = tz(tmp$DT))]
+    tmp[, DATE := as.Date(DT, tz = tzone(tmp$DT))]
     setkeyv(tmp, "DT")
     
     tmp <- tmp[, RETURN := log(PRICE) - shift(log(PRICE), type = "lag"), by = "DATE"][!is.na(RETURN)]

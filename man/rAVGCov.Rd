@@ -9,6 +9,7 @@ rAVGCov(
   cor = FALSE,
   alignBy = "minutes",
   alignPeriod = 5,
+  alignPeriod2 = 1,
   makeReturns = FALSE
 )
 }

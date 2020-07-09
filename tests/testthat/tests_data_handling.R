@@ -106,7 +106,6 @@ test_that("aggregatePrice edge cases", {
 })
 
 
-
 context("aggregatePrice milliseconds vs seconds")
 test_that("aggregatePrice milliseconds vs seconds", {
   dat <- data.table(DT = as.POSIXct(c(34150 ,34201, 34500, 34500 + 1e-9, 34799, 34801, 34803, 35099), origin = "1970-01-01", tz = "GMT"), PRICE = 0:7)
@@ -129,5 +128,30 @@ test_that("aggregatePrice filling correctly", {
   expect_equal(sum(output$PRICE == 7), 1) # 7 only happens once
   expect_equal(sum(output$PRICE == 8), 0) # 8 should be removed since it happens 1 sec after market closes.
   expect_equal(nrow(output), 23401)
+})
+
+
+context("aggregateQuotes edge cases")
+test_that("aggregateQuotes edge cases", {
+  dat <- data.table(DT = as.POSIXct(c(34150 ,34201, 34500, 34500 + 1e-9, 34799, 34801, 34803, 35099), origin = "1970-01-01", tz = "GMT"), 
+                    SYMBOL = "XXX", BID = as.numeric(0:7), BIDSIZ = as.numeric(1), OFR = as.numeric(1:8), OFRSIZ = as.numeric(2))
+  output <- aggregateQuotes(dat, on = "minutes", k = 5, marketOpen = "09:30:00", marketClose = "16:00:00")
+  
+  target <- data.table(DT = as.POSIXct(c(34200, 34500, 34800, 35100), origin = "1970-01-01", tz = "GMT"),
+                       SYMBOL = "XXX", BID = c(1,2,4,7), BIDSIZ = c(1,1,2,3), OFR = c(1,2,4,7) + 1, OFRSIZ = c(1,1,2,3) * 2)
+  
+  expect_equivalent(output, target)
+  
+  expect_true(all.equal(output$BIDSIZ * 2 , output$OFRSIZ))
+})
+
+
+context("aggregateQuotes milliseconds vs seconds")
+test_that("aggregateQuotes milliseconds vs seconds", {
+  dat <- data.table(DT = as.POSIXct(c(34150 ,34201, 34500, 34500 + 1e-12, 34799, 34801, 34803, 35099), origin = "1970-01-01", tz = "GMT"), 
+                    SYMBOL = "XXX", BID = as.numeric(0:7), BIDSIZ = as.numeric(1), OFR = as.numeric(1:8), OFRSIZ = as.numeric(2))
+  expect_equal(aggregateQuotes(dat, on = "milliseconds", k = 5000, marketOpen = "09:30:00", marketClose = "16:00:00"),
+               aggregateQuotes(dat, on = "secs", k = 5, marketOpen = "09:30:00", marketClose = "16:00:00"))
+  
 })
 

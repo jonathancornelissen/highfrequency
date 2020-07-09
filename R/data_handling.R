@@ -195,10 +195,10 @@ aggregateTS <- function (ts, FUN = "previoustick", on = "minutes", k = 1, weight
 #' # aggregate price data to half a second frequency including zero return price changes
 #' aggregatePrice(sampleTDataMicroseconds, on = "milliseconds", k = 500, fill = TRUE)
 #' @keywords internal
-#' @importFrom xts last
+#' @importFrom xts last tzone
 #' @export
 aggregatePrice <- function(pData, on = "minutes", k = 1, marketOpen = "09:30:00", marketClose = "16:00:00" , fill = FALSE, tz = NULL) {
-  pData <- data.table::copy(pData) # cop
+  pData <- data.table::copy(pData) # copy
   DATE = DT = FIRST_DT = DT_ROUND = LAST_DT = SYMBOL = PRICE = NULL
   
   on_true <- NULL
@@ -233,7 +233,7 @@ aggregatePrice <- function(pData, on = "minutes", k = 1, marketOpen = "09:30:00"
       # However, multi-day input not possible
       if (ndays(pData) == 1) {
         if (is.null(tz)) {
-          tz <- tz(pData)
+          tz <- tzone(pData)
         }
         ts2 <- fastTickAgregation(pData, on, k, tz)
         date <- strsplit(as.character(index(pData)), " ")[[1]][1]
@@ -266,7 +266,7 @@ aggregatePrice <- function(pData, on = "minutes", k = 1, marketOpen = "09:30:00"
     }
   }
   
-  timeZone <- tz(pData$DT)
+  timeZone <- tzone(pData$DT)
   if(is.null(tz)){
     tz <- timeZone
   }
@@ -348,7 +348,7 @@ aggregatePrice <- function(pData, on = "minutes", k = 1, marketOpen = "09:30:00"
 #       # However, multi-day input not possible
 #       if (ndays(pData) == 1) {
 #         if (is.null(tz) == TRUE) {
-#           tz <-tz(pData)
+#           tz <-tzone(pData)
 #         }
 #         ts2 <- fastTickAgregation(pData, on, k, tz)
 #         date <- strsplit(as.character(index(pData)), " ")[[1]][1]
@@ -380,10 +380,10 @@ aggregatePrice <- function(pData, on = "minutes", k = 1, marketOpen = "09:30:00"
 #       stop("Data.table neeeds PRICE column (date-time).")
 #     }
 #   }
-#   pData <- pData[DT >= ymd_hms(paste(as.Date(pData$DT, tz = tz(pData$DT)), marketOpen), tz = tz(pData$DT))]
-#   pData <- pData[DT <= ymd_hms(paste(as.Date(pData$DT, tz = tz(pData$DT)), marketClose), tz = tz(pData$DT))]
+#   pData <- pData[DT >= ymd_hms(paste(as.Date(pData$DT, tz = tzone(pData$DT)), marketOpen), tz = tzone(pData$DT))]
+#   pData <- pData[DT <= ymd_hms(paste(as.Date(pData$DT, tz = tzone(pData$DT)), marketClose), tz = tzone(pData$DT))]
 #   
-#   pData[, DATE := as.Date(DT, tz = tz(pData))]
+#   pData[, DATE := as.Date(DT, tz = tzone(pData))]
 #   pData[, FIRST_DT := min(DT), by = "DATE"]
 #   
 #   browser()
@@ -402,10 +402,10 @@ aggregatePrice <- function(pData, on = "minutes", k = 1, marketOpen = "09:30:00"
 #   pData[, LAST_DT := max(DT), by = "DT_ROUND"]
 #   
 #   pData_open <- data.table::copy(pData[DT == FIRST_DT])
-#   pData_open[, DT := ymd_hms(paste(as.Date(pData_open$DT), marketOpen), tz = tz(pData_open$DT))]
+#   pData_open[, DT := ymd_hms(paste(as.Date(pData_open$DT), marketOpen), tz = tzone(pData_open$DT))]
 #   pData_open <- pData_open[, c("DT", "PRICE")]
 #   pData <- pData[DT == LAST_DT][, DT := DT_ROUND][, c("DT", "PRICE")]
-#   lubridate::tz(pData$DT) <- tz(pData_open$DT)
+#   lubridate::tzone(pData$DT) <- tzone(pData_open$DT)
 #   # due to rounding there may be an observation that is refered to the opening time
 #   pData <- pData[!(DT %in% pData_open$DT)]
 #   
@@ -422,18 +422,18 @@ aggregatePrice <- function(pData, on = "minutes", k = 1, marketOpen = "09:30:00"
 #     if (is.null(on_true) == FALSE) {
 #       dt_full_index <-
 #         rbindlist(lapply(unique(as.Date(pData$DT)),
-#                          FUN = function(x) data.frame(DT = seq.POSIXt(from = as.POSIXct(paste0(x, marketOpen, tz = tz(pData$DT))), 
-#                                                                       to   = as.POSIXct(paste0(x, marketClose, tz = tz(pData$DT))), 
+#                          FUN = function(x) data.frame(DT = seq.POSIXt(from = as.POSIXct(paste0(x, marketOpen, tz = tzone(pData$DT))), 
+#                                                                       to   = as.POSIXct(paste0(x, marketClose, tz = tzone(pData$DT))), 
 #                                                                       units = on,
 #                                                                       by = k))))
 #     } else {
 #       dt_full_index <-
 #         rbindlist(lapply(unique(as.Date(pData$DT)),
-#                          FUN = function(x) data.frame(DT = seq.POSIXt(from = as.POSIXct(paste0(x, marketOpen, tz = tz(pData$DT))), 
-#                                                                       to   = as.POSIXct(paste0(x, marketClose, tz = tz(pData$DT))),
+#                          FUN = function(x) data.frame(DT = seq.POSIXt(from = as.POSIXct(paste0(x, marketOpen, tz = tzone(pData$DT))), 
+#                                                                       to   = as.POSIXct(paste0(x, marketClose, tz = tzone(pData$DT))),
 #                                                                       by = paste(k, on)))))
 #     }
-#     lubridate::tz(dt_full_index$DT) <- tz(pData$DT)
+#     lubridate::tzone(dt_full_index$DT) <- tzone(pData$DT)
 #     pData <- merge(pData, dt_full_index, by = "DT", all = TRUE)
 #     
 #     setkeyv(pData, "DT")
@@ -442,7 +442,7 @@ aggregatePrice <- function(pData, on = "minutes", k = 1, marketOpen = "09:30:00"
 #   }
 #   
 #   if (dummy_was_xts == TRUE) {
-#     return(xts(as.matrix(pData[, -c("DT")]), order.by = pData$DT, tzone = tz(pData$DT)))
+#     return(xts(as.matrix(pData[, -c("DT")]), order.by = pData$DT, tzone = tzone(pData$DT)))
 #   } else {
 #     return(pData)
 #   }
@@ -492,7 +492,20 @@ aggregateQuotes <- function(qData, on = "minutes", k = 5, marketOpen = "09:30:00
   
   qData <- checkColumnNames(qData)
   checkqData(qData)
-  
+  if (on == "milliseconds") {
+    on_true <- "milliseconds"
+    on <- "secs"
+    k <- k / 1000
+  }
+  if(on == "secs" | on == "seconds"){
+    scaleFactor <- k
+  }
+  if(on == "mins" | on == "minutes"){
+    scaleFactor <- k * 60
+  }
+  if(on == "hours"){
+    scaleFactor <- k * 60 * 60
+  }
   dummy_was_xts <- FALSE
   if (is.data.table(qData) == FALSE) {
     if (is.xts(qData) == TRUE) {
@@ -516,17 +529,32 @@ aggregateQuotes <- function(qData, on = "minutes", k = 5, marketOpen = "09:30:00
     }
   }
   
-  qData[, DATE := as.Date(DT)]
+  timeZone <- tzone(qData$DT)
+  if(is.null(tz)){
+    tz <- timeZone
+  }
+  marketOpenNumeric <- as.numeric(as.POSIXct(paste("1970-01-01", marketOpen), format = "%Y-%m-%d %H:%M:%OS", tz = timeZone), tz = timeZone)
+  marketCloseNumeric <- as.numeric(as.POSIXct(paste("1970-01-01", marketClose), format = "%Y-%m-%d %H:%M:%OS", tz = timeZone), tz = timeZone)
+  
+  
+  qData[,DT := as.numeric(DT, tz = timeZone)]
+  qData <- qData[between(DT %% 86400, marketOpenNumeric, marketCloseNumeric),]
+  
+  qData[, DATE := floor(DT / 86400)]
   qData[, FIRST_DT := min(DT), by = "DATE"]
+  
+  # Use Dirks answer here: https://stackoverflow.com/a/42498175 to round the timestamps to the latest scaleFactor
   qData[, DT_ROUND := ifelse(DT == FIRST_DT,
-                             floor_date(ymd_hms(DT), unit = paste(k, on)),
-                             ceiling_date(ymd_hms(DT), unit = paste(k, on), change_on_boundary = FALSE))]
-  qData[, DT_ROUND := as_datetime(DT_ROUND)]
+                             floor(DT/scaleFactor) * scaleFactor,
+                             ceiling(DT/scaleFactor) * scaleFactor)]
   qData[, LAST_DT := max(DT), by = "DT_ROUND"]
   qData[, OFRSIZ := sum(OFRSIZ), by = "DT_ROUND"]
   qData[, BIDSIZ := sum(BIDSIZ), by = "DT_ROUND"]
   
   qData <- qData[DT == LAST_DT][, DT := DT_ROUND][, c("DT", "SYMBOL", "BID", "BIDSIZ", "OFR", "OFRSIZ")]
+
+  qData[, DT := as.POSIXct(DT, origin = "1970-01-01", tz = tz)]
+  
   
   if (dummy_was_xts == TRUE) {
     return(xts(as.matrix(qData[, -c("DT")]), order.by = qData$DT, tzone = tz))
@@ -570,15 +598,27 @@ aggregateQuotes <- function(qData, on = "minutes", k = 5, marketOpen = "09:30:00
 #' # aggregate trade data to 5 minute frequency
 #' tData_aggregated <- aggregateTrades(sampleTData, on = "minutes", k = 5)
 #' head(tData_aggregated)
-#' @importFrom lubridate floor_date
-#' @importFrom lubridate ceiling_date
-#' @importFrom lubridate ymd_hms
-#' @importFrom lubridate as_datetime
 #' @export
 aggregateTrades <- function(tData, on = "minutes", k = 5, marketOpen = "09:30:00", marketClose = "16:00:00", tz = "GMT") {
   DATE = SIZE = DT = FIRST_DT = DT_ROUND = LAST_DT = SYMBOL = PRICE = VWPRICE = SIZETPRICE = SIZESUM = NULL
   tData <- checkColumnNames(tData)
   checktData(tData)
+  
+  if (on == "milliseconds") {
+    on_true <- "milliseconds"
+    on <- "secs"
+    k <- k / 1000
+  }
+  if(on == "secs" | on == "seconds"){
+    scaleFactor <- k
+  }
+  if(on == "mins" | on == "minutes"){
+    scaleFactor <- k * 60
+  }
+  if(on == "hours"){
+    scaleFactor <- k * 60 * 60
+  }
+  
   
   dummy_was_xts <- FALSE
   if (is.data.table(tData) == FALSE) {
@@ -591,23 +631,37 @@ aggregateTrades <- function(tData, on = "minutes", k = 5, marketOpen = "09:30:00
     }
   } else {
     if (("DT" %in% colnames(tData)) == FALSE) {
-      stop("Data.table neeeds DT column (date-time ).")
+      stop("Data.table neeeds DT column (date-time).")
     }
   }
   
-  tData[, DATE := as.Date(DT)]
+  timeZone <- tzone(tData$DT)
+  if(is.null(tz)){
+    tz <- timeZone
+  }
+  marketOpenNumeric <- as.numeric(as.POSIXct(paste("1970-01-01", marketOpen), format = "%Y-%m-%d %H:%M:%OS", tz = timeZone), tz = timeZone)
+  marketCloseNumeric <- as.numeric(as.POSIXct(paste("1970-01-01", marketClose), format = "%Y-%m-%d %H:%M:%OS", tz = timeZone), tz = timeZone)
+  
+  
+  tData[,DT := as.numeric(DT, tz = timeZone)]
+  tData <- tData[between(DT %% 86400, marketOpenNumeric, marketCloseNumeric),]
+  tData[, DATE := floor(DT / 86400)]
   tData[, FIRST_DT := min(DT), by = "DATE"]
   tData[, DT_ROUND := ifelse(DT == FIRST_DT,
-                             floor_date(ymd_hms(DT), unit = paste(k, on)),
-                             ceiling_date(ymd_hms(DT), unit = paste(k, on), change_on_boundary = FALSE))]
-  tData[, DT_ROUND := as_datetime(DT_ROUND)]
+                             floor(DT/scaleFactor) * scaleFactor,
+                             ceiling(DT/scaleFactor) * scaleFactor)]
+  
   tData[, LAST_DT := max(DT), by = "DT_ROUND"]
+  
   tData[, SIZETPRICE := SIZE * PRICE]
   tData[, SIZESUM := sum(SIZE), by = "DT_ROUND"]
   tData[, VWPRICE := sum(SIZETPRICE/SIZESUM), by = "DT_ROUND"]
   tData[, SIZE := SIZESUM]
   
   tData <- tData[DT == LAST_DT][, DT := DT_ROUND][, c("DT", "SYMBOL", "PRICE", "SIZE", "VWPRICE")]
+  
+  tData[, DT := as.POSIXct(DT, origin = "1970-01-01", tz = tz)]
+  
   
   if (dummy_was_xts == TRUE) {
     return(xts(as.matrix(tData[, -c("DT")]), order.by = tData$DT, tzone = tz))
@@ -680,7 +734,7 @@ autoSelectExchangeTrades <- function(tData) {
   print(paste("The ", namechosen, "is the exchange with the highest volume."))
   
   if (dummy_was_xts == TRUE) {
-    return(xts(as.matrix(tData[, -c("DT")]), order.by = tData$DT, tzone = tz(tData$DT)))
+    return(xts(as.matrix(tData[, -c("DT")]), order.by = tData$DT, tzone = tzone(tData$DT)))
   } else {
     return(tData)
   }
@@ -760,7 +814,7 @@ autoSelectExchangeQuotes <- function(qData) {
   print(paste("The ", namechosen, "is the exchange with the highest volume."))
   
   if (dummy_was_xts == TRUE) {
-    return(xts(as.matrix(qData[, -c("DT")]), order.by = qData$DT, tzone = tz(qData$DT)))
+    return(xts(as.matrix(qData[, -c("DT")]), order.by = qData$DT, tzone = tzone(qData$DT)))
   } else {
     return(qData)
   }
@@ -789,8 +843,7 @@ autoSelectExchangeQuotes <- function(qData) {
 #' @examples 
 #' exchangeHoursOnly(sampleTDataRawMicroseconds)
 #' @keywords cleaning
-#' @importFrom lubridate tz
-#' @importFrom lubridate ymd_hms
+#' @importFrom xts tzone
 #' @export
 exchangeHoursOnly <- function(data, dayBegin = "09:30:00", dayEnd = "16:00:00") {
   DT = NULL # needed for data table (otherwise notes pop up in check())
@@ -809,12 +862,16 @@ exchangeHoursOnly <- function(data, dayBegin = "09:30:00", dayEnd = "16:00:00") 
       stop("Data.table neeeds DT column.")
     }
   }
+  timeZone <- tzone(data$DT)
+  # data <- data[DT >= ymd_hms(paste(as.Date(data$DT), dayBegin), tz = tzone(data$DT))]
+  # data <- data[DT <= ymd_hms(paste(as.Date(data$DT), dayEnd), tz = tzone(data$DT))]
+  marketOpenNumeric <- as.numeric(as.POSIXct(paste("1970-01-01", dayBegin), format = "%Y-%m-%d %H:%M:%OS", tz = timeZone), tz = timeZone)
+  marketCloseNumeric <- as.numeric(as.POSIXct(paste("1970-01-01", dayEnd), format = "%Y-%m-%d %H:%M:%OS", tz = timeZone), tz = timeZone)
   
-  data <- data[DT >= ymd_hms(paste(as.Date(data$DT), dayBegin), tz = tz(data$DT))]
-  data <- data[DT <= ymd_hms(paste(as.Date(data$DT), dayEnd), tz = tz(data$DT))]
+  data <- data[between(as.numeric(DT, tz = tzone(data$DT)) %% 86400, marketOpenNumeric, marketCloseNumeric)]
   
   if (dummy_was_xts == TRUE) {
-    return(xts(as.matrix(data[, -c("DT")]), order.by = data$DT, tzone = tz(data$DT)))
+    return(xts(as.matrix(data[, -c("DT")]), order.by = data$DT, tzone = tzone(data$DT)))
   } else {
     return(data)
   }
@@ -924,7 +981,7 @@ makeReturns <- function(ts) {
 #' head(tqData)
 #' # multi-day input allowed
 #' tqData <- matchTradesQuotes(sampleTDataMicroseconds, sampleQDataMicroseconds)
-#' @importFrom lubridate seconds
+#' @importFrom xts tzone<- tzone
 #' @export
 matchTradesQuotes <- function(tData, qData, adjustment = 2) {
   
@@ -956,18 +1013,28 @@ matchTradesQuotes <- function(tData, qData, adjustment = 2) {
     }
   }
   
-  qData[, DATE := as.Date(DT)]
+  if(tzone(tData$DT) != tzone(qData$DT)){
+    stop("timezone of the trade data is not the same as the timezone of the quote data")
+  }
+  
+  timeZone <- tzone(tData$DT)
+
+  qData[, DT_ROUND := ifelse(DT == FIRST_DT, DT, DT + adjustment)]
+  qData[, DT := as.numeric(DT, tz = timeZone)]
+  qData[, DATE := floor(DT / 86400)]
   qData[, FIRST_DT := min(DT), by = "DATE"]
-  qData[, DT_ROUND := ifelse(DT == FIRST_DT, ymd_hms(DT), ymd_hms(DT) + seconds(2))]
-  
-  qData <- qData[, DT := ifelse(DT != min(DT), DT + seconds(2), DT)] 
-  qData <- qData[, DT := as_datetime(DT_ROUND)][, -c("FIRST_DT", "DT_ROUND", "DATE")]
-  
-  setkey(tData, SYMBOL, DT)
-  setkey(qData, SYMBOL, DT)
+  # Make the adjustments
+  qData <- qData[, DT := ifelse(DT == FIRST_DT, DT, DT + adjustment)][,-c("FIRST_DT", "DATE")]
+  qData[, DT := as.POSIXct(DT, tz = timeZone, origin = "1970-01-01")]
+
   
   tData <- tData[, c("DT", "SYMBOL", "PRICE", "SIZE")]
+  setkey(tData, SYMBOL, DT)
+  setkey(qData, SYMBOL, DT)
   tqData <- qData[tData, roll = TRUE, on = c("SYMBOL", "DT")]
+  tqData[, DT := as.POSIXct(DT, tz = timeZone, origin = "1970-01-01")]
+  tzone(tqData) <- timeZone
+  
   
   if (dummy_was_xts == TRUE) {
     return(xts(as.matrix(tqData[, -c("DT")]), order.by = tqData$DT))
