@@ -168,12 +168,12 @@ checkMultiDays <- function(x) {
   if ((is.matrix(x) | is.numeric(x)) & !is.xts(x)) {
     return(FALSE)
   }
-  if (is.xts(x) == FALSE) {
+  if (!is.xts(x)) {
     stop("Please provide xts-object or simple numeric vector.")
   }
-  if (is.xts(x) && (ndays(x)!=1)) {
-    TRUE
+  if (ndays(x) != 1) {
+    return(TRUE)
   } else {
-    FALSE
+    return(FALSE)
   }
 } 
