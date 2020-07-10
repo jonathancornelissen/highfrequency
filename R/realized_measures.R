@@ -381,6 +381,7 @@ MRC <- function(pData, pairwise = FALSE, makePsd = FALSE) {
 #' @param cor boolean, in case it is TRUE, the correlation is returned. FALSE by default.
 #' @param alignBy Align the tick data to seconds|minutes|hours
 #' @param alignPeriod Align the tick data to this many [seconds|minutes|hours]
+#' @param alignPeriod2 fast alignment Align the tick data to this many [seconds|minutes|hours]
 #' @param makeReturns Prices are passed make them into log returns
 #' 
 #' @return Realized covariance using average subsample.
@@ -411,9 +412,8 @@ MRC <- function(pData, pairwise = FALSE, makePsd = FALSE) {
 #' @export
 #' 
 rAVGCov <- function(rData, cor = FALSE, alignBy = "minutes", alignPeriod = 5, alignPeriod2 = 1, makeReturns = FALSE) {
-  
-  DT = DT_ROUND = DT_SUBSAMPLE = FIRST_DT = MAXDT = RETURN = RETURN1 = RETURN2 = NULL
-  
+  print("~~~~~rAVGCov~~~~~~: check for alignPeriod2 flexibility (fast and slow timescale control)")
+  DT <- DT_ROUND <- DT_SUBSAMPLE <- FIRST_DT <- MAXDT <- RETURN <- RETURN1 <- RETURN2 <- NULL
   multixts <- multixts(rData)
   if (multixts == TRUE) {
     stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")
@@ -440,6 +440,9 @@ rAVGCov <- function(rData, cor = FALSE, alignBy = "minutes", alignPeriod = 5, al
   
   
   scalingFraction <- alignPeriod/alignPeriod2
+  if(scalingFraction < 0 | scalingFraction %% 1){
+    stop("alignPeriod must be greater than alignPeriod2, and the fraction of these must be an integer value")
+  }
   
   
   if (n == 1) {
@@ -468,18 +471,19 @@ rAVGCov <- function(rData, cor = FALSE, alignBy = "minutes", alignPeriod = 5, al
     
     
     
-    for (ii in c(1:(alignPeriod - 1))) {
-      rdatasub <- rData[-c(1:ii, (dim(rData)[1]-alignPeriod + ii + 1):dim(rData)[1]), ]
+    for (ii in c(1:(scalingFraction - 1))) {
+      rdatasub <- rData[-c(1:ii, (dim(rData)[1]-scalingFraction + ii + 1):dim(rData)[1]), ]
       rdatasub[, DT_ROUND := DT_ROUND - ii * scaleFactorFast] 
-      rvavg <- rvavg + sum(rdatasub[, DT_SUBSAMPLE := ceiling(DT_ROUND/scaleFactor) * scaleFactor][, list(RETURN = sum(RETURN)), by = list(DT_SUBSAMPLE)]$RETURN^2) * (dim(rdatasub)[1]/alignPeriod + 1) / (dim(rdatasub)[1]/alignPeriod)
+      rvavg <- rvavg + sum(rdatasub[, DT_SUBSAMPLE := ceiling(DT_ROUND/scaleFactor) * scaleFactor][, list(RETURN = sum(RETURN)), by = list(DT_SUBSAMPLE)]$RETURN^2) * (dim(rdatasub)[1]/scalingFraction + 1) / (dim(rdatasub)[1]/scalingFraction)
     }
-      return(rvavg / alignPeriod)
+      return(rvavg / scalingFraction)
   }
   
   if (n > 1) {
     rdatamatrix <- matrix(0, nrow = n, ncol = n)
     for (ii in 1:n) {
-      rdatamatrix[ii, ii] <- rAVGCov(rData[, ii], cor = cor, alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = makeReturns)
+      # calculate variances
+      rdatamatrix[ii, ii] <- rAVGCov(rData[, ii], cor = cor, alignBy = alignBy, alignPeriod = alignPeriod, alignPeriod2 = alignPeriod2, makeReturns = makeReturns)
       if (ii < n) {
         for (jj in (ii+1):n) {
           rdatabackup <- data.table(DT = as.numeric(index(rData), tz = tzone(rData)), RETURN1 = as.numeric(rData[, ii]), RETURN2 = as.numeric(rData[,jj]))
@@ -501,18 +505,19 @@ rAVGCov <- function(rData, cor = FALSE, alignBy = "minutes", alignPeriod = 5, al
             
           }
           returns <- rdatabackup[, DT_SUBSAMPLE := ceiling(DT_ROUND / scaleFactor) * scaleFactor][, list(RETURN1 = sum(RETURN1), RETURN2 = sum(RETURN2)), by = list(DT_SUBSAMPLE)]
+          # Calculate off-diagonals
           covavg <- t(returns$RETURN1) %*% returns$RETURN2
           
-          for (kk in c(1:(alignPeriod - 1))) {
+          for (kk in c(1:(scalingFraction - 1))) {
             returns <- rdatabackup[, DT_SUBSAMPLE := ceiling(DT_ROUND/scaleFactorFast) * scaleFactorFast][, list(RETURN1 = sum(RETURN1), RETURN2 = sum(RETURN2)), by = list(DT_SUBSAMPLE)]
-            rdatasub <- returns[-c(1:kk, (dim(returns)[1]-alignPeriod + kk + 1):dim(returns)[1]), ]
+            rdatasub <- returns[-c(1:kk, (dim(returns)[1]-scalingFraction + kk + 1):dim(returns)[1]), ]
             rdatasub[, DT_SUBSAMPLE := DT_SUBSAMPLE - kk * scaleFactorFast] 
             returns <- rdatasub[, DT_SUBSAMPLE := ceiling(DT_SUBSAMPLE/scaleFactor) * scaleFactor][, list(RETURN1 = sum(RETURN1), RETURN2 = sum(RETURN2)), by = list(DT_SUBSAMPLE)]
             covavg <- covavg + t(returns$RETURN1) %*% returns$RETURN2
           }
           
           
-          rdatamatrix[ii, jj] <- rdatamatrix[jj, ii] <- covavg / alignPeriod
+          rdatamatrix[ii, jj] <- rdatamatrix[jj, ii] <- covavg / scalingFraction
           
         }
       }

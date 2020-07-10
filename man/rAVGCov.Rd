@@ -23,6 +23,8 @@ return series over period \eqn{t}, with \eqn{M} observations during \eqn{t}.}
 
 \item{alignPeriod}{Align the tick data to this many [seconds|minutes|hours]}
 
+\item{alignPeriod2}{fast alignment Align the tick data to this many [seconds|minutes|hours]}
+
 \item{makeReturns}{Prices are passed make them into log returns}
 }
 \value{

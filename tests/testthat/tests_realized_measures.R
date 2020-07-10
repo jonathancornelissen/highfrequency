@@ -234,6 +234,28 @@ test_that("ivInference", {
   )
 })
 
+context("rAVGCov")
+test_that("rAVGCov",{
+  rcovSub <- rAVGCov(rData = cbind(lltc, sbux, fill = 0), alignBy = "minutes",alignPeriod = 5, alignPeriod2 = 1, makeReturns = FALSE)
+  expect_equal(as.numeric(rcovSub), c(0.0005884480, 0.0004312966, 0.0004312966, 0.0006857147))
+  
+  
+  
+  rcovSubSeconds <- rAVGCov(rData = cbind(lltc, sbux, fill = 0), alignBy = "seconds",alignPeriod = 5 * 60 , alignPeriod2 = 60 , makeReturns = FALSE)
+  expect_equal(rcovSub , rcovSubSeconds)
+  
+  rcovSubUnivariate <- rAVGCov(rData = cbind(lltc, sbux, fill = 0)[,1], alignBy = "minutes",alignPeriod = 5, makeReturns = FALSE)
+  
+  expect_equal(rcovSub[[1]], rcovSubUnivariate)
+  
+  rcovSub_makeReturns <- rAVGCov(rData = exp(cumsum(cbind(lltc, sbux, fill = 0))), alignBy = "minutes",alignPeriod = 5, alignPeriod2 = 1, makeReturns = TRUE)
+  
+  expect_equal(as.numeric(rcovSub_makeReturns) , c(0.0005881636, 0.0004307105,0.0004307105, 0.0005710761))
+})
+
+
+
+
 
 context("refreshTime")
 test_that("refreshTime", {
