@@ -348,7 +348,7 @@ BNSjumpTest <- function (rData, IVestimator = "BV", IQestimator = "TP", type = "
 #'    }
 #'  where \eqn{k_j} are nonzero random variables. The counting process can be either finite or infinite for finite or infinite activity jumps.
 #'  
-#'  The Jiang and Oomen test is that: in the absence of jumps, the accumulated difference between the simple return and the log return captures one half of the integrated variance.(Theodosiou& Zikes(2009))
+#'  The Jiang and Oomen test is that: in the absence of jumps, the accumulated difference between the simple return and the log return captures one half of the integrated variance. (Theodosiou& Zikes(2009))
 #'  
 #' @references 
 #'  Andersen, T. G., D. Dobrev, and E. Schaumburg (2012). Jump-robust volatility estimation using nearest neighbor truncation. Journal of Econometrics, 169(1), 75- 93.
@@ -451,7 +451,7 @@ JOjumpTest <- function(pData, power = 4, alignBy = NULL, alignPeriod = NULL, alp
 #' @examples 
 #' \dontrun{
 #' # We can easily make a Lee-Mykland jump test.
-#' LMtest <- intradayJumpTest(pData = sampleTDataMicroseconds[, .(DT, PRICE)], 
+#' LMtest <- intradayJumpTest(pData = sampleTDataMicroseconds[, list(DT, PRICE)], 
 #'                            volEstimator = "RM", driftEstimator = "none",
 #'                            RM = "bipower", lookBackPeriod = 10,
 #'                            on = "minutes", k = 5, marketOpen = "09:30:00", 
@@ -591,9 +591,9 @@ intradayJumpTest <- function(pData, volEstimator = "RM", driftEstimator = "none"
   criticalValue <- Cn + Sn * betastar
   
   if(dummy_was_xts){
-    pData <- as.xts(pData[ , .(DT, PRICE)])
+    pData <- as.xts(pData[ , list(DT, PRICE)])
   } else {
-    pData <- pData[ , .(DT, PRICE)]
+    pData <- pData[ , list(DT, PRICE)]
   }
   
   
@@ -840,7 +840,7 @@ rankJumpTest <- function(marketPrice, stockPrices, alpha = c(5,3), coarseFreq = 
     setkeyv(tmp, "DT")
     
     tmp <- tmp[, RETURN := log(PRICE) - shift(log(PRICE), type = "lag"), by = "DATE"][!is.na(RETURN)]
-    stockReturns <- cbind(stockReturns, as.xts(tmp[,.(DT, PRICE)])$PRICE)
+    stockReturns <- cbind(stockReturns, as.xts(tmp[, list(DT, PRICE)])$PRICE)
   }
 
   
