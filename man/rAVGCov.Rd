@@ -9,7 +9,7 @@ rAVGCov(
   cor = FALSE,
   alignBy = "minutes",
   alignPeriod = 5,
-  alignPeriod2 = 1,
+  alignPeriodFast = 1,
   makeReturns = FALSE
 )
 }
@@ -19,11 +19,11 @@ return series over period \eqn{t}, with \eqn{M} observations during \eqn{t}.}
 
 \item{cor}{boolean, in case it is TRUE, the correlation is returned. FALSE by default.}
 
-\item{alignBy}{Align the tick data to seconds|minutes|hours}
+\item{alignBy}{Align the tick data to seconds|minutes|hours. Default is \code{"minutes"}}
 
-\item{alignPeriod}{Align the tick data to this many [seconds|minutes|hours]}
+\item{alignPeriod}{Align the tick data to this many [seconds|minutes|hours] Default is \code{5}}
 
-\item{alignPeriod2}{fast alignment Align the tick data to this many [seconds|minutes|hours]}
+\item{alignPeriodFast}{fast alignment. The fast alignment period should be a divisor of the slow period (alignPeriod). Default is \code{1}}
 
 \item{makeReturns}{Prices are passed make them into log returns}
 }
@@ -47,6 +47,9 @@ rcovSub <- rAVGCov(rData = cbind(lltc, sbux, fill = 0), alignBy = "minutes",
                    alignPeriod = 5, makeReturns = FALSE)
 rcovSub
 
+# Multivariate with a 30 second fast aggregation and a 2.5 minute slow aggregation.
+rcovSub <- rAVGCov(rData = cbind(lltc, sbux, fill = 0), alignBy = "minutes", alignPeriod = 2.5, alignPeriodFast = 0.5, makeReturns = FALSE)
+rcovSub
 }
 \references{
 L. Zhang, P.A Mykland, and Y. Ait-Sahalia. A tale of two time scales: Determining integrated volatility with noisy high-frequency data. \emph{Journal of the American Statistical Association}, 2005.

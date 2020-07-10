@@ -379,9 +379,9 @@ MRC <- function(pData, pairwise = FALSE, makePsd = FALSE) {
 #' @param rData a \eqn{(M x N)} matrix/zoo/xts object containing the \eqn{N}
 #' return series over period \eqn{t}, with \eqn{M} observations during \eqn{t}.
 #' @param cor boolean, in case it is TRUE, the correlation is returned. FALSE by default.
-#' @param alignBy Align the tick data to seconds|minutes|hours
-#' @param alignPeriod Align the tick data to this many [seconds|minutes|hours]
-#' @param alignPeriod2 fast alignment Align the tick data to this many [seconds|minutes|hours]
+#' @param alignBy Align the tick data to seconds|minutes|hours. Default is \code{"minutes"}
+#' @param alignPeriod Align the tick data to this many [seconds|minutes|hours] Default is \code{5}
+#' @param alignPeriodFast fast alignment. The fast alignment period should be a divisor of the slow period (alignPeriod). Default is \code{1}
 #' @param makeReturns Prices are passed make them into log returns
 #' 
 #' @return Realized covariance using average subsample.
@@ -407,12 +407,14 @@ MRC <- function(pData, pairwise = FALSE, makePsd = FALSE) {
 #'                    alignPeriod = 5, makeReturns = FALSE)
 #' rcovSub
 #' 
+#' # Multivariate with a 30 second fast aggregation and a 2.5 minute slow aggregation.
+#' rcovSub <- rAVGCov(rData = cbind(lltc, sbux, fill = 0), alignBy = "minutes", alignPeriod = 2.5, alignPeriodFast = 0.5, makeReturns = FALSE)
+#' rcovSub
 #' @importFrom data.table data.table
 #' @keywords volatility
 #' @export
 #' 
-rAVGCov <- function(rData, cor = FALSE, alignBy = "minutes", alignPeriod = 5, alignPeriod2 = 1, makeReturns = FALSE) {
-  print("~~~~~rAVGCov~~~~~~: check for alignPeriod2 flexibility (fast and slow timescale control)")
+rAVGCov <- function(rData, cor = FALSE, alignBy = "minutes", alignPeriod = 5, alignPeriodFast = 1, makeReturns = FALSE) {
   DT <- DT_ROUND <- DT_SUBSAMPLE <- FIRST_DT <- MAXDT <- RETURN <- RETURN1 <- RETURN2 <- NULL
   multixts <- multixts(rData)
   if (multixts == TRUE) {
@@ -427,21 +429,21 @@ rAVGCov <- function(rData, cor = FALSE, alignBy = "minutes", alignPeriod = 5, al
   
   if(alignBy == "secs" | alignBy == "seconds"){
     scaleFactor <- alignPeriod
-    scaleFactorFast <- alignPeriod2
+    scaleFactorFast <- alignPeriodFast
   }
   if(alignBy == "mins" | alignBy == "minutes"){
     scaleFactor <- alignPeriod * 60
-    scaleFactorFast <- alignPeriod2 * 60 
+    scaleFactorFast <- alignPeriodFast * 60 
   }
   if(alignBy == "hours"){
     scaleFactor <- alignPeriod * 60 * 60
-    scaleFactorFast <- alignPeriod2 * 60 * 60 
+    scaleFactorFast <- alignPeriodFast * 60 * 60 
   }
   
-  
-  scalingFraction <- alignPeriod/alignPeriod2
+  # We calculate how many times the fast alignment period divides the slow one and makes sure it is a positive integer.
+  scalingFraction <- alignPeriod/alignPeriodFast
   if(scalingFraction < 0 | scalingFraction %% 1){
-    stop("alignPeriod must be greater than alignPeriod2, and the fraction of these must be an integer value")
+    stop("alignPeriod must be greater than alignPeriodFast, and the fraction of these must be an integer value")
   }
   
   
@@ -483,7 +485,7 @@ rAVGCov <- function(rData, cor = FALSE, alignBy = "minutes", alignPeriod = 5, al
     rdatamatrix <- matrix(0, nrow = n, ncol = n)
     for (ii in 1:n) {
       # calculate variances
-      rdatamatrix[ii, ii] <- rAVGCov(rData[, ii], cor = cor, alignBy = alignBy, alignPeriod = alignPeriod, alignPeriod2 = alignPeriod2, makeReturns = makeReturns)
+      rdatamatrix[ii, ii] <- rAVGCov(rData[, ii], cor = cor, alignBy = alignBy, alignPeriod = alignPeriod, alignPeriodFast = alignPeriodFast, makeReturns = makeReturns)
       if (ii < n) {
         for (jj in (ii+1):n) {
           rdatabackup <- data.table(DT = as.numeric(index(rData), tz = tzone(rData)), RETURN1 = as.numeric(rData[, ii]), RETURN2 = as.numeric(rData[,jj]))
