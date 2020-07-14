@@ -15,7 +15,7 @@ test_that("matchTradesQuotes & getTradeDirection quotes", {
   directions <- getTradeDirection(tqData)
   sum(directions)
 expect_equal(
-  sum(directions),
+  sum(directions), 
   -754
 )})
 # 

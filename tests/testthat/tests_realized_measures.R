@@ -157,8 +157,8 @@ test_that("rSkew", {
 # rSV
 context("rSV")
 test_that("rSV", {
-  expect_equal({
-    rSV(sampleTData$PRICE,alignBy ="minutes", alignPeriod = 5, makeReturns = TRUE)},
+  expect_equal(
+    rSV(sampleTData$PRICE,alignBy ="minutes", alignPeriod = 5, makeReturns = TRUE),
     list(rSVdownside = 0.00029125752237359241398, rSVupside = 0.00016310984360246060573)
   )
 })
@@ -236,10 +236,10 @@ test_that("ivInference", {
 
 context("rAVGCov")
 test_that("rAVGCov",{
-  rcovSub <- rAVGCov(rData = cbind(lltc, sbux, fill = 0), alignBy = "minutes",alignPeriod = 5, alignPeriodFast = 1, makeReturns = FALSE)
+  rcovSub <- rAVGCov(rData = cbind(lltc, sbux, fill = 0), alignBy = "minutes",alignPeriod = 5, k = 1, makeReturns = FALSE)
   expect_equal(as.numeric(rcovSub), c(0.0005884480, 0.0004312966, 0.0004312966, 0.0006857147))
   # Correct handling of seconds?
-  rcovSubSeconds <- rAVGCov(rData = cbind(lltc, sbux, fill = 0), alignBy = "seconds",alignPeriod = 5 * 60 , alignPeriodFast = 60 , makeReturns = FALSE)
+  rcovSubSeconds <- rAVGCov(rData = cbind(lltc, sbux, fill = 0), alignBy = "seconds",alignPeriod = 5 * 60 , k = 60 , makeReturns = FALSE)
   expect_equal(rcovSub , rcovSubSeconds)
   
   
@@ -248,17 +248,17 @@ test_that("rAVGCov",{
   
   expect_equal(rcovSub[[1]], rcovSubUnivariate)
   
-  rcovSub_makeReturns <- rAVGCov(rData = exp(cumsum(cbind(lltc, sbux, fill = 0))), alignBy = "minutes",alignPeriod = 5, alignPeriodFast = 1, makeReturns = TRUE)
+  rcovSub_makeReturns <- rAVGCov(rData = exp(cumsum(cbind(lltc, sbux, fill = 0))), alignBy = "minutes",alignPeriod = 5, k = 1, makeReturns = TRUE)
   
   expect_equal(as.numeric(rcovSub_makeReturns) , c(0.0005881636, 0.0004307105,0.0004307105, 0.0005710761))
   
   # Correct handling of fractional minute specification.
-  rcovSub <- rAVGCov(rData = cbind(lltc, sbux, fill = 0), alignBy = "minutes",alignPeriod = 2.5, alignPeriodFast = 0.5, makeReturns = FALSE)
+  rcovSub <- rAVGCov(rData = cbind(lltc, sbux, fill = 0), alignBy = "minutes",alignPeriod = 2.5, k = 0.5, makeReturns = FALSE)
   expect_equal(as.numeric(rcovSub), c(0.0005945100, 0.0003883607, 0.0003883607, 0.0006608860))
   
   
   # We the fast alignment is not a factor of the slow alignment period
-  expect_error(rAVGCov(rData = cbind(lltc, sbux, fill = 0), alignBy = "minutes",alignPeriod = 2.75, alignPeriodFast = 0.5, makeReturns = FALSE))  
+  expect_error(rAVGCov(rData = cbind(lltc, sbux, fill = 0), alignBy = "minutes",alignPeriod = 2.75, k = 0.5, makeReturns = FALSE))  
   
 })
 
@@ -329,4 +329,3 @@ test_that("rCholCov", {
   
   
 })
-
