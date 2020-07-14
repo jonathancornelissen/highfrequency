@@ -145,7 +145,6 @@ summary(x)
 plot(x)
 predict(x)
 
-
 }
 \references{
 Andersen, T. G., T. Bollerslev, and F. Diebold (2007). Roughing it up: including jump components in the measurement, modelling and forecasting of return volatility. The Review of Economics and Statistics 89, 701-720.

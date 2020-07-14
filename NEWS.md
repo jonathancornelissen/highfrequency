@@ -6,6 +6,7 @@ Changes in version 0.7.0
  - Implement rankJumpTest to test for the rank of the jump matrix
  - Implement new features in spotVol. Now the local volatility can be estimated with realized measures, they can also be used with pre-averaged realized measures.
  - Implement a wrapper around quantmod's getSymbols.av function
+ - harModel now includes Newey-West standard errors in the output.
 
 Changes in version 0.6.5
  - bug fix for kernelCov if cor = TRUE
