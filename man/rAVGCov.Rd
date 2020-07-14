@@ -9,7 +9,7 @@ rAVGCov(
   cor = FALSE,
   alignBy = "minutes",
   alignPeriod = 5,
-  alignPeriodFast = 1,
+  k = 1,
   makeReturns = FALSE
 )
 }
@@ -21,9 +21,9 @@ return series over period \eqn{t}, with \eqn{M} observations during \eqn{t}.}
 
 \item{alignBy}{Align the tick data to seconds|minutes|hours. Default is \code{"minutes"}}
 
-\item{alignPeriod}{Align the tick data to this many [seconds|minutes|hours] Default is \code{5}}
+\item{alignPeriod}{Align the tick data to this many [seconds|minutes|hours]. This can be a fraction. Default is \code{5}}
 
-\item{alignPeriodFast}{fast alignment. The fast alignment period should be a divisor of the slow period (alignPeriod). Default is \code{1}}
+\item{k}{numeric denoting which horizon to use for the subsambles. This can be a fraction as long as k is a divisor of alignPeriod default is \code{1}}
 
 \item{makeReturns}{Prices are passed make them into log returns}
 }
@@ -48,7 +48,8 @@ rcovSub <- rAVGCov(rData = cbind(lltc, sbux, fill = 0), alignBy = "minutes",
 rcovSub
 
 # Multivariate with a 30 second fast aggregation and a 2.5 minute slow aggregation.
-rcovSub <- rAVGCov(rData = cbind(lltc, sbux, fill = 0), alignBy = "minutes", alignPeriod = 2.5, alignPeriodFast = 0.5, makeReturns = FALSE)
+rcovSub <- rAVGCov(rData = cbind(lltc, sbux, fill = 0), 
+                   alignBy = "minutes", alignPeriod = 2.5, k = 0.5, makeReturns = FALSE)
 rcovSub
 }
 \references{

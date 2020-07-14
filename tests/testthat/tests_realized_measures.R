@@ -329,3 +329,22 @@ test_that("rCholCov", {
   
   
 })
+
+context("rSemiCov")
+test_that("rSemiCov", {
+  rSC <- rSemiCov(sample5MinPrices, makeReturns = TRUE)
+  mixed <- do.call(rbind, lapply(rSC, function(x) x[["mixed"]][1,2]))
+  neg <- do.call(rbind, lapply(rSC, function(x) x[["negative"]][1,2]))
+  pos <- do.call(rbind, lapply(rSC, function(x) x[["positive"]][1,2]))
+  concordant <- do.call(rbind, lapply(rSC, function(x) x[["concordant"]][1,2]))
+  # Test whether we have zeros on the diagonal of the mixed covariance matrix
+  expect_equal(as.numeric(diag((rSC[[1]][['mixed']]))) , numeric(nrow(rSC[[1]][['mixed']])))
+  
+  
+  rCv <- rCov(sample5MinPrices, makeReturns = TRUE)
+  realized <- do.call(rbind, lapply(rCv, function(x) x[1,2]))
+  # Test whether the realized covariance is equal to the sum of the decomposed realized semicovariances.
+  expect_equal(realized , (mixed + neg + pos))
+})
+
+

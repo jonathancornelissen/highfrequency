@@ -408,7 +408,8 @@ MRC <- function(pData, pairwise = FALSE, makePsd = FALSE) {
 #' rcovSub
 #' 
 #' # Multivariate with a 30 second fast aggregation and a 2.5 minute slow aggregation.
-#' rcovSub <- rAVGCov(rData = cbind(lltc, sbux, fill = 0), alignBy = "minutes", alignPeriod = 2.5, k = 0.5, makeReturns = FALSE)
+#' rcovSub <- rAVGCov(rData = cbind(lltc, sbux, fill = 0), 
+#'                    alignBy = "minutes", alignPeriod = 2.5, k = 0.5, makeReturns = FALSE)
 #' rcovSub
 #' @importFrom data.table data.table
 #' @keywords volatility
@@ -817,6 +818,7 @@ rBPCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeR
     }
     if (n > 1) { 
       result <- applyGetList(rData, rBPCov, cor = cor, alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = makeReturns, makePsd) 
+      names(result) <- unique(as.Date(index(rData)))
     }    
     return(result)
   } else { #single day code
@@ -923,7 +925,8 @@ rCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeRet
       result <- apply.daily(rData, rCov, alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = makeReturns) 
     }
     if (n > 1) { 
-      result <- applyGetList(rData, rCov, cor=cor, alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = makeReturns) 
+      result <- applyGetList(rData, rCov, cor=cor, alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = makeReturns)
+      names(result) <- unique(as.Date(index(rData)))
     }    
     return(result)
   } else {
@@ -1631,6 +1634,7 @@ rThresholdCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL
     if (n > 1) { 
       result <- applyGetList(rData, rThresholdCov, cor = cor, alignBy = alignBy,
                               alignPeriod = alignPeriod, makeReturns = makeReturns)
+      names(result) <- unique(as.Date(index(rData)))
     }    
     return(result)
   } else { #single day code
@@ -2270,3 +2274,136 @@ rCholCov <- function(pData, IVest = "MRC", COVest = "MRC", criterion = "squared 
   
 }
 
+
+
+#' Realized Semicovariance
+#' 
+#' @description Function returns the Realized Semicovariances (rSemiCov).
+#' Let \eqn{r_{t,i}} be an intraday \eqn{N x M} return vector and \eqn{i=1,...,M}
+#' the number of intraday returns. Then, let p = max(r_{t,i},0) and n = min(r_{t,i}).
+#' 
+#' Then, the realized semicovariance is given by the following three matrices:
+#' 
+#'\deqn{
+#'  \mbox{pos}_t =\sum_{i=1}^{M}p_{t,i}p'_{t,i}
+#'} 
+#'\deqn{
+#'  \mbox{neg}_t =\sum_{i=1}^{M}n_{t,i}n'_{t,i}
+#'} 
+#'\deqn{
+#'  \mbox{mixed}_t =\sum_{i=1}^{M}(p_{t,i}n'_{t,i} + n_{t,i}p'_{t,i})
+#'}
+#'
+#' The mixed covariance matrix will have 0 on the diagonal.
+#' From these three matrices, the realized covariance can be constructed as pos + neg + mixed.
+#' The concordant semicovariance matrix is pos + neg.
+#' The off-diagonals of the concordant matrix is always positive, while for the mixed matrix, it is always negative.
+#'
+#'  
+#' @param rData a \eqn{(M x N)} matrix/zoo/xts object containing the \eqn{N}
+#' return series over period \eqn{t}, with \eqn{M} observations during \eqn{t}.
+#' In case of a matrix, no multi-day adjustment is possible.
+#' @param cor logical, in case it is TRUE, the correlation is returned. FALSE by default.
+#' @param alignBy a string, align the tick data to "seconds"|"minutes"|"hours".
+#' @param alignPeriod an integer, align the tick data to this many [seconds|minutes|hours].
+#' @param makeReturns logical, should be TRUE when rData contains prices instead of returns. FALSE by default.
+#' 
+#' @return In case the data consists of one day a list of four \eqn{N x N} matrices are returned. These matrices are the mixed, positive, negative and concordant
+#' In case the data spans more than one day, the list for each day will be put into another list named according to the date of the estimates.
+#' 
+#' @details In the case that cor is TRUE, the mixed matrix will be an \eqn{N x N} matrix filled with NA as mapping the mixed covariance matrix into correlation space is impossible due to the 0-diagonal.
+#' 
+#' @author Emil Sjoerup
+#' 
+#' @examples 
+#' # Realized semi-variance/semi-covariance for prices aligned   
+#' # at 5 minutes.
+#' data(sampleTData)
+#' data(sample5MinPricesJumps)
+#' 
+#' # Univariate: 
+#' rSV = rSemiCov(rData = sampleTData$PRICE, alignBy = "minutes", 
+#'                    alignPeriod = 5, makeReturns = TRUE)
+#' 
+#' # Multivariate single day: 
+#' rSC = rSemiCov(rData = sample5MinPricesJumps['2010-01-04'], makeReturns=TRUE)
+#' 
+#' \dontrun{
+#' # Multivariate multi day:
+#' rSC <- rSemiCov(sample5MinPrices, makeReturns = TRUE) # rSC is a list of lists
+#' # We extract the covariance between stock 1 and stock 2 for all three covariances.
+#' mixed <- do.call(rbind, lapply(rSC, function(x) x[["mixed"]][1,2]))
+#' neg <- do.call(rbind, lapply(rSC, function(x) x[["negative"]][1,2]))
+#' pos <- do.call(rbind, lapply(rSC, function(x) x[["positive"]][1,2]))
+#' covariances <- xts(cbind(mixed, neg, pos), as.Date(rownames(pos)))
+#' colnames(covariances) <- c("mixed", "neg", "pos")
+#' # We make a quick plot of the different covariances
+#' plot(covariances)
+#' addLegend(lty = 1)
+#' }
+#' 
+#' @keywords volatility
+#' @importFrom data.table between
+#' @export
+rSemiCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE){
+  
+  N <- ncol(rData)
+  if (checkMultiDays(rData)) { 
+    if (N == 1) { 
+      result <- apply.daily(rData, rSemiCov, alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = makeReturns) 
+    }
+    if (N > 1) { 
+      result <- applyGetList(rData, rSemiCov, cor=cor, alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = makeReturns)
+      names(result) <- unique(as.Date(index(rData)))
+    }    
+    return(result)
+  }
+  
+  if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+    rData <- fastTickAgregation(rData, on = alignBy, k = alignPeriod)
+  } 
+  if (makeReturns) {  
+    rData <- makeReturns(rData) 
+  }  
+  
+  
+  # create p and n
+  pos <- pmax(rData, 0)
+  neg <- pmin(rData, 0)
+  
+  # calculate the mixed covariance (variances will be 0)
+  mixCov <- t(pos) %*% neg + t(neg) %*% pos
+  
+  # Calculate negative covariance
+  negCov <- t(neg) %*% neg
+  # Calculate positive covariance
+  posCov <- t(pos) %*% pos
+  
+  # Construct the concordant covariance
+  concordantCov <- negCov + posCov
+  # We also return the realized covariance 
+  rCovEst <- mixCov + concordantCov
+  
+  if(cor){
+    
+    ## Calculate the correlations from the covariance matrices.
+    mixCor <- matrix(NA, N, N)
+    
+    sdmatrix <- sqrt(diag(diag(negCov)))
+    negCor <- solve(sdmatrix) %*% negCov %*% solve(sdmatrix)  
+    
+    sdmatrix <- sqrt(diag(diag(posCov)))
+    posCor <- solve(sdmatrix) %*% posCov %*% solve(sdmatrix)  
+    
+    sdmatrix <- sqrt(diag(diag(concordantCov)))
+    concordantCor <- solve(sdmatrix) %*% concordantCov %*% solve(sdmatrix)  
+    
+    sdmatrix <- sqrt(diag(diag(rCovEst)))
+    rCorEst <- solve(sdmatrix) %*% rCovEst %*% solve(sdmatrix)  
+    
+    return(list("mixed" = mixCor, "negative" = negCor,  "positive" = posCor, "concordant" = concordantCor))
+  }
+  
+  return(list("mixed" = mixCov, "negative" = negCov,  "positive" = posCov, "concordant" = concordantCov))
+  
+}
