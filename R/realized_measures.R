@@ -2180,21 +2180,22 @@ rTSCov <- function (pData, cor = FALSE, K = 300, J = 1, K_cov = NULL, J_cov = NU
 
 
 #' rCholCov positive semi-definite covariance estimation using the CholCov algorithm
-#' @description Function that estimates the integrated covariance matrix using the CholCov algorithm
+#' @description Function that estimates the integrated covariance matrix using the CholCov algorithm.
 #' @param pData a list. Each list-item i contains an xts object with the intraday price data 
 #' of stock i for day t. The order of the data does not matter as it will be sorted according to the criterion specified in the \code{criterion} argument
-#' @param IVest integrated variance estimator
-#' @param COVest covariance estimator
+#' @param IVest integrated variance estimator, default is \code{"MRC"}
+#' @param COVest covariance estimator, default is \code{"MRC"}
 #' @param criterion criterion to use for sorting the data according to liquidity. Possible values are ["squared duration"|"duration"|"count"], defaults to \code{"squared duration"}.
 #' @param ... additional arguments to pass to IVest and COVest. See details.
 #' 
 #' @return a list containing the covariance matrix "CholCov", and the Cholesky Decomposition of "L" "G"
 #' such that L * G * L' = CholCov
 #' 
-#' @details 
+#' @details all additional arguments 
+#' @references 
+#' Boudt, Laurent Lunde, Quaedvlieg, Sauri(2017) Positive semidefinite integrated covariance estimation, factorizations and asynchronicity. Journal of Econometrics 196, 347-367
+#' @author Emil Sjoerup
 #' 
-#' delta = 0.1
-#' theta = 1
 #' @export
 rCholCov <- function(pData, IVest = "MRC", COVest = "MRC", criterion = "squared duration", ...){
   
@@ -2214,11 +2215,34 @@ rCholCov <- function(pData, IVest = "MRC", COVest = "MRC", criterion = "squared 
     stop("Criterion must be either 'squared duration' or 'duration' or 'count'")
   }
   
+  if(!(IVest %in% listCholCovEstimators() & COVest %in% listCholCovEstimators())){
+    stop("rCholCov IVest or COVest not in the available CholCov estimators. See listCholCovEstimators() for list of implemented estimators.")
+  }
+  
+  
   options <- list(...)
-  op <- list("delta" = 0.1, "theta" = 1)
+  op <- list("delta" = 0.1, "theta" = 1, "alignBy" = "minutes", "alignPeriod" = 5, "kernelType" = "rectangular", "kernelParam" = 1, "kernelDOFadj" = TRUE,
+             "startIV" = NULL, "noisevar" = NULL, "K" = 300, "J" = 1, "K_cov" = NULL, "J_cov" = NULL, "K_var" = NULL, "J_var" = NULL, "eta" = 9, "makePsd" = FALSE, "k" = 1)
   op[names(options)] <- options
   delta <- op[["delta"]]
   theta <- op[["theta"]]
+  alignBy <- op[["alignBy"]]
+  alignPeriod <- op[["alignPeriod"]]
+  kernelType <- op[["kernelType"]]
+  kernelParam <- op[["kernelParam"]]
+  kernelDOFadj <- op[["kernelDOFadj"]]
+  startIV <- op[["startIV"]]
+  noisevar <- op[["noisevar"]]
+  K_cov <- op[["K_cov"]]
+  J_cov <- op[["J_cov"]]
+  K_var <- op[["K_var"]]
+  J_var <- op[["J_var"]]
+  eta <- op[["eta"]]
+  makePsd <- op[["makePsd"]]
+  K <- op[["K"]]
+  J <- op[["J"]]
+  k <- op[["k"]]
+  
   if(length(delta) != 1 | !is.numeric(delta)){
     stop("delta must be a numeric of length one")
   }
@@ -2247,7 +2271,20 @@ rCholCov <- function(pData, IVest = "MRC", COVest = "MRC", criterion = "squared 
           
           for (m in 1:(l-1)) {
             
-            COV <- cholCovMRC(as.matrix(coredata(cbind(returns[,l], f[,m]))), delta = delta, theta = theta)
+            COV <- switch(COVest,
+                   MRC = cholCovMRC(as.matrix(coredata(cbind(returns[,l], f[,m]))), delta = delta, theta = theta),
+                   rCov = rCov(exp(cumsum(cbind(returns[,l], f[,m]))), alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = TRUE),
+                   rAVGCov = rAVGCov(exp(cumsum(cbind(returns[,l], f[,m]))), alignBy = alignBy, alignPeriod = alignPeriod, k = k, makeReturns = TRUE),
+                   rBPCov = rBPCov(exp(cumsum(cbind(returns[,l], f[,m]))), alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = TRUE),
+                   rHYCov = rHYCov(exp(cumsum(cbind(returns[,l], f[,m]))), alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = TRUE),
+                   rKernelCov = rKernelCov(exp(cumsum(cbind(returns[,l], f[,m]))), alignBy = alignBy, alignPeriod = alignPeriod,
+                                           makeReturns = TRUE, kernelType = kernelType, kernelParam = kernelParam, kernelDOFadj = kernelDOFadj),
+                   rOWCov = rOWCov(exp(cumsum(cbind(returns[,l], f[,m]))), alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = TRUE),
+                   rRTSCov = rRTSCov(exp(cumsum(cbind(returns[,l], f[,m]))), cor = FALSE, startIV = startIV, noisevar = noisevar, K = K, J = J, 
+                                     K_cov = K_cov, J_cov=J_cov, K_var=K_var, J_var = J_var, eta = eta, makePsd = makePsd ),
+                   rThresholdCov = rThresholdCov(exp(cumsum(cbind(returns[,l], f[,m]))), alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = TRUE)
+                   )
+            
             
             Ltemp[l,m] <- COV[1,2]/COV[2,2]
             
@@ -2260,7 +2297,20 @@ rCholCov <- function(pData, IVest = "MRC", COVest = "MRC", criterion = "squared 
       L[d ,] <- Ltemp[d,]
       
       
-      G[d,d] <- cholCovMRC(as.matrix(coredata(f[,d])) , delta = delta, theta = theta)
+      # In this switch, we need to use xts on the data to get the aggregation to work
+      G[d,d] <- switch(IVest, 
+                       MRC = cholCovMRC(as.matrix(coredata(f[,d])), delta = delta, theta = theta),
+                       rCov =          rCov(xts(exp(cumsum(f[,d])), order.by = index(returns)), alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = TRUE),
+                       rAVGCov =       rAVGCov(xts(exp(cumsum(f[,d])), order.by = index(returns)), alignBy = alignBy, alignPeriod = alignPeriod, k = k, makeReturns = TRUE),
+                       rBPCov =        rBPCov(xts(exp(cumsum(f[,d])), order.by = index(returns)), alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = TRUE),
+                       rHYCov =        rHYCov(xts(exp(cumsum(f[,d])), order.by = index(returns)), alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = TRUE),
+                       rKernelCov =    rKernelCov(xts(exp(cumsum(f[,d])), order.by = index(returns)), alignBy = alignBy, alignPeriod = alignPeriod,                                        
+                                                  makeReturns = TRUE, kernelType = kernelType, kernelParam = kernelParam, kernelDOFadj = kernelDOFadj),
+                       rOWCov =        rOWCov(xts(exp(cumsum(f[,d])), order.by = index(returns)), alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = TRUE),
+                       rRTSCov =       rRTSCov(xts(exp(cumsum(f[,d])), order.by = index(returns)), cor = FALSE, startIV = startIV, noisevar = noisevar, K = K, J = J,                              
+                                               K_cov = K_cov, J_cov=J_cov, K_var=K_var, J_var = J_var, eta = eta, makePsd = makePsd ),
+                       rThresholdCov = rThresholdCov(xts(exp(cumsum(f[,d])), order.by = index(returns)), alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = TRUE)      
+                       )
     }
     
   
@@ -2273,6 +2323,10 @@ rCholCov <- function(pData, IVest = "MRC", COVest = "MRC", criterion = "squared 
   return(out)
   
 }
+
+
+
+
 
 
 
@@ -2406,4 +2460,22 @@ rSemiCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, mak
   
   return(list("mixed" = mixCov, "negative" = negCov,  "positive" = posCov, "concordant" = concordantCov))
   
+}
+
+
+#' Utility function listing the available estimators for the CholCov estimation
+#' 
+#' 
+#' @return This function returns a character vector containing the available estimators.
+#' @export
+listCholCovEstimators <- function(){
+  c("MRC",
+    "rCov",
+    "rAVGCov",
+    "rBPCov",
+    "rHYCov",
+    "rKernelCov",
+    "rOWCov",
+    "rRTSCov",
+    "rThresholdCov")
 }
