@@ -223,7 +223,7 @@ harInsanityFilter <- function(fittedValues, lower, upper, replacement) {
 #' plot(x)
 #' predict(x)
 #'
-#'
+#' @importFrom sandwich NeweyWest
 #' @import RcppArmadillo
 #' @export
 HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), periodsQ = c(1),
@@ -326,7 +326,7 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
       J <- pmax(RM1 - RM2, 0) # Jump contributions should be positive
     }
     J <- as.data.frame(har_agg(J, periodsJ, length(periodsJ)))
-    colnames(J) = paste0("J", periodsJ)
+    colnames(J) <- paste0("J", periodsJ)
   }
 
   if (is.null(leverage) == FALSE) {
@@ -474,8 +474,8 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
     model <- estimhar(y=y,x=x2)
     model$transform <- transform
     model$type <- "CHARRV"
-    model$dates < alldates[(maxp+h):n]
-    model$RVest < RVest[1]
+    model$dates <- alldates[(maxp+h):n]
+    model$RVest <- RVest[1]
   } #End CHAR-RV if cond
 
   if (type == "CHARRVQ") {
@@ -492,12 +492,13 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
     x2 <- cbind(x2,rmin)
     model <- estimhar(y = y, x = x2)
     model$fitted.values <- harInsanityFilter(fittedValues = model$fitted.values, lower = min(RM1), upper = max(RM1), replacement = mean(RM1))
-    model$type = "CHARRVQ"
-    model$dates < alldates[(maxp+h):n]
+    model$type <- "CHARRVQ"
+    model$dates <- alldates[(maxp+h):n]
     model$RVest <- RVest[1]
 
   } #End CHAR-RVQ if cond
-
+  
+  model$NeweyWestSE <- sandwich::NeweyWest(model)
   model$transform <- transform
   model$inputType <- inputType
   model$h <- h
@@ -887,11 +888,14 @@ print.harModel <- function(x, digits = max(3, getOption("digits") - 3), ...){
       "\n\n", sep = "")
 
   coefs <- coef(x);
+  NeweyWestSE <- x$NeweyWestSE
   names(coefs) <- c("beta0",betas)
-
+  colnames(NeweyWestSE) <- rownames(NeweyWestSE) <- c("beta0",betas)
   if (length(coef(x))){
     cat("Coefficients:\n")
     print.default(format(coefs, digits = digits), print.gap = 2,quote = FALSE);
+    cat("Newey-West Standard Errors:\n");
+    print.default(format(diag(NeweyWestSE), digits = digits), print.gap = 2,quote = FALSE);
     cat("\n\n");
     Rs <- summary(x)[c("r.squared", "adj.r.squared")]
     zz <- c(Rs$r.squared,Rs$adj.r.squared);

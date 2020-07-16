@@ -38,12 +38,12 @@ test_that("MRC", {
   expect_equal({
     formatC(sum(MRC(list(sample5MinPricesJumps["2010-01-04",1], sample5MinPricesJumps["2010-01-04",2]), pairwise = TRUE, makePsd = TRUE)), digits = 5)
     },
-    "0.031718"
+    "0.031692"
   )
   expect_equal({
     formatC(sum(MRC(list(sample5MinPricesJumps["2010-01-04",1], sample5MinPricesJumps["2010-01-04",2]), pairwise = FALSE, makePsd = TRUE)), digits = 5)
     },
-    "0.034418"
+    "0.034393"
   )
 })
 
@@ -129,7 +129,7 @@ test_that("rRTSCov", {
   )
   expect_equal(
     formatC(sum(rRTSCov(pData = list(cumsum(lltc) + 100, cumsum(sbux) + 100))) * 1000000, digits = 5),
-    "0.24693"
+    "0.24729"
   )
 })
 
@@ -157,8 +157,8 @@ test_that("rSkew", {
 # rSV
 context("rSV")
 test_that("rSV", {
-  expect_equal({
-    rSV(sampleTData$PRICE,alignBy ="minutes", alignPeriod = 5, makeReturns = TRUE)},
+  expect_equal(
+    rSV(sampleTData$PRICE,alignBy ="minutes", alignPeriod = 5, makeReturns = TRUE),
     list(rSVdownside = 0.00029125752237359241398, rSVupside = 0.00016310984360246060573)
   )
 })
@@ -195,7 +195,7 @@ context("rTSCov")
 test_that("rTSCov", {
   expect_equal(
     formatC(sum(rTSCov(pData = list(cumsum(lltc) + 100, cumsum(sbux) + 100))) * 10000, digits = 5),
-    "0.0024259"
+    "0.0024262"
   )
 })
 # RV
@@ -233,4 +233,118 @@ test_that("ivInference", {
     c("4.7594", "5.7472")
   )
 })
+
+context("rAVGCov")
+test_that("rAVGCov",{
+  rcovSub <- rAVGCov(rData = cbind(lltc, sbux, fill = 0), alignBy = "minutes",alignPeriod = 5, k = 1, makeReturns = FALSE)
+  expect_equal(as.numeric(rcovSub), c(0.0005884480, 0.0004312966, 0.0004312966, 0.0006857147))
+  # Correct handling of seconds?
+  rcovSubSeconds <- rAVGCov(rData = cbind(lltc, sbux, fill = 0), alignBy = "seconds",alignPeriod = 5 * 60 , k = 60 , makeReturns = FALSE)
+  expect_equal(rcovSub , rcovSubSeconds)
+  
+  
+  
+  rcovSubUnivariate <- rAVGCov(rData = cbind(lltc, sbux, fill = 0)[,1], alignBy = "minutes",alignPeriod = 5, makeReturns = FALSE)
+  
+  expect_equal(rcovSub[[1]], rcovSubUnivariate)
+  
+  rcovSub_makeReturns <- rAVGCov(rData = exp(cumsum(cbind(lltc, sbux, fill = 0))), alignBy = "minutes",alignPeriod = 5, k = 1, makeReturns = TRUE)
+  
+  expect_equal(as.numeric(rcovSub_makeReturns) , c(0.0005881636, 0.0004307105,0.0004307105, 0.0005710761))
+  
+  # Correct handling of fractional minute specification.
+  rcovSub <- rAVGCov(rData = cbind(lltc, sbux, fill = 0), alignBy = "minutes",alignPeriod = 2.5, k = 0.5, makeReturns = FALSE)
+  expect_equal(as.numeric(rcovSub), c(0.0005945100, 0.0003883607, 0.0003883607, 0.0006608860))
+  
+  
+  # We the fast alignment is not a factor of the slow alignment period
+  expect_error(rAVGCov(rData = cbind(lltc, sbux, fill = 0), alignBy = "minutes",alignPeriod = 2.75, k = 0.5, makeReturns = FALSE))  
+  
+})
+
+
+
+
+
+
+context("refreshTime")
+test_that("refreshTime", {
+  
+  # Unit test for the refreshTime algorithm based on Kris' example in http://past.rinfinance.com/agenda/2015/workshop/KrisBoudt.pdf
+  #suppose irregular timepoints: 
+  start = as.POSIXct("2010-01-01 09:30:00") 
+  ta = start + c(1,2,4,5,9,14); 
+  tb = start + c(1,3,6,7,8,9,10,11,15); 
+  tc = start + c(1,2,3,5,7,8,10,13); 
+  a = as.xts(1:length(ta),order.by=ta); 
+  b = as.xts(1:length(tb),order.by=tb);
+  c = as.xts(1:length(tc),order.by=tc); 
+  #Calculate the synchronized timeseries: 
+  
+  expect_equal(refreshTime(list(a,b,c)),
+  xts(matrix(c(1,1,1,
+               2,2,3,
+               4,3,4,
+               5,6,6,
+               6,8,8), ncol = 3, byrow = TRUE), order.by = start + c(1,3,6,9,14)))
+  
+  
+})
+
+
+context("rCholCov")
+test_that("rCholCov", {
+  
+  set.seed(123)
+  iT <- 23400 * 2
+  
+  rets <- mvtnorm::rmvnorm(iT * 3 + 1, mean = rep(0,4), 
+                           sigma = matrix(c(1, -0.5 , 0.7, 0.8,
+                                            -0.5, 3, -0.4, 0.7,
+                                            0.7, -0.4, 2, 0.6,  
+                                            0.8, 0.7, 0.6, 4), ncol = 4))
+  
+  w1 <- rets[,1]
+  w2 <- rets[sort(sample(1:nrow(rets), size = nrow(rets) * 0.75)), 2]
+  w3 <- rets[sort(sample(1:nrow(rets), size = nrow(rets) * 0.65)), 3]
+  w4 <- rets[sort(sample(1:nrow(rets), size = nrow(rets) * 0.8)), 4] # Here we make stock 4 the second most liquid asset, which will function to test the ordering
+  
+  timestamps1 <- seq(34200, 57600, length.out =  length(w1))
+  timestamps2 <- seq(34200, 57600, length.out =  length(w2))
+  timestamps3 <- seq(34200, 57600, length.out =  length(w3))
+  timestamps4 <- seq(34200, 57600, length.out =  length(w4))
+  
+  
+  p1  <- xts(cumsum(w1) * c(0,sqrt(diff(timestamps1) / (max(timestamps1) - min(timestamps1)))), as.POSIXct(timestamps1, origin = "1970-01-01"))
+  p2  <- xts(cumsum(w2) * c(0,sqrt(diff(timestamps2) / (max(timestamps2) - min(timestamps2)))), as.POSIXct(timestamps2, origin = "1970-01-01"))
+  p3  <- xts(cumsum(w3) * c(0,sqrt(diff(timestamps3) / (max(timestamps3) - min(timestamps3)))), as.POSIXct(timestamps3, origin = "1970-01-01"))
+  p4  <- xts(cumsum(w4) * c(0,sqrt(diff(timestamps4) / (max(timestamps4) - min(timestamps4)))), as.POSIXct(timestamps4, origin = "1970-01-01"))
+  
+  rCC <- rCholCov(list("market" = p1, "stock1" = p2, "stock2" =p3 , "stock3" = p4))
+  
+  expect_equal(colnames(rCC$CholCov) , c("market", "stock3", "stock1", "stock2"))
+  expect_equal(round(as.numeric(rCC$CholCov), 6) , round(c(0.8570523 ,  0.8326273, -0.2399617,   0.4726952,0.8326273 ,  4.6763568, 
+                                                           0.8359081  , 0.6736803,-0.2399617 ,  0.8359081,  2.9427983 , -0.4344481,0.4726952 ,  0.6736803, -0.4344481,   1.9089227) , 6))
+  expect_equal(colnames(rCC$L), colnames(rCC$G))
+  
+  
+})
+
+context("rSemiCov")
+test_that("rSemiCov", {
+  rSC <- rSemiCov(sample5MinPrices, makeReturns = TRUE)
+  mixed <- do.call(rbind, lapply(rSC, function(x) x[["mixed"]][1,2]))
+  neg <- do.call(rbind, lapply(rSC, function(x) x[["negative"]][1,2]))
+  pos <- do.call(rbind, lapply(rSC, function(x) x[["positive"]][1,2]))
+  concordant <- do.call(rbind, lapply(rSC, function(x) x[["concordant"]][1,2]))
+  # Test whether we have zeros on the diagonal of the mixed covariance matrix
+  expect_equal(as.numeric(diag((rSC[[1]][['mixed']]))) , numeric(nrow(rSC[[1]][['mixed']])))
+  
+  
+  rCv <- rCov(sample5MinPrices, makeReturns = TRUE)
+  realized <- do.call(rbind, lapply(rCv, function(x) x[1,2]))
+  # Test whether the realized covariance is equal to the sum of the decomposed realized semicovariances.
+  expect_equal(realized , (mixed + neg + pos))
+})
+
 

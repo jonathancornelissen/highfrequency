@@ -4,11 +4,15 @@
 \alias{refreshTime}
 \title{Synchronize (multiple) irregular timeseries by refresh time}
 \usage{
-refreshTime(pData)
+refreshTime(pData, sort = FALSE, criterion = "squared duration")
 }
 \arguments{
 \item{pData}{a list. Each list-item contains an xts object
 containing the original time series (one day only and typically a price series).}
+
+\item{sort}{logical determining whether to sort the index based on a criterion (will only sort descending (i.e. most liquid first)). Default is FALSE}
+
+\item{criterion}{character determining which criterion used. Currently supports "squared duration" and "duration". Default is "squared duration".}
 }
 \value{
 An xts object containing the synchronized time series.

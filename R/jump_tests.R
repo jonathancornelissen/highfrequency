@@ -348,7 +348,7 @@ BNSjumpTest <- function (rData, IVestimator = "BV", IQestimator = "TP", type = "
 #'    }
 #'  where \eqn{k_j} are nonzero random variables. The counting process can be either finite or infinite for finite or infinite activity jumps.
 #'  
-#'  The Jiang and Oomen test is that: in the absence of jumps, the accumulated difference between the simple return and the log return captures one half of the integrated variance.(Theodosiou& Zikes(2009))
+#'  The Jiang and Oomen test is that: in the absence of jumps, the accumulated difference between the simple return and the log return captures one half of the integrated variance. (Theodosiou& Zikes(2009))
 #'  
 #' @references 
 #'  Andersen, T. G., D. Dobrev, and E. Schaumburg (2012). Jump-robust volatility estimation using nearest neighbor truncation. Journal of Econometrics, 169(1), 75- 93.
@@ -451,7 +451,7 @@ JOjumpTest <- function(pData, power = 4, alignBy = NULL, alignPeriod = NULL, alp
 #' @examples 
 #' \dontrun{
 #' # We can easily make a Lee-Mykland jump test.
-#' LMtest <- intradayJumpTest(pData = sampleTDataMicroseconds[, .(DT, PRICE)], 
+#' LMtest <- intradayJumpTest(pData = sampleTDataMicroseconds[, list(DT, PRICE)], 
 #'                            volEstimator = "RM", driftEstimator = "none",
 #'                            RM = "bipower", lookBackPeriod = 10,
 #'                            on = "minutes", k = 5, marketOpen = "09:30:00", 
@@ -516,7 +516,7 @@ intradayJumpTest <- function(pData, volEstimator = "RM", driftEstimator = "none"
     prices <- aggregatePrice(pData, on = on, k = k , marketOpen = marketOpen,
                    marketClose = marketClose, tz = tz, fill = TRUE)
     setkeyv(prices, "DT")
-    prices[, DATE := as.Date(DT, tz = tz(prices$DT))]
+    prices[, DATE := as.Date(DT, tz = tzone(prices$DT))]
     returns <- prices[, RETURN := log(PRICE) - shift(log(PRICE), type = "lag"), by = "DATE"][is.na(RETURN) == FALSE]
     
   } else { # volEstimator == "PARM" i.e. we have pre-averaged realized measures
@@ -591,9 +591,9 @@ intradayJumpTest <- function(pData, volEstimator = "RM", driftEstimator = "none"
   criticalValue <- Cn + Sn * betastar
   
   if(dummy_was_xts){
-    pData <- as.xts(pData[ , .(DT, PRICE)])
+    pData <- as.xts(pData[ , list(DT, PRICE)])
   } else {
-    pData <- pData[ , .(DT, PRICE)]
+    pData <- pData[ , list(DT, PRICE)]
   }
   
   
@@ -653,6 +653,7 @@ intradayJumpTest <- function(pData, volEstimator = "RM", driftEstimator = "none"
 
 
 #' @importFrom xts addPolygon xts
+#' @importFrom graphics lines
 #' @importFrom zoo na.locf0
 #' @export
 plot.intradayJumpTest <- function(x, ...){
@@ -779,12 +780,10 @@ plot.intradayJumpTest <- function(x, ...){
 #' specified by \code{tz}. By default, \code{marketClose = "16:00:00"}.
 #' @param tz string specifying the time zone to which the times in \code{data}
 #' and/or \code{marketOpen}/ \code{marketClose} belong. Default = \code{"GMT"}.
-#' @param ... method-specific parameters (see 'Details').
 #' This parameter will also help determine the testing times as the test is done on non-overlapping pre-averaged returns.
 #' 
 #' @details 
 #' 
-#' @importFrom graphics lines
 #' @importFrom stats na.omit quantile runif
 #' @export
 #' @importFrom zoo coredata
@@ -826,7 +825,7 @@ rankJumpTest <- function(marketPrice, stockPrices, alpha = c(5,3), coarseFreq = 
 
   marketPrice <- aggregatePrice(marketPrice, on = on, k = k , marketOpen = marketOpen,
                           marketClose = marketClose, tz = tz, fill = TRUE)
-  marketPrice[, DATE := as.Date(DT, tz = tz(marketPrice$DT))]
+  marketPrice[, DATE := as.Date(DT, tz = tzone(marketPrice$DT))]
   setkeyv(marketPrice, "DT")
   marketPrice <- marketPrice[, RETURN := log(PRICE) - shift(log(PRICE), type = "lag"), by = "DATE"][!is.na(RETURN)]
   marketReturns <- xts(marketPrice$RETURN, order.by = marketPrice$DT)
@@ -837,11 +836,11 @@ rankJumpTest <- function(marketPrice, stockPrices, alpha = c(5,3), coarseFreq = 
     colnames(tmp) <- c("DT", "PRICE")
     tmp <- aggregatePrice(tmp, on = on, k = k , marketOpen = marketOpen,
                                  marketClose = marketClose, tz = tz, fill = TRUE)
-    tmp[, DATE := as.Date(DT, tz = tz(tmp$DT))]
+    tmp[, DATE := as.Date(DT, tz = tzone(tmp$DT))]
     setkeyv(tmp, "DT")
     
     tmp <- tmp[, RETURN := log(PRICE) - shift(log(PRICE), type = "lag"), by = "DATE"][!is.na(RETURN)]
-    stockReturns <- cbind(stockReturns, as.xts(tmp[,.(DT, PRICE)])$PRICE)
+    stockReturns <- cbind(stockReturns, as.xts(tmp[, list(DT, PRICE)])$PRICE)
   }
 
   

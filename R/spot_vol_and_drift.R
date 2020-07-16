@@ -71,17 +71,28 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
       stop("Data.table needs DT column containing the time-stamps of the trades.") # added the timestamp comment for verbosity.
     }
   }
-
   datad <- aggregatePrice(data, on = on, k = k , marketOpen = marketOpen,
                           marketClose = marketClose, tz = tz, fill = TRUE)
+  # datad2 <- aggregatePrice2(data, on = on, k = k , marketOpen = marketOpen,
+  #                         marketClose = marketClose, tz = tz, fill = TRUE)
+  # 
   datad[, DATE := as.Date(DT)]
   setkeyv(datad, "DT")
   datad <- datad[, RETURN := log(PRICE) - shift(log(PRICE), type = "lag"), by = "DATE"][is.na(RETURN) == FALSE]
   datad <- split(datad, by = "DATE")
   mR <- matrix(unlist(lapply(datad, FUN = function(x) as.numeric(x$RETURN))), ncol = length(datad[[1]]$RETURN), byrow = TRUE)
 
+  # datad2[, DATE := as.Date(DT)]
+  # setkeyv(datad2, "DT")
+  # datad2 <- datad2[, RETURN := log(PRICE) - shift(log(PRICE), type = "lag"), by = "DATE"][is.na(RETURN) == FALSE]
+  # datad2 <- split(datad2, by = "DATE")
+  # mR2 <- matrix(unlist(lapply(datad2, FUN = function(x) as.numeric(x$RETURN))), ncol = length(datad2[[1]]$RETURN), byrow = TRUE)
+  # 
+  # 
+  
   if (method != "driftKernel") {
     mR <- t(mR)
+    # mR2 <- t(mR2)
   }
 
   if (method == "driftKernel") {
@@ -92,6 +103,13 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
                 driftKernel = driftKernel(data = data, intraday, options),
                 driftMean   = driftMean(mR = mR, options),
                 driftMedian = driftMedian(mR = mR, options))
+  
+  # out2 <- switch(method, ### driftKernel works only for one day at a time! Does the rest of data preparation in the function.
+  #                driftKernel = driftKernel(data = data, intraday, options),
+  #                driftMean   = driftMean(mR = mR2, options),
+  #                driftMedian = driftMedian(mR = mR, options))
+  # browser()
+
   return(out)
 }
 
@@ -497,7 +515,7 @@ spotVol <- function(data, method = "detPer", ..., on = "minutes", k = 5,
   if( method != "PARM"){
     datad <- aggregatePrice(data, on = on, k = k , marketOpen = marketOpen,
                             marketClose = marketClose, tz = tz, fill = TRUE)
-    datad[, DATE := as.Date(DT, tz = tz(datad$DT))]
+    datad[, DATE := as.Date(DT, tz = tzone(datad$DT))]
     setkeyv(datad, "DT")
     datad <- datad[, RETURN := log(PRICE) - shift(log(PRICE), type = "lag"), by = "DATE"][is.na(RETURN) == FALSE]
     rData <- xts(datad$RETURN, order.by = datad$DT)

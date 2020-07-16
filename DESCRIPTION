@@ -49,7 +49,6 @@ Imports:
     mvtnorm,
     data.table (>= 1.12.0),
     RcppRoll,
-    lubridate,
     readr,
     quantmod
 LinkingTo: Rcpp, RcppArmadillo

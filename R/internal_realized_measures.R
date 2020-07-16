@@ -263,6 +263,8 @@ rdatacheck <- function (rData, multi = FALSE) {
 #' 
 #' @param pData a list. Each list-item contains an xts object  
 #' containing the original time series (one day only and typically a price series).
+#' @param sort logical determining whether to sort the index based on a criterion (will only sort descending (i.e. most liquid first)). Default is FALSE
+#' @param criterion character determining which criterion used. Currently supports "squared duration" and "duration". Default is "squared duration".
 #' 
 #' @return An xts object containing the synchronized time series.
 #' 
@@ -283,40 +285,62 @@ rdatacheck <- function (rData, multi = FALSE) {
 #' 
 #' @author Jonathan Cornelissen and Kris Boudt
 #' @keywords data manipulation
-#' @importFrom xts as.xts
+#' @importFrom xts xts tzone
 #' @export
-refreshTime <- function (pData) {
+refreshTime <- function (pData, sort = FALSE, criterion = "squared duration") {
+  
+  if(!is.list(pData)){
+    stop("pData must be a list of atleast length one")
+  }
+  if(!all(as.logical(lapply(pData, is.xts)))){
+    stop("All the series in pData must be xts objects")
+  }
+  
+  if(any(as.logical(lapply(pData, function(x) ndays(x) > 1)))){
+    stop("All the series in pData must contain data for a single day")
+  }
+  
   if (length(pData) < 1) {
-    stop("pData should contain at least two time series.")
+    stop("pData should contain at least two time series")
   }
-  temp <- pData[[1]]
-  for (i in 2:length(pData)) {
-    temp <- merge(temp, pData[[i]])
-  }
-  
-  temp2 <- xts(matrix(NA, nrow = dim(temp)[1], ncol = dim(temp)[2]), order.by = index(temp))
-  
-  last_values <- as.numeric(temp[1, ])
-  
-  if (sum(is.na(last_values)) == 0) {
-    temp2[1, ] <- last_values
-    last_values <- rep(NA, times = dim(temp)[2])
+  if( length(pData) == 1){
+    return(pData[[1]])
   }
   
-  for (ii in c(2:dim(temp)[1])) {
-    if (sum(is.na(last_values)) == 0) {
-      temp2[ii, ] <- last_values
-      last_values <- rep(NA, times = dim(temp)[2])
+  tz_ <- tzone(pData[[1]])
+  if(sort){
+    
+    if(criterion == "squared duration"){
+      criterion <- function(x) sum(as.numeric(diff(index(x)))^2)
+    } else if( criterion == "duration"){
+      criterion <- function(x) sum(as.numeric(diff(index(x))))
+    } else {
+      stop("Criterion must be either 'squared duration' or 'duration'")
     }
-    for (jj in c(1:dim(temp)[2])) {
-      if (is.na(last_values[jj]) == TRUE) {
-        last_values[jj] <- temp[ii,jj]
-      }
+    
+    vec <- sort(sapply(pData, criterion), index.return = TRUE)$ix
+    nameVec <- names(pData)[vec]
+    temp <- pData[[vec[1]]]
+    for (i in vec[-1]) {
+      temp <- merge(temp, pData[[i]])
     }
+    
+  } else {
+    nameVec <- names(pData)
+    temp <- pData[[1]]
+    for (i in 2:length(pData)) {
+      temp <- merge(temp, pData[[i]])
+    }  
   }
   
-  return(temp2[!is.na(temp2[, 1])])
+  
+  
+  temp <- refreshTimeMathing(coredata(temp), index(temp))
+  temp <- xts(temp[[1]], order.by = as.POSIXct(temp[[2]], tz = tz_, origin = "1970-01-01"))
+  names(temp) <- nameVec # Set names 
+  return(temp)
 }
+
 
 #' @keywords internal
 RBPCov_bi <- function(ts1, ts2) {
@@ -714,4 +738,27 @@ zgamma <- function (x, y, gamma_power) {
   }
   
   return(out)
+}
+
+
+#' @keywords internal
+cholCovMRC <- function(returns, delta = 0.1, theta = 1){
+  
+  nObs <- nrow(returns) + 1 
+  kn <- floor(theta * nObs ^(1/2 + delta))
+  
+  
+  preAveragedReturns <- preAveragingReturnsInternal(returns, kn)
+  x <- (1:(kn-1)) / kn
+  x[x > (1-x)] <- (1-x)[x > (1-x)]
+  
+  psi1 <- kn * sum((gfunction((1:kn)/kn) - gfunction(((1:kn) - 1 )/kn))^2)
+  
+  psi2 <- mean(c(0,x,0)^2)
+  #psi <- (t(returns) %*% returns) / (2 * nObs)
+  
+  # Just called factor in the Ox code
+  correctionFactor <- nObs/(nObs - kn + 2) * (1/( psi2 * kn))
+  return(correctionFactor * (t(preAveragedReturns) %*% preAveragedReturns))
+  
 }

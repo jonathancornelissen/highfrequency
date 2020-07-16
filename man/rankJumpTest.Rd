@@ -52,9 +52,7 @@ specified by \code{tz}. By default, \code{marketOpen = "09:30:00"}.}
 specified by \code{tz}. By default, \code{marketClose = "16:00:00"}.}
 
 \item{tz}{string specifying the time zone to which the times in \code{data}
-and/or \code{marketOpen}/ \code{marketClose} belong. Default = \code{"GMT"}.}
-
-\item{...}{method-specific parameters (see 'Details').
+and/or \code{marketOpen}/ \code{marketClose} belong. Default = \code{"GMT"}.
 This parameter will also help determine the testing times as the test is done on non-overlapping pre-averaged returns.}
 }
 \description{

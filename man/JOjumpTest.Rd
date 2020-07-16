@@ -73,7 +73,7 @@ The theoretical framework underlying jump test is that the logarithmic price pro
    }
  where \eqn{k_j} are nonzero random variables. The counting process can be either finite or infinite for finite or infinite activity jumps.
  
- The Jiang and Oomen test is that: in the absence of jumps, the accumulated difference between the simple return and the log return captures one half of the integrated variance.(Theodosiou& Zikes(2009))
+ The Jiang and Oomen test is that: in the absence of jumps, the accumulated difference between the simple return and the log return captures one half of the integrated variance. (Theodosiou& Zikes(2009))
 }
 \examples{
 JOjumpTest(sample5MinPricesJumps$stock1, power = 6)

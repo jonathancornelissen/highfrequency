@@ -41,7 +41,7 @@ checkColumnNames <- function(data) {
   
   # Adjust correction column, if necessary:
   if (any(colnames(data) == "CR")) {
-    colnames(data)[colnames(data) == "CR"] = "CORR"
+    colnames(data)[colnames(data) == "CR"] <- "CORR"
   }
   
   return(data)

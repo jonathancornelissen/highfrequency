@@ -10,7 +10,8 @@ aggregateTS(
   on = "minutes",
   k = 1,
   weights = NULL,
-  dropna = FALSE
+  dropna = FALSE,
+  tz = NULL
 )
 }
 \arguments{
@@ -32,6 +33,8 @@ Of course, the weights should have the same timestamps as the supplied time seri
 \item{dropna}{boolean, which determines whether empty intervals should be dropped.
 By default, an NA is returned in case an interval is empty, except when the user opts
 for previous tick aggregation, by setting FUN = "previoustick" (default).}
+
+\item{tz}{character denoting which timezone the output should be in. Defaults to "GMT"}
 }
 \value{
 An xts object containing the aggregated time series.
