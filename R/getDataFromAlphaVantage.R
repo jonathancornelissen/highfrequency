@@ -8,7 +8,6 @@
 #' @param apiKey string with the api key provided by Alpha Vantage. 
 #' @param doSleep logical when the length of symbols > 5 the function will sleep for 12 seconds by default. 
 #' 
-#' 
 #' @details #' The doSleep argument is set to true as default because Alpha Vantage has a limit of five calls per minute. 
 #' The function does not try to extract when the last API call was made which means that if
 #' you made successive calls to get 3 symbols in rapid succession, the function may not retrieve all the data.
@@ -39,7 +38,7 @@
 #' @importFrom data.table as.data.table setnames
 #' @keywords data
 #' @export
-getAlphaVantageData <- function(symbols = NULL, interval = "5min", outputType = "xts", apiKey = NULL, doSleep = TRUE){
+getAlphaVantageData <- function(symbols = NULL, interval = "5min", outputType = "xts", apiKey = NULL, doSleep = TRUE) {
   # Check for API key set in quantmod if it is not present, we kindly remind the user to get it.
   if (is.null(getDefaults(getSymbols.av, "api.key")$api.key) & is.null(apiKey)) {
     stop("Your AlphaVantage API key is not set in the quantmod package and no API key was provided. 
@@ -65,7 +64,7 @@ getAlphaVantageData <- function(symbols = NULL, interval = "5min", outputType = 
                                    api.key = apiKey, auto.assign = FALSE, output.size = "full")
       
       
-      if(outputType == "DT"){ #Here the user wants a data table out. Thus we set the class DT and we change the names.
+      if (outputType == "DT") { #Here the user wants a data.table out. Thus we set the class DT and we change the names.
         singleSymbol <- as.data.table(singleSymbol)
         setnames(singleSymbol, colnames(singleSymbol), new = c("DT", "Open", "High", "Low" , "Close", "Volume"))
       } else{
@@ -78,14 +77,13 @@ getAlphaVantageData <- function(symbols = NULL, interval = "5min", outputType = 
         print("Sleeping for 12 seconds because the length of symbols > 5.")
         Sys.sleep(12)
       }
-      
     }
   }
   # We have one symbols
   else {
     # load the data for the symbol into singleSymbol.
     data <- getSymbols.av(symbols, periodicity = "intraday", interval = interval,
-                         api.key = apiKey, auto.assign = FALSE, output.size = "full", ...)  
+                         api.key = apiKey, auto.assign = FALSE, output.size = "full")  
     if (outputType == "DT") { #Here the user wants a data table out. Thus we set the class DT and we change the names.
       data <- as.data.table(data)
       setnames(data, colnames(data), new = c("DT", "Open", "High", "Low" , "Close", "Volume"))
