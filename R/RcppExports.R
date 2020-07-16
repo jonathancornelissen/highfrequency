@@ -25,12 +25,22 @@ colCumsum <- function(x) {
     .Call(`_highfrequency_colCumsum`, x)
 }
 
+#' @keywords internal
 refreshTimeMathing <- function(x, idx) {
     .Call(`_highfrequency_refreshTimeMathing`, x, idx)
 }
 
+#' @keywords internal
 preAveragingReturnsInternal <- function(ret, kn) {
     .Call(`_highfrequency_preAveragingReturnsInternal`, ret, kn)
+}
+
+clamp <- function(x, lower = 0.0, upper = 1.0) {
+    .Call(`_highfrequency_clamp`, x, lower, upper)
+}
+
+find_first <- function(x, thresh) {
+    .Call(`_highfrequency_find_first`, x, thresh)
 }
 
 nsmaller <- function(times, lengths, start, end, max) {

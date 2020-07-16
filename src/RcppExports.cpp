@@ -117,6 +117,31 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// clamp
+arma::vec clamp(arma::vec x, const double lower, const double upper);
+RcppExport SEXP _highfrequency_clamp(SEXP xSEXP, SEXP lowerSEXP, SEXP upperSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const double >::type lower(lowerSEXP);
+    Rcpp::traits::input_parameter< const double >::type upper(upperSEXP);
+    rcpp_result_gen = Rcpp::wrap(clamp(x, lower, upper));
+    return rcpp_result_gen;
+END_RCPP
+}
+// find_first
+arma::uword find_first(arma::vec x, const int thresh);
+RcppExport SEXP _highfrequency_find_first(SEXP xSEXP, SEXP threshSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const int >::type thresh(threshSEXP);
+    rcpp_result_gen = Rcpp::wrap(find_first(x, thresh));
+    return rcpp_result_gen;
+END_RCPP
+}
 // nsmaller
 int nsmaller(IntegerVector times, IntegerVector lengths, int start, int end, int max);
 RcppExport SEXP _highfrequency_nsmaller(SEXP timesSEXP, SEXP lengthsSEXP, SEXP startSEXP, SEXP endSEXP, SEXP maxSEXP) {
@@ -208,6 +233,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_highfrequency_colCumsum", (DL_FUNC) &_highfrequency_colCumsum, 1},
     {"_highfrequency_refreshTimeMathing", (DL_FUNC) &_highfrequency_refreshTimeMathing, 2},
     {"_highfrequency_preAveragingReturnsInternal", (DL_FUNC) &_highfrequency_preAveragingReturnsInternal, 2},
+    {"_highfrequency_clamp", (DL_FUNC) &_highfrequency_clamp, 3},
+    {"_highfrequency_find_first", (DL_FUNC) &_highfrequency_find_first, 2},
     {"_highfrequency_nsmaller", (DL_FUNC) &_highfrequency_nsmaller, 5},
     {"_highfrequency_KK", (DL_FUNC) &_highfrequency_KK, 2},
     {"_highfrequency_kernelEstimator", (DL_FUNC) &_highfrequency_kernelEstimator, 8},

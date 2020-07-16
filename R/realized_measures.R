@@ -2183,19 +2183,22 @@ rTSCov <- function (pData, cor = FALSE, K = 300, J = 1, K_cov = NULL, J_cov = NU
 #' @description Function that estimates the integrated covariance matrix using the CholCov algorithm.
 #' @param pData a list. Each list-item i contains an xts object with the intraday price data 
 #' of stock i for day t. The order of the data does not matter as it will be sorted according to the criterion specified in the \code{criterion} argument
-#' @param IVest integrated variance estimator, default is \code{"MRC"}
-#' @param COVest covariance estimator, default is \code{"MRC"}
+#' @param IVest integrated variance estimator, default is \code{"MRC"}. For a list of implemented estimators, use listCholCovEstimators().
+#' @param COVest covariance estimator, default is \code{"MRC"}. For a list of implemented estimators, use listCholCovEstimators().
 #' @param criterion criterion to use for sorting the data according to liquidity. Possible values are ["squared duration"|"duration"|"count"], defaults to \code{"squared duration"}.
 #' @param ... additional arguments to pass to IVest and COVest. See details.
 #' 
-#' @return a list containing the covariance matrix "CholCov", and the Cholesky Decomposition of "L" "G"
-#' such that L * G * L' = CholCov
+#' @return a list containing the covariance matrix "CholCov", and the Cholesky decomposition "L" and "G" such that L * G * L' = CholCov
 #' 
-#' @details all additional arguments 
+#' @details
+#' additional arguments for IVest and COVest should be passed in the ... argument. For the MRC estimator, the theta and delta parameters can be set. These default to 1 and 0.1 respectively.
+#' 
 #' @references 
 #' Boudt, Laurent Lunde, Quaedvlieg, Sauri(2017) Positive semidefinite integrated covariance estimation, factorizations and asynchronicity. Journal of Econometrics 196, 347-367
 #' @author Emil Sjoerup
 #' 
+#' @importFrom xts xts
+#' @importFrom zoo coredata
 #' @export
 rCholCov <- function(pData, IVest = "MRC", COVest = "MRC", criterion = "squared duration", ...){
   
@@ -2282,7 +2285,8 @@ rCholCov <- function(pData, IVest = "MRC", COVest = "MRC", criterion = "squared 
                    rOWCov = rOWCov(exp(cumsum(cbind(returns[,l], f[,m]))), alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = TRUE),
                    rRTSCov = rRTSCov(exp(cumsum(cbind(returns[,l], f[,m]))), cor = FALSE, startIV = startIV, noisevar = noisevar, K = K, J = J, 
                                      K_cov = K_cov, J_cov=J_cov, K_var=K_var, J_var = J_var, eta = eta, makePsd = makePsd ),
-                   rThresholdCov = rThresholdCov(exp(cumsum(cbind(returns[,l], f[,m]))), alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = TRUE)
+                   rThresholdCov = rThresholdCov(exp(cumsum(cbind(returns[,l], f[,m]))), alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = TRUE),
+                   rSemiCov = rSemiCov(exp(cumsum(cbind(returns[,l], f[,m]))), alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = TRUE)
                    )
             
             
@@ -2309,7 +2313,8 @@ rCholCov <- function(pData, IVest = "MRC", COVest = "MRC", criterion = "squared 
                        rOWCov =        rOWCov(xts(exp(cumsum(f[,d])), order.by = index(returns)), alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = TRUE),
                        rRTSCov =       rRTSCov(xts(exp(cumsum(f[,d])), order.by = index(returns)), cor = FALSE, startIV = startIV, noisevar = noisevar, K = K, J = J,                              
                                                K_cov = K_cov, J_cov=J_cov, K_var=K_var, J_var = J_var, eta = eta, makePsd = makePsd ),
-                       rThresholdCov = rThresholdCov(xts(exp(cumsum(f[,d])), order.by = index(returns)), alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = TRUE)      
+                       rThresholdCov = rThresholdCov(xts(exp(cumsum(f[,d])), order.by = index(returns)), alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = TRUE),
+                       rSemiCov = rSemiCov(xts(exp(cumsum(f[,d])), order.by = index(returns)), alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = TRUE)
                        )
     }
     
@@ -2333,7 +2338,7 @@ rCholCov <- function(pData, IVest = "MRC", COVest = "MRC", criterion = "squared 
 #' Realized Semicovariance
 #' 
 #' @description Function returns the Realized Semicovariances (rSemiCov).
-#' Let \eqn{r_{t,i}} be an intraday \eqn{N x M} return vector and \eqn{i=1,...,M}
+#' Let \eqn{r_{t,i}} be an intraday \eqn{M x N} return matrix and \eqn{i=1,...,M}
 #' the number of intraday returns. Then, let p = max(r_{t,i},0) and n = min(r_{t,i}).
 #' 
 #' Then, the realized semicovariance is given by the following three matrices:
@@ -2393,7 +2398,7 @@ rCholCov <- function(pData, IVest = "MRC", COVest = "MRC", criterion = "squared 
 #' colnames(covariances) <- c("mixed", "neg", "pos")
 #' # We make a quick plot of the different covariances
 #' plot(covariances)
-#' addLegend(lty = 1)
+#' addLegend(lty = 1) # Add legend so we can distinguish the series.
 #' }
 #' 
 #' @keywords volatility
@@ -2461,7 +2466,6 @@ rSemiCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, mak
   return(list("mixed" = mixCov, "negative" = negCov,  "positive" = posCov, "concordant" = concordantCov))
   
 }
-
 
 #' Utility function listing the available estimators for the CholCov estimation
 #' 
