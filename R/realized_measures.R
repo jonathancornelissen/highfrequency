@@ -934,10 +934,10 @@ rCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeRet
     if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation(rData, on = alignBy, k = alignPeriod)
     } 
-    if (makeReturns) {  
+    if (makeReturns == TRUE) {  
       rData <- makeReturns(rData) 
     }  
-    if (is.null(dim(rData))) {  
+    if (is.null(dim(rData) == TRUE)) {  
       n <- 1
     } else { 
       n <- dim(rData)[2]
@@ -1002,7 +1002,7 @@ rHYCov <- function(rData, cor = FALSE, period = 1, alignBy = "seconds", alignPer
     rData <- makeReturns(rData) 
     aggrdata <- makeReturns(aggrdata)
   }  
-  if (is.null(dim(rData))) {
+  if (is.null(dim(rData)) == TRUE) {
     n <- 1
   } else { 
     n <- dim(rData)[2]

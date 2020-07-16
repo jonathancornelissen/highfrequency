@@ -880,6 +880,7 @@ predict.harModel <- function(object, newdata = NULL, warnings = TRUE, ...) {
 }
 
 #' @importFrom stats coef
+#' @importFrom sandwich NeweyWest
 #' @export
 print.harModel <- function(x, digits = max(3, getOption("digits") - 3), ...){
   formula <- getHarmodelformula(x); modeldescription = formula[[1]]; betas = formula[[2]];

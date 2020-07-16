@@ -101,11 +101,12 @@ AJjumpTest <- function(pData, p = 4 , k = 2, alignBy = NULL, alignPeriod = NULL,
 
   if (checkMultiDays(pData) == TRUE) {
     
-    result <- apply.daily(pData, function(x){
-      tmp <- AJjumpTest(x, p = p, k = k, alignBy = alignBy, alignPeriod = alignPeriod, alphaMultiplier = alphaMultiplier, makeReturns = makeReturns, ...)
-      return(cbind(tmp[[1]], tmp[[2]][1], tmp[[2]][2], tmp[[3]]))
-      
-    })
+    result <- 
+      apply.daily(pData, 
+                  function(x){
+                    tmp <- AJjumpTest(x, p = p, k = k, alignBy = alignBy, alignPeriod = alignPeriod, alphaMultiplier = alphaMultiplier, makeReturns = makeReturns, ...)
+                    return(cbind(tmp[[1]], tmp[[2]][1], tmp[[2]][2], tmp[[3]]))
+                    })
     colnames(result) <- c("ztest", "lower", "upper", "p-value")
     universalThreshold <- 2 * pnorm(-sqrt(log(ndays(result$ztest) * 2)))
     
@@ -222,12 +223,15 @@ AJjumpTest <- function(pData, p = 4 , k = 2, alignBy = NULL, alignPeriod = NULL,
 BNSjumpTest <- function (rData, IVestimator = "BV", IQestimator = "TP", type = "linear",
                          logTransform = FALSE, max = FALSE, alignBy = NULL, alignPeriod = NULL,
                          makeReturns = FALSE, alpha = 0.975) {
+  
   if (checkMultiDays(rData) == TRUE) {
     
-    result <- apply.daily(rData, function(x){
-        tmp <- BNSjumpTest(x, IVestimator, IQestimator, type, logTransform, max, alignBy, alignPeriod, makeReturns, alpha)
-        return(cbind(tmp[[1]], tmp[[2]][1], tmp[[2]][2], tmp[[3]]))
-      })
+    result <- 
+      apply.daily(rData, 
+                  function(x) {
+                    tmp <- BNSjumpTest(x, IVestimator, IQestimator, type, logTransform, max, alignBy, alignPeriod, makeReturns, alpha)
+                    return(cbind(tmp[[1]], tmp[[2]][1], tmp[[2]][2], tmp[[3]]))
+                  })
     
     # browser()
     colnames(result) <- c("ztest", "lower", "upper", "p-value")
@@ -369,12 +373,14 @@ BNSjumpTest <- function (rData, IVestimator = "BV", IQestimator = "TP", type = "
 #' @export
 JOjumpTest <- function(pData, power = 4, alignBy = NULL, alignPeriod = NULL, alpha = 0.975, ...) {
   
-  if (checkMultiDays(pData)) {
+  if (checkMultiDays(pData) == TRUE) {
     
-    result <- apply.daily(pData, function(x){
-      tmp <- JOjumpTest(x, power, alignBy, alignPeriod, alpha, ...)
-      return(cbind(tmp[[1]], tmp[[2]][1], tmp[[2]][2], tmp[[3]]))
-    })
+    result <- 
+      apply.daily(pData,
+                  function(x){
+                    tmp <- JOjumpTest(x, power, alignBy, alignPeriod, alpha, ...)
+                    return(cbind(tmp[[1]], tmp[[2]][1], tmp[[2]][2], tmp[[3]]))})
+    
     colnames(result) <- c("ztest", "lower", "upper", "p-value")
     
     universalThreshold <- 2 * pnorm(-sqrt(log(ndays(result$ztest) * 2)))
@@ -426,11 +432,10 @@ JOjumpTest <- function(pData, power = 4, alignBy = NULL, alignPeriod = NULL, alp
 }
 
 
-#' General framework for testing for jumps on an intraday basis
-#' @description 
-#'  This function can be used to  test for jumps in intraday price paths.
-#'  The tests are of the form:
-#'  L(t) = (R(t) - mu(t))/sigma(t) 
+#' Intraday jump tests
+#' 
+#' This function can be used to  test for jumps in intraday price paths.
+#' The tests are of the form \eqn{L(t) = (R(t) - mu(t))/sigma(t)}.
 #' 
 #' The null hypothesis of the tests in this function is that
 #' @param pData xts or data.table of the price data in levels. This data can (and should in some cases) be tick-level data. The data can span more than one day.
@@ -456,8 +461,7 @@ JOjumpTest <- function(pData, power = 4, alignBy = NULL, alignPeriod = NULL, alp
 #'                            RM = "bipower", lookBackPeriod = 10,
 #'                            on = "minutes", k = 5, marketOpen = "09:30:00", 
 #'                            marketClose = "16:00:00")
-#' plot(LMtest)
-#' }
+#' plot(LMtest)}
 #' 
 #' @importFrom zoo index
 #' @export
@@ -492,7 +496,7 @@ intradayJumpTest <- function(pData, volEstimator = "RM", driftEstimator = "none"
   
   D <- ndays(pData)
   isMultiDay <- FALSE
-  if(D > 1){
+  if (D > 1) {
     isMultiDay <- TRUE
   } 
   
@@ -512,7 +516,7 @@ intradayJumpTest <- function(pData, volEstimator = "RM", driftEstimator = "none"
   }
 
   
-  if(volEstimator != "PARM"){
+  if (volEstimator != "PARM") {
     prices <- aggregatePrice(pData, on = on, k = k , marketOpen = marketOpen,
                    marketClose = marketClose, tz = tz, fill = TRUE)
     setkeyv(prices, "DT")
@@ -526,14 +530,13 @@ intradayJumpTest <- function(pData, volEstimator = "RM", driftEstimator = "none"
     options <- list(...)
     op[names(options)] <- options
     
-    if(isMultiDay){
+    if (isMultiDay == TRUE) {
       dates <- NULL 
       if(is.data.table(pData)){
         dates <- unique(as.Date(pData$DT))
       } else {
         dates <- unique(as.Date(index(pData)))
       }
-      
       
       preAveragedReturns <- testingIndices <- c()
       
@@ -551,14 +554,12 @@ intradayJumpTest <- function(pData, volEstimator = "RM", driftEstimator = "none"
       
     } else {
       testingIndices <- seq(op$lookBackPeriod - 2 + vol$kn +1, nObs-vol$kn, by = vol$kn)
-      if(op$RM == "medrv"){ # We can expand this if need be. 
+      if (op$RM == "medrv") { # We can expand this if need be. 
         testingIndices <- testingIndices[-length(testingIndices)]
       }
       
       returns <- pData[, RETURN := c(as.numeric(hatreturn(as.xts(pData)$PRICE, vol$kn)), rep(NA, vol$kn - 2))][testingIndices,"RETURN"]
     }
-    
-    
     
     prices <- NULL
   }
@@ -575,8 +576,6 @@ intradayJumpTest <- function(pData, volEstimator = "RM", driftEstimator = "none"
     drift <- 0
   }
   
-  
-  
   vol$spot <- sqrt(vol$spot^2  * 1/(op$lookBackPeriod-2))
   
   tests <- (returns$RETURN - drift)/(vol$spot)
@@ -590,14 +589,15 @@ intradayJumpTest <- function(pData, volEstimator = "RM", driftEstimator = "none"
   betastar <- -log(-log(1-alpha))
   criticalValue <- Cn + Sn * betastar
   
-  if(dummy_was_xts){
+  if (dummy_was_xts == TRUE) {
     pData <- as.xts(pData[ , list(DT, PRICE)])
   } else {
     pData <- pData[ , list(DT, PRICE)]
   }
   
   
-  out <- list("ztest" = tests, "vol" = vol,  "drift" = drift, "criticalValue" = criticalValue, "pData" = pData, "prices" = prices, "isMultiDay" = isMultiDay)
+  out <- list("ztest" = tests, "vol" = vol,  "drift" = drift, "criticalValue" = criticalValue, 
+              "pData" = pData, "prices" = prices, "isMultiDay" = isMultiDay)
   class(out) <- c( "intradayJumpTest", "list")
   
   # testingTimes <- trimws(gsub("1970-01-01", "", index(vol$spot)))
@@ -660,14 +660,12 @@ plot.intradayJumpTest <- function(x, ...){
   #unpack values
   isMultiday <- x[["isMultiDay"]]
 
-
-
-  if(isMultiday){
+  if (isMultiday == TRUE) {
     
     D <- ndays(x$pData)
     prices <- as.xts(x$pData)
     dates <- as.character(unique(as.Date(index(prices)))) # Get the dates in the sample.
-    for(d in 1:D){ # We loop through all the days and ask the user whether we should continue or stop
+    for (d in 1:D){ # We loop through all the days and ask the user whether we should continue or stop
       
       thisDat <- prices[dates[d]]
       p1 <- plot(thisDat, main = "intraday jump test", lty = ifelse(is.null(x$prices), 1, 2))
@@ -707,7 +705,8 @@ plot.intradayJumpTest <- function(x, ...){
       
       
       shade <- abs( x$ztest[dates[d]] ) > x$criticalValue
-      shade <- cbind(upper = shade * as.numeric(max(thisDat, na.rm = TRUE) +1e5), lower = shade * as.numeric(min(thisDat, na.rm = TRUE)) -1e5)
+      shade <- cbind(upper = shade * as.numeric(max(thisDat, na.rm = TRUE) +1e5), 
+                     lower = shade * as.numeric(min(thisDat, na.rm = TRUE)) -1e5)
       colnames(shade) <- c("upper", "lower")
       shade <- na.omit(shade)
       p1 <- addPolygon(shade, on = -1, col = 2)
@@ -722,18 +721,14 @@ plot.intradayJumpTest <- function(x, ...){
   } else {
     shade <- abs( x$ztest ) > x$criticalValue
     
-    if(!is.xts(x$pData)){
+    if(is.xts(x$pData) == FALSE){
       shade <- cbind(upper = shade * as.numeric(max(x$pData$PRICE, na.rm = TRUE) +1e5), lower = shade * as.numeric(min(x$pData$PRICE, na.rm = TRUE)) -1e5)
     } else {
       shade <- cbind(upper = shade * as.numeric(max(x$pData, na.rm = TRUE) +1e5), lower = shade * as.numeric(min(x$pData, na.rm = TRUE)) -1e5)
     }
     
-    
     colnames(shade) <- c("upper", "lower")
-    
-
     p1 <- plot(na.locf0(as.xts(x$pData)), main = "intraday jump test", lty = ifelse(is.null(x$prices), 1, 2))
-
 
     if(!is.null(x$prices)){
       if(!is.xts(x$prices)){
@@ -741,17 +736,17 @@ plot.intradayJumpTest <- function(x, ...){
       } else {
         p1 <- lines(na.locf0(cbind(x$pData, x$prices))[ ,2], col = "blue", lwd = 2)
       }
-      p1 <- addLegend(legend.loc = 'topleft', legend.names = c("Actual prices", "Sub-sampled prices", "Jump detection zone"), lwd = c(2,2,0), pch=c(NA,NA,15), col =c(1, "blue", 2))
+      p1 <- addLegend(legend.loc = 'topleft', legend.names = c("Actual prices", "Sub-sampled prices", "Jump detection zone"), 
+                      lwd = c(2,2,0), pch = c(NA,NA,15), col =c(1, "blue", 2))
     } else {
-      p1 <- addLegend(legend.loc = 'topleft', legend.names = c("Prices", "Jump detection zone"), lwd = c(2,0), pch=c(NA,15), col =c(1, 2))
+      p1 <- addLegend(legend.loc = 'topleft', legend.names = c("Prices", "Jump detection zone"), 
+                      lwd = c(2,0), pch=c(NA,15), col =c(1, 2))
     } 
     ## Add shaded region to the plot where we detect jumps
     shade <- na.omit(shade)
     p1 <- addPolygon(shade, on = -1, col = 2)
     plot(p1)
   }
-
-
 
   invisible(p1)
 
@@ -782,19 +777,16 @@ plot.intradayJumpTest <- function(x, ...){
 #' and/or \code{marketOpen}/ \code{marketClose} belong. Default = \code{"GMT"}.
 #' This parameter will also help determine the testing times as the test is done on non-overlapping pre-averaged returns.
 #' 
-#' @details 
-#' 
 #' @importFrom stats na.omit quantile runif
-#' @export
 #' @importFrom zoo coredata
+#' @export
 rankJumpTest <- function(marketPrice, stockPrices, alpha = c(5,3), coarseFreq = 10, localWindow = 30, rank = 1, BoxCox = 1, nBoot = 1000, dontTestAtBoundaries = TRUE, on = "minutes", k = 5,
                          marketOpen = "09:30:00", marketClose = "16:00:00", tz = "GMT"){
-  
   
   ## Preparation of data
   PRICE = DATE = RETURN = DT = NULL
   
-  if(!all.equal(class(marketPrice), class(stockPrices[[1]]))){
+  if (!all.equal(class(marketPrice), class(stockPrices[[1]]))) {
     stop("Please provide marketPrice and stockPrice as the same class (either xts or data.table)")
   }
   
@@ -807,7 +799,7 @@ rankJumpTest <- function(marketPrice, stockPrices, alpha = c(5,3), coarseFreq = 
   }
   
   dummyWasXts <- FALSE
-  if (!is.data.table(marketPrice)) {
+  if (is.data.table(marketPrice) == FALSE) {
     if (is.xts(marketPrice) == TRUE) {
       marketPrice <- setnames(as.data.table(marketPrice), old = "index", new = "DT")
       marketPrice[, PRICE := as.numeric(PRICE)]
@@ -844,23 +836,20 @@ rankJumpTest <- function(marketPrice, stockPrices, alpha = c(5,3), coarseFreq = 
   }
 
   
-  if(!is.numeric(alpha)){
+  if (!is.numeric(alpha)) {
     stop("alpha must be a numeric and should be of length one or two")
   }
-  if(length(alpha) == 1){
+  if (length(alpha) == 1) {
     alpha = rep(alpha,2)
-  } else if(length(alpha) > 2){
+  } else if (length(alpha) > 2) {
     warning("alpha should be a numeric of length one or two")
     alpha = alpha[1:2]
   }
   
-  if(any(alpha< 1)){
+  if (any(alpha < 1)) {
     warning("alpha should be specified in terms of standard deviations in the rank jump test.")
   }
   ## Data prep ends
-  
-  
-  
   
   nDays <- ndays(marketReturns)
   nRets <- nrow(marketReturns)/nDays
@@ -878,7 +867,7 @@ rankJumpTest <- function(marketPrice, stockPrices, alpha = c(5,3), coarseFreq = 
   
   jumps <- matrix(coredata(stockReturns)[jumpIndices,], ncol = ncol(stockReturns), byrow = FALSE)
   
-  for(i in 1:(coarseFreq-1)){
+  for (i in 1:(coarseFreq-1)) {
     jumps <- jumps + matrix(stockReturns[jumpIndices + i, ], ncol = ncol(stockReturns), byrow = FALSE)
   }
   
@@ -897,9 +886,6 @@ rankJumpTest <- function(marketPrice, stockPrices, alpha = c(5,3), coarseFreq = 
     testStatistic[i] <- sum(BoxCox__(singularValues, a))
   }
   
-  
-  
-  
   ## Start bootstrapping of the critical values
   p <- ncol(jumps)
   dxc <- pmax(pmin(coredata(stockReturns), coredata(stockJumpDetections)), -coredata(stockJumpDetections))
@@ -910,7 +896,7 @@ rankJumpTest <- function(marketPrice, stockPrices, alpha = c(5,3), coarseFreq = 
     for (i in 1:p) {
       jmp <- jumpIndices[i] 
       
-      if(dontTestAtBoundaries){
+      if (dontTestAtBoundaries == TRUE) {
         # We need to make sure that we don't take data from the previous day
         pos <- ((jmp - 1) %% nRets) + 1
         leftKN <- min(localWindow, pos-1)
@@ -952,9 +938,7 @@ timeOfDayAdjustments <- function(returns, n, m, polyOrder){
   
   timePolyMatrix <- matrix(rep(1:nrow(returns), each = polyOrder + 1)^(0:polyOrder), nrow = nrow(returns), ncol = polyOrder + 1, byrow = TRUE)
   
-
   timeOfDayScatter <- 1.249531 * rowMeans((abs(returns[,1:(m-2)])* abs(returns[,2:(m-1)]) * abs(returns[,3:m]))^(2/3))
-  
   
   timeOfDayBeta <- as.numeric(solve(t(timePolyMatrix) %*% timePolyMatrix) %*% t(timePolyMatrix) %*% timeOfDayScatter)
   
@@ -962,7 +946,6 @@ timeOfDayAdjustments <- function(returns, n, m, polyOrder){
   
   # Normalize the fit
   timeOfDayFit <- timeOfDayFit / mean(timeOfDayFit)
-  
   
   timeOfDayScatter <- timeOfDayScatter/mean(timeOfDayScatter)
   out <- list("timeOfDayScatter" = timeOfDayScatter, "timeOfDayFit" = timeOfDayFit, "timeOfDayBeta" = timeOfDayBeta, "timePolyMatrix" = timePolyMatrix) 
@@ -987,13 +970,15 @@ jumpDetection <- function(returns, alpha, nRets, nDays){
   return(out)
   
 }
+
 #' @keywords internal
 #find better name?
 BoxCox__ <- function(x, lambda){
-  if(!lambda)
+  if (!lambda) {
     return(log(1+x))
-  else 
+  } else {
     return(((1+x)^lambda - 1)/lambda)
+  }
 }
 
 
