@@ -74,14 +74,14 @@ Rcpp::List refreshTimeMathing(const arma::mat& x, arma::vec& idx) {
 
 
 //' @keywords internal
-inline double weightedSumPreAveragingInternal(const arma::vec x, const arma::vec series){
+inline double weightedSumPreAveragingInternal(const arma::vec& x, const arma::vec& series){
   
   return(arma::dot(x,series));
 }
 
 //' @keywords internal
 // [[Rcpp::export]]
-arma::mat preAveragingReturnsInternal(arma::mat ret, const int kn){
+arma::mat preAveragingReturnsInternal(arma::mat& ret, const int kn){
   
   const int N = ret.n_rows + 1;
   const int D = ret.n_cols;
@@ -109,21 +109,20 @@ arma::mat preAveragingReturnsInternal(arma::mat ret, const int kn){
 
 // Armadillo version of np.clip needed for the lead-lag estimation, didn't find a version in base R
 // [[Rcpp::export]]
-arma::vec clamp(arma::vec x, const double lower = 0.0, const double upper = 1.0){
+arma::vec clamp(arma::vec& x, const double lower = 0.0, const double upper = 1.0){
   return(arma::clamp(x, lower, upper));
 }
 
 
 // Armadillo version of bisect_left needed for the lead-lag estimation, didn't find a version in base R
 // [[Rcpp::export]]
-arma::uword find_first(arma::vec x , const int thresh){
+arma::uword find_first(arma::vec& x , const int thresh){
   arma::uword i;
   for(i = 1; i <= x.n_elem; i++){ // We start from 1 and go to the end to keep with R's 1-indexed arrays
     
     if(x[i] >= thresh){
       return i;
     }
-    
     
   }
   return i;

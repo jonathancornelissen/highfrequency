@@ -106,24 +106,24 @@ BEGIN_RCPP
 END_RCPP
 }
 // preAveragingReturnsInternal
-arma::mat preAveragingReturnsInternal(arma::mat ret, const int kn);
+arma::mat preAveragingReturnsInternal(arma::mat& ret, const int kn);
 RcppExport SEXP _highfrequency_preAveragingReturnsInternal(SEXP retSEXP, SEXP knSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::mat >::type ret(retSEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type ret(retSEXP);
     Rcpp::traits::input_parameter< const int >::type kn(knSEXP);
     rcpp_result_gen = Rcpp::wrap(preAveragingReturnsInternal(ret, kn));
     return rcpp_result_gen;
 END_RCPP
 }
 // clamp
-arma::vec clamp(arma::vec x, const double lower, const double upper);
+arma::vec clamp(arma::vec& x, const double lower, const double upper);
 RcppExport SEXP _highfrequency_clamp(SEXP xSEXP, SEXP lowerSEXP, SEXP upperSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::vec >::type x(xSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type x(xSEXP);
     Rcpp::traits::input_parameter< const double >::type lower(lowerSEXP);
     Rcpp::traits::input_parameter< const double >::type upper(upperSEXP);
     rcpp_result_gen = Rcpp::wrap(clamp(x, lower, upper));
@@ -131,12 +131,12 @@ BEGIN_RCPP
 END_RCPP
 }
 // find_first
-arma::uword find_first(arma::vec x, const int thresh);
+arma::uword find_first(arma::vec& x, const int thresh);
 RcppExport SEXP _highfrequency_find_first(SEXP xSEXP, SEXP threshSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::vec >::type x(xSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type x(xSEXP);
     Rcpp::traits::input_parameter< const int >::type thresh(threshSEXP);
     rcpp_result_gen = Rcpp::wrap(find_first(x, thresh));
     return rcpp_result_gen;

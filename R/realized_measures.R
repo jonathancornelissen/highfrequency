@@ -2481,5 +2481,124 @@ listCholCovEstimators <- function(){
     "rKernelCov",
     "rOWCov",
     "rRTSCov",
-    "rThresholdCov")
+    "rThresholdCov",
+    "rSemiCov")
+}
+
+
+
+
+
+
+
+
+
+overlap <- function(min1, max1, min2, max2){
+  return(max(0, min(max1, max2) - max(min1, min2)) > 0)
+}
+
+
+#' @export
+leadLag <- function(price1, price2, lagRange, normalize = FALSE){
+  
+  
+  print("make handle milliseconds")
+  
+  timestampsX <- as.numeric(index(price1))# * 1000
+  timestampsY <- as.numeric(index(price2))# * 1000
+  origin <- min(timestampsY[1], timestampsX[1])
+  timestampsX <- timestampsX - origin
+  timestampsY <- timestampsY - origin
+  
+  res <- numeric(length(lagRange))
+  
+  x <- as.numeric(price1)
+  y <- as.numeric(price2)
+  if( normalize ){
+    factorX <- sqrt(sum(diff(x) ^ 2))
+    factorY <- sqrt(sum(diff(y) ^ 2))  
+  } else {
+    factorX <- 1
+    factorY <- 1
+  }
+  
+  minTSY <- timestampsY[1]
+  maxTSY <- timestampsY[length(timestampsY)]
+  idx <- 1
+  
+  counter <- 0
+  right <- left <- 0
+  for(k in lagRange){
+    
+    clampedTimestamps <- clamp(timestampsY - k, minTSY, maxTSY)
+    
+    for(i in 1:(length(price1)-1)) {
+      ret <- x[i+1] - x[i]
+      
+      midPointBackup <- find_first(clampedTimestamps, timestampsX[i])
+      
+      midPoint <- midPointBackup 
+
+      while(TRUE){
+        if(midPoint < 1 | (midPoint + 1) >= length(timestampsY)){
+          break
+        }
+        j0 <- midPoint
+        j1 <- midPoint + 1
+
+
+
+        if( overlap(timestampsX[i], timestampsX[i+1], timestampsY[j0] - k, timestampsY[j1] - k) ){
+          counter <- counter + 1
+          res[idx] <- res[idx] + (y[j1] - y[j0]) * ret
+          midPoint <- midPoint +1
+          left <- left + 1
+
+        } else {
+          break
+        }
+        
+        
+      }
+      
+      
+      midPoint <- midPointBackup - 1
+      while(TRUE){
+        
+        if(midPoint < 1 | (midPoint + 1) >= length(timestampsY)){
+          break
+        }
+        j0 <- midPoint -1
+        j1 <- midPoint #+ 1
+        if((timestampsY[j1] - k) == 8074){
+          print("foo")
+        }
+          
+        #browser()
+        if( overlap(timestampsX[i], timestampsX[i+1], timestampsY[j0] - k, timestampsY[j1] - k) ){
+          counter <- counter + 1
+          right <- right + 1
+          res[idx] <- res[idx] + (y[j1] - y[j0]) * ret
+          midPoint <- midPoint - 1
+        } else {
+          break
+        }
+        
+        
+      }
+      
+      #print( i)
+      
+      
+    }
+    
+    idx <- idx + 1
+  }
+  browser()
+  
+  
+
+  ret
+  return(abs(res)/(factorX * factorY))
+  
 }
