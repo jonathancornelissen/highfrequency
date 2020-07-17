@@ -1946,15 +1946,15 @@ rQPVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
     result <- apply.daily(rData, rQPVar, alignBy, alignPeriod, makeReturns)
     return(result)
   } else {
-    if ((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+    if (!is.null(alignBy) && !is.null(alignPeriod)) {
       rData <-fastTickAgregation(rData, on = alignBy, k = alignPeriod)
     }
     if (makeReturns) {
       rData <- makeReturns(rData)
     }
-    q      <- abs(as.numeric(rData))
-    q      <- rollapply(q, width = 4, FUN = prod, align = "left")
-    N      <- length(q) + 3
+    q <- abs(as.numeric(rData))
+    q <- rollapply(q, width = 4, FUN = prod, align = "left")
+    N <- length(q) + 3
     rQPVar <- N* (N / (N-3)) * (pi^2 / 4) * sum(q)
     return(rQPVar)
   }
@@ -1999,8 +1999,8 @@ rQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
     if (makeReturns) {
       rData <- makeReturns(rData)
     }
-    q     <- as.numeric(rData)
-    N     <- length(q) + 1
+    q <- as.numeric(rData)
+    N <- length(q) + 1
     rQuar <- N/3 * sum(q^4)
     return(rQuar)
   }
