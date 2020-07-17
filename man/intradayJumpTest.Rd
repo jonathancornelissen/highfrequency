@@ -2,7 +2,7 @@
 % Please edit documentation in R/jump_tests.R
 \name{intradayJumpTest}
 \alias{intradayJumpTest}
-\title{General framework for testing for jumps on an intraday basis}
+\title{Intraday jump tests}
 \usage{
 intradayJumpTest(
   pData,
@@ -42,9 +42,9 @@ and/or \code{marketOpen}/ \code{marketClose} belong. Default = \code{"GMT"}.}
 }
 \description{
 This function can be used to  test for jumps in intraday price paths.
- The tests are of the form:
- L(t) = (R(t) - mu(t))/sigma(t) 
-
+The tests are of the form \eqn{L(t) = (R(t) - mu(t))/sigma(t)}.
+}
+\details{
 The null hypothesis of the tests in this function is that
 }
 \examples{
@@ -55,7 +55,6 @@ LMtest <- intradayJumpTest(pData = sampleTDataMicroseconds[, list(DT, PRICE)],
                            RM = "bipower", lookBackPeriod = 10,
                            on = "minutes", k = 5, marketOpen = "09:30:00", 
                            marketClose = "16:00:00")
-plot(LMtest)
-}
+plot(LMtest)}
 
 }

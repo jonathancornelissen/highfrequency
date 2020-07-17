@@ -151,7 +151,7 @@ huberweight <- function(d,k) {
 }
 
 #' @keywords internal
-multixts <- function(x, y = NULL) { 
+isMultiXts <- function(x, y = NULL) { 
   if (is.null(y)) {
     test <- is.xts(x) && (ndays(x)!=1)
     return(test)
@@ -364,7 +364,7 @@ RBPVar <- function(rData) {
 
 #' @keywords internal
 kernelCharToInt <- function(type) {
-  if (is.character(type) == TRUE) {
+  if (is.character(type)) {
     ans <- switch(casefold(type), 
                   rectangular = 0,
                   bartlett = 1,
@@ -432,7 +432,7 @@ thetaROWVar <- function(alpha = 0.001 , alphaMCD = 0.5) {
 #' @keywords internal
 ROWVar <- function(rData, seasadjR = NULL, wFunction = "HR" , alphaMCD = 0.75, alpha = 0.001) {
   
-  if (is.null(seasadjR) == TRUE) {
+  if (is.null(seasadjR)) {
     seasadjR <- rData
   }
   
@@ -485,7 +485,7 @@ RTSCov_bi <- function (pData1, pData2, startIV1 = NULL, startIV2 = NULL, noiseva
   }
   
   # Calculation of the noise variance and TSRV for the truncation
-  if (is.null(noisevar1) == TRUE) {
+  if (is.null(noisevar1)) {
     logprices1 <- log(as.numeric(pData1))
     n_var1     <- length(logprices1)
     nbarK_var1 <- (n_var1 - K_var1 + 1)/(K_var1)
@@ -524,15 +524,15 @@ RTSCov_bi <- function (pData1, pData2, startIV1 = NULL, startIV2 = NULL, noiseva
     noisevar2 = max(0,1/(2 * nbarJ_var2) * (sum(logreturns_J2^2)/J_var2 - TSRV(pData2,K=K_var2,J=J_var2)))
   }    
   
-  if (!is.null(startIV1)) {
+  if (is.null(startIV1)) {
+    RTSRV1 <- RTSRV(pData=pData1, noisevar = noisevar1, K = K_var1, J = J_var1, eta = eta)
+  } else {      
     RTSRV1 = startIV1
-  } else {
-    RTSRV1 <- RTSRV(pData=pData1, noisevar = noisevar1, K = K_var1, J = J_var1, eta = eta)      
   }
-  if (is.null(startIV2) == FALSE) {
+  if (is.null(startIV2)) {
+    RTSRV2 <- RTSRV(pData = pData2, noisevar = noisevar2, K = K_var2, J = J_var2, eta = eta) 
+  } else { 
     RTSRV2 <- startIV2
-  }else{
-    RTSRV2 <- RTSRV(pData = pData2, noisevar = noisevar2, K = K_var2, J = J_var2, eta = eta)      
   }
   
   # Refresh time is for the covariance calculation
@@ -646,7 +646,7 @@ RTSRV <- function(pData, startIV = NULL, noisevar = NULL, K = 300, J = 1, eta = 
 #'                      alignPeriod = 1) {            # Align the tick data to this many [seconds|minutes|hours]            
 #'   # Multiday adjustment: 
 #'   multixts <- multixts(x)
-#'   if (multixts == TRUE) {
+#'   if (multixts) {
 #'     result <- apply.daily(x, rv.kernel,kernelType,kernelParam,kernelDOFadj,
 #'                           alignBy, alignPeriod, cts, makeReturns)
 #'     return(result)

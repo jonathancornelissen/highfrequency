@@ -35,7 +35,7 @@ fmupk <- function(p,k){
                   "3" = 320.26,
                   "4" = 455.67)
   }
-  if (is.null(mupk) == TRUE) {
+  if (is.null(mupk)) {
     # reduce simulation error by taking large T and large nrep
     nrep <- 100
     vmupk <- rep(NA, times = nrep)

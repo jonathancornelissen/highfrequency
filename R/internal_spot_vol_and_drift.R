@@ -852,21 +852,21 @@ diurnal <- function (stddata, method = "TML", dummies = F, P1 = 6, P2 = 4) {
 }
 
 #' @keywords internal
-diurnalfit <- function( theta , P1 , P2 , intraT , dummies=F ) {
+diurnalfit <- function( theta , P1 , P2 , intraT , dummies = FALSE) {
   vi <- c(1:intraT)
   M1 <- (intraT+1) / 2
   M2 <- (2 * intraT^2 + 3 * intraT + 1) / 6
 
   # Regressors that do not depend on Day of Week:
   X <- c()
-  if(dummies == FALSE) {
+  if (!dummies) {
     if (P1 > 0) {
       for (j in 1:P1 ) {
         X <- cbind(X , cos(2*pi*j*vi/intraT))
       }
     }
 
-    ADD <- (vi/M1 )
+    ADD <- (vi/M1)
     X   <- cbind(X,ADD)
     ADD <- (vi^2/M2)
     X   <- cbind(X,ADD)

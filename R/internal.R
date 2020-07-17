@@ -50,7 +50,7 @@ applyGetList <- function(x, FUN, cor = FALSE, alignBy = NULL, alignPeriod = NULL
   result <- list()
   FUN <- match.fun(FUN)
   for(i in 1:(length(INDEX)-1)){
-    if (is.null(makePsd) == TRUE) {
+    if (is.null(makePsd)) {
       result[[i]] <- FUN(x[(INDEX[i] + 1):INDEX[i + 1]], cor, alignBy, alignPeriod, makeReturns)
     } else {
       result[[i]] <- FUN(x[(INDEX[i] + 1):INDEX[i + 1]], cor, alignBy, alignPeriod, makeReturns, makePsd)
@@ -115,19 +115,19 @@ makePsd <- function(S, method = "covariance") {
 #' @importFrom xts is.xts
 #' @importFrom xts ndays
 #' @keywords internal
-multixts <- function(x, y = NULL) { 
-  if (is.null(y) == TRUE) {
+isMultiXts <- function(x, y = NULL) { 
+  if (is.null(y)) {
     test <- is.xts(x) && (ndays(x)!=1)
     return(test)
   } else {
     test <- (is.xts(x) && (ndays(x)!=1)) || (ndays(y)!=1 && is.xts(y))
-    if (test == TRUE) {
-      equal_dimension <- (dim(y) == dim(x))
-      if (equal_dimension == FALSE) { 
-        warning("Please make sure x and y have the same dimensions")
-        } else {
-          test <- list(TRUE, cbind(x,y))
+    if (test) {
+      isEqualDimensions <- (dim(y) == dim(x))
+      if (isEqualDimensions) { 
+        test <- list(TRUE, cbind(x,y))
         return(test) 
+      } else {
+          warning("Please make sure x and y have the same dimensions") 
       }
     } 
   } 

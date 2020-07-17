@@ -88,7 +88,7 @@ HEAVYmodel <- function(data, p = matrix(c(0, 0, 1, 1), ncol = 2), q = matrix(c(1
       UB <- rep(10^6, K)
     }
 
-    if (is.null(startingValues) == TRUE) {
+    if (is.null(startingValues)) {
       startingValues <- rep(NA, K + sum(p) + sum(q))
       startingValues[1:K] <- 0.1
       start <- K + 1
@@ -99,7 +99,7 @@ HEAVYmodel <- function(data, p = matrix(c(0, 0, 1, 1), ncol = 2), q = matrix(c(1
       startingValues[start:end] <- 0.6
     }
 
-    if (is.null(backCast) == TRUE) {
+    if (is.null(backCast)) {
       backCast <- t(t(colMeans(data)))
     }
 
@@ -131,7 +131,7 @@ HEAVYmodel <- function(data, p = matrix(c(0, 0, 1, 1), ncol = 2), q = matrix(c(1
                              backCast = backCast, LB = LB, UB = UB, compConst = compConst,
                              return.only.llh = FALSE)
 
-    if (is.null(rownames(data)) == FALSE) {
+    if (!is.null(rownames(data))) {
       output$condvar <- xts(t(matrix(xx$h, K)), order.by = as.POSIXct(rownames(data)))
       output$likelihoods <- xts(t(matrix(xx$lls, 1)), order.by = as.POSIXct(rownames(data)))
     }
@@ -181,7 +181,7 @@ heavyLikelihoodllC <- function(splittedparams, data, p, q, backCast, LB, UB, com
            lls = as.double(rep(0, TT)),
            llRM = as.double(rep(0, K)))
   
-  if (return.only.llh == TRUE) {
+  if (return.only.llh) {
     return(out$ll)
   } else {
     return(out)

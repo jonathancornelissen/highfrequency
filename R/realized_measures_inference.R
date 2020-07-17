@@ -104,7 +104,7 @@ IV <- function(IVestimator, iq) {
 #' @export 
 ivInference <- function(rData, IVestimator = "RV", IQestimator = "rQuar", confidence = 0.95, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, ...) {
   
-  if (checkMultiDays(rData) == TRUE) { 
+  if (checkMultiDays(rData)) { 
     result <- apply.daily(rData, ivInference, alignBy, alignPeriod, makeReturns)
     return(result)
   } else {
@@ -112,7 +112,7 @@ ivInference <- function(rData, IVestimator = "RV", IQestimator = "rQuar", confid
       rData <- fastTickAgregation(rData, on = alignBy, k = alignPeriod)
     }
     
-    if (makeReturns == TRUE) { 
+    if (makeReturns) { 
       rData <- makeReturns(rData)  
     }
     
