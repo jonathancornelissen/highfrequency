@@ -99,7 +99,7 @@ ABDJumptest <- function(RV, BPV, TQ) { # Compute jump detection stat mentioned i
 #' @export
 AJjumpTest <- function(pData, p = 4 , k = 2, alignBy = NULL, alignPeriod = NULL, alphaMultiplier = 4, makeReturns = FALSE, ...) {
 
-  if (checkMultiDays(pData) == TRUE) {
+  if (checkMultiDays(pData)) {
     
     result <- 
       apply.daily(pData, 
@@ -224,7 +224,7 @@ BNSjumpTest <- function (rData, IVestimator = "BV", IQestimator = "TP", type = "
                          logTransform = FALSE, max = FALSE, alignBy = NULL, alignPeriod = NULL,
                          makeReturns = FALSE, alpha = 0.975) {
   
-  if (checkMultiDays(rData) == TRUE) {
+  if (checkMultiDays(rData)) {
     
     result <- 
       apply.daily(rData, 
@@ -249,7 +249,7 @@ BNSjumpTest <- function (rData, IVestimator = "BV", IQestimator = "TP", type = "
     if ((!is.null(alignBy)) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation(rData, on = alignBy, k = alignPeriod)
     }
-    if (makeReturns == TRUE) {
+    if (makeReturns) {
       rData <- makeReturns(rData)
     }
     N <- length(rData)
@@ -373,7 +373,7 @@ BNSjumpTest <- function (rData, IVestimator = "BV", IQestimator = "TP", type = "
 #' @export
 JOjumpTest <- function(pData, power = 4, alignBy = NULL, alignPeriod = NULL, alpha = 0.975, ...) {
   
-  if (checkMultiDays(pData) == TRUE) {
+  if (checkMultiDays(pData)) {
     
     result <- 
       apply.daily(pData,
@@ -471,7 +471,7 @@ intradayJumpTest <- function(pData, volEstimator = "RM", driftEstimator = "none"
 
   PRICE = DATE = RETURN = DT = NULL
   
-  if ("PRICE" %in% colnames(pData) == FALSE) {
+  if (!("PRICE" %in% colnames(pData))) {
     if (dim(pData)[2] == 1) {
       names(pData) <- "PRICE"
     } else {
@@ -479,17 +479,17 @@ intradayJumpTest <- function(pData, volEstimator = "RM", driftEstimator = "none"
     }
   }
     
-  dummy_was_xts <- FALSE
-  if (is.data.table(pData) == FALSE) {
-    if (is.xts(pData) == TRUE) {
+  dataWasXts <- FALSE
+  if (!is.data.table(pData)) {
+    if (is.xts(pData)) {
       pData <- setnames(as.data.table(pData), old = "index", new = "DT")
       pData[, PRICE := as.numeric(PRICE)]
-      dummy_was_xts <- TRUE
+      dataWasXts <- TRUE
     } else {
       stop("Input has to be data.table or xts.")
     }
   } else {
-    if (("DT" %in% colnames(pData)) == FALSE) {
+    if (!("DT" %in% colnames(pData))) {
       stop("Data.table needs DT column containing the time-stamps of the trades.") # added the timestamp comment for verbosity.
     }
   }
@@ -502,7 +502,7 @@ intradayJumpTest <- function(pData, volEstimator = "RM", driftEstimator = "none"
   
   vol <- spotVol(pData, method = volEstimator, on = on, k = k, marketOpen = marketOpen, marketClose = marketClose, tz = tz, ...)
 
-  if(volEstimator == "RM"){
+  if (volEstimator == "RM") {
     
     op <- list(RM = "bipower", lookBackPeriod = 10)
     options <- list(...)
@@ -521,7 +521,7 @@ intradayJumpTest <- function(pData, volEstimator = "RM", driftEstimator = "none"
                    marketClose = marketClose, tz = tz, fill = TRUE)
     setkeyv(prices, "DT")
     prices[, DATE := as.Date(DT, tz = tzone(prices$DT))]
-    returns <- prices[, RETURN := log(PRICE) - shift(log(PRICE), type = "lag"), by = "DATE"][is.na(RETURN) == FALSE]
+    returns <- prices[, RETURN := log(PRICE) - shift(log(PRICE), type = "lag"), by = "DATE"][!is.na(RETURN)]
     
   } else { # volEstimator == "PARM" i.e. we have pre-averaged realized measures
     nObs <- length(pData$PRICE)
@@ -530,7 +530,7 @@ intradayJumpTest <- function(pData, volEstimator = "RM", driftEstimator = "none"
     options <- list(...)
     op[names(options)] <- options
     
-    if (isMultiDay == TRUE) {
+    if (isMultiDay) {
       dates <- NULL 
       if(is.data.table(pData)){
         dates <- unique(as.Date(pData$DT))
@@ -589,7 +589,7 @@ intradayJumpTest <- function(pData, volEstimator = "RM", driftEstimator = "none"
   betastar <- -log(-log(1-alpha))
   criticalValue <- Cn + Sn * betastar
   
-  if (dummy_was_xts == TRUE) {
+  if (dataWasXts) {
     pData <- as.xts(pData[ , list(DT, PRICE)])
   } else {
     pData <- pData[ , list(DT, PRICE)]
@@ -660,7 +660,7 @@ plot.intradayJumpTest <- function(x, ...){
   #unpack values
   isMultiday <- x[["isMultiDay"]]
 
-  if (isMultiday == TRUE) {
+  if (isMultiday) {
     
     D <- ndays(x$pData)
     prices <- as.xts(x$pData)
@@ -721,10 +721,10 @@ plot.intradayJumpTest <- function(x, ...){
   } else {
     shade <- abs( x$ztest ) > x$criticalValue
     
-    if(is.xts(x$pData) == FALSE){
-      shade <- cbind(upper = shade * as.numeric(max(x$pData$PRICE, na.rm = TRUE) +1e5), lower = shade * as.numeric(min(x$pData$PRICE, na.rm = TRUE)) -1e5)
-    } else {
+    if (is.xts(x$pData)) {
       shade <- cbind(upper = shade * as.numeric(max(x$pData, na.rm = TRUE) +1e5), lower = shade * as.numeric(min(x$pData, na.rm = TRUE)) -1e5)
+    } else {
+      shade <- cbind(upper = shade * as.numeric(max(x$pData$PRICE, na.rm = TRUE) +1e5), lower = shade * as.numeric(min(x$pData$PRICE, na.rm = TRUE)) -1e5)
     }
     
     colnames(shade) <- c("upper", "lower")
@@ -799,12 +799,12 @@ rankJumpTest <- function(marketPrice, stockPrices, alpha = c(5,3), coarseFreq = 
   }
   
   dummyWasXts <- FALSE
-  if (is.data.table(marketPrice) == FALSE) {
-    if (is.xts(marketPrice) == TRUE) {
+  if (!is.data.table(marketPrice)) {
+    if (is.xts(marketPrice)) {
       marketPrice <- setnames(as.data.table(marketPrice), old = "index", new = "DT")
       marketPrice[, PRICE := as.numeric(PRICE)]
       
-      dummy_was_xts <- TRUE
+      dataWasXts <- TRUE
     } else {
       stop("Input has to be data.table or xts.")
     }
@@ -896,7 +896,7 @@ rankJumpTest <- function(marketPrice, stockPrices, alpha = c(5,3), coarseFreq = 
     for (i in 1:p) {
       jmp <- jumpIndices[i] 
       
-      if (dontTestAtBoundaries == TRUE) {
+      if (dontTestAtBoundaries) {
         # We need to make sure that we don't take data from the previous day
         pos <- ((jmp - 1) %% nRets) + 1
         leftKN <- min(localWindow, pos-1)

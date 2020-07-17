@@ -49,7 +49,7 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
 
   PRICE = DATE = RETURN = DT = NULL
 
-  if ("PRICE" %in% colnames(data) == FALSE) {
+  if (!("PRICE" %in% colnames(data))) {
     if (dim(data)[2] == 1) {
       names(data) <- "PRICE"
     } else {
@@ -58,8 +58,8 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
   }
 
   dummy_was_xts <- FALSE
-  if (is.data.table(data) == FALSE) {
-    if (is.xts(data) == TRUE) {
+  if (!is.data.table(data)) {
+    if (is.xts(data)) {
       data <- setnames(as.data.table(data), old = "index", new = "DT")
       data[, PRICE := as.numeric(PRICE)]
       dummy_was_xts <- TRUE
@@ -67,7 +67,7 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
       stop("Input has to be data.table or xts.")
     }
   } else {
-    if (("DT" %in% colnames(data)) == FALSE) {
+    if (!("DT" %in% colnames(data))) {
       stop("Data.table needs DT column containing the time-stamps of the trades.") # added the timestamp comment for verbosity.
     }
   }
@@ -78,13 +78,13 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
   # 
   datad[, DATE := as.Date(DT)]
   setkeyv(datad, "DT")
-  datad <- datad[, RETURN := log(PRICE) - shift(log(PRICE), type = "lag"), by = "DATE"][is.na(RETURN) == FALSE]
+  datad <- datad[, RETURN := log(PRICE) - shift(log(PRICE), type = "lag"), by = "DATE"][!is.na(RETURN)]
   datad <- split(datad, by = "DATE")
   mR <- matrix(unlist(lapply(datad, FUN = function(x) as.numeric(x$RETURN))), ncol = length(datad[[1]]$RETURN), byrow = TRUE)
 
   # datad2[, DATE := as.Date(DT)]
   # setkeyv(datad2, "DT")
-  # datad2 <- datad2[, RETURN := log(PRICE) - shift(log(PRICE), type = "lag"), by = "DATE"][is.na(RETURN) == FALSE]
+  # datad2 <- datad2[, RETURN := log(PRICE) - shift(log(PRICE), type = "lag"), by = "DATE"][!is.na(RETURN)]
   # datad2 <- split(datad2, by = "DATE")
   # mR2 <- matrix(unlist(lapply(datad2, FUN = function(x) as.numeric(x$RETURN))), ncol = length(datad2[[1]]$RETURN), byrow = TRUE)
   # 
@@ -489,7 +489,7 @@ spotVol <- function(data, method = "detPer", ..., on = "minutes", k = 5,
   
   PRICE = DATE = RETURN = DT = NULL
   
-  if ("PRICE" %in% colnames(data) == FALSE) {
+  if (!("PRICE" %in% colnames(data))) {
     if (dim(data)[2] == 1) {
       names(data) <- "PRICE"
     } else {
@@ -498,8 +498,8 @@ spotVol <- function(data, method = "detPer", ..., on = "minutes", k = 5,
   }
   
   dummy_was_xts <- FALSE
-  if (is.data.table(data) == FALSE) {
-    if (is.xts(data) == TRUE) {
+  if (!is.data.table(data)) {
+    if (is.xts(data)) {
       data <- setnames(as.data.table(data), old = "index", new = "DT")
       data[, PRICE := as.numeric(PRICE)]
       dummy_was_xts <- TRUE
@@ -507,7 +507,7 @@ spotVol <- function(data, method = "detPer", ..., on = "minutes", k = 5,
       stop("Input has to be data.table or xts.")
     }
   } else {
-    if (("DT" %in% colnames(data)) == FALSE) {
+    if (!("DT" %in% colnames(data))) {
       stop("Data.table needs DT column containing the time-stamps of the trades.") # added the timestamp comment for verbosity.
     }
   }
@@ -517,7 +517,7 @@ spotVol <- function(data, method = "detPer", ..., on = "minutes", k = 5,
                             marketClose = marketClose, tz = tz, fill = TRUE)
     datad[, DATE := as.Date(DT, tz = tzone(datad$DT))]
     setkeyv(datad, "DT")
-    datad <- datad[, RETURN := log(PRICE) - shift(log(PRICE), type = "lag"), by = "DATE"][is.na(RETURN) == FALSE]
+    datad <- datad[, RETURN := log(PRICE) - shift(log(PRICE), type = "lag"), by = "DATE"][!is.na(RETURN)]
     rData <- xts(datad$RETURN, order.by = datad$DT)
     datad <- split(datad, by = "DATE")
     mR <- matrix(unlist(lapply(datad, FUN = function(x) as.numeric(x$RETURN))), ncol = length(datad[[1]]$RETURN), byrow = TRUE)

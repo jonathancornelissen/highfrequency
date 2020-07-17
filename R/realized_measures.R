@@ -57,14 +57,14 @@ listAvailableKernels <- function() {
 medRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE) {
   
   # self-reference for multi-day input
-  if (checkMultiDays(rData) == TRUE) {
+  if (checkMultiDays(rData)) {
     result <- apply.daily(rData, medRQ, alignBy, alignPeriod, makeReturns) 
     return(result)
   } else {
     if ((!is.null(alignBy)) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation(rData, on = alignBy, k = alignPeriod)
     }
-    if (makeReturns == TRUE) {
+    if (makeReturns) {
       rData <- makeReturns(rData)
     }
     q <- abs(as.numeric(rData))
@@ -104,14 +104,14 @@ medRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 minRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE) {
   
   # self-reference for multi-day input
-  if (checkMultiDays(rData) == TRUE) {
+  if (checkMultiDays(rData)) {
     result <- apply.daily(rData, minRQ, alignBy, alignPeriod, makeReturns)
     return(result)
   } else {
     if ((!is.null(alignBy)) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation(rData, on = alignBy, k = alignPeriod)
     }
-    if (makeReturns == TRUE) {
+    if (makeReturns) {
       rData = makeReturns(rData)
     }
     q     <- as.zoo(abs(as.numeric(rData)))
@@ -156,7 +156,7 @@ minRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 minRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE){
   
   # self-reference for multi-day input
-  if (checkMultiDays(rData) == TRUE) {
+  if (checkMultiDays(rData)) {
     result <- apply.daily(rData, minRV, alignBy, alignPeriod, makeReturns)
     return(result)
   } else {
@@ -222,14 +222,14 @@ minRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 medRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE){
   
   # self-reference for multi-day input
-  if (checkMultiDays(rData) == TRUE) {
+  if (checkMultiDays(rData)) {
     result <- apply.daily(rData, medRV, alignBy, alignPeriod, makeReturns)
     return(result)
   } else {
     if ((!is.null(alignBy)) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation(rData, on = alignBy, k = alignPeriod)
     }
-    if (makeReturns == TRUE) {
+    if (makeReturns) {
       rData <- makeReturns(rData)
     }
     
@@ -303,26 +303,24 @@ medRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #' @export
 MRC <- function(pData, pairwise = FALSE, makePsd = FALSE) {
   
-  if (is.list(pData) == FALSE) {
+  if (!is.list(pData)) {
     n <- 1
   } else {
     n <- length(pData)
   }
-  if (n == 1) {
-    multixts <- multixts(pData)
-    if (multixts == TRUE) {
+  if (n == 1) { 
+    if (isMultiXts(pData)) {
       stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")
     }
     mrc <- crv(pData)
   }
   
   if (n > 1) {
-    multixts <- multixts(pData[[1]])
-    if (multixts == TRUE) {
+    if (isMultiXts(pData[[1]])) {
       stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")
     }
     
-    if (pairwise == TRUE) {
+    if (pairwise) {
       cov <- matrix(rep(0, n * n), ncol = n)
       diagonal <- c()
       for (i in 1:n) {
@@ -338,7 +336,7 @@ MRC <- function(pData, pairwise = FALSE, makePsd = FALSE) {
       
       mrc <- cov
       
-      if (makePsd == TRUE) {
+      if (makePsd) {
         mrc <- makePsd(mrc)
       }
       
@@ -364,7 +362,7 @@ MRC <- function(pData, pairwise = FALSE, makePsd = FALSE) {
       
       mrc <- N / (N - kn + 2) * 1/(psi2 * kn) * S
       
-      if (makePsd == TRUE) {
+      if (makePsd) {
         mrc <- makePsd(mrc)
       }
     }
@@ -417,8 +415,8 @@ MRC <- function(pData, pairwise = FALSE, makePsd = FALSE) {
 #' 
 rAVGCov <- function(rData, cor = FALSE, alignBy = "minutes", alignPeriod = 5, k = 1, makeReturns = FALSE) {
   DT <- DT_ROUND <- DT_SUBSAMPLE <- FIRST_DT <- MAXDT <- RETURN <- RETURN1 <- RETURN2 <- NULL
-  multixts <- multixts(rData)
-  if (multixts == TRUE) {
+  
+  if (isMultiXts(rData)) {
     stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")
   }
   
@@ -452,7 +450,7 @@ rAVGCov <- function(rData, cor = FALSE, alignBy = "minutes", alignPeriod = 5, k 
     rdatabackup <- data.table(DT = as.numeric(index(rData), tz = tzone(rData)), RETURN = as.numeric(rData))
     rData <- rdatabackup
     rData[, FIRST_DT := min(DT)]
-    if (makeReturns == TRUE) {
+    if (makeReturns) {
       
       rData[, DT_ROUND := ifelse(DT == FIRST_DT,
                                   floor(DT/scaleFactorFast) * scaleFactorFast,
@@ -462,7 +460,7 @@ rAVGCov <- function(rData, cor = FALSE, alignBy = "minutes", alignPeriod = 5, k 
       rData[, MAXDT := max(DT), by = "DT_ROUND"]
       rData <- rData[DT == MAXDT]
       rData[, RETURN := log(RETURN) - shift(log(RETURN), n = 1, type = "lag")]
-      rData <- rData[is.na(RETURN) == FALSE]
+      rData <- rData[!is.na(RETURN)]
       rData <- rData[, c("DT_ROUND", "RETURN")]
       
     } else {
@@ -491,7 +489,7 @@ rAVGCov <- function(rData, cor = FALSE, alignBy = "minutes", alignPeriod = 5, k 
         for (jj in (ii+1):n) {
           rdatabackup <- data.table(DT = as.numeric(index(rData), tz = tzone(rData)), RETURN1 = as.numeric(rData[, ii]), RETURN2 = as.numeric(rData[,jj]))
           rdatabackup[, FIRST_DT := min(DT)]
-          if (makeReturns == TRUE) {
+          if (makeReturns) {
             
             rdatabackup[, DT_ROUND := ifelse(DT == FIRST_DT,
                                                     floor(DT/scaleFactorFast) * scaleFactorFast,
@@ -500,7 +498,7 @@ rAVGCov <- function(rData, cor = FALSE, alignBy = "minutes", alignPeriod = 5, k 
             rdatabackup <- rdatabackup[DT == MAXDT]
             rdatabackup[, RETURN1 := log(RETURN1) - shift(log(RETURN1), n = 1, type = "lag")]
             rdatabackup[, RETURN2 := log(RETURN2) - shift(log(RETURN2), n = 1, type = "lag")]
-            rdatabackup <- rdatabackup[is.na(RETURN1) == FALSE][is.na(RETURN2) == FALSE][, c("DT_ROUND", "RETURN1", "RETURN2")]
+            rdatabackup <- rdatabackup[!is.na(RETURN1)][!is.na(RETURN2)][, c("DT_ROUND", "RETURN1", "RETURN2")]
           } else {
 
             rdatabackup[, DT_ROUND := ceiling(DT/scaleFactorFast) * scaleFactorFast]
@@ -530,7 +528,7 @@ rAVGCov <- function(rData, cor = FALSE, alignBy = "minutes", alignPeriod = 5, k 
   return(rdatamatrix)
   # 
   # r# Aggregate:
-  # if (makeReturns == TRUE) {
+  # if (makeReturns) {
   #   if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
   #     rData <- fastTickAgregation(rData, on = alignBy, k = 1)
   #   }
@@ -603,10 +601,9 @@ rAVGCov <- function(rData, cor = FALSE, alignBy = "minutes", alignPeriod = 5, k 
   #   rdatamatrix <- as.matrix(rData)
   #   covariance <- t(rdatamatrix) %*% rdatamatrix
   #   if (alignPeriod == 1) { # no subsampling
-  #     if (cor == FALSE) {
+  #     if (!cor) {
   #       return(covariance)
-  #     }
-  #     if (cor == TRUE){
+  #     } else (cor){
   #       sdmatrix <- sqrt(diag(diag(covariance)))
   #       rcor <- solve(sdmatrix) %*% covariance %*% solve(sdmatrix)
   #       return(rcor)
@@ -616,10 +613,9 @@ rAVGCov <- function(rData, cor = FALSE, alignBy = "minutes", alignPeriod = 5, k 
   #       covariance <- covariance + t(rdatamatrix[-c(1:ii), ]) %*% rdatamatrix[-c(1:ii), ]
   #     }
   #     covariance / alignPeriod
-  #     if (cor == FALSE) {
+  #     if (!cor) {
   #       return(covariance)
-  #     }
-  #     if (cor == TRUE){
+  #     } else {
   #       sdmatrix <- sqrt(diag(diag(covariance)))
   #       rcor <- solve(sdmatrix) %*% covariance %*% solve(sdmatrix)
   #       return(rcor)
@@ -702,9 +698,7 @@ rBeta <- function(rData, rIndex, RCOVestimator = "rCov", RVestimator = "RV", mak
     }
   }
   
-  multixts <- multixts(rData)
-  
-  if (multixts) {
+  if (isMultiXts(rData)) {
     print("No support for multiple days")
   } else {
     rcovfun <- function(rData, rIndex, RCOVestimator) {
@@ -807,7 +801,7 @@ rBeta <- function(rData, rIndex, RCOVestimator = "rCov", RVestimator = "RV", mak
 rBPCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, makePsd = FALSE) {
   
   # self-reference for multi-day input
-  if (checkMultiDays(rData) == TRUE) { 
+  if (checkMultiDays(rData)) { 
     if (is.null(dim(rData))) {  
       n <- 1
     } else { 
@@ -855,16 +849,15 @@ rBPCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeR
         }
       }
       
-      if (cor == FALSE){
-        if (makePsd == TRUE) {
+      if (!cor){
+        if (makePsd) {
           cov <- makePsd(cov)
         }
         return(cov)
-      }
-      if(cor==TRUE){
+      } else {
         sdmatrix <- sqrt(diag(diag(cov)))
         rcor <- solve(sdmatrix) %*% cov %*% solve(sdmatrix)
-        if (makePsd == TRUE) {
+        if (makePsd) {
           rcor <- makePsd(rcor)
         }
         return(rcor)
@@ -915,7 +908,7 @@ rBPCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeR
 rCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE) {
   
   # Multiday adjustment: 
-  if (checkMultiDays(rData) == TRUE) { 
+  if (checkMultiDays(rData)) { 
     if (is.null(dim(rData))) {  
       n <- 1
     } else { 
@@ -934,10 +927,10 @@ rCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeRet
     if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation(rData, on = alignBy, k = alignPeriod)
     } 
-    if (makeReturns == TRUE) {  
+    if (makeReturns) {  
       rData <- makeReturns(rData) 
     }  
-    if (is.null(dim(rData) == TRUE)) {  
+    if (is.null(dim(rData))) {  
       n <- 1
     } else { 
       n <- dim(rData)[2]
@@ -950,10 +943,10 @@ rCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeRet
       
       rData <- as.matrix(rData)
       covariance <- t(rData) %*% rData
-      if (cor == FALSE) {
+      if (!cor) {
         return(covariance)
       }
-      if (cor == TRUE){
+      if (cor){
         sdmatrix <- sqrt(diag(diag(covariance)));
         rcor <- solve(sdmatrix) %*% covariance %*% solve(sdmatrix)
         return(rcor)
@@ -989,8 +982,7 @@ rCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeRet
 #' @export
 rHYCov <- function(rData, cor = FALSE, period = 1, alignBy = "seconds", alignPeriod = 1, makeReturns = FALSE, makePsd = TRUE) {
   
-  multixts <- multixts(rData)
-  if (multixts == TRUE) {
+  if (isMultiXts(rData)) {
     stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")
   }
   
@@ -998,11 +990,11 @@ rHYCov <- function(rData, cor = FALSE, period = 1, alignBy = "seconds", alignPer
   rData <- rData[-dim(rData)[1], ]
   aggrdata <- fastTickAgregation(rData, on = alignBy, k = alignPeriod)
   
-  if (makeReturns == TRUE) {  
+  if (makeReturns) {  
     rData <- makeReturns(rData) 
     aggrdata <- makeReturns(aggrdata)
   }  
-  if (is.null(dim(rData)) == TRUE) {
+  if (is.null(dim(rData))) {
     n <- 1
   } else { 
     n <- dim(rData)[2]
@@ -1049,15 +1041,15 @@ rHYCov <- function(rData, cor = FALSE, period = 1, alignBy = "seconds", alignPer
       }
     }
     
-    if (cor == FALSE){
-      if (makePsd == TRUE) {
+    if (!cor){
+      if (makePsd) {
         cov <- makePsd(cov)
       }
       return(cov)
     } else {
       sdmatrix <- sqrt(diag(diag(cov)))
       rcor <- solve(sdmatrix) %*% cov %*% solve(sdmatrix)
-      if (makePsd == TRUE) {
+      if (makePsd) {
         rcor <- makePsd(rcor)
       }
       return(rcor)
@@ -1108,8 +1100,7 @@ rKernelCov <- function(rData, cor = FALSE,  alignBy = "seconds", alignPeriod = 1
                        makeReturns = FALSE, kernelType = "rectangular", kernelParam = 1,
                        kernelDOFadj = TRUE) {
   
-  multixts <- multixts(rData)
-  if (multixts == TRUE) {
+  if (isMultiXts(rData)) {
     stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")
   }
   
@@ -1117,11 +1108,11 @@ rKernelCov <- function(rData, cor = FALSE,  alignBy = "seconds", alignPeriod = 1
   if ((!is.null(alignBy)) && (!is.null(alignPeriod))) {
     rData <- fastTickAgregation(rData, on = alignBy, k = alignPeriod)
   }
-  if (makeReturns == TRUE) {
+  if (makeReturns) {
     rData <- makeReturns(rData)
   }
   
-  if (is.null(dim(rData)) == TRUE) {
+  if (is.null(dim(rData))) {
     n <- 1
   } else {
     n <- dim(rData)[2]
@@ -1158,12 +1149,12 @@ rKernelCov <- function(rData, cor = FALSE,  alignBy = "seconds", alignPeriod = 1
                                    ab2 = double(kernelParam + 1))
       }
     }
-    if (cor == FALSE) {
+    if (!cor) {
       return(makePsd(cov))
     }
-    if (cor == TRUE) {
+    if (cor) {
       invsdmatrix <- try(solve(sqrt(diag(diag(cov)))), silent = F)
-      if (inherits(invsdmatrix, "try-error") == FALSE) {
+      if (!inherits(invsdmatrix, "try-error")) {
         rcor <- invsdmatrix %*% cov %*% invsdmatrix
         return(rcor)
       }
@@ -1204,14 +1195,14 @@ rKernelCov <- function(rData, cor = FALSE,  alignBy = "seconds", alignPeriod = 1
 rKurt <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE) {
   
   # self-reference for multi-day input
-  if (checkMultiDays(rData) == TRUE) { 
+  if (checkMultiDays(rData)) { 
     result <- apply.daily(rData, rKurt, alignBy, alignPeriod, makeReturns)
     return(result)
   } else {
     if ((!is.null(alignBy)) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation(rData, on = alignBy, k = alignPeriod)
     }
-    if (makeReturns == TRUE) {
+    if (makeReturns) {
       rData <- makeReturns(rData)
     }
     
@@ -1271,7 +1262,7 @@ rKurt <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 rMPV <- function(rData, m = 2, p = 2, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE) {
   
   # self-reference for multi-day input
-  if (checkMultiDays(rData) == TRUE) { 
+  if (checkMultiDays(rData)) { 
     result <- apply.daily(rData, rMPV, alignBy, alignPeriod, makeReturns)
     return(result)
   } else {
@@ -1375,11 +1366,10 @@ rMPV <- function(rData, m = 2, p = 2, alignBy = NULL, alignPeriod = NULL, makeRe
 rOWCov <- function (rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, seasadjR = NULL,
                     wFunction = "HR" , alphaMCD = 0.75, alpha = 0.001){
   
-  if (is.null(seasadjR) == TRUE) { 
+  if (is.null(seasadjR)) { 
     seasadjR <- rData 
   }
-  multixts <- multixts(rData)
-  if (multixts == TRUE) { 
+  if (isMultiXts(rData)) { 
     stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")
   }
   
@@ -1388,14 +1378,14 @@ rOWCov <- function (rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, make
     rData <- fastTickAgregation(rData, on = alignBy, k = alignPeriod)
     seasadjR <- fastTickAgregation(seasadjR, on = alignBy, k = alignPeriod)
   }     
-  if (makeReturns == TRUE) { 
+  if (makeReturns) { 
     rData <- makeReturns(rData)
-    if (is.null(seasadjR) == FALSE) { 
+    if (!is.null(seasadjR)) { 
       seasadjR <- makeReturns(seasadjR)
     } 
   }
   
-  if (is.null(dim(rData)) == TRUE) { 
+  if (is.null(dim(rData))) { 
     n <- 1 
   } else { 
     n <- dim(rData)[2]
@@ -1440,7 +1430,7 @@ rOWCov <- function (rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, make
       weights[outlierindic] = 0
       wR <- sqrt(weights) * rData
       covariance <- (conHR(di = N, alpha = alpha) * t(wR) %*% wR) / mean(weights)
-      if (cor == FALSE) {
+      if (!cor) {
         return(covariance)
       } else {
         sdmatrix = sqrt(diag(diag(covariance)))
@@ -1453,7 +1443,7 @@ rOWCov <- function (rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, make
       weights[outlierindic] <- k/outlyingness[outlierindic]
       wR <- sqrt(weights) * rData
       covariance <- (conhuber(di = N, alpha = alpha) * t(wR) %*% wR) / mean(weights)
-      if (cor == FALSE) {
+      if (!cor) {
         return(covariance)
       } else {
         sdmatrix <- sqrt(diag(diag(covariance)))
@@ -1498,7 +1488,7 @@ rOWCov <- function (rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, make
 rSkew <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE) {
   
   # self-reference for multi-day input
-  if (checkMultiDays(rData) == TRUE) { 
+  if (checkMultiDays(rData)) { 
     result <- apply.daily(rData, rSkew, alignBy, alignPeriod, makeReturns)
     return(result)
   } else {
@@ -1550,7 +1540,7 @@ rSkew <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 rSV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE) {
   
   # self-reference for multi-day input
-  if (checkMultiDays(rData) == TRUE) {
+  if (checkMultiDays(rData)) {
     result <- apply.daily(rData, rSV, alignBy, alignPeriod, makeReturns)
     colnames(result) = c("downside", "upside")
     return(result)
@@ -1620,8 +1610,7 @@ rSV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE) 
 rThresholdCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE) {
   rdatacheck(rData, multi = TRUE)
   # Multiday adjustment: 
-  multixts <- multixts(rData)
-  if (multixts == TRUE) { 
+  if (isMultiXts(rData)) { 
     if (is.null(dim(rData))) {  
       n <- 1
     } else { 
@@ -1638,10 +1627,10 @@ rThresholdCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL
     }    
     return(result)
   } else { #single day code
-    if ((is.null(alignBy) == FALSE) && (!is.null(alignPeriod))) {
+    if (!is.null(alignBy) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation(rData, on = alignBy, k = alignPeriod)
     } 
-    if (makeReturns == TRUE) { 
+    if (makeReturns) { 
       rData <- makeReturns(rData) 
     }  
     
@@ -1655,10 +1644,10 @@ rThresholdCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL
     rData[condition] <- 0
     covariance <- rCov(rData)
     
-    if (cor == FALSE) { 
+    if (!cor) { 
       return(covariance) 
     }
-    if (cor == TRUE) {
+    if (cor) {
       sdmatrix <- sqrt(diag(diag(covariance)))
       rcor     <- solve(sdmatrix) %*% covariance %*% solve(sdmatrix)
       return(rcor)
@@ -1779,8 +1768,7 @@ rRTSCov <- function (pData, cor = FALSE, startIV = NULL, noisevar = NULL,
       stop("Two time scale estimator uses returns based on prices that are K ticks aways. 
            Please provide a timeseries of at least 10*K" ) 
     } 
-    multixts <- multixts(pData)
-    if (multixts == TRUE) { 
+    if (isMultiXts(pData)) { 
       stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input.")
     }    
     return(RTSRV(pData, startIV = startIV, noisevar = noisevar, 
@@ -1791,8 +1779,8 @@ rRTSCov <- function (pData, cor = FALSE, startIV = NULL, noisevar = NULL,
       stop("Two time scale estimator uses returns based on prices that are K ticks aways. 
            Please provide a timeseries of at least 10*K" ) 
     } 
-    multixts <- multixts(pData[[1]])
-    if (multixts) { 
+    
+    if (isMultiXts(pData[[1]])) { 
       stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input.")
     }
     
@@ -1826,17 +1814,16 @@ rRTSCov <- function (pData, cor = FALSE, startIV = NULL, noisevar = NULL,
                                           K = K_cov, J = J_cov, eta = eta)
       }
     }
-    if (cor == FALSE) {
-      if (makePsd == TRUE) {
+    if (!cor) {
+      if (makePsd) {
         cov = makePsd(cov)
       }
       return(cov)
-    }
-    if (cor == TRUE) {
+    } else {
       invsdmatrix = try(solve(sqrt(diag(diag(cov)))), silent = F)
       if (!inherits(invsdmatrix, "try-error")) {
         rcor = invsdmatrix %*% cov %*% invsdmatrix
-        if (makePsd == TRUE) {
+        if (makePsd) {
           rcor = makePsd(rcor)
         }
         return(rcor)
@@ -1892,7 +1879,7 @@ RV <- function(rData) {
 rTPVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE) {
   
   # self-reference for multi-day input
-  if (checkMultiDays(rData) == TRUE) { 
+  if (checkMultiDays(rData)) { 
     result <- apply.daily(rData, rTPVar, alignBy, alignPeriod, makeReturns)
     return(result)
   } else {
@@ -1955,7 +1942,7 @@ RTQ <- function(rData) {
 rQPVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE) {
   
   # self-reference for multi-day input
-  if (checkMultiDays(rData) == TRUE) { 
+  if (checkMultiDays(rData)) { 
     result <- apply.daily(rData, rQPVar, alignBy, alignPeriod, makeReturns)
     return(result)
   } else {
@@ -2002,14 +1989,14 @@ rQPVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
 rQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE) {
   
   # self-reference for multi-day input
-  if (checkMultiDays(rData) == TRUE) { 
+  if (checkMultiDays(rData)) { 
     result <- apply.daily(rData, rQuar, alignBy, alignPeriod, makeReturns)
     return(result)
   } else {
     if ((!is.null(alignBy)) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation(rData, on = alignBy, k = alignPeriod)
     }
-    if (makeReturns == TRUE) {
+    if (makeReturns) {
       rData <- makeReturns(rData)
     }
     q     <- as.numeric(rData)
@@ -2101,7 +2088,7 @@ rQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #' @export
 rTSCov <- function (pData, cor = FALSE, K = 300, J = 1, K_cov = NULL, J_cov = NULL, 
                     K_var = NULL, J_var = NULL, makePsd = FALSE) {
-  if (is.list(pData) == FALSE) {
+  if (!is.list(pData)) {
     n <- 1
   }
   else {
@@ -2116,8 +2103,7 @@ rTSCov <- function (pData, cor = FALSE, K = 300, J = 1, K_cov = NULL, J_cov = NU
       stop("Two time scale estimator uses returns based on prices that are K ticks aways. 
            Please provide a timeseries of at least 10 * K." ) 
     } 
-    multixts <- multixts(pData)
-    if (multixts == TRUE) { 
+    if (isMultiXts(pData)) { 
       stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input");
     }
     return(TSRV(pData, K = K, J = J))
@@ -2127,22 +2113,21 @@ rTSCov <- function (pData, cor = FALSE, K = 300, J = 1, K_cov = NULL, J_cov = NU
       stop("Two time scale estimator uses returns based on prices that are K ticks aways. 
            Please provide a timeseries of at least 10*K" ) 
     } 
-    multixts <- multixts(pData[[1]])
-    if (multixts == TRUE){ 
+    if (isMultiXts(pData[[1]])){ 
       stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input") 
     }
     
     cov <- matrix(rep(0, n * n), ncol = n)
-    if (is.null(K_cov) == TRUE) { 
+    if (is.null(K_cov)) { 
       K_cov <- K 
     }
-    if (is.null(J_cov) == TRUE) { 
+    if (is.null(J_cov)) { 
       J_cov <- J 
     }
-    if (is.null(K_var) == TRUE) { 
+    if (is.null(K_var)) { 
       K_var <- rep(K,n) 
     }
-    if (is.null(J_var) == TRUE) { 
+    if (is.null(J_var)) { 
       J_var <- rep(J,n) 
     }
     
@@ -2158,17 +2143,16 @@ rTSCov <- function (pData, cor = FALSE, K = 300, J = 1, K_cov = NULL, J_cov = NU
                                          pData[[j]], K = K_cov, J = J_cov)
       }
     }
-    if (cor == FALSE) {
-      if (makePsd == TRUE) {
+    if (!cor) {
+      if (makePsd) {
         cov <- makePsd(cov)
       }
       return(cov)
-    }
-    if (cor == TRUE) {
+    } else {
       invsdmatrix <- try(solve(sqrt(diag(diag(cov)))), silent = F)
       if (!inherits(invsdmatrix, "try-error")) {
         rcor <- invsdmatrix %*% cov %*% invsdmatrix
-        if (makePsd == TRUE) {
+        if (makePsd) {
           rcor <- makePsd(rcor)
         }
         return(rcor)

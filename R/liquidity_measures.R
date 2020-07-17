@@ -236,17 +236,16 @@ getLiquidityMeasures <- function(tqData, win = 300, type = NULL) {
   checktData(tqData)
   checkqData(tqData)
   
-  dummy_was_xts <- FALSE
-  if (is.data.table(tqData) == FALSE) {
-    if (is.xts(tqData) == TRUE) {
+  wasXts <- FALSE
+  if (!is.data.table(tqData)) {
+    if (is.xts(tqData)) {
       tqData <- setnames(as.data.table(tqData), old = "index", new = "DT")
-      dummy_was_xts <- TRUE
+      wasXts <- TRUE
     } else {
       stop("Input has to be data.table or xts.")
     }
   } else {
-    if (("DT" %in% colnames(tqData)) == FALSE) {
-      
+    if (!("DT" %in% colnames(tqData))) {
       stop("Data.table neeeds DT column (date-time ).")
     }
   }
@@ -298,8 +297,8 @@ getLiquidityMeasures <- function(tqData, win = 300, type = NULL) {
 
   tqData[, signedTradeSize := direction * SIZE]
   
-  if (dummy_was_xts == TRUE) {
-    if (is.null(type) == TRUE) {
+  if (wasXts) {
+    if (is.null(type)) {
       return(xts(as.matrix(tqData[, -c("DT")]), order.by = tqData$DT))
     } else {
       return(xts(as.matrix(tqData[, -c("DT")]), order.by = tqData$DT)[, type])
@@ -342,19 +341,19 @@ getTradeDirection <- function(tqData) {
   checktData(tqData)
   checkqData(tqData)
 
-  dummy_was_xts <- FALSE
-  if (is.data.table(tqData) == FALSE) {
-    if (is.xts(tqData) == TRUE) {
+  wasXts <- FALSE
+  if (!is.data.table(tqData)) {
+    if (is.xts(tqData)) {
       tqData <- setnames(as.data.table(tqData), old = "index", new = "DT")
       tqData[, BID := as.numeric(as.character(BID))]
       tqData[, PRICE := as.numeric(as.character(PRICE))]
       tqData[, OFR := as.numeric(as.character(OFR))]
-      dummy_was_xts <- TRUE
+      wasXts <- TRUE
     } else {
       stop("Input has to be data.table or xts.")
     }
   } else {
-    if (("DT" %in% colnames(tqData)) == FALSE) {
+    if (!("DT" %in% colnames(tqData))) {
       stop("Data.table neeeds DT column (date-time ).")
     }
   }

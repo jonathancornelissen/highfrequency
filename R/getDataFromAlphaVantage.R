@@ -46,16 +46,16 @@ getAlphaVantageData <- function(symbols = NULL, interval = "5min", outputType = 
           Please see the getSymbols.av function in the quantmod package for details on how to set a default API key for the current session.
           Alternatively, use the apiKey argument to provide the key.")
   }
-  if (is.null(apiKey) == TRUE) {
+  if (is.null(apiKey)) {
     apiKey <- getDefaults(getSymbols.av, "api.key")$api.key #quantMod handles the extra quotes.
   }
   
   
   # Check if we have more than one symbol
-  multiSymbols <- ifelse(length(symbols) > 1, TRUE, FALSE)
+  isMultiSymbols <- ifelse(length(symbols) > 1, TRUE, FALSE)
   
   # We have more than one symbol
-  if (multiSymbols == TRUE) {
+  if (isMmultiSymbols) {
     data <- vector("list", length = length(symbols))
     names(data) <- symbols
     for (symbol in symbols) {

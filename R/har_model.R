@@ -79,7 +79,7 @@ estimhar <- function(y, x){ #Potentially add stuff here
 getHarmodelformula <- function(x) {
   #modelnames = colnames(x$model$x)
   modelnames = colnames(x$model)[-1] ##Changed because the formula is now y~. which makes model a single matrix-like object
-  if (is.null(x$transform) == FALSE) {
+  if (!is.null(x$transform)) {
     modelnames <- paste(x$transform,"(",modelnames,")",sep="")
   } #Added visual tingie for plotting transformed RV
 
@@ -88,7 +88,7 @@ getHarmodelformula <- function(x) {
   rightside  <- paste(betas2, modelnames,collapse="")
   h <- x$h
   left <- paste("RV", h, sep = "")
-  if (is.null(x$transform) == FALSE) {
+  if (!is.null(x$transform)) {
     left <- paste(x$transform,"(",left,")",sep="" )
   }
   modeldescription <- paste(left, "= beta0", rightside)
@@ -237,7 +237,7 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
   quarticityModels <- c("HARRVQ", "HARRVQJ", "CHARRVQ")
   bpvModels <- c("CHARRV", "CHARRVQ")
 
-  if (is.null(transform) == FALSE) {
+  if (!is.null(transform)) {
     Ftransform = match.fun(transform)
   }
   if (!(type %in% c("HARRV", jumpModels, quarticityModels))) {
@@ -288,7 +288,7 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
   # Get the matrix for estimation of linear model:
   maxp <- max(periods,periodsJ,periodsQ) # Max number of aggregation levels
 
-  if (is.null(leverage) == FALSE) {
+  if (!is.null(leverage)) {
     maxp <- max(maxp,leverage)
   }
   n <- length(RM1)  #Number of Days
@@ -311,9 +311,9 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
   if (type %in% quarticityModels) { #in case realized quarticity estimator is supplied
     RQmatrix  <- as.matrix(har_agg(RM3,periodsQ, nperiodsQ)[(maxp:(n-h)),])
     colnames(RQmatrix) <- paste0("RQ", periodsQ)
-    if(nperiodsQ == 1){
+    if (nperiodsQ == 1){
       RQmatrix <- as.matrix(sqrt(RQmatrix) - sqrt(mean(RM3)))
-    }else{
+    } else {
       RQmatrix <- sqrt(RQmatrix) - sqrt(mean(RM3)) #Demeaned realized quarticity estimator as in BPQ(2016)
     }
   }
@@ -329,7 +329,7 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
     colnames(J) <- paste0("J", periodsJ)
   }
 
-  if (is.null(leverage) == FALSE) {
+  if (!is.null(leverage)) {
     if (sum(data < 0) == 0) {
       warning("You cannot use leverage variables in the model in case your input consists of Realized Measures")
     }
@@ -351,7 +351,7 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
   # Estimate the model parameters, according to type of model :
   # First model type: traditional HAR-RV:
   if (type == "HARRV") {
-    if (is.null(transform) == FALSE) {
+    if (!is.null(transform)) {
       y  <- Ftransform(y)
       x1 <- Ftransform(x1)
     }
@@ -370,7 +370,7 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
     }
     J <- J[(maxp:(n-h)),]
     x <- cbind(x1,J)         # bind jumps to RV data
-    if (is.null(transform) == FALSE) {
+    if (!is.null(transform)) {
       y <- Ftransform(y)
       x <- Ftransform(x)
     }
@@ -411,7 +411,7 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
     }
 
     x <- cbind(Cmatrix, Jmatrix)              # bind jumps to RV data
-    if (is.null(transform) == FALSE) {
+    if (!is.null(transform)) {
       y <- Ftransform(y)
       x <- Ftransform(x)
     }
@@ -426,7 +426,7 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
   }
 
   if (type == "HARRVQ") {
-    if (is.null(transform) == FALSE) {
+    if (!is.null(transform)) {
       y  <- Ftransform(y)
       x1 <- Ftransform(x1)
       warning("The realized quarticity is already transformed with sqrt() thus only realized variance is transformed")
@@ -449,7 +449,7 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
       J <- J + 1
     }
     J <- J[(maxp:(n-h)),]
-    if (is.null(transform) == FALSE) {
+    if (!is.null(transform)) {
       y <- Ftransform(y); x1 = Ftransform(x1)
       warning("The realized quarticity is already transformed with sqrt() thus only realized variance is transformed")
     }
@@ -466,7 +466,7 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
   }
 
   if (type == "CHARRV") {
-    if (is.null(transform) == FALSE) {
+    if (!is.null(transform)) {
       y  <- Ftransform(y)
       x2 <- Ftransform(x2)
     }
@@ -479,7 +479,7 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
   } #End CHAR-RV if cond
 
   if (type == "CHARRVQ") {
-    if (is.null(transform) == FALSE) {
+    if (!is.null(transform)) {
       y  <- Ftransform(y)
       x2 <- Ftransform(x2)
       warning("The realized quarticity is already transformed with sqrt() thus only realized variance and bipower variation is transformed")
@@ -559,18 +559,18 @@ predict.harModel <- function(object, newdata = NULL, warnings = TRUE, ...) {
   type <- object$type
   inputType <- object$inputType
 
-  if (is.null(newdata) == TRUE) {
-    if (is.null(object$transform) == TRUE) {
+  if (is.null(newdata)) {
+    if (is.null(object$transform) ) {
       return(as.numeric(c(1, xts::last(object$model$x))  %*%  object$coefficients))
     }
     if (object$transform == "log") {
-      if (warnings == TRUE) {
+      if (warnings) {
         warning("Due to log-transform, forecast of RV is derived under assumption of log-normality.")
       }
       return(as.numeric(exp(c(1, xts::last(object$model$x))  %*%  object$coefficients + 1/2 * var(object$residuals))))
     }
     if (object$transform == "sqrt") {
-      if (warnings == TRUE) {
+      if (warnings) {
         warning("Forecast for sqrt(RV) due to transform == \"sqrt\".")
       }
       return(as.numeric(c(1, xts::last(object$model$x))  %*%  object$coefficients))
@@ -579,7 +579,7 @@ predict.harModel <- function(object, newdata = NULL, warnings = TRUE, ...) {
 
   # Check whether newdata is in right format
   if (sum(colnames(newdata) == colnames(object$model$x)) == length(colnames(object$model$x))) {
-    if (is.null(object$transform) == TRUE) {
+    if (is.null(object$transform)) {
       return(as.numeric(cbind(1, newdata)  %*%  object$coefficients))
     }
     if (object$transform == "log") {
@@ -694,7 +694,7 @@ predict.harModel <- function(object, newdata = NULL, warnings = TRUE, ...) {
     leverage <- object$leverage
 
     maxp <- max(periods,periodsJ,periodsQ); # Max number of aggregation levels
-    if (is.null(leverage) == FALSE) {
+    if (!is.null(leverage)) {
       maxp <- max(maxp,leverage)
     }
     n <- length(RM1)  #Number of Days
@@ -736,7 +736,7 @@ predict.harModel <- function(object, newdata = NULL, warnings = TRUE, ...) {
       colnames(J) = paste0("J", periodsJ)
     }
 
-    if (is.null(leverage) == FALSE) {
+    if (!is.null(leverage)) {
       if (inputType == "RM") {
         warning("You cannot use leverage variables in the model in case your input consists of Realized Measures")
       }
@@ -768,7 +768,7 @@ predict.harModel <- function(object, newdata = NULL, warnings = TRUE, ...) {
       }
       J <- J[(maxp:(n)),]
       x <- cbind(x1,J)         # bind jumps to RV data
-      if (is.null(transform) == FALSE) {
+      if (!is.null(transform)) {
         x <- Ftransform(x)
       }
       x <- cbind(x,rmin)
@@ -804,20 +804,20 @@ predict.harModel <- function(object, newdata = NULL, warnings = TRUE, ...) {
       }
 
       x <- cbind(Cmatrix, Jmatrix)               # bind jumps to RV data
-      if (is.null(transform) == FALSE) {
+      if (!is.null(transform)) {
         x <- Ftransform(x)
       }
       x <- cbind(x, rmin)
     }
 
     if (type == "HARRVQ") {
-      if (is.null(transform) == FALSE) {
+      if (!is.null(transform)) {
         y  <- Ftransform(y)
         x1 <- Ftransform(x1)
         warning("The realized quarticity is already transformed with sqrt() thus only realized variance is transformed")
       }
       x1 <- cbind(x1, RQmatrix[,1:nperiodsQ] * x1[,1:nperiodsQ])
-      if (is.null(colnames(RQmatrix)) == TRUE) { #special case for 1 aggregation period of realized quarticity. This appends the RQ1 name
+      if (is.null(colnames(RQmatrix))) { #special case for 1 aggregation period of realized quarticity. This appends the RQ1 name
         colnames(x1) <- c(colnames(x1[, 1:nperiods]),"RQ1")
       }
       x <- cbind(x1,rmin)
@@ -828,7 +828,7 @@ predict.harModel <- function(object, newdata = NULL, warnings = TRUE, ...) {
         J <- J + 1
       }
       J <- J[(maxp:(n-h)), ]
-      if (is.null(transform) == FALSE) {
+      if (!is.null(transform)) {
         y  <- Ftransform(y)
         x1 <- Ftransform(x1)
         warning("The realized quarticity is already transformed with sqrt() thus only realized variance is transformed")
@@ -849,7 +849,7 @@ predict.harModel <- function(object, newdata = NULL, warnings = TRUE, ...) {
     } #End CHAR-RV if cond
 
     if (type == "CHARRVQ") {
-      if ( !is.null(transform)) {
+      if (!is.null(transform)) {
         y  <- Ftransform(y)
         x2 <- Ftransform(x2)
         warning("The realized quarticity is already transformed with sqrt() thus only realized variance and bipower variation is transformed")
@@ -861,17 +861,17 @@ predict.harModel <- function(object, newdata = NULL, warnings = TRUE, ...) {
       x = cbind(x2,rmin)
     } #End CHAR-RVQ if cond
 
-    if (is.null(object$transform) == TRUE) {
+    if (is.null(object$transform)) {
       return(as.numeric(as.matrix(cbind(1, x))  %*%  object$coefficients))
     }
     if (object$transform == "log") {
-      if (warnings == TRUE) {
+      if (warnings) {
         warning("Due to log-transform, forecast of RV is derived under assumption of log-normality.")
       }
       return(as.numeric(exp(as.matrix(cbind(1, x))  %*%  object$coefficients + 1/2 * var(object$residuals))))
     }
     if (object$transform == "sqrt") {
-      if (warnings == TRUE) {
+      if (warnings) {
         warning("Forecast for sqrt(RV) due to transform == \"sqrt\".")
       }
       return(as.numeric(as.matrix(cbind(1, x))  %*%  object$coefficients))
