@@ -2565,7 +2565,12 @@ leadLag <- function(price1, price2, lagRange, normalize = FALSE){
       midPoint <- midPointBackup - 1
       while(TRUE){
         
-        if(midPoint < 1 | (midPoint + 1) >= length(timestampsY)){
+        if(midPoint < 1 ){
+          print("first")
+          break
+        }
+        if((midPoint + 1) >= length(timestampsY)){
+          print("second")
           break
         }
         j0 <- midPoint -1
