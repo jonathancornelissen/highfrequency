@@ -58,6 +58,3 @@ This parameter will also help determine the testing times as the test is done on
 \description{
 General framework for testing for jumps on an intraday basis
 }
-\details{
-
-}

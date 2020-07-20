@@ -50,7 +50,8 @@ Imports:
     data.table (>= 1.12.0),
     RcppRoll,
     readr,
-    quantmod
+    quantmod,
+    sandwich
 LinkingTo: Rcpp, RcppArmadillo
 Suggests:
     covr,
