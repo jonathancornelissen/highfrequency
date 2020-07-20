@@ -2486,7 +2486,7 @@ overlap <- function(min1, max1, min2, max2){
 leadLag <- function(price1, price2, lagRange, normalize = FALSE){
   
   
-  print("make handle milliseconds.")
+  print("make handle milliseconds")
   
   timestampsX <- as.numeric(index(price1))# * 1000
   timestampsY <- as.numeric(index(price2))# * 1000
