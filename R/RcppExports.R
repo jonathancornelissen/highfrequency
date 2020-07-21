@@ -51,6 +51,10 @@ leadLagCpp <- function(x, timestampsX, y, timestampsY, lags, normalize) {
     .Call(`_highfrequency_leadLagCpp`, x, timestampsX, y, timestampsY, lags, normalize)
 }
 
+leadLagCppPAR <- function(x, timestampsX, y, timestampsY, lags, normalize, iCores) {
+    .Call(`_highfrequency_leadLagCppPAR`, x, timestampsX, y, timestampsY, lags, normalize, iCores)
+}
+
 nsmaller <- function(times, lengths, start, end, max) {
     .Call(`_highfrequency_nsmaller`, times, lengths, start, end, max)
 }

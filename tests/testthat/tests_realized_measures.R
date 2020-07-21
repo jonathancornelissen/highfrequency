@@ -296,7 +296,7 @@ context("rCholCov")
 test_that("rCholCov", {
   
   set.seed(123)
-  iT <- 23400 * 2
+  iT <- 23400
   
   rets <- mvtnorm::rmvnorm(iT * 3 + 1, mean = rep(0,4), 
                            sigma = matrix(c(1, -0.5 , 0.7, 0.8,
@@ -323,8 +323,12 @@ test_that("rCholCov", {
   rCC <- rCholCov(list("market" = p1, "stock1" = p2, "stock2" =p3 , "stock3" = p4))
   
   expect_equal(colnames(rCC$CholCov) , c("market", "stock3", "stock1", "stock2"))
-  expect_equal(round(as.numeric(rCC$CholCov), 6) , round(c(0.8570523 ,  0.8326273, -0.2399617,   0.4726952,0.8326273 ,  4.6763568, 
-                                                           0.8359081  , 0.6736803,-0.2399617 ,  0.8359081,  2.9427983 , -0.4344481,0.4726952 ,  0.6736803, -0.4344481,   1.9089227) , 6))
+  expect_equal(round(as.numeric(rCC$CholCov), 6) , round(c(0.9719097, 0.7821389, -0.3605819,  0.5238333, 0.7821389, 4.5218663,  0.5850890,
+                                                           0.3575620, -0.3605819, 0.5850890,  2.4545129, -0.4106370, 0.5238333, 0.3575620,
+                                                           -0.4106370,  1.6889769) , 6))
+  
+  
+  
   expect_equal(colnames(rCC$L), colnames(rCC$G))
   
   
