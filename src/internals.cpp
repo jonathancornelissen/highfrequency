@@ -1,5 +1,4 @@
 #include <RcppArmadillo.h>
-
 using namespace arma;
 using namespace Rcpp;
 
@@ -116,14 +115,21 @@ arma::vec clamp(arma::vec& x, const double lower = 0.0, const double upper = 1.0
 
 // Armadillo version of bisect_left needed for the lead-lag estimation, didn't find a version in base R
 // [[Rcpp::export]]
-arma::uword find_first(arma::vec& x , const int thresh){
+arma::uword findFirst(arma::vec& x , const int thresh){
   arma::uword i;
-  for(i = 1; i <= x.n_elem; i++){ // We start from 1 and go to the end to keep with R's 1-indexed arrays
+  for(i = 0; i < x.n_elem; i++){ 
     
     if(x[i] >= thresh){
-      return i;
+      return i; 
     }
     
   }
-  return i;
+  return i; 
 }
+
+
+// [[Rcpp::export]]
+bool overlap(double min1, double max1, double min2, double max2){
+  return (std::max(0.0, ((double) std::min(max1, max2) - (double) std::max(min1, min2))) > 0.0);
+}
+

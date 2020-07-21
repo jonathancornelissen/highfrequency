@@ -39,8 +39,16 @@ clamp <- function(x, lower = 0.0, upper = 1.0) {
     .Call(`_highfrequency_clamp`, x, lower, upper)
 }
 
-find_first <- function(x, thresh) {
-    .Call(`_highfrequency_find_first`, x, thresh)
+findFirst <- function(x, thresh) {
+    .Call(`_highfrequency_findFirst`, x, thresh)
+}
+
+overlap <- function(min1, max1, min2, max2) {
+    .Call(`_highfrequency_overlap`, min1, max1, min2, max2)
+}
+
+leadLagCpp <- function(x, timestampsX, y, timestampsY, lags, normalize) {
+    .Call(`_highfrequency_leadLagCpp`, x, timestampsX, y, timestampsY, lags, normalize)
 }
 
 nsmaller <- function(times, lengths, start, end, max) {
