@@ -2,6 +2,7 @@
 
 S3method(plot,harModel)
 S3method(plot,intradayJumpTest)
+S3method(plot,leadLag)
 S3method(plot,spotDrift)
 S3method(plot,spotVol)
 S3method(predict,harModel)
