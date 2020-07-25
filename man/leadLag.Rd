@@ -2,20 +2,42 @@
 % Please edit documentation in R/leadLag.R
 \name{leadLag}
 \alias{leadLag}
-\title{Lead-Lag estimations
-Function that}
+\title{Lead-Lag estimation}
 \usage{
 leadLag(
-  price1,
-  price2,
-  lags,
+  price1 = NULL,
+  price2 = NULL,
+  lags = NULL,
   resolution = "seconds",
   normalize = TRUE,
   parallelize = FALSE,
   nCores = NA
 )
 }
+\arguments{
+\item{price1}{xts or data.table containing prices in levels, in case of data.table,
+use a column DT to denote the date-time in POSIXct format, and a column PRICE to denote the price}
+
+\item{price2}{xts or data.table containing prices in levels, in case of data.table,
+use a column DT to denote the date-time in POSIXct format, and a column PRICE to denote the price}
+
+\item{lags}{a numeric denoting which lags (in units of \code{resolution}) should be tested as leading or lagging}
+
+\item{resolution}{the resolution at which the lags is measured. 
+The default is "seconds", use this argument to gain 1000 times resolution by setting it to either "ms", "milliseconds", or "milli-seconds".}
+
+\item{normalize}{logical denoting whether the contrasts should be normalized by the product of the L2 norms of both the prices. Default = TRUE. 
+This does not change the value of the lead-lag-ratio.}
+
+\item{parallelize}{logical denoting whether to use a parallelized version of the C++ code (parallelized using OPENMP). Default = FALSE}
+
+\item{nCores}{integer valued numeric denoting how many cores to use for the lead-lag estimation procedure in case parallelize is TRUE. 
+Default is NA, which does not parallelize the code.}
+}
 \description{
-Lead-Lag estimations
-Function that
+Function that estimates the whether one series leads (or lags) another.
+}
+\examples{
+ll <- leadLag(100 + cumsum(sbux), 100 + cumsum(lltc), lags = seq(-50,50))
+plot(ll)
 }
