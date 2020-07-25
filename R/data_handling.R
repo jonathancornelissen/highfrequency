@@ -258,11 +258,11 @@ aggregatePrice <- function(pData, on = "minutes", k = 1, marketOpen = "09:30:00"
       stop("Input has to be data.table or xts.")
     }
   } else {
-    if (("DT" %in% colnames(pData)) == FALSE) {
+    if (!("DT" %in% colnames(pData))) {
       stop("Data.table neeeds DT column (date-time ).")
     }
-    if (("PRICE" %in% colnames(pData)) == FALSE) {
-      stop("Data.table neeeds PRICE column (date-time).")
+    if (!("PRICE" %in% colnames(pData))) {
+      stop("Data.table neeeds PRICE column.")
     }
   }
   
