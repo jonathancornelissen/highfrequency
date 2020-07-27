@@ -40,4 +40,5 @@ Function that estimates the whether one series leads (or lags) another.
 \examples{
 ll <- leadLag(100 + cumsum(sbux), 100 + cumsum(lltc), lags = seq(-50,50))
 plot(ll)
+
 }
