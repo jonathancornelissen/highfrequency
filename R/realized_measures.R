@@ -2321,10 +2321,6 @@ rCholCov <- function(pData, IVest = "MRC", COVest = "MRC", criterion = "squared 
 
 
 
-
-
-
-
 #' Realized Semicovariance
 #' 
 #' @description Function returns the Realized Semicovariances (rSemiCov).
@@ -2473,6 +2469,35 @@ listCholCovEstimators <- function(){
     "rRTSCov",
     "rThresholdCov",
     "rSemiCov")
+}
+
+
+#' WIP for REMEDI calculations
+#' @export
+REMEDI <- function(pData, kn, lags){
+  
+  
+  
+  
+  prices <- as.numeric(pData)
+  res <- numeric(length(lags))
+  
+  kn <- c(-kn, 2 * kn)
+  idx <- 1
+  for (lag in lags){
+    thisLag <- c(lag, 0)
+    
+    for (i in (kn[2] + 1):(length(prices) - lag + kn[1])) {
+      
+      res[idx] <- res[idx] + prod(prices[i + thisLag] - prices[i + thisLag - kn])
+      
+    }
+    
+    res[idx] <- res[idx] / (length(prices) - lag + kn[1]- kn[2])  
+    idx <- idx +1
+  }
+  
+  return(res)
 }
 
 
