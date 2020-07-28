@@ -2478,7 +2478,6 @@ REMEDI <- function(pData, kn, lags){
   
   
   
-  
   prices <- as.numeric(pData)
   res <- numeric(length(lags))
   
