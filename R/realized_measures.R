@@ -2614,14 +2614,3 @@ knChooseREMEDI <- function(pData, correctTime = FALSE, jumpsIndex = NULL, knMax 
   
 }
 
-#' @keywords internal
-flat <- function(kn , err, errMax, size, tol ){
-  localerrMin <- min(err[kn:(kn+ size)])
-  localerrMax <- max(err[kn:(kn+ size)])
-  if(max(c((localerrMin/errMax), (localerrMax/errMax))) < tol){
-    return(kn)
-  } else {
-    return(NA)
-  }
-}
-

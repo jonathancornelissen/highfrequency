@@ -762,3 +762,15 @@ cholCovMRC <- function(returns, delta = 0.1, theta = 1){
   return(correctionFactor * (t(preAveragedReturns) %*% preAveragedReturns))
   
 }
+
+#' @keywords internal
+flat <- function(kn , err, errMax, size, tol ){
+  localerrMin <- min(err[kn:(kn+ size)])
+  localerrMax <- max(err[kn:(kn+ size)])
+  if(max(c((localerrMin/errMax), (localerrMax/errMax))) < tol){
+    return(kn)
+  } else {
+    return(NA)
+  }
+}
+
