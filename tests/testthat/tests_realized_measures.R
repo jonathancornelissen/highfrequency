@@ -352,3 +352,41 @@ test_that("rSemiCov", {
 })
 
 
+context("ReMeDI")
+
+test_that("ReMeDI", {
+  print("Make sure to implement tests for correctTime = TRUE")
+  expect_equal(TRUE, FALSE) # Extra reminder for above!
+  remed <- ReMeDI(sampleTDataMicroseconds, correctTime = FALSE, lags = 0:25, kn = 2)
+  expected <- c(-3.593647e-05, 7.133251e-05, 3.357673e-05,6.837046e-05, 6.843234e-05, -3.911304e-05, -6.023102e-05, -5.886964e-05, -1.736964e-04,
+              -1.801960e-04, -1.214563e-04, -1.403775e-04, -4.730198e-05, 2.747318e-05, 4.187706e-05, 9.465140e-05, 8.263201e-05, 3.929043e-05,
+              9.014026e-06, -4.593234e-05, -5.731229e-05, -2.038366e-05, -3.419761e-05, 5.367162e-06, 1.314831e-04, 2.025495e-04)
+  expect_equal(remed, expected)
+  
+  # Different data-set
+  dat <- sampleTData$PRICE
+  storage.mode(dat) <- "numeric"
+  remed <- ReMeDI(dat, correctTime = FALSE, jumpsIndex = NULL, lags = 0:25, kn = 4)
+  expected <- c(1.727738e-04, -4.413651e-04, -6.576720e-04, -8.805869e-04, -8.963142e-04, -9.340979e-04, -8.683123e-04, -8.788084e-04, -7.723047e-04,
+                -5.868239e-04, -3.945358e-04, -1.922053e-04, -2.168711e-04, -1.448455e-04, -1.701368e-04, -2.254692e-05, 4.851588e-05, 9.959524e-06, 
+                -7.839752e-05, -2.061327e-04, -1.161842e-04, -3.656323e-05, 2.000889e-04, 2.520453e-04, 2.141604e-04, 1.082608e-04)
+  
+  
+  expect_equal(remed, expected)
+  
+  
+})
+
+test_that("ReMeDI kn choosing algorithm", {
+  
+  optimalKn <- knChooseReMeDI(sampleTDataMicroseconds, correctTime = FALSE, jumpsIndex = NULL, knMax = 10, tol = 0.05, size = 3, lower = 1, upper = 10, plot = FALSE)
+  expect_equal(optimalKn, 2L)
+  
+  dat <- sampleTData$PRICE
+  storage.mode(dat) <- "numeric"
+  optimalKn <- knChooseReMeDI(dat, correctTime = FALSE, jumpsIndex = NULL, knMax = 10, tol = 0.05, size = 3, lower = 3, upper = 5, plot = FALSE)
+  expect_equal(optimalKn, 4L)
+  
+    
+  
+})
