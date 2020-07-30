@@ -1352,7 +1352,7 @@ noZeroQuotes <- function(qData) {
 #' # In case you have more data it is advised to use the on-disk functionality
 #' # via "from","to","dataSource",etc. arguments
 #' 
-#' @importFrom readr read_csv
+#' @importFrom data.table fread
 #' @keywords cleaning
 #' @export
 quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, qDataRaw = NULL, report = TRUE, 
@@ -1372,7 +1372,7 @@ quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, 
     
     quotesfiles <- list.files(dataSource, recursive = TRUE)[grepl("quotes", list.files(dataSource, recursive = TRUE))]
     for (ii in quotesfiles) {
-      readdata <- try(as.data.table(read_csv(paste0(dataSource, "/", ii))), silent = TRUE)
+      readdata <- try(fread(paste0(dataSource, "/", ii)), silent = TRUE)
       readdata <- try(readdata[, DT := as.POSIXct(substring(paste(as.character(DATE), TIME_M, sep = " "), 1, 20), tz = "EST", format = "%Y%m%d %H:%M:%OS")], silent = TRUE)
       qData <- try(quotesCleanup(qDataRaw = readdata,
                                  selection = selection,
@@ -1864,6 +1864,7 @@ selectExchange <- function(data, exch = "N") {
 #' Brownlees, C.T. and Gallo, G.M. (2006). Financial econometric analysis at ultra-high frequency: Data handling concerns. Computational Statistics & Data Analysis, 51, pp. 2232-2245.
 #' 
 #' @author Jonathan Cornelissen and Kris Boudt
+#' @importFrom data.table fread
 #' @keywords cleaning
 #' @export
 tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, tDataRaw = NULL, report = TRUE, selection = "median", saveAsXTS = TRUE) {
@@ -1874,7 +1875,7 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, 
     
     tradesfiles <- list.files(dataSource, recursive = TRUE)[!grepl("quotes", list.files(dataSource, recursive = TRUE))]
     for (ii in tradesfiles) {
-      readdata <- try(as.data.table(read_csv(paste0(dataSource, "/", ii))), silent = TRUE)
+      readdata <- try(fread(paste0(dataSource, "/", ii)), silent = TRUE)
       readdata <- try(readdata[, DT := as.POSIXct(substring(paste(as.character(DATE), TIME_M, sep = " "), 1, 20), tz = "EST", format = "%Y%m%d %H:%M:%OS")], silent = TRUE)
       tData <- try(tradesCleanup(tDataRaw = readdata,
                                  selection = selection,
