@@ -2472,31 +2472,156 @@ listCholCovEstimators <- function(){
 }
 
 
-#' WIP for REMEDI calculations
+#' REMEDI
+#' estimates auto-covariance of market-microstructure noise 
+#' 
+#' @param pData xts or data.table containing the log-prices of the asset.
+#' @param kn numeric of length 1 determining the tuning parameter kn
+#' @param lags numeric containing integer values indicating 
+#' @param correctTime logical indicating whether to use the time-adjusted REMEDI measure, default is FALSE
+#' @param jumpsIndex Index of jumps 
+#' @param makeCorrelation logical indicating whether to transform the autocovariances into autocorrelations. 
+#' 
+#' @references remedi paper, muzafer's paper
+#' @keywords microstructure noise autocovariance autocorrelation
 #' @export
-REMEDI <- function(pData, kn, lags){
+REMEDI <- function(pData, kn = 1, lags = 1, correctTime = FALSE, jumpsIndex = NULL, makeCorrelation = FALSE){
+  time <- DT <- PRICE <- NULL
+  # Check input
+  if(is.data.table(pData)){ # We have a data.table
+    
+    if(!("PRICE" %in% colnames(pData))){
+      stop("REMEDI with data.table input requires a PRICE column")
+    }
+    
+    if(correctTime){
+      if(!("DT" %in% colnames(pData))){
+        stop("REMEDI with correctTime set to TRUE needs a DT (date-time) column when the input is a data.table")
+      } else {
+        time <- as.numeric(pData[, DT])    
+      }
+    }
+    
+    prices <- as.numeric(pData[, PRICE])
+    
+  } else if( is.xts(pData) ) { # We have an xts object
+    if(correctTime){
+      time <- as.numeric(index(pData))
+    }    
+    prices <- as.numeric(pData)
+  } else {
+    stop("Error in REMEDI: pData must be an xts or a data.table")
+  }
   
+  correctJumps <- FALSE
   
+  if(is.numeric(jumpsIndex)){
+    if(!all(jumpsIndex %% 1 == 0)){
+      stop("Error in REMEDI: jumpsIndex must be a numeric of integer values")
+    }
+    correctJumps <- TRUE  
+  }
   
-  prices <- as.numeric(pData)
+  if(!all(lags %% 1 == 0 )){
+    stop("lags must be contain integer values")
+  }
+  
   res <- numeric(length(lags))
+  nObs <- length(prices)
   
   kn <- c(-kn, 2 * kn)
-  idx <- 1
-  for (lag in lags){
+  resIDX <- 1
+  
+  if(makeCorrelation){
+    lags <- c(0,lags) # We make sure we have 0 lag first in the series (we remove it later again)
+  }
+  
+  for (lag in lags) {
     thisLag <- c(lag, 0)
+    remedi <- (kn[2] + 1):(nObs - lag + kn[1])
+    idx <- 1
     
-    for (i in (kn[2] + 1):(length(prices) - lag + kn[1])) {
+    for (i in (kn[2] + 1):(nObs - lag + kn[1])) { # Calculate REMEDI
+      remedi[idx] <- prod(prices[i + thisLag] - prices[i + thisLag - kn])
+      idx <- idx + 1
+    }
+    
+    ## Use the time corrections Muzafer provided
+    if(correctTime){
       
-      res[idx] <- res[idx] + prod(prices[i + thisLag] - prices[i + thisLag - kn])
+      timeIDX <- sweep(matrix(rep((kn[2] + 1):(nObs - lag + kn[1]), 4), ncol = 4),2, c(thisLag , thisLag - kn), FUN = "+")
+      
+      ## Follow up with muzafer whether this is correct
+      timeCorrection <- (time[timeIDX[,3]] - time[timeIDX[,1]]) * (time[timeIDX[,2]] - time[timeIDX[,4]])
+      
+      remedi <- remedi * timeCorrection
       
     }
     
-    res[idx] <- res[idx] / (length(prices) - lag + kn[1]- kn[2])  
-    idx <- idx +1
+    
+    ## Use the jump correction Muzafer provided
+    if(correctJumps){
+      jumpIDX <- matrix(0, nrow = length(jumpsIndex), ncol = 3 + (thisLag[1] != 0))
+      
+      for (i in 1:length(jumpsIndex)) {
+        if(thisLag[1] != 0){
+          jumpIDX[i,] <- c(jumpsIndex[i] - sum(abs(kn)) - thisLag[1], jumpsIndex[i] - rep(kn[2], 1 + sum(thisLag != 0)) - thisLag, jumpsIndex[i] )
+        } else {
+          jumpIDX[i,] <- c(jumpsIndex[i] - sum(abs(kn)) - thisLag[1], jumpsIndex[i] - kn[2] - thisLag[1], jumpsIndex[i])
+        }  
+        
+        remedi <- remedi[-as.numeric(jumpIDX)]
+      }
+      
+      
+    }
+    
+    
+    
+    res[resIDX] <- sum(remedi) / nObs
+    resIDX <- resIDX +1
+  }
+  
+  
+  
+  
+  if(makeCorrelation){
+    res <- res[-1]/res[1] # We transform the autocovariances into autocorrelations (and remove the 0-lag, which may be unwanted.)
   }
   
   return(res)
 }
 
+#' REMEDI tuning parameter
+#' function to choose the tuning parameter, kn in REMEDI estimation
+#' 
+#' @export
+knChooseREMEDI <- function(pData, correctTime = FALSE, jumpsIndex = NULL, knMax = 10, tol = 0.05, size = 3, lower = 2, upper = 5){
+  
+  kn <- 1:(knMax + size +1)
+  err <- vapply(kn, REMEDI, FUN.VALUE = numeric(4), pData = pData, correctTime = correctTime, jumpsIndex = jumpsIndex, lags = 0:3)
+  err <- (err[1,] - err[2,] - err[3,] + err[4,] - err[1,])^2
+  errMax <- max(err[1:(round(knMax/2))])
+  
+  kns <- vapply(1:(knMax+1), flat, FUN.VALUE = numeric(1), err = err, errMax = errMax, size = size, tol = tol)
+  kn <- kns[1]
+  
+  if(is.na(kn)){
+    kn <- which(err == min(err[lower:upper]))
+  }
+  
+  return(kn)
+  
+}
+
+#' @keywords internal
+flat <- function(kn , err, errMax, size, tol ){
+  localerrMin <- min(err[kn:(kn+ size)])
+  localerrMax <- max(err[kn:(kn+ size)])
+  if(max(c((localerrMin/errMax), (localerrMax/errMax))) < tol){
+    return(kn)
+  } else {
+    return(NA)
+  }
+}
 
