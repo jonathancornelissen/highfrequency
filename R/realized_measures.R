@@ -2599,7 +2599,7 @@ ReMeDI <- function(pData, kn = 1, lags = 1, correctTime = FALSE, jumpsIndex = NU
 #' @param correctTime logical indicating whether to use the time-adjusted ReMeDI measure, default is FALSE
 #' @param jumpsIndex Indices of jump(s) detected
 #' @param knMax max value of kn to be considered
-#' @param tol tolerance for the minimum
+#' @param tol tolerance for the minimizing value. If tol is high, the algorithm will choose a lower optimal value.
 #' @param size size of the local window
 #' @param lower lower boundary for the method if it fails to find an optimal value. If this is the case, the kn between lower and upper that is best is returned 
 #' @param upper upper boundary for the method if it fails to find an optimal value. If this is the case, the kn between lower and upper that is best is returned

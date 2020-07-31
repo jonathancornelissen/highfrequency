@@ -26,7 +26,7 @@ knChooseReMeDI(
 
 \item{knMax}{max value of kn to be considered}
 
-\item{tol}{tolerance for the minimum}
+\item{tol}{tolerance for the minimizing value. If tol is high, the algorithm will choose a lower optimal value.}
 
 \item{size}{size of the local window}
 
