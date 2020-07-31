@@ -79,6 +79,54 @@ test_that("selectExchange and data cleaning functions", {
   )
 })
 
+
+
+context("tradesCleanup")
+test_that("tradesCleanup on-disk functionality", {
+  library(data.table)
+  options(digits = 6)
+  trades1 <- sampleTDataRaw
+  trades2 <- sampleTDataRawMicroseconds
+
+  currentWD <- getwd()
+  tempDir <- tempdir(check = TRUE)
+  setwd(tempDir)
+  dir.create("rawTradeData")
+  dir.create("rawQuoteData")
+
+  fwrite(trades1, "rawTradeData/trades1.csv")
+  fwrite(trades2, "rawTradeData/trades2.csv")
+
+  tradesCleanup(dataSource = "rawTradeData", dataDestination = "cleanedTradeData", exchanges = "N", saveAsXTS = FALSE)
+
+  cleanedTrades1 <- tradesCleanup(tDataRaw = trades1, exchanges = "N", report = FALSE)
+  cleanedTrades2 <- tradesCleanup(tDataRaw = trades2, exchanges = "N", report = FALSE)
+  cleanedTrades2Day1 <- cleanedTrades2[as.character(as.Date(DT)) == "2018-01-02",]
+  cleanedTrades2Day2 <- cleanedTrades2[as.character(as.Date(DT)) == "2018-01-03",]
+
+
+  onDisk1 <- readRDS("cleanedTradeData/trades1.csv/2008-01-04.rds")
+  onDisk2Day1 <- readRDS("cleanedTradeData/trades2.csv/2018-01-02.rds")
+  onDisk2Day2 <- readRDS("cleanedTradeData/trades2.csv/2018-01-03.rds")
+
+  ### CLEANUP!
+  setwd(currentWD)
+  unlink(tempDir, recursive = TRUE, force = TRUE)
+
+  expected2 <- tradesCleanup(tDataRaw = sampleTDataRawMicroseconds, exchanges = "N", report = FALSE)
+
+  expect_equal(cleanedTrades2Day1[,2:4], onDisk2Day1[,2:4])
+  
+  expect_equal(expected2[as.Date(DT) == "2018-01-02",], cleanedTrades2Day1)
+  expect_equal(expected2[as.Date(DT) == "2018-01-03",], cleanedTrades2Day2)
+
+  
+
+})
+
+
+
+
 context("aggregateTS edge cases")
 test_that("aggregateTS edge cases", {
   # Test edge cases of aggregateTS
@@ -154,4 +202,6 @@ test_that("aggregateQuotes milliseconds vs seconds", {
                aggregateQuotes(dat, on = "secs", k = 5, marketOpen = "09:30:00", marketClose = "16:00:00"))
   
 })
+
+
 
