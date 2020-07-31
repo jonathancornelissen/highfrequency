@@ -48,7 +48,7 @@ tData_afterfinalcleaning <-
                            tData = tData_afterfirstcleaning[as.Date(DT) == "2018-01-02"])
 dim(tData_afterfinalcleaning)
 #In case you have more data it is advised to use the on-disk functionality
-#via "from","to","dataSource", etc. arguments
+#via "dataSource" and "dataDestination" arguments
 }
 \references{
 Barndorff-Nielsen, O. E., P. R. Hansen, A. Lunde, and N. Shephard (2009). Realized kernels in practice: Trades and quotes. Econometrics Journal 12, C1-C32.

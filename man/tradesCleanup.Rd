@@ -79,7 +79,7 @@ tData_afterfirstcleaning$report
 dim(tData_afterfirstcleaning$tData)
 
 #In case you have more data it is advised to use the on-disk functionality
-#via "from","to","dataSource",etc. arguments
+#via "dataSource" and "dataDestination" arguments
 
 }
 \references{

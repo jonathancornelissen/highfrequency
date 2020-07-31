@@ -85,7 +85,7 @@ qData_aftercleaning$report
 dim(qData_aftercleaning$qData)
 
 # In case you have more data it is advised to use the on-disk functionality
-# via "from","to","dataSource",etc. arguments
+#via "dataSource" and "dataDestination" arguments
 
 }
 \references{
