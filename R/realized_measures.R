@@ -2586,7 +2586,7 @@ ReMeDI <- function(pData, kn = 1, lags = 1, correctTime = FALSE, jumpsIndex = NU
   
   
   if(makeCorrelation){
-    res <- res[-1]/res[1] # We transform the autocovariances into autocorrelations (and remove the 0-lag, which may be unwanted.)
+    res <- res[-1]/res[1] # We transform the autocovariances into autocorrelations (and remove the 0-lag we added earlier)
   }
   
   return(res)
@@ -2599,31 +2599,39 @@ ReMeDI <- function(pData, kn = 1, lags = 1, correctTime = FALSE, jumpsIndex = NU
 #' @param correctTime logical indicating whether to use the time-adjusted ReMeDI measure, default is FALSE
 #' @param jumpsIndex Indices of jump(s) detected
 #' @param knMax max value of kn to be considered
-#' @param tol tolerance or the minimum
-#' @param size 
+#' @param tol tolerance for the minimum
+#' @param size size of the local window
 #' @param lower lower boundary for the method if it fails to find an optimal value. If this is the case, the kn between lower and upper that is best is returned 
 #' @param upper upper boundary for the method if it fails to find an optimal value. If this is the case, the kn between lower and upper that is best is returned
-#' 
+#' @param plot logical whether to plot the errors.
 #' @details This is the algorithm B.2 in the appendix of the Li and Linton (2019) working paper
 #' 
 #' @examples 
-#' optimalKn <- knChooseReMeDI(sampleTDataMicroseconds, correctTime = FALSE, jumpsIndex = NULL, knMax = 10, tol = 0.05, size = 3, lower = 2, upper = 5)
+#' optimalKn <- knChooseReMeDI(sampleTDataMicroseconds, correctTime = FALSE, jumpsIndex = NULL, knMax = 10, tol = 0.05, size = 3, lower = 2, upper = 5, plot = TRUE)
 #' optimalKn
 #' \dontrun{
-#' optimalKn <- knChooseReMeDI(sampleTDataMicroseconds, correctTime = FALSE, jumpsIndex = NULL, knMax = 50, tol = 0.05, size = 3, lower = 2, upper = 5)
+#' # We can also have a much larger search-space
+#' optimalKn <- knChooseReMeDI(sampleTDataMicroseconds, correctTime = FALSE, jumpsIndex = NULL, knMax = 50, tol = 0.05, size = 3, lower = 2, upper = 5, plot = TRUE)
+#' optimalKn
 #' }
 #' 
 #' @references A ReMeDI for Microstructure Noise
 #' @return integer containing the optimal kn
 #' @export
-knChooseReMeDI <- function(pData, correctTime = FALSE, jumpsIndex = NULL, knMax = 10, tol = 0.05, size = 3, lower = 2, upper = 5){
+knChooseReMeDI <- function(pData, correctTime = FALSE, jumpsIndex = NULL, knMax = 10, tol = 0.05, size = 3, lower = 2, upper = 5, plot = FALSE){
   
   kn <- 1:(knMax + size +1)
   err <- vapply(kn, ReMeDI, FUN.VALUE = numeric(4), pData = pData, correctTime = correctTime, jumpsIndex = jumpsIndex, lags = 0:3)
-  err <- (err[1,] - err[2,] - err[3,] + err[4,] - err[1,])^2
+  err <- (err[1,] - err[2,] - err[3,] + err[4,] - ReMeDI(pData, kn = 1, lags = 0, correctTime = correctTime, jumpsIndex = jumpsIndex))^2
+
+  if(plot){
+    plot.ts(err, ylab = "error", xlab = "kn")
+  }
+  
   errMax <- max(err[1:(round(knMax/2))])
   
   kns <- vapply(1:(knMax+1), flat, FUN.VALUE = numeric(1), err = err, errMax = errMax, size = size, tol = tol)
+  kns <- kns[!is.na(kns)]
   kn <- kns[1]
   
   if(is.na(kn)){

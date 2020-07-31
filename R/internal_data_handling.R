@@ -314,7 +314,7 @@ checktData <- function(tData) {
 #' @keywords internal
 checkqData <- function(qData) {
   if (!is.xts(qData) & !is.data.table(qData)) {
-    stop("The argument qData should be an data.table or xts object.")
+    stop("The argument qData should be a data.table or xts object.")
   }
   if (!any(colnames(qData) == "BID")) {
     stop("The argument qData should have a column containing the BID. Could not find that column.")

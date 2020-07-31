@@ -13,7 +13,8 @@ knChooseReMeDI(
   tol = 0.05,
   size = 3,
   lower = 2,
-  upper = 5
+  upper = 5,
+  plot = FALSE
 )
 }
 \arguments{
@@ -25,13 +26,15 @@ knChooseReMeDI(
 
 \item{knMax}{max value of kn to be considered}
 
-\item{tol}{tolerance or the minimum}
+\item{tol}{tolerance for the minimum}
 
-\item{size}{}
+\item{size}{size of the local window}
 
 \item{lower}{lower boundary for the method if it fails to find an optimal value. If this is the case, the kn between lower and upper that is best is returned}
 
 \item{upper}{upper boundary for the method if it fails to find an optimal value. If this is the case, the kn between lower and upper that is best is returned}
+
+\item{plot}{logical whether to plot the errors.}
 }
 \value{
 integer containing the optimal kn
@@ -44,10 +47,12 @@ function to choose the tuning parameter, kn in ReMeDI estimation
 This is the algorithm B.2 in the appendix of the Li and Linton (2019) working paper
 }
 \examples{
-optimalKn <- knChooseReMeDI(sampleTDataMicroseconds, correctTime = FALSE, jumpsIndex = NULL, knMax = 10, tol = 0.05, size = 3, lower = 2, upper = 5)
+optimalKn <- knChooseReMeDI(sampleTDataMicroseconds, correctTime = FALSE, jumpsIndex = NULL, knMax = 10, tol = 0.05, size = 3, lower = 2, upper = 5, plot = TRUE)
 optimalKn
 \dontrun{
-optimalKn <- knChooseReMeDI(sampleTDataMicroseconds, correctTime = FALSE, jumpsIndex = NULL, knMax = 50, tol = 0.05, size = 3, lower = 2, upper = 5)
+# We can also have a much larger search-space
+optimalKn <- knChooseReMeDI(sampleTDataMicroseconds, correctTime = FALSE, jumpsIndex = NULL, knMax = 50, tol = 0.05, size = 3, lower = 2, upper = 5, plot = TRUE)
+optimalKn
 }
 
 }
