@@ -1350,7 +1350,7 @@ noZeroQuotes <- function(qData) {
 #' dim(qData_aftercleaning$qData)
 #' 
 #' # In case you have more data it is advised to use the on-disk functionality
-#' # via "from","to","dataSource",etc. arguments
+#' #via "dataSource" and "dataDestination" arguments
 #' 
 #' @importFrom data.table fread
 #' @keywords cleaning
@@ -1589,7 +1589,6 @@ rmTradeOutliersUsingQuotes <- function(tData, qData) {
   setkey(qData, SYMBOL, DT)
   
   tData <- tData[, c("DT", "SYMBOL", "PRICE")]
-  
   tData <- qData[tData, roll = TRUE, on = c("SYMBOL", "DT")]
   
   tData[is.na(BID)][, "BID"] <- tData$BID[min(which(is.na(tData$BID) == FALSE))]
@@ -1857,7 +1856,7 @@ selectExchange <- function(data, exch = "N") {
 #' dim(tData_afterfirstcleaning$tData)
 #' 
 #' #In case you have more data it is advised to use the on-disk functionality
-#' #via "from","to","dataSource",etc. arguments
+#' #via "dataSource" and "dataDestination" arguments
 #' 
 #' @references Barndorff-Nielsen, O. E., P. R. Hansen, A. Lunde, and N. Shephard (2009). Realized kernels in practice: Trades and quotes. Econometrics Journal 12, C1-C32.
 #' 
@@ -1943,13 +1942,13 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, 
   }
 }
 
-#' @export
-tradesCleanupUsingQuotes <- function(from, to, dataSource, dataDestination, ticker, tData = NULL, qData = NULL) {
-  
-  ## Deprecated
-  warning("Please use tradesCleanupUsingQuotes instead of tradesCleanupFinal.") 
-  tradesCleanupFinal(from, to, dataSource, dataDestination, ticker, tData = NULL, qData = NULL)
-}
+# #' #' @export
+# #' tradesCleanupUsingQuotes <- function(from, to, dataSource, dataDestination, ticker, tData = NULL, qData = NULL) {
+# #'   
+# #'   ## Deprecated
+# #'   warning("Please use tradesCleanupUsingQuotes instead of tradesCleanupFinal.") 
+# #'   tradesCleanupFinal(from, to, dataSource, dataDestination, ticker, tData = NULL, qData = NULL)
+# #' }
 
 #' Perform a final cleaning procedure on trade data
 #' 
@@ -1990,7 +1989,7 @@ tradesCleanupUsingQuotes <- function(from, to, dataSource, dataDestination, tick
 #'                            tData = tData_afterfirstcleaning[as.Date(DT) == "2018-01-02"])
 #' dim(tData_afterfinalcleaning)
 #' #In case you have more data it is advised to use the on-disk functionality
-#' #via "from","to","dataSource", etc. arguments
+#' #via "dataSource" and "dataDestination" arguments
 #' @keywords cleaning
 #' @export
 tradesCleanupUsingQuotes <- function(dataSource = NULL, dataDestination = NULL, tData = NULL, qData = NULL) {
