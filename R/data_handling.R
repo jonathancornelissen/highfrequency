@@ -1177,17 +1177,16 @@ mergeTradesSameTimestamp <- function(tData, selection = "median") {
       stop("Data.table neeeds DT column (date-time ).")
     }
   }
-  
   if (selection == "median") {
     tData[, PRICE := median(PRICE), by = list(DT, SYMBOL)]
     #If there is more than one observation at median price, take the average volume.
-    tData[, SIZE := as.numeric(SIZE)]
+    tData[, SIZE := as.numeric(as.character(SIZE))]
     tData[, SIZE := mean(SIZE), by = list(DT, SYMBOL)] 
     tData <- unique(tData[, c("DT", "SYMBOL", "PRICE", "SIZE")])
   }
   
   if (selection == "max.volume") {
-    tData[, SIZE := as.numeric(SIZE)]
+    tData[, SIZE := as.numeric(as.character(SIZE))]
     tData <- tData[, MAXSIZE := max(SIZE), by = list(DT, SYMBOL)]
     tData[, SIZE := ifelse(SIZE == MAXSIZE, 1, 0)]
     tData[, PRICE := PRICE * SIZE]
@@ -1197,7 +1196,7 @@ mergeTradesSameTimestamp <- function(tData, selection = "median") {
     tData <- unique(tData[, c("DT", "SYMBOL", "PRICE", "SIZE")])
   }
   if (selection == "weighted.average") {
-    tData[, SIZE := as.numeric(SIZE)]
+    tData[, SIZE := as.numeric(as.character(SIZE))]
     tData <- tData[, `:=` (SIZE_WEIGHT = SIZE / sum(SIZE)), by = list(DT, SYMBOL)]
     tData[, `:=` (PRICE = sum(PRICE * SIZE_WEIGHT)), by = list(DT, SYMBOL)]
     tData[, SIZE := mean(SIZE), by = list(DT, SYMBOL)]
@@ -1373,7 +1372,14 @@ quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, 
     quotesfiles <- list.files(dataSource, recursive = TRUE)[grepl("quotes", list.files(dataSource, recursive = TRUE))]
     for (ii in quotesfiles) {
       readdata <- try(fread(paste0(dataSource, "/", ii)), silent = TRUE)
-      readdata <- try(readdata[, DT := as.POSIXct(substring(paste(as.character(DATE), TIME_M, sep = " "), 1, 20), tz = "EST", format = "%Y%m%d %H:%M:%OS")], silent = TRUE)
+      if(colnames(readdata)[1] == "index"){ # The data was saved from an xts object
+        readdata <- try(readdata[, DT := as.POSIXct(index, tz = "EST", format = "%Y-%m-%dT%H:%M:%OS")])
+      } else if ("DT" %in% colnames(readdata)){
+        readdata <- try(readdata[, DT := as.POSIXct(DT, tz = "EST", format = "%Y-%m-%dT%H:%M:%OS")])
+      } else {
+        readdata <- try(readdata[, DT := as.POSIXct(substring(paste(as.character(DATE), TIME_M, sep = " "), 1, 20), tz = "EST", format = "%Y%m%d %H:%M:%OS")], silent = TRUE)
+      }
+      
       qData <- try(quotesCleanup(qDataRaw = readdata,
                                  selection = selection,
                                  exchanges = exchanges,
@@ -1587,7 +1593,6 @@ rmTradeOutliersUsingQuotes <- function(tData, qData) {
   
   setkey(tData, SYMBOL, DT)
   setkey(qData, SYMBOL, DT)
-  
   tData <- tData[, c("DT", "SYMBOL", "PRICE")]
   tData <- qData[tData, roll = TRUE, on = c("SYMBOL", "DT")]
   
@@ -1871,11 +1876,16 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, 
   
   if (is.null(tDataRaw) == TRUE) {
     try(dir.create(dataDestination), silent = TRUE)
-    
-    tradesfiles <- list.files(dataSource, recursive = TRUE)[!grepl("quotes", list.files(dataSource, recursive = TRUE))]
+    tradesfiles <- list.files(dataSource, recursive = TRUE)[grepl("trades", list.files(dataSource, recursive = TRUE))]
     for (ii in tradesfiles) {
       readdata <- try(fread(paste0(dataSource, "/", ii)), silent = TRUE)
-      readdata <- try(readdata[, DT := as.POSIXct(substring(paste(as.character(DATE), TIME_M, sep = " "), 1, 20), tz = "EST", format = "%Y%m%d %H:%M:%OS")], silent = TRUE)
+      if(colnames(readdata)[1] == "index"){ # The data was saved from an xts object
+        readdata <- try(readdata[, DT := as.POSIXct(index, tz = "EST", format = "%Y-%m-%dT%H:%M:%OS")])
+      } else if ("DT" %in% colnames(readdata)){
+        readdata <- try(readdata[, DT := as.POSIXct(DT, tz = "EST", format = "%Y-%m-%dT%H:%M:%OS")])
+      } else {
+        readdata <- try(readdata[, DT := as.POSIXct(substring(paste(as.character(DATE), TIME_M, sep = " "), 1, 20), tz = "EST", format = "%Y%m%d %H:%M:%OS")], silent = TRUE)
+      }
       tData <- try(tradesCleanup(tDataRaw = readdata,
                                  selection = selection,
                                  exchanges = exchanges))$tData
@@ -1884,7 +1894,7 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, 
       
       try(dir.create(paste0(dataDestination, "/", strsplit(ii, "/")[[1]][1])), silent = TRUE)
       for (jj in tData) {
-        if (saveAsXTS == TRUE) {
+        if (saveAsXTS) {
           df_result <- xts(as.matrix(jj[, -c("DT", "DATE")]), order.by = jj$DT)
         } else {
           df_result <- jj[, -c( "DATE")]
