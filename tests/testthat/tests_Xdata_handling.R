@@ -80,14 +80,13 @@ test_that("selectExchange and data cleaning functions", {
 })
 
 
-
 context("tradesCleanup")
 test_that("tradesCleanup on-disk functionality", {
+  skip_on_cran()
   library(data.table)
   options(digits = 6)
   trades1 <- sampleTDataRaw
   trades2 <- sampleTDataRawMicroseconds
-
   currentWD <- getwd()
   tempDir <- tempdir(check = TRUE)
   setwd(tempDir)
