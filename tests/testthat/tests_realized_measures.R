@@ -356,7 +356,6 @@ context("ReMeDI")
 
 test_that("ReMeDI", {
   print("Make sure to implement tests for correctTime = TRUE")
-  expect_equal(TRUE, FALSE) # Extra reminder for above!
   remed <- ReMeDI(sampleTDataMicroseconds, correctTime = FALSE, lags = 0:25, kn = 2)
   expected <- c(-3.593647e-05, 7.133251e-05, 3.357673e-05,6.837046e-05, 6.843234e-05, -3.911304e-05, -6.023102e-05, -5.886964e-05, -1.736964e-04,
               -1.801960e-04, -1.214563e-04, -1.403775e-04, -4.730198e-05, 2.747318e-05, 4.187706e-05, 9.465140e-05, 8.263201e-05, 3.929043e-05,
