@@ -2619,6 +2619,7 @@ ReMeDI <- function(pData, kn = 1, lags = 1, correctTime = FALSE, jumpsIndex = NU
 #' optimalKn
 #' }
 #' 
+#' @importFrom stats plot.ts
 #' @references A ReMeDI for Microstructure Noise
 #' @return integer containing the optimal kn
 #' @export
