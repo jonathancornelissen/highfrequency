@@ -4,12 +4,14 @@
 \alias{rmTradeOutliersUsingQuotes}
 \title{Delete transactions with unlikely transaction prices}
 \usage{
-rmTradeOutliersUsingQuotes(tData, qData)
+rmTradeOutliersUsingQuotes(tData, qData, lagCompensation = 2)
 }
 \arguments{
 \item{tData}{a data.table or xts object containing the time series data, with at least the column "PRICE", containing the transaction price (ONE DAY ONLY).}
 
 \item{qData}{a data.table or xts object containing the time series data with at least the columns "BID" and "OFR", containing the bid and ask prices (ONE DAY ONLY).}
+
+\item{lagCompensation}{a numeric of length 1 that denotes how many seconds to lag the quotes. Default is 2 seconds. See Details.}
 }
 \value{
 xts or data.table object depending on input
@@ -21,6 +23,12 @@ Similar for entries with prices below the bid minus the bid-ask spread.
 \details{
 Note: in order to work correctly, the input data of this function should be
 cleaned trade (tData) and quote (qData) data respectively.
+In older high frequency datasets the trades frequently lag the quotes. In newer datasets this tends to happen 
+only during extreme market activity when exchange networks are at maximum capacity.
+}
+\references{
+Vergote, O. (2005). How to match trades and quotes for NYSE stocks?
+K.U.Leuven working paper.
 }
 \author{
 Jonathan Cornelissen, Kris Boudt and Onno Kleen
