@@ -9,7 +9,7 @@
 #' @param FUN function to apply over each interval. By default, previous tick aggregation is done. 
 #' Alternatively one can set e.g. FUN = "mean".
 #' In case weights are supplied, this argument is ignored and a weighted average is taken.
-#' @param on character, indicating the time scale in which "k" is expressed. Possible values are: "secs", "seconds", "mins", "minutes", "hours", "days", "weeks".
+#' @param on character, indicating the time scale in which "k" is expressed. Possible values are: "secs", "seconds", "mins", "minutes", "hours", "days", "weeks", "ticks".
 #' @param k positive integer, indicating the number of periods to aggregate over. For example, to aggregate an 
 #' xts object to the five-minute frequency set k = 5 and on = "minutes".
 #' @param weights By default, no weighting scheme is used. 
@@ -31,6 +31,10 @@
 #' tick aggregation it makes sense to fill these NA's by the function \code{na.locf}
 #' (last observation carried forward) from the zoo package.
 #' 
+#' In case on = "ticks", the sampling is done such the sampling starts on the first tick.
+#' For example, if 14 observations are made on one day, and these are 1, 2, 3, ... 14.
+#' Then, with on = "ticks" and k = 3, the output will be 1, 4, 7, 10, 13.
+#' 
 #' @return An xts object containing the aggregated time series.
 #' 
 #' @author Jonathan Cornelissen and Kris Boudt
@@ -47,6 +51,8 @@
 #' tsagg30sec <- aggregateTS(ts, on = "seconds", k = 30)
 #' tail(tsagg30sec)
 #' 
+#' # tsagg3ticks <- aggregateTS(ts, on = "ticks", k = 3)
+#' 
 #' @importFrom zoo zoo na.locf
 #' @importFrom stats start end
 #' @importFrom xts period.apply tzone	
@@ -54,6 +60,10 @@
 aggregateTS <- function (ts, FUN = "previoustick", on = "minutes", k = 1, weights = NULL, dropna = FALSE, tz = NULL) {
   
   makethispartbetter <- ((!is.null(weights))| on=="days"| on=="weeks" | (FUN!="previoustick") | dropna)
+  if(length(k) > 1){
+    k <- k[1]
+    warning("K must be of length one. Longer object provided. Using only first entry.")
+  }
   
   if (FUN == "previoustick") {
     FUN <- previoustick 
@@ -64,6 +74,15 @@ aggregateTS <- function (ts, FUN = "previoustick", on = "minutes", k = 1, weight
   if(is.null(tz)){
     tz <- tzone(ts)
   }
+  
+  if(on == "ticks"){ ## Special case for on = "ticks"
+    if(k < 1 | k%%1 != 0){
+      stop("When on is `ticks`, must be a positive integer valued numeric")
+    }
+    pData <- pData[seq(1, nrow(pData), by = k),]
+    return(pData)
+  }
+  
   
   if (makethispartbetter == TRUE)  {
     
@@ -265,6 +284,7 @@ aggregatePrice <- function(pData, on = "minutes", k = 1, marketOpen = "09:30:00"
       stop("Data.table neeeds PRICE column.")
     }
   }
+  
   
   timeZone <- tzone(pData$DT)
   if(is.null(tz)){
@@ -485,7 +505,7 @@ aggregatePrice <- function(pData, on = "minutes", k = 1, marketOpen = "09:30:00"
 #' @examples
 #' # aggregate quote data to the 30 second frequency
 #' qDataAggregated <- aggregateQuotes(sampleQData, on = "seconds", k = 30)
-#' head(qData_aggregated)
+#' head(qDataAggregated)
 #' @export
 aggregateQuotes <- function(qData, on = "minutes", k = 5, marketOpen = "09:30:00", marketClose = "16:00:00", tz = "GMT") {
   DATE = BID = OFR = BIDSIZ = OFRSIZ = DT = FIRST_DT = DT_ROUND = LAST_DT = SYMBOL = NULL
