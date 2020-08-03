@@ -1007,7 +1007,7 @@ makeReturns <- function(ts) {
 #' @export
 matchTradesQuotes <- function(tData, qData, adjustment = 2) {
   
-  PRICE = BID = OFR = PFR = DATE = DT = FIRST_DT = DT_ROUND = SYMBOL = NULL
+  PRICE = BID = OFR = DATE = DT = FIRST_DT = DT_ROUND = SYMBOL = NULL
   
   tData <- checkColumnNames(tData)
   qData <- checkColumnNames(qData)
