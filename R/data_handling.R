@@ -484,7 +484,7 @@ aggregatePrice <- function(pData, on = "minutes", k = 1, marketOpen = "09:30:00"
 #' 
 #' @examples
 #' # aggregate quote data to the 30 second frequency
-#' qData_aggregated <- aggregateQuotes(sampleQData, on = "seconds", k = 30)
+#' qDataAggregated <- aggregateQuotes(sampleQData, on = "seconds", k = 30)
 #' head(qData_aggregated)
 #' @export
 aggregateQuotes <- function(qData, on = "minutes", k = 5, marketOpen = "09:30:00", marketClose = "16:00:00", tz = "GMT") {
@@ -596,8 +596,8 @@ aggregateQuotes <- function(qData, on = "minutes", k = 5, marketOpen = "09:30:00
 #' 
 #' @examples 
 #' # aggregate trade data to 5 minute frequency
-#' tData_aggregated <- aggregateTrades(sampleTData, on = "minutes", k = 5)
-#' head(tData_aggregated)
+#' tDataAggregated <- aggregateTrades(sampleTData, on = "minutes", k = 5)
+#' head(tDataAggregated)
 #' @export
 aggregateTrades <- function(tData, on = "minutes", k = 5, marketOpen = "09:30:00", marketClose = "16:00:00", tz = "GMT") {
   DATE = SIZE = DT = FIRST_DT = DT_ROUND = LAST_DT = SYMBOL = PRICE = VWPRICE = SIZETPRICE = SIZESUM = NULL
@@ -1344,9 +1344,9 @@ noZeroQuotes <- function(qData) {
 #' # Consider you have raw quote data for 1 stock for 2 days
 #' head(sampleQDataRawMicroseconds)
 #' dim(sampleQDataRawMicroseconds)
-#' qData_aftercleaning <- quotesCleanup(qDataRaw = sampleQDataRawMicroseconds, exchanges = "N")
-#' qData_aftercleaning$report
-#' dim(qData_aftercleaning$qData)
+#' qDataAfterCleaning <- quotesCleanup(qDataRaw = sampleQDataRawMicroseconds, exchanges = "N")
+#' qDataAfterCleaning$report
+#' dim(qDataAfterCleaning$qData)
 #' 
 #' # In case you have more data it is advised to use the on-disk functionality
 #' #via "dataSource" and "dataDestination" arguments
@@ -1865,9 +1865,9 @@ selectExchange <- function(data, exch = "N") {
 #' # Consider you have raw trade data for 1 stock for 2 days 
 #' head(sampleTDataRawMicroseconds)
 #' dim(sampleTDataRawMicroseconds)
-#' tData_afterfirstcleaning <- tradesCleanup(tDataRaw = sampleTDataRaw, exchanges = list("N"))
-#' tData_afterfirstcleaning$report
-#' dim(tData_afterfirstcleaning$tData)
+#' tDataAfterFirstCleaning <- tradesCleanup(tDataRaw = sampleTDataRaw, exchanges = list("N"))
+#' tDataAfterFirstCleaning$report
+#' dim(tDataAfterFirstCleaning$tData)
 #' 
 #' #In case you have more data it is advised to use the on-disk functionality
 #' #via "dataSource" and "dataDestination" arguments
@@ -1997,16 +1997,16 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, 
 #' 
 #' @examples 
 #' # Consider you have raw trade data for 1 stock for 2 days 
-#' tData_afterfirstcleaning <- tradesCleanup(tDataRaw = sampleTDataRawMicroseconds, 
+#' tDataAfterFirstCleaning <- tradesCleanup(tDataRaw = sampleTDataRawMicroseconds, 
 #'                                           exchanges = "N", report = FALSE)
 #' # 
 #' qData <- quotesCleanup(qDataRaw = sampleQDataRawMicroseconds, 
 #'                        exchanges = "N", report = FALSE)
-#' dim(tData_afterfirstcleaning)
-#' tData_afterfinalcleaning <- 
+#' dim(tDataAfterFirstCleaning)
+#' tDataAfterFinalCleaning <- 
 #'   tradesCleanupUsingQuotes(qData = qData[as.Date(DT) == "2018-01-02"],
-#'                            tData = tData_afterfirstcleaning[as.Date(DT) == "2018-01-02"])
-#' dim(tData_afterfinalcleaning)
+#'                            tData = tDataAfterFirstCleaning[as.Date(DT) == "2018-01-02"])
+#' dim(tDataAfterFinalCleaning)
 #' #In case you have more data it is advised to use the on-disk functionality
 #' #via "dataSource" and "dataDestination" arguments
 #' @keywords cleaning
