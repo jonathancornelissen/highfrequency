@@ -1548,7 +1548,7 @@ rmTradeOutliers <- function(tData, qData) {
 #' 
 #' @param tData a data.table or xts object containing the time series data, with at least the column "PRICE", containing the transaction price (ONE DAY ONLY).
 #' @param qData a data.table or xts object containing the time series data with at least the columns "BID" and "OFR", containing the bid and ask prices (ONE DAY ONLY).
-#' @param lagCompensation a numeric of length 1 that denotes how many seconds to lag the quotes. Default is 2 seconds. See Details.
+#' @param lagQuotes a numeric of length 1 that denotes how many seconds to lag the quotes. Default is 2 seconds. See Details.
 #' @details Note: in order to work correctly, the input data of this function should be
 #' cleaned trade (tData) and quote (qData) data respectively.
 #' In older high frequency datasets the trades frequently lag the quotes. In newer datasets this tends to happen 
@@ -1563,9 +1563,9 @@ rmTradeOutliers <- function(tData, qData) {
 #' @keywords cleaning
 #' @importFrom data.table setkey
 #' @export
-rmTradeOutliersUsingQuotes <- function(tData, qData, lagCompensation = 2) {
-  if(length(lagCompensation) != 1){
-    lagCompensation <- lagCompensation[1]
+rmTradeOutliersUsingQuotes <- function(tData, qData, lagQuotes = 2) {
+  if(length(lagQuotes) != 1){
+    lagQuotes <- lagQuotes[1]
   }
   SPREAD = DT = PRICE = BID = OFR = SYMBOL = 0
   tData <- checkColumnNames(tData)
@@ -1598,7 +1598,7 @@ rmTradeOutliersUsingQuotes <- function(tData, qData, lagCompensation = 2) {
     stop("Both data sets should only include data for one day.")
   }
   
-  qData <- qData[, DT := DT + lagCompensation]
+  qData <- qData[, DT := DT + lagQuotes]
   
   setkey(tData, SYMBOL, DT)
   setkey(qData, SYMBOL, DT)
