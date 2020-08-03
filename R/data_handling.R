@@ -217,6 +217,7 @@ aggregateTS <- function (ts, FUN = "previoustick", on = "minutes", k = 1, weight
 #' @importFrom xts last tzone
 #' @export
 aggregatePrice <- function(pData, on = "minutes", k = 1, marketOpen = "09:30:00", marketClose = "16:00:00" , fill = FALSE, tz = NULL) {
+  pData <- checkColumnNames(pData)
   DATE = DT = FIRST_DT = DT_ROUND = LAST_DT = SYMBOL = PRICE = NULL
   
   on_true <- NULL
@@ -276,6 +277,7 @@ aggregatePrice <- function(pData, on = "minutes", k = 1, marketOpen = "09:30:00"
       stop("Input has to be data.table or xts.")
     }
   } else {
+    #pData <- data.table::copy(pData) # copy
     if (!("DT" %in% colnames(pData))) {
       stop("Data.table neeeds DT column (date-time ).")
     }
@@ -290,7 +292,7 @@ aggregatePrice <- function(pData, on = "minutes", k = 1, marketOpen = "09:30:00"
     tz <- timeZone
   }
   
-  pData[,DT := as.numeric(DT, tz = timeZone)]
+  pData <- pData[, DT := as.numeric(DT, tz = timeZone)]
   
   marketOpenNumeric <- as.numeric(as.POSIXct(paste("1970-01-01", marketOpen), format = "%Y-%m-%d %H:%M:%OS", tz = timeZone), tz = timeZone)
   marketCloseNumeric <- as.numeric(as.POSIXct(paste("1970-01-01", marketClose), format = "%Y-%m-%d %H:%M:%OS", tz = timeZone), tz = timeZone)
@@ -537,6 +539,7 @@ aggregateQuotes <- function(qData, on = "minutes", k = 5, marketOpen = "09:30:00
       stop("Input has to be data.table or xts.")
     }
   } else {
+    
     if (("DT" %in% colnames(qData)) == FALSE) {
       stop("Data.table neeeds DT column.")
     }
