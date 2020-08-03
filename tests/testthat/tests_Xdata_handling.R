@@ -54,12 +54,12 @@ test_that("selectExchange and data cleaning functions", {
   
   expect_equal(
     dim(mergeQuotesSameTimestamp(selectExchange(sampleQDataRaw, "N"), selection = "max.volume")),
-    c(7707, 5)
+    c(7707, 7)
   )
   
   expect_equal(
     dim(mergeQuotesSameTimestamp(selectExchange(sampleQDataRaw, "N"), selection = "weighted.average")),
-    c(7707, 5)
+    c(7707, 7)
   )
   
   expect_equal(

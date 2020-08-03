@@ -8,7 +8,8 @@ tradesCleanupUsingQuotes(
   dataSource = NULL,
   dataDestination = NULL,
   tData = NULL,
-  qData = NULL
+  qData = NULL,
+  lagQuotes = 2
 )
 }
 \arguments{
@@ -21,6 +22,8 @@ from, to, dataSource and dataDestination will be ignored. (only advisable for sm
 
 \item{qData}{data.table or xts object containing (ONE day and for ONE stock only) cleaned quote data. This argument is NULL by default. Enabling it means the arguments
 from, to, dataSource, dataDestination will be ignored. (only advisable for small chunks of data)}
+
+\item{lagQuotes}{passed through to rmTradeOutliersUsingQuotes. \code{\link{rmTradeOutliersUsingQuotes}}}
 }
 \value{
 For each day an xts object is saved into the folder of that date, containing the cleaned data.
