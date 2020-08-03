@@ -217,7 +217,6 @@ aggregateTS <- function (ts, FUN = "previoustick", on = "minutes", k = 1, weight
 #' @importFrom xts last tzone
 #' @export
 aggregatePrice <- function(pData, on = "minutes", k = 1, marketOpen = "09:30:00", marketClose = "16:00:00" , fill = FALSE, tz = NULL) {
-  pData <- data.table::copy(pData) # copy
   DATE = DT = FIRST_DT = DT_ROUND = LAST_DT = SYMBOL = PRICE = NULL
   
   on_true <- NULL
