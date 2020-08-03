@@ -1434,8 +1434,9 @@ quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, 
     dummy_was_xts <- FALSE
     if (is.data.table(qDataRaw) == FALSE) {
       if (is.xts(qDataRaw) == TRUE) {
-        qDataRaw <- setnames(as.data.table(qDataRaw)[, BID := as.numeric(as.character(BID))][, OFR := as.numeric(as.character(OFR))]
-                             [, BIDSIZ := as.numeric(as.character(BIDSIZ))][, OFRSIZ := as.numeric(as.character(OFRSIZ))], old = "index", new = "DT")
+        qDataRaw <- as.data.table(qDataRaw)
+        qDataRaw[, `:=`(BID = as.numeric(as.character(BID)), OFR = as.numeric(as.character(OFR)), BIDSIZ = as.numeric(as.character(BIDSIZ)), OFRSIZ = as.numeric(as.character(OFRSIZ)))]
+        setnames(qDataRaw, old = "index", new = "DT")
         dummy_was_xts <- TRUE
       } else {
         stop("Input has to be data.table or xts.")
@@ -1451,7 +1452,7 @@ quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, 
     nresult[2] <- dim(qDataRaw)[1] 
     qDataRaw <- qDataRaw[EX %in% exchanges]
     nresult[3] <- dim(qDataRaw)[1] 
-    qDataRaw <- qDataRaw[OFR > BID][, SPREAD := OFR - BID][, DATE := as.Date(DT)][, SPREAD_MEDIAN := median(SPREAD), by = "DATE"]
+    qDataRaw[OFR > BID, `:=`(SPREAD = OFR - BID, DATE = as.Date(DT))][, SPREAD_MEDIAN := median(SPREAD), by = "DATE"]
     nresult[4] <- dim(qDataRaw)[1] 
     qDataRaw <- qDataRaw[SPREAD < (SPREAD_MEDIAN * maxi)]
     nresult[5] <- dim(qDataRaw)[1]
@@ -1460,13 +1461,13 @@ quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, 
     
     qDataRaw <- rmOutliersQuotes(qDataRaw, window = window, type = type, maxi = rmoutliersmaxi)
     nresult[7] <- dim(qDataRaw)[1]
-    if (dummy_was_xts == TRUE) {
+    if (dummy_was_xts) {
       df_result <- xts(as.matrix(qDataRaw[, -c("DT",  "DATE")]), order.by = qDataRaw$DT)
     } else {
       df_result <- qDataRaw[, -c( "DATE")]
     }
     
-    if (report == TRUE) {
+    if (report) {
       return(list(qData = df_result, report = nresult))
     } else {
       return(df_result)
