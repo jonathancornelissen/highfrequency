@@ -49,7 +49,7 @@ Please note: Returned objects always contain the first observation (i.e. opening
 \examples{
 # aggregate quote data to the 30 second frequency
 qDataAggregated <- aggregateQuotes(sampleQData, on = "seconds", k = 30)
-head(qData_aggregated)
+head(qDataAggregated)
 }
 \author{
 Jonathan Cornelissen, Kris Boudt and Onno Kleen
