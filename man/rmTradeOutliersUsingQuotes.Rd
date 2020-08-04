@@ -7,9 +7,9 @@
 rmTradeOutliersUsingQuotes(tData, qData, lagQuotes = 2)
 }
 \arguments{
-\item{tData}{a data.table or xts object containing the time series data, with at least the column "PRICE", containing the transaction price (ONE DAY ONLY).}
+\item{tData}{a data.table or xts object containing the time series data, with at least the column "PRICE", containing the transaction price.}
 
-\item{qData}{a data.table or xts object containing the time series data with at least the columns "BID" and "OFR", containing the bid and ask prices (ONE DAY ONLY).}
+\item{qData}{a data.table or xts object containing the time series data with at least the columns "BID" and "OFR", containing the bid and ask prices.}
 
 \item{lagQuotes}{a numeric of length 1 that denotes how many seconds to lag the quotes. Default is 2 seconds. See Details.}
 }

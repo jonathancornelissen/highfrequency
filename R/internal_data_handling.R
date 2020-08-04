@@ -8,41 +8,60 @@
 #' @importFrom xts xtsAttributes
 #' @keywords internal
 checkColumnNames <- function(data) { 
-  # FUNCTION sets column names according to RTAQ format using quantmod conventions, such that all the other functions find the correct information.
+  # FUNCTION sets column names according to RTAQ format using quantmod conventions, 
+  # such that all the other functions find the correct information.
   # First step: assign the xts attributes:
-  data <- set.AllColumns(data)
   
+  
+  if(is.xts(data)){
+    data <- set.AllColumns(data)
+    # Change column names to previous RTAQ format! 
+    # Adjust price col naming:  
+    try((colnames(data)[xtsAttributes(data)[['Price']]] = 'PRICE'), silent = TRUE)
+    # Adjust Bid col naming:    
+    try((colnames(data)[xtsAttributes(data)[['Bid']]] = 'BID'))  
+    # Adjust Ask col naming:    
+    try((colnames(data)[xtsAttributes(data)[['Ask']]] = 'OFR'))
+    # Adjust SYMBOL col naming:    
+    try((colnames(data)[xtsAttributes(data)[['SYM_ROOT']]] = 'SYMBOL'))
+    # Adjust Ask size col naming:
+    try((colnames(data)[xtsAttributes(data)[['BidSize']]] = 'BIDSIZ'))
+    # Adjust Bid size col naming:    
+    try((colnames(data)[xtsAttributes(data)[['AskSize']]] = 'OFRSIZ'))
+    # Adjust correction column, if necessary:
+    if (any(colnames(data) == "CR")) {
+      colnames(data)[colnames(data) == "CR"] <- "CORR"
+    }
+    
+  }
+  
+  if(is.data.table(data)){
+    
   # Change column names to previous RTAQ format! 
   # Adjust price col naming:  
-  try((colnames(data)[xtsAttributes(data)[['Price']]] = 'PRICE'), silent = TRUE)
   try(setnames(data, "Price", "PRICE", skip_absent = TRUE), silent = TRUE)
+  
   # Adjust Bid col naming:    
-  try((colnames(data)[xtsAttributes(data)[['Bid']]] = 'BID'))
   try(setnames(data, "Bid", "BID", skip_absent = TRUE), silent = TRUE)
   # Adjust Ask col naming:    
-  try((colnames(data)[xtsAttributes(data)[['Ask']]] = 'OFR'))
   try(setnames(data, "Ask", "OFR", skip_absent = TRUE), silent = TRUE)
+  try(setnames(data, "ASK", "OFR", skip_absent = TRUE), silent = TRUE)
   # Adjust SYMBOL col naming:    
-  try((colnames(data)[xtsAttributes(data)[['SYM_ROOT']]] = 'SYMBOL'))
   try(setnames(data, "SYM_ROOT", "SYMBOL", skip_absent = TRUE), silent = TRUE)
   
   # Adjust Ask size col naming:
-  try((colnames(data)[xtsAttributes(data)[['BidSize']]] = 'BIDSIZ'))
   try(setnames(data, "BidSize", "BIDSIZ", skip_absent = TRUE), silent = TRUE)
   
   # Adjust Bid size col naming:    
-  try((colnames(data)[xtsAttributes(data)[['AskSize']]] = 'OFRSIZ'))
   try(setnames(data, "AskSize", "OFRSIZ", skip_absent = TRUE), silent = TRUE)
+  # Adjust Bid size col naming:    
   try(setnames(data, "ASKSIZ", "OFRSIZ", skip_absent = TRUE), silent = TRUE)
   
   
   try(setnames(data, "TR_SCOND", "COND", skip_absent = TRUE), silent = TRUE)
-  
-  
-  # Adjust correction column, if necessary:
-  if (any(colnames(data) == "CR")) {
-    colnames(data)[colnames(data) == "CR"] <- "CORR"
+  try(setnames(data, "CR", "CORR", skip_absent = TRUE), silent = TRUE)  
   }
+  
   
   return(data)
 } 

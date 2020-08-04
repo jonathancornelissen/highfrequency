@@ -7,6 +7,14 @@ Changes in version 0.7.0
  - Implement new features in spotVol. Now the local volatility can be estimated with realized measures, they can also be used with pre-averaged realized measures.
  - Implement a wrapper around quantmod's getSymbols.av function
  - harModel now includes Newey-West standard errors in the output.
+ - Bugfix for refreshTime function and large performance improvement
+ - Implement CholCov estimator in rCholCov
+ - Bugfixes in data handling functions, which sometimes produced different results depending on the options(digits.secs) setting. Most data handling functions now run considerably faster as a concequence of internally using numerics for timestamps.
+ - Implemented new realized semi-covariance estimator in rSemiCov
+ - Implemented new lead-lag estimation in leadLag
+ - Implemented ReMeDI estimation in ReMeDI
+ - More transparantly handle the lagging of quotes when matching these with trades, now the user has control of this.
+ - rmTradeOutliersUsingQuotes now supports input that is
 
 Changes in version 0.6.5
  - bug fix for kernelCov if cor = TRUE

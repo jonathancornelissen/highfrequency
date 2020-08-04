@@ -19,7 +19,7 @@ driftKernel <- function(data, intraday, options) {
   mu[1]          <- 0
   vpreAveraged[(k*2-1):(iT-1)] <- filter(x = as.numeric(datap), c(rep(1,k),rep(-1,k)))[k:(iT-k)]
   vpreAveraged <- c(0, vpreAveraged)
-  time <- as.numeric(data$DT)
+  time <- as.numeric(data$DT, origin = "1970-01-01")
   # time <- time - as.numeric(data$DT)[1]
   #estimtimes <- intraday #c(34200, as.numeric(intraday) * 86400)
 

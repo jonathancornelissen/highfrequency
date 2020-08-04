@@ -44,7 +44,7 @@ test_that("selectExchange and data cleaning functions", {
   
   expect_equal(
     dim(rmTradeOutliersUsingQuotes(selectExchange(sampleTDataRaw, "W"), selectExchange(sampleQDataRaw, "W"))),
-    c(203, 8)
+    c(203, 13)
   )
   
   expect_equal(
@@ -70,12 +70,12 @@ test_that("selectExchange and data cleaning functions", {
   
   expect_equal(
   dim(tradesCleanupUsingQuotes(tData = sampleTData, qData = sampleQData)),
-  c(8153, 8)
+  c(8153, 13)
   )
   
   expect_equal(
   dim(tradesCleanup(tDataRaw = sampleTDataRaw, exchanges = "N", report = FALSE)),
-  c(9104, 3)
+  c(9104, 7)
   )
 })
 
@@ -118,10 +118,26 @@ test_that("tradesCleanup on-disk functionality", {
   
   expect_equal(expected2[as.Date(DT) == "2018-01-02",], cleanedTrades2Day1)
   expect_equal(expected2[as.Date(DT) == "2018-01-03",], cleanedTrades2Day2)
-
   
 
 })
+
+# test_that("sampleTData matches cleaned sampleTDataRaw", {
+#   
+#   cleaned <- tradesCleanup(tDataRaw = sampleTDataRaw, exchanges = "N", report = FALSE)  
+#   
+#   
+#   cleaned <- tradesCleanupUsingQuotes(tData = tradesCleanup(tDataRaw = sampleTDataRaw, exchanges = "N", report = FALSE),
+#                                       qData = quotesCleanup(qDataRaw = sampleQDataRaw, exchanges = "N", type = "advanced", report = FALSE))
+#   
+#   
+#   cleaned <- cleaned$PRICE
+#   old <- sampleTData$PRICE
+#   storage.mode(cleaned) <- storage.mode(old) <- "numeric"
+#   plot(cleaned, lwd = 1)
+#   plot(na.locf(cbind(cleaned, old)), col = 2:1)
+#   lines(old, col = "red", lwd = 1)
+# })
 
 
 
