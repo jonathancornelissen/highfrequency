@@ -22,7 +22,7 @@ cleanedQuotes <- quotesCleanup(qDataRaw = sampleQDataRaw, exchanges = "N", type 
 sampleTData <- tradesCleanupUsingQuotes(tData = tradesAfterFirstCleaning,
                                         qData = cleanedQuotes, lagQuotes = 2)
 sampleTData <- sampleTData[,c("SYMBOL", "EX",  "PRICE", "SIZE", "COND", "CORR", "G127")]
-# Only some columns are included. These are the ones that were historically included.
+# These are the historically included columns.
 }
 
 }

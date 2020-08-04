@@ -99,7 +99,10 @@
 #' @examples
 #' \dontrun{
 #' #The code to create sampleQData from raw data is 
-#' sampleQData <- quotesCleanup(qDataRaw = sampleQDataRaw, exchanges = "N", type = "standard", report = FALSE) 
+#' sampleQData <- quotesCleanup(
+#' qDataRaw = sampleQDataRaw, exchanges = "N", type = "standard", 
+#' report = FALSE)[, c("SYMBOL", "BID", "BIDSIZ", "OFR", "OFRSIZ", "MODE")]
+#' # These are the historically included columns.
 #' }
 #' 
 #' @format xts object
@@ -159,7 +162,7 @@
 #' sampleTData <- tradesCleanupUsingQuotes(tData = tradesAfterFirstCleaning,
 #'                                         qData = cleanedQuotes, lagQuotes = 2)
 #' sampleTData <- sampleTData[,c("SYMBOL", "EX",  "PRICE", "SIZE", "COND", "CORR", "G127")]
-#' # Only some columns are included. These are the ones that were historically included.
+#' # These are the historically included columns.
 #' }
 #' 
 #' @docType data

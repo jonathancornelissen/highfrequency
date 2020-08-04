@@ -17,7 +17,10 @@ This is the cleaned version of the data sample \code{\link{sampleQDataRaw}}, usi
 \examples{
 \dontrun{
 #The code to create sampleQData from raw data is 
-sampleQData <- quotesCleanup(qDataRaw = sampleQDataRaw, exchanges = "N", type = "standard", report = FALSE) 
+sampleQData <- quotesCleanup(
+qDataRaw = sampleQDataRaw, exchanges = "N", type = "standard", 
+report = FALSE)[, c("SYMBOL", "BID", "BIDSIZ", "OFR", "OFRSIZ", "MODE")]
+# These are the historically included columns.
 }
 
 }

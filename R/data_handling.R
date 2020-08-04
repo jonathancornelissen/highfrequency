@@ -1797,7 +1797,7 @@ rmOutliersQuotes <- function (qData, maxi = 10, window = 50, type = "advanced") 
   }
   
   if (length(unique(qData$SYMBOL)) > 1) {
-    stop("Please provide only one symbol at a time.")
+    stop("Please provide only one symbol at a time.") # This may actually not be needed!
   }
   
   if ((type %in% c("standard", "advanced")) == FALSE) {
