@@ -2601,8 +2601,8 @@ ReMeDI <- function(pData, kn = 1, lags = 1, correctTime = FALSE, jumpsIndex = NU
 #' @param knMax max value of kn to be considered
 #' @param tol tolerance for the minimizing value. If tol is high, the algorithm will choose a lower optimal value.
 #' @param size size of the local window
-#' @param lower lower boundary for the method if it fails to find an optimal value. If this is the case, the kn between lower and upper that is best is returned 
-#' @param upper upper boundary for the method if it fails to find an optimal value. If this is the case, the kn between lower and upper that is best is returned
+#' @param lower lower boundary for the method if it fails to find an optimal value. If this is the case, the best kn between lower and upper is returned
+#' @param upper upper boundary for the method if it fails to find an optimal value. If this is the case, the best kn between lower and upper is returned
 #' @param plot logical whether to plot the errors.
 #' @details This is the algorithm B.2 in the appendix of the Li and Linton (2019) working paper
 #' 

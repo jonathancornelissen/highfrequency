@@ -30,9 +30,9 @@ knChooseReMeDI(
 
 \item{size}{size of the local window}
 
-\item{lower}{lower boundary for the method if it fails to find an optimal value. If this is the case, the kn between lower and upper that is best is returned}
+\item{lower}{lower boundary for the method if it fails to find an optimal value. If this is the case, the best kn between lower and upper is returned}
 
-\item{upper}{upper boundary for the method if it fails to find an optimal value. If this is the case, the kn between lower and upper that is best is returned}
+\item{upper}{upper boundary for the method if it fails to find an optimal value. If this is the case, the best kn between lower and upper is returned}
 
 \item{plot}{logical whether to plot the errors.}
 }
