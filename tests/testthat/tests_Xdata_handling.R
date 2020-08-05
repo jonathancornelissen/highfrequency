@@ -79,8 +79,34 @@ test_that("selectExchange and data cleaning functions", {
   )
 })
 
-
 context("tradesCleanup")
+
+test_that("tradesCleanup gives same data as the shipped data", {
+  rawTrades <- sampleTDataRaw
+  rawQuotes <- sampleQDataRaw
+  
+  cleanedTrades <- tradesCleanupUsingQuotes(
+    tData = tradesCleanup(tDataRaw = rawTrades, 
+                          exchanges = "N", report = FALSE),
+    qData = quotesCleanup(qDataRaw = rawQuotes,
+                          exchanges = "N", type = "standard", report = FALSE),
+    lagQuotes = 2)[,c("SYMBOL", "EX",  "PRICE", "SIZE", "COND", "CORR", "G127")]
+  expect_equal(cleanedTrades, sampleTData)
+  
+  
+  
+  cleanedMicroseconds <-
+    tradesCleanupUsingQuotes(
+      tData = tradesCleanup(tDataRaw = sampleTDataRawMicroseconds, exchanges = "N", report = FALSE),
+      qData = quotesCleanup(qDataRaw = sampleQDataRawMicroseconds, exchanges = "N", type = "standard", report = FALSE),
+      lagQuotes = 0
+    )[, c("DT", "SYMBOL", "PRICE", "SIZE")]
+  
+  expect_equal(cleanedMicroseconds, sampleTDataMicroseconds)
+  
+  
+})
+
 test_that("tradesCleanup on-disk functionality", {
   skip_on_cran()
   library(data.table)
@@ -137,7 +163,12 @@ test_that("tradesCleanup on-disk functionality", {
   setkey(onDiskDay2, SYMBOL, DT)
   expect_equal(onDiskDay1, sampleTDataMicrosecondsDay1)
   expect_equal(onDiskDay2, sampleTDataMicrosecondsDay2)
+  ## Test that they are equal to the shipped data
+  expect_equal(sampleTDataMicroseconds, rbind(sampleTDataMicrosecondsDay1, sampleTDataMicrosecondsDay2)) 
+  
 })
+
+
 
 # test_that("sampleTData matches cleaned sampleTDataRaw", {
 #   
