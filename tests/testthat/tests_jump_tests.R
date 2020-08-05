@@ -5,7 +5,7 @@ context("AJjumpTest unit test")
 test_that("AJjumpTest unit test",{
   expect_equal(
     formatC(AJjumpTest(sampleTData$PRICE, p = 2, k = 3, alignBy = "seconds", alignPeriod = 5, makeReturns = TRUE)$ztest, digits = 10),
-    "-2.903324467"
+    "-2.960506691"
   )
 })
 

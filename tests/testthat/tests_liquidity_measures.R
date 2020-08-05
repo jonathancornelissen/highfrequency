@@ -7,7 +7,7 @@ expect_equal(
     directions <- getTradeDirection(tqdata)
     sum(directions)
   },
-  -833
+  -850
 )})
 context("matchTradesQuotes & getTradeDirection quotes")
 test_that("matchTradesQuotes & getTradeDirection quotes", {
@@ -16,7 +16,7 @@ test_that("matchTradesQuotes & getTradeDirection quotes", {
   sum(directions)
 expect_equal(
   sum(directions), 
-  -754
+  -753
 )})
 # 
 # expect_equal(

@@ -9,7 +9,7 @@ test_that("spotDrift",{
     storage.mode(price) <- "numeric"
     kerneldrift <- spotDrift(price, method = "driftKernel", on = "minutes", k = 1)
     formatC(kerneldrift$mu[1:6], digits = 5)},
-    c("-0.070876", "-0.1145", "-0.072902", "0.020546", "0.078481", "0.089241")
+    c("-0.070876", "-0.11462", "-0.073003", "0.020463", "0.078413", "0.089185")
   )
   
   dat <- data.table::copy(sampleTDataMicroseconds)

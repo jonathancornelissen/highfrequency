@@ -125,7 +125,7 @@ context("rRTSCov")
 test_that("rRTSCov", {
   expect_equal(
     formatC(rRTSCov(pData = sampleTData$PRICE) * 10000, digits = 5),
-    "3.5276"
+    "3.5409"
   )
   expect_equal(
     formatC(sum(rRTSCov(pData = list(cumsum(lltc) + 100, cumsum(sbux) + 100))) * 1000000, digits = 5),
@@ -187,7 +187,7 @@ context("rTSCov")
 test_that("rTSCov", {
   expect_equal(
     formatC(rTSCov(pData = sampleTData$PRICE), digits = 5),
-    "0.00052769"
+    "0.00052696"
   )
 })
 # rTSCov multivariate
@@ -203,7 +203,7 @@ context("RV")
 test_that("RV", {
   expect_equal(
     formatC(RV(makeReturns(sampleTData$PRICE)), digits = 5),
-    "0.00064381"
+    "0.00064518"
   )
 })
 
@@ -230,7 +230,7 @@ context("ivInference")
 test_that("ivInference", {
   expect_equal(
     formatC(ivInference(sampleTData$PRICE, IVestimator= "minRV", IQestimator = "medRQ", confidence = 0.95, makeReturns = TRUE)$cb * 10000, digits = 5),
-    c("4.7594", "5.7472")
+    c("4.7938", "5.7822")
   )
 })
 
@@ -357,18 +357,19 @@ context("ReMeDI")
 test_that("ReMeDI", {
   print("Make sure to implement tests for correctTime = TRUE")
   remed <- ReMeDI(sampleTDataMicroseconds, correctTime = FALSE, lags = 0:25, kn = 2)
-  expected <- c(-3.593647e-05, 7.133251e-05, 3.357673e-05,6.837046e-05, 6.843234e-05, -3.911304e-05, -6.023102e-05, -5.886964e-05, -1.736964e-04,
-              -1.801960e-04, -1.214563e-04, -1.403775e-04, -4.730198e-05, 2.747318e-05, 4.187706e-05, 9.465140e-05, 8.263201e-05, 3.929043e-05,
-              9.014026e-06, -4.593234e-05, -5.731229e-05, -2.038366e-05, -3.419761e-05, 5.367162e-06, 1.314831e-04, 2.025495e-04)
+  expected <- c(-2.66218e-05, 7.38816e-05, 2.96756e-05, 7.41375e-05, 8.37818e-05, -2.75132e-05, -5.82783e-05, -6.68703e-05, -1.70089e-04,
+                -1.73686e-04, -1.14679e-04, -1.33920e-04, -6.44437e-05, 6.57602e-06, 2.64237e-05, 7.67724e-05, 8.39634e-05, 5.12545e-05,
+                4.86547e-06, -4.60135e-05, -4.63127e-05, -2.73605e-06, -4.31042e-06, 4.12182e-05, 1.34246e-04, 1.82589e-04)
+  
   expect_equal(remed, expected)
   
   # Different data-set
   dat <- sampleTData$PRICE
   storage.mode(dat) <- "numeric"
   remed <- ReMeDI(dat, correctTime = FALSE, jumpsIndex = NULL, lags = 0:25, kn = 4)
-  expected <- c(1.727738e-04, -4.413651e-04, -6.576720e-04, -8.805869e-04, -8.963142e-04, -9.340979e-04, -8.683123e-04, -8.788084e-04, -7.723047e-04,
-                -5.868239e-04, -3.945358e-04, -1.922053e-04, -2.168711e-04, -1.448455e-04, -1.701368e-04, -2.254692e-05, 4.851588e-05, 9.959524e-06, 
-                -7.839752e-05, -2.061327e-04, -1.161842e-04, -3.656323e-05, 2.000889e-04, 2.520453e-04, 2.141604e-04, 1.082608e-04)
+  expected <- c(1.86978e-04, -4.31953e-04, -6.52901e-04, -8.80298e-04, -9.02409e-04, -9.37731e-04, -8.64216e-04, -8.68524e-04, -7.54001e-04,
+                -5.65765e-04, -4.09569e-04, -1.95228e-04, -2.05796e-04, -1.55349e-04, -1.24973e-04, -1.68317e-05, 3.43256e-05, 3.60085e-05,
+                -3.09326e-05, -1.54228e-04, -6.38609e-05, -6.48542e-06, 1.67251e-04, 2.73141e-04, 2.72673e-04, 1.25878e-04)
   
   
   expect_equal(remed, expected)
