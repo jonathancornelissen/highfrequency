@@ -100,8 +100,8 @@ test_that("tradesCleanup gives same data as the shipped data", {
       qData = quotesCleanup(qDataRaw = sampleQDataRawMicroseconds, exchanges = "N", type = "standard", report = FALSE),
       lagQuotes = 0
     )[, c("DT", "SYMBOL", "PRICE", "SIZE")]
-  setkey(cleanedMicroseconds, SYMBOL, DT)
   
+  setkey(cleanedMicroseconds, SYMBOL, DT)
   expect_equal(cleanedMicroseconds, sampleTDataMicroseconds)
   
   
