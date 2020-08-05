@@ -1394,7 +1394,7 @@ noZeroQuotes <- function(qData) {
 #' @param type argument to be passed on to the cleaning routine \code{\link{rmOutliersQuotes}}.
 #' @param rmoutliersmaxi argument to be passed on to the cleaning routine \code{\link{rmOutliersQuotes}}.
 #' @param saveAsXTS indicates whether data should be saved in xts format instead of data.table when using on-disk functionality. TRUE by default.
-#' 
+#' @param tz timezone to use
 #' @return The function converts every csv file in dataSource into multiple xts or data.table files.
 #' In dataDestination, there will be one folder for each symbol containing .rds files with cleaned data stored either in data.table or xts format.
 #' 
@@ -1422,7 +1422,7 @@ noZeroQuotes <- function(qData) {
 #' @keywords cleaning
 #' @export
 quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, qDataRaw = NULL, report = TRUE, 
-                          selection = "median", maxi = 50, window = 50, type = "advanced", rmoutliersmaxi = 10, saveAsXTS = TRUE) {
+                          selection = "median", maxi = 50, window = 50, type = "advanced", rmoutliersmaxi = 10, saveAsXTS = TRUE, tz = "EST") {
   
   BID <- OFR <- DT <- SPREAD <- SPREAD_MEDIAN <- EX <- DATE <- BIDSIZ <- OFRSIZ <- TIME_M <- SYMBOL <- NULL
   nresult <- c(initial_number = 0,
@@ -1440,11 +1440,11 @@ quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, 
     for (ii in quotesfiles) {
       readdata <- try(fread(paste0(dataSource, "/", ii)), silent = TRUE)
       if(colnames(readdata)[1] == "index"){ # The data was saved from an xts object
-        readdata <- try(readdata[, DT := as.POSIXct(index, tz = "EST", format = "%Y-%m-%dT%H:%M:%OS")])
+        readdata <- try(readdata[, DT := as.POSIXct(index, tz = tz, format = "%Y-%m-%dT%H:%M:%OS")])
       } else if ("DT" %in% colnames(readdata)){
-        readdata <- try(readdata[, DT := as.POSIXct(DT, tz = "EST", format = "%Y-%m-%dT%H:%M:%OS")])
+        readdata <- try(readdata[, DT := as.POSIXct(DT, tz = tz, format = "%Y-%m-%dT%H:%M:%OS")])
       } else {
-        readdata <- try(readdata[, DT := as.POSIXct(substring(paste(as.character(DATE), TIME_M, sep = " "), 1, 20), tz = "EST", format = "%Y%m%d %H:%M:%OS")], silent = TRUE)
+        readdata <- try(readdata[, DT := as.POSIXct(substring(paste(as.character(DATE), TIME_M, sep = " "), 1, 20), tz = tz, format = "%Y%m%d %H:%M:%OS")], silent = TRUE)
       }
       
       qData <- try(quotesCleanup(qDataRaw = readdata,
@@ -1465,7 +1465,7 @@ quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, 
         } else {
           df_result <- jj[, -c( "DATE")]
         }
-        saveRDS(df_result, paste0(dataDestination, "/", strsplit(ii, "/")[[1]][1], "/", unique(as.Date(jj$DT, tz = "EST")), "quotes.rds"))
+        saveRDS(df_result, paste0(dataDestination, "/", strsplit(ii, "/")[[1]][1], "/", unique(as.Date(jj$DT, tz = tz)), "quotes.rds"))
         # saveRDS(df_result, paste0(dataDestination, "/", strsplit(ii, "/")[[1]][1], "/", strsplit(strsplit(ii, "/")[[1]][2], ".zip")[1], ".rds"))
       }
     }
@@ -1962,7 +1962,7 @@ selectExchange <- function(data, exch = "N") {
 #' @param report boolean and TRUE by default. In case it is true the function returns (also) a vector indicating how many trades remained after each cleaning step.
 #' @param selection argument to be passed on to the cleaning routine \code{\link{mergeTradesSameTimestamp}}. The default is "median".
 #' @param saveAsXTS indicates whether data should be saved in xts format instead of data.table when using on-disk functionality. TRUE by default.
-#' 
+#' @param tz timezone to use
 #' @return For each day an xts or data.table object is saved into the folder of that date, containing the cleaned data.
 #' This procedure is performed for each stock in "ticker".
 #' The function returns a vector indicating how many trades remained after each cleaning step.
@@ -1989,8 +1989,8 @@ selectExchange <- function(data, exch = "N") {
 #' @importFrom data.table fread
 #' @keywords cleaning
 #' @export
-tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, tDataRaw = NULL, report = TRUE, selection = "median", saveAsXTS = TRUE) {
-  G127 <- SIZE <- CORR <- SYMBOL <- PRICE <- EX <- COND <- DT <- DATE <- TIME_M <- NULL
+tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, tDataRaw = NULL, report = TRUE, selection = "median", saveAsXTS = TRUE, tz = "EST") {
+  SIZE <- SYMBOL <- PRICE <- EX <- COND <- DT <- DATE <- TIME_M <- NULL
   
   if (is.null(tDataRaw) == TRUE) {
     try(dir.create(dataDestination), silent = TRUE)
@@ -1998,16 +1998,16 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, 
     for (ii in tradesfiles) {
       readdata <- try(fread(paste0(dataSource, "/", ii)), silent = TRUE)
       if(colnames(readdata)[1] == "index"){ # The data was saved from an xts object
-        readdata <- try(readdata[, DT := as.POSIXct(index, tz = "EST", format = "%Y-%m-%dT%H:%M:%OS")])
+        readdata <- try(readdata[, DT := as.POSIXct(index, tz = tz, format = "%Y-%m-%dT%H:%M:%OS")])
       } else if ("DT" %in% colnames(readdata)){
-        readdata <- try(readdata[, DT := as.POSIXct(DT, tz = "EST", format = "%Y-%m-%dT%H:%M:%OS")])
+        readdata <- try(readdata[, DT := as.POSIXct(DT, tz = tz, format = "%Y-%m-%dT%H:%M:%OS")])
       } else {
-        readdata <- try(readdata[, DT := as.POSIXct(substring(paste(as.character(DATE), TIME_M, sep = " "), 1, 20), tz = "EST", format = "%Y%m%d %H:%M:%OS")], silent = TRUE)
+        readdata <- try(readdata[, DT := as.POSIXct(substring(paste(as.character(DATE), TIME_M, sep = " "), 1, 20), tz = tz, format = "%Y%m%d %H:%M:%OS")], silent = TRUE)
       }
       tData <- try(tradesCleanup(tDataRaw = readdata,
                                  selection = selection,
                                  exchanges = exchanges))$tData
-      tData <- tData[, DATE := as.Date(DT, tz = "EST")]
+      tData <- tData[, DATE := as.Date(DT, tz = tz)]
       tData <- split(tData, by = "DATE")
       
       try(dir.create(paste0(dataDestination, "/", strsplit(ii, "/")[[1]][1])), silent = TRUE)
@@ -2017,7 +2017,7 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, 
         } else {
           df_result <- jj[, -c( "DATE")]
         }
-        saveRDS(df_result, paste0(dataDestination, "/", strsplit(ii, "/")[[1]][1], "/", unique(as.Date(jj$DT, tz = "EST")), ".rds"))
+        saveRDS(df_result, paste0(dataDestination, "/", strsplit(ii, "/")[[1]][1], "/", unique(as.Date(jj$DT, tz = tz)), ".rds"))
         # saveRDS(df_result, paste0(dataDestination, "/", strsplit(ii, "/")[[1]][1], "/", strsplit(strsplit(ii, "/")[[1]][2], ".zip")[1], ".rds"))
       }
     }
@@ -2104,8 +2104,11 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, 
 #' 
 #' @return For each day an xts object is saved into the folder of that date, containing the cleaned data.
 #' 
+#' @details 
 #' In case you supply the arguments "tData" and "qData", the on-disk functionality is ignored
 #' and the function returns cleaned trades as a data.table or xts object (see examples).
+#' 
+#' When using the on-disk functionality and tradeDataSource and quoteDataSource are the same, the quote files are all files in the folder that contains 'quote', and the rest are treated as containing trade data.
 #' 
 #' @references Barndorff-Nielsen, O. E., P. R. Hansen, A. Lunde, and N. Shephard (2009). Realized kernels in practice: Trades and quotes. Econometrics Journal 12, C1-C32.
 #' 
@@ -2129,10 +2132,10 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, 
 #' #via "dataSource" and "dataDestination" arguments
 #' @keywords cleaning
 #' @export
-tradesCleanupUsingQuotes <- function(dataSource = NULL, dataDestination = NULL, tData = NULL, qData = NULL, lagQuotes = 2) {
+tradesCleanupUsingQuotes <- function(tradeDataSource = NULL, quoteDataSource = NULL, dataDestination = NULL, tData = NULL, qData = NULL, lagQuotes = 2) {
   
   if (is.null(dataDestination) == TRUE) {
-    dataDestination <- dataSource
+    dataDestination <- tradeDataSource
   }
   
   if ((!is.null(tData)) & (!is.null(qData))) {
@@ -2143,16 +2146,67 @@ tradesCleanupUsingQuotes <- function(dataSource = NULL, dataDestination = NULL, 
     tData <- rmTradeOutliersUsingQuotes(tData, qData, lagQuotes = lagQuotes)
     return(tData)
   } else {
-    ticker <- list.files(dataSource)
-    for (ii in ticker) {
-      filesforticker <- list.files(paste0(dataSource, "/", ii, "/"))
-      for (jj in filesforticker[!grepl("quotes", filesforticker)]) {
-        tData <- try(readRDS(paste0(dataSource, "/", ii, "/", jj)))
-        qData <- try(readRDS(paste0(dataSource, "/", ii, "/", substring(jj, 1, 10), "quotes.rds")))
-        tData <- checkColumnNames(tData)
-        qData <- checkColumnNames(qData)
-        saveRDS(rmTradeOutliersUsingQuotes(tData, qData), paste0(dataDestination, "/", ii, "/", substring(jj, 1, 10), "tradescleanedbyquotes.rds"))
-      }
+    
+    if(tradeDataSource == quoteDataSource){
+      tradeFiles <- list.files(tradeDataSource, recursive = TRUE, full.names = TRUE)
+      quoteFiles <- tradeFiles[grepl("quote", tradeFiles)] # quoteFiles is defined as the files with quote in them
+      tradeFiles <- tradeFiles[!grepl("quote", tradeFiles)]
+    } else {
+      tradeFiles <- list.files(tradeDataSource, recursive = TRUE, full.names = TRUE)
+      quoteFiles <- list.files(quoteDataSource, recursive = TRUE, full.names = TRUE)
     }
+    
+    if(length(quoteFiles) != length(tradeFiles)){
+      stop("The number of files in tradeDataSource must be the same as quoteDataSource")
+    }
+    
+    if(!file.exists(dataDestination)){
+      dir.create(dataDestination)
+    }
+    
+    ## Make regular expression to find the tradeDatasource in tradeFiles, so we can create a destination that follows same 
+    ## naming conventions for the end files.
+    finalDestinations <- tradeFiles
+    finalDestinations <- sapply(finalDestinations , strsplit, split = .Platform$file.sep)
+    
+    for (i in 1:length(finalDestinations)) {
+      
+      ## We change the directory to the dataDestination directory
+      finalDestinations[[i]][grepl(tradeDataSource, finalDestinations[[i]],)] <- dataDestination
+      
+      ## substitute in tradescleanedbyquotes right before the extension.
+      finalDestinations[[i]][length(finalDestinations[[i]])] <- 
+        sub("\\.", "tradescleanedbyquotes.", finalDestinations[[i]][length(finalDestinations[[i]])])
+    }
+    
+    finalDestinations <- unlist(lapply(finalDestinations, paste0, collapse = .Platform$file.sep))
+    ## Check if the directories exist
+    if(any(!file.exists(dirname(finalDestinations)))){
+      sapply(dirname(finalDestinations), dir.create, showWarnings = FALSE)
+    }
+    
+    for (i in 1:length(tradeFiles)) {
+      
+      tradeFile <- tradeFiles[i]
+      quoteFile <- quoteFiles[i]
+      
+      tData <- try(readRDS(tradeFile))
+      qData <- try(readRDS(quoteFile))
+      saveRDS(rmTradeOutliersUsingQuotes(tData, qData, lagQuotes = lagQuotes), file = finalDestinations[i])
+      
+      
+      
+    }
+    # for (tFile in tradeFiles) {
+    #   browser()
+    #   filesforticker <- list.files(paste0(tradeDataSource, "/", tFile, "/"))
+    #   for (jj in filesforticker[!grepl("quotes", filesforticker)]) {
+    #     tData <- try(readRDS(paste0(dataSource, "/", ii, "/", jj)))
+    #     qData <- try(readRDS(paste0(dataSource, "/", ii, "/", substring(jj, 1, 10), "quotes.rds")))
+    #     tData <- checkColumnNames(tData)
+    #     qData <- checkColumnNames(qData)
+    #     saveRDS(rmTradeOutliersUsingQuotes(tData, qData), paste0(dataDestination, "/", ii, "/", substring(jj, 1, 10), "tradescleanedbyquotes.rds"))
+    #   }
+    # }
   }
 }

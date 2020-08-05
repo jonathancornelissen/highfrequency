@@ -84,42 +84,59 @@ context("tradesCleanup")
 test_that("tradesCleanup on-disk functionality", {
   skip_on_cran()
   library(data.table)
-  options(digits = 6)
-  trades1 <- sampleTDataRaw
+  DT <- SYMBOL <- NULL
   trades2 <- sampleTDataRawMicroseconds
-  currentWD <- getwd()
-  tempDir <- tempdir(check = TRUE)
-  setwd(tempDir)
-  dir.create("rawTradeData")
-  dir.create("rawQuoteData")
-
-  fwrite(trades1, "rawTradeData/trades1.csv")
-  fwrite(trades2, "rawTradeData/trades2.csv")
-
-  tradesCleanup(dataSource = "rawTradeData", dataDestination = "cleanedTradeData", exchanges = "N", saveAsXTS = FALSE)
-
-  cleanedTrades1 <- tradesCleanup(tDataRaw = trades1, exchanges = "N", report = FALSE)
-  cleanedTrades2 <- tradesCleanup(tDataRaw = trades2, exchanges = "N", report = FALSE)
-  cleanedTrades2Day1 <- cleanedTrades2[as.character(as.Date(DT)) == "2018-01-02",]
-  cleanedTrades2Day2 <- cleanedTrades2[as.character(as.Date(DT)) == "2018-01-03",]
-
-
-  onDisk1 <- readRDS("cleanedTradeData/trades1.csv/2008-01-04.rds")
-  onDisk2Day1 <- readRDS("cleanedTradeData/trades2.csv/2018-01-02.rds")
-  onDisk2Day2 <- readRDS("cleanedTradeData/trades2.csv/2018-01-03.rds")
+  quotes2 <- sampleQDataRawMicroseconds
+  trades2[,DT := as.POSIXct(DT, tz = "EST")]
+  quotes2[,DT := as.POSIXct(DT, tz = "EST")]
+  setwd("/home/emil/tmp/")
+  
+  rawDataSource <- paste0(LETTERS[sample(1:26, size = 10)], collapse = "")
+  tradeDataSource <- paste0(LETTERS[sample(1:26, size = 10)], collapse = "")
+  quoteDataSource <- paste0(LETTERS[sample(1:26, size = 10)], collapse = "")
+  dataDestination <- paste0(LETTERS[sample(1:26, size = 10)], collapse = "")
+  dir.create(rawDataSource)
+  fwrite(quotes2, paste0(rawDataSource, "/quotes2.csv"))
+  fwrite(trades2, paste0(rawDataSource, "/trades2.csv"))
+  tradesCleanup(dataSource = rawDataSource, dataDestination = tradeDataSource, exchanges = "N", saveAsXTS = FALSE, tz = "EST")
+  quotesCleanup(dataSource = rawDataSource, dataDestination = quoteDataSource, exchanges = "N", saveAsXTS = FALSE, type = "standard", tz = "EST")
+  tradesCleanupUsingQuotes(tradeDataSource = tradeDataSource, quoteDataSource = quoteDataSource, dataDestination = dataDestination,
+                           lagQuotes = 0)
+  
+  onDiskDay1 <- readRDS(paste0(dataDestination, "/", "trades2.csv/2018-01-02tradescleanedbyquotes.rds"))
+  onDiskDay2 <- readRDS(paste0(dataDestination, "/", "trades2.csv/2018-01-03tradescleanedbyquotes.rds"))
+  
 
   ### CLEANUP!
-  setwd(currentWD)
-  unlink(tempDir, recursive = TRUE, force = TRUE)
-
-  expected2 <- tradesCleanup(tDataRaw = sampleTDataRawMicroseconds, exchanges = "N", report = FALSE)
-
-  expect_equal(cleanedTrades2Day1[,2:4], onDisk2Day1[,2:4])
+  setwd("/home/emil/tmp")  ## Emil Sjoerup's computer
+  unlink(rawDataSource, recursive = TRUE, force = TRUE)
+  unlink(tradeDataSource, recursive = TRUE, force = TRUE)
+  unlink(quoteDataSource, recursive = TRUE, force = TRUE)
+  unlink(dataDestination, recursive = TRUE, force = TRUE)
   
-  expect_equal(expected2[as.Date(DT) == "2018-01-02",], cleanedTrades2Day1)
-  expect_equal(expected2[as.Date(DT) == "2018-01-03",], cleanedTrades2Day2)
+  sampleTDataMicrosecondsDay1 <-
+    tradesCleanupUsingQuotes(
+      tData = tradesCleanup(tDataRaw = sampleTDataRawMicroseconds[as.Date(DT) == "2018-01-02"], exchanges = "N", report = FALSE),
+      qData = quotesCleanup(qDataRaw = sampleQDataRawMicroseconds[as.Date(DT) == "2018-01-02"], exchanges = "N", type = "advanced", report = FALSE),
+      lagQuotes = 0
+    )[, c("DT", "SYMBOL", "PRICE", "SIZE")]
   
-
+  
+  sampleTDataMicrosecondsDay2 <-
+    tradesCleanupUsingQuotes(
+      tData = tradesCleanup(tDataRaw = sampleTDataRawMicroseconds[as.Date(DT) == "2018-01-03"], exchanges = "N", report = FALSE),
+      qData = quotesCleanup(qDataRaw = sampleQDataRawMicroseconds[as.Date(DT) == "2018-01-03"], exchanges = "N", type = "standard", report = FALSE),
+      lagQuotes = 0
+    )[, c("DT", "SYMBOL", "PRICE", "SIZE")]
+  
+  
+  
+  onDiskDay1 <- onDiskDay1[as.Date(DT, tz = "EST") == "2018-01-02",c("DT", "SYMBOL", "PRICE", "SIZE")][, DT := DT - 18000]
+  onDiskDay2 <- onDiskDay2[as.Date(DT, tz = "EST") == "2018-01-03",c("DT", "SYMBOL", "PRICE", "SIZE")][, DT := DT - 18000]
+  setkey(onDiskDay1, SYMBOL, DT)
+  setkey(onDiskDay2, SYMBOL, DT)
+  expect_equal(onDiskDay1, sampleTDataMicrosecondsDay1)
+  expect_equal(onDiskDay2, sampleTDataMicrosecondsDay2)
 })
 
 # test_that("sampleTData matches cleaned sampleTDataRaw", {

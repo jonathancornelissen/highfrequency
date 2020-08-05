@@ -509,3 +509,20 @@ set.Trade <- function(x, error = TRUE) {
     attr(x,"Trade") <- has.Trade(x, which = TRUE)
   return(x)
 }
+
+
+## #' @keywords internal
+## #' @importFrom data.table fread
+## readDataset <- function(path){
+##   extension <- regexpr("*.[a-z]{0,}$", path) # Extract the extension of the file.
+##   extension <- substr(path, start = extension[[1]], stop = extension[[1]] + attr(extension, "match.length"))
+##   
+##   if(extension == ".rds"){
+##     return(try(readRDS(path)))
+##   } else if( extension == ".csv"){
+##     return(try(fread(path)))
+##   }else {
+##      stop("Extension not recognized")
+##    }
+##   
+## }

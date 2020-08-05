@@ -5,7 +5,8 @@
 \title{Perform a final cleaning procedure on trade data}
 \usage{
 tradesCleanupUsingQuotes(
-  dataSource = NULL,
+  tradeDataSource = NULL,
+  quoteDataSource = NULL,
   dataDestination = NULL,
   tData = NULL,
   qData = NULL,
@@ -13,8 +14,6 @@ tradesCleanupUsingQuotes(
 )
 }
 \arguments{
-\item{dataSource}{character indicating the folder in which the original data is stored.}
-
 \item{dataDestination}{character indicating the folder in which the cleaned data is stored, folder of dataSource by default.}
 
 \item{tData}{data.table or xts object containing (ONE day and for ONE stock only) trade data cleaned by \code{\link{tradesCleanup}}. This argument is NULL by default. Enabling it, means the arguments
@@ -24,12 +23,11 @@ from, to, dataSource and dataDestination will be ignored. (only advisable for sm
 from, to, dataSource, dataDestination will be ignored. (only advisable for small chunks of data)}
 
 \item{lagQuotes}{passed through to rmTradeOutliersUsingQuotes. \code{\link{rmTradeOutliersUsingQuotes}}}
+
+\item{dataSource}{character indicating the folder in which the original data is stored.}
 }
 \value{
 For each day an xts object is saved into the folder of that date, containing the cleaned data.
-
-In case you supply the arguments "tData" and "qData", the on-disk functionality is ignored
-and the function returns cleaned trades as a data.table or xts object (see examples).
 }
 \description{
 Function performs cleaning procedure \code{\link{rmTradeOutliersUsingQuotes}} 
@@ -37,6 +35,12 @@ for the trades of all stocks data in "dataDestination".
 Note that preferably the input data for this function 
 is trade and quote data cleaned by respectively e.g. \code{\link{tradesCleanup}}
 and \code{\link{quotesCleanup}}.
+}
+\details{
+In case you supply the arguments "tData" and "qData", the on-disk functionality is ignored
+and the function returns cleaned trades as a data.table or xts object (see examples).
+
+When using the on-disk functionality and tradeDataSource and quoteDataSource are the same, the quote files are all files in the folder that contains 'quote', and the rest are treated as containing trade data.
 }
 \examples{
 # Consider you have raw trade data for 1 stock for 2 days 
