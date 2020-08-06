@@ -31,9 +31,9 @@
 #' tick aggregation it makes sense to fill these NA's by the function \code{na.locf}
 #' (last observation carried forward) from the zoo package.
 #' 
-#' In case on = "ticks", the sampling is done such the sampling starts on the first tick.
+#' In case on = "ticks", the sampling is done such the sampling starts on the first tick, and the last tick is always included
 #' For example, if 14 observations are made on one day, and these are 1, 2, 3, ... 14.
-#' Then, with on = "ticks" and k = 3, the output will be 1, 4, 7, 10, 13.
+#' Then, with on = "ticks" and k = 3, the output will be 1, 4, 7, 10, 13, 14.
 #' 
 #' @return An xts object containing the aggregated time series.
 #' 
@@ -51,7 +51,7 @@
 #' tsagg30sec <- aggregateTS(ts, on = "seconds", k = 30)
 #' tail(tsagg30sec)
 #' 
-#' # tsagg3ticks <- aggregateTS(ts, on = "ticks", k = 3)
+#' tsagg3ticks <- aggregateTS(ts, on = "ticks", k = 3)
 #' 
 #' @importFrom zoo zoo na.locf
 #' @importFrom stats start end
@@ -79,10 +79,14 @@ aggregateTS <- function (ts, FUN = "previoustick", on = "minutes", k = 1, weight
     if(k < 1 | k%%1 != 0){
       stop("When on is `ticks`, must be a positive integer valued numeric")
     }
-    pData <- pData[seq(1, nrow(pData), by = k),]
-    return(pData)
+    idx <- seq(1, nrow(ts), by = k)
+    if(k %% nrow(ts) != 0){
+      idx <- c(idx, nrow(ts))
+    }
+    ts <- ts[idx,]
+    return(ts)
   }
-  
+  c(seq.int(1, 14, k), k %% 14 == 0 )
   
   if (makethispartbetter == TRUE)  {
     
@@ -2208,4 +2212,95 @@ tradesCleanupUsingQuotes <- function(tradeDataSource = NULL, quoteDataSource = N
     #   }
     # }
   }
+}
+
+
+
+
+#' Synchronize (multiple) irregular timeseries by refresh time
+#' 
+#' @description This function implements the refresh time synchronization scheme proposed by Harris et al. (1995). 
+#' It picks the so-called refresh times at which all assets have traded at least once since the last refresh time point. 
+#' For example, the first refresh time corresponds to the first time at which all stocks have traded.
+#' The subsequent refresh time is defined as the first time when all stocks have traded again.
+#' This process is repeated untill the end of one time series is reached.
+#' 
+#' @param pData a list. Each list-item contains an xts object  
+#' containing the original time series (one day only and typically a price series).
+#' @param sort logical determining whether to sort the index based on a criterion (will only sort descending (i.e. most liquid first)). Default is FALSE
+#' @param criterion character determining which criterion used. Currently supports "squared duration" and "duration". Default is "squared duration".
+#' 
+#' @return An xts object containing the synchronized time series.
+#' 
+#' @references Harris, F., T. McInish, G. Shoesmith, and R. Wood (1995). Cointegration, error correction, and price discovery on infomationally linked security markets. Journal of Financial and Quantitative Analysis 30, 563-581.
+#' 
+#' @examples 
+#' # Suppose irregular timepoints:
+#' start <- as.POSIXct("2010-01-01 09:30:00")
+#' ta <- start + c(1,2,4,5,9)
+#' tb <- start + c(1,3,6,7,8,9,10,11)
+#' 
+#' # Yielding the following timeseries:
+#' a <- xts::as.xts(1:length(ta), order.by = ta)
+#' b <- xts::as.xts(1:length(tb), order.by = tb)
+#' 
+#' # Calculate the synchronized timeseries:
+#' refreshTime(list(a,b))
+#' 
+#' @author Jonathan Cornelissen and Kris Boudt
+#' @keywords data manipulation
+#' @importFrom xts xts tzone
+#' @export
+refreshTime <- function (pData, sort = FALSE, criterion = "squared duration") {
+  
+  if(!is.list(pData)){
+    stop("pData must be a list of atleast length one")
+  }
+  if(!all(as.logical(lapply(pData, is.xts)))){
+    stop("All the series in pData must be xts objects")
+  }
+  
+  if(any(as.logical(lapply(pData, function(x) ndays(x) > 1)))){
+    stop("All the series in pData must contain data for a single day")
+  }
+  
+  if (length(pData) < 1) {
+    stop("pData should contain at least two time series")
+  }
+  if( length(pData) == 1){
+    return(pData[[1]])
+  }
+  
+  tz_ <- tzone(pData[[1]])
+  if(sort){
+    
+    if(criterion == "squared duration"){
+      criterion <- function(x) sum(as.numeric(diff(index(x)))^2)
+    } else if( criterion == "duration"){
+      criterion <- function(x) sum(as.numeric(diff(index(x))))
+    } else {
+      stop("Criterion must be either 'squared duration' or 'duration'")
+    }
+    
+    vec <- sort(sapply(pData, criterion), index.return = TRUE)$ix
+    nameVec <- names(pData)[vec]
+    temp <- pData[[vec[1]]]
+    for (i in vec[-1]) {
+      temp <- merge(temp, pData[[i]])
+    }
+    
+  } else {
+    nameVec <- names(pData)
+    temp <- pData[[1]]
+    for (i in 2:length(pData)) {
+      temp <- merge(temp, pData[[i]])
+    }  
+  }
+  
+  
+  
+  temp <- refreshTimeMathing(coredata(temp), index(temp))
+  temp <- xts(temp[[1]], order.by = as.POSIXct(temp[[2]], tz = tz_, origin = "1970-01-01"))
+  names(temp) <- nameVec # Set names 
+  return(temp)
 }

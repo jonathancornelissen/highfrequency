@@ -133,3 +133,8 @@ bool overlap(double min1, double max1, double min2, double max2){
   return (std::max(0.0, ((double) std::min(max1, max2) - (double) std::max(min1, min2))) > 0.0);
 }
 
+
+// [[Rcpp::export]]
+arma::vec quadraticKernel(arma::vec x){
+  return(0.975 * pow(pow(1 - arma::clamp(x, 0.0, 1.0) , 2.0) , 2.0));
+}

@@ -526,3 +526,7 @@ set.Trade <- function(x, error = TRUE) {
 ##    }
 ##   
 ## }
+
+
+
+
