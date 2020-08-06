@@ -58,9 +58,9 @@ Please note: In case an interval is empty, by default an NA is returned.. In cas
 tick aggregation it makes sense to fill these NA's by the function \code{na.locf}
 (last observation carried forward) from the zoo package.
 
-In case on = "ticks", the sampling is done such the sampling starts on the first tick.
+In case on = "ticks", the sampling is done such the sampling starts on the first tick, and the last tick is always included
 For example, if 14 observations are made on one day, and these are 1, 2, 3, ... 14.
-Then, with on = "ticks" and k = 3, the output will be 1, 4, 7, 10, 13.
+Then, with on = "ticks" and k = 3, the output will be 1, 4, 7, 10, 13, 14.
 }
 \examples{
 #load sample price data
@@ -73,7 +73,7 @@ head(tsagg5min)
 tsagg30sec <- aggregateTS(ts, on = "seconds", k = 30)
 tail(tsagg30sec)
 
-# tsagg3ticks <- aggregateTS(ts, on = "ticks", k = 3)
+tsagg3ticks <- aggregateTS(ts, on = "ticks", k = 3)
 
 }
 \author{
