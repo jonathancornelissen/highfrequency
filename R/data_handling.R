@@ -2198,7 +2198,6 @@ tradesCleanupUsingQuotes <- function(tradeDataSource = NULL, quoteDataSource = N
       
     }
     # for (tFile in tradeFiles) {
-    #   browser()
     #   filesforticker <- list.files(paste0(tradeDataSource, "/", tFile, "/"))
     #   for (jj in filesforticker[!grepl("quotes", filesforticker)]) {
     #     tData <- try(readRDS(paste0(dataSource, "/", ii, "/", jj)))
