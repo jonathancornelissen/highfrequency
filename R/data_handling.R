@@ -86,7 +86,6 @@ aggregateTS <- function (ts, FUN = "previoustick", on = "minutes", k = 1, weight
     ts <- ts[idx,]
     return(ts)
   }
-  c(seq.int(1, 14, k), k %% 14 == 0 )
   
   if (makethispartbetter == TRUE)  {
     
@@ -2303,4 +2302,47 @@ refreshTime <- function (pData, sort = FALSE, criterion = "squared duration") {
   temp <- xts(temp[[1]], order.by = as.POSIXct(temp[[2]], tz = tz_, origin = "1970-01-01"))
   names(temp) <- nameVec # Set names 
   return(temp)
+}
+
+
+
+#' @export
+businessTimeAggregation <- function(pData, measure, obs, bandwidth, ...){
+  PRICE <- NULL
+  
+  res <- list()
+  
+  if(measure == "intensity"){
+    time <- as.numeric(index(pData))
+    tradeIntensityProcess <- as.numeric(tradeIntensityProcessCpp(time, bandwidth))
+    tradeIntensityProcess <- tradeIntensityProcess / sum(tradeIntensityProcess) * obs
+    idx <- which(diff(floor(cumsum(tradeIntensityProcess))) == 1)
+    pData <- pData[idx,]
+    
+    if(max(idx) > 1){
+      warning("The measure mandated sampling the same point twice, at least once, returning series that is smaller than obs")
+    }
+    
+  }
+  
+  if(measure == "vol"){
+    vol <- spotVol(data = pData[, PRICE], ...)$spot
+    vol <- vol/sum(vol) * obs
+    idx <- which(diff(floor(cumsum(vol))) == 1)
+    pData <- pData[index(vol)[idx], ]
+    if(max(idx) > 1){
+      warning("The measure mandated sampling the same point twice, at least once, returning series that is smaller than obs")
+    }
+    
+  }
+  
+  if(measure == "volume"){
+    
+    
+    
+  }
+  
+  res[["pData"]] <- pData
+  return(pData)
+  
 }

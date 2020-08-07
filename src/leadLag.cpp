@@ -1,5 +1,5 @@
 #include <RcppArmadillo.h>
-#include "utils.h"
+#include "internals.h"
 #ifdef _OPENMP
 #include <omp.h>
 // [[Rcpp::plugins(openmp)]]

@@ -106,12 +106,6 @@ arma::mat preAveragingReturnsInternal(arma::mat& ret, const int kn){
 }
 
 
-// Armadillo version of np.clip needed for the lead-lag estimation, didn't find a version in base R
-// [[Rcpp::export]]
-arma::vec clamp(arma::vec& x, const double lower = 0.0, const double upper = 1.0){
-  return(arma::clamp(x, lower, upper));
-}
-
 
 // Armadillo version of bisect_left needed for the lead-lag estimation, didn't find a version in base R
 // [[Rcpp::export]]
@@ -131,10 +125,4 @@ arma::uword findFirst(arma::vec& x , const int thresh){
 // [[Rcpp::export]]
 bool overlap(double min1, double max1, double min2, double max2){
   return (std::max(0.0, ((double) std::min(max1, max2) - (double) std::max(min1, min2))) > 0.0);
-}
-
-
-// [[Rcpp::export]]
-arma::vec quadraticKernel(arma::vec x){
-  return(0.975 * pow(pow(1 - arma::clamp(x, 0.0, 1.0) , 2.0) , 2.0));
 }

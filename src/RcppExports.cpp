@@ -6,6 +6,29 @@
 
 using namespace Rcpp;
 
+// quadraticKernel
+arma::vec quadraticKernel(const arma::vec& x);
+RcppExport SEXP _highfrequency_quadraticKernel(SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::vec& >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(quadraticKernel(x));
+    return rcpp_result_gen;
+END_RCPP
+}
+// tradeIntensityProcessCpp
+arma::vec tradeIntensityProcessCpp(arma::vec& time, const double bandwidth);
+RcppExport SEXP _highfrequency_tradeIntensityProcessCpp(SEXP timeSEXP, SEXP bandwidthSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec& >::type time(timeSEXP);
+    Rcpp::traits::input_parameter< const double >::type bandwidth(bandwidthSEXP);
+    rcpp_result_gen = Rcpp::wrap(tradeIntensityProcessCpp(time, bandwidth));
+    return rcpp_result_gen;
+END_RCPP
+}
 // har_agg
 arma::mat har_agg(arma::vec RM, arma::vec periods, int iNperiods);
 RcppExport SEXP _highfrequency_har_agg(SEXP RMSEXP, SEXP periodsSEXP, SEXP iNperiodsSEXP) {
@@ -114,19 +137,6 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::mat& >::type ret(retSEXP);
     Rcpp::traits::input_parameter< const int >::type kn(knSEXP);
     rcpp_result_gen = Rcpp::wrap(preAveragingReturnsInternal(ret, kn));
-    return rcpp_result_gen;
-END_RCPP
-}
-// clamp
-arma::vec clamp(arma::vec& x, const double lower, const double upper);
-RcppExport SEXP _highfrequency_clamp(SEXP xSEXP, SEXP lowerSEXP, SEXP upperSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::vec& >::type x(xSEXP);
-    Rcpp::traits::input_parameter< const double >::type lower(lowerSEXP);
-    Rcpp::traits::input_parameter< const double >::type upper(upperSEXP);
-    rcpp_result_gen = Rcpp::wrap(clamp(x, lower, upper));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -273,6 +283,8 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_highfrequency_quadraticKernel", (DL_FUNC) &_highfrequency_quadraticKernel, 1},
+    {"_highfrequency_tradeIntensityProcessCpp", (DL_FUNC) &_highfrequency_tradeIntensityProcessCpp, 2},
     {"_highfrequency_har_agg", (DL_FUNC) &_highfrequency_har_agg, 3},
     {"_highfrequency_heavy_parameter_transformR_", (DL_FUNC) &_highfrequency_heavy_parameter_transformR_, 9},
     {"_highfrequency_heavy_parameter_transform_RetrackR_", (DL_FUNC) &_highfrequency_heavy_parameter_transform_RetrackR_, 10},
@@ -280,7 +292,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_highfrequency_colCumsum", (DL_FUNC) &_highfrequency_colCumsum, 1},
     {"_highfrequency_refreshTimeMathing", (DL_FUNC) &_highfrequency_refreshTimeMathing, 2},
     {"_highfrequency_preAveragingReturnsInternal", (DL_FUNC) &_highfrequency_preAveragingReturnsInternal, 2},
-    {"_highfrequency_clamp", (DL_FUNC) &_highfrequency_clamp, 3},
     {"_highfrequency_findFirst", (DL_FUNC) &_highfrequency_findFirst, 2},
     {"_highfrequency_overlap", (DL_FUNC) &_highfrequency_overlap, 4},
     {"_highfrequency_leadLagCpp", (DL_FUNC) &_highfrequency_leadLagCpp, 6},
