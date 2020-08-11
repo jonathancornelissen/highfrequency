@@ -1010,7 +1010,7 @@ preAveragedRealizedMeasureSpotVol <- function(data, options = list()){
   
   DT <- NULL;
   
-  ## Considerations for the multiday case:::::##########!#!#!#!#!#!#
+  ## Considerations for the multiday case:
   D <- ndays(data)
   
   if( D > 1 ){
