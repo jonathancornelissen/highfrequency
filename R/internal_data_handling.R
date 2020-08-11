@@ -527,9 +527,3 @@ set.Trade <- function(x, error = TRUE) {
 ##   
 ## }
 
-
-
-#' @keywords internal
-estimateTradeIntensityProcess <- function(time, bandwidth){
-  return(as.numeric(tradeIntensityProcessCpp(time, bandwidth)))
-}
