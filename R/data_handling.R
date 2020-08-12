@@ -2307,16 +2307,33 @@ refreshTime <- function (pData, sort = FALSE, criterion = "squared duration") {
 
 
 #' @export
+#' @importFrom zoo index
 businessTimeAggregation <- function(pData, measure, obs, bandwidth, ...){
-  PRICE <- NULL
+  SIZE <- PRICE <- DT <- intensityProcess <- NULL
   
-  res <- list()
+  
+  inputWasXTS <- FALSE
+  if (!is.data.table(pData)) {
+    if (is.xts(pData)) {
+      pData <- setnames(as.data.table(pData), old = "index", new = "DT")
+      pData[, PRICE := as.numeric(PRICE), SIZE := as.numeric(SIZE)]
+      inputWasXTS <- TRUE
+    } else {
+      stop("Input has to be data.table or xts.")
+    }
+  } else {
+    if (!("DT" %in% colnames(pData))) {
+      stop("Data.table needs DT column containing the time-stamps of the trades.")
+    }
+  }
+  
+  time <- as.numeric(pData[, DT])
   
   if(measure == "intensity"){
-    time <- as.numeric(index(pData))
-    tradeIntensityProcess <- as.numeric(tradeIntensityProcessCpp(time, bandwidth))
-    tradeIntensityProcess <- tradeIntensityProcess / sum(tradeIntensityProcess) * obs
-    idx <- which(diff(floor(cumsum(tradeIntensityProcess))) == 1)
+    
+    intensityProcess <- as.numeric(tradeIntensityProcessCpp(time, bandwidth))
+    intensityProcess <- intensityProcess / sum(intensityProcess) * obs
+    idx <- which(diff(floor(cumsum(intensityProcess))) == 1)
     pData <- pData[idx,]
     
     if(max(idx) > 1){
@@ -2324,12 +2341,11 @@ businessTimeAggregation <- function(pData, measure, obs, bandwidth, ...){
     }
     
   }
-  
   if(measure == "vol"){
-    vol <- spotVol(data = pData[, PRICE], ...)$spot
-    vol <- vol/sum(vol) * obs
-    idx <- which(diff(floor(cumsum(vol))) == 1)
-    pData <- pData[index(vol)[idx], ]
+    intensityProcess <- spotVol(data = pData[, "PRICE"], ...)$spot
+    intensityProcess <- intensityProcess/sum(intensityProcess) * obs
+    idx <- which(diff(floor(cumsum(intensityProcess))) == 1)
+    pData <- pData[index(intensityProcess)[idx], ]
     if(max(idx) > 1){
       warning("The measure mandated sampling the same point twice, at least once, returning series that is smaller than obs")
     }
@@ -2337,12 +2353,26 @@ businessTimeAggregation <- function(pData, measure, obs, bandwidth, ...){
   }
   
   if(measure == "volume"){
+    if(!"SIZE" %in% colnames(pData)){
+      stop("SIZE must be present in pData in order to aggregate based on volume.")
+    }
     
-    
-    
+    intensityProcess <- pData[, "SIZE"]
+    intensityProcess <- intensityProcess/sum(intensityProcess) * obs
+    idx <- which(diff(floor(cumsum(intensityProcess))) == 1)
+    pData <- pData[idx, ]
+    if(max(idx) > 1){
+      warning("The measure mandated sampling the same point twice, at least once, returning series that is smaller than obs")
+    }
   }
   
+  if(inputWasXTS){
+    pData <- xts(pData[, -"DT"], order.by = pData[, DT])
+  }
+  
+  res <- list()
   res[["pData"]] <- pData
-  return(pData)
+  res[["intensityProcess"]] <- intensityProcess
+  return(res)
   
 }

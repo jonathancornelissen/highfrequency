@@ -1025,7 +1025,7 @@ preAveragedRealizedMeasureSpotVol <- function(data, options = list()){
     nObs <- kn <- numeric(D)
     
     for (d in 1:D) {
-      res <- preAveragedRealizedMeasureSpotVol(data[as.Date(data$DT) == dates[d]], options)
+      res <- preAveragedRealizedMeasureSpotVol(data[as.Date(data$DT) == dates[d],], options)
       spot <- rbind(spot, res$spot)
       kn[d] <- res$kn
       nObs[d] <- res$nObs
@@ -1053,7 +1053,7 @@ preAveragedRealizedMeasureSpotVol <- function(data, options = list()){
     kn <- kn + kn%%2
     idx <- NULL
     if(op$RM != "rv"){
-      idx <- spot <- seq(M - 2 + kn + 1, nObs - kn, by = kn) # initialize indices to loop over and the container to have the post esitmates.
+      idx <- spot <- seq(M - 2 + kn + 1, nObs - kn, by = kn) # initialize indices to loop over and the container to have the post estimates.
     } else {
       idx <- spot <- seq(M - 2 + 1, nObs - kn, by = kn) # Here we have one more estimate than the other cases.
     }
