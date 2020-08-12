@@ -221,7 +221,7 @@ aggregateTS <- function (ts, FUN = "previoustick", on = "minutes", k = 1, weight
 #' @export
 aggregatePrice <- function(pData, on = "minutes", k = 1, marketOpen = "09:30:00", marketClose = "16:00:00" , fill = FALSE, tz = NULL) {
   pData <- checkColumnNames(pData)
-  DATE = DT = FIRST_DT = DT_ROUND = LAST_DT = SYMBOL = PRICE = NULL
+  DATE <- DT <- FIRST_DT <- DT_ROUND <- LAST_DT <- SYMBOL <- PRICE <- NULL
   
   on_true <- NULL
   
@@ -514,7 +514,7 @@ aggregatePrice <- function(pData, on = "minutes", k = 1, marketOpen = "09:30:00"
 #' head(qDataAggregated)
 #' @export
 aggregateQuotes <- function(qData, on = "minutes", k = 5, marketOpen = "09:30:00", marketClose = "16:00:00", tz = "GMT") {
-  DATE = BID = OFR = BIDSIZ = OFRSIZ = DT = FIRST_DT = DT_ROUND = LAST_DT = SYMBOL = NULL
+  DATE <- BID <- OFR <- BIDSIZ <- OFRSIZ <- DT <- FIRST_DT <- DT_ROUND <-LAST_DT <- SYMBOL <- NULL
   
   qData <- checkColumnNames(qData)
   checkqData(qData)
@@ -632,7 +632,7 @@ aggregateQuotes <- function(qData, on = "minutes", k = 5, marketOpen = "09:30:00
 #' head(tDataAggregated)
 #' @export
 aggregateTrades <- function(tData, on = "minutes", k = 5, marketOpen = "09:30:00", marketClose = "16:00:00", tz = "GMT") {
-  DATE = SIZE = DT = FIRST_DT = DT_ROUND = LAST_DT = SYMBOL = PRICE = VWPRICE = SIZETPRICE = SIZESUM = NULL
+  DATE <- SIZE <- DT <- FIRST_DT <- DT_ROUND <- LAST_DT <- SYMBOL <- PRICE <- VWPRICE <- SIZETPRICE <- SIZESUM <- NULL
   tData <- checkColumnNames(tData)
   checktData(tData)
   
@@ -738,7 +738,7 @@ aggregateTrades <- function(tData, on = "minutes", k = 5, marketOpen = "09:30:00
 #' @keywords cleaning
 #' @export
 autoSelectExchangeTrades <- function(tData) {
-  DATE = SIZE = DT = SIZESUM = NULL
+  DATE <- SIZE <- DT <- SIZESUM <- NULL
   
   exchanges <- c("Q", "A", "P", "B", "C", "N", "D", "X", "I", "M", "W", "Z")
   exchangenames <- c("NASDAQ", "AMEX", "ARCA", "Boston", "NSX", "NYSE", "NASD ADF and TRF", "Philadelphia", "ISE", "Chicago", "CBOE", "BATS")
@@ -821,7 +821,7 @@ autoSelectExchangeTrades <- function(tData) {
 #' @export
 autoSelectExchangeQuotes <- function(qData) {
   
-  BIDSIZ = OFRSIZ = DT = EX = SUMVOL = NULL
+  BIDSIZ <- OFRSIZ <- DT <- EX <- SUMVOL <- NULL
   
   exchanges = c("Q","A","P","B","C","N","D","X","I","M","W","Z");
   exchangenames = c("NASDAQ","AMEX","ARCA","Boston","NSX","NYSE","NASD ADF and TRF","Philadelphia","ISE","Chicago","CBOE","BATS");
@@ -894,7 +894,7 @@ autoSelectExchangeQuotes <- function(qData) {
 #' @importFrom xts tzone
 #' @export
 exchangeHoursOnly <- function(data, dayBegin = "09:30:00", dayEnd = "16:00:00") {
-  DT = NULL # needed for data table (otherwise notes pop up in check())
+  DT <- NULL # needed for data table (otherwise notes pop up in check())
   data <- checkColumnNames(data)
   
   dummy_was_xts <- FALSE
@@ -1033,7 +1033,7 @@ makeReturns <- function(ts) {
 #' @export
 matchTradesQuotes <- function(tData, qData, adjustment = 2) {
   
-  PRICE = BID = OFR = DATE = DT = FIRST_DT = DT_ROUND = SYMBOL = NULL
+  PRICE <- BID <- OFR <- DATE <- DT <- FIRST_DT <- DT_ROUND <- SYMBOL <- NULL
   
   tData <- checkColumnNames(tData)
   qData <- checkColumnNames(qData)
@@ -1209,14 +1209,14 @@ mergeQuotesSameTimestamp <- function(qData, selection = "median") {
 #' largest volume.
 #' \item selection = "weighted.average": take the weighted average of all prices.
 #' }
-#' 
+#' @note previously this function returned the mean of the size of the merged trades (pre version 0.7 and when not using max.volume as the criterion), now it returns the sum.
 #' @return data.table or xts object depending on input
 #' 
 #' @author Jonathan Cornelissen and Kris Boudt
 #' @keywords cleaning
 #' @export
 mergeTradesSameTimestamp <- function(tData, selection = "median") {
-  SIZE = MAXSIZE = PRICE = DT = SYMBOL = .SD = SIZE_WEIGHT = NULL
+  .N <- SIZE <- MAXSIZE <- PRICE <- DT <- SYMBOL <- .SD <- SIZE_WEIGHT <- NULL
   
   tData <- checkColumnNames(tData)
   checktData(tData)
@@ -1248,29 +1248,29 @@ mergeTradesSameTimestamp <- function(tData, selection = "median") {
   keepCols <- colnames(tData)[!(colnames(tData) %in% c("DT", "SYMBOL", "PRICE", "SIZE"))]
   keptData <- tData[, lapply(.SD, last), by = list(DT, SYMBOL)][, ..keepCols]
   if (selection == "median") {
-    tData[, PRICE := median(PRICE), by = list(DT, SYMBOL)]
+    tData[, `:=` (PRICE = median(PRICE), NUMTRADES = .N), by = list(DT, SYMBOL)]
     #If there is more than one observation at median price, take the average volume.
     tData[, SIZE := as.numeric(as.character(SIZE))]
-    tData[, SIZE := mean(SIZE), by = list(DT, SYMBOL)]
-    tData <- unique(tData[, c("DT", "SYMBOL", "PRICE", "SIZE")])
+    tData[, SIZE := sum(SIZE), by = list(DT, SYMBOL)]
+    tData <- unique(tData[, c("DT", "SYMBOL", "PRICE", "SIZE", "NUMTRADES")])
   }
   
   if (selection == "max.volume") {
     tData[, SIZE := as.numeric(as.character(SIZE))]
-    tData <- tData[, MAXSIZE := max(SIZE), by = list(DT, SYMBOL)]
+    tData <- tData[, `:=` (MAXSIZE = max(SIZE), NUMTRADES = .N), by = list(DT, SYMBOL)]
     tData[, SIZE := ifelse(SIZE == MAXSIZE, 1, 0)]
     tData[, PRICE := PRICE * SIZE]
     tData[, PRICE := max(PRICE), by = "DT"]
     tData[, SIZE := MAXSIZE]
     tData[, -c("MAXSIZE")]
-    tData <- unique(tData[, c("DT", "SYMBOL", "PRICE", "SIZE")])
+    tData <- unique(tData[, c("DT", "SYMBOL", "PRICE", "SIZE", "NUMTRADES")])
   }
   if (selection == "weighted.average") {
     tData[, SIZE := as.numeric(as.character(SIZE))]
-    tData <- tData[, `:=` (SIZE_WEIGHT = SIZE / sum(SIZE)), by = list(DT, SYMBOL)]
+    tData <- tData[, `:=` (SIZE_WEIGHT = SIZE / sum(SIZE), NUMTRADES = .N), by = list(DT, SYMBOL)]
     tData[, `:=` (PRICE = sum(PRICE * SIZE_WEIGHT)), by = list(DT, SYMBOL)]
-    tData[, SIZE := mean(SIZE), by = list(DT, SYMBOL)]
-    tData <- unique(tData[, c("DT", "SYMBOL", "PRICE", "SIZE")])
+    tData[, SIZE := sum(SIZE), by = list(DT, SYMBOL)]
+    tData <- unique(tData[, c("DT", "SYMBOL", "PRICE", "SIZE", "NUMTRADES")])
   }
   tData <- cbind(tData, keptData)
   if (dummy_was_xts == TRUE) {
@@ -1330,7 +1330,7 @@ noZeroPrices <- function(tData) {
 #' @keywords cleaning
 #' @export
 noZeroQuotes <- function(qData) {
-  BID = OFR = DT = NULL
+  BID <- OFR <- DT <- NULL
   qData <- checkColumnNames(qData)
   checkqData(qData)
   
@@ -1541,7 +1541,7 @@ quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, 
 #' @keywords cleaning
 #' @export
 rmLargeSpread <- function(qData, maxi = 50) {
-  BID = OFR = DATE = DT = SPREAD = SPREAD_MEDIAN = NULL
+  BID <- OFR <- DATE <- DT <- SPREAD <- SPREAD_MEDIAN <- NULL
   qData <- checkColumnNames(qData)
   checkqData(qData)
   dummy_was_xts <- FALSE
@@ -1580,7 +1580,7 @@ rmLargeSpread <- function(qData, maxi = 50) {
 #' @keywords cleaning
 #' @export
 rmNegativeSpread <- function(qData) {
-  BID = OFR = DATE = DT = NULL
+  BID <- OFR <- DATE <- DT <- NULL
   qData <- checkColumnNames(qData)
   checkqData(qData)
   dummy_was_xts <- FALSE
@@ -1769,7 +1769,7 @@ rmOutliersQuotes <- function (qData, maxi = 10, window = 50, type = "advanced") 
   # NOTE: Median Absolute deviation chosen contrary to Barndorff-Nielsen et al.
   # Setting those variables equal NULL is for suppressing NOTES in devtools::check
   # References inside data.table-operations throw "no visible binding for global variable ..." error
-  BID = OFR = MIDQUOTE = DATE = DT = MADALL = CRITERION = NULL
+  BID <- OFR <- MIDQUOTE <- DATE <- DT <- MADALL <- CRITERION <- NULL
   if ((window %% 2) != 0) {
     stop("Window size can't be odd.")
   }
@@ -1841,15 +1841,18 @@ rmOutliersQuotes <- function (qData, maxi = 10, window = 50, type = "advanced") 
 #' 
 #' @param tData an xts or data.table object containing the time series data, with 
 #' one column named "COND" indicating the Sale Condition.
+#' @param validConds a character vector containing valid sales conditions defaults to \code{c('', '@', 'E', '@E', 'F', 'FI', '@F', '@FI', 'I', '@I')}. See details.
 #' 
+#' @details To get more information on the sales conditions, see the NYSE documentation. Section about Daily TAQ Trades File.
+#' The current version (as of May 2020) can be found online at \href{https://www.nyse.com/publicdocs/nyse/data/Daily_TAQ_Client_Spec_v3.3.pdf}{NYSE's webpage}
 #' @return xts or data.table object depending on input
 #' 
 #' @author Jonathan Cornelissen and Kris Boudt
 #' 
 #' @keywords leaning
 #' @export
-salesCondition <- function(tData) {
-  COND = NULL
+salesCondition <- function(tData, validConds = c('', '@', 'E', '@E', 'F', 'FI', '@F', '@FI', 'I', '@I')) {
+  COND <- NULL
   tData <- checkColumnNames(tData)
   checktData(tData)
   
@@ -1868,7 +1871,7 @@ salesCondition <- function(tData) {
     }
   } 
   
-  tData <- tData[COND %in% c("E", "F")]
+  tData <- tData[COND %in% validConds]
   
   if (dummy_was_xts == TRUE) {
     return(xts(as.matrix(tData), order.by = tData$DT))
@@ -1904,7 +1907,7 @@ salesCondition <- function(tData) {
 #' @keywords cleaning
 #' @export
 selectExchange <- function(data, exch = "N") { 
-  EX = NULL
+  EX  <- NULL
   data <- checkColumnNames(data)
   # checkqData(data)
   
@@ -1964,6 +1967,7 @@ selectExchange <- function(data, exch = "N") {
 #' from, to, dataSource and dataDestination will be ignored. (only advisable for small chunks of data)
 #' @param report boolean and TRUE by default. In case it is true the function returns (also) a vector indicating how many trades remained after each cleaning step.
 #' @param selection argument to be passed on to the cleaning routine \code{\link{mergeTradesSameTimestamp}}. The default is "median".
+#' @param validConds character vector containing valid sales conditions. Passed through to \code{\link{salesCondition}}.
 #' @param saveAsXTS indicates whether data should be saved in xts format instead of data.table when using on-disk functionality. TRUE by default.
 #' @param tz timezone to use
 #' @return For each day an xts or data.table object is saved into the folder of that date, containing the cleaned data.
@@ -1992,7 +1996,8 @@ selectExchange <- function(data, exch = "N") {
 #' @importFrom data.table fread
 #' @keywords cleaning
 #' @export
-tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, tDataRaw = NULL, report = TRUE, selection = "median", saveAsXTS = TRUE, tz = "EST") {
+tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, tDataRaw = NULL, report = TRUE, selection = "median",
+                          validConds = c('', '@', 'E', '@E', 'F', 'FI', '@F', '@FI', 'I', '@I'), saveAsXTS = TRUE, tz = "EST") {
   SIZE <- SYMBOL <- PRICE <- EX <- COND <- DT <- DATE <- TIME_M <- NULL
   
   if (is.null(tDataRaw) == TRUE) {
@@ -2009,7 +2014,8 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, 
       }
       tData <- try(tradesCleanup(tDataRaw = readdata,
                                  selection = selection,
-                                 exchanges = exchanges))$tData
+                                 exchanges = exchanges,
+                                 validConds = validConds))$tData
       tData <- tData[, DATE := as.Date(DT, tz = tz)]
       tData <- split(tData, by = "DATE")
       
@@ -2062,9 +2068,9 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, 
     nresult[2] <- dim(tDataRaw)[1] 
     tDataRaw <- tDataRaw[EX %in% exchanges]
     nresult[3] <- dim(tDataRaw)[1] 
-    tDataRaw <- tDataRaw[COND %in% c("E", "F")]
+    tData <- salesCondition(tDataRaw, validConds)
     nresult[4] <- dim(tDataRaw)[1] 
-    tDataRaw <- mergeTradesSameTimestamp(tDataRaw, selection = selection)
+    tDataRaw <- mergeTradesSameTimestamp(tData, selection = selection)
     nresult[5] <- dim(tDataRaw)[1] 
     
     if (dummy_was_xts == TRUE) {

@@ -11,6 +11,7 @@ tradesCleanup(
   tDataRaw = NULL,
   report = TRUE,
   selection = "median",
+  validConds = c("", "@", "E", "@E", "F", "FI", "@F", "@FI", "I", "@I"),
   saveAsXTS = TRUE,
   tz = "EST"
 )
@@ -44,6 +45,8 @@ from, to, dataSource and dataDestination will be ignored. (only advisable for sm
 \item{report}{boolean and TRUE by default. In case it is true the function returns (also) a vector indicating how many trades remained after each cleaning step.}
 
 \item{selection}{argument to be passed on to the cleaning routine \code{\link{mergeTradesSameTimestamp}}. The default is "median".}
+
+\item{validConds}{character vector containing valid sales conditions. Passed through to \code{\link{salesCondition}}.}
 
 \item{saveAsXTS}{indicates whether data should be saved in xts format instead of data.table when using on-disk functionality. TRUE by default.}
 
