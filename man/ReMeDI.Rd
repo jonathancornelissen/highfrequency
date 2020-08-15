@@ -17,7 +17,7 @@ ReMeDI(
 \arguments{
 \item{pData}{xts or data.table containing the log-prices of the asset}
 
-\item{kn}{numeric of length 1 determining the tuning parameter kn, which controls the lengths of the non-overlapping interval in the ReMeDI estimation}
+\item{kn}{numeric of length 1 determining the tuning parameter kn this controls the lengths of the non-overlapping interval in the ReMeDI estimation}
 
 \item{lags}{numeric containing integer values indicating}
 
@@ -33,6 +33,9 @@ estimates auto-covariance of market-microstructure noise
 }
 \references{
 remedi paper, muzafer's paper
+}
+\author{
+Emil Sjoerup
 }
 \keyword{autocorrelation}
 \keyword{autocovariance}

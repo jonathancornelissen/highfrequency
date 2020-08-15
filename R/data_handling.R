@@ -290,18 +290,23 @@ aggregatePrice <- function(pData, on = "minutes", k = 1, marketOpen = "09:30:00"
   }
   
   
-  timeZone <- tzone(pData$DT)
-  if(is.null(tz)){
-    if(is.null(timeZone)){
-      timeZone <- "GMT"
+  timeZone <- attr(pData$DT, "tzone")
+  if(timeZone == ""){
+    if(is.null(tz)){
+      tz <- "UTC"
     }
+    pData[, DT := as.POSIXct(format(DT, digits = 20, nsmall = 20), tz = tz)]
+  } else {
     tz <- timeZone
   }
-  pData <- pData[, DT := as.numeric(DT, tz = timeZone)]
   
-  marketOpenNumeric <- as.numeric(as.POSIXct(paste("1970-01-01", marketOpen), format = "%Y-%m-%d %H:%M:%OS", tz = timeZone), tz = timeZone)
-  marketCloseNumeric <- as.numeric(as.POSIXct(paste("1970-01-01", marketClose), format = "%Y-%m-%d %H:%M:%OS", tz = timeZone), tz = timeZone)
+  marketOpenNumeric <- as.numeric(as.POSIXct(paste("1970-01-01", marketOpen), format = "%Y-%m-%d %H:%M:%OS", tz = tz))
+  marketCloseNumeric <- as.numeric(as.POSIXct(paste("1970-01-01", marketClose), format = "%Y-%m-%d %H:%M:%OS", tz = tz))
   
+  
+  dateNumeric <- as.numeric(unique(as.Date(pData$DT)))
+  
+  pData[, DT := as.numeric(DT)]
   pData <- pData[between(DT %% 86400, marketOpenNumeric, marketCloseNumeric)]
   
   pData[, DATE := floor(DT / 86400)]
@@ -323,26 +328,20 @@ aggregatePrice <- function(pData, on = "minutes", k = 1, marketOpen = "09:30:00"
   # due to rounding there may be an observation that is refered to the opening time
   pData <- pData[!(DT %in% pData_open$DT)]
   pData <- merge(pData, pData_open, all = TRUE)
-  pData[, DT := as.POSIXct(DT, origin = "1970-01-01", tz = tz)]
   
   
   if (fill) {
     
-    dateNumeric <- as.numeric(unique(as.Date(pData$DT)))
-    dt_full_index <- data.table(DT = as.POSIXct(rep(seq(marketOpenNumeric, marketCloseNumeric, scaleFactor), each = length(dateNumeric)) + dateNumeric * 86400, origin = "1970-01-01", tz = tz))
-    
-    pData <- merge(pData, dt_full_index, by = "DT", all = TRUE)
-    
-    
-    pData$PRICE <- na.locf0(pData$PRICE)
-    
+    dt_full_index <- data.table(DT = rep(seq(marketOpenNumeric, marketCloseNumeric, scaleFactor), each = length(dateNumeric)) + dateNumeric * 86400)
+    setkey(dt_full_index, DT)
+    pData <- unique(pData[dt_full_index, roll = TRUE, on = "DT"])
   }
   
+  pData[, DT := as.POSIXct(DT, origin = "1970-01-01", tz = tz)]
   
   if (dummy_was_xts) {
     return(xts(as.matrix(pData[, -c("DT")]), order.by = pData$DT, tzone = tz))
   } else {
-    setkeyv(pData, c("DT", "PRICE"))
     return(pData)
   }
 }
@@ -558,18 +557,22 @@ aggregateQuotes <- function(qData, on = "minutes", k = 5, marketOpen = "09:30:00
     }
   }
   
-  timeZone <- tzone(qData$DT)
-  if(is.null(tz)){
-    if(is.null(timeZone)){
-      timeZone <- "GMT"
+  timeZone <- attr(qData$DT, "tzone")
+  if(timeZone == ""){
+    if(is.null(tz)){
+      tz <- "UTC"
     }
+    qData[, DT := as.POSIXct(format(DT, digits = 20, nsmall = 20), tz = tz)]
+  } else {
     tz <- timeZone
   }
-  marketOpenNumeric <- as.numeric(as.POSIXct(paste("1970-01-01", marketOpen), format = "%Y-%m-%d %H:%M:%OS", tz = timeZone), tz = timeZone)
-  marketCloseNumeric <- as.numeric(as.POSIXct(paste("1970-01-01", marketClose), format = "%Y-%m-%d %H:%M:%OS", tz = timeZone), tz = timeZone)
   
   
-  qData[,DT := as.numeric(DT, tz = tz)]
+  marketOpenNumeric <- as.numeric(as.POSIXct(paste("1970-01-01", marketOpen), format = "%Y-%m-%d %H:%M:%OS", tz = tz), tz = tz)
+  marketCloseNumeric <- as.numeric(as.POSIXct(paste("1970-01-01", marketClose), format = "%Y-%m-%d %H:%M:%OS", tz = tz), tz = tz)
+  
+  
+  qData[,DT := as.numeric(DT)]
   qData <- qData[between(DT %% 86400, marketOpenNumeric, marketCloseNumeric),]
   
   qData[, DATE := floor(DT / 86400)]
@@ -672,15 +675,21 @@ aggregateTrades <- function(tData, on = "minutes", k = 5, marketOpen = "09:30:00
     }
   }
   
-  timeZone <- tzone(tData$DT)
-  if(is.null(tz)){
+  timeZone <- attr(tData$DT, "tzone")
+  if(timeZone == ""){
+    if(is.null(tz)){
+      tz <- "UTC"
+    }
+    tData[, DT := as.POSIXct(format(DT, digits = 20, nsmall = 20), tz = tz)]
+  } else {
     tz <- timeZone
   }
-  marketOpenNumeric <- as.numeric(as.POSIXct(paste("1970-01-01", marketOpen), format = "%Y-%m-%d %H:%M:%OS", tz = timeZone), tz = timeZone)
-  marketCloseNumeric <- as.numeric(as.POSIXct(paste("1970-01-01", marketClose), format = "%Y-%m-%d %H:%M:%OS", tz = timeZone), tz = timeZone)
+  
+  marketOpenNumeric <- as.numeric(as.POSIXct(paste("1970-01-01", marketOpen), format = "%Y-%m-%d %H:%M:%OS", tz = tz), tz = tz)
+  marketCloseNumeric <- as.numeric(as.POSIXct(paste("1970-01-01", marketClose), format = "%Y-%m-%d %H:%M:%OS", tz = tz), tz = tz)
   
   
-  tData[,DT := as.numeric(DT, tz = timeZone)]
+  tData[,DT := as.numeric(DT)]
   tData <- tData[between(DT %% 86400, marketOpenNumeric, marketCloseNumeric),]
   tData[, DATE := floor(DT / 86400)]
   tData[, FIRST_DT := min(DT), by = "DATE"]
@@ -1456,9 +1465,9 @@ quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, 
                                  maxi = maxi,
                                  window = window,
                                  type = type,
-                                 rmoutliersmaxi = rmoutliersmaxi))$qData
+                                 rmoutliersmaxi = rmoutliersmaxi, tz = tz))$qData
       
-      qData <- qData[, DATE := as.Date(DT, tz = "EST")]
+      qData <- qData[, DATE := as.Date(DT, tz = tz)]
       qData <- split(qData, by = "DATE")
       
       try(dir.create(paste0(dataDestination, "/", strsplit(ii, "/")[[1]][1])), silent = TRUE)
@@ -2015,7 +2024,7 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, 
       tData <- try(tradesCleanup(tDataRaw = readdata,
                                  selection = selection,
                                  exchanges = exchanges,
-                                 validConds = validConds))$tData
+                                 validConds = validConds, tz = tz))$tData
       tData <- tData[, DATE := as.Date(DT, tz = tz)]
       tData <- split(tData, by = "DATE")
       
@@ -2073,13 +2082,13 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, 
     tDataRaw <- mergeTradesSameTimestamp(tData, selection = selection)
     nresult[5] <- dim(tDataRaw)[1] 
     
-    if (dummy_was_xts == TRUE) {
+    if (dummy_was_xts) {
       df_result <- xts(as.matrix(tDataRaw[, -c("DT")]), order.by = tDataRaw$DT)
     } else {
       df_result <- tDataRaw
     }
     
-    if (report == TRUE) {
+    if (report) {
       return(list(tData = df_result, report = nresult))
     } else {
       return(df_result)
@@ -2314,6 +2323,7 @@ refreshTime <- function (pData, sort = FALSE, criterion = "squared duration") {
 
 #' @export
 #' @importFrom zoo index
+#' @author Emil Sjoerup
 businessTimeAggregation <- function(pData, measure, obs, bandwidth, ...){
   SIZE <- PRICE <- DT <- intensityProcess <- NULL
   

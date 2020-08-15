@@ -12,7 +12,7 @@ context("medRQ")
 test_that("", {
   expect_equal(
     formatC(medRQ(sampleTData$PRICE,alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE) * 1000000, digits = 5),
-    "0.23645"
+    "0.23646"
   )
 })
 # minRV
@@ -28,7 +28,7 @@ context("minRQ")
 test_that("minRQ", {
   expect_equal(
     minRQ(sampleTData$PRICE, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE) * 1000000,
-    0.13061613812613856456
+    0.1306161
   )
 })
 
@@ -105,7 +105,7 @@ context("rMPV")
 test_that("rMPV", {
   expect_equal(
     formatC(rMPV(sampleTData$PRICE, alignBy ="minutes", alignPeriod = 5, makeReturns = TRUE), digits = 5),
-    "0.00042328"
+    "0.00042302"
   )
 })
 # rOWCov
@@ -125,7 +125,7 @@ context("rRTSCov")
 test_that("rRTSCov", {
   expect_equal(
     formatC(rRTSCov(pData = sampleTData$PRICE) * 10000, digits = 5),
-    "3.5409"
+    "3.5676"
   )
   expect_equal(
     formatC(sum(rRTSCov(pData = list(cumsum(lltc) + 100, cumsum(sbux) + 100))) * 1000000, digits = 5),
@@ -138,7 +138,7 @@ context("rKernelCov")
 test_that("rKernelCov", {
   expect_equal(
     formatC(rKernelCov(rData = sampleTData$PRICE, alignBy = "minutes",  alignPeriod = 5, makeReturns = TRUE), digits = 5),
-    "0.00059605"
+    "0.00059641"
   )
   expect_equal(
     formatC(sum(rKernelCov(rData = cbind(lltc, sbux, fill = 0), alignBy = "minutes", alignPeriod = 5, makeReturns = FALSE)) * 1000, digits = 5),
@@ -159,7 +159,7 @@ context("rSV")
 test_that("rSV", {
   expect_equal(
     rSV(sampleTData$PRICE,alignBy ="minutes", alignPeriod = 5, makeReturns = TRUE),
-    list(rSVdownside = 0.00029125752237359241398, rSVupside = 0.00016310984360246060573)
+    list(rSVdownside = 0.0002913423, rSVupside = 0.000163109843602460)
   )
 })
 # rThresholdCov
@@ -179,7 +179,7 @@ context("rTPVar")
 test_that("rTPVar", {
   expect_equal(
     formatC(rTPVar(sampleTData$PRICE,alignBy ="minutes", alignPeriod = 5, makeReturns = TRUE) * 1000000, digits = 5),
-    "0.41334"
+    "0.41333"
   )
 })
 # rTSCov univariate
@@ -187,7 +187,7 @@ context("rTSCov")
 test_that("rTSCov", {
   expect_equal(
     formatC(rTSCov(pData = sampleTData$PRICE), digits = 5),
-    "0.00052696"
+    "0.00052838"
   )
 })
 # rTSCov multivariate
@@ -203,7 +203,7 @@ context("RV")
 test_that("RV", {
   expect_equal(
     formatC(RV(makeReturns(sampleTData$PRICE)), digits = 5),
-    "0.00064518"
+    "0.00064815"
   )
 })
 
@@ -230,7 +230,7 @@ context("ivInference")
 test_that("ivInference", {
   expect_equal(
     formatC(ivInference(sampleTData$PRICE, IVestimator= "minRV", IQestimator = "medRQ", confidence = 0.95, makeReturns = TRUE)$cb * 10000, digits = 5),
-    c("4.7938", "5.7822")
+    c("4.8088", "5.7948")
   )
 })
 
@@ -357,9 +357,10 @@ context("ReMeDI")
 test_that("ReMeDI", {
   print("Make sure to implement tests for correctTime = TRUE")
   remed <- ReMeDI(sampleTDataMicroseconds, correctTime = FALSE, lags = 0:25, kn = 2)
-  expected <- c(-2.66218e-05, 7.38816e-05, 2.96756e-05, 7.41375e-05, 8.37818e-05, -2.75132e-05, -5.82783e-05, -6.68703e-05, -1.70089e-04,
-                -1.73686e-04, -1.14679e-04, -1.33920e-04, -6.44437e-05, 6.57602e-06, 2.64237e-05, 7.67724e-05, 8.39634e-05, 5.12545e-05,
-                4.86547e-06, -4.60135e-05, -4.63127e-05, -2.73605e-06, -4.31042e-06, 4.12182e-05, 1.34246e-04, 1.82589e-04)
+  
+   expected <- c(1.429670e-05, 9.640725e-05, 1.059059e-04, 7.751148e-05, 3.816783e-05, 1.706490e-05, -9.071417e-06, -4.930293e-06, -2.065554e-06, -2.675700e-05,
+                 -4.750562e-05, -6.652264e-05, -7.900057e-05, -7.084243e-05, -2.944357e-05, -1.196783e-05, 1.206840e-06, 2.660061e-05, 2.610301e-05, 3.354312e-05,
+                 3.074634e-05, -3.352647e-06, -2.297883e-05, -4.176323e-05, -4.162248e-05, -5.299878e-06)
   
   expect_equal(remed, expected)
   
@@ -367,11 +368,11 @@ test_that("ReMeDI", {
   dat <- sampleTData$PRICE
   storage.mode(dat) <- "numeric"
   remed <- ReMeDI(dat, correctTime = FALSE, jumpsIndex = NULL, lags = 0:25, kn = 4)
-  expected <- c(1.86978e-04, -4.31953e-04, -6.52901e-04, -8.80298e-04, -9.02409e-04, -9.37731e-04, -8.64216e-04, -8.68524e-04, -7.54001e-04,
-                -5.65765e-04, -4.09569e-04, -1.95228e-04, -2.05796e-04, -1.55349e-04, -1.24973e-04, -1.68317e-05, 3.43256e-05, 3.60085e-05,
-                -3.09326e-05, -1.54228e-04, -6.38609e-05, -6.48542e-06, 1.67251e-04, 2.73141e-04, 2.72673e-04, 1.25878e-04)
   
-  
+ expected <- c(1.943885e-04, -3.938879e-04, -5.858273e-04, -7.996193e-04, -8.395354e-04, -9.102818e-04, -8.829556e-04, -8.944065e-04, -7.944514e-04, -6.351139e-04,
+               -4.721643e-04, -2.342956e-04, -1.940048e-04, -1.110132e-04, -4.208034e-05, 9.607314e-06,  8.919365e-05,  7.845024e-05, -1.345024e-05, -1.488040e-04,
+               -1.283543e-04, -3.281175e-05, 1.010042e-04, 2.796343e-04,   2.801229e-04,   1.847872e-04)
+ 
   expect_equal(remed, expected)
   
   
@@ -380,7 +381,7 @@ test_that("ReMeDI", {
 test_that("ReMeDI kn choosing algorithm", {
   
   optimalKn <- knChooseReMeDI(sampleTDataMicroseconds, correctTime = FALSE, jumpsIndex = NULL, knMax = 10, tol = 0.05, size = 3, lower = 1, upper = 10, plot = FALSE)
-  expect_equal(optimalKn, 2L)
+  expect_equal(optimalKn, 1L)
   
   dat <- sampleTData$PRICE
   storage.mode(dat) <- "numeric"

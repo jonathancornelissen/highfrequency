@@ -1,3 +1,4 @@
+library(xts)
 context("autoSelectExchangeTrades")
 test_that("autoSelectExchangeTrades", {
   expect_equal(
@@ -70,12 +71,12 @@ test_that("selectExchange and data cleaning functions", {
   
   expect_equal(
   dim(tradesCleanupUsingQuotes(tData = sampleTData, qData = sampleQData)),
-  c(8230, 12)
+  c(8340, 12)
   )
   
   expect_equal(
   dim(tradesCleanup(tDataRaw = sampleTDataRaw, exchanges = "N", report = FALSE)),
-  c(9104, 7)
+  c(9208, 8)
   )
 })
 
@@ -161,8 +162,8 @@ test_that("tradesCleanup on-disk functionality", {
   onDiskDay2 <- onDiskDay2[as.Date(DT, tz = "EST") == "2018-01-03",c("DT", "SYMBOL", "PRICE", "SIZE")][, DT := DT - 18000]
   setkey(onDiskDay1, SYMBOL, DT)
   setkey(onDiskDay2, SYMBOL, DT)
-  expect_equal(onDiskDay1, sampleTDataMicrosecondsDay1)
-  expect_equal(onDiskDay2, sampleTDataMicrosecondsDay2)
+  expect_equal(onDiskDay1[,-"DT"], sampleTDataMicrosecondsDay1[,-"DT"])
+  expect_equal(onDiskDay2[,-"DT"], sampleTDataMicrosecondsDay2[,-"DT"])
   ## Test that they are equal to the shipped data
   cleanedMicroseconds <-  rbind(sampleTDataMicrosecondsDay1, sampleTDataMicrosecondsDay2)
   setkey(cleanedMicroseconds, SYMBOL, DT)
@@ -207,14 +208,21 @@ test_that("aggregateTS edge cases", {
 })
 
 
+context("aggregatePrice time zones")
+test_that("aggregatePrice time zones", {
+  dat <- data.table(DT = as.POSIXct(c(34150, 34201, 34500, 34500 + 1e-9, 34799, 34801, 34803, 35099), origin = "1970-01-01", tz = "EST"), PRICE = 0:7)
+  
+  output <- aggregatePrice(dat, on = "minutes", k = 5, marketOpen = "04:30:00", marketClose = "11:00:00", fill = FALSE)
+  target <- data.table(DT = as.POSIXct(c(34200, 34500, 34800, 35100), origin = "1970-01-01", tz = "EST"), PRICE = c(1,2,4,7))
+  expect_equal(output, target)
+})
+
 
 context("aggregatePrice edge cases")
 test_that("aggregatePrice edge cases", {
-  dat <- data.table(DT = as.POSIXct(c(34150 ,34201, 34500, 34500 + 1e-9, 34799, 34801, 34803, 35099), origin = "1970-01-01", tz = "GMT"), PRICE = 0:7)
+  dat <- data.table(DT = as.POSIXct(c(34150, 34201, 34500, 34500 + 1e-9, 34799, 34801, 34803, 35099), origin = "1970-01-01", tz = "UTC"), PRICE = 0:7)
   output <- aggregatePrice(dat, on = "minutes", k = 5, marketOpen = "09:30:00", marketClose = "16:00:00", fill = FALSE)
-  
-  target <- data.table(DT = as.POSIXct(c(34200, 34500, 34800, 35100), origin = "1970-01-01", tz = "GMT"), PRICE = c(1,2,4,7))
-  setkeyv(target, c("DT", "PRICE"))
+  target <- data.table(DT = as.POSIXct(c(34200, 34500, 34800, 35100), origin = "1970-01-01", tz = "UTC"), PRICE = c(1,2,4,7))
   expect_equal(output, target)
 })
 

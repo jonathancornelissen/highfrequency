@@ -80,9 +80,10 @@ colnames(covariances) <- c("mixed", "neg", "pos")
 plot(covariances)
 addLegend(lty = 1) # Add legend so we can distinguish the series.
 }
-
 }
 \author{
+Emil Sjoerup
+
 Emil Sjoerup
 }
 \keyword{volatility}

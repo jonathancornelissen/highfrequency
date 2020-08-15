@@ -2386,7 +2386,7 @@ rCholCov <- function(pData, IVest = "MRC", COVest = "MRC", criterion = "squared 
 #' plot(covariances)
 #' addLegend(lty = 1) # Add legend so we can distinguish the series.
 #' }
-#' 
+#' @author Emil Sjoerup
 #' @keywords volatility
 #' @importFrom data.table between
 #' @export
@@ -2476,7 +2476,7 @@ listCholCovEstimators <- function(){
 #' estimates auto-covariance of market-microstructure noise 
 #' 
 #' @param pData xts or data.table containing the log-prices of the asset
-#' @param kn numeric of length 1 determining the tuning parameter kn, which controls the lengths of the non-overlapping interval in the ReMeDI estimation
+#' @param kn numeric of length 1 determining the tuning parameter kn this controls the lengths of the non-overlapping interval in the ReMeDI estimation
 #' @param lags numeric containing integer values indicating 
 #' @param correctTime logical indicating whether to use the time-adjusted ReMeDI measure, default is FALSE
 #' @param jumpsIndex Indices of jump(s) detected
@@ -2485,7 +2485,7 @@ listCholCovEstimators <- function(){
 #' @references remedi paper, muzafer's paper
 #' @keywords microstructure noise autocovariance autocorrelation
 #' 
-#' 
+#' @author Emil Sjoerup
 #' @export
 ReMeDI <- function(pData, kn = 1, lags = 1, correctTime = FALSE, jumpsIndex = NULL, makeCorrelation = FALSE){
   time <- DT <- PRICE <- NULL
@@ -2619,6 +2619,7 @@ ReMeDI <- function(pData, kn = 1, lags = 1, correctTime = FALSE, jumpsIndex = NU
 #' optimalKn
 #' }
 #' 
+#' @author Emil Sjoerup
 #' @importFrom stats plot.ts
 #' @references A ReMeDI for Microstructure Noise
 #' @return integer containing the optimal kn
@@ -2646,4 +2647,133 @@ knChooseReMeDI <- function(pData, correctTime = FALSE, jumpsIndex = NULL, knMax 
   return(as.integer(kn))
   
 }
+
+
+#' Autocorrelation of noise estimation
+#' @importFrom zoo coredata
+#' @export
+autoCorrelationOfNoise <- function(pData, kn, lags){
+  ## Make general:
+  reticulate::source_python("../pickle_reader.py")
+  dat <- read_pickle_file("/data/data/pickles/AIG_Tr_20140102_cleaned.pickle")
+  pData <- xts(dat$price, anytime::anytime(dat$timestamp))
+  colnames(pData) <- "PRICE"
+  prices <- pData$PRICE
+  kn <- 2
+  lags <- 30
+  averagedPrices <- filter(coredata(prices), rep(1, kn)/kn, sides = 1)[-seq(1, (kn-1))]
+  nObs <- length(averagedPrices)
+  J <- lags
+  R_est <- rep(0, J + 1)
+  r_est <- rep(0, J + 1)
+  
+  U_0 <- rep(0, J + 1)
+  
+  for (j in 0:J) {
+    
+    ind <- seq(1, nObs + 1 - j - 2 * 2 * kn)
+    U_0[(j+1)] <- sum((prices[ind] - averagedPrices[(j + kn + ind)]) * (prices[ j+ ind] - averagedPrices[(j + 3 * kn + ind)]))
+    R_est[(j+1)] <- U_0[j + 1]/length(ind)
+    
+  }
+  
+  
+  UU_2 <- UU_3 <- UU_4 <- UU_1 <- matrix(0 ,nrow= kn + 1, ncol= J + 1) 
+  
+  for (m in 0:kn) {
+    for (j in 0:J) {
+      mu <- j + m
+      ind <- seq(1, nObs + 1 - mu - 8 * kn)
+      
+      UU_1[(m+1), (j+1)] <- 
+        sum((prices[ind] - averagedPrices[(mu + kn + ind)]) * 
+            (prices[j + ind] - averagedPrices[(mu + 3 * kn + ind)]) *
+            (prices[m + ind] - averagedPrices[(mu + 5 * kn + ind)]) *
+            (prices[j + m + ind] - averagedPrices[(mu + 7 * kn + ind)])) 
+      
+      UU_2[(m+1),(j+1)] <- 
+        sum( (prices[m + ind] - averagedPrices[(mu + kn + ind)]) * 
+             (prices[j + m + ind] - averagedPrices[(mu + 3 * kn + ind)] ) *
+             (prices[ind] - averagedPrices[(mu + 5 * kn + ind)] ) *
+             (prices[j + ind] - averagedPrices[(mu + 7 * kn + ind)] )  )  
+      
+      UU_3[(m+1),(j+1)] <- 
+        sum( (prices[ind] - averagedPrices[(mu + kn + ind)]) * 
+             (prices[j + ind] - averagedPrices[(mu + 3 * kn + ind)] ) *
+             (prices[m + ind] - averagedPrices[(mu + 5 * kn + ind)] ) *
+             (prices[m + ind] - averagedPrices[(mu + 7 * kn + ind)] )  )  
+      
+      
+      UU_4[(m+1),(j+1)] <- 
+        sum( (prices[m + ind] - averagedPrices[(mu + kn + ind)]) * 
+             (prices[j + m + ind] - averagedPrices[(mu + 3 * kn + ind)] ) *
+             (prices[ind] - averagedPrices[(mu + 5 * kn + ind)] ) *
+             (prices[ind] - averagedPrices[(mu + 7 * kn + ind)] ))  
+    }
+  }
+  
+  U_bar_1 <- rep(0, J + 1) # U_bar(0,j,0,j)
+  U_bar_2 <- rep(0, J + 1) # U_bar(0,j,0,0)
+  
+  
+  for (j in 0:J) {
+    mu <- j
+    mu_pp <- j + j
+    
+    ind <- seq(1, nObs + 1 - mu_pp - 9 * kn)
+    
+    U_bar_1[(j+1)] <- sum( (prices[ind] - averagedPrices[(mu + kn + ind)]) * 
+                           (prices[j+ ind] - averagedPrices[(mu + 3 * kn + ind)] ) *
+                           (prices[mu + 5 * kn + ind] - averagedPrices[(mu_pp + 5 * kn + kn + ind)] ) *
+                           (prices[mu + 5 * kn + j + ind] - averagedPrices[(mu_pp + 5 * kn + 3 * kn + ind)] ) )
+    
+    U_bar_2[(j+1)] <- sum( (prices[ind] - averagedPrices[(mu + kn + ind)]) * 
+                           (prices[ j+ ind] - averagedPrices[(mu + 3*kn + ind)] ) *
+                           (prices[ mu + 5*kn + ind] - averagedPrices[(mu + 5 * kn + kn + ind)] ) *
+                           (prices[ mu + 5*kn + ind] - averagedPrices[(mu + 5 * kn + 3 * kn + ind)] ) )
+  }
+  
+  S <- rep(0, J + 1) # S[0,j,0,j]
+  Bza <- rep(0, J + 1) # Bza[0,j,0,j]
+  
+  S_1 <- rep(0, J + 1) # S[0,j,0,0]
+  Bza_1 <- rep(0, J + 1) # Bza[0,j,0,0]
+  sigma_r <- rep(1, J) # 
+  
+  j<-0
+  S[(j+1)] <- (sum(UU_1[,(j+1)]) + sum(UU_2[,(j+1)]) - UU_1[1,(j+1)]) - (2*kn + 1)*U_bar_1[(j+1)]
+  Bza[(j+1)] <- S[(j+1)]/nObs + U_bar_1[(j+1)]/nObs - R_est[(j+1)]^2
+  
+  S_1[(j+1)] <- (sum(UU_3[,(j+1)]) + sum(UU_4[,(j+1)]) - UU_3[1,(j+1)] ) - (2*kn + 1)*U_bar_2[(j+1)]
+  Bza_1[(j+1)] <- S_1[(j+1)]/nObs + U_bar_2[(j+1)]/nObs - R_est[1]*R_est[(j+1)]
+  
+  
+  for (j in 1:J) {
+    S[(j+1)] <- (sum(UU_1[,(j+1)]) + sum(UU_2[,(j+1)]) - UU_1[1,(j+1)]) - (2*kn + 1)*U_bar_1[(j+1)]
+    Bza[(j+1)] <- S[(j+1)]/nObs + U_bar_1[(j+1)]/nObs - R_est[(j+1)]^2
+    
+    S_1[(j+1)] <- (sum(UU_3[,(j+1)]) + sum(UU_4[,(j+1)]) - UU_3[1,(j+1)] ) - (2*kn + 1)*U_bar_2[(j+1)]
+    Bza_1[(j+1)] <- S_1[(j+1)]/nObs + U_bar_2[(j+1)]/nObs - R_est[1]*R_est[(j+1)]
+    sigma_r[j] <- (R_est[1]^2*Bza[(j+1)] + R_est[(j+1)]^2 * Bza[1] - (2 * R_est[1] * R_est[(j+1)] * Bza_1[(j+1)]))/(R_est[1]^4)
+  }
+  
+  
+  
+  
+  
+  plot.ts(R_est)
+  
+  #plot.ts(sigma_r)
+  
+}
+
+
+
+
+
+
+
+
+
+
 

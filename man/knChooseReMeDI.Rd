@@ -63,3 +63,6 @@ optimalKn
 \references{
 A ReMeDI for Microstructure Noise
 }
+\author{
+Emil Sjoerup
+}
