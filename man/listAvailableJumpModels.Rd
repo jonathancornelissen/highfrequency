@@ -12,3 +12,6 @@ This function returns the available Jump models in a matrix
 \description{
 List the available jump models for simulations
 }
+\author{
+Emil Sjoerup
+}

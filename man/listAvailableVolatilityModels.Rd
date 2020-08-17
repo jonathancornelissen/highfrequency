@@ -12,3 +12,6 @@ This function returns the available volatility models in a matrix
 \description{
 List the available volatility models for simulations
 }
+\author{
+Emil Sjoerup
+}

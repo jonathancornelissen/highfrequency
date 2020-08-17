@@ -281,6 +281,21 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// vasicekModel
+Rcpp::List vasicekModel(Rcpp::List model, int nObs, int nSeries, int nDays, arma::mat dt);
+RcppExport SEXP _highfrequency_vasicekModel(SEXP modelSEXP, SEXP nObsSEXP, SEXP nSeriesSEXP, SEXP nDaysSEXP, SEXP dtSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::List >::type model(modelSEXP);
+    Rcpp::traits::input_parameter< int >::type nObs(nObsSEXP);
+    Rcpp::traits::input_parameter< int >::type nSeries(nSeriesSEXP);
+    Rcpp::traits::input_parameter< int >::type nDays(nDaysSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type dt(dtSEXP);
+    rcpp_result_gen = Rcpp::wrap(vasicekModel(model, nObs, nSeries, nDays, dt));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_highfrequency_quadraticKernel", (DL_FUNC) &_highfrequency_quadraticKernel, 1},
@@ -301,6 +316,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_highfrequency_kernelEstimator", (DL_FUNC) &_highfrequency_kernelEstimator, 8},
     {"_highfrequency_rv", (DL_FUNC) &_highfrequency_rv, 7},
     {"_highfrequency_pcovcc", (DL_FUNC) &_highfrequency_pcovcc, 10},
+    {"_highfrequency_vasicekModel", (DL_FUNC) &_highfrequency_vasicekModel, 5},
     {NULL, NULL, 0}
 };
 

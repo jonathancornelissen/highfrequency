@@ -9,3 +9,6 @@ hfsim.do(hfSimSpec)
 \description{
 simulate hf prices
 }
+\author{
+Emil Sjoerup
+}

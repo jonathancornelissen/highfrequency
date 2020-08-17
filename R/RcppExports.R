@@ -79,3 +79,7 @@ pcovcc <- function(a, ap, b, at, atp, bt, na, nap, nb, period) {
     .Call(`_highfrequency_pcovcc`, a, ap, b, at, atp, bt, na, nap, nb, period)
 }
 
+vasicekModel <- function(model, nObs, nSeries, nDays, dt) {
+    .Call(`_highfrequency_vasicekModel`, model, nObs, nSeries, nDays, dt)
+}
+
