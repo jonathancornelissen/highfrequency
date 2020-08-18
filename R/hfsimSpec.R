@@ -38,8 +38,8 @@ createHFSimSpec <- function(volatilityModel = list(modelType = "constant", sigma
   
   # If we don't get the input, we set it to the defaults
   if(is.null(volatilityModel$modelType)) volatilityModel$modelType <- "constant"
-  if(is.null(volatilityModel$sigma)) volatilityModel$sigma <- as.matrix(0.2)
-  volatilityModel$sigma <- as.matrix(volatilityModel$sigma)
+  if(is.null(volatilityModel$sigma)) volatilityModel$sigma <- diag(0.2, nrow = nSeries, ncol = nSeries)
+  volatilityModel$sigma <- matrix(volatilityModel$sigma, ncol = nSeries)
   
 
   validVolatilityModelTypes <- listAvailableVolatilityModels()[,1]
@@ -50,11 +50,9 @@ createHFSimSpec <- function(volatilityModel = list(modelType = "constant", sigma
     stop("volatility model type specified does not appear in valid model types. See listAvalableVolatilityModels() for valid types.\n", call.=FALSE)
   }
   
-  if(!is.numeric(volatilityModel$sigma) | any(diag(volatilityModel$sigma) <= 0) | !isSymmetric(volatilityModel$sigma)){
-    stop("sigma must be symmetric matrix with positive diagonal")
+  if(!is.numeric(volatilityModel$sigma) | any(diag(volatilityModel$sigma) < 0) | !isSymmetric(volatilityModel$sigma)){
+    stop("sigma must be symmetric matrix with non-negative diagonal")
   }
-  
-
   
   if(nrow(volatilityModel$sigma) > 1){
     ev <- eigen(volatilityModel$sigma, symmetric = TRUE)
@@ -64,8 +62,22 @@ createHFSimSpec <- function(volatilityModel = list(modelType = "constant", sigma
   }
   
   if(nSeries != nrow(volatilityModel$sigma)){
-    warning("nSeries does not match the number of assets mandated in the sigma matrix. Setting nSeries to match nrow(sigma)")
-    nSeries <- nrow(volatilityModel$sigma)
+    if(nrow(volatilityModel$sigma) != 1){
+      warning("nSeries does not match the number of assets mandated in the sigma matrix. Setting nSeries to match nrow(sigma)")
+      nSeries <- nrow(volatilityModel$sigma)
+    } else { ## We have 1 value for sigma, so we make it into a nSeries by nSeries diagonal matrix
+      volatilityModel$sigma <- diag(as.numeric(volatilityModel$sigma), ncol = nSeries, nrow = nSeries)
+    }
+  }
+  
+  if(volatilityModel$modelType == "heston"){
+    # Defaults on the slides of Bezirgen Veliyev for the 2018 high frequency econometrics course at Aarhus University:
+    if(is.null(volatilityModel$meanReversion)) volatilityModel$meanReversion <- rep(5/250, nSeries)
+    if(is.null(volatilityModel$sigma)) volatilityModel$sigma <- rep(0.2/250, nSeries)
+    if(is.null(volatilityModel$volOfVol)) volatilityModel$volOfVol <- rep(0.5/250, nSeries)
+    if(is.null(volatilityModel$rho)) volatilityModel$rho <- rep(-0.5, nSeries)
+    # Currently we have no correlation in the heston model.
+    volatilityModel$sigma <- matrix(as.numeric(diag(volatilityModel$sigma)), ncol = nSeries)
   }
   
   
@@ -85,7 +97,6 @@ createHFSimSpec <- function(volatilityModel = list(modelType = "constant", sigma
   if(is.null(driftModel$drift)) driftModel$drift <- 0
   # drift must be same length as sigma has columns
   if(length(driftModel$drift) != ncol(volatilityModel$sigma)) driftModel$drift <- rep(driftModel$drift, ncol(volatilityModel$sigma))[1:ncol(volatilityModel$sigma)]
-  
   if(!is.character(driftModel$modelType)){
     stop("drift model type must be a character.\n", call.=FALSE)
   }
@@ -93,7 +104,18 @@ createHFSimSpec <- function(volatilityModel = list(modelType = "constant", sigma
   if(!(driftModel$modelType %in% validDriftModelTypes)){
     stop("drift model type specified does not appear in valid model types. See listAvailableDriftModels() for valid types.\n", call.=FALSE)
   }
-
+  
+  ## Check that vasicek model is correctly specified
+  if(driftModel$modelType == "vasicek"){
+    
+    if(is.null(driftModel$drift)) driftModel$drift = rep(0, ncol(volatilityModel$sigma))
+    if(is.null(driftModel$meanReversion)) driftModel$meanReversion = rep(2, ncol(volatilityModel$sigma))
+    if(is.null(driftModel$driftVol)) driftModel$driftVol = rep(0.0391/252, ncol(volatilityModel$sigma))
+    
+    if(length(driftModel$drift) != ncol(volatilityModel$sigma)) driftModel$drift <- rep(driftModel$drift, ncol(volatilityModel$sigma))[1:ncol(volatilityModel$sigma)]
+    if(length(driftModel$meanReversion) != ncol(volatilityModel$sigma)) driftModel$meanReversion <- rep(driftModel$meanReversion, ncol(volatilityModel$sigma))[1:ncol(volatilityModel$sigma)]
+    if(length(driftModel$driftVol) != ncol(volatilityModel$sigma)) driftModel$driftVol <- rep(driftModel$driftVol, ncol(volatilityModel$sigma))[1:ncol(volatilityModel$sigma)]
+  }
   
   if(!is.numeric(driftModel$drift) | (length(driftModel$drift) != 1 & length(driftModel$drift) != nSeries) & length(driftModel$drift) != ncol(volatilityModel$sigma)){
     stop("drift must be a numeric with length equal to 1 or equal to nSeries, or ncol(sigma) ")
@@ -298,7 +320,7 @@ createHFSimSpec <- function(volatilityModel = list(modelType = "constant", sigma
 listAvailableDriftModels <- function(){
   models <- matrix(
     c("constant", "constant drift",
-      "oneFactor", "single factor models"
+      "vasicek", "vasicek model"
       
       ), ncol = 2, byrow=TRUE
   )

@@ -83,3 +83,16 @@ vasicekModel <- function(model, nObs, nSeries, nDays, dt) {
     .Call(`_highfrequency_vasicekModel`, model, nObs, nSeries, nDays, dt)
 }
 
+#' Heston model: 
+#' dXt = mu_t * dt + sigma_t * dW_t 
+#' dSigma_t^2 = kappa * (theta - sigma_t^2) * dt + xi * sigma_t *dB_t
+#' Where Wt and Bt are (often negatively) correlated brownian motions with correlation rho
+#' We will not simulate mu_t here, that is done in R code elsewhere.
+#' kappa is the mean reversion factor.
+#' theta is the long term mean of volatility
+#' xi is the vol of vol parameter.
+#' @keywords internal
+hestonModel <- function(model, nObs, nSeries, nDays, dt) {
+    .Call(`_highfrequency_hestonModel`, model, nObs, nSeries, nDays, dt)
+}
+

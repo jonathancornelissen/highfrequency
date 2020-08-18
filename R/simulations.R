@@ -39,23 +39,16 @@ hfsim.do <- function(hfSimSpec){
     #(1/(1 + (volatilityModel$burstModel$burstInterval[2] - volatilityModel$burstModel$burstInterval[1]) * volatilityModel$burstModel$burstMultiplier))
   }
   
-  
   ### Returns coming from mu(t)
   driftReturns <- switch(driftModel$modelType,
                          constant = list("drift" = driftModel$drift * dt),
-                         oneFactor = vasicekModel(driftModel, nObs, nSeries, nDays, dt)
+                         vasicek = vasicekModel(driftModel, nObs, nSeries, nDays, dt)
                          )
-  # par(mfrow = c(2,1))
-  # plot.ts(driftReturns$drift[,1])
-  # abline(h = driftModel$drift[1])
-  # plot.ts(driftReturns$drift[,2])
-  # abline(h = driftModel$drift[2])
-  # browser()
   ### Returns coming from sigma(t)
   volatilityReturns <- switch(volatilityModel$modelType,
-                              constant = constantVolatilitySim(volatilityModel, nDays, nSeries, nObs, dt)
+                              constant = constantVolatilitySim(volatilityModel, nDays, nSeries, nObs, dt),
+                              heston = hestonModel(volatilityModel, nDays, nSeries, nObs, dt)
                               )
-  
   ### Returns from drift bursts
   driftBursts <- switch(burstModel$driftModel$modelType,
                         none = 0,
@@ -73,7 +66,7 @@ hfsim.do <- function(hfSimSpec){
     PA = preAnnouncedJumpSim(hfSimSpec$jumpModel, nDays, nSeries, nObs)
   )
   #Construct our price process
-  returns <- driftReturns$drift + driftBursts + volatilityReturns$returns * volBursts
+  returns <- volatilityReturns$returns * volBursts
   
   # If we need to include jumps, then we do it here
   if(includeJumps){
@@ -83,14 +76,20 @@ hfsim.do <- function(hfSimSpec){
     }
   }
   
-  
   out <- vector(mode = "list", length = 4L)
   names(out) <- c("prices", "drift", "volatility", "jumps")
 
-  out$prices <- xts(colCumsum(returns), as.POSIXct(timestamps, origin = hfSimSpec$timeSettings$origin))
+  out$prices <- xts((driftReturns$drift + driftBursts) + colCumsum(returns), as.POSIXct(timestamps, origin = hfSimSpec$timeSettings$origin))
   if(hfSimSpec$discretize){
    out$prices <- log(round(100 * exp(out$prices)) / 100)
   }
+  if(!is.null(volatilityReturns$underlyingVolatility)){
+    out$underlyingVolatility <- volatilityReturns$underlyingVolatility
+  }
+  if(driftModel$modelType != "none"){
+    out$drift <- driftReturns$drift
+  }
+  
   
   out$jumps <- jumps
   return(out)
@@ -107,7 +106,8 @@ hfsim.do <- function(hfSimSpec){
 listAvailableVolatilityModels <- function(){
   
   models <- matrix(
-    c("constant", "constant volatility"), ncol = 2, byrow=TRUE
+    c("constant", "constant volatility",
+      "heston", "heston stochastic volatility model"), ncol = 2, byrow=TRUE
                  )
   
   colnames(models) <- c("Abbreviation", "Description")
@@ -157,16 +157,12 @@ FoFVolatilitySim <- function(model, nDays, nSeries, nObs, dt){
 #' @importFrom data.table between
 #' @keywords internal
 singularityVolBurst <- function(model, nDays, nSeries, nObs, dt){
-  if(length(dt) == 1){
-    burstIndices <- round(nObs * model$burstInterval)
-    timestamps <- 1:nObs/nObs
-    pivot <- mean(timestamps[burstIndices]) # we use this pivot so we can move our drift burst around on the day
-  } else {
-    print("need to make driftBursts compatible with non-equidistant sampling")
-    timestamps <- (colCumsum(dt[1:nObs,])) 
-    burstIndices <- which(between(dt, model$burstInterval[1], model$burstInterval[2]))
-    pivot <- timestamps[round(mean(round(nObs * model$burstInterval)))] ## Find the pivot and make sure it's actually an obseration.
-  }
+  
+  timestamps <- (colCumsum(dt[1:nObs,])) 
+  burstIndices <- which(between(dt, model$burstInterval[1], model$burstInterval[2]))
+  pivot <- timestamps[round(mean(round(nObs * model$burstInterval)))] ## Find the pivot and make sure it's actually an obseration.
+  
+  # Volatility burst.
   volBurst <- matrix(rep(model$b * 1/abs(pivot - timestamps)^model$beta, nDays), ncol = nSeries)
   infs <- which(is.infinite(volBurst))
   volBurst[infs] <- volBurst[infs-1]
@@ -179,16 +175,10 @@ singularityVolBurst <- function(model, nDays, nSeries, nObs, dt){
 #' @importFrom data.table between
 #' @keywords internal
 singularityDriftBurst <- function(model, nDays, nSeries, nObs, dt){
-  if(length(dt) == 1){
-    burstIndices <- round(nObs * model$burstInterval)
-    timestamps <- 1:nObs/nObs
-    pivot <- mean(timestamps[burstIndices]) # we use this pivot so we can move our drift burst around on the day
-  } else {
-    print("need to make driftBursts compatible with non-equidistant sampling")
-    timestamps <- (colCumsum(dt[1:nObs,])) 
-    burstIndices <- which(between(timestamps, model$burstInterval[1], model$burstInterval[2]))
-    pivot <- timestamps[round(mean(round(nObs * model$burstInterval)))] ## Find the pivot and make sure it's actually an obseration.
-  }
+  timestamps <- (colCumsum(dt[1:nObs,])) 
+  burstIndices <- which(between(timestamps, model$burstInterval[1], model$burstInterval[2]))
+  pivot <- timestamps[round(mean(round(nObs * model$burstInterval)))] ## Find the pivot and make sure it's actually an obseration.
+  # Drift burst
   driftDB <- matrix(rep(model$a * sign(timestamps - pivot)/(abs(pivot - timestamps)^model$alpha), nDays), ncol = nSeries)
   driftDB[is.na(driftDB)] <- 0
   return(driftDB * dt)
