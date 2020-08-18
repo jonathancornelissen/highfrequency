@@ -47,7 +47,7 @@ hfsim.do <- function(hfSimSpec){
   ### Returns coming from sigma(t)
   volatilityReturns <- switch(volatilityModel$modelType,
                               constant = constantVolatilitySim(volatilityModel, nDays, nSeries, nObs, dt),
-                              heston = hestonModel(volatilityModel, nDays, nSeries, nObs, dt)
+                              heston = hestonModel(volatilityModel, nObs, nSeries, nDays, dt)
                               )
   ### Returns from drift bursts
   driftBursts <- switch(burstModel$driftModel$modelType,

@@ -1,7 +1,7 @@
 #include <RcppArmadillo.h>
 using namespace arma;
 using namespace Rcpp;
-// [[Rcpp::plugins(cpp11)]]
+// [[Rcpp::plugins(cpp11)]] // So we can use lambdafunctions
 inline arma::rowvec vecpow(arma::rowvec x, const arma::rowvec power){
   assert (x.n_elem == power.n_elem);
   
@@ -53,19 +53,26 @@ List vasicekModel(List model, int nObs, int nSeries, int nDays, arma::mat dt){
 //' @keywords internal
 // [[Rcpp::export]]
 List hestonModel(List model, int nObs, int nSeries, int nDays, arma::mat dt){
+  arma::mat sigma = model["sigma"];
+  const arma::rowvec kappa = model["meanReversion"];
+  const arma::rowvec theta = sigma.diag().t();
+  const arma::rowvec xi = model["volOfVol"];
+  const arma::rowvec rho = model["rho"];
   
-  arma::rowvec kappa = model["meanReversion"];
-  arma::rowvec theta = model["sigma"];
-  arma::rowvec xi = model["volOfVol"];
-  arma::rowvec rho = model["rho"];
+  //sigma /= prod(sqrt(sigma.diag()));
+  sigma = sqrt(diagmat(sigma.diag())).i() * sigma * sqrt(diagmat(sigma.diag())).i();
   
-  arma::mat wt = arma::randn((nObs * nDays), nSeries) % sqrt(dt);
+  
+  //sigma = sigma * (1/as_scalar(sigma.min()));
+  // arma::mat wt = arma::randn((nObs * nDays), nSeries) % sqrt(dt);
+  arma::mat wt = arma::mvnrnd(arma::zeros(nSeries), sigma, nObs * nDays).t() % sqrt(dt);
   arma::mat bt = arma::randn((nObs * nDays), nSeries) % sqrt(dt);
   bt = bt.each_row(([&rho](const arma::rowvec& B){return B % sqrt(1.0 - square(rho)); })) + wt.each_row(([&rho](const arma::rowvec& W){ return W % rho;}));
+  
   // sigma^2 container
   arma::mat sigma2 = mat(bt);
   sigma2.row(0) = theta;
-  
+
   for(int t = 1; t < nObs * nDays; t++){
     sigma2.row(t) = sigma2.row(t-1) + kappa % (theta - sigma2.row(t-1)) % dt.row(t-1) + xi % sqrt(sigma2.row(t-1)) % bt.row(t-1);
   }
@@ -83,23 +90,4 @@ List hestonModel(List model, int nObs, int nSeries, int nDays, arma::mat dt){
   
 }
 
-
-
-// // [[Rcpp::export]]
-// List hestonSimCpp(int iObs, double dMu, double dKappa, double dSigma, double dXi, double dRho) {
-//   
-//   arma::vec vVol(iObs);
-//   arma::vec vPrice(iObs);
-//   arma::vec vWt = arma::randn(iObs) * sqrt(1.0/iObs);
-//   arma::vec vBt = arma::randn(iObs) * sqrt(1.0/iObs)  * sqrt((1.0-pow(dRho,2.0))) + dRho * vWt;
-//   vVol[0] = dSigma;
-//   for(int t = 1; t < iObs; t++){
-//     vVol[t] = vVol[(t-1)] + dKappa * (dSigma - vVol[(t-1)]) *  1.0/iObs + dXi * sqrt(vVol[(t-1)]) * vBt[(t-1)];
-//   }
-//   
-//   arma::vec vRet = (dMu + pow(vVol,2.0) * 0.5) * 1.0/iObs + sqrt(vVol) % vWt;
-//   List lOut;
-//   lOut["sigma"] = vVol;
-//   lOut["returns"] = vRet;
-//   return lOut;
-// }
+//List 

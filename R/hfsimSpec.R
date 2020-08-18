@@ -77,7 +77,7 @@ createHFSimSpec <- function(volatilityModel = list(modelType = "constant", sigma
     if(is.null(volatilityModel$volOfVol)) volatilityModel$volOfVol <- rep(0.5/250, nSeries)
     if(is.null(volatilityModel$rho)) volatilityModel$rho <- rep(-0.5, nSeries)
     # Currently we have no correlation in the heston model.
-    volatilityModel$sigma <- matrix(as.numeric(diag(volatilityModel$sigma)), ncol = nSeries)
+    #volatilityModel$sigma <- matrix(as.numeric(diag(volatilityModel$sigma)), ncol = nSeries)
   }
   
   
