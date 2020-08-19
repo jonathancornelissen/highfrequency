@@ -3,10 +3,26 @@ using namespace arma;
 using namespace Rcpp;
 // [[Rcpp::plugins(cpp11)]] // So we can use lambda functions
 
+
+
 // This needs to be corrected so we actually do s-exp instead of just exp.
-arma::mat s_exp(const arma::mat x){
-  return clamp(exp(x), 0.0, 100.0);
+arma::rowvec s_exp(const arma::rowvec& x){
+  const double u_0 = std::log(1.5);
+  arma::rowvec y = arma::zeros<rowvec>(x.n_elem);
+  for(arma::uword i = 0; i < y.n_elem; i++){
+    if( (x[i] <= u_0) ){
+      y[i] = exp(x[i]);
+    } else {
+      y[i] = exp(u_0)/sqrt(u_0) * sqrt(u_0 - pow(u_0, 2.0) + x[i]);
+    }
+  }
+  
+  
+  return y;
 }
+
+
+
 
 inline arma::rowvec vecpow(arma::rowvec x, const arma::rowvec power){
   assert (x.n_elem == power.n_elem);
@@ -129,16 +145,16 @@ List huangTauchen(List model, int nObs, int nSeries, int nDays, const arma::mat&
   nu.row(0) = s_exp(beta0 + beta1 % volFactor1.row(0) + beta2 % volFactor2.row(0));
   for(int t = 1; t < nObs * nDays; t++){
     
-    volFactor1.row(t) = volFactor1.row(t-1) + alpha1 % volFactor1.row(t-1) + dW1t.row(t);
+    volFactor1.row(t) = volFactor1.row(t-1) + alpha1 % volFactor1.row(t-1) % dt.row(t) + dW1t.row(t);
     
-    volFactor2.row(t) = volFactor2.row(t-1) + alpha2 % volFactor2.row(t-1) + (1.0 + phi % volFactor2.row(t-1)) % dW2t.row(t);
+    volFactor2.row(t) = volFactor2.row(t-1) + alpha2 % volFactor2.row(t-1) % dt.row(t) + (1.0 + phi % volFactor2.row(t-1)) % dW2t.row(t);
     
     nu.row(t) = s_exp(beta0 + beta1 % volFactor1.row(t) + beta2 % volFactor2.row(t));
     
   }
   
   
-  arma::mat returns = (dW1t.each_row([&rho1](const arma::rowvec& w1){return rho1 % w1;}) + dW2t.each_row([&rho2](const arma::rowvec& w2){return rho2 % w2;}) + 
+  arma::mat returns = sqrt(nu) % (dW1t.each_row([&rho1](const arma::rowvec& w1){return rho1 % w1;}) + dW2t.each_row([&rho2](const arma::rowvec& w2){return rho2 % w2;}) + 
     dW3t.each_row([&rho1, &rho2](const arma::rowvec& w3){ sqrt(1.0 - rho1 - rho2) % w3;}));
   
   List out;

@@ -8,7 +8,7 @@ hfsim.do <- function(hfSimSpec){
   driftModel <- hfSimSpec$driftModel
   volatilityModel <- hfSimSpec$volatilityModel
   
-  diurnallModel <- hfSimSpec$diurnalModel
+  diurnalModel <- hfSimSpec$diurnalModel
   burstModel <- hfSimSpec$burstModel
   jumpModel <- hfSimSpec$jumpModel
   noiseModel <- hfSimSpec$noiseModel
@@ -20,8 +20,6 @@ hfsim.do <- function(hfSimSpec){
   
   if(hfSimSpec$timeSettings$sampling != "equidistant"){
     timestamps <- rep(0:(nDays-1), each = nObs) * 86400 
-    
-    
   } else {
     timestamps <- rep(0:(nDays-1), each = nObs) * 86400 + seq(hfSimSpec$timeSettings$tradingStart, hfSimSpec$timeSettings$tradingEnd, length.out = nObs)
     dt <- matrix(rep(1/nObs, nDays * nObs * nSeries), ncol= nSeries)
@@ -67,8 +65,15 @@ hfsim.do <- function(hfSimSpec){
     none = 0,
     PA = preAnnouncedJumpSim(hfSimSpec$jumpModel, nDays, nSeries, nObs)
   )
-  #Construct our price process
-  returns <- volatilityReturns$returns * volBursts
+  
+  diurnality <- switch (diurnalModel$modelType,
+                        none = 1,
+                        revJ = reverseJDiurnality(diurnalModel, nDays, nSeries, nObs, dt)
+                        
+  )
+  
+  #Construct our returns that comes from volatility and diurnality of this
+  returns <- (volatilityReturns$returns * volBursts) * diurnality
   
   # If we need to include jumps, then we do it here
   if(includeJumps){
@@ -99,8 +104,10 @@ hfsim.do <- function(hfSimSpec){
   if(driftModel$modelType != "none"){
     out$drift <- driftReturns$drift
   }
-  
-  
+  if(any(diurnality != 1)){
+    out$diurnality <- diurnality
+  }
+  out$returns <- returns + driftReturns$drift + driftBursts
   out$jumps <- jumps
   return(out)
   
@@ -168,10 +175,6 @@ singularityDriftBurst <- function(model, nDays, nSeries, nObs, dt){
 
 
 
-
-
-
-
 ############# Simulate jumps
 #' @keywords internal
 preAnnouncedJumpSim <- function(model, nDays, nSeries, nObs){
@@ -186,3 +189,12 @@ preAnnouncedJumpSim <- function(model, nDays, nSeries, nObs){
   return(out)
 }
 
+
+#' @keywords internal
+reverseJDiurnality <- function(model, nDays, nSeries, nObs, dt){
+ 
+  times <- colCumsum(dt) %% 1
+  diurnality <- model$C + model$A * exp(-model$a * times) + model$B * exp(-model$b * (1-times))
+  return(diurnality)
+  
+}

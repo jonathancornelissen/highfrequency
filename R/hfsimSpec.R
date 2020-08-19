@@ -271,7 +271,7 @@ createHFSimSpec <- function(volatilityModel = list(modelType = "constant", sigma
     warning(paste(c("unidentified option(s) in diurnalModel:\n", enx), sep="", collapse= " "), call. = FALSE, domain=NULL)
   }
   
-  if(!is.null(diurnalModel$modelType)) diurnalModel$modelType = "none"
+  if(is.null(diurnalModel$modelType)) diurnalModel$modelType = "none"
   
   validDiurnalModels <- listAvailableDiurnalModels()[,1]
   if(!(diurnalModel$modelType %in% validDiurnalModels)){
