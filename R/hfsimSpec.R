@@ -1,4 +1,3 @@
-
 #' create high frequency simulation spec
 #' @param model Object of type list with the entries: \enumerate{
 #'    \item modelType A string denoting which model type to use, available models are available through the \code{listAvailableVolatilityModels} function
@@ -28,7 +27,7 @@ createHFSimSpec <- function(volatilityModel = list(modelType = "constant", sigma
   ## Ensuring the models are valid is based on code from Alexios Ghalanos' rugarch.
   
   ######## Volatility model checking starts
-  vm <- match(names(volatilityModel), c("modelType", "sigma"))
+  vm <- match(names(volatilityModel), c("modelType", "sigma","rho", "alpha1", "alpha2", "beta0", "beta1", "beta2", "phi", "rho1", "rho2"))
   if(any(is.na(vm))){
     idx <- which(is.na(vm))
     enx <- NULL
@@ -73,18 +72,28 @@ createHFSimSpec <- function(volatilityModel = list(modelType = "constant", sigma
   if(volatilityModel$modelType == "heston"){
     # Defaults on the slides of Bezirgen Veliyev for the 2018 high frequency econometrics course at Aarhus University:
     if(is.null(volatilityModel$meanReversion)) volatilityModel$meanReversion <- rep(5/250, nSeries)
-    if(is.null(volatilityModel$sigma)) volatilityModel$sigma <- rep(0.2/250, nSeries)
+    if(is.null(volatilityModel$sigma)) volatilityModel$sigma <- diag(0.2/250, nSeries)
     if(is.null(volatilityModel$volOfVol)) volatilityModel$volOfVol <- rep(0.5/250, nSeries)
     if(is.null(volatilityModel$rho)) volatilityModel$rho <- rep(-0.5, nSeries)
-    # Currently we have no correlation in the heston model.
-    #volatilityModel$sigma <- matrix(as.numeric(diag(volatilityModel$sigma)), ncol = nSeries)
+  }
+  
+  
+  if(volatilityModel$modelType == "huangTauchen"){
+    if(is.null(volatilityModel$alpha1)) volatilityModel$alpha1 <- rep(-0.00137, nSeries)
+    if(is.null(volatilityModel$alpha2)) volatilityModel$alpha2 <- rep(-1.386, nSeries)
+    if(is.null(volatilityModel$beta0)) volatilityModel$beta0 <- rep(-1.2, nSeries)
+    if(is.null(volatilityModel$beta1)) volatilityModel$beta1 <- rep(0.04, nSeries)
+    if(is.null(volatilityModel$beta2)) volatilityModel$beta2 <- rep(1.5, nSeries)
+    if(is.null(volatilityModel$phi)) volatilityModel$phi <- rep(0.25, nSeries)
+    if(is.null(volatilityModel$rho1)) volatilityModel$rho1 <- rep(-0.3, nSeries)
+    if(is.null(volatilityModel$rho2)) volatilityModel$rho2 <- rep(-0.3, nSeries)
   }
   
   
   ######## Volatility model checking done
   
   ######## Drift model checking starts
-  dm <- match(names(driftModel), c("modelType", "drift", "meanReversion", "gamma", "driftVol"))
+  dm <- match(names(driftModel), c("modelType", "drift", "meanReversion", "driftVol"))
   if(any(is.na(dm))){
     idx <- which(is.na(dm))
     enx <- NULL
@@ -372,3 +381,34 @@ listAvailableNoiseModels <- function(){
   )
 }
 
+
+#' List the available volatility models for simulations
+#' @export
+#' @author Emil Sjoerup
+#' @return This function returns the available volatility models in a matrix
+listAvailableVolatilityModels <- function(){
+  
+  models <- matrix(
+    c("constant", "constant volatility",
+      "heston", "heston stochastic volatility model",
+      "huangTauchen", "two factor stochastic volatility model of Huang and Tauchen (2005)"), ncol = 2, byrow=TRUE
+  )
+  
+  colnames(models) <- c("Abbreviation", "Description")
+  
+  return(models)
+}
+
+#' List the available jump models for simulations
+#' @export
+#' @author Emil Sjoerup
+#' @return This function returns the available Jump models in a matrix
+listAvailableJumpModels <- function(){
+  models <- matrix(
+    c("none", "No jumps",
+      "PA", "Single daily pre announced jump"), ncol = 2, byrow=TRUE
+  )
+  
+  colnames(models) <- c("Abbreviation", "Description")
+  return(models)
+}

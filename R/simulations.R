@@ -47,8 +47,10 @@ hfsim.do <- function(hfSimSpec){
   ### Returns coming from sigma(t)
   volatilityReturns <- switch(volatilityModel$modelType,
                               constant = constantVolatilitySim(volatilityModel, nDays, nSeries, nObs, dt),
-                              heston = hestonModel(volatilityModel, nObs, nSeries, nDays, dt)
+                              heston = hestonModel(volatilityModel, nObs, nSeries, nDays, dt),
+                              huangTauchen = huangTauchen(volatilityModel, nObs, nSeries, nDays, dt)
                               )
+  
   ### Returns from drift bursts
   driftBursts <- switch(burstModel$driftModel$modelType,
                         none = 0,
@@ -83,8 +85,16 @@ hfsim.do <- function(hfSimSpec){
   if(hfSimSpec$discretize){
    out$prices <- log(round(100 * exp(out$prices)) / 100)
   }
-  if(!is.null(volatilityReturns$underlyingVolatility)){
-    out$underlyingVolatility <- volatilityReturns$underlyingVolatility
+  
+  if(!is.null(volatilityReturns$sigma2)){
+    out$sigma2 <- volatilityReturns$sigma2
+  }
+  
+  if(!is.null(volatilityReturns$volatilityFactor)){
+    out$volatilityFactor <- volatilityReturns$volatilityFactor
+  }
+  if(!is.null(volatilityReturns$volatilityFactor2)){
+    out$volatilityFactor2 <- volatilityReturns$volatilityFactor2
   }
   if(driftModel$modelType != "none"){
     out$drift <- driftReturns$drift
@@ -99,35 +109,6 @@ hfsim.do <- function(hfSimSpec){
 
 }
 
-#' List the available volatility models for simulations
-#' @export
-#' @author Emil Sjoerup
-#' @return This function returns the available volatility models in a matrix
-listAvailableVolatilityModels <- function(){
-  
-  models <- matrix(
-    c("constant", "constant volatility",
-      "heston", "heston stochastic volatility model"), ncol = 2, byrow=TRUE
-                 )
-  
-  colnames(models) <- c("Abbreviation", "Description")
-  
-  return(models)
-}
-
-#' List the available jump models for simulations
-#' @export
-#' @author Emil Sjoerup
-#' @return This function returns the available Jump models in a matrix
-listAvailableJumpModels <- function(){
-  models <- matrix(
-    c("none", "No jumps",
-      "PA", "Single daily pre announced jump"), ncol = 2, byrow=TRUE
-  )
-  
-  colnames(models) <- c("Abbreviation", "Description")
-  return(models)
-}
 
 
 
