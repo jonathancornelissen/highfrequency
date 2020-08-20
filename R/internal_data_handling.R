@@ -1,4 +1,6 @@
-
+# Necessary for check-package not throwing errors
+#' @keywords internal
+..keepCols <- NULL
 # Necessary for check-package not throwing errors
 #' @keywords internal
 `:=` <- function(...) {

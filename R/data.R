@@ -126,7 +126,8 @@
 #' @examples 
 #' \dontrun{
 #' # The code to create the sampleQDataMicroseconds dataset from raw data is
-#' sampleQDataMicroseconds <- quotesCleanup(qDataRaw = sampleQDataRawMicroseconds, exchanges = "N", type = "standard", report = FALSE)
+#' sampleQDataMicroseconds <- quotesCleanup(qDataRaw = sampleQDataRawMicroseconds,
+#'                                          exchanges = "N", type = "standard", report = FALSE)
 #' }
 #' @keywords datasets
 "sampleQDataMicroseconds"
@@ -157,8 +158,11 @@
 #' @examples 
 #' \dontrun{
 #' #The code to create sampleTData from raw data is 
-#' tradesAfterFirstCleaning <- tradesCleanup(tDataRaw = sampleTDataRaw, exchanges = "N", report = FALSE)
-#' cleanedQuotes <- quotesCleanup(qDataRaw = sampleQDataRaw, exchanges = "N", type = "standard", report = FALSE)
+#' tradesAfterFirstCleaning <- tradesCleanup(tDataRaw = sampleTDataRaw, 
+#'                                           exchanges = "N", report = FALSE)
+#'                                           
+#' cleanedQuotes <- quotesCleanup(qDataRaw = sampleQDataRaw, exchanges = "N", 
+#'                                type = "standard", report = FALSE)
 #' sampleTData <- tradesCleanupUsingQuotes(tData = tradesAfterFirstCleaning,
 #'                                         qData = cleanedQuotes, lagQuotes = 2)
 #' sampleTData <- sampleTData[,c("SYMBOL", "EX",  "PRICE", "SIZE", "COND", "CORR", "G127")]
