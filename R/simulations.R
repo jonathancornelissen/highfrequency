@@ -92,7 +92,7 @@ hfsim.do <- function(hfSimSpec){
   }
   
   if(!is.null(volatilityReturns$sigma2)){
-    out$sigma2 <- volatilityReturns$sigma2
+    out$sigma2 <- volatilityReturns$sigma2 * diurnality
   }
   
   if(!is.null(volatilityReturns$volatilityFactor)){

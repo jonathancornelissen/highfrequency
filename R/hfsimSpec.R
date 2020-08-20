@@ -27,7 +27,8 @@ createHFSimSpec <- function(volatilityModel = list(modelType = "constant", sigma
   ## Ensuring the models are valid is based on code from Alexios Ghalanos' rugarch.
   
   ######## Volatility model checking starts
-  vm <- match(names(volatilityModel), c("modelType", "sigma","rho", "alpha1", "alpha2", "beta0", "beta1", "beta2", "phi", "rho1", "rho2"))
+  vm <- match(names(volatilityModel), c("modelType","meanReversion", "sigma","volOfVol", "rho", "alpha1", "alpha2", "beta0",
+                                        "beta1", "beta2", "phi", "rho1", "rho2"))
   if(any(is.na(vm))){
     idx <- which(is.na(vm))
     enx <- NULL
@@ -252,15 +253,6 @@ createHFSimSpec <- function(volatilityModel = list(modelType = "constant", sigma
   }
   
   
-  if(burstModel$driftModel$modelType == "singularityBurst"){
-    if(is.null(burstModel$driftModel$C)) diurnalModel$C <- 0.02
-    if(is.null(burstModel$driftModel$A)) diurnalModel$A <- 0.75
-  }
-  
-
-
-  
-  
   
   ######## diurnal model checking starts
   dm <- match(names(diurnalModel), c("modelType","C", "A", "B", "a", "b"))
@@ -376,7 +368,8 @@ listAvailableNoiseModels <- function(){
   models <- matrix(
     c(
       "none", "no noise",
-      "additiveGaussian", "additive Gaussian noise term"
+      "additiveGaussian", "additive Gaussian noise term",
+      "ratio", "additive Gaussian noise with constant signal to noise ratio"
     ), ncol = 2, byrow = TRUE
   )
 }

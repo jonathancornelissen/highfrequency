@@ -99,12 +99,10 @@ List hestonModel(List model, int nObs, int nSeries, int nDays, const arma::mat& 
   
   
   
-  // Convert sigma2 to sigma (keeping same name for memory purposes!!!!!)
-  sigma2 = sqrt(sigma2);
-  arma::mat returns = sigma2 % wt;
+  arma::mat returns = sqrt(sigma2) % wt;
   
   List out;
-  out["volatilityFactor"] = sigma2;
+  out["sigma2"] = sigma2;
   out["returns"] = returns;
   return out;
   
