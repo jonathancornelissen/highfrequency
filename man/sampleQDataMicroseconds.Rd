@@ -16,7 +16,8 @@ A data.table object containing the raw quotes for the imaginary stock XXX for 2 
 \examples{
 \dontrun{
 # The code to create the sampleQDataMicroseconds dataset from raw data is
-sampleQDataMicroseconds <- quotesCleanup(qDataRaw = sampleQDataRawMicroseconds, exchanges = "N", type = "standard", report = FALSE)
+sampleQDataMicroseconds <- quotesCleanup(qDataRaw = sampleQDataRawMicroseconds,
+                                         exchanges = "N", type = "standard", report = FALSE)
 }
 }
 \keyword{datasets}

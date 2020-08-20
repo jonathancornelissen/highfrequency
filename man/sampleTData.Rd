@@ -17,8 +17,11 @@ This is the cleaned version of the data sample \code{\link{sampleTDataRaw}}, usi
 \examples{
 \dontrun{
 #The code to create sampleTData from raw data is 
-tradesAfterFirstCleaning <- tradesCleanup(tDataRaw = sampleTDataRaw, exchanges = "N", report = FALSE)
-cleanedQuotes <- quotesCleanup(qDataRaw = sampleQDataRaw, exchanges = "N", type = "standard", report = FALSE)
+tradesAfterFirstCleaning <- tradesCleanup(tDataRaw = sampleTDataRaw, 
+                                          exchanges = "N", report = FALSE)
+                                          
+cleanedQuotes <- quotesCleanup(qDataRaw = sampleQDataRaw, exchanges = "N", 
+                               type = "standard", report = FALSE)
 sampleTData <- tradesCleanupUsingQuotes(tData = tradesAfterFirstCleaning,
                                         qData = cleanedQuotes, lagQuotes = 2)
 sampleTData <- sampleTData[,c("SYMBOL", "EX",  "PRICE", "SIZE", "COND", "CORR", "G127")]
