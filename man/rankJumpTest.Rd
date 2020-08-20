@@ -2,7 +2,7 @@
 % Please edit documentation in R/jump_tests.R
 \name{rankJumpTest}
 \alias{rankJumpTest}
-\title{General framework for testing for jumps on an intraday basis}
+\title{Rank jump test}
 \usage{
 rankJumpTest(
   marketPrice,
@@ -56,5 +56,5 @@ and/or \code{marketOpen}/ \code{marketClose} belong. Default = \code{"GMT"}.
 This parameter will also help determine the testing times as the test is done on non-overlapping pre-averaged returns.}
 }
 \description{
-General framework for testing for jumps on an intraday basis
+Rank jump test
 }
