@@ -432,7 +432,7 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
 #' plot(vol1)
 #'
 #' # Compare to stochastic periodicity
-#' \donttest{
+#' \dontrun{
 #' init <- list(sigma = 0.03, sigma_mu = 0.005, sigma_h = 0.007,
 #'              sigma_k = 0.06, phi = 0.194, rho = 0.986, mu = c(1.87,-0.42),
 #'              delta_c = c(0.25, -0.05, -0.2, 0.13, 0.02),
@@ -445,7 +445,7 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
 #' legend("topright", c("detPer", "stochper"), col = c("black", "red"), lty=1)}
 #'
 #' # Various kernel estimates
-#' \donttest{
+#' \dontrun{
 #' h1 <- bw.nrd0((1:nrow(sampleReal5MinPrices))*(5*60))
 #' vol3 <- spotVol(sampleReal5MinPrices, method = "kernel", h = h1)
 #' vol4 <- spotVol(sampleReal5MinPrices, method = "kernel", est = "quarticity")
@@ -457,13 +457,13 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
 #'                      "h = crossvalidated"), col = c("black", "red", "blue"), lty=1)}
 #'
 #' # Piecewise constant volatility
-#' \donttest{
+#' \dontrun{
 #' vol6 <- spotVol(sampleReal5MinPrices, method = "piecewise", m = 200, n  = 100,
 #'                 online = FALSE)
 #' plot(vol6)}
 #'
 #' # Compare regular GARCH(1,1) model to eGARCH, both with external regressors
-#' \donttest{
+#' \dontrun{
 #' vol7 <- spotVol(sampleReal5MinPrices, method = "garch", model = "sGARCH")
 #' vol8 <- spotVol(sampleReal5MinPrices, method = "garch", model = "eGARCH")
 #' plot(as.numeric(t(vol7$spot)), type = "l")
