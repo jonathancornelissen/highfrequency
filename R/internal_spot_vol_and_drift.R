@@ -1058,7 +1058,7 @@ preAveragedRealizedMeasureSpotVol <- function(data, options = list()){
       idx <- spot <- seq(M - 2 + 1, nObs - kn, by = kn) # Here we have one more estimate than the other cases.
     }
     # Measuring jump variation during the entire day.
-    preAveragedReturns <- hatreturn(as.xts(data), kn) 
+    preAveragedReturns <- hatreturn(as.xts(data)[,"PRICE"], kn) 
     preAveragedReturns <- c(as.numeric(preAveragedReturns), rep(NA, nObs - length(preAveragedReturns)))#, as.POSIXct(index(pData), origin = dateOfData)) # maybe we want to add back in xts, but it's removed for now...
     
     
