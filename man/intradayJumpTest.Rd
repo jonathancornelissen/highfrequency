@@ -24,6 +24,10 @@ intradayJumpTest(
 
 \item{driftEstimator}{character denoting which drift estimator to use for the tests. See \link{spotDrift}. Default = \code{"none"} denoting no drift esitmation.}
 
+\item{alpha}{numeric of length one determining what confidence level to use when constructing the critical values.}
+
+\item{...}{extra arguments passed on to \code{\link{spotVol}} for the volatility estimation, and to \code{\link{spotDrift}}.}
+
 \item{on}{string indicating the time scale in which \code{k} is expressed.
 Possible values are: \code{"secs", "seconds", "mins", "minutes", "hours"}.}
 

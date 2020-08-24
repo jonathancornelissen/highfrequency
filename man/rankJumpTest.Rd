@@ -38,6 +38,8 @@ rankJumpTest(
 
 \item{nBoot}{numeric denoting how many replications to be used for the bootstrap algorithm. Default is \code{1000}}
 
+\item{dontTestAtBoundaries}{logical determining whether to exclude data across different days. Default is \code{TRUE}}
+
 \item{on}{string indicating the time scale in which \code{k} is expressed.
 Possible values are: \code{"secs", "seconds", "mins", "minutes", "hours"}.}
 

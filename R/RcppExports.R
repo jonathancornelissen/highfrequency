@@ -103,6 +103,7 @@ hestonModel <- function(model, nObs, nSeries, nDays, dt) {
 #' dnu_1_t^2 = alpha_1  * nu_1_t^2 * dt + dWt_1
 #' dnu_2_t^2 = alpha_2 * nu_2_t^2 * dt + (1 + phi nu_2_t^2) * dW2_t
 #' sigma_ut = C + A*exp(-a*t) + B*exp(-b*(1-t))
+#' @keywords internal
 huangTauchen <- function(model, nObs, nSeries, nDays, dt) {
     .Call(`_highfrequency_huangTauchen`, model, nObs, nSeries, nDays, dt)
 }

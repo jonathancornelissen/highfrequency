@@ -14,6 +14,10 @@ tradesCleanupUsingQuotes(
 )
 }
 \arguments{
+\item{tradeDataSource}{character indicating the folder in which the original trade data is stored.}
+
+\item{quoteDataSource}{character indicating the folder in which the original quote data is stored.}
+
 \item{dataDestination}{character indicating the folder in which the cleaned data is stored, folder of dataSource by default.}
 
 \item{tData}{data.table or xts object containing (ONE day and for ONE stock only) trade data cleaned by \code{\link{tradesCleanup}}. This argument is NULL by default. Enabling it, means the arguments
@@ -23,8 +27,6 @@ from, to, dataSource and dataDestination will be ignored. (only advisable for sm
 from, to, dataSource, dataDestination will be ignored. (only advisable for small chunks of data)}
 
 \item{lagQuotes}{passed through to rmTradeOutliersUsingQuotes. \code{\link{rmTradeOutliersUsingQuotes}}}
-
-\item{dataSource}{character indicating the folder in which the original data is stored.}
 }
 \value{
 For each day an xts object is saved into the folder of that date, containing the cleaned data.
@@ -55,7 +57,7 @@ tDataAfterFinalCleaning <-
                            tData = tDataAfterFirstCleaning[as.Date(DT) == "2018-01-02"])
 dim(tDataAfterFinalCleaning)
 #In case you have more data it is advised to use the on-disk functionality
-#via "dataSource" and "dataDestination" arguments
+#via the "tradeDataSource", "quoteDataSource", and "dataDestination" arguments
 }
 \references{
 Barndorff-Nielsen, O. E., P. R. Hansen, A. Lunde, and N. Shephard (2009). Realized kernels in practice: Trades and quotes. Econometrics Journal 12, C1-C32.
