@@ -278,3 +278,31 @@ test_that("aggregateQuotes milliseconds vs seconds", {
 
 
 
+context("business time aggregation")
+test_that("business time aggregation",{
+  
+  pData <- sampleTDataMicroseconds
+  agged1 <- businessTimeAggregation(pData, measure = "intensity", obs = 390, bandwidth = 0.075)
+  expect_equal(nrow(agged1$pData), 780) # We return the correct number of observations
+  
+  
+  expect_warning(businessTimeAggregation(pData, measure = "volume", obs = 390), "smaller")
+  agged2 <- suppressWarnings(businessTimeAggregation(pData, measure = "volume", obs = 390))
+  expect_equal(nrow(agged2$pData), 748)
+  
+  agged3 <- suppressWarnings(businessTimeAggregation(pData, measure = "vol", obs = 39, method = "PARM", RM = "rv", lookBackPeriod = 5))
+  expect_equal(nrow(agged3$pData), 76)
+  
+  pData <- sampleTData[,c("PRICE", "SIZE")]
+  storage.mode(pData) <- "numeric"
+  agged4 <- businessTimeAggregation(pData, measure = "intensity", obs = 390, bandwidth = 0.075)
+  expect_equal(nrow(agged4$pData), 390) # We return the correct number of observations
+  
+  
+  agged5 <- suppressWarnings(businessTimeAggregation(pData, measure = "volume", obs = 78))
+  expect_equal(nrow(agged5$pData), 78)
+  
+  agged6 <- suppressWarnings(businessTimeAggregation(pData, measure = "vol", obs = 39, method = "PARM", RM = "rv", lookBackPeriod = 5))
+  expect_equal(nrow(agged6$pData), 39)
+  
+})
