@@ -441,6 +441,8 @@ JOjumpTest <- function(pData, power = 4, alignBy = NULL, alignPeriod = NULL, alp
 #' @param pData xts or data.table of the price data in levels. This data can (and should in some cases) be tick-level data. The data can span more than one day.
 #' @param volEstimator character denoting which volatility estimator to use for the tests. See \link{spotVol}. Default = \code{"RM"} denoting realized measures.
 #' @param driftEstimator character denoting which drift estimator to use for the tests. See \link{spotDrift}. Default = \code{"none"} denoting no drift esitmation.
+#' @param alpha numeric of length one determining what confidence level to use when constructing the critical values.
+#' @param ... extra arguments passed on to \code{\link{spotVol}} for the volatility estimation, and to \code{\link{spotDrift}}.
 #' @param on string indicating the time scale in which \code{k} is expressed.
 #' Possible values are: \code{"secs", "seconds", "mins", "minutes", "hours"}.
 #' @param k positive integer, indicating the number of periods to aggregate
@@ -764,6 +766,7 @@ plot.intradayJumpTest <- function(x, ...){
 #' @param rank rank of the jump matrix under the null hypothesis. Default is \code{1}
 #' @param BoxCox numeric of exponents for the Box-Cox transformation, default is \code{1}
 #' @param nBoot numeric denoting how many replications to be used for the bootstrap algorithm. Default is \code{1000}
+#' @param dontTestAtBoundaries logical determining whether to exclude data across different days. Default is \code{TRUE}
 #' @param on string indicating the time scale in which \code{k} is expressed.
 #' Possible values are: \code{"secs", "seconds", "mins", "minutes", "hours"}.
 #' @param k positive integer, indicating the number of periods to aggregate
@@ -780,7 +783,8 @@ plot.intradayJumpTest <- function(x, ...){
 #' @importFrom stats na.omit quantile runif
 #' @importFrom zoo coredata
 #' @export
-rankJumpTest <- function(marketPrice, stockPrices, alpha = c(5,3), coarseFreq = 10, localWindow = 30, rank = 1, BoxCox = 1, nBoot = 1000, dontTestAtBoundaries = TRUE, on = "minutes", k = 5,
+rankJumpTest <- function(marketPrice, stockPrices, alpha = c(5,3), coarseFreq = 10, localWindow = 30, rank = 1, BoxCox = 1, nBoot = 1000, 
+                         dontTestAtBoundaries = TRUE, on = "minutes", k = 5,
                          marketOpen = "09:30:00", marketClose = "16:00:00", tz = "GMT"){
   
   ## Preparation of data

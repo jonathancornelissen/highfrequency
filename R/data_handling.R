@@ -1169,7 +1169,7 @@ mergeQuotesSameTimestamp <- function(qData, selection = "median") {
   # qData <- checkColumnNames(qData)
   # keep summed size columns
   keepCols <- colnames(qData)[!(colnames(qData) %in% c("DT", "SYMBOL","BID", "OFR","BIDSIZ", "OFRSIZ"))]
-  keptData <- qData[, lapply(.SD, last), by = list(DT, SYMBOL)][, ..keepCols]
+  keptData <- qData[, lapply(.SD, last), by = list(DT, SYMBOL)][, keepCols, with = FALSE]
   qData_size <- qData[, lapply(.SD, sum), by = list(DT, SYMBOL), .SDcols = c("BIDSIZ", "OFRSIZ")]
   if (selection == "median") {
     qData <- qData[, lapply(.SD, median), by = list(DT, SYMBOL), .SDcols = c("BID", "OFR")]
@@ -1255,7 +1255,7 @@ mergeTradesSameTimestamp <- function(tData, selection = "median") {
   }
   
   keepCols <- colnames(tData)[!(colnames(tData) %in% c("DT", "SYMBOL", "PRICE", "SIZE"))]
-  keptData <- tData[, lapply(.SD, last), by = list(DT, SYMBOL)][, ..keepCols]
+  keptData <- tData[, lapply(.SD, last), by = list(DT, SYMBOL)][, keepCols, with = FALSE]
   if (selection == "median") {
     tData[, `:=` (PRICE = median(PRICE), NUMTRADES = .N), by = list(DT, SYMBOL)]
     #If there is more than one observation at median price, take the average volume.
@@ -2112,7 +2112,8 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, 
 #' is trade and quote data cleaned by respectively e.g. \code{\link{tradesCleanup}}
 #' and \code{\link{quotesCleanup}}.
 #' 
-#' @param dataSource character indicating the folder in which the original data is stored.
+#' @param tradeDataSource character indicating the folder in which the original trade data is stored.
+#' @param quoteDataSource character indicating the folder in which the original quote data is stored.
 #' @param dataDestination character indicating the folder in which the cleaned data is stored, folder of dataSource by default.
 #' @param tData data.table or xts object containing (ONE day and for ONE stock only) trade data cleaned by \code{\link{tradesCleanup}}. This argument is NULL by default. Enabling it, means the arguments
 #' from, to, dataSource and dataDestination will be ignored. (only advisable for small chunks of data)
@@ -2147,7 +2148,7 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, 
 #'                            tData = tDataAfterFirstCleaning[as.Date(DT) == "2018-01-02"])
 #' dim(tDataAfterFinalCleaning)
 #' #In case you have more data it is advised to use the on-disk functionality
-#' #via "dataSource" and "dataDestination" arguments
+#' #via the "tradeDataSource", "quoteDataSource", and "dataDestination" arguments
 #' @keywords cleaning
 #' @export
 tradesCleanupUsingQuotes <- function(tradeDataSource = NULL, quoteDataSource = NULL, dataDestination = NULL, tData = NULL, qData = NULL, lagQuotes = 2) {
@@ -2320,19 +2321,52 @@ refreshTime <- function (pData, sort = FALSE, criterion = "squared duration") {
 }
 
 
-
-#' @export
+#' Business time aggregation
+#' 
+#' @param pData xts or data.table containing data to aggregate.
+#' @param measure character denoting which measure to use. Valid options are "intensity", "vol", and "volume", denoting the trade intensity process of Oomen (2005),
+#' volatility, and volume, respectively.
+#' @param obs integer valued numeric of length 1 denoting how many observations is wanted after the aggregation procedure.
+#' @param bandwidth numeric of length one, denoting which bandwidth parameter to use in the trade intensity process estimation of Oomen (2005.)
+#' @param ... extra arguments passed on to \code{\link{spotVol}} when measure is "vol"
+#' 
+#' @return A list containing "pData" which is the aggregated data and a list containing the intensity process, split up day by day.
+#' 
+#' @examples
+#' pData <- sampleTData[,c("PRICE", "SIZE")]
+#' storage.mode(pData) <- "numeric"
+#' # Aggregate based on the trade intensity measure. Getting 390 observations.
+#' agged <- businessTimeAggregation(pData, measure = "intensity", obs = 390, bandwidth = 0.075)
+#' # Plot the trade intensity measure
+#' plot.ts(agged$intensityProcess$`2008-01-04`)
+#' rCov(agged$pData[,"PRICE"], makeReturns = TRUE)
+#' rCov(pData[,"PRICE"], makeReturns = TRUE, alignBy = "minutes", alignPeriod = 1)
+#' 
+#' # Aggregate based on the volume measure. Getting 78 observations.
+#' agged <- businessTimeAggregation(pData, measure = "volume", obs = 78)
+#' rCov(agged$pData[,"PRICE"], makeReturns = TRUE)
+#' rCov(pData[,"PRICE"], makeReturns = TRUE, alignBy = "minutes", alignPeriod = 5)
+#' 
 #' @importFrom zoo index
+#' @importFrom xts is.xts
+#' @importFrom data.table copy as.xts.data.table
 #' @author Emil Sjoerup
-businessTimeAggregation <- function(pData, measure, obs, bandwidth, ...){
-  SIZE <- PRICE <- DT <- intensityProcess <- NULL
+#' @export
+businessTimeAggregation <- function(pData, measure = "intensity", obs = 390, bandwidth = 0.075, ...){
+  aggregated <- SIZE <- PRICE <- DT <- intensityProcess <- NULL
+  if(length(measure) > 1){
+    measures <- measure[1]
+  }
+  if(! (measure %in% c("intensity", "vol", "volume"))){
+    stop("measure not a valid choice, valid choices are: \"intensity\", \"vol\", and \"volume\"")
+  }
   
-  
+    
   inputWasXTS <- FALSE
   if (!is.data.table(pData)) {
     if (is.xts(pData)) {
       pData <- setnames(as.data.table(pData), old = "index", new = "DT")
-      pData[, PRICE := as.numeric(PRICE), SIZE := as.numeric(SIZE)]
+      pData[, `:=` (PRICE = as.numeric(PRICE), SIZE = as.numeric(SIZE))]
       inputWasXTS <- TRUE
     } else {
       stop("Input has to be data.table or xts.")
@@ -2343,52 +2377,67 @@ businessTimeAggregation <- function(pData, measure, obs, bandwidth, ...){
     }
   }
   
-  time <- as.numeric(pData[, DT])
   
-  if(measure == "intensity"){
-    
-    intensityProcess <- as.numeric(tradeIntensityProcessCpp(time, bandwidth))
-    intensityProcess <- intensityProcess / sum(intensityProcess) * obs
-    idx <- which(diff(floor(cumsum(intensityProcess))) == 1)
-    pData <- pData[idx,]
-    
-    if(max(idx) > 1){
-      warning("The measure mandated sampling the same point twice, at least once, returning series that is smaller than obs")
+  dates <- as.character(unique(as.Date(pData[,DT])))
+  pDataBackcup <- copy(pData)
+  ITP <- list() # Container for trade intensity process.
+  for (date in dates) {
+    pData <- pDataBackcup[as.Date(DT) == date,]
+    if(measure == "intensity"){
+      time <- as.numeric(pData[, DT])
+      bandwidth = bandwidth[1]
+      
+      
+      intensityProcess <- as.numeric(tradeIntensityProcessCpp(time, bandwidth))
+      intensityProcess <- intensityProcess / sum(intensityProcess) * obs
+      idx <- which(diff(floor(cumsum(intensityProcess))) >= 1)
+      pData <- pData[idx,]
+      
+      if(length(idx) < obs){
+        warning(paste("The measure mandated sampling the same point twice, at least once, returning series that is smaller than obs on", date))
+      }
+      
+    }
+    if(measure == "vol"){
+      dat <- as.xts.data.table(pData[, list(DT, PRICE)])
+      
+      intensityProcess <- spotVol(data = dat, ...)$spot
+      intensityProcess <- intensityProcess/sum(intensityProcess) * obs
+      idx <- which(diff(floor(cumsum(intensityProcess))) >= 1)
+      pData <- pData[DT %in% index(intensityProcess)[idx],]
+      if(length(idx) < obs){
+        warning(paste("The measure mandated sampling the same point twice, at least once, returning series that is smaller than obs on", date))
+      }
+      
     }
     
-  }
-  if(measure == "vol"){
-    intensityProcess <- spotVol(data = pData[, "PRICE"], ...)$spot
-    intensityProcess <- intensityProcess/sum(intensityProcess) * obs
-    idx <- which(diff(floor(cumsum(intensityProcess))) == 1)
-    pData <- pData[index(intensityProcess)[idx], ]
-    if(max(idx) > 1){
-      warning("The measure mandated sampling the same point twice, at least once, returning series that is smaller than obs")
+    if(measure == "volume"){
+      if(!"SIZE" %in% colnames(pData)){
+        stop("SIZE must be present in pData in order to aggregate based on volume.")
+      }
+      
+      intensityProcess <- as.numeric(pData$SIZE)
+      intensityProcess <- intensityProcess/sum(intensityProcess) * obs
+      idx <- which(diff(floor(cumsum(intensityProcess))) >= 1)
+      pData <- pData[idx, ]
+      if(length(idx) < obs){
+        warning(paste("The measure mandated sampling the same point twice, at least once, returning series that is smaller than obs on", date))
+      }
     }
-    
+    ITP[[date]] <- intensityProcess
+    aggregated <- rbind(aggregated, pData)
   }
   
-  if(measure == "volume"){
-    if(!"SIZE" %in% colnames(pData)){
-      stop("SIZE must be present in pData in order to aggregate based on volume.")
-    }
-    
-    intensityProcess <- pData[, "SIZE"]
-    intensityProcess <- intensityProcess/sum(intensityProcess) * obs
-    idx <- which(diff(floor(cumsum(intensityProcess))) == 1)
-    pData <- pData[idx, ]
-    if(max(idx) > 1){
-      warning("The measure mandated sampling the same point twice, at least once, returning series that is smaller than obs")
-    }
-  }
+  
   
   if(inputWasXTS){
-    pData <- xts(pData[, -"DT"], order.by = pData[, DT])
+    aggregated <- xts(aggregated[, -"DT"], order.by = aggregated[, DT])
   }
   
   res <- list()
-  res[["pData"]] <- pData
-  res[["intensityProcess"]] <- intensityProcess
+  res[["pData"]] <- aggregated
+  res[["intensityProcess"]] <- ITP
   return(res)
   
 }
+
