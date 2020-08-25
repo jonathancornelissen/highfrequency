@@ -43,9 +43,11 @@ inline arma::rowvec vecpow(arma::rowvec x, const arma::rowvec power){
 // [[Rcpp::export]]
 List vasicekModel(List model, int nObs, int nSeries, int nDays, const arma::mat& dt){
   
-  arma::rowvec a = model["meanReversion"];
-  arma::rowvec b = model["drift"];
+  const arma::rowvec a = model["meanReversion"];
+  const arma::rowvec b = model["drift"];
   arma::rowvec sigma = model["driftVol"];
+  
+  sigma = sqrt(sigma);
   
   arma::mat drift = arma::zeros<mat>((nObs * nDays), nSeries);
   
