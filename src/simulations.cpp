@@ -92,19 +92,25 @@ List hestonModel(List model, int nObs, int nSeries, int nDays, const arma::mat& 
   bt = bt.each_row(([&rho](const arma::rowvec& B){return B % sqrt(1.0 - square(rho)); })) + wt.each_row(([&rho](const arma::rowvec& W){ return W % rho;}));
   
   // sigma^2 container
-  arma::mat sigma2 = mat(bt);
-  sigma2.row(0) = theta;
-
+  // arma::mat sigma2 = mat(bt);
+  // 
+  // for(int t = 1; t < nObs * nDays; t++){
+  //   sigma2.row(t) = sigma2.row(t-1) + kappa % (theta - sigma2.row(t-1)) % dt.row(t) + xi % sqrt(sigma2.row(t-1)) % bt.row(t);
+  // }
+  
+  arma::mat sigmat = mat(bt);
+  sigmat.row(0) = sqrt(theta);
+  
   for(int t = 1; t < nObs * nDays; t++){
-    sigma2.row(t) = sigma2.row(t-1) + kappa % (theta - sigma2.row(t-1)) % dt.row(t-1) + xi % sqrt(sigma2.row(t-1)) % bt.row(t-1);
+    sigmat.row(t) = sigmat.row(t-1) + kappa % (theta - square(sigmat.row(t-1))) % dt.row(t) + xi % sigmat.row(t-1) % bt.row(t);
   }
   
   
   
-  arma::mat returns = sqrt(sigma2) % wt;
+  arma::mat returns = sigmat % wt;
   
   List out;
-  out["sigma2"] = sigma2;
+  out["sigma"] = sigmat;
   out["returns"] = returns;
   return out;
   
@@ -160,7 +166,7 @@ List huangTauchen(List model, int nObs, int nSeries, int nDays, const arma::mat&
   
   List out;
   out["returns"] = returns;
-  out["sigma2"] = nu;
+  out["sigma"] = sqrt(nu);
   out["volatilityFactor"] = volFactor1;
   out["volatilityFactor2"] = volFactor2;
   return out;

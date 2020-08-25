@@ -1,5 +1,7 @@
 
 #' simulate hf prices
+#' @param hfSimSpec object of type hfSimSpec created by \code{\link{createHFSimSpec}}
+#' @return a List containing the simulated data and additional information, e.g. underlying variance process, bursts in the drift or volatility, and if applicable noise term.
 #' @author Emil Sjoerup
 #' @export
 hfsim.do <- function(hfSimSpec){
@@ -91,8 +93,8 @@ hfsim.do <- function(hfSimSpec){
    out$prices <- log(round(100 * exp(out$prices)) / 100)
   }
   
-  if(!is.null(volatilityReturns$sigma2)){
-    out$sigma2 <- volatilityReturns$sigma2 * diurnality
+  if(!is.null(volatilityReturns$sigma)){
+    out$sigma <- volatilityReturns$sigma# * diurnality
   }
   
   if(!is.null(volatilityReturns$volatilityFactor)){
@@ -107,6 +109,10 @@ hfsim.do <- function(hfSimSpec){
   if(any(diurnality != 1)){
     out$diurnality <- diurnality
   }
+  if(burstModel$driftModel$modelType != "none"){
+    out$driftBurst <- driftBursts
+  }
+  
   out$returns <- returns + driftReturns$drift + driftBursts
   out$jumps <- jumps
   return(out)
@@ -115,8 +121,6 @@ hfsim.do <- function(hfSimSpec){
 
 
 }
-
-
 
 
 
