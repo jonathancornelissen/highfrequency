@@ -75,8 +75,7 @@ hfsim.do <- function(hfSimSpec){
   )
   
   #Construct our returns that comes from volatility and diurnality of this
-  returns <- (volatilityReturns$returns * volBursts) * diurnality
-  
+  returns <- (driftReturns$drift + driftBursts) + volatilityReturns$returns * volBursts * diurnality
   # If we need to include jumps, then we do it here
   if(includeJumps){
     jumps$jumpIndices <- jumps$jumpIndices + 0:(nDays-1) * nObs
@@ -87,14 +86,13 @@ hfsim.do <- function(hfSimSpec){
   
   out <- vector(mode = "list", length = 4L)
   names(out) <- c("prices", "drift", "volatility", "jumps")
-
-  out$prices <- xts((driftReturns$drift + driftBursts) + colCumsum(returns), as.POSIXct(timestamps, origin = hfSimSpec$timeSettings$origin))
+  out$prices <- xts(colCumsum(returns), as.POSIXct(timestamps, origin = hfSimSpec$timeSettings$origin))
   if(hfSimSpec$discretize){
    out$prices <- log(round(100 * exp(out$prices)) / 100)
   }
   
   if(!is.null(volatilityReturns$sigma)){
-    out$sigma <- volatilityReturns$sigma# * diurnality
+    out$sigma <- volatilityReturns$sigma * volBursts * diurnality
   }
   
   if(!is.null(volatilityReturns$volatilityFactor)){
@@ -103,17 +101,14 @@ hfsim.do <- function(hfSimSpec){
   if(!is.null(volatilityReturns$volatilityFactor2)){
     out$volatilityFactor2 <- volatilityReturns$volatilityFactor2
   }
-  if(driftModel$modelType != "none"){
-    out$drift <- driftReturns$drift
-  }
   if(any(diurnality != 1)){
     out$diurnality <- diurnality
   }
-  if(burstModel$driftModel$modelType != "none"){
-    out$driftBurst <- driftBursts
-  }
   
-  out$returns <- returns + driftReturns$drift + driftBursts
+  
+  out$drift <- driftReturns$drift + driftBursts
+  
+  out$returns <- returns
   out$jumps <- jumps
   return(out)
   
@@ -149,16 +144,16 @@ FoFVolatilitySim <- function(model, nDays, nSeries, nObs, dt){
 #' @importFrom data.table between
 #' @keywords internal
 singularityVolBurst <- function(model, nDays, nSeries, nObs, dt){
-  
-  timestamps <- (colCumsum(dt[1:nObs,])) 
-  burstIndices <- which(between(dt, model$burstInterval[1], model$burstInterval[2]))
-  pivot <- timestamps[round(mean(round(nObs * model$burstInterval)))] ## Find the pivot and make sure it's actually an obseration.
-  
+  timestamps <- round(colCumsum(dt) %% 1, 5) # round for numerical stability
+  nonBurstIndices <- which(!between(timestamps, model$burstInterval[1], model$burstInterval[2]), arr.ind = TRUE)
+  pivot <- mean(model$burstInterval)
+
   # Volatility burst.
-  volBurst <- matrix(rep(model$b * 1/abs(pivot - timestamps)^model$beta, nDays), ncol = nSeries)
-  infs <- which(is.infinite(volBurst))
-  volBurst[infs] <- volBurst[infs-1]
-  return(sqrt(volBurst))
+  volBurst <- matrix(model$b * 1/abs(pivot - timestamps)^model$beta, ncol = nSeries)
+  #browser()
+  volBurst[which(volBurst > 100)] <- mean(volBurst[which(volBurst > 100) + c(-1,1)])
+  volBurst[nonBurstIndices] <- 1
+  return(volBurst)
   
 }
 
@@ -167,12 +162,15 @@ singularityVolBurst <- function(model, nDays, nSeries, nObs, dt){
 #' @importFrom data.table between
 #' @keywords internal
 singularityDriftBurst <- function(model, nDays, nSeries, nObs, dt){
-  timestamps <- (colCumsum(dt[1:nObs,])) 
-  burstIndices <- which(between(timestamps, model$burstInterval[1], model$burstInterval[2]))
-  pivot <- timestamps[round(mean(round(nObs * model$burstInterval)))] ## Find the pivot and make sure it's actually an obseration.
+  timestamps <- round(colCumsum(dt) %% 1, 5)  # round for numerical stability
+  nonBurstIndices <- which(!between(timestamps, model$burstInterval[1], model$burstInterval[2]), arr.ind = TRUE)
+  pivot <- mean(model$burstInterval)
+  #pivot <- timestamps[round(mean(round(nObs * model$burstInterval)))] ## Find the pivot and make sure it's actually an obseration, otherwise we may get NaNs or INFS
   # Drift burst
-  driftDB <- matrix(rep(model$a * sign(timestamps - pivot)/(abs(pivot - timestamps)^model$alpha), nDays), ncol = nSeries)
-  driftDB[is.na(driftDB)] <- 0
+  driftDB <- matrix(model$a * (sign(timestamps - pivot)/(abs(pivot - timestamps)^model$alpha)), ncol = nSeries)
+  #driftDB[abs(driftDB) > 10000] <- 0
+  driftDB[nonBurstIndices] <- 0
+  driftDB[is.nan(driftDB)] <- 0
   return(driftDB * dt)
   
 }

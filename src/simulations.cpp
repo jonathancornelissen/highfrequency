@@ -1,4 +1,5 @@
 #include <RcppArmadillo.h>
+#include "internals.h"
 using namespace arma;
 using namespace Rcpp;
 // [[Rcpp::plugins(cpp11)]] // So we can use lambda functions
@@ -91,6 +92,9 @@ List hestonModel(List model, int nObs, int nSeries, int nDays, const arma::mat& 
   // Create the bt matrix as correlated with wt using lambda functions.
   bt = bt.each_row(([&rho](const arma::rowvec& B){return B % sqrt(1.0 - square(rho)); })) + wt.each_row(([&rho](const arma::rowvec& W){ return W % rho;}));
   
+  
+  
+  // Heston model in terms of dSigma^2 = ... This caused problems with NaNs (dunno why)
   // sigma^2 container
   // arma::mat sigma2 = mat(bt);
   // 
@@ -98,18 +102,22 @@ List hestonModel(List model, int nObs, int nSeries, int nDays, const arma::mat& 
   //   sigma2.row(t) = sigma2.row(t-1) + kappa % (theta - sigma2.row(t-1)) % dt.row(t) + xi % sqrt(sigma2.row(t-1)) % bt.row(t);
   // }
   
+  
+  // Heston model in terms of dSigma = ... Seems to not produce NaNs
   arma::mat sigmat = mat(bt);
-  sigmat.row(0) = sqrt(theta);
+  
+  // Initialize sigma_t: as a draw from its unconditional distribution.
+  for(int i = 0; i<nSeries; i++){
+    sigmat(0,i) = as_scalar(randg(1, distr_param(2.0 * kappa(i) * sqrt(theta(i)) * pow(xi(i), -2.0), 1.0/(2.0 * kappa(i) * pow(xi(i), -2.0)))));
+  }
   
   for(int t = 1; t < nObs * nDays; t++){
     sigmat.row(t) = sigmat.row(t-1) + kappa % (theta - square(sigmat.row(t-1))) % dt.row(t) + xi % sigmat.row(t-1) % bt.row(t);
   }
-  
-  
-  
+
+  List out;
   arma::mat returns = sigmat % wt;
   
-  List out;
   out["sigma"] = sigmat;
   out["returns"] = returns;
   return out;
@@ -171,3 +179,4 @@ List huangTauchen(List model, int nObs, int nSeries, int nDays, const arma::mat&
   out["volatilityFactor2"] = volFactor2;
   return out;
 }
+

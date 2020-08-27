@@ -13,30 +13,95 @@ createHFSimSpec(
   burstModel = list(driftModel = list(modelType = "none"), volModel = list(modelType =
     "none")),
   noiseModel = list(noiseType = "none", signalToNoiseRatio = 2),
+  timeSettings = list(tradingStart = 34200, tradingEnd = 57600, origin = "1970-01-01",
+    sampling = "equidistant"),
   nSeries = 1,
   nDays = 1,
   nObs = 23401,
-  discretize = FALSE,
-  timeSettings = list(tradingStart = 34200, tradingEnd = 57600, origin = "1970-01-01",
-    sampling = "equidistant")
+  discretize = FALSE
 )
 }
 \arguments{
-\item{jumpModel}{Object of type list with entries \enumerate{
-   \item modelType 
-   \item jumpComponent double in (0,1) denoting how much of the total sigma of the model that should come from the jump variation.
-   \item
-   \item
-   \item
-   \item
+\item{volatilityModel}{Object of type list with the entries: \enumerate{
+   \item \code{modelType} A string denoting which model type to use, available models and descriptions thereof are available through the \code{\link{listAvailableVolatilityModels}} function
+   \item \code{sigma} A symmetric, preferably positive semi-definite variance-covariance matrix. This is not used when modelType is "huangTauchen".
+   \item \code{volOfVol} numeric of either length 1, nrow(sigma) or nSeries denoting the volatility of the volatility
+   \item \code{meanReversion} numeric of either length 1, nrow or nSeries denoting the mean reversion of the volatlity series
+   \item \code{rho} numeric of either length 1, nrow(sigma) or nSeries denoting the correlation between wt and bt in the "Heston" model
+   \item \code{alpha1} numeric of either length 1, nrow(sigma) or nSeries denoting the mean reversion of the persistent volatility factor in the "huangTauchen" model
+   \item \code{alpha2} numeric of either length 1, nrow(sigma) or nSeries denoting the mean reversion of the transient volatility factor in the "huangTauchen" model
+   \item \code{beta0} numeric of either length 1, nrow(sigma) or nSeries used for scaling the volatility in the "huangTauchen" model
+   \item \code{beta1} numeric of either length 1, nrow(sigma) or nSeries used for scaling the importance of the persistent volatility factor in the "huangTauchen" model
+   \item \code{beta2} numeric of either length 1, nrow(sigma) or nSeries used for scaling the importance of the transient volatility factor in the "huangTauchen" model
+   \item \code{phi} numeric of either length 1, nrow(sigma) or nSeries denoting the strenght of the feedback in the transient volatility factor in the "huangTauchen" model
+   \item \code{rho1} numeric of either length 1, nrow(sigma) or nSeries denoting the leverage correlations between w1t and w2t in the "huangTauchen" model
+   \item \code{rho2} numeric of either length 1, nrow(sigma) or nSeries denoting the leverage correlations between w1t and w2t in the "huangTauchen" model
 }}
 
-\item{model}{Object of type list with the entries: \enumerate{
-   \item modelType A string denoting which model type to use, available models are available through the \code{listAvailableVolatilityModels} function
-   \item driftModel A strig denoting which (if any) drift model type to use, available models are available through the \code{listAvailableDriftModels} function
-   \item drift
-   \item volatility the total volatility (standard deviation) of the simulated model if using jumps, the jump component will lower this argument
+\item{driftModel}{Object of type list with entries \enumerate{
+   \item \code{modelType} A string denoting which model type to use, available models and descriptions thereof are available through the \code{\link{listAvailableDriftModels}} function
+   \item \code{drift} numeric of either length 1, nrow or nSeries denoting the drift in case modelType = "constant", and the long term mean of drift in case that is not true. Default is 0.
+   \item \code{meanReversion} numeric of either length 1, nrow or nSeries denoting the mean reversion of drift. Default is 2.
+   \item \code{driftVol} numeric of either length 1, nrow or nSeries denoting the volatility of drift in case modelType = "vasicek".
 }}
+
+\item{jumpModel}{Object of type list with entries \enumerate{
+   \item \code{modelType} A string denoting which model type to use, available models and descriptions thereof are available through the \code{\link{listAvailableJumpModels}} function
+   \item \code{jumpComponent} double between 0 and 1 denoting how much of the total sigma of the model that should come from the jump variation.
+   \item \code{}
+   \item
+   \item
+   \item 
+}}
+
+\item{diurnalModel}{Object of type list with entries \enumerate{
+   \item \code{modelType} A string denoting which model type to use, available models and descriptions thereof are available through the \code{\link{listAvailableDiurnalModels}} function.
+   \item \code{C} double denoting the level of the diurnal pattern. (Usually calibrated to make sure that when integrating over the diurnal factor, it gives 1)
+   \item \code{A} double denoting the A value of the diurnal pattern. This is used to control the level of the diurnal factor during the beginning of the day. Default is 0.75
+   \item \code{B} double denoting the B value of the diurnal pattern. This is used to control the level of the diurnal factor during the end of the day. Default is 0.25
+   \item \code{a} double denoting the a value of the diurnal pattern. This is used to control the steepness of the drop during the beginning of the day. Default is 10
+   \item \code{b} double denoting the b value of the diurnal pattern. This is used to control the steepness of the increase during the end of the day. Default is 10
+}}
+
+\item{burstModel}{Object of type list with entries \enumerate{
+   \item driftModel list with entries \enumerate{ 
+         \item{ \code{modelType} A string denoting which model type to use, available models and descriptions thereof are available through the \code{\link{listAvailableBurstModels}} function}
+         \item{ \code{alpha} A numeric of length one denoting the alpha exponent in the drift burst. Default is 0.65 }
+         \item{ \code{a} A numeric of length one denoting the a scalar in the drift burst this can be used to control the severity of the drift burst. Default is 1 }
+         \item{ \code{burstInterval} A numeric of length two when the drift burst is to take place. Default is \code{c(15/32, 17/32)} }
+   }
+   \item volModel list with entries \enumerate{
+         \item{ \code{modelType} A string denoting which model type to use, available models and descriptions thereof are available through the \code{\link{listAvailableBurstModels}} function}
+         \item{ \code{beta} (Used only when modelType is "singularityBurst") A numeric of length one denoting the beta exponent in the volatility burst. Default is 0.4 }
+         \item{ \code{b} (Used only when modelType is "singularityBurst") A numeric of length one denoting the b scalar in the volatility burst this can be used to control the severity of the volatility burst. Default is 1 }
+         \item{ \code{burstMultiplier} (Used only when modelType is "constantBurst") A numeric of length one denoting the severity of the volatility burst. Default is 3 denoting a temporary three-fold increase of volatility}
+         \item{ \code{burstInterval} A numeric of length two when the volatility burst is to take place. Default is \code{c(15/32, 17/32)} }
+   }
+}}
+
+\item{noiseModel}{Object of type list with entries \enumerate{
+   \item \code{modelType} A string denoting which model type to use, available models and descriptions thereof are available through the \code{\link{listAvailableNoiseModels}} function.
+   \item \code{signalToNoise} A numeric of either length 1, nrow(sigma) or nSeries denoting the signal to noise ratio of the noise.
+   \item \code{variance} A numeric of either length 1, nrow(sigma) or nSeries denoting the variance of the noise when the variance is constant.
+}}
+
+\item{timeSettings}{Object of type list with entries \enumerate{
+   \item \code{tradingStart} A numeric of length one denoting in seconds after midnight the start of trading. Default is 34200 which corresponds to 09:30
+   \item \code{tradingEnd} A numeric of length one denoting in seconds after midnight the start of trading. Default is 57600 which corresponds to 16:00
+   \item \code{origin} A character which can be coerced to a date, denoting the first day of the simulated series. Default is "1970-01-01"
+   \item \code{sampling} A character denoting which sampling scheme to use. Currently only "equidistant" is implemented.
+}}
+
+\item{nSeries}{Integer-valued numeric of length one denoting how many series to simulate. This is overwritten in case nrow of the variance covariance matrix is greater than one then, nSeries will be set to match nrow(sigma)}
+
+\item{nDays}{Integer-valued numeric of length one denoting how many days to simulate the data over.}
+
+\item{nObs}{Integer-valued numeric of length one denoting how many days to simulate the data over.}
+
+\item{discretize}{Logical denoting whether to discretize the prices. The prices are discretized using log(round(100 * exp(prices)) / 100). i.e. to nearest cent.}
+}
+\value{
+an object of type "highfrequencySimSpec"
 }
 \description{
 create high frequency simulation spec

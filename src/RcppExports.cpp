@@ -106,12 +106,12 @@ BEGIN_RCPP
 END_RCPP
 }
 // colCumsum
-arma::mat colCumsum(arma::mat& x);
+arma::mat colCumsum(const arma::mat& x);
 RcppExport SEXP _highfrequency_colCumsum(SEXP xSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::mat& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type x(xSEXP);
     rcpp_result_gen = Rcpp::wrap(colCumsum(x));
     return rcpp_result_gen;
 END_RCPP

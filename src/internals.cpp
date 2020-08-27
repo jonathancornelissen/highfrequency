@@ -6,7 +6,7 @@ using namespace Rcpp;
 
 //' @keywords internal
 // [[Rcpp::export]]
-arma::mat colCumsum(arma::mat& x) {
+arma::mat colCumsum(const arma::mat& x) {
   arma::mat y = x;
   // We loop through the columns of x and apply cumsum
   for(uword col = 0; col < x.n_cols; col++){

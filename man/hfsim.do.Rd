@@ -6,6 +6,12 @@
 \usage{
 hfsim.do(hfSimSpec)
 }
+\arguments{
+\item{hfSimSpec}{object of type hfSimSpec created by \code{\link{createHFSimSpec}}}
+}
+\value{
+a List containing the simulated data and additional information, e.g. underlying variance process, bursts in the drift or volatility, and if applicable noise term.
+}
 \description{
 simulate hf prices
 }
