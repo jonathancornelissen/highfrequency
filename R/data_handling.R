@@ -329,6 +329,24 @@ aggregatePrice <- function(pData, on = "minutes", k = 1, marketOpen = "09:30:00"
   pData[, DT := as.numeric(DT)]
   pData <- pData[between(DT %% 86400, marketOpenNumeric, marketCloseNumeric)]
   
+  if(on == "ticks"){ ## Special case for on = "ticks"
+    if(k < 1 | k%%1 != 0){
+      stop("When on is `ticks`, must be a positive integer valued numeric")
+    }
+    if(length(unique(as.Date(pData[,DT]))) > 1){
+      stop("Multiday support for aggregatePrice with on = \"ticks\" is not implemented yet.")
+    }
+    idx <- seq(1, nrow(pData), by = k)
+    if(k %% nrow(pData) != 0){
+      idx <- c(idx, nrow(pData))
+    }
+    pData <- pData[idx,]
+    return(pData)
+  }
+  
+  
+  
+  
   pData[, DATE := floor(DT / 86400)]
   pData[, FIRST_DT := min(DT), by = "DATE"]
   
