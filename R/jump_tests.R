@@ -790,6 +790,24 @@ plot.intradayJumpTest <- function(x, ...){
 #' and/or \code{marketOpen}/ \code{marketClose} belong. Default = \code{"GMT"}.
 #' This parameter will also help determine the testing times as the test is done on non-overlapping pre-averaged returns.
 #' 
+#' @return A list containing "criticalValues" which are the bootstrapped critcal values, "testStatistic" the test statistic of the jump test, "dimensions" which are the dimensions of the jump matrix
+#'  "marketJumpDetections" the jumps detected in the market prices, "stockJumpDetections" the co-jumps detected in the individual stock prices, and "jumpIndices" which are the indices of the detected jumps.
+#' 
+#' @examples 
+#' \dontrun{
+#' #Rank jump test using simulated sample data that includes jumps
+#' marketPrice <- sample5MinPricesJumps[,1] # pretend that the marketPrice is the first asset in the data
+#' ## construct stockPrice as a list
+#' stockPrice <- list() 
+#' for (i in 1:(ncol(sample5MinPricesJumps)-1)) {
+#'   stockPrice[[i]] <- sample5MinPricesJumps[,i+1]
+#' }
+#' ## This can take a long time due to the bootstrapping
+#' rankTest <- rankJumpTest(marketPrice, stockPrice, coarseFreq = 10, k = 1, alpha = c(5,3), tz = "GMT", marketOpen = "09:30:00", marketClose = "16:00:00")
+#' # Plot the detected stock jump detections
+#' plot(rankTest$stockJumpDetections)
+#' }
+#' 
 #' @importFrom stats na.omit quantile runif
 #' @importFrom zoo coredata
 #' @export
