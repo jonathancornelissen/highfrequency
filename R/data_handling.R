@@ -229,6 +229,8 @@ aggregatePrice <- function(pData, on = "minutes", k = 1, marketOpen = "09:30:00"
   
   on_true <- NULL
   
+  
+  
   if ("PRICE" %in% colnames(pData) == FALSE) {
     stop("data.table or xts needs column named PRICE.")
   }
@@ -247,7 +249,9 @@ aggregatePrice <- function(pData, on = "minutes", k = 1, marketOpen = "09:30:00"
     scaleFactor <- k * 60 * 60
   }
   
-  
+  if(! (on %in% c("milliseconds", "secs", "seconds", "mins", "minutes", "hours", "ticks"))){
+    stop("on not valid value. Valid values are: \"milliseconds\", \"secs\", \"seconds\", \"mins\", \"minutes\", \"hours\", and \"ticks\".")
+  }
   
   dummy_was_xts <- FALSE
   if (!is.data.table(pData)) {
