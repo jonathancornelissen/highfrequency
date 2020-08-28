@@ -307,7 +307,7 @@ test_that("rCholCov", {
   w1 <- rets[,1]
   w2 <- rets[sort(sample(1:nrow(rets), size = nrow(rets) * 0.75)), 2]
   w3 <- rets[sort(sample(1:nrow(rets), size = nrow(rets) * 0.65)), 3]
-  w4 <- rets[sort(sample(1:nrow(rets), size = nrow(rets) * 0.8)), 4] # Here we make stock 4 the second most liquid asset, which will function to test the ordering
+  w4 <- rets[sort(sample(1:nrow(rets), size = nrow(rets) * 0.8)), 4] # Here we make asset 4 the second most liquid asset, which will function to test the ordering
   
   timestamps1 <- seq(34200, 57600, length.out =  length(w1))
   timestamps2 <- seq(34200, 57600, length.out =  length(w2))

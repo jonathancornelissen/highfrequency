@@ -31,7 +31,7 @@ a list containing the covariance matrix "CholCov", and the Cholesky decompositio
 Function that estimates the integrated covariance matrix using the CholCov algorithm.
 }
 \details{
-additional arguments for IVest and COVest should be passed in the ... argument. For the MRC estimator, the theta and delta parameters can be set. These default to 1 and 0.1 respectively.
+additional arguments for IVest and COVest should be passed in the ... argument. For the MRC estimator, which is the default, the theta and delta parameters can be set. These default to 1 and 0.1 respectively.
 }
 \references{
 Boudt, Laurent Lunde, Quaedvlieg, Sauri(2017) Positive semidefinite integrated covariance estimation, factorizations and asynchronicity. Journal of Econometrics 196, 347-367
