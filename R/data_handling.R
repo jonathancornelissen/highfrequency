@@ -2394,7 +2394,7 @@ businessTimeAggregation <- function(pData, measure = "intensity", obs = 390, ban
       pData <- pData[idx,]
       
       if(length(idx) < obs){
-        warning(paste("The measure mandated sampling the same point twice, at least once, returning series that is smaller than obs on", date))
+        warning(paste("The measure mandated sampling the same point twice, at least once, returning series that is smaller than obs on", date, "\n"))
       }
       
     }
@@ -2406,7 +2406,7 @@ businessTimeAggregation <- function(pData, measure = "intensity", obs = 390, ban
       idx <- which(diff(floor(cumsum(intensityProcess))) >= 1)
       pData <- pData[DT %in% index(intensityProcess)[idx],]
       if(length(idx) < obs){
-        warning(paste("The measure mandated sampling the same point twice, at least once, returning series that is smaller than obs on", date))
+        warning(paste("The measure mandated sampling the same point twice, at least once, returning series that is smaller than obs on", date, "\n"))
       }
       
     }
@@ -2421,7 +2421,7 @@ businessTimeAggregation <- function(pData, measure = "intensity", obs = 390, ban
       idx <- which(diff(floor(cumsum(intensityProcess))) >= 1)
       pData <- pData[idx, ]
       if(length(idx) < obs){
-        warning(paste("The measure mandated sampling the same point twice, at least once, returning series that is smaller than obs on", date))
+        warning(paste("The measure mandated sampling the same point twice, at least once, returning series that is smaller than obs on", date, "\n"))
       }
     }
     ITP[[date]] <- intensityProcess
