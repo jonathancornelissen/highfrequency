@@ -29,7 +29,7 @@ hfsim.do <- function(hfSimSpec){
   
   # Here, we lower the volatility of the volatility process to account for the jump variation
   if (jumpModel$modelType != "none" && includeJumps) {
-    diag(jumpModel$jumpVolatility) <- diag(volatilityModel$sigma * jumpModel$jumpComponent) # We create a variable to contain the jump volatility which will be used in the RNG
+    jumpModel$jumpVolatility <- diag(volatilityModel$sigma * jumpModel$jumpComponent) # We create a variable to contain the jump volatility which will be used in the RNG
     diag(volatilityModel$sigma) <- diag(volatilityModel$sigma * (1-jumpModel$jumpComponent))
   }
 
@@ -65,7 +65,7 @@ hfsim.do <- function(hfSimSpec){
   ### Returns coming from J(t)
   jumps <- switch (jumpModel$modelType,
     none = 0,
-    PA = preAnnouncedJumpSim(hfSimSpec$jumpModel, nDays, nSeries, nObs)
+    PA = preAnnouncedJumpSim(jumpModel, nDays, nSeries, nObs)
   )
   
   diurnality <- switch (diurnalModel$modelType,
@@ -180,7 +180,7 @@ singularityDriftBurst <- function(model, nDays, nSeries, nObs, dt){
 ############# Simulate jumps
 #' @keywords internal
 preAnnouncedJumpSim <- function(model, nDays, nSeries, nObs){
-  jumps <- matrix(rnorm(nDays * nSeries, sd = model$jumpVolatility), ncol = nSeries)
+  jumps <- matrix(rnorm(nDays * nSeries, sd = model$jumpVolatility), ncol = nSeries, byrow = TRUE)
   
   jumpIndices <- round(matrix(sample((model$jumpTime[1] * nObs):(model$jumpTime[2] * nObs), nSeries * nDays, replace = TRUE), nrow = nDays, ncol = nSeries))
   # make sure the jumps don't happen during trading and not after (i.e. we try to put it in to indices that dont exits)
