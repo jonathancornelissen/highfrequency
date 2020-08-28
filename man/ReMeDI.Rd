@@ -5,14 +5,7 @@
 \title{ReMeDI
 estimates auto-covariance of market-microstructure noise}
 \usage{
-ReMeDI(
-  pData,
-  kn = 1,
-  lags = 1,
-  correctTime = FALSE,
-  jumpsIndex = NULL,
-  makeCorrelation = FALSE
-)
+ReMeDI(pData, kn = 1, lags = 1, makeCorrelation = FALSE)
 }
 \arguments{
 \item{pData}{xts or data.table containing the log-prices of the asset}
@@ -21,15 +14,15 @@ ReMeDI(
 
 \item{lags}{numeric containing integer values indicating}
 
-\item{correctTime}{logical indicating whether to use the time-adjusted ReMeDI measure, default is FALSE}
-
-\item{jumpsIndex}{Indices of jump(s) detected}
-
 \item{makeCorrelation}{logical indicating whether to transform the autocovariances into autocorrelations}
 }
 \description{
 ReMeDI
 estimates auto-covariance of market-microstructure noise
+}
+\examples{
+remed <- ReMeDI(sampleTDataMicroseconds[as.Date(DT) == "2018-01-02", ], kn = 5, lags = 1:8)
+plot.ts(remed)
 }
 \references{
 remedi paper, muzafer's paper

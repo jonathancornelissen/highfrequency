@@ -7,8 +7,6 @@ function to choose the tuning parameter, kn in ReMeDI estimation}
 \usage{
 knChooseReMeDI(
   pData,
-  correctTime = FALSE,
-  jumpsIndex = NULL,
   knMax = 10,
   tol = 0.05,
   size = 3,
@@ -19,10 +17,6 @@ knChooseReMeDI(
 }
 \arguments{
 \item{pData}{xts or data.table containing the log-prices of the asset.}
-
-\item{correctTime}{logical indicating whether to use the time-adjusted ReMeDI measure, default is FALSE}
-
-\item{jumpsIndex}{Indices of jump(s) detected}
 
 \item{knMax}{max value of kn to be considered}
 
@@ -47,14 +41,14 @@ function to choose the tuning parameter, kn in ReMeDI estimation
 This is the algorithm B.2 in the appendix of the Li and Linton (2019) working paper
 }
 \examples{
-optimalKn <- knChooseReMeDI(sampleTDataMicroseconds, correctTime = FALSE, 
-                            jumpsIndex = NULL, knMax = 10, tol = 0.05, 
-                            size = 3, lower = 2, upper = 5, plot = TRUE)
+optimalKn <- knChooseReMeDI(sampleTDataMicroseconds[as.Date(DT) == "2018-01-02",],
+                            knMax = 10, tol = 0.05, size = 3, 
+                            lower = 2, upper = 5, plot = TRUE)
 optimalKn
 \dontrun{
 # We can also have a much larger search-space
-optimalKn <- knChooseReMeDI(sampleTDataMicroseconds, correctTime = FALSE, 
-                            jumpsIndex = NULL, knMax = 50, tol = 0.05,
+optimalKn <- knChooseReMeDI(sampleTDataMicroseconds[, as.Date(DT) == "2018-01-02"], 
+                            knMax = 50, tol = 0.05,
                             size = 3, lower = 2, upper = 5, plot = TRUE)
 optimalKn
 }
