@@ -950,8 +950,18 @@ realizedMeasureSpotVol <- function(mR, rData, options = list()){
   N <- ncol(mR)
   lookBackPeriod <- op$lookBackPeriod
   if((lookBackPeriod %% 1 != 0) | (lookBackPeriod <= 0)){ #lookBackPeriod must be a positive integer
-    stop("lookBackPeriod must be a positive integer.")
+    stop("lookBackPeriod must be a positive integer greater than 0.")
   }
+  
+  if((op$RM == "bipower" | op$RM == "minrv") && lookBackPeriod <= 1){
+    stop(paste("When RM is", op$RM, "lookBackPeriod must be atleast 2\n"))
+  }
+  
+  if(op$RM == "medrv" && lookBackPeriod <= 2){
+    stop("When RM is medrv, lookBackPeriod must be atleast 3\n")
+  }
+  
+  
   sigma2hat <- matrix(0, D, N)
   idx <- seq(lookBackPeriod+1, N)
   if(!op$dontIncludeLast){
