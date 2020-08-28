@@ -435,9 +435,8 @@ JOjumpTest <- function(pData, power = 4, alignBy = NULL, alignPeriod = NULL, alp
 #' Intraday jump tests
 #' 
 #' This function can be used to  test for jumps in intraday price paths.
-#' The tests are of the form \eqn{L(t) = (R(t) - mu(t))/sigma(t)}.
+#' The tests are of the form \eqn{L(t) = (R(t) - mu(t))/sigma(t)}. 
 #' 
-#' The null hypothesis of the tests in this function is that
 #' @param pData xts or data.table of the price data in levels. This data can (and should in some cases) be tick-level data. The data can span more than one day.
 #' @param volEstimator character denoting which volatility estimator to use for the tests. See \link{spotVol}. Default = \code{"RM"} denoting realized measures.
 #' @param driftEstimator character denoting which drift estimator to use for the tests. See \link{spotDrift}. Default = \code{"none"} denoting no drift esitmation.
@@ -455,15 +454,26 @@ JOjumpTest <- function(pData, power = 4, alignBy = NULL, alignPeriod = NULL, alp
 #' @param tz string specifying the time zone to which the times in \code{data}
 #' and/or \code{marketOpen}/ \code{marketClose} belong. Default = \code{"GMT"}.
 #' 
+#' The null hypothesis of the tests in this function is that there are no jumps in the price series
+#' 
 #' @examples 
 #' \dontrun{
 #' # We can easily make a Lee-Mykland jump test.
 #' LMtest <- intradayJumpTest(pData = sampleTDataMicroseconds[, list(DT, PRICE)], 
 #'                            volEstimator = "RM", driftEstimator = "none",
-#'                            RM = "bipower", lookBackPeriod = 10,
+#'                            RM = "bipower", lookBackPeriod = 20,
 #'                            on = "minutes", k = 5, marketOpen = "09:30:00", 
 #'                            marketClose = "16:00:00")
-#' plot(LMtest)}
+#' plot(LMtest)
+#' 
+#' # We can just as easily use the pre-averaged version from the "Fact or Friction" paper
+#' FoFtest <- intradayJumpTest(pData = sampleTDataMicroseconds[, list(DT, PRICE)], 
+#'                             volEstimator = "PARM", driftEstimator = "none",
+#'                             RM = "bipower", lookBackPeriod = 20, theta = 1.2,
+#'                             marketOpen = "09:30:00", marketClose = "16:00:00")
+#' plot(FoFtest)
+#' 
+#' }
 #' 
 #' @importFrom zoo index
 #' @export

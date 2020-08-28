@@ -42,23 +42,31 @@ specified by \code{tz}. By default, \code{marketOpen = "09:30:00"}.}
 specified by \code{tz}. By default, \code{marketClose = "16:00:00"}.}
 
 \item{tz}{string specifying the time zone to which the times in \code{data}
-and/or \code{marketOpen}/ \code{marketClose} belong. Default = \code{"GMT"}.}
+and/or \code{marketOpen}/ \code{marketClose} belong. Default = \code{"GMT"}.
+
+The null hypothesis of the tests in this function is that there are no jumps in the price series}
 }
 \description{
 This function can be used to  test for jumps in intraday price paths.
 The tests are of the form \eqn{L(t) = (R(t) - mu(t))/sigma(t)}.
-}
-\details{
-The null hypothesis of the tests in this function is that
 }
 \examples{
 \dontrun{
 # We can easily make a Lee-Mykland jump test.
 LMtest <- intradayJumpTest(pData = sampleTDataMicroseconds[, list(DT, PRICE)], 
                            volEstimator = "RM", driftEstimator = "none",
-                           RM = "bipower", lookBackPeriod = 10,
+                           RM = "bipower", lookBackPeriod = 20,
                            on = "minutes", k = 5, marketOpen = "09:30:00", 
                            marketClose = "16:00:00")
-plot(LMtest)}
+plot(LMtest)
+
+# We can just as easily use the pre-averaged version from the "Fact or Friction" paper
+FoFtest <- intradayJumpTest(pData = sampleTDataMicroseconds[, list(DT, PRICE)], 
+                            volEstimator = "PARM", driftEstimator = "none",
+                            RM = "bipower", lookBackPeriod = 20, theta = 1.2,
+                            marketOpen = "09:30:00", marketClose = "16:00:00")
+plot(FoFtest)
+
+}
 
 }
