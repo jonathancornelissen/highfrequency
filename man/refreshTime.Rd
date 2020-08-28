@@ -22,7 +22,7 @@ This function implements the refresh time synchronization scheme proposed by Har
 It picks the so-called refresh times at which all assets have traded at least once since the last refresh time point. 
 For example, the first refresh time corresponds to the first time at which all stocks have traded.
 The subsequent refresh time is defined as the first time when all stocks have traded again.
-This process is repeated untill the end of one time series is reached.
+This process is repeated until the end of one time series is reached.
 }
 \examples{
 # Suppose irregular timepoints:
