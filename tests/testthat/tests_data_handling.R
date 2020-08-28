@@ -201,8 +201,9 @@ test_that("aggregateTS edge cases", {
   )
   
   expect_true(
-    max(index(aggregateTS(xts(1:23400, as.POSIXct(seq(34200, 57600, length.out = 23400), origin = '1970-01-01')))))<
-    max(index(aggregateTS(xts(1:23400, as.POSIXct(seq(34200, 57601, length.out = 23400), origin = '1970-01-01')))))
+    max(index(aggregateTS(xts(1:23400, as.POSIXct(seq(34200, 57600, length.out = 23400), origin = '1970-01-01', on = "minutes", k = 1)))))<
+    max(index(aggregateTS(xts(1:23400, as.POSIXct(seq(34200, 57601, length.out = 23400), origin = '1970-01-01', on = "minutes", k = 1)))))
+    # The last one will have an extra minute in this case!
   )
 
 })
