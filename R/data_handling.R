@@ -189,7 +189,7 @@ aggregateTS <- function (ts, FUN = "previoustick", on = "minutes", k = 1, weight
 #' of the result.
 #' 
 #' @param pData data.table or xts object to be aggregated containing the intraday price series, possibly across multiple days.
-#' @param on character, indicating the time scale in which "k" is expressed. Possible values are: "milliseconds", "secs", "seconds", "mins", "minutes","hours".
+#' @param on character, indicating the time scale in which "k" is expressed. Possible values are: "milliseconds", "secs", "seconds", "mins", "minutes","hours", "ticks".
 #' @param k positive integer, indicating the number of periods to aggregate over; e.g. to aggregate a 
 #' xts object to the 5 minute frequency set k = 5 and on = "minutes".
 #' @param marketOpen the market opening time, by default: marketOpen = "09:30:00". 
@@ -203,6 +203,10 @@ aggregateTS <- function (ts, FUN = "previoustick", on = "minutes", k = 1, weight
 #' In case of previous tick aggregation or on = "seconds"/"minutes"/"hours",
 #' the element of the returned series with e.g. timestamp 09:35:00 contains 
 #' the last observation up to that point, including the value at 09:35:00 itself.
+#' 
+#' In case on = "ticks", the sampling is done such the sampling starts on the first tick, and the last tick is always included
+#' For example, if 14 observations are made on one day, and these are 1, 2, 3, ... 14.
+#' Then, with on = "ticks" and k = 3, the output will be 1, 4, 7, 10, 13, 14.
 #' 
 #' @return A data.table or xts object containing the aggregated time series.
 #' 
@@ -287,6 +291,18 @@ aggregatePrice <- function(pData, on = "minutes", k = 1, marketOpen = "09:30:00"
     if (!("PRICE" %in% colnames(pData))) {
       stop("Data.table neeeds PRICE column.")
     }
+  }
+  
+  if(on == "ticks"){ ## Special case for on = "ticks"
+    if(k < 1 | k%%1 != 0){
+      stop("When on is `ticks`, must be a positive integer valued numeric")
+    }
+    idx <- seq(1, nrow(pData), by = k)
+    if(k %% nrow(pData) != 0){
+      idx <- c(idx, nrow(pData))
+    }
+    pData <- pData[idx,]
+    return(pData)
   }
   
   
