@@ -355,10 +355,11 @@ test_that("rSemiCov", {
 context("ReMeDI")
 
 test_that("ReMeDI", {
-  print("Make sure to implement tests for correctTime = TRUE")
-  remed <- ReMeDI(sampleTDataMicroseconds, correctTime = FALSE, lags = 0:25, kn = 2)
+  # print("Make sure to implement tests for correctTime = TRUE") ## When it becomes relevant.
+  #remed <- ReMeDI(sampleTDataMicroseconds, correctTime = FALSE, lags = 0:25, kn = 2) ##Changed due to correctTime bug
+  remed <- ReMeDI(sampleTDataMicroseconds, lags = 0:25, kn = 2) 
   
-   expected <- c(1.429670e-05, 9.640725e-05, 1.059059e-04, 7.751148e-05, 3.816783e-05, 1.706490e-05, -9.071417e-06, -4.930293e-06, -2.065554e-06, -2.675700e-05,
+  expected <- c(1.429670e-05, 9.640725e-05, 1.059059e-04, 7.751148e-05, 3.816783e-05, 1.706490e-05, -9.071417e-06, -4.930293e-06, -2.065554e-06, -2.675700e-05,
                  -4.750562e-05, -6.652264e-05, -7.900057e-05, -7.084243e-05, -2.944357e-05, -1.196783e-05, 1.206840e-06, 2.660061e-05, 2.610301e-05, 3.354312e-05,
                  3.074634e-05, -3.352647e-06, -2.297883e-05, -4.176323e-05, -4.162248e-05, -5.299878e-06)
   
@@ -367,7 +368,8 @@ test_that("ReMeDI", {
   # Different data-set
   dat <- sampleTData$PRICE
   storage.mode(dat) <- "numeric"
-  remed <- ReMeDI(dat, correctTime = FALSE, jumpsIndex = NULL, lags = 0:25, kn = 4)
+  #remed <- ReMeDI(dat, correctTime = FALSE, jumpsIndex = NULL, lags = 0:25, kn = 4) ##Changed due to correctTime bug
+  remed <- ReMeDI(dat, lags = 0:25, kn = 4)
   
  expected <- c(1.943885e-04, -3.938879e-04, -5.858273e-04, -7.996193e-04, -8.395354e-04, -9.102818e-04, -8.829556e-04, -8.944065e-04, -7.944514e-04, -6.351139e-04,
                -4.721643e-04, -2.342956e-04, -1.940048e-04, -1.110132e-04, -4.208034e-05, 9.607314e-06,  8.919365e-05,  7.845024e-05, -1.345024e-05, -1.488040e-04,
@@ -380,12 +382,14 @@ test_that("ReMeDI", {
 
 test_that("ReMeDI kn choosing algorithm", {
   
-  optimalKn <- knChooseReMeDI(sampleTDataMicroseconds, correctTime = FALSE, jumpsIndex = NULL, knMax = 10, tol = 0.05, size = 3, lower = 1, upper = 10, plot = FALSE)
+  # optimalKn <- knChooseReMeDI(sampleTDataMicroseconds, correctTime = FALSE, jumpsIndex = NULL, knMax = 10, tol = 0.05, size = 3, lower = 1, upper = 10, plot = FALSE)##Changed due to correctTime bug
+  optimalKn <- knChooseReMeDI(sampleTDataMicroseconds, knMax = 10, tol = 0.05, size = 3, lower = 1, upper = 10, plot = FALSE)
   expect_equal(optimalKn, 1L)
   
   dat <- sampleTData$PRICE
   storage.mode(dat) <- "numeric"
-  optimalKn <- knChooseReMeDI(dat, correctTime = FALSE, jumpsIndex = NULL, knMax = 10, tol = 0.05, size = 3, lower = 3, upper = 5, plot = FALSE)
+  # optimalKn <- knChooseReMeDI(dat, correctTime = FALSE, jumpsIndex = NULL, knMax = 10, tol = 0.05, size = 3, lower = 3, upper = 5, plot = FALSE) ##Changed due to correctTime bug
+  optimalKn <- knChooseReMeDI(dat, knMax = 10, tol = 0.05, size = 3, lower = 3, upper = 5, plot = FALSE)
   expect_equal(optimalKn, 4L)
   
     

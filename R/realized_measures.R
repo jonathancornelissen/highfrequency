@@ -2471,6 +2471,8 @@ listCholCovEstimators <- function(){
     "rSemiCov")
 }
 
+### #' @param correctTime logical indicating whether to use the time-adjusted ReMeDI measure, default is FALSE               #To put into documentation when time-fix is found
+### #' @param jumpsIndex Indices of jump(s) detected               #To put into documentation when time-fix is found
 
 #' ReMeDI
 #' estimates auto-covariance of market-microstructure noise 
@@ -2478,16 +2480,19 @@ listCholCovEstimators <- function(){
 #' @param pData xts or data.table containing the log-prices of the asset
 #' @param kn numeric of length 1 determining the tuning parameter kn this controls the lengths of the non-overlapping interval in the ReMeDI estimation
 #' @param lags numeric containing integer values indicating 
-#' @param correctTime logical indicating whether to use the time-adjusted ReMeDI measure, default is FALSE
-#' @param jumpsIndex Indices of jump(s) detected
 #' @param makeCorrelation logical indicating whether to transform the autocovariances into autocorrelations
 #' 
 #' @references remedi paper, muzafer's paper
 #' @keywords microstructure noise autocovariance autocorrelation
 #' 
+#' @examples 
+#' remed <- ReMeDI(sampleTDataMicroseconds[as.Date(DT) == "2018-01-02", ], kn = 5, lags = 1:8)
+#' plot.ts(remed)
 #' @author Emil Sjoerup
 #' @export
-ReMeDI <- function(pData, kn = 1, lags = 1, correctTime = FALSE, jumpsIndex = NULL, makeCorrelation = FALSE){
+ReMeDI <- function(pData, kn = 1, lags = 1,
+                   #correctTime = FALSE, jumpsIndex = NULL,
+                   makeCorrelation = FALSE){
   time <- DT <- PRICE <- NULL
   # Check input
   if(is.data.table(pData)){ # We have a data.table
@@ -2495,34 +2500,34 @@ ReMeDI <- function(pData, kn = 1, lags = 1, correctTime = FALSE, jumpsIndex = NU
     if(!("PRICE" %in% colnames(pData))){
       stop("ReMeDI with data.table input requires a PRICE column")
     }
-    
-    if(correctTime){
-      if(!("DT" %in% colnames(pData))){
-        stop("ReMeDI with correctTime set to TRUE needs a DT (date-time) column when the input is a data.table")
-      } else {
-        time <- as.numeric(pData[, DT])    
-      }
-    }
+    # 
+    # if(correctTime){
+    #   if(!("DT" %in% colnames(pData))){
+    #     stop("ReMeDI with correctTime set to TRUE needs a DT (date-time) column when the input is a data.table")
+    #   } else {
+    #     time <- as.numeric(pData[, DT])    
+    #   }
+    # }
     
     prices <- as.numeric(pData[, PRICE])
     
   } else if( is.xts(pData) ) { # We have an xts object
-    if(correctTime){
-      time <- as.numeric(index(pData))
-    }    
+    # if(correctTime){
+    #   time <- as.numeric(index(pData))
+    # }    
     prices <- as.numeric(pData)
   } else {
     stop("Error in ReMeDI: pData must be an xts or a data.table")
   }
   
-  correctJumps <- FALSE
-  
-  if(is.numeric(jumpsIndex)){
-    if(!all(jumpsIndex %% 1 == 0)){
-      stop("Error in ReMeDI: jumpsIndex must be a numeric of integer values")
-    }
-    correctJumps <- TRUE  
-  }
+  # correctJumps <- FALSE
+  # 
+  # if(is.numeric(jumpsIndex)){
+  #   if(!all(jumpsIndex %% 1 == 0)){
+  #     stop("Error in ReMeDI: jumpsIndex must be a numeric of integer values")
+  #   }
+  #   correctJumps <- TRUE  
+  # }
   
   if(!all(lags %% 1 == 0 )){
     stop("lags must be contain integer values")
@@ -2547,38 +2552,38 @@ ReMeDI <- function(pData, kn = 1, lags = 1, correctTime = FALSE, jumpsIndex = NU
       remedi[idx] <- prod(prices[i + thisLag] - prices[i + thisLag - kn])
       idx <- idx + 1
     }
-    
-    ## Use the time corrections Muzafer provided
-    if(correctTime){
-      
-      timeIDX <- sweep(matrix(rep((kn[2] + 1):(nObs - lag + kn[1]), 4), ncol = 4),2, c(thisLag , thisLag - kn), FUN = "+")
-      
-      ## Follow up with muzafer whether this is correct
-      timeCorrection <- (time[timeIDX[,3]] - time[timeIDX[,1]]) * (time[timeIDX[,2]] - time[timeIDX[,4]])
-      
-      remedi <- remedi * timeCorrection
-      
-    }
-    
-    
-    ## Use the jump correction Muzafer provided
-    if(correctJumps){
-      jumpIDX <- matrix(0, nrow = length(jumpsIndex), ncol = 3 + (thisLag[1] != 0))
-      
-      for (i in 1:length(jumpsIndex)) {
-        if(thisLag[1] != 0){
-          jumpIDX[i,] <- c(jumpsIndex[i] - sum(abs(kn)) - thisLag[1], jumpsIndex[i] - rep(kn[2], 1 + sum(thisLag != 0)) - thisLag, jumpsIndex[i] )
-        } else {
-          jumpIDX[i,] <- c(jumpsIndex[i] - sum(abs(kn)) - thisLag[1], jumpsIndex[i] - kn[2] - thisLag[1], jumpsIndex[i])
-        }  
-        
-        remedi <- remedi[-as.numeric(jumpIDX)]
-      }
-      
-      
-    }
-    
-    
+    # 
+    # ## Use the time corrections Muzafer provided
+    # if(correctTime){
+    #   
+    #   timeIDX <- sweep(matrix(rep((kn[2] + 1):(nObs - lag + kn[1]), 4), ncol = 4),2, c(thisLag , thisLag - kn), FUN = "+")
+    #   
+    #   ## Follow up with muzafer whether this is correct
+    #   timeCorrection <- (time[timeIDX[,3]] - time[timeIDX[,1]]) * (time[timeIDX[,2]] - time[timeIDX[,4]])
+    #   
+    #   remedi <- remedi * timeCorrection
+    #   
+    # }
+    # 
+    # 
+    # ## Use the jump correction Muzafer provided
+    # if(correctJumps){
+    #   jumpIDX <- matrix(0, nrow = length(jumpsIndex), ncol = 3 + (thisLag[1] != 0))
+    #   
+    #   for (i in 1:length(jumpsIndex)) {
+    #     if(thisLag[1] != 0){
+    #       jumpIDX[i,] <- c(jumpsIndex[i] - sum(abs(kn)) - thisLag[1], jumpsIndex[i] - rep(kn[2], 1 + sum(thisLag != 0)) - thisLag, jumpsIndex[i] )
+    #     } else {
+    #       jumpIDX[i,] <- c(jumpsIndex[i] - sum(abs(kn)) - thisLag[1], jumpsIndex[i] - kn[2] - thisLag[1], jumpsIndex[i])
+    #     }  
+    #     
+    #     remedi <- remedi[-as.numeric(jumpIDX)]
+    #   }
+    #   
+    #   
+    # }
+    # 
+    # 
     
     res[resIDX] <- sum(remedi) / nObs
     resIDX <- resIDX +1
@@ -2592,12 +2597,28 @@ ReMeDI <- function(pData, kn = 1, lags = 1, correctTime = FALSE, jumpsIndex = NU
   return(res)
 }
 
+## For when correcTime is solved:
+# #' @examples 
+# #' optimalKn <- knChooseReMeDI(sampleTDataMicroseconds, correctTime = FALSE, 
+# #'                             jumpsIndex = NULL, knMax = 10, tol = 0.05, 
+# #'                             size = 3, lower = 2, upper = 5, plot = TRUE)
+# #' optimalKn
+# #' \dontrun{
+# #' # We can also have a much larger search-space
+# #' optimalKn <- knChooseReMeDI(sampleTDataMicroseconds, correctTime = FALSE, 
+# #'                             jumpsIndex = NULL, knMax = 50, tol = 0.05,
+# #'                             size = 3, lower = 2, upper = 5, plot = TRUE)
+# #' optimalKn
+# #' }
+# #' @param correctTime logical indicating whether to use the time-adjusted ReMeDI measure, default is FALSE
+# #' @param jumpsIndex Indices of jump(s) detected
+
+
+
 #' ReMeDI tuning parameter
 #' function to choose the tuning parameter, kn in ReMeDI estimation
 #' 
 #' @param pData xts or data.table containing the log-prices of the asset.
-#' @param correctTime logical indicating whether to use the time-adjusted ReMeDI measure, default is FALSE
-#' @param jumpsIndex Indices of jump(s) detected
 #' @param knMax max value of kn to be considered
 #' @param tol tolerance for the minimizing value. If tol is high, the algorithm will choose a lower optimal value.
 #' @param size size of the local window
@@ -2607,14 +2628,14 @@ ReMeDI <- function(pData, kn = 1, lags = 1, correctTime = FALSE, jumpsIndex = NU
 #' @details This is the algorithm B.2 in the appendix of the Li and Linton (2019) working paper
 #' 
 #' @examples 
-#' optimalKn <- knChooseReMeDI(sampleTDataMicroseconds, correctTime = FALSE, 
-#'                             jumpsIndex = NULL, knMax = 10, tol = 0.05, 
-#'                             size = 3, lower = 2, upper = 5, plot = TRUE)
+#' optimalKn <- knChooseReMeDI(sampleTDataMicroseconds[as.Date(DT) == "2018-01-02",],
+#'                             knMax = 10, tol = 0.05, size = 3, 
+#'                             lower = 2, upper = 5, plot = TRUE)
 #' optimalKn
 #' \dontrun{
 #' # We can also have a much larger search-space
-#' optimalKn <- knChooseReMeDI(sampleTDataMicroseconds, correctTime = FALSE, 
-#'                             jumpsIndex = NULL, knMax = 50, tol = 0.05,
+#' optimalKn <- knChooseReMeDI(sampleTDataMicroseconds[, as.Date(DT) == "2018-01-02"], 
+#'                             knMax = 50, tol = 0.05,
 #'                             size = 3, lower = 2, upper = 5, plot = TRUE)
 #' optimalKn
 #' }
@@ -2624,11 +2645,17 @@ ReMeDI <- function(pData, kn = 1, lags = 1, correctTime = FALSE, jumpsIndex = NU
 #' @references A ReMeDI for Microstructure Noise
 #' @return integer containing the optimal kn
 #' @export
-knChooseReMeDI <- function(pData, correctTime = FALSE, jumpsIndex = NULL, knMax = 10, tol = 0.05, size = 3, lower = 2, upper = 5, plot = FALSE){
+knChooseReMeDI <- function(pData, 
+                           #correctTime = FALSE, jumpsIndex = NULL,
+                           knMax = 10, tol = 0.05, size = 3, lower = 2, upper = 5, plot = FALSE){
   
   kn <- 1:(knMax + size +1)
-  err <- vapply(kn, ReMeDI, FUN.VALUE = numeric(4), pData = pData, correctTime = correctTime, jumpsIndex = jumpsIndex, lags = 0:3)
-  err <- (err[1,] - err[2,] - err[3,] + err[4,] - ReMeDI(pData, kn = 1, lags = 0, correctTime = correctTime, jumpsIndex = jumpsIndex))^2
+  err <- vapply(kn, ReMeDI, FUN.VALUE = numeric(4), pData = pData, 
+                #correctTime = correctTime, jumpsIndex = jumpsIndex, ## For when correctTime is fixed
+                lags = 0:3)
+  err <- (err[1,] - err[2,] - err[3,] + err[4,] - ReMeDI(pData, kn = 1, lags = 0 ))^2
+          #                                               , correctTime = correctTime, jumpsIndex = jumpsIndex) ## For when correctTime is fixed
+          
 
   if(plot){
     plot.ts(err, ylab = "error", xlab = "kn")
