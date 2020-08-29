@@ -79,32 +79,3 @@ pcovcc <- function(a, ap, b, at, atp, bt, na, nap, nb, period) {
     .Call(`_highfrequency_pcovcc`, a, ap, b, at, atp, bt, na, nap, nb, period)
 }
 
-vasicekModel <- function(model, nObs, nSeries, nDays, dt) {
-    .Call(`_highfrequency_vasicekModel`, model, nObs, nSeries, nDays, dt)
-}
-
-#' Heston model: 
-#' dXt = mu_t * dt + sigma_t * dW_t 
-#' dSigma_t^2 = kappa * (theta - sigma_t^2) * dt + xi * sigma_t *dB_t
-#' Where Wt and Bt are (often negatively) correlated brownian motions with correlation rho
-#' We will not simulate mu_t here, that is done in R code elsewhere.
-#' kappa is the mean reversion factor.
-#' theta is the long term mean of volatility
-#' xi is the vol of vol parameter.
-#' @keywords internal
-hestonModel <- function(model, nObs, nSeries, nDays, dt) {
-    .Call(`_highfrequency_hestonModel`, model, nObs, nSeries, nDays, dt)
-}
-
-#' Huang and Tauchen 2005 model
-#' (we don't include drift here) (sigma_ut is calculated elsewhere too!)
-#' sigma_ut * nu_t (rho_1 * dWt_1 + rho_2 * dWt_2 + sqrt(1 - rho_1 ^2 - rho^2) * dWt_3)
-#' nu_t^2 = s-exp(beta_0 + beta_1 * nu_t_1^2 + beta_2 * nu_t_2^2)
-#' dnu_1_t^2 = alpha_1  * nu_1_t^2 * dt + dWt_1
-#' dnu_2_t^2 = alpha_2 * nu_2_t^2 * dt + (1 + phi nu_2_t^2) * dW2_t
-#' sigma_ut = C + A*exp(-a*t) + B*exp(-b*(1-t))
-#' @keywords internal
-huangTauchen <- function(model, nObs, nSeries, nDays, dt) {
-    .Call(`_highfrequency_huangTauchen`, model, nObs, nSeries, nDays, dt)
-}
-
