@@ -14,7 +14,9 @@ Changes in version 0.7.0
  - Implemented new lead-lag estimation in leadLag
  - Implemented ReMeDI estimation in ReMeDI
  - More transparantly handle the lagging of quotes when matching these with trades, now the user has control of this.
- - rmTradeOutliersUsingQuotes now supports input that is
+ - Add business time sampling
+ - Changes to the included datasets. The microseconds quote datasets have been thinned out aggressively for exchanges != "N"
+
 
 Changes in version 0.6.5
  - bug fix for kernelCov if cor = TRUE
