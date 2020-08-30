@@ -46,6 +46,11 @@ rCov(agged$pData[,"PRICE"], makeReturns = TRUE)
 rCov(pData[,"PRICE"], makeReturns = TRUE, alignBy = "minutes", alignPeriod = 5)
 
 }
+\references{
+Roel C.A. Oomen Properties of realized variance under alternative sampling schemes. (2006) Journal of Business & Economic Statistics 24, pages 219-237
+
+Yingjie Dong and Yiu Kuen Tse. (2017) Business time sampling scheme with applications to testing semi-martingale hypothesis and estimating integrated volatility. Econometrics, 5
+}
 \author{
 Emil Sjoerup
 }
