@@ -14,6 +14,13 @@
 #' @param nCores integer valued numeric denoting how many cores to use for the lead-lag estimation procedure in case parallelize is TRUE. 
 #' Default is NA, which does not parallelize the code.
 #' 
+#' @return An list with class "leadLag" which containing 'contrasts', 'lead-lag-ratio', and 'lags', denoting the estimated values for each lag calculated,
+#' the lead-lag-ratio, and the tested lags respectively.
+#' 
+#' @details The lead-lag-ratio (LLR) can be used to see if one asset leads the other. If LLR < 1, then price1 MAY be leading price2 and vice versa if LLR > 1.
+#' 
+#' @references M. Hoffmann, M. Rosenbaum, and N. Yoshida (2013) : Estimation of the lead-lag parameter from non-synchronous data. Bernoulli 19, pages 1-37
+#' 
 #' @examples 
 #' ll <- leadLag(100 + cumsum(sbux), 100 + cumsum(lltc), lags = seq(-50,50))
 #' plot(ll)
@@ -108,7 +115,7 @@ leadLag <- function(price1 = NULL, price2 = NULL, lags = NULL, resolution = "sec
   }
   
   res <- list("contrasts" = contrasts, "lead-lag-ratio" = LLR, "lags" = lags)
-  class(res) <- "leadLag"
+  class(res) <- c("leadLag", "list")
   return(res)
   
 }

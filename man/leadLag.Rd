@@ -34,11 +34,21 @@ This does not change the value of the lead-lag-ratio.}
 \item{nCores}{integer valued numeric denoting how many cores to use for the lead-lag estimation procedure in case parallelize is TRUE. 
 Default is NA, which does not parallelize the code.}
 }
+\value{
+An list with class "leadLag" which containing 'contrasts', 'lead-lag-ratio', and 'lags', denoting the estimated values for each lag calculated,
+the lead-lag-ratio, and the tested lags respectively.
+}
 \description{
 Function that estimates the whether one series leads (or lags) another.
+}
+\details{
+The lead-lag-ratio (LLR) can be used to see if one asset leads the other. If LLR < 1, then price1 MAY be leading price2 and vice versa if LLR > 1.
 }
 \examples{
 ll <- leadLag(100 + cumsum(sbux), 100 + cumsum(lltc), lags = seq(-50,50))
 plot(ll)
 
+}
+\references{
+M. Hoffmann, M. Rosenbaum, and N. Yoshida (2013) : Estimation of the lead-lag parameter from non-synchronous data. Bernoulli 19, pages 1-37
 }
