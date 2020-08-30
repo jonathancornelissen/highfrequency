@@ -18,3 +18,4 @@ notes.R
 GSoC playground.R
 ^.Rprofvis
 ^article$
+^Wrapup*
