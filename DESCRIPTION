@@ -21,7 +21,10 @@ Authors@R:
       person(given = "Onno",
              family = "Kleen",
              role = "aut",
-             comment = c(ORCID = "0000-0003-4731-4640")))
+             comment = c(ORCID = "0000-0003-4731-4640")),
+      person(given = "Emil",
+             family = "Sjoerup",
+             role = "aut"))
 Maintainer: Kris Boudt
     <kris.boudt@ugent.be>
 Description: Provide functionality to manage, clean and match highfrequency
