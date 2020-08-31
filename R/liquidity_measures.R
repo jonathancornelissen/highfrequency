@@ -224,13 +224,13 @@
 #' @export
 getLiquidityMeasures <- function(tqData, win = 300, type = NULL) {
   
-  BID = PRICE = OFR = SIZE = OFRSIZ = BIDSIZ = NULL
-  
-  midpoints = direction = effectiveSpread = realizedSpread = valueTrade = signedValueTrade = NULL
-  depthImbalanceRatio = depthImbalanceDifference = proportionalEffectiveSpread = proportionalRealizedSpread = NULL
-  priceImpact = proportionalPriceImpact = halfTradedSpread = proportionalHalfTradedSpread = squaredLogReturn = NULL
-  squaredLogReturn = absLogReturn = quotedSpread = proportionalQuotedSpread = logQuotedSpread = logQuotedSize = NULL
-  quotedSlope = logQSlope = midQuoteSquaredReturn = midQuoteAbsReturn = signedTradeSize = NULL
+  BID <- PRICE <- OFR  <- SIZE <- OFRSIZ <- BIDSIZ <- NULL
+  ## All these are assigned to NULL
+  midpoints <- direction <- effectiveSpread <- realizedSpread <- valueTrade <- signedValueTrade <- 
+  depthImbalanceRatio <- depthImbalanceDifference <- proportionalEffectiveSpread <- proportionalRealizedSpread <- 
+  priceImpact <- proportionalPriceImpact <- halfTradedSpread <- proportionalHalfTradedSpread <- squaredLogReturn <- 
+  squaredLogReturn <- absLogReturn <- quotedSpread <- proportionalQuotedSpread <- logQuotedSpread <- logQuotedSize <- 
+  quotedSlope <- logQSlope <- midQuoteSquaredReturn <- midQuoteAbsReturn <- signedTradeSize <- NULL
   
   tqData <- checkColumnNames(tqData)
   checktData(tqData)
@@ -287,7 +287,7 @@ getLiquidityMeasures <- function(tqData, win = 300, type = NULL) {
   tqData[, proportionalQuotedSpread := quotedSpread/midpoints]
 
   tqData[, logQuotedSpread := log(OFR/BID)]
-  tqData[, logQuotedSize := log(OFRSIZ) - log(BIDSIZ)]
+  tqData[, logQuotedSize := log(OFRSIZ) + log(BIDSIZ)]
 
   tqData[, quotedSlope := quotedSpread/logQuotedSize]
   tqData[, logQSlope := logQuotedSpread/logQuotedSize]
