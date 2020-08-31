@@ -2,7 +2,7 @@
 % Please edit documentation in R/jump_tests.R
 \name{intradayJumpTest}
 \alias{intradayJumpTest}
-\title{General framework for testing for jumps on an intraday basis}
+\title{Intraday jump tests}
 \usage{
 intradayJumpTest(
   pData,
@@ -24,6 +24,10 @@ intradayJumpTest(
 
 \item{driftEstimator}{character denoting which drift estimator to use for the tests. See \link{spotDrift}. Default = \code{"none"} denoting no drift esitmation.}
 
+\item{alpha}{numeric of length one determining what confidence level to use when constructing the critical values.}
+
+\item{...}{extra arguments passed on to \code{\link{spotVol}} for the volatility estimation, and to \code{\link{spotDrift}}.}
+
 \item{on}{string indicating the time scale in which \code{k} is expressed.
 Possible values are: \code{"secs", "seconds", "mins", "minutes", "hours"}.}
 
@@ -38,22 +42,31 @@ specified by \code{tz}. By default, \code{marketOpen = "09:30:00"}.}
 specified by \code{tz}. By default, \code{marketClose = "16:00:00"}.}
 
 \item{tz}{string specifying the time zone to which the times in \code{data}
-and/or \code{marketOpen}/ \code{marketClose} belong. Default = \code{"GMT"}.}
+and/or \code{marketOpen}/ \code{marketClose} belong. Default = \code{"GMT"}.
+
+The null hypothesis of the tests in this function is that there are no jumps in the price series}
 }
 \description{
 This function can be used to  test for jumps in intraday price paths.
- The tests are of the form:
- L(t) = (R(t) - mu(t))/sigma(t) 
-
-The null hypothesis of the tests in this function is that
+The tests are of the form \eqn{L(t) = (R(t) - mu(t))/sigma(t)}.
 }
 \examples{
 \dontrun{
 # We can easily make a Lee-Mykland jump test.
-LMtest <- intradayJumpTest(pData = sampleTDataMicroseconds[, .(DT, PRICE)], volEstimator = "RM", driftEstimator = "none",
-                           RM = "bipower", lookBackPeriod = 10,
-                           on = "minutes", k = 5, marketOpen = "09:30:00", marketClose = "16:00:00")
+LMtest <- intradayJumpTest(pData = sampleTDataMicroseconds[, list(DT, PRICE)], 
+                           volEstimator = "RM", driftEstimator = "none",
+                           RM = "bipower", lookBackPeriod = 20,
+                           on = "minutes", k = 5, marketOpen = "09:30:00", 
+                           marketClose = "16:00:00")
 plot(LMtest)
+
+# We can just as easily use the pre-averaged version from the "Fact or Friction" paper
+FoFtest <- intradayJumpTest(pData = sampleTDataMicroseconds[, list(DT, PRICE)], 
+                            volEstimator = "PARM", driftEstimator = "none",
+                            RM = "bipower", lookBackPeriod = 20, theta = 1.2,
+                            marketOpen = "09:30:00", marketClose = "16:00:00")
+plot(FoFtest)
+
 }
 
 }

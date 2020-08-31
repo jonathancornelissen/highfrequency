@@ -10,7 +10,7 @@
                      alignPeriod = 1) {            # Align the tick data to this many [seconds|minutes|hours]            
   # Multiday adjustment: 
   multixts <- multixts(x)
-  if (multixts == TRUE) {
+  if (multixts) {
     result <- apply.daily(x, rv.kernel,kernelType,kernelParam,kernelDOFadj,
                           alignBy, alignPeriod, cts, makeReturns)
     return(result)
@@ -38,7 +38,7 @@ rvKernel <- function(x,                             # Tick Data
                      alignPeriod = 1) {            # Align the tick data to this many [seconds|minutes|hours]            
   # Multiday adjustment: 
   multixts <- multixts(x)
-  if (multixts == TRUE) {
+  if (multixts) {
     result <- apply.daily(x, rv.kernel,kernelType,kernelParam,kernelDOFadj,
                           alignBy, alignPeriod, cts, makeReturns)
     return(result)

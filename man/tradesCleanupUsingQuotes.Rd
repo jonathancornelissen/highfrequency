@@ -5,14 +5,18 @@
 \title{Perform a final cleaning procedure on trade data}
 \usage{
 tradesCleanupUsingQuotes(
-  dataSource = NULL,
+  tradeDataSource = NULL,
+  quoteDataSource = NULL,
   dataDestination = NULL,
   tData = NULL,
-  qData = NULL
+  qData = NULL,
+  lagQuotes = 2
 )
 }
 \arguments{
-\item{dataSource}{character indicating the folder in which the original data is stored.}
+\item{tradeDataSource}{character indicating the folder in which the original trade data is stored.}
+
+\item{quoteDataSource}{character indicating the folder in which the original quote data is stored.}
 
 \item{dataDestination}{character indicating the folder in which the cleaned data is stored, folder of dataSource by default.}
 
@@ -21,12 +25,11 @@ from, to, dataSource and dataDestination will be ignored. (only advisable for sm
 
 \item{qData}{data.table or xts object containing (ONE day and for ONE stock only) cleaned quote data. This argument is NULL by default. Enabling it means the arguments
 from, to, dataSource, dataDestination will be ignored. (only advisable for small chunks of data)}
+
+\item{lagQuotes}{passed through to rmTradeOutliersUsingQuotes. \code{\link{rmTradeOutliersUsingQuotes}}}
 }
 \value{
 For each day an xts object is saved into the folder of that date, containing the cleaned data.
-
-In case you supply the arguments "tData" and "qData", the on-disk functionality is ignored
-and the function returns cleaned trades as a data.table or xts object (see examples).
 }
 \description{
 Function performs cleaning procedure \code{\link{rmTradeOutliersUsingQuotes}} 
@@ -35,20 +38,26 @@ Note that preferably the input data for this function
 is trade and quote data cleaned by respectively e.g. \code{\link{tradesCleanup}}
 and \code{\link{quotesCleanup}}.
 }
+\details{
+In case you supply the arguments "tData" and "qData", the on-disk functionality is ignored
+and the function returns cleaned trades as a data.table or xts object (see examples).
+
+When using the on-disk functionality and tradeDataSource and quoteDataSource are the same, the quote files are all files in the folder that contains 'quote', and the rest are treated as containing trade data.
+}
 \examples{
 # Consider you have raw trade data for 1 stock for 2 days 
-tData_afterfirstcleaning <- tradesCleanup(tDataRaw = sampleTDataRawMicroseconds, 
+tDataAfterFirstCleaning <- tradesCleanup(tDataRaw = sampleTDataRawMicroseconds, 
                                           exchanges = "N", report = FALSE)
 # 
 qData <- quotesCleanup(qDataRaw = sampleQDataRawMicroseconds, 
                        exchanges = "N", report = FALSE)
-dim(tData_afterfirstcleaning)
-tData_afterfinalcleaning <- 
+dim(tDataAfterFirstCleaning)
+tDataAfterFinalCleaning <- 
   tradesCleanupUsingQuotes(qData = qData[as.Date(DT) == "2018-01-02"],
-                           tData = tData_afterfirstcleaning[as.Date(DT) == "2018-01-02"])
-dim(tData_afterfinalcleaning)
+                           tData = tDataAfterFirstCleaning[as.Date(DT) == "2018-01-02"])
+dim(tDataAfterFinalCleaning)
 #In case you have more data it is advised to use the on-disk functionality
-#via "from","to","dataSource", etc. arguments
+#via the "tradeDataSource", "quoteDataSource", and "dataDestination" arguments
 }
 \references{
 Barndorff-Nielsen, O. E., P. R. Hansen, A. Lunde, and N. Shephard (2009). Realized kernels in practice: Trades and quotes. Econometrics Journal 12, C1-C32.

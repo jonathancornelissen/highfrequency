@@ -1,4 +1,6 @@
-
+# # Necessary for check-package not throwing errors
+# #' @keywords internal
+# ..keepCols <- NULL
 # Necessary for check-package not throwing errors
 #' @keywords internal
 `:=` <- function(...) {
@@ -8,41 +10,60 @@
 #' @importFrom xts xtsAttributes
 #' @keywords internal
 checkColumnNames <- function(data) { 
-  # FUNCTION sets column names according to RTAQ format using quantmod conventions, such that all the other functions find the correct information.
+  # FUNCTION sets column names according to RTAQ format using quantmod conventions, 
+  # such that all the other functions find the correct information.
   # First step: assign the xts attributes:
-  data <- set.AllColumns(data)
   
+  
+  if(is.xts(data)){
+    data <- set.AllColumns(data)
+    # Change column names to previous RTAQ format! 
+    # Adjust price col naming:  
+    try((colnames(data)[xtsAttributes(data)[['Price']]] = 'PRICE'), silent = TRUE)
+    # Adjust Bid col naming:    
+    try((colnames(data)[xtsAttributes(data)[['Bid']]] = 'BID'))  
+    # Adjust Ask col naming:    
+    try((colnames(data)[xtsAttributes(data)[['Ask']]] = 'OFR'))
+    # Adjust SYMBOL col naming:    
+    try((colnames(data)[xtsAttributes(data)[['SYM_ROOT']]] = 'SYMBOL'))
+    # Adjust Ask size col naming:
+    try((colnames(data)[xtsAttributes(data)[['BidSize']]] = 'BIDSIZ'))
+    # Adjust Bid size col naming:    
+    try((colnames(data)[xtsAttributes(data)[['AskSize']]] = 'OFRSIZ'))
+    # Adjust correction column, if necessary:
+    if (any(colnames(data) == "CR")) {
+      colnames(data)[colnames(data) == "CR"] <- "CORR"
+    }
+    
+  }
+  
+  if(is.data.table(data)){
+    
   # Change column names to previous RTAQ format! 
   # Adjust price col naming:  
-  try((colnames(data)[xtsAttributes(data)[['Price']]] = 'PRICE'), silent = TRUE)
   try(setnames(data, "Price", "PRICE", skip_absent = TRUE), silent = TRUE)
+  
   # Adjust Bid col naming:    
-  try((colnames(data)[xtsAttributes(data)[['Bid']]] = 'BID'))
   try(setnames(data, "Bid", "BID", skip_absent = TRUE), silent = TRUE)
   # Adjust Ask col naming:    
-  try((colnames(data)[xtsAttributes(data)[['Ask']]] = 'OFR'))
   try(setnames(data, "Ask", "OFR", skip_absent = TRUE), silent = TRUE)
+  try(setnames(data, "ASK", "OFR", skip_absent = TRUE), silent = TRUE)
   # Adjust SYMBOL col naming:    
-  try((colnames(data)[xtsAttributes(data)[['SYM_ROOT']]] = 'SYMBOL'))
   try(setnames(data, "SYM_ROOT", "SYMBOL", skip_absent = TRUE), silent = TRUE)
   
   # Adjust Ask size col naming:
-  try((colnames(data)[xtsAttributes(data)[['BidSize']]] = 'BIDSIZ'))
   try(setnames(data, "BidSize", "BIDSIZ", skip_absent = TRUE), silent = TRUE)
   
   # Adjust Bid size col naming:    
-  try((colnames(data)[xtsAttributes(data)[['AskSize']]] = 'OFRSIZ'))
   try(setnames(data, "AskSize", "OFRSIZ", skip_absent = TRUE), silent = TRUE)
+  # Adjust Bid size col naming:    
   try(setnames(data, "ASKSIZ", "OFRSIZ", skip_absent = TRUE), silent = TRUE)
   
   
   try(setnames(data, "TR_SCOND", "COND", skip_absent = TRUE), silent = TRUE)
-  
-  
-  # Adjust correction column, if necessary:
-  if (any(colnames(data) == "CR")) {
-    colnames(data)[colnames(data) == "CR"] = "CORR"
+  try(setnames(data, "CR", "CORR", skip_absent = TRUE), silent = TRUE)  
   }
+  
   
   return(data)
 } 
@@ -292,17 +313,17 @@ hasQty <- function(x, which = FALSE) {
 #' @importFrom xts is.xts
 #' @keywords internal
 checktData <- function(tData) {
-  if (is.xts(tData) == FALSE & is.data.table(tData) == FALSE) {
+  if (!is.xts(tData) & !is.data.table(tData)) {
     stop("The argument tData should be a data.table or xts object.")
   }
-  if (any(colnames(tData) == "PRICE") == FALSE) {
+  if (!any(colnames(tData) == "PRICE")) {
     stop("The argument tData should have a column containing the PRICE. Could not find that column.")
   }
-  if (any(colnames(tData) == "SYMBOL") == FALSE) {
+  if (!any(colnames(tData) == "SYMBOL")) {
     stop("The argument tData should have a column containing SYMBOL. Could not find that column.")
   }
   
-  if (is.data.table(tData) == TRUE) {
+  if (is.data.table(tData)) {
     if (typeof(tData$PRICE) != "double") {
       stop("Column PRICE should be of type double.")
     }
@@ -313,19 +334,19 @@ checktData <- function(tData) {
 #' @importFrom xts is.xts
 #' @keywords internal
 checkqData <- function(qData) {
-  if (is.xts(qData) == FALSE & is.data.table(qData) == FALSE) {
-    stop("The argument qData should be an data.table or xts object.")
+  if (!is.xts(qData) & !is.data.table(qData)) {
+    stop("The argument qData should be a data.table or xts object.")
   }
-  if (any(colnames(qData) == "BID") == FALSE) {
+  if (!any(colnames(qData) == "BID")) {
     stop("The argument qData should have a column containing the BID. Could not find that column.")
   }
-  if (any(colnames(qData) == "OFR") == FALSE) {
+  if (!any(colnames(qData) == "OFR")) {
     stop("The argument qData should have a column containing the ASK / OFR. Could not find that column.")
   }
-  if (any(colnames(qData) == "SYMBOL") == FALSE) {
+  if (!any(colnames(qData) == "SYMBOL")) {
     stop("The argument qData should have a column containing SYMBOL. Could not find that column.")
   }
-  if (is.data.table(qData) == TRUE) {
+  if (is.data.table(qData)) {
     if (typeof(qData$BID) != "double") {
       stop("Column BID should be of type double.")
     }
@@ -490,3 +511,21 @@ set.Trade <- function(x, error = TRUE) {
     attr(x,"Trade") <- has.Trade(x, which = TRUE)
   return(x)
 }
+
+
+## #' @keywords internal
+## #' @importFrom data.table fread
+## readDataset <- function(path){
+##   extension <- regexpr("*.[a-z]{0,}$", path) # Extract the extension of the file.
+##   extension <- substr(path, start = extension[[1]], stop = extension[[1]] + attr(extension, "match.length"))
+##   
+##   if(extension == ".rds"){
+##     return(try(readRDS(path)))
+##   } else if( extension == ".csv"){
+##     return(try(fread(path)))
+##   }else {
+##      stop("Extension not recognized")
+##    }
+##   
+## }
+

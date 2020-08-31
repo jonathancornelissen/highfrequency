@@ -40,3 +40,8 @@ pickle_reader.py
 BAbrajgowicz - spelling?.R
 prices.rda
 BAprices.rda
+article/*.log
+article/*.synctex.gz
+article/*.sty
+article/article-concordance.tex
+article/article.tex

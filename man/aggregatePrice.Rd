@@ -17,7 +17,7 @@ aggregatePrice(
 \arguments{
 \item{pData}{data.table or xts object to be aggregated containing the intraday price series, possibly across multiple days.}
 
-\item{on}{character, indicating the time scale in which "k" is expressed. Possible values are: "milliseconds", "secs", "seconds", "mins", "minutes","hours".}
+\item{on}{character, indicating the time scale in which "k" is expressed. Possible values are: "milliseconds", "secs", "seconds", "mins", "minutes","hours", "ticks".}
 
 \item{k}{positive integer, indicating the number of periods to aggregate over; e.g. to aggregate a 
 xts object to the 5 minute frequency set k = 5 and on = "minutes".}
@@ -44,6 +44,10 @@ The timestamps of the new time series are the closing times and/or days of the i
 In case of previous tick aggregation or on = "seconds"/"minutes"/"hours",
 the element of the returned series with e.g. timestamp 09:35:00 contains 
 the last observation up to that point, including the value at 09:35:00 itself.
+
+In case on = "ticks", the sampling is done such the sampling starts on the first tick, and the last tick is always included
+For example, if 14 observations are made on one day, and these are 1, 2, 3, ... 14.
+Then, with on = "ticks" and k = 3, the output will be 1, 4, 7, 10, 13, 14.
 }
 \examples{
 # aggregate price data to the 30 second frequency

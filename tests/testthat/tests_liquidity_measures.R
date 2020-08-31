@@ -7,15 +7,16 @@ expect_equal(
     directions <- getTradeDirection(tqdata)
     sum(directions)
   },
-  -833
+  -886
 )})
 context("matchTradesQuotes & getTradeDirection quotes")
 test_that("matchTradesQuotes & getTradeDirection quotes", {
+  tqData <- matchTradesQuotes(sampleTDataMicroseconds, sampleQDataMicroseconds, adjustment = 2)
+  directions <- getTradeDirection(tqData)
+  sum(directions)
 expect_equal(
-  {tqdata <- matchTradesQuotes(sampleTDataMicroseconds, sampleQDataMicroseconds)
-  directions <- getTradeDirection(tqdata)
-  sum(directions)},
-  -1403
+  sum(directions), 
+  -1472
 )})
 # 
 # expect_equal(

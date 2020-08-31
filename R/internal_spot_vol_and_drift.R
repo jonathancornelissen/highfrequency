@@ -19,7 +19,7 @@ driftKernel <- function(data, intraday, options) {
   mu[1]          <- 0
   vpreAveraged[(k*2-1):(iT-1)] <- filter(x = as.numeric(datap), c(rep(1,k),rep(-1,k)))[k:(iT-k)]
   vpreAveraged <- c(0, vpreAveraged)
-  time <- as.numeric(data$DT)
+  time <- as.numeric(data$DT, origin = "1970-01-01")
   # time <- time - as.numeric(data$DT)[1]
   #estimtimes <- intraday #c(34200, as.numeric(intraday) * 86400)
 
@@ -852,21 +852,21 @@ diurnal <- function (stddata, method = "TML", dummies = F, P1 = 6, P2 = 4) {
 }
 
 #' @keywords internal
-diurnalfit <- function( theta , P1 , P2 , intraT , dummies=F ) {
+diurnalfit <- function( theta , P1 , P2 , intraT , dummies = FALSE) {
   vi <- c(1:intraT)
   M1 <- (intraT+1) / 2
   M2 <- (2 * intraT^2 + 3 * intraT + 1) / 6
 
   # Regressors that do not depend on Day of Week:
   X <- c()
-  if(dummies == FALSE) {
+  if (!dummies) {
     if (P1 > 0) {
       for (j in 1:P1 ) {
         X <- cbind(X , cos(2*pi*j*vi/intraT))
       }
     }
 
-    ADD <- (vi/M1 )
+    ADD <- (vi/M1)
     X   <- cbind(X,ADD)
     ADD <- (vi^2/M2)
     X   <- cbind(X,ADD)
@@ -950,8 +950,18 @@ realizedMeasureSpotVol <- function(mR, rData, options = list()){
   N <- ncol(mR)
   lookBackPeriod <- op$lookBackPeriod
   if((lookBackPeriod %% 1 != 0) | (lookBackPeriod <= 0)){ #lookBackPeriod must be a positive integer
-    stop("lookBackPeriod must be a positive integer.")
+    stop("lookBackPeriod must be a positive integer greater than 0.")
   }
+  
+  if((op$RM == "bipower" | op$RM == "minrv") && lookBackPeriod <= 1){
+    stop(paste("When RM is", op$RM, "lookBackPeriod must be atleast 2\n"))
+  }
+  
+  if(op$RM == "medrv" && lookBackPeriod <= 2){
+    stop("When RM is medrv, lookBackPeriod must be atleast 3\n")
+  }
+  
+  
   sigma2hat <- matrix(0, D, N)
   idx <- seq(lookBackPeriod+1, N)
   if(!op$dontIncludeLast){
@@ -1008,8 +1018,9 @@ realizedMeasureSpotVol <- function(mR, rData, options = list()){
 #' @importFrom xts as.xts
 preAveragedRealizedMeasureSpotVol <- function(data, options = list()){
   
+  DT <- NULL;
   
-  ## Considerations for the multiday case:::::##########!#!#!#!#!#!#
+  ## Considerations for the multiday case:
   D <- ndays(data)
   
   if( D > 1 ){
@@ -1024,7 +1035,7 @@ preAveragedRealizedMeasureSpotVol <- function(data, options = list()){
     nObs <- kn <- numeric(D)
     
     for (d in 1:D) {
-      res <- preAveragedRealizedMeasureSpotVol(data[as.Date(data$DT) == dates[d]], options)
+      res <- preAveragedRealizedMeasureSpotVol(data[as.Date(data$DT) == dates[d],], options)
       spot <- rbind(spot, res$spot)
       kn[d] <- res$kn
       nObs[d] <- res$nObs
@@ -1052,12 +1063,12 @@ preAveragedRealizedMeasureSpotVol <- function(data, options = list()){
     kn <- kn + kn%%2
     idx <- NULL
     if(op$RM != "rv"){
-      idx <- spot <- seq(M - 2 + kn + 1, nObs - kn, by = kn) # initialize indices to loop over and the container to have the post esitmates.
+      idx <- spot <- seq(M - 2 + kn + 1, nObs - kn, by = kn) # initialize indices to loop over and the container to have the post estimates.
     } else {
       idx <- spot <- seq(M - 2 + 1, nObs - kn, by = kn) # Here we have one more estimate than the other cases.
     }
     # Measuring jump variation during the entire day.
-    preAveragedReturns <- hatreturn(as.xts(data), kn) 
+    preAveragedReturns <- hatreturn(as.xts(data)[,"PRICE"], kn) 
     preAveragedReturns <- c(as.numeric(preAveragedReturns), rep(NA, nObs - length(preAveragedReturns)))#, as.POSIXct(index(pData), origin = dateOfData)) # maybe we want to add back in xts, but it's removed for now...
     
     

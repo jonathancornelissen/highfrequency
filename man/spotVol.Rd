@@ -304,7 +304,7 @@ Along with the spot volatility estimates, this method will return the
 Parameters:
 \tabular{ll}{
 \code{RM} \tab String denoting which realized measure to use to estimate the local volatility. Possible values are: "bipower", "medrv", "minrv", "rv"
-Default = "BPV" \cr
+Default = "bipower" \cr
 \code{lookBackPeriod} \tab positive integer denoting the amount of sub-sampled returns to use for the estimation of the local volatility. Default = 10. \cr
 \code{dontIncludeLast} \tab logical indicating whether to omit the last return in the calculation of the local volatility. This is done in e.g. Lee-Mykland (2008) to produce jump-robust estimates of spot volatility. 
 Setting this to TRUE will then use lookBackPeriod - 1 returns in the construction of the realized measures. Default = FALSE\cr
@@ -344,7 +344,7 @@ vol1 <- spotVol(sampleReal5MinPrices)
 plot(vol1)
 
 # Compare to stochastic periodicity
-\donttest{
+\dontrun{
 init <- list(sigma = 0.03, sigma_mu = 0.005, sigma_h = 0.007,
              sigma_k = 0.06, phi = 0.194, rho = 0.986, mu = c(1.87,-0.42),
              delta_c = c(0.25, -0.05, -0.2, 0.13, 0.02),
@@ -357,7 +357,7 @@ lines(as.numeric(vol2$spot[1:780]), col="red")
 legend("topright", c("detPer", "stochper"), col = c("black", "red"), lty=1)}
 
 # Various kernel estimates
-\donttest{
+\dontrun{
 h1 <- bw.nrd0((1:nrow(sampleReal5MinPrices))*(5*60))
 vol3 <- spotVol(sampleReal5MinPrices, method = "kernel", h = h1)
 vol4 <- spotVol(sampleReal5MinPrices, method = "kernel", est = "quarticity")
@@ -368,17 +368,14 @@ lines(as.numeric(t(vol5$spot))[1:2880], col = "blue")
 legend("topright", c("h = simple estimate", "h = quarticity corrected",
                      "h = crossvalidated"), col = c("black", "red", "blue"), lty=1)}
 
-# Piecewise constant volatility, using an example from Fried (2012)
-\donttest{
-simdata <- matrix(sqrt(5/3)*rt(3000, df = 5), ncol = 500, byrow = TRUE)
-simdata <- c(1, 1, 1.5, 1.5, 2, 1)*simdata
-# the volatility of the simulated now changes at 1000, 2000 and 2500
-vol6 <- spotVol(simdata, method = "piecewise", m = 200, n  = 100,
+# Piecewise constant volatility
+\dontrun{
+vol6 <- spotVol(sampleReal5MinPrices, method = "piecewise", m = 200, n  = 100,
                 online = FALSE)
 plot(vol6)}
 
 # Compare regular GARCH(1,1) model to eGARCH, both with external regressors
-\donttest{
+\dontrun{
 vol7 <- spotVol(sampleReal5MinPrices, method = "garch", model = "sGARCH")
 vol8 <- spotVol(sampleReal5MinPrices, method = "garch", model = "eGARCH")
 plot(as.numeric(t(vol7$spot)), type = "l")

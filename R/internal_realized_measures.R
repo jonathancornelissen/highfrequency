@@ -151,7 +151,7 @@ huberweight <- function(d,k) {
 }
 
 #' @keywords internal
-multixts <- function(x, y = NULL) { 
+isMultiXts <- function(x, y = NULL) { 
   if (is.null(y)) {
     test <- is.xts(x) && (ndays(x)!=1)
     return(test)
@@ -253,70 +253,6 @@ rdatacheck <- function (rData, multi = FALSE) {
   }
 }
 
-#' Synchronize (multiple) irregular timeseries by refresh time
-#' 
-#' @description This function implements the refresh time synchronization scheme proposed by Harris et al. (1995). 
-#' It picks the so-called refresh times at which all assets have traded at least once since the last refresh time point. 
-#' For example, the first refresh time corresponds to the first time at which all stocks have traded.
-#' The subsequent refresh time is defined as the first time when all stocks have traded again.
-#' This process is repeated untill the end of one time series is reached.
-#' 
-#' @param pData a list. Each list-item contains an xts object  
-#' containing the original time series (one day only and typically a price series).
-#' 
-#' @return An xts object containing the synchronized time series.
-#' 
-#' @references Harris, F., T. McInish, G. Shoesmith, and R. Wood (1995). Cointegration, error correction, and price discovery on infomationally linked security markets. Journal of Financial and Quantitative Analysis 30, 563-581.
-#' 
-#' @examples 
-#' # Suppose irregular timepoints:
-#' start <- as.POSIXct("2010-01-01 09:30:00")
-#' ta <- start + c(1,2,4,5,9)
-#' tb <- start + c(1,3,6,7,8,9,10,11)
-#' 
-#' # Yielding the following timeseries:
-#' a <- xts::as.xts(1:length(ta), order.by = ta)
-#' b <- xts::as.xts(1:length(tb), order.by = tb)
-#' 
-#' # Calculate the synchronized timeseries:
-#' refreshTime(list(a,b))
-#' 
-#' @author Jonathan Cornelissen and Kris Boudt
-#' @keywords data manipulation
-#' @importFrom xts as.xts
-#' @export
-refreshTime <- function (pData) {
-  if (length(pData) < 1) {
-    stop("pData should contain at least two time series.")
-  }
-  temp <- pData[[1]]
-  for (i in 2:length(pData)) {
-    temp <- merge(temp, pData[[i]])
-  }
-  
-  temp2 <- xts(matrix(NA, nrow = dim(temp)[1], ncol = dim(temp)[2]), order.by = index(temp))
-  
-  last_values <- as.numeric(temp[1, ])
-  
-  if (sum(is.na(last_values)) == 0) {
-    temp2[1, ] <- last_values
-    last_values <- rep(NA, times = dim(temp)[2])
-  }
-  
-  for (ii in c(2:dim(temp)[1])) {
-    if (sum(is.na(last_values)) == 0) {
-      temp2[ii, ] <- last_values
-      last_values <- rep(NA, times = dim(temp)[2])
-    }
-    for (jj in c(1:dim(temp)[2])) {
-      if (is.na(last_values[jj]) == TRUE) {
-        last_values[jj] <- temp[ii,jj]
-      }
-    }
-  }
-  
-  return(temp2[!is.na(temp2[, 1])])
-}
 
 #' @keywords internal
 RBPCov_bi <- function(ts1, ts2) {
@@ -340,7 +276,7 @@ RBPVar <- function(rData) {
 
 #' @keywords internal
 kernelCharToInt <- function(type) {
-  if (is.character(type) == TRUE) {
+  if (is.character(type)) {
     ans <- switch(casefold(type), 
                   rectangular = 0,
                   bartlett = 1,
@@ -408,7 +344,7 @@ thetaROWVar <- function(alpha = 0.001 , alphaMCD = 0.5) {
 #' @keywords internal
 ROWVar <- function(rData, seasadjR = NULL, wFunction = "HR" , alphaMCD = 0.75, alpha = 0.001) {
   
-  if (is.null(seasadjR) == TRUE) {
+  if (is.null(seasadjR)) {
     seasadjR <- rData
   }
   
@@ -461,7 +397,7 @@ RTSCov_bi <- function (pData1, pData2, startIV1 = NULL, startIV2 = NULL, noiseva
   }
   
   # Calculation of the noise variance and TSRV for the truncation
-  if (is.null(noisevar1) == TRUE) {
+  if (is.null(noisevar1)) {
     logprices1 <- log(as.numeric(pData1))
     n_var1     <- length(logprices1)
     nbarK_var1 <- (n_var1 - K_var1 + 1)/(K_var1)
@@ -500,15 +436,15 @@ RTSCov_bi <- function (pData1, pData2, startIV1 = NULL, startIV2 = NULL, noiseva
     noisevar2 = max(0,1/(2 * nbarJ_var2) * (sum(logreturns_J2^2)/J_var2 - TSRV(pData2,K=K_var2,J=J_var2)))
   }    
   
-  if (!is.null(startIV1)) {
+  if (is.null(startIV1)) {
+    RTSRV1 <- RTSRV(pData=pData1, noisevar = noisevar1, K = K_var1, J = J_var1, eta = eta)
+  } else {      
     RTSRV1 = startIV1
-  } else {
-    RTSRV1 <- RTSRV(pData=pData1, noisevar = noisevar1, K = K_var1, J = J_var1, eta = eta)      
   }
-  if (is.null(startIV2) == FALSE) {
+  if (is.null(startIV2)) {
+    RTSRV2 <- RTSRV(pData = pData2, noisevar = noisevar2, K = K_var2, J = J_var2, eta = eta) 
+  } else { 
     RTSRV2 <- startIV2
-  }else{
-    RTSRV2 <- RTSRV(pData = pData2, noisevar = noisevar2, K = K_var2, J = J_var2, eta = eta)      
   }
   
   # Refresh time is for the covariance calculation
@@ -622,7 +558,7 @@ RTSRV <- function(pData, startIV = NULL, noisevar = NULL, K = 300, J = 1, eta = 
 #'                      alignPeriod = 1) {            # Align the tick data to this many [seconds|minutes|hours]            
 #'   # Multiday adjustment: 
 #'   multixts <- multixts(x)
-#'   if (multixts == TRUE) {
+#'   if (multixts) {
 #'     result <- apply.daily(x, rv.kernel,kernelType,kernelParam,kernelDOFadj,
 #'                           alignBy, alignPeriod, cts, makeReturns)
 #'     return(result)
@@ -715,3 +651,38 @@ zgamma <- function (x, y, gamma_power) {
   
   return(out)
 }
+
+
+#' @keywords internal
+cholCovMRC <- function(returns, delta = 0.1, theta = 1){
+  
+  nObs <- nrow(returns) + 1 
+  kn <- floor(theta * nObs ^(1/2 + delta))
+  
+  
+  preAveragedReturns <- preAveragingReturnsInternal(returns, kn)
+  x <- (1:(kn-1)) / kn
+  x[x > (1-x)] <- (1-x)[x > (1-x)]
+  
+  psi1 <- kn * sum((gfunction((1:kn)/kn) - gfunction(((1:kn) - 1 )/kn))^2)
+  
+  psi2 <- mean(c(0,x,0)^2)
+  #psi <- (t(returns) %*% returns) / (2 * nObs)
+  
+  # Just called factor in the Ox code
+  correctionFactor <- nObs/(nObs - kn + 2) * (1/( psi2 * kn))
+  return(correctionFactor * (t(preAveragedReturns) %*% preAveragedReturns))
+  
+}
+
+#' @keywords internal
+flat <- function(kn , err, errMax, size, tol ){
+  localerrMin <- min(err[kn:(kn+ size)])
+  localerrMax <- max(err[kn:(kn+ size)])
+  if(max(c((localerrMin/errMax), (localerrMax/errMax))) < tol){
+    return(kn)
+  } else {
+    return(NA)
+  }
+}
+
