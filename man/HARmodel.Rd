@@ -21,7 +21,9 @@ HARmodel(
 )
 }
 \arguments{
-\item{data}{an xts object containing either: intra-day (log-)returns or realized measures already computed from such returns. In case more than one realized measure is needed, the object should have the as many columns as realized measures needed.}
+\item{data}{an xts object containing either: intra-day (log-)returns or realized measures already computed from such returns. 
+In case more than one realized measure is needed, the object should have the as many columns as realized measures needed. 
+The first column should always be the realized variance proxy. In case type is either "HARRVQJ" or "CHARRVQ" the order should be "RV", "BPV", "RQ", or the relevant proxies.}
 
 \item{periods}{a vector of integers indicating over how days the realized measures in the model should be aggregated. By default  periods = c(1,5,22), which corresponds to one day, one week and one month respectively. This default is in line with Andersen et al. (2007).}
 
