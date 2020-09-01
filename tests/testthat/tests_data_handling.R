@@ -110,6 +110,9 @@ test_that("tradesCleanup gives same data as the shipped data", {
 
 test_that("tradesCleanup on-disk functionality", {
   skip_on_cran()
+  if(Sys.getenv("USERNAME") != "emil"){
+    skip("Skipped to not mess with other people's files")
+  }
   library(data.table)
   DT <- SYMBOL <- NULL
   trades2 <- sampleTDataRawMicroseconds
