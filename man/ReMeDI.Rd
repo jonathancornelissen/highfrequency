@@ -5,7 +5,7 @@
 \title{ReMeDI
 estimates auto-covariance of market-microstructure noise}
 \usage{
-ReMeDI(pData, kn = 1, lags = 1, makeCorrelation = FALSE)
+ReMeDI(pData, kn = 1, lags = 1, knEqual = FALSE, makeCorrelation = FALSE)
 }
 \arguments{
 \item{pData}{xts or data.table containing the log-prices of the asset}
@@ -13,6 +13,8 @@ ReMeDI(pData, kn = 1, lags = 1, makeCorrelation = FALSE)
 \item{kn}{numeric of length 1 determining the tuning parameter kn this controls the lengths of the non-overlapping interval in the ReMeDI estimation}
 
 \item{lags}{numeric containing integer values indicating}
+
+\item{knEqual}{Use an altered version of the ReMeDI estimator, where we instead use equal kn, instead of kn and 2kn}
 
 \item{makeCorrelation}{logical indicating whether to transform the autocovariances into autocorrelations}
 }
@@ -25,7 +27,7 @@ remed <- ReMeDI(sampleTDataMicroseconds[as.Date(DT) == "2018-01-02", ], kn = 5, 
 plot.ts(remed)
 }
 \references{
-remedi paper, muzafer's paper
+Li and Linton (2018) (Working paper): "A ReMeDI for microstructure noise."
 }
 \author{
 Emil Sjoerup
