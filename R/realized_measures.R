@@ -2657,6 +2657,7 @@ ReMeDI <- function(pData, kn = 1, lags = 1, knEqual = FALSE,
 #' function to choose the tuning parameter, kn in ReMeDI estimation
 #'
 #' @param pData xts or data.table containing the log-prices of the asset.
+#' @param knEqual Use an altered version of the ReMeDI estimator, where we instead use equal kn, instead of kn and 2*kn for the windows. See Figure 1 of paper in reference section.
 #' @param knMax max value of kn to be considered
 #' @param tol tolerance for the minimizing value. If tol is high, the algorithm will choose a lower optimal value.
 #' @param size size of the local window
@@ -2683,15 +2684,15 @@ ReMeDI <- function(pData, kn = 1, lags = 1, knEqual = FALSE,
 #' @references A ReMeDI for Microstructure Noise
 #' @return integer containing the optimal kn
 #' @export
-knChooseReMeDI <- function(pData,
+knChooseReMeDI <- function(pData, knEqual = FALSE,
                            #correctTime = FALSE, jumpsIndex = NULL,
                            knMax = 10, tol = 0.05, size = 3, lower = 2, upper = 5, plot = FALSE){
 
   kn <- 1:(knMax + size +1)
   err <- vapply(kn, ReMeDI, FUN.VALUE = numeric(4), pData = pData,
                 #correctTime = correctTime, jumpsIndex = jumpsIndex, ## For when correctTime is fixed
-                lags = 0:3)
-  err <- (err[1,] - err[2,] - err[3,] + err[4,] - ReMeDI(pData, kn = 1, lags = 0 ))^2
+                lags = 0:3, knEqual = knEqual)
+  err <- (err[1,] - err[2,] - err[3,] + err[4,] - ReMeDI(pData, kn = 1, lags = 0, knEqual = knEqual ))^2
           #                                               , correctTime = correctTime, jumpsIndex = jumpsIndex) ## For when correctTime is fixed
 
 
