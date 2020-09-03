@@ -14,7 +14,7 @@
 #' 
 #' @author Kris Boudt, Jonathan Cornelissen, Scott Payseur
 #' 
-#' Maintainer: Kris Boudt <Kris.Boudt@econ.kuleuven.be>
+#' Maintainer: Kris Boudt <Kris.Boudt@ugent.be>
 #' 
 #' Contributors: Giang Nguyen, Onno Kleen
 #' 
