@@ -2568,7 +2568,7 @@ ReMeDI <- function(pData, kn = 1, lags = 1, knEqual = FALSE,
   }
   
   for (lag in lags) {
-    thisLag <- c(lag, 0)
+    # thisLag <- c(lag, 0)
     #remedi <- (kn[2] + 1):(nObs - lag + kn[1])
     #idx <- 1
     remedi <- 0
@@ -2622,7 +2622,7 @@ ReMeDI <- function(pData, kn = 1, lags = 1, knEqual = FALSE,
     #
     #
 
-    res[resIDX] <- sum(-remedi) / (nObs - (3-foo) * (-kn[1]) - lag)
+    res[resIDX] <- -remedi/(nObs - (3-foo) * (-kn[1]) - lag)
     resIDX <- resIDX +1
   }
 
