@@ -2483,7 +2483,7 @@ listCholCovEstimators <- function(){
 #' @param kn numeric of length 1 determining the tuning parameter kn this controls the lengths of the non-overlapping interval in the ReMeDI estimation
 #' @param lags numeric containing integer values indicating
 #' @param knEqual Use an altered version of the ReMeDI estimator, where we instead use equal kn, instead of kn and 2*kn for the windows. See Figure 1 of paper in reference section.
-#' @param makeCorrelation logical indicating whether to transform the autocovariances into autocorrelations
+#' @param makeCorrelation logical indicating whether to transform the autocovariances into autocorrelations. The estimate of variance is unprecise and thus, constructing the correlation like this may show correlations that fall outside (-1,1)
 #' 
 #' @references Li and Linton (2019) (Working paper): "A ReMeDI for microstructure noise."
 #' @keywords microstructure noise autocovariance autocorrelation
@@ -2503,9 +2503,8 @@ ReMeDI <- function(pData, kn = 1, lags = 1, knEqual = FALSE,
                    makeCorrelation = FALSE){
   time <- DT <- PRICE <- NULL
   # Check input
-  
-  if(is.logical(knEqual)){
-    
+  if(!is.logical(knEqual)){
+    stop("knEqual must be logical")
   }
   
   if(is.data.table(pData)){ # We have a data.table
