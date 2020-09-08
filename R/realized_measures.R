@@ -2496,6 +2496,7 @@ listCholCovEstimators <- function(){
 #'                             lower = 2, upper = 5, plot = TRUE)
 #' optimalKn 
 #' remed <- ReMeDI(sampleTDataMicroseconds[as.Date(DT) == "2018-01-02", ], kn = optimalKn, lags = 1:8)
+
 #' @author Emil Sjoerup
 #' @export
 ReMeDI <- function(pData, kn = 1, lags = 1, knEqual = FALSE,
@@ -2503,6 +2504,7 @@ ReMeDI <- function(pData, kn = 1, lags = 1, knEqual = FALSE,
                    makeCorrelation = FALSE){
   time <- DT <- PRICE <- NULL
   # Check input
+
   if(!is.logical(knEqual)){
     stop("knEqual must be logical")
   }
@@ -2568,6 +2570,7 @@ ReMeDI <- function(pData, kn = 1, lags = 1, knEqual = FALSE,
   }
   
   for (lag in lags) {
+
     # thisLag <- c(lag, 0)
     #remedi <- (kn[2] + 1):(nObs - lag + kn[1])
     #idx <- 1
@@ -2579,7 +2582,7 @@ ReMeDI <- function(pData, kn = 1, lags = 1, knEqual = FALSE,
     
     idx <- seq_len((nObs - (3-foo) * (-kn[1]) - lag))
     remedi <- sum((prices[idx + (2-foo) * (-kn[1])] - prices[idx]) * (prices[idx + (3-foo) * (-kn[1]) + lag] - prices[idx + (2-foo) * (-kn[1]) + lag]))
-    
+
     # ## Use the time corrections Muzafer provided
     # if(correctTime){
     # 
@@ -2623,6 +2626,7 @@ ReMeDI <- function(pData, kn = 1, lags = 1, knEqual = FALSE,
     #
 
     res[resIDX] <- -remedi/(nObs - (3-foo) * (-kn[1]) - lag)
+
     resIDX <- resIDX +1
   }
 

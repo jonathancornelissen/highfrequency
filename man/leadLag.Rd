@@ -39,7 +39,7 @@ An list with class "leadLag" which containing 'contrasts', 'lead-lag-ratio', and
 the lead-lag-ratio, and the tested lags respectively.
 }
 \description{
-Function that estimates the whether one series leads (or lags) another.
+Function that estimates whether one series leads (or lags) another.
 }
 \details{
 The lead-lag-ratio (LLR) can be used to see if one asset leads the other. If LLR < 1, then price1 MAY be leading price2 and vice versa if LLR > 1.

@@ -332,13 +332,13 @@ test_that("ReMeDI", {
   # print("Make sure to implement tests for correctTime = TRUE") ## When it becomes relevant.
   #remed <- ReMeDI(sampleTDataMicroseconds, correctTime = FALSE, lags = 0:25, kn = 2) ##Changed due to correctTime bug
   remed <- ReMeDI(sampleTDataMicroseconds, lags = 0:25, kn = 2)
-  
+
   expected <- c(1.431069e-05, 9.651728e-05, 1.060440e-04, 7.762527e-05, 3.823010e-05, 1.709553e-05, -9.089181e-06, -4.940754e-06, -2.070274e-06, 
                 -2.682253e-05, -4.762974e-05, -6.670733e-05, -7.923285e-05, -7.106233e-05, -2.953979e-05, -1.200891e-05, 1.211180e-06,  2.670063e-05, 
                 2.620544e-05, 3.368025e-05, 3.087709e-05, -3.367455e-06, -2.308410e-05, -4.196142e-05, -4.182684e-05, -5.326772e-06)
   
   expect_equal(remed, expected)
-  
+
   # Different data-set
   dat <- sampleTData$PRICE
   storage.mode(dat) <- "numeric"
@@ -349,23 +349,22 @@ test_that("ReMeDI", {
                 -6.367172e-04, -4.734131e-04, -2.349435e-04, -1.945647e-04,  -1.113470e-04, -4.221193e-05,  9.638518e-06, 8.949410e-05, 
                 7.872398e-05,-1.349880e-05, -1.493591e-04, -1.288487e-04, -3.294210e-05,  1.014176e-04, 2.808128e-04,  2.813373e-04,  1.856106e-04)
   
+
   expect_equal(remed, expected)
-  
-  
+
+
 })
 
 test_that("ReMeDI kn choosing algorithm", {
-  
+
   # optimalKn <- knChooseReMeDI(sampleTDataMicroseconds, correctTime = FALSE, jumpsIndex = NULL, knMax = 10, tol = 0.05, size = 3, lower = 1, upper = 10, plot = FALSE)##Changed due to correctTime bug
   optimalKn <- knChooseReMeDI(sampleTDataMicroseconds, knMax = 10, tol = 0.05, size = 3, lower = 1, upper = 10, plot = FALSE)
   expect_equal(optimalKn, 1L)
-  
+
   dat <- sampleTData$PRICE
   storage.mode(dat) <- "numeric"
   # optimalKn <- knChooseReMeDI(dat, correctTime = FALSE, jumpsIndex = NULL, knMax = 10, tol = 0.05, size = 3, lower = 3, upper = 5, plot = FALSE) ##Changed due to correctTime bug
   optimalKn <- knChooseReMeDI(dat, knMax = 10, tol = 0.05, size = 3, lower = 3, upper = 5, plot = FALSE)
   expect_equal(optimalKn, 4L)
-  
-  
-  
+
 })

@@ -6,7 +6,7 @@
 \usage{
 businessTimeAggregation(
   pData,
-  measure = "intensity",
+  measure = "volume",
   obs = 390,
   bandwidth = 0.075,
   ...
@@ -16,7 +16,7 @@ businessTimeAggregation(
 \item{pData}{xts or data.table containing data to aggregate.}
 
 \item{measure}{character denoting which measure to use. Valid options are "intensity", "vol", and "volume", denoting the trade intensity process of Oomen (2005),
-volatility, and volume, respectively.}
+volatility, and volume, respectively. Default is "volume"}
 
 \item{obs}{integer valued numeric of length 1 denoting how many observations is wanted after the aggregation procedure.}
 
@@ -28,7 +28,8 @@ volatility, and volume, respectively.}
 A list containing "pData" which is the aggregated data and a list containing the intensity process, split up day by day.
 }
 \description{
-Business time aggregation
+Time series aggregation based on `business time` statistics. Instead of equidistant sampling based on time during a trading day, business time sampling creates measures and samples equidistantly using these instead.
+For example when sampling based on volume, business time aggregation will result in a time series that has an equal amount of volume between each observation (if possible).
 }
 \examples{
 pData <- sampleTData[,c("PRICE", "SIZE")]
@@ -47,7 +48,7 @@ rCov(pData[,"PRICE"], makeReturns = TRUE, alignBy = "minutes", alignPeriod = 5)
 
 }
 \references{
-Roel C.A. Oomen Properties of realized variance under alternative sampling schemes. (2006) Journal of Business & Economic Statistics 24, pages 219-237
+Roel C. A. Oomen Properties of realized variance under alternative sampling schemes. (2006) Journal of Business & Economic Statistics 24, pages 219-237
 
 Yingjie Dong and Yiu Kuen Tse. (2017) Business time sampling scheme with applications to testing semi-martingale hypothesis and estimating integrated volatility. Econometrics, 5
 }
