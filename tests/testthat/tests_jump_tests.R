@@ -38,7 +38,7 @@ context("intradayJumpTest")
 test_that("LM test",{
   ## Extract the prices and set the time-zone to the local time-zone
   library(xts)
-  dat <- sampleTDataMicroseconds[as.Date(DT) == "2018-01-02", .(DT, PRICE)]
+  dat <- sampleTDataMicroseconds[as.Date(DT) == "2018-01-02", list(DT, PRICE)]
   
   jumpTest <- intradayJumpTest(pData = dat, volEstimator = "RM", driftEstimator = "none", alpha = 0.95, RM = "bipower", 
                                lookBackPeriod = 10, dontIncludeLast = TRUE, on = "minutes", k = 5,
