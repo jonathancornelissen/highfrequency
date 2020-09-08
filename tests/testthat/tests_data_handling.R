@@ -214,19 +214,36 @@ test_that("aggregateTS edge cases", {
 
 context("aggregatePrice time zones")
 test_that("aggregatePrice time zones", {
-  dat <- data.table(DT = as.POSIXct(c(34150, 34201, 34500, 34500 + 1e-9, 34799, 34801, 34803, 35099), origin = "1970-01-01", tz = "EST"), PRICE = 0:7)
+  dat <- data.table(DT = as.POSIXct(c(34150, 34201, 34201, 34500, 34500 + 1e-6, 34799, 34799, 34801, 34803, 35099), origin = "1970-01-01", tz = "EST"), PRICE = 0:9)
   
   output <- aggregatePrice(dat, on = "minutes", k = 5, marketOpen = "04:30:00", marketClose = "11:00:00", fill = FALSE)
-  target <- data.table(DT = as.POSIXct(c(34200, 34500, 34800, 35100), origin = "1970-01-01", tz = "EST"), PRICE = c(1,2,4,7))
+  target <- data.table(DT = as.POSIXct(c(34200, 34500, 34800, 35100), origin = "1970-01-01", tz = "EST"), PRICE = c(1,3,6,9))
   expect_equal(output, target)
+  
+  dat <- as.xts(dat)
+  
+  output <- aggregatePrice(dat, on = "minutes", k = 5, marketOpen = "04:30:00", marketClose = "11:00:00", fill = FALSE, tz = "EST")
+  target <- xts(c(1,3,6,9), as.POSIXct(c(34200, 34500, 34800, 35100), origin = "1970-01-01", tz = "EST")) 
+  colnames(target) <- "PRICE"
+  expect_equal(output, target)
+  
+  dat <- data.table(DT = as.POSIXct(c(34150, 34201, 34201, 34500, 34500 + 1e-6, 34799, 34799, 34801, 34803, 35099) + 86400 * c(rep(1,10), rep(200,10)),
+                                    origin =  as.POSIXct("1970-01-01", tz = "EST"), tz = "EST"), PRICE = rep(0:9, 2))
+  
+  output <- aggregatePrice(dat, on = "minutes", k = 5, marketOpen = "09:30:00", marketClose = "16:00:00", fill = FALSE)
+  target <- data.table(DT = as.POSIXct(c(34200, 34500, 34800, 35100) + 86400 * c(rep(1,4), rep(200,4)), origin = as.POSIXct("1970-01-01", tz = "EST"), tz = "EST"), PRICE = rep(c(1,3,6,9), 2))
+  expect_equal(output, target)
+  
+  
+  
 })
 
 
 context("aggregatePrice edge cases")
 test_that("aggregatePrice edge cases", {
-  dat <- data.table(DT = as.POSIXct(c(34150, 34201, 34500, 34500 + 1e-9, 34799, 34801, 34803, 35099), origin = "1970-01-01", tz = "UTC"), PRICE = 0:7)
+  dat <- data.table(DT = as.POSIXct(c(34150, 34201, 34201, 34500, 34500 + 1e-9, 34799, 34799, 34801, 34803, 35099), origin = "1970-01-01", tz = "UTC"), PRICE = 0:9)
   output <- aggregatePrice(dat, on = "minutes", k = 5, marketOpen = "09:30:00", marketClose = "16:00:00", fill = FALSE)
-  target <- data.table(DT = as.POSIXct(c(34200, 34500, 34800, 35100), origin = "1970-01-01", tz = "UTC"), PRICE = c(1,2,4,7))
+  target <- data.table(DT = as.POSIXct(c(34200, 34500, 34800, 35100), origin = "1970-01-01", tz = "UTC"), PRICE = c(1,3,6,9))
   expect_equal(output, target)
 })
 
