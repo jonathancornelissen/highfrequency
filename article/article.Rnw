@@ -8,7 +8,10 @@
 \usepackage[T1]{fontenc}
 
 
-<<preliminaries, echo=FALSE, results='hide'>>=
+
+
+
+<<preliminaries, echo=FALSE, options$results="verbatim", cache = TRUE, dev = "pdf">>=
 # Using knitr for manuscript
 
 # JSS code formatting
@@ -26,8 +29,9 @@ library(highfrequency)
 @
 
 
-\author{Author 1 \\University 1
-	\And Author 2 \\ University 2}
+\author{Kris Boudt \\ Ghent University + ...
+  \And Onno Kleen \\ Erasmus Rotterdam?
+	\And Emil Sj{\o}rup  \\ Ghent Univeristy}
 \Plainauthor{Author 1, Author 2}
 
 \title{Intraday financial data with \pkg{highfrequency}}
@@ -49,18 +53,30 @@ Highfrequency data very important, \dots. The \pkg{highfrequency} package for \p
 
 
 \begin{document}
+\SweaveOpts{concordance=TRUE}
 
 \begin{itemize}
 \item 
 \end{itemize}
 
 \section{Preparing TAQ data}
+In high frequency econometrics correct data handling is very important and 
+
+\begin{figure}
+<<uncleaned, dev = pdf, out.width=\\linewidth, echo=FALSE, fig = TRUE>>=
+library("highfrequency")
+prices <- sampleTDataRaw$PRICE
+storage.mode(prices) <- "numeric"
+plot(prices, main = "Uncleaned prices")
+@
+\end{figure}
+
 <<Simple-trades-cleaning>>=
 library("highfrequency")
 tdata_cleaned <- 
-  tradesCleanup(tdataraw = sample_tdataraw, exchanges = "N")
+  tradesCleanup(tDataRaw = sampleTDataRaw, exchanges = "N")
 tdata_cleaned$report
-dim(tdata_cleaned$tdata)
+dim(tdata_cleaned$tData)
 @
 
 \end{document}
