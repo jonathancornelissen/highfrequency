@@ -2,10 +2,10 @@ library(testthat)
 library(highfrequency)
 context("medRV")
 test_that("", {
-expect_equal(
-  formatC(as.numeric(medRV(sample5MinPricesJumps[c('2010-01-04', '2010-01-05'), 1], alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)[1]), digits = 5),
-  "0.013105"
-)
+  expect_equal(
+    formatC(as.numeric(medRV(sample5MinPricesJumps[c('2010-01-04', '2010-01-05'), 1], alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)[1]), digits = 5),
+    "0.013105"
+  )
 })
 # medRQ
 context("medRQ")
@@ -37,13 +37,13 @@ context("MRC")
 test_that("MRC", {
   expect_equal({
     formatC(sum(MRC(list(sample5MinPricesJumps["2010-01-04",1], sample5MinPricesJumps["2010-01-04",2]), pairwise = TRUE, makePsd = TRUE)), digits = 5)
-    },
-    "0.031692"
+  },
+  "0.031692"
   )
   expect_equal({
     formatC(sum(MRC(list(sample5MinPricesJumps["2010-01-04",1], sample5MinPricesJumps["2010-01-04",2]), pairwise = FALSE, makePsd = TRUE)), digits = 5)
-    },
-    "0.034393"
+  },
+  "0.034393"
   )
 })
 
@@ -54,8 +54,8 @@ test_that("rBeta", {
     a <- sample5MinPricesJumps['2010-01-04', 1]
     b <- sample5MinPricesJumps['2010-01-04', 2]
     formatC(rBeta(a,b, RCOVestimator = "rBPCov", RVestimator = "minRV", makeReturns = TRUE), digits = 5)
-    },
-    c(stock2 = "1.4318")
+  },
+  c(stock2 = "1.4318")
   )
   expect_equal({
     a <- sample5MinPricesJumps['2010-01-04', 1]
@@ -224,8 +224,8 @@ test_that("rQuar", {
     "116.57"
   )
 })
-  
-  
+
+
 context("ivInference")
 test_that("ivInference", {
   expect_equal(
@@ -345,9 +345,10 @@ test_that("ReMeDI", {
   #remed <- ReMeDI(dat, correctTime = FALSE, jumpsIndex = NULL, lags = 0:25, kn = 4) ##Changed due to correctTime bug
   remed <- ReMeDI(dat, lags = 0:25, kn = 4)
   
-   expected <- c(1.946686e-04, -3.945028e-04, -5.868124e-04,  -8.010601e-04, -8.411491e-04, -9.121411e-04, -8.848654e-04, -8.964487e-04,-7.963612e-04,
-                 -6.367172e-04, -4.734131e-04, -2.349435e-04, -1.945647e-04,  -1.113470e-04, -4.221193e-05,  9.638518e-06, 8.949410e-05, 
-                 7.872398e-05,-1.349880e-05, -1.493591e-04, -1.288487e-04, -3.294210e-05,  1.014176e-04, 2.808128e-04,  2.813373e-04,  1.856106e-04)
+  expected <- c(1.946686e-04, -3.945028e-04, -5.868124e-04,  -8.010601e-04, -8.411491e-04, -9.121411e-04, -8.848654e-04, -8.964487e-04,-7.963612e-04,
+                -6.367172e-04, -4.734131e-04, -2.349435e-04, -1.945647e-04,  -1.113470e-04, -4.221193e-05,  9.638518e-06, 8.949410e-05, 
+                7.872398e-05,-1.349880e-05, -1.493591e-04, -1.288487e-04, -3.294210e-05,  1.014176e-04, 2.808128e-04,  2.813373e-04,  1.856106e-04)
+  
 
   expect_equal(remed, expected)
 
@@ -365,7 +366,5 @@ test_that("ReMeDI kn choosing algorithm", {
   # optimalKn <- knChooseReMeDI(dat, correctTime = FALSE, jumpsIndex = NULL, knMax = 10, tol = 0.05, size = 3, lower = 3, upper = 5, plot = FALSE) ##Changed due to correctTime bug
   optimalKn <- knChooseReMeDI(dat, knMax = 10, tol = 0.05, size = 3, lower = 3, upper = 5, plot = FALSE)
   expect_equal(optimalKn, 4L)
-
-
 
 })

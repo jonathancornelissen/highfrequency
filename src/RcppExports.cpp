@@ -166,6 +166,19 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// mSeq
+arma::vec mSeq(arma::vec starts, arma::vec ends, double scaleFactor);
+RcppExport SEXP _highfrequency_mSeq(SEXP startsSEXP, SEXP endsSEXP, SEXP scaleFactorSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type starts(startsSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type ends(endsSEXP);
+    Rcpp::traits::input_parameter< double >::type scaleFactor(scaleFactorSEXP);
+    rcpp_result_gen = Rcpp::wrap(mSeq(starts, ends, scaleFactor));
+    return rcpp_result_gen;
+END_RCPP
+}
 // leadLagCpp
 arma::vec leadLagCpp(const arma::vec& x, const arma::vec& timestampsX, const arma::vec& y, const arma::vec& timestampsY, const arma::vec lags, const bool normalize);
 RcppExport SEXP _highfrequency_leadLagCpp(SEXP xSEXP, SEXP timestampsXSEXP, SEXP ySEXP, SEXP timestampsYSEXP, SEXP lagsSEXP, SEXP normalizeSEXP) {
@@ -294,6 +307,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_highfrequency_preAveragingReturnsInternal", (DL_FUNC) &_highfrequency_preAveragingReturnsInternal, 2},
     {"_highfrequency_findFirst", (DL_FUNC) &_highfrequency_findFirst, 2},
     {"_highfrequency_overlap", (DL_FUNC) &_highfrequency_overlap, 4},
+    {"_highfrequency_mSeq", (DL_FUNC) &_highfrequency_mSeq, 3},
     {"_highfrequency_leadLagCpp", (DL_FUNC) &_highfrequency_leadLagCpp, 6},
     {"_highfrequency_leadLagCppPAR", (DL_FUNC) &_highfrequency_leadLagCppPAR, 7},
     {"_highfrequency_nsmaller", (DL_FUNC) &_highfrequency_nsmaller, 5},

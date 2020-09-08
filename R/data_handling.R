@@ -183,54 +183,55 @@ aggregateTS <- function (ts, FUN = "previoustick", on = "minutes", k = 1, weight
   }
 }
 
+
 #' Aggregate a time series but keep first and last observation
 #' @description Function returns new time series as xts object where first observation is always the opening price
-#' and subsequent observations are the closing prices over the interval with as endpoint the timestamp 
+#' and subsequent observations are the closing prices over the interval with as endpoint the timestamp
 #' of the result.
-#' 
+#'
 #' @param pData data.table or xts object to be aggregated containing the intraday price series, possibly across multiple days.
 #' @param on character, indicating the time scale in which "k" is expressed. Possible values are: "milliseconds", "secs", "seconds", "mins", "minutes","hours", "ticks".
-#' @param k positive integer, indicating the number of periods to aggregate over; e.g. to aggregate a 
+#' @param k positive integer, indicating the number of periods to aggregate over; e.g. to aggregate a
 #' xts object to the 5 minute frequency set k = 5 and on = "minutes".
-#' @param marketOpen the market opening time, by default: marketOpen = "09:30:00". 
-#' @param marketClose the market closing time, by default: marketClose = "16:00:00". 
+#' @param marketOpen the market opening time, by default: marketOpen = "09:30:00".
+#' @param marketClose the market closing time, by default: marketClose = "16:00:00".
 #' @param fill indicates whether rows without trades should be added with the most recent value, FALSE by default.
 #' @param tz time zone used, by default: tz = timezone of DT column/index of xts.
-#' 
-#' @details 
-#' The timestamps of the new time series are the closing times and/or days of the intervals. 
-#' 
+#'
+#' @details
+#' The timestamps of the new time series are the closing times and/or days of the intervals.
+#'
 #' In case of previous tick aggregation or on = "seconds"/"minutes"/"hours",
-#' the element of the returned series with e.g. timestamp 09:35:00 contains 
+#' the element of the returned series with e.g. timestamp 09:35:00 contains
 #' the last observation up to that point, including the value at 09:35:00 itself.
-#' 
+#'
 #' In case on = "ticks", the sampling is done such the sampling starts on the first tick, and the last tick is always included
 #' For example, if 14 observations are made on one day, and these are 1, 2, 3, ... 14.
 #' Then, with on = "ticks" and k = 3, the output will be 1, 4, 7, 10, 13, 14.
-#' 
+#'
 #' @return A data.table or xts object containing the aggregated time series.
-#' 
+#'
 #' @author Jonathan Cornelissen, Kris Boudt and Onno Kleen.
 #' @keywords data manipulation
-#' @examples 
+#' @examples
 #' # aggregate price data to the 30 second frequency
 #' aggregatePrice(sampleTDataMicroseconds, on = "secs", k = 30)
 #' # aggregate price data to the 30 second frequency including zero return price changes
 #' aggregatePrice(sampleTDataMicroseconds, on = "secs", k = 30)
-#' 
+#'
 #' # aggregate price data to half a second frequency including zero return price changes
 #' aggregatePrice(sampleTDataMicroseconds, on = "milliseconds", k = 500, fill = TRUE)
 #' @keywords internal
 #' @importFrom xts last tzone
+#' @importFrom data.table fifelse
 #' @export
 aggregatePrice <- function(pData, on = "minutes", k = 1, marketOpen = "09:30:00", marketClose = "16:00:00" , fill = FALSE, tz = NULL) {
+  ## checking
   pData <- checkColumnNames(pData)
-  DATE <- DT <- FIRST_DT <- DT_ROUND <- LAST_DT <- SYMBOL <- PRICE <- NULL
-  
+  N <- DATE <- DT <- FIRST_DT <- DT_ROUND <- LAST_DT <- SYMBOL <- PRICE <- NULL
+
   on_true <- NULL
-  
-  
-  
+
   if ("PRICE" %in% colnames(pData) == FALSE) {
     stop("data.table or xts needs column named PRICE.")
   }
@@ -248,40 +249,15 @@ aggregatePrice <- function(pData, on = "minutes", k = 1, marketOpen = "09:30:00"
   if(on == "hours"){
     scaleFactor <- k * 60 * 60
   }
-  
+
   if(! (on %in% c("milliseconds", "secs", "seconds", "mins", "minutes", "hours", "ticks"))){
     stop("on not valid value. Valid values are: \"milliseconds\", \"secs\", \"seconds\", \"mins\", \"minutes\", \"hours\", and \"ticks\".")
   }
-  
+
   dummy_was_xts <- FALSE
   if (!is.data.table(pData)) {
     if (is.xts(pData)) {
-      
       dummy_was_xts <- TRUE
-      # If there is only one day of input and input is xts,
-      # use old code because it's faster
-      # However, multi-day input not possible
-      if (ndays(pData) == 1) {
-        if (is.null(tz)) {
-          tz <- tzone(pData)
-        }
-        ts2 <- fastTickAgregation(pData, on, k, tz)
-        date <- strsplit(as.character(index(pData)), " ")[[1]][1]
-        
-        #open
-        a <- as.POSIXct(paste(date, marketOpen), tz = tz)
-        b <- as.xts(matrix(as.numeric(pData[1]), nrow = 1), a)
-        storage.mode(ts2) <- "numeric"
-        ts3 <- c(b, ts2)
-        
-        #close
-        aa <- as.POSIXct(paste(date, marketClose), tz = tz)
-        condition <- index(ts3) < aa
-        ts3 <- ts3[condition]
-        bb <- as.xts(matrix(as.numeric(last(pData)), nrow = 1), aa)
-        ts3 <- c(ts3, bb)
-        return(ts3)
-      }
       pData <- setnames(as.data.table(pData)[, PRICE := as.numeric(as.character(PRICE))],
                         old = "index", new = "DT")
     } else {
@@ -296,20 +272,7 @@ aggregatePrice <- function(pData, on = "minutes", k = 1, marketOpen = "09:30:00"
       stop("Data.table neeeds PRICE column.")
     }
   }
-  
-  if(on == "ticks"){ ## Special case for on = "ticks"
-    if(k < 1 | k%%1 != 0){
-      stop("When on is `ticks`, must be a positive integer valued numeric")
-    }
-    idx <- seq(1, nrow(pData), by = k)
-    if(k %% nrow(pData) != 0){
-      idx <- c(idx, nrow(pData))
-    }
-    pData <- pData[idx,]
-    return(pData)
-  }
-  
-  
+
   timeZone <- attr(pData$DT, "tzone")
   if(timeZone == ""){
     if(is.null(tz)){
@@ -319,16 +282,47 @@ aggregatePrice <- function(pData, on = "minutes", k = 1, marketOpen = "09:30:00"
   } else {
     tz <- timeZone
   }
-  
-  marketOpenNumeric <- as.numeric(as.POSIXct(paste("1970-01-01", marketOpen), format = "%Y-%m-%d %H:%M:%OS", tz = tz))
-  marketCloseNumeric <- as.numeric(as.POSIXct(paste("1970-01-01", marketClose), format = "%Y-%m-%d %H:%M:%OS", tz = tz))
-  
-  
-  dateNumeric <- as.numeric(unique(as.Date(pData$DT)))
-  
-  pData[, DT := as.numeric(DT)]
-  pData <- pData[between(DT %% 86400, marketOpenNumeric, marketCloseNumeric)]
-  
+  ## Checking ends
+  # Convert DT to numeric. This is much faster than dealing with the strings (POSIXct)
+  pData[, DT := as.numeric(DT, tz = tz)]
+  # Calculate the date in the data
+  pData[, DATE := as.Date(floor(as.numeric(DT, tz = tz) / 86400), origin = "1970-01-01", tz = tz)]
+  # extract a vector of dates
+  dates <- unique(pData[,DATE])
+  ## Find the opening times of each of the days as numerics.
+  marketOpenNumeric <- as.numeric(as.POSIXct(paste(dates, marketOpen), format = "%Y-%m-%d %H:%M:%OS", tz = tz), tz = tz)
+  marketCloseNumeric <- as.numeric(as.POSIXct(paste(dates, marketClose), format = "%Y-%m-%d %H:%M:%OS", tz = tz), tz =tz)
+  # Find observations per day
+  obsPerDay <- pData[, .N, by = DATE][,N]
+
+  ## Here we make sure that we can correctly handle times that happen before midnight in the corrected timestamps from the flag if statements
+  if(length(marketOpenNumeric) != length(obsPerDay)){
+    if(length(marketOpenNumeric) < length(obsPerDay)){ ## Here we add entries
+      marketOpenNumeric <- rep(marketOpenNumeric, length(obsPerDay))[1:length(obsPerDay)]
+      marketCloseNumeric <- rep(marketCloseNumeric, length(obsPerDay))[1:length(obsPerDay)]
+    } else {
+      stop("unknown error occured in aggregatePrice")
+    }
+
+  }
+
+  # Subset observations that does not fall between their respective market opening and market closing times.
+  pData <- pData[between(DT, rep(marketOpenNumeric, obsPerDay), rep(marketCloseNumeric, obsPerDay))]
+  # Find observations per day again
+  obsPerDay <- pData[, .N, by = DATE][,N]
+
+  ## Here (AGAIN!) we make sure that we can correctly handle if we deleted a day in the subsetting step above
+  if(length(marketOpenNumeric) != length(obsPerDay)){
+    if(length(marketOpenNumeric) > length(obsPerDay)){ ## Here we delete entries
+      marketOpenNumeric <- rep(marketOpenNumeric, length(obsPerDay))[1:length(obsPerDay)]
+      marketCloseNumeric <- rep(marketCloseNumeric, length(obsPerDay))[1:length(obsPerDay)]
+    } else {
+      stop("unknown error occured in aggregatePrice")
+    }
+
+
+  }
+
   if(on == "ticks"){ ## Special case for on = "ticks"
     if(k < 1 | k%%1 != 0){
       stop("When on is `ticks`, must be a positive integer valued numeric")
@@ -343,40 +337,38 @@ aggregatePrice <- function(pData, on = "minutes", k = 1, marketOpen = "09:30:00"
     pData <- pData[idx,]
     return(pData)
   }
-  
-  
-  
-  
-  pData[, DATE := floor(DT / 86400)]
+
+  # Find the first observation per day.
   pData[, FIRST_DT := min(DT), by = "DATE"]
-  
   # Use Dirks answer here: https://stackoverflow.com/a/42498175 to round the timestamps to the latest scaleFactor
-  pData[, DT_ROUND := ifelse(DT == FIRST_DT,
-                                        floor(DT/scaleFactor) * scaleFactor,
-                                        ceiling(DT/scaleFactor) * scaleFactor)]
-  
+  pData[, DT_ROUND := fifelse(DT == FIRST_DT,
+                             floor(DT/scaleFactor) * scaleFactor,
+                             ceiling(DT/scaleFactor) * scaleFactor)]
+
   pData[, LAST_DT := max(DT), by = "DT_ROUND"]
-  
-  pData_open <- data.table::copy(pData[DT == FIRST_DT , c("DT", "PRICE")])
-  
-  pData_open[, DT := floor(DT/86400) * 86400 + marketOpenNumeric]
-  
-  pData <- pData[DT == LAST_DT][, DT := DT_ROUND][, c("DT", "PRICE")]
-  
+
+  # Create the first observation each day.
+  pData_open <- pData[pData[DT == FIRST_DT, .I[1], DATE]$V1, c("DT", "PRICE")]
+  pData_open[, DT := floor(DT/86400) * 86400 + marketOpenNumeric %% 86400]
+
+  # Take the last observation of each group of LAST_DT
+  pData <- pData[pData[DT == LAST_DT, .I[.N], LAST_DT]$V1][, DT := DT_ROUND][, c("DT", "PRICE")] ## Make sure we only take the last observation
+
   # due to rounding there may be an observation that is refered to the opening time
   pData <- pData[!(DT %in% pData_open$DT)]
+  # Merge the opening observation onto the rest of the observations.
   pData <- merge(pData, pData_open, all = TRUE)
-  
-  
+
+
   if (fill) {
-    
-    dt_full_index <- data.table(DT = rep(seq(marketOpenNumeric, marketCloseNumeric, scaleFactor), each = length(dateNumeric)) + dateNumeric * 86400)
+    # Construct timestamps that go from marketOpenNumeric to marketClose numeric each day with step of scaleFactor e.g. 1 min (60)
+    dt_full_index <- data.table(DT = as.numeric(mSeq(marketOpenNumeric, marketCloseNumeric, scaleFactor)))
     setkey(dt_full_index, DT)
+    # Merge the construct the NA.LOCF filled in data.
     pData <- unique(pData[dt_full_index, roll = TRUE, on = "DT"])
   }
-  
-  pData[, DT := as.POSIXct(DT, origin = "1970-01-01", tz = tz)]
-  
+
+  pData[, DT := as.POSIXct(DT, origin = as.POSIXct("1970-01-01", tz = "UTC"), tz = tz)]
   if (dummy_was_xts) {
     return(xts(as.matrix(pData[, -c("DT")]), order.by = pData$DT, tzone = tz))
   } else {
@@ -422,7 +414,7 @@ aggregatePrice <- function(pData, on = "minutes", k = 1, marketOpen = "09:30:00"
 #' head(qDataAggregated)
 #' @export
 aggregateQuotes <- function(qData, on = "minutes", k = 5, marketOpen = "09:30:00", marketClose = "16:00:00", tz = "GMT") {
-  DATE <- BID <- OFR <- BIDSIZ <- OFRSIZ <- DT <- FIRST_DT <- DT_ROUND <-LAST_DT <- SYMBOL <- NULL
+  .I <- .N <- N <- DATE <- BID <- OFR <- BIDSIZ <- OFRSIZ <- DT <- FIRST_DT <- DT_ROUND <-LAST_DT <- SYMBOL <- NULL
   
   qData <- checkColumnNames(qData)
   checkqData(qData)
@@ -476,28 +468,70 @@ aggregateQuotes <- function(qData, on = "minutes", k = 5, marketOpen = "09:30:00
     tz <- timeZone
   }
   
+  # Convert DT to numeric. This is much faster than dealing with the strings (POSIXct)
+  qData[, DT := as.numeric(DT, tz = tz)]
+  # Calculate the date in the data
+  qData[, DATE := as.Date(floor(as.numeric(DT, tz = tz) / 86400), origin = "1970-01-01", tz = tz)]
+  # extract a vector of dates
+  dates <- unique(qData[,DATE])
+  ## Find the opening times of each of the days as numerics.
+  marketOpenNumeric <- as.numeric(as.POSIXct(paste(dates, marketOpen), format = "%Y-%m-%d %H:%M:%OS", tz = tz), tz = tz) 
+  marketCloseNumeric <- as.numeric(as.POSIXct(paste(dates, marketClose), format = "%Y-%m-%d %H:%M:%OS", tz = tz), tz =tz)
+  # Find observations per day
+  obsPerDay <- qData[, .N, by = DATE][,N]
   
-  marketOpenNumeric <- as.numeric(as.POSIXct(paste("1970-01-01", marketOpen), format = "%Y-%m-%d %H:%M:%OS", tz = tz), tz = tz)
-  marketCloseNumeric <- as.numeric(as.POSIXct(paste("1970-01-01", marketClose), format = "%Y-%m-%d %H:%M:%OS", tz = tz), tz = tz)
+  ## Here we make sure that we can correctly handle times that happen before midnight in the corrected timestamps from the flag if statements
+  if(length(marketOpenNumeric) != length(obsPerDay)){
+    if(length(marketOpenNumeric) < length(obsPerDay)){ ## Here we add entries
+      marketOpenNumeric <- rep(marketOpenNumeric, length(obsPerDay))[1:length(obsPerDay)]
+      marketCloseNumeric <- rep(marketCloseNumeric, length(obsPerDay))[1:length(obsPerDay)]
+    } else {
+      stop("unknown error occured in aggregateQuotes")
+    }
+    
+  }
   
+  # Subset observations that does not fall between their respective market opening and market closing times.
+  qData <- qData[between(DT, rep(marketOpenNumeric, obsPerDay), rep(marketCloseNumeric, obsPerDay))]
+  # Find observations per day again
+  obsPerDay <- qData[, .N, by = DATE][,N]
   
-  qData[,DT := as.numeric(DT)]
-  qData <- qData[between(DT %% 86400, marketOpenNumeric, marketCloseNumeric),]
+  ## Here (AGAIN!) we make sure that we can correctly handle if we deleted a day in the subsetting step above
+  if(length(marketOpenNumeric) != length(obsPerDay)){
+    if(length(marketOpenNumeric) > length(obsPerDay)){ ## Here we delete entries
+      marketOpenNumeric <- rep(marketOpenNumeric, length(obsPerDay))[1:length(obsPerDay)]
+      marketCloseNumeric <- rep(marketCloseNumeric, length(obsPerDay))[1:length(obsPerDay)]
+    } else {
+      stop("unknown error occured in aggregateQuotes")
+    }
+    
+    
+  }
   
-  qData[, DATE := floor(DT / 86400)]
+  # Find the first observation per day.  
   qData[, FIRST_DT := min(DT), by = "DATE"]
-  
   # Use Dirks answer here: https://stackoverflow.com/a/42498175 to round the timestamps to the latest scaleFactor
-  qData[, DT_ROUND := ifelse(DT == FIRST_DT,
+  qData[, DT_ROUND := fifelse(DT == FIRST_DT,
                              floor(DT/scaleFactor) * scaleFactor,
                              ceiling(DT/scaleFactor) * scaleFactor)]
+  
   qData[, LAST_DT := max(DT), by = "DT_ROUND"]
   qData[, OFRSIZ := sum(OFRSIZ), by = "DT_ROUND"]
   qData[, BIDSIZ := sum(BIDSIZ), by = "DT_ROUND"]
   
-  qData <- qData[DT == LAST_DT][, DT := DT_ROUND][, c("DT", "SYMBOL", "BID", "BIDSIZ", "OFR", "OFRSIZ")]
-
-  qData[, DT := as.POSIXct(DT, origin = "1970-01-01", tz = tz)]
+  # Create the first observation each day.
+  qData_open <- qData[qData[DT == FIRST_DT, .I[1], DATE]$V1, c("DT", "SYMBOL", "BID", "BIDSIZ", "OFR", "OFRSIZ")]
+  qData_open[, DT := floor(DT/86400) * 86400 + marketOpenNumeric %% 86400]
+  
+  # Take the last observation of each group of LAST_DT 
+  qData <- qData[qData[DT == LAST_DT, .I[.N], LAST_DT]$V1][, DT := DT_ROUND][, c("DT", "SYMBOL", "BID", "BIDSIZ", "OFR", "OFRSIZ")] ## Make sure we only take the last observation
+  
+  # due to rounding there may be an observation that is refered to the opening time
+  qData <- qData[!(DT %in% qData_open$DT)]
+  # Merge the opening observation onto the rest of the observations.
+  qData <- merge(qData, qData_open, all = TRUE)
+  
+  qData[, DT := as.POSIXct(DT, origin = as.POSIXct("1970-01-01", tz = "UTC"), tz = tz)]
   
   
   if (dummy_was_xts == TRUE) {
@@ -544,7 +578,7 @@ aggregateQuotes <- function(qData, on = "minutes", k = 5, marketOpen = "09:30:00
 #' head(tDataAggregated)
 #' @export
 aggregateTrades <- function(tData, on = "minutes", k = 5, marketOpen = "09:30:00", marketClose = "16:00:00", tz = "GMT") {
-  DATE <- SIZE <- DT <- FIRST_DT <- DT_ROUND <- LAST_DT <- SYMBOL <- PRICE <- VWPRICE <- SIZETPRICE <- SIZESUM <- NULL
+  .I <- .N <- N <- DATE <- SIZE <- DT <- FIRST_DT <- DT_ROUND <- LAST_DT <- SYMBOL <- PRICE <- VWPRICE <- SIZETPRICE <- SIZESUM <- NULL
   tData <- checkColumnNames(tData)
   checktData(tData)
   
@@ -565,14 +599,13 @@ aggregateTrades <- function(tData, on = "minutes", k = 5, marketOpen = "09:30:00
   
   
   dummy_was_xts <- FALSE
-  if (is.data.table(tData) == FALSE) {
-    if (is.xts(tData) == TRUE) {
+  if (!is.data.table(tData)) {
+    if (is.xts(tData)) {
       tData <- as.data.table(tData)
       tData <- setnames(tData , old = "index", new = "DT")
       for (col in names(tData)[-1]) {
         set(tData, j = col, value = as.character(tData[[col]]))
       }
-      
       tData[, `:=` (SIZE = as.numeric(SIZE), PRICE = as.numeric(PRICE))]
       dummy_was_xts <- TRUE
     } else {
@@ -594,28 +627,73 @@ aggregateTrades <- function(tData, on = "minutes", k = 5, marketOpen = "09:30:00
     tz <- timeZone
   }
   
-  marketOpenNumeric <- as.numeric(as.POSIXct(paste("1970-01-01", marketOpen), format = "%Y-%m-%d %H:%M:%OS", tz = tz), tz = tz)
-  marketCloseNumeric <- as.numeric(as.POSIXct(paste("1970-01-01", marketClose), format = "%Y-%m-%d %H:%M:%OS", tz = tz), tz = tz)
   
+  # Convert DT to numeric. This is much faster than dealing with the strings (POSIXct)
+  tData[, DT := as.numeric(DT, tz = tz)]
+  # Calculate the date in the data
+  tData[, DATE := as.Date(floor(as.numeric(DT, tz = tz) / 86400), origin = "1970-01-01", tz = tz)]
+  # extract a vector of dates
+  dates <- unique(tData[,DATE])
+  ## Find the opening times of each of the days as numerics.
+  marketOpenNumeric <- as.numeric(as.POSIXct(paste(dates, marketOpen), format = "%Y-%m-%d %H:%M:%OS", tz = tz), tz = tz) 
+  marketCloseNumeric <- as.numeric(as.POSIXct(paste(dates, marketClose), format = "%Y-%m-%d %H:%M:%OS", tz = tz), tz =tz)
+  # Find observations per day
+  obsPerDay <- tData[, .N, by = DATE][,N]
   
-  tData[,DT := as.numeric(DT)]
-  tData <- tData[between(DT %% 86400, marketOpenNumeric, marketCloseNumeric),]
-  tData[, DATE := floor(DT / 86400)]
+  ## Here we make sure that we can correctly handle times that happen before midnight in the corrected timestamps from the flag if statements
+  if(length(marketOpenNumeric) != length(obsPerDay)){
+    if(length(marketOpenNumeric) < length(obsPerDay)){ ## Here we add entries
+      marketOpenNumeric <- rep(marketOpenNumeric, length(obsPerDay))[1:length(obsPerDay)]
+      marketCloseNumeric <- rep(marketCloseNumeric, length(obsPerDay))[1:length(obsPerDay)]
+    } else {
+      stop("unknown error occured in aggregateQuotes")
+    }
+    
+  }
+  
+  # Subset observations that does not fall between their respective market opening and market closing times.
+  tData <- tData[between(DT, rep(marketOpenNumeric, obsPerDay), rep(marketCloseNumeric, obsPerDay))]
+  # Find observations per day again
+  obsPerDay <- tData[, .N, by = DATE][,N]
+  
+  ## Here (AGAIN!) we make sure that we can correctly handle if we deleted a day in the subsetting step above
+  if(length(marketOpenNumeric) != length(obsPerDay)){
+    if(length(marketOpenNumeric) > length(obsPerDay)){ ## Here we delete entries
+      marketOpenNumeric <- rep(marketOpenNumeric, length(obsPerDay))[1:length(obsPerDay)]
+      marketCloseNumeric <- rep(marketCloseNumeric, length(obsPerDay))[1:length(obsPerDay)]
+    } else {
+      stop("unknown error occured in aggregateQuotes")
+    }
+    
+    
+  }
+  
+  # Find the first observation per day.  
   tData[, FIRST_DT := min(DT), by = "DATE"]
-  tData[, DT_ROUND := ifelse(DT == FIRST_DT,
+  # Use Dirks answer here: https://stackoverflow.com/a/42498175 to round the timestamps to the latest scaleFactor
+  tData[, DT_ROUND := fifelse(DT == FIRST_DT,
                              floor(DT/scaleFactor) * scaleFactor,
                              ceiling(DT/scaleFactor) * scaleFactor)]
-  
   tData[, LAST_DT := max(DT), by = "DT_ROUND"]
-  
   tData[, SIZETPRICE := SIZE * PRICE]
   tData[, SIZESUM := sum(SIZE), by = "DT_ROUND"]
   tData[, VWPRICE := sum(SIZETPRICE/SIZESUM), by = "DT_ROUND"]
   tData[, SIZE := SIZESUM]
   
-  tData <- tData[DT == LAST_DT][, DT := DT_ROUND][, c("DT", "SYMBOL", "PRICE", "SIZE", "VWPRICE")]
+  # Create the first observation each day.
+  tData_open <- tData[tData[DT == FIRST_DT, .I[1], DATE]$V1, c("DT", "SYMBOL", "PRICE", "SIZE", "VWPRICE")]
+  tData_open[, DT := floor(DT/86400) * 86400 + marketOpenNumeric %% 86400]
   
-  tData[, DT := as.POSIXct(DT, origin = "1970-01-01", tz = tz)]
+  # Take the last observation of each group of LAST_DT 
+  tData <- tData[tData[DT == LAST_DT, .I[.N], LAST_DT]$V1][, DT := DT_ROUND][, c("DT", "SYMBOL", "PRICE", "SIZE", "VWPRICE")] ## Make sure we only take the last observation
+  
+  # due to rounding there may be an observation that is refered to the opening time
+  tData <- tData[!(DT %in% tData_open$DT)]
+  # Merge the opening observation onto the rest of the observations.
+  tData <- merge(tData, tData_open, all = TRUE)
+  
+  tData[, DT := as.POSIXct(DT, origin = as.POSIXct("1970-01-01", tz = "UTC"), tz = tz)]
+  
   
   
   if (dummy_was_xts == TRUE) {
@@ -995,27 +1073,25 @@ matchTradesQuotes <- function(tData, qData, adjustment = 2) {
     stop("timezone of the trade data is not the same as the timezone of the quote data")
   }
   
-  timeZone <- tzone(tData$DT)
-
-  qData[, DT_ROUND := ifelse(DT == FIRST_DT, DT, DT + adjustment)]
-  qData[, DT := as.numeric(DT, tz = timeZone)]
+  
+  tz <- tzone(tData$DT)
+  qData[, DT := as.numeric(DT, tz = tz)]
   qData[, DATE := floor(DT / 86400)]
   qData[, FIRST_DT := min(DT), by = "DATE"]
-  # Make the adjustments
-  qData <- qData[, DT := ifelse(DT == FIRST_DT, DT, DT + adjustment)][,-c("FIRST_DT", "DATE")]
-  qData[, DT := as.POSIXct(DT, tz = timeZone, origin = "1970-01-01")]
+  # Make the adjustments to the quote timestamps.
+  qData <- qData[, DT := fifelse(DT == FIRST_DT, DT, DT + adjustment)][,-c("FIRST_DT", "DATE")]
+  qData[, DT := as.POSIXct(DT, tz = tz, origin = "1970-01-01")]
 
   
-  #tData <- tData[, c("DT", "SYMBOL", "PRICE", "SIZE")]
   setkey(tData, SYMBOL, DT)
   setkey(qData, SYMBOL, DT)
   tqData <- qData[tData, roll = TRUE, on = c("SYMBOL", "DT")]
-  tqData[, DT := as.POSIXct(DT, tz = timeZone, origin = "1970-01-01")]
-  tzone(tqData) <- timeZone
+  tqData[, DT := as.POSIXct(DT, tz = tz, origin = "1970-01-01")]
+  tzone(tqData) <- tz
   
   
   if (dummy_was_xts == TRUE) {
-    return(xts(as.matrix(tqData[, -c("DT")]), order.by = tqData$DT))
+    return(xts(as.matrix(tqData[, -c("DT")]), order.by = tqData$DT, tz = tz))
   } else {
     return(tqData)
   }
@@ -1087,8 +1163,8 @@ mergeQuotesSameTimestamp <- function(qData, selection = "median") {
   
   if (selection == "max.volume") {
     qData <- qData[, MAXBID := max(BIDSIZ), by = list(DT, SYMBOL)][, MAXOFR := max(OFRSIZ), by = "DT"][
-      , BIDSIZ := ifelse(BIDSIZ == MAXBID, 1, 0)][
-      , OFRSIZ := ifelse(OFRSIZ == MAXOFR, 1, 0)][
+      , BIDSIZ := fifelse(BIDSIZ == MAXBID, 1, 0)][
+      , OFRSIZ := fifelse(OFRSIZ == MAXOFR, 1, 0)][
       , BID := BID * BIDSIZ][
       , OFR := OFR * OFRSIZ][
       , BID := max(BID), by = "DT"][, OFR := max(OFR), by = list(DT, SYMBOL)][, -c("MAXBID", "MAXOFR", "BIDSIZ", "OFRSIZ")][
@@ -1176,7 +1252,7 @@ mergeTradesSameTimestamp <- function(tData, selection = "median") {
   if (selection == "max.volume") {
     tData[, SIZE := as.numeric(as.character(SIZE))]
     tData <- tData[, `:=` (MAXSIZE = max(SIZE), NUMTRADES = .N), by = list(DT, SYMBOL)]
-    tData[, SIZE := ifelse(SIZE == MAXSIZE, 1, 0)]
+    tData[, SIZE := fifelse(SIZE == MAXSIZE, 1, 0)]
     tData[, PRICE := PRICE * SIZE]
     tData[, PRICE := max(PRICE), by = "DT"]
     tData[, SIZE := MAXSIZE]
@@ -1986,9 +2062,9 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, 
     nresult[2] <- dim(tDataRaw)[1] 
     tDataRaw <- tDataRaw[EX %in% exchanges]
     nresult[3] <- dim(tDataRaw)[1] 
-    tData <- salesCondition(tDataRaw, validConds)
+    tDataRaw <- salesCondition(tDataRaw, validConds)
     nresult[4] <- dim(tDataRaw)[1] 
-    tDataRaw <- mergeTradesSameTimestamp(tData, selection = selection)
+    tDataRaw <- mergeTradesSameTimestamp(tDataRaw, selection = selection)
     nresult[5] <- dim(tDataRaw)[1] 
     
     if (dummy_was_xts) {

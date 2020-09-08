@@ -3,7 +3,7 @@
 \name{ReMeDI}
 \alias{ReMeDI}
 \title{ReMeDI
-estimates auto-covariance of market-microstructure noise}
+This function estimates the auto-covariance of market-microstructure noise}
 \usage{
 ReMeDI(pData, kn = 1, lags = 1, knEqual = FALSE, makeCorrelation = FALSE)
 }
@@ -14,20 +14,27 @@ ReMeDI(pData, kn = 1, lags = 1, knEqual = FALSE, makeCorrelation = FALSE)
 
 \item{lags}{numeric containing integer values indicating}
 
-\item{knEqual}{Use an altered version of the ReMeDI estimator, where we instead use equal kn, instead of kn and 2kn}
 
-\item{makeCorrelation}{logical indicating whether to transform the autocovariances into autocorrelations}
+\item{knEqual}{Use an altered version of the ReMeDI estimator, where we instead use equal kn, instead of kn and 2*kn for the windows. See Figure 1 of paper in reference section.}
+
+\item{makeCorrelation}{logical indicating whether to transform the autocovariances into autocorrelations. The estimate of variance is unprecise and thus, constructing the correlation like this may show correlations that fall outside (-1,1)}
+
 }
 \description{
 ReMeDI
-estimates auto-covariance of market-microstructure noise
+This function estimates the auto-covariance of market-microstructure noise
 }
 \examples{
-remed <- ReMeDI(sampleTDataMicroseconds[as.Date(DT) == "2018-01-02", ], kn = 5, lags = 1:8)
-plot.ts(remed)
+remed <- ReMeDI(sampleTDataMicroseconds[as.Date(DT) == "2018-01-02", ], kn = 2, lags = 1:8)
+# We can also use the algorithm for choosing the kn to 
+optimalKn <- knChooseReMeDI(sampleTDataMicroseconds[as.Date(DT) == "2018-01-02",],
+                            knMax = 10, tol = 0.05, size = 3,
+                            lower = 2, upper = 5, plot = TRUE)
+optimalKn 
+remed <- ReMeDI(sampleTDataMicroseconds[as.Date(DT) == "2018-01-02", ], kn = optimalKn, lags = 1:8)
 }
 \references{
-Li and Linton (2018) (Working paper): "A ReMeDI for microstructure noise."
+Li and Linton (2019) (Working paper): "A ReMeDI for microstructure noise."
 }
 \author{
 Emil Sjoerup

@@ -126,3 +126,21 @@ arma::uword findFirst(arma::vec& x , const int thresh){
 bool overlap(double min1, double max1, double min2, double max2){
   return (std::max(0.0, ((double) std::min(max1, max2) - (double) std::max(min1, min2))) > 0.0);
 }
+
+
+// [[Rcpp::export]]
+arma::vec mSeq(arma::vec starts, arma::vec ends, double scaleFactor){ // multiple sequence with same step length but differing start and end (the differences between these are the same)
+  
+  arma::mat out = mat(floor((ends(0) - starts(0))/scaleFactor) + 1, starts.n_elem);
+
+  for(arma::uword j = 0; j < out.n_cols; j++){
+    out.col(j) = regspace(starts(j), scaleFactor, ends(j));
+  }
+  //arma::mat out = regspace<arma::mat>(starts, scaleFactor, ends);
+  return vectorise(out);
+  
+}
+
+
+
+

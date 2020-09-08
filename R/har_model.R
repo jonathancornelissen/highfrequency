@@ -1,71 +1,3 @@
-#' @importFrom zoo rollmean
-#' @keywords internal
-aggRV <- function(RM1, periods, type = "RV") {
-  n <- length(RM1);
-  nperiods <- length(periods)
-  RVmatrix1 <- matrix(nrow = n, ncol = nperiods)
-  for (i in 1:nperiods) {
-    if (periods[i]==1) {
-      RVmatrix1[,i] <- RM1
-    } else {
-      RVmatrix1[(periods[i]:n),i] = rollmean(x = RM1,k = periods[i], align = "left")
-    }
-  } #end loop over periods for standard RV estimator
-  colnames(RVmatrix1) <- paste(type, periods, sep = "")
-  return(RVmatrix1)
-}
-
-#' @importFrom zoo rollmean
-#' @keywords internal
-aggJ <- function(J, periodsJ) {
-  n <- length(J);
-  nperiods <- length(periodsJ)
-  JM <- matrix(nrow = n, ncol = nperiods)
-  for (i in c(1:nperiods)) {
-    if (periodsJ[i] == 1) {
-      JM[,i] <- J
-    } else {
-      JM[(periodsJ[i]:n),i] <- rollmean(x = J, k = periodsJ[i], align = "left")
-    }
-  } # End loop over periods for standard RV estimator
-  colnames(JM) <- paste("J",periodsJ, sep = "")
-  return(JM)
-}
-
-#' @importFrom zoo rollmean
-#' @keywords internal
-aggY <- function(RM1,h,maxp) {
-  n <-  length(RM1)
-  if (h == 1) {
-    y <- RM1[(maxp+1):n]
-  }
-  if (h != 1) {
-    y <- matrix( nrow=length(RM1), ncol=1 )
-    colnames(y) <- "y"
-    y[(h:n),] <- rollmean(x = RM1,k = h,align = "left")
-    y <- matrix(y[((maxp+h):n),], ncol = 1)
-    y <- as.data.frame(y)
-  }
-  return(y)
-}
-
-#' @importFrom zoo rollmean
-#' @keywords internal
-aggRQ <- function(RM3, periods, type = "RQ"){
-  n <- length(RM3)
-  nperiods <- length(periods)
-  RQmatrix <- matrix(nrow = n, ncol = nperiods)
-  for(i in 1:nperiods){
-    if (periods[i]==1) {
-      RQmatrix[,i] <- RM3
-    } else {
-      RQmatrix[(periods[i]:n),i] <- rollmean(x = RM3, k = periods[i], align = "left")
-    }
-  } #end loop over periods for standard RV estimator
-  colnames(RQmatrix) <- paste(type, periods, sep = "")
-  return(RQmatrix)
-}
-
 #' @importFrom stats lm formula
 #' @keywords internal
 estimhar <- function(y, x){ #Potentially add stuff here
@@ -725,8 +657,8 @@ predict.harModel <- function(object, newdata = NULL, warnings = TRUE, ...) {
       x2 <- RVmatrix2[(maxp:(n-h)), ]
     }  # In case a jumprobust estimator is supplied
     if (type %in% quarticityModels) { #in case realized quarticity estimator is supplied
-      RQmatrix <- aggRQ(RM3,periodsQ)[(maxp:(n - h)), ]
-      RVmatrix1 <- har_agg(RM3, periodsQ, nperiodsQ)
+      # RQmatrix <- aggRQ(RM3,periodsQ)[(maxp:(n - h)), ]
+      RQmatrix <- har_agg(RM3, periodsQ, nperiodsQ)
       colnames(RVmatrix1) <- paste0("RV", periods)
       if(nperiodsQ == 1){
         RQmatrix <- as.matrix(sqrt(RQmatrix) - sqrt(mean(RM3)))

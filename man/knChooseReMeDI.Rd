@@ -7,6 +7,7 @@ function to choose the tuning parameter, kn in ReMeDI estimation}
 \usage{
 knChooseReMeDI(
   pData,
+  knEqual = FALSE,
   knMax = 10,
   tol = 0.05,
   size = 3,
@@ -17,6 +18,8 @@ knChooseReMeDI(
 }
 \arguments{
 \item{pData}{xts or data.table containing the log-prices of the asset.}
+
+\item{knEqual}{Use an altered version of the ReMeDI estimator, where we instead use equal kn, instead of kn and 2*kn for the windows. See Figure 1 of paper in reference section.}
 
 \item{knMax}{max value of kn to be considered}
 
