@@ -325,7 +325,7 @@ checktData <- function(tData) {
   
   if (is.data.table(tData)) {
     if (typeof(tData$PRICE) != "double") {
-      warning("Column PRICE should be of type double.")
+      stop("Column PRICE should be of type double.")
     }
   }
 }
@@ -348,10 +348,10 @@ checkqData <- function(qData) {
   }
   if (is.data.table(qData)) {
     if (typeof(qData$BID) != "double") {
-      warning("Column BID should be of type double.")
+      stop("Column BID should be of type double.")
     }
     if (typeof(qData$OFR) != "double") {
-      warning("Column OFR should be of type double.")
+      stop("Column OFR should be of type double.")
     }
   }
 }
