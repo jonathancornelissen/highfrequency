@@ -20,7 +20,7 @@
 #' These arguments default to 300 and 5 respectively.
 #'
 #'
-#' @references Christensen, Oomen and Reno (2018) <DOI:10.2139/ssrn.2842535>.
+#' @references Christensen, Oomen and Reno (2018): The drift burst hypothesis (working paper) <DOI:10.2139/ssrn.2842535>.
 #' @author Emil Sjoerup
 #' @keywords Drift
 #'

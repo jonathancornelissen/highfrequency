@@ -2308,9 +2308,12 @@ refreshTime <- function (pData, sort = FALSE, criterion = "squared duration") {
 
 #' Business time aggregation
 #' 
+#' Time series aggregation based on `business time` statistics. Instead of equidistant sampling based on time during a trading day, business time sampling creates measures and samples equidistantly using these instead.
+#' For example when sampling based on volume, business time aggregation will result in a time series that has an equal amount of volume between each observation (if possible).
+#' 
 #' @param pData xts or data.table containing data to aggregate.
 #' @param measure character denoting which measure to use. Valid options are "intensity", "vol", and "volume", denoting the trade intensity process of Oomen (2005),
-#' volatility, and volume, respectively.
+#' volatility, and volume, respectively. Default is "volume"
 #' @param obs integer valued numeric of length 1 denoting how many observations is wanted after the aggregation procedure.
 #' @param bandwidth numeric of length one, denoting which bandwidth parameter to use in the trade intensity process estimation of Oomen (2005.)
 #' @param ... extra arguments passed on to \code{\link{spotVol}} when measure is "vol"
@@ -2332,7 +2335,7 @@ refreshTime <- function (pData, sort = FALSE, criterion = "squared duration") {
 #' rCov(agged$pData[,"PRICE"], makeReturns = TRUE)
 #' rCov(pData[,"PRICE"], makeReturns = TRUE, alignBy = "minutes", alignPeriod = 5)
 #' 
-#' @references Roel C.A. Oomen Properties of realized variance under alternative sampling schemes. (2006) Journal of Business & Economic Statistics 24, pages 219-237
+#' @references Roel C. A. Oomen Properties of realized variance under alternative sampling schemes. (2006) Journal of Business & Economic Statistics 24, pages 219-237
 #' 
 #' Yingjie Dong and Yiu Kuen Tse. (2017) Business time sampling scheme with applications to testing semi-martingale hypothesis and estimating integrated volatility. Econometrics, 5
 #' 
@@ -2341,7 +2344,7 @@ refreshTime <- function (pData, sort = FALSE, criterion = "squared duration") {
 #' @importFrom data.table copy as.xts.data.table
 #' @author Emil Sjoerup
 #' @export
-businessTimeAggregation <- function(pData, measure = "intensity", obs = 390, bandwidth = 0.075, ...){
+businessTimeAggregation <- function(pData, measure = "volume", obs = 390, bandwidth = 0.075, ...){
   aggregated <- SIZE <- PRICE <- DT <- intensityProcess <- NULL
   if(length(measure) > 1){
     measures <- measure[1]

@@ -16,9 +16,9 @@
 #' 
 #' Maintainer: Kris Boudt <Kris.Boudt@ugent.be>
 #' 
-#' Contributors: Giang Nguyen, Onno Kleen
+#' Contributors: Giang Nguyen, Onno Kleen, Emil Sjoerup
 #' 
-#' Thanks: We would like to thank Brian Peterson, Chris Blakely, Eric Zivot and Maarten Schermer. We are also grateful to Dirk Eddelbuettel for his extraordinary support as a mentor during the Google Summmer of Code 2019. Moreover, we thank Emil Sjørup for implementing additional options in the harModel function.
+#' Thanks: We would like to thank Brian Peterson, Chris Blakely, Eric Zivot and Maarten Schermer. We are also grateful to Dirk Eddelbuettel for his extraordinary support as a mentor during the Google Summmer of Code 2019.
 #'
 #' @useDynLib highfrequency, .registration = TRUE
 "_PACKAGE"
