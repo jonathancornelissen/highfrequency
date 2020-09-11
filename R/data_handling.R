@@ -228,7 +228,7 @@ aggregateTS <- function (ts, FUN = "previoustick", on = "minutes", k = 1, weight
 aggregatePrice <- function(pData, on = "minutes", k = 1, marketOpen = "09:30:00", marketClose = "16:00:00" , fill = FALSE, tz = NULL) {
   ## checking
   pData <- checkColumnNames(pData)
-  N <- DATE <- DT <- FIRST_DT <- DT_ROUND <- LAST_DT <- SYMBOL <- PRICE <- NULL
+  .I <- .N <- N <- DATE <- DT <- FIRST_DT <- DT_ROUND <- LAST_DT <- SYMBOL <- PRICE <- NULL
 
   on_true <- NULL
 
@@ -1091,7 +1091,7 @@ matchTradesQuotes <- function(tData, qData, adjustment = 2) {
   
   
   if (dummy_was_xts == TRUE) {
-    return(xts(as.matrix(tqData[, -c("DT")]), order.by = tqData$DT, tz = tz))
+    return(xts(as.matrix(tqData[, -c("DT")]), order.by = tqData$DT, tzone = tz))
   } else {
     return(tqData)
   }
