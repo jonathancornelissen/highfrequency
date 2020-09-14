@@ -532,7 +532,7 @@ intradayJumpTest <- function(pData, volEstimator = "RM", driftEstimator = "none"
     prices <- aggregatePrice(pData, on = on, k = k , marketOpen = marketOpen,
                    marketClose = marketClose, tz = tz, fill = TRUE)
     setkeyv(prices, "DT")
-    prices[, DATE := as.Date(DT, tz = tzone(prices$DT))]
+    prices[, DATE := as.Date(DT, tz = tz)]
     returns <- prices[, RETURN := log(PRICE) - shift(log(PRICE), type = "lag"), by = "DATE"][!is.na(RETURN)]
     
   } else { # volEstimator == "PARM" i.e. we have pre-averaged realized measures
@@ -545,9 +545,9 @@ intradayJumpTest <- function(pData, volEstimator = "RM", driftEstimator = "none"
     if (isMultiDay) {
       dates <- NULL 
       if(is.data.table(pData)){
-        dates <- unique(as.Date(pData$DT))
+        dates <- unique(as.Date(pData$DT, tz = tz))
       } else {
-        dates <- unique(as.Date(index(pData)))
+        dates <- unique(as.Date(index(pData), tz = tz))
       }
       
       preAveragedReturns <- testingIndices <- c()
@@ -559,7 +559,7 @@ intradayJumpTest <- function(pData, volEstimator = "RM", driftEstimator = "none"
           tmp <- tmp[-length(tmp)]
         } 
         testingIndices <- c(testingIndices, tmp)
-        preAveragedReturns <- c(preAveragedReturns, c(as.numeric(hatreturn(as.xts(pData[as.Date(pData$DT) == dates[d]])$PRICE, vol$kn[d])), rep(NA, vol$kn[d] - 2)))
+        preAveragedReturns <- c(preAveragedReturns, c(as.numeric(hatreturn(as.xts(pData[as.Date(pData$DT, tz = tz) == dates[d]])$PRICE, vol$kn[d])), rep(NA, vol$kn[d] - 2)))
       }
       
       returns <- pData[, RETURN := preAveragedReturns][testingIndices, "RETURN"]
@@ -602,7 +602,7 @@ intradayJumpTest <- function(pData, volEstimator = "RM", driftEstimator = "none"
   criticalValue <- Cn + Sn * betastar
   
   if (dataWasXts) {
-    pData <- as.xts(pData[ , list(DT, PRICE)])
+    pData <- as.xts(pData[ , list(DT, PRICE)], tz = tz)
   } else {
     pData <- pData[ , list(DT, PRICE)]
   }

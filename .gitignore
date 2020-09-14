@@ -45,3 +45,6 @@ article/*.synctex.gz
 article/*.sty
 article/article-concordance.tex
 article/article.tex
+article/
+article/*
+article/article.Rnw

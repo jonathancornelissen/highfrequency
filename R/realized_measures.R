@@ -2483,7 +2483,7 @@ listCholCovEstimators <- function(){
 #' @param kn numeric of length 1 determining the tuning parameter kn this controls the lengths of the non-overlapping interval in the ReMeDI estimation
 #' @param lags numeric containing integer values indicating
 #' @param knEqual Use an altered version of the ReMeDI estimator, where we instead use equal kn, instead of kn and 2*kn for the windows. See Figure 1 of paper in reference section.
-#' @param makeCorrelation logical indicating whether to transform the autocovariances into autocorrelations
+#' @param makeCorrelation logical indicating whether to transform the autocovariances into autocorrelations. The estimate of variance is unprecise and thus, constructing the correlation like this may show correlations that fall outside (-1,1)
 #' 
 #' @references Li and Linton (2019) (Working paper): "A ReMeDI for microstructure noise."
 #' @keywords microstructure noise autocovariance autocorrelation
@@ -2496,6 +2496,7 @@ listCholCovEstimators <- function(){
 #'                             lower = 2, upper = 5, plot = TRUE)
 #' optimalKn 
 #' remed <- ReMeDI(sampleTDataMicroseconds[as.Date(DT) == "2018-01-02", ], kn = optimalKn, lags = 1:8)
+
 #' @author Emil Sjoerup
 #' @export
 ReMeDI <- function(pData, kn = 1, lags = 1, knEqual = FALSE,
@@ -2503,9 +2504,9 @@ ReMeDI <- function(pData, kn = 1, lags = 1, knEqual = FALSE,
                    makeCorrelation = FALSE){
   time <- DT <- PRICE <- NULL
   # Check input
-  
-  if(is.logical(knEqual)){
-    
+
+  if(!is.logical(knEqual)){
+    stop("knEqual must be logical")
   }
   
   if(is.data.table(pData)){ # We have a data.table
@@ -2569,7 +2570,8 @@ ReMeDI <- function(pData, kn = 1, lags = 1, knEqual = FALSE,
   }
   
   for (lag in lags) {
-    thisLag <- c(lag, 0)
+
+    # thisLag <- c(lag, 0)
     #remedi <- (kn[2] + 1):(nObs - lag + kn[1])
     #idx <- 1
     remedi <- 0
@@ -2580,7 +2582,7 @@ ReMeDI <- function(pData, kn = 1, lags = 1, knEqual = FALSE,
     
     idx <- seq_len((nObs - (3-foo) * (-kn[1]) - lag))
     remedi <- sum((prices[idx + (2-foo) * (-kn[1])] - prices[idx]) * (prices[idx + (3-foo) * (-kn[1]) + lag] - prices[idx + (2-foo) * (-kn[1]) + lag]))
-    
+
     # ## Use the time corrections Muzafer provided
     # if(correctTime){
     # 
@@ -2623,7 +2625,8 @@ ReMeDI <- function(pData, kn = 1, lags = 1, knEqual = FALSE,
     #
     #
 
-    res[resIDX] <- sum(-remedi) / (nObs - (3-foo) * (-kn[1]) - lag)
+    res[resIDX] <- -remedi/(nObs - (3-foo) * (-kn[1]) - lag)
+
     resIDX <- resIDX +1
   }
 

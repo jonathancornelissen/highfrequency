@@ -51,6 +51,10 @@ overlap <- function(min1, max1, min2, max2) {
     .Call(`_highfrequency_overlap`, min1, max1, min2, max2)
 }
 
+mSeq <- function(starts, ends, scaleFactor) {
+    .Call(`_highfrequency_mSeq`, starts, ends, scaleFactor)
+}
+
 leadLagCpp <- function(x, timestampsX, y, timestampsY, lags, normalize) {
     .Call(`_highfrequency_leadLagCpp`, x, timestampsX, y, timestampsY, lags, normalize)
 }

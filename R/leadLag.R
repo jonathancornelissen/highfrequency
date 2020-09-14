@@ -1,5 +1,5 @@
 #' Lead-Lag estimation
-#' @description Function that estimates the whether one series leads (or lags) another.
+#' @description Function that estimates whether one series leads (or lags) another.
 #' 
 #' @param price1 xts or data.table containing prices in levels, in case of data.table,
 #'  use a column DT to denote the date-time in POSIXct format, and a column PRICE to denote the price
