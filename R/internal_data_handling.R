@@ -292,7 +292,7 @@ has.Vo<-function (x, which = FALSE){
 #' position of those columns.
 #' 
 #' @param x data object
-#' @param which disply position of match
+#' @param which display position of match
 #' 
 #' @export
 hasQty <- function(x, which = FALSE) {

@@ -76,7 +76,7 @@ The respective liquidity measures are defined as follows:
    so this is were the time indication refers to (and thus not to the registered quote timestamp).
  } 
  
- \item{depthImbalanceRatio: depth imbalace (as ratio)}{
+ \item{depthImbalanceRatio: depth imbalance (as ratio)}{
    \deqn{
      \mbox{depth imbalance (as ratio)}_t =  (\frac{\mbox{OFRSIZ}_{t}}{\mbox{BIDSIZ}_{t}})^{D_t},
    }

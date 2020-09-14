@@ -1,6 +1,6 @@
 
 #' HEAVY Model estimation
-#' @description This function calculatest the High frEquency bAsed VolatilitY (HEAVY) model proposed in Shephard and Sheppard (2010). This function is used as a predictive volatility model built to exploit highfrequency data.
+#' @description This function calculates the High frEquency bAsed VolatilitY (HEAVY) model proposed in Shephard and Sheppard (2010). This function is used as a predictive volatility model built to exploit highfrequency data.
 #'
 #' @param data a (T x K) matrix containing the data, with T the number of days. For the traditional HEAVY model: K = 2, the first column contains the squared daily demeaned returns, the second column contains the realized measures.
 #' @param p a (K x K) matrix containing the lag length for the model innovations. Position (i, j) in the matrix indicates the number of lags in equation i of the model for the innovations in data column j. For the traditional heavy model p is given by matrix(c(0,0,1,1), ncol = 2) (default).
@@ -13,7 +13,7 @@
 #'
 #' @details Assume there are \eqn{T} daily returns and realized measures in the period \eqn{t}. Let \eqn{r_i} and \eqn{RM_i} be the \eqn{i^{th}} daily return and daily realized measure respectively (with \eqn{i=1, \ldots,T}).
 #'
-#' The most basic heavy model is the one with lag matrices p of \eqn{\left( \begin{array}{ccc} 0 & 1 \\ 0 & 1 \end{array} \right)} and q of \eqn{\left( \begin{array}{ccc} 1 & 0 \\ 0 & 1 \end{array} \right)}. This can be reprensented by the following equations:
+#' The most basic heavy model is the one with lag matrices p of \eqn{\left( \begin{array}{ccc} 0 & 1 \\ 0 & 1 \end{array} \right)} and q of \eqn{\left( \begin{array}{ccc} 1 & 0 \\ 0 & 1 \end{array} \right)}. This can be represented by the following equations:
 #' \deqn{
 #'      \mbox{var}{\left(r_t \right)} = h_t = w + \alpha RM_{t-1} + \beta h_{t-1}; w,\alpha \geq 0, \beta \in [0,1]
 #' }

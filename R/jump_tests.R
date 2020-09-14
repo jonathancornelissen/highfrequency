@@ -162,7 +162,7 @@ AJjumpTest <- function(pData, p = 4 , k = 2, alignBy = NULL, alignPeriod = NULL,
 #' Barndorff-Nielsen and Shephard (2006) tests for the presence of jumps in the price series.
 #' 
 #' @description This test examines the presence of jumps in highfrequency price series. It is based on theory of Barndorff- Nielsen and Shephard (BNS). The null hypothesis is no jumps. 
-#' Depending on the choice of estimator (integrated variance (IVestimator), integrated quarticity (IQestimator)), mechanism (linear, ratio) and adjustment (logarith), the function returns the result.
+#' Depending on the choice of estimator (integrated variance (IVestimator), integrated quarticity (IQestimator)), mechanism (linear, ratio) and adjustment (logarithm), the function returns the result.
 #' Function returns three outcomes: 1.z-test value 2.critical value(with confidence level of 95\%) and 3.pvalue of the test. 
 #' Assume there is \eqn{N} equispaced returns in period \eqn{t}. 
 #' 
@@ -183,7 +183,7 @@ AJjumpTest <- function(pData, p = 4 , k = 2, alignBy = NULL, alignPeriod = NULL,
 #' @param IVestimator can be chosen among jump robust integrated variance estimators: BV, minRV, medRV and corrected threshold bipower variation (CTBV). If CTBV is chosen, an argument of \eqn{startV}, start point of auxiliary estimators in threshold estimation (Corsi et al. (2010) can be included. BV by default.
 #' @param IQestimator can be chosen among jump robust integrated quarticity estimators: TP, QP, minRQ and medRQ. TP by default.
 #' @param type a method of BNS testing: can be linear or ratio. Linear by default.
-#' @param logTransform boolean, should be TRUE when QVestimator and IVestimator are in logarith form. FALSE by default.
+#' @param logTransform boolean, should be TRUE when QVestimator and IVestimator are in logarithm form. FALSE by default.
 #' @param max boolean, should be TRUE when max adjustment in SE. FALSE by default.
 #' @param alignBy a string, align the tick data to "seconds"|"minutes"|"hours".
 #' @param alignPeriod an integer, align the tick data to this many [seconds|minutes|hours].
@@ -439,7 +439,7 @@ JOjumpTest <- function(pData, power = 4, alignBy = NULL, alignPeriod = NULL, alp
 #' 
 #' @param pData xts or data.table of the price data in levels. This data can (and should in some cases) be tick-level data. The data can span more than one day.
 #' @param volEstimator character denoting which volatility estimator to use for the tests. See \link{spotVol}. Default = \code{"RM"} denoting realized measures.
-#' @param driftEstimator character denoting which drift estimator to use for the tests. See \link{spotDrift}. Default = \code{"none"} denoting no drift esitmation.
+#' @param driftEstimator character denoting which drift estimator to use for the tests. See \link{spotDrift}. Default = \code{"none"} denoting no drift estimation.
 #' @param alpha numeric of length one determining what confidence level to use when constructing the critical values.
 #' @param ... extra arguments passed on to \code{\link{spotVol}} for the volatility estimation, and to \code{\link{spotDrift}}.
 #' @param on string indicating the time scale in which \code{k} is expressed.

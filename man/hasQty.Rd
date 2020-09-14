@@ -9,7 +9,7 @@ hasQty(x, which = FALSE)
 \arguments{
 \item{x}{data object}
 
-\item{which}{disply position of match}
+\item{which}{display position of match}
 }
 \description{
 A set of functions to check for appropriate TBBO/BBO and price column

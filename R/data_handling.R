@@ -874,7 +874,7 @@ autoSelectExchangeQuotes <- function(qData) {
 #' @param data a data.table or xts object containing the time series data. 
 #' Multiple days of input are allowed.
 #' @param dayBegin character in the format of \"HH:MM:SS\",
-#' specifying the starting hour, minute and second of an exhange
+#' specifying the starting hour, minute and second of an exchange
 #' trading day.
 #' @param dayEnd character in the format of \"HH:MM:SS\^",
 #' specifying the closing hour, minute and second of an exchange
@@ -1935,7 +1935,7 @@ selectExchange <- function(data, exch = "N") {
 #' 
 #' Since the function \code{\link{rmTradeOutliersUsingQuotes}}
 #' also requires cleaned quote data as input, it is not incorporated here and
-#' there is a seperate wrapper called \code{\link{tradesCleanupUsingQuotes}}.
+#' there is a separate wrapper called \code{\link{tradesCleanupUsingQuotes}}.
 #' 
 #' @param dataSource character indicating the folder in which the original data is stored.
 #' @param dataDestination character indicating the folder in which the cleaned data is stored.
@@ -2232,7 +2232,7 @@ tradesCleanupUsingQuotes <- function(tradeDataSource = NULL, quoteDataSource = N
 #' 
 #' @return An xts object containing the synchronized time series.
 #' 
-#' @references Harris, F., T. McInish, G. Shoesmith, and R. Wood (1995). Cointegration, error correction, and price discovery on infomationally linked security markets. Journal of Financial and Quantitative Analysis 30, 563-581.
+#' @references Harris, F., T. McInish, G. Shoesmith, and R. Wood (1995). Cointegration, error correction, and price discovery on informationally linked security markets. Journal of Financial and Quantitative Analysis 30, 563-581.
 #' 
 #' @examples 
 #' # Suppose irregular timepoints:

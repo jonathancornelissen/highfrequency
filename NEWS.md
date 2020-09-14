@@ -9,7 +9,7 @@ Changes in version 0.7.0
  - harModel now includes Newey-West standard errors in the output.
  - Bugfix for refreshTime function and large performance improvement
  - Implement CholCov estimator in rCholCov
- - Bugfixes in data handling functions, which sometimes produced different results depending on the options(digits.secs) setting. Most data handling functions now run considerably faster as a concequence of internally using numerics for timestamps.
+ - Bugfixes in data handling functions, which sometimes produced different results depending on the options(digits.secs) setting. Most data handling functions now run considerably faster as a consequence of internally using numerics for timestamps.
  - Implemented new realized semi-covariance estimator in rSemiCov
  - Implemented new lead-lag estimation in leadLag
  - Implemented ReMeDI estimation in ReMeDI
