@@ -14,7 +14,7 @@ realizedLibrary
 A data.frame object containing the daily open-close returns, daily realized variances based on 
 five-minute intraday returns and daily realized kernels ranging from 2000-01-03 up to 2019-06-10 for the S&P 500. 
 Use \code{colnames(realizedLibrary)} to see which realized measures. 
-The full library of the Oxford-Man Institute of Quantitative Finance can be found on their website: \url{http://realized.oxford-man.ox.ac.uk}.
+The full library of the Oxford-Man Institute of Quantitative Finance can be found on their website: \url{https://realized.oxford-man.ox.ac.uk/}.
 }
 \references{
 Gerd Heber, Asger Lunde, Neil Shephard, and Kevin Sheppard (2009)
