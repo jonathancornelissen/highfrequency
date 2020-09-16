@@ -2369,7 +2369,7 @@ businessTimeAggregation <- function(pData, measure = "volume", obs = 390, bandwi
     }
   }
   
-  
+  setkey(pData, DT)
   dates <- as.character(unique(as.Date(pData[,DT])))
   pDataBackcup <- copy(pData)
   ITP <- list() # Container for trade intensity process.
@@ -2419,7 +2419,6 @@ businessTimeAggregation <- function(pData, measure = "volume", obs = 390, bandwi
     ITP[[date]] <- intensityProcess
     aggregated <- rbind(aggregated, pData)
   }
-  
   
   
   if(inputWasXTS){
