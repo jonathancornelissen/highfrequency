@@ -38,30 +38,29 @@ checkColumnNames <- function(data) {
   }
   
   if(is.data.table(data)){
+    # Change column names to previous RTAQ format! 
+    # Adjust price col naming:  
+    try(setnames(data, "Price", "PRICE", skip_absent = TRUE), silent = TRUE)
     
-  # Change column names to previous RTAQ format! 
-  # Adjust price col naming:  
-  try(setnames(data, "Price", "PRICE", skip_absent = TRUE), silent = TRUE)
-  
-  # Adjust Bid col naming:    
-  try(setnames(data, "Bid", "BID", skip_absent = TRUE), silent = TRUE)
-  # Adjust Ask col naming:    
-  try(setnames(data, "Ask", "OFR", skip_absent = TRUE), silent = TRUE)
-  try(setnames(data, "ASK", "OFR", skip_absent = TRUE), silent = TRUE)
-  # Adjust SYMBOL col naming:    
-  try(setnames(data, "SYM_ROOT", "SYMBOL", skip_absent = TRUE), silent = TRUE)
-  
-  # Adjust Ask size col naming:
-  try(setnames(data, "BidSize", "BIDSIZ", skip_absent = TRUE), silent = TRUE)
-  
-  # Adjust Bid size col naming:    
-  try(setnames(data, "AskSize", "OFRSIZ", skip_absent = TRUE), silent = TRUE)
-  # Adjust Bid size col naming:    
-  try(setnames(data, "ASKSIZ", "OFRSIZ", skip_absent = TRUE), silent = TRUE)
-  
-  
-  try(setnames(data, "TR_SCOND", "COND", skip_absent = TRUE), silent = TRUE)
-  try(setnames(data, "CR", "CORR", skip_absent = TRUE), silent = TRUE)  
+    # Adjust Bid col naming:    
+    try(setnames(data, "Bid", "BID", skip_absent = TRUE), silent = TRUE)
+    # Adjust Ask col naming:    
+    try(setnames(data, "Ask", "OFR", skip_absent = TRUE), silent = TRUE)
+    try(setnames(data, "ASK", "OFR", skip_absent = TRUE), silent = TRUE)
+    # Adjust SYMBOL col naming:    
+    try(setnames(data, "SYM_ROOT", "SYMBOL", skip_absent = TRUE), silent = TRUE)
+    
+    # Adjust Ask size col naming:
+    try(setnames(data, "BidSize", "BIDSIZ", skip_absent = TRUE), silent = TRUE)
+    
+    # Adjust Bid size col naming:    
+    try(setnames(data, "AskSize", "OFRSIZ", skip_absent = TRUE), silent = TRUE)
+    # Adjust Bid size col naming:    
+    try(setnames(data, "ASKSIZ", "OFRSIZ", skip_absent = TRUE), silent = TRUE)
+    
+    
+    try(setnames(data, "TR_SCOND", "COND", skip_absent = TRUE), silent = TRUE)
+    try(setnames(data, "CR", "CORR", skip_absent = TRUE), silent = TRUE)  
   }
   
   
