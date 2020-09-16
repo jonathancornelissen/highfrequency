@@ -906,13 +906,40 @@ exchangeHoursOnly <- function(data, dayBegin = "09:30:00", dayEnd = "16:00:00") 
       stop("Data.table neeeds DT column.")
     }
   }
-  timeZone <- tzone(data$DT)
+  
+  timeZone <- attr(data$DT, "tzone")
+  if(timeZone == ""){
+    if(is.null(tz)){
+      tz <- "UTC"
+    }
+    data[, DT := as.POSIXct(format(DT, digits = 20, nsmall = 20), tz = tz)]
+  } else {
+    tz <- timeZone
+  }
+  data <- copy(data) # We need to copy the data so as to not change the user's data
+  setkey(data, DT) # The below code MAY fail with data with unordered DT column. Also setkey inceases speed of grouping
+  data[, DATE := as.Date(floor(as.numeric(DT, tz = tz) / 86400), origin = "1970-01-01", tz = tz)]
+  dates <- unique(data[,DATE])
   # data <- data[DT >= ymd_hms(paste(as.Date(data$DT), dayBegin), tz = tzone(data$DT))]
   # data <- data[DT <= ymd_hms(paste(as.Date(data$DT), dayEnd), tz = tzone(data$DT))]
-  marketOpenNumeric <- as.numeric(as.POSIXct(paste("1970-01-01", dayBegin), format = "%Y-%m-%d %H:%M:%OS", tz = timeZone), tz = timeZone)
-  marketCloseNumeric <- as.numeric(as.POSIXct(paste("1970-01-01", dayEnd), format = "%Y-%m-%d %H:%M:%OS", tz = timeZone), tz = timeZone)
+  marketOpenNumeric <- as.numeric(as.POSIXct(paste(dates, marketOpen), format = "%Y-%m-%d %H:%M:%OS", tz = tz), tz = tz)
+  marketCloseNumeric <- as.numeric(as.POSIXct(paste(dates, marketClose), format = "%Y-%m-%d %H:%M:%OS", tz = tz), tz =tz)
   
-  data <- data[between(as.numeric(DT, tz = tzone(data$DT)) %% 86400, marketOpenNumeric, marketCloseNumeric)]
+  obsPerDay <- data[, .N, by = DATE][,N]
+  
+  ## Here we make sure that we can correctly handle times that happen before midnight in the corrected timestamps from the flag if statements
+  if(length(marketOpenNumeric) != length(obsPerDay)){
+    if(length(marketOpenNumeric) < length(obsPerDay)){ ## Here we add entries
+      marketOpenNumeric <- rep(marketOpenNumeric, length(obsPerDay))[1:length(obsPerDay)]
+      marketCloseNumeric <- rep(marketCloseNumeric, length(obsPerDay))[1:length(obsPerDay)]
+    } else {
+      stop("unknown error occured in aggregatePrice")
+    }
+    
+  }
+  
+  # Subset observations that does not fall between their respective market opening and market closing times.
+  data <- data[between(DT, rep(marketOpenNumeric, obsPerDay), rep(marketCloseNumeric, obsPerDay))]
   
   if (dummy_was_xts == TRUE) {
     return(xts(as.matrix(data[, -c("DT")]), order.by = data$DT, tzone = tzone(data$DT)))
@@ -920,6 +947,9 @@ exchangeHoursOnly <- function(data, dayBegin = "09:30:00", dayEnd = "16:00:00") 
     return(data)
   }
 }
+
+
+
 
 #' Get price column(s) from a timeseries
 #' @description Will attempt to locate price column(s) from a time series with rational defaults.
