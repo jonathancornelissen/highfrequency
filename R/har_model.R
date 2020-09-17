@@ -1,16 +1,33 @@
 #' @importFrom stats lm formula
+#' @importFrom xts xts 
+#' @importFrom zoo index
 #' @keywords internal
-estimhar <- function(y, x){ #Potentially add stuff here
+estimhar <- function(y, x, externalRegressor){ #Potentially add stuff here
   colnames(y) <- "y"
-  output <- lm(formula(y ~ .), data = cbind(y, x)) ##Changed this to y~. because I got an error that the data was a list, even though class(data) was data.frame (only happened when using leverage)
+  if(is.xts(y)){
+    output <- lm(formula(y ~ .), data = xts(cbind(y, x, externalRegressor), order.by = index(y))) ##Changed this to y~. because I got an error that the data was a list, even though class(data) was data.frame (only happened when using leverage)
+  } else {
+    ## Shouldn't actually ever get reached
+    output <- lm(formula(y ~ .), data = cbind(y, x, externalRegressor)) 
+  }
+  
+  return(output)  
+  
 }
 
 
 # Help function to get nicely formatted formula's for print/summary methods.
 #' @keywords internal
 getHarmodelformula <- function(x) {
-  #modelnames = colnames(x$model$x)
+  
   modelnames = colnames(x$model)[-1] ##Changed because the formula is now y~. which makes model a single matrix-like object
+  
+  if(grepl("-X", x$type)){ ## We have external regressors
+    externals <- grepl("external", modelnames)
+    modelnames[externals] <- paste0("X", 1:sum(externals))
+  }
+  
+  
   if (!is.null(x$transform)) {
     modelnames <- paste(x$transform,"(",modelnames,")",sep="")
   } #Added visual tingie for plotting transformed RV
@@ -30,8 +47,7 @@ getHarmodelformula <- function(x) {
 #Insanity filter of BPQ, not exported
 #' @keywords internal
 harInsanityFilter <- function(fittedValues, lower, upper, replacement) {
-  replacementIndices <- (fittedValues < lower | fittedValues > upper)
-  fittedValues[replacementIndices] <- replacement
+  fittedValues[(fittedValues < lower | fittedValues > upper)] <- replacement
   return(fittedValues)
 }
 
@@ -60,6 +76,8 @@ harInsanityFilter <- function(fittedValues, lower, upper, replacement) {
 #' @param h an integer indicating the number over how many days the dependent variable should be aggregated.
 #' By default, h=1, i.e. no aggregation takes place, you just model the daily realized volatility.
 #' @param transform optionally a string referring to a function that transforms both the dependent and explanatory variables in the model. By default transform=NULL, so no transformation is done. Typical other choices in this context would be "log" or "sqrt".
+#' @param externalRegressor an xts object of same number of rows as \code{data}, and one column. This is used as an external regressor. Default is NULL
+#' @param periodsExternal a vector of integers indicating over how days \code{externalRegressor} should be aggregated.
 #' @param ... extra arguments for jump test.
 #'
 #' @return The function outputs an object of class \code{HARmodel} and \code{\link{lm}} (so \code{HARmodel} is  a subclass of \code{\link{lm}}).
@@ -162,7 +180,7 @@ harInsanityFilter <- function(fittedValues, lower, upper, replacement) {
 #' @export
 HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), periodsQ = c(1),
                      leverage=NULL, RVest = c("rCov","rBPCov", "rQuar"), type = "HARRV", inputType = "RM",
-                     jumpTest = "ABDJumptest", alpha = 0.05, h = 1, transform = NULL, ...){
+                     jumpTest = "ABDJumptest", alpha = 0.05, h = 1, transform = NULL, externalRegressor = NULL, periodsExternal = c(1), ...){
 
   nperiods <- length(periods) # Number of periods to aggregate over
   nest <- length(RVest)      # Number of RV estimators
@@ -179,7 +197,10 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
   if (!(type %in% c("HARRV", jumpModels, quarticityModels))) {
     warning("Please provide a valid argument for type, see documentation.")
   }
-
+  if(!is.null(externalRegressor) && !is.xts(externalRegressor) || (nrow(externalRegressor) != nrow(data) | ncol(externalRegressor) != 1)){
+    stop("When using the externalRegressor argument, the input must be of type xts and have same number of rows as the data input. externalRegressor must have one column")
+  }
+  
   if (inputType != "RM") { #If it is returns as input
     # Get the daily RMs
     RV1 <- match.fun(RVest[1])
@@ -221,6 +242,9 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
     }
   }
 
+  
+  
+  
   # Get the matrix for estimation of linear model:
   maxp <- max(periods,periodsJ,periodsQ) # Max number of aggregation levels
 
@@ -235,7 +259,7 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
   RVmatrix1 <- har_agg(RM1, periods, nperiods)
   colnames(RVmatrix1) <- paste0("RV", periods)
   # Aggregate and subselect y:
-  y <- as.data.frame(har_agg(RM1, c(h), 1L)[(maxp+h):(n), , drop = FALSE])
+  y <- xts(har_agg(RM1, c(h), 1L)[(maxp+h):(n)], order.by = index(RM1)[(maxp+h):(n)])
   colnames(y) <- "y"
   # Only keep useful parts:
   x1 <- RVmatrix1[(maxp:(n-h)), ]
@@ -283,6 +307,15 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
     rmin <- matrix(ncol=0,nrow=dim(x1)[1])
   }
 
+  if(!is.null(externalRegressor)){
+    ## Aggregate external regressor as mandated by periodsExternal
+    externalRegressor <- har_agg(externalRegressor, periodsExternal, length(periodsExternal))[(maxp:(n-h)), ,drop = FALSE]
+  }
+  
+  
+  
+  
+  
   ###############################
   # Estimate the model parameters, according to type of model :
   # First model type: traditional HAR-RV:
@@ -292,10 +325,13 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
       x1 <- Ftransform(x1)
     }
     x1 <- cbind(x1,rmin)
-
-    model <- estimhar(y = y, x = x1)
-    model$type <- "HARRV"
-    model$dates <- alldates[(maxp+h):n]
+    model <- estimhar(y = y, x = x1, externalRegressor = externalRegressor)
+    
+    if(!is.null(externalRegressor)){
+      type <- paste0(type, "-X")
+    }
+    
+    
     model$RVest <- RVest[1]
 
   } #End HAR-RV if cond
@@ -311,9 +347,10 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
       x <- Ftransform(x)
     }
     x <- cbind(x, rmin)
-    model <- estimhar(y = y, x = x)
-    model$type <- "HARRVJ"
-    model$dates <- alldates[(maxp+h):n]
+    model <- estimhar(y = y, x = x, externalRegressor = externalRegressor)
+    if(!is.null(externalRegressor)){
+      type <- paste0(type, "-X")
+    }
     model$RVest <- RVest
   }#End HAR-RV-J if cond
 
@@ -352,13 +389,13 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
       x <- Ftransform(x)
     }
     x <- cbind(x,rmin)
-    model <- estimhar(y = y,
-                      x = x)
-    model$type <- "HARRVCJ"
-    model$dates <- alldates[(maxp+h):n]
+    model <- estimhar(y = y, x = x, externalRegressor = externalRegressor)
     model$RVest <- RVest
     model$jumpTest <- jumpTest
     model$alpha_jumps <- alpha
+    if(!is.null(externalRegressor)){
+      type <- paste0(type, "-X")
+    }
   }
 
   if (type == "HARRVQ") {
@@ -376,11 +413,12 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
       colnames(x1) <- c(colnames(x1[,1:nperiods]), paste0("RQ", periodsQ))
     }
     x1 <- cbind(x1,rmin)
-    model <- estimhar(y=y,x=x1)
+    model <- estimhar(y = y, x = x1, externalRegressor = externalRegressor)
     model$fitted.values <- harInsanityFilter(fittedValues = model$fitted.values, lower = min(RM1), upper = max(RM1), replacement = mean(RM1))
-    model$type = "HARRVQ"
-    model$dates <- alldates[(maxp+h):n]
     model$RVest <- RVest[1]
+    if(!is.null(externalRegressor)){
+      type <- paste0(type, "-X")
+    }
   }
 
   if (type == "HARRVQJ") {
@@ -400,11 +438,12 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
       colnames(x1) <- c(colnames(x1[,1:(nperiods+length(periodsJ))]), paste0("RQ", periodsQ))
     }
     x1 <- cbind(x1,rmin);
-    model <-  estimhar(y = y, x = x1)
+    model <-  estimhar(y = y, x = x1, externalRegressor = externalRegressor)
     model$fitted.values <- harInsanityFilter(fittedValues = model$fitted.values, lower = min(RM1), upper = max(RM1), replacement = mean(RM1))
-    model$type <- "HARRVQJ"
-    model$dates <- alldates[(maxp+h):n]
     model$RVest <- RVest[1]
+    if(!is.null(externalRegressor)){
+      type <- paste0(type, "-X")
+    }
   }
 
   if (type == "CHARRV") {
@@ -413,11 +452,12 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
       x2 <- Ftransform(x2)
     }
     x2 <- cbind(x2,rmin);
-    model <- estimhar(y=y,x=x2)
+    model <- estimhar(y = y, x = x2, externalRegressor = externalRegressor)
     model$transform <- transform
-    model$type <- "CHARRV"
-    model$dates <- alldates[(maxp+h):n]
     model$RVest <- RVest[1]
+    if(!is.null(externalRegressor)){
+      type <- paste0(type, "-X")
+    }
   } #End CHAR-RV if cond
 
   if (type == "CHARRVQ") {
@@ -432,13 +472,21 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
       colnames(x2) <- c(colnames(x2[,1:nperiods]), "RQ1")
     }
     x2 <- cbind(x2,rmin)
-    model <- estimhar(y = y, x = x2)
+    model <- estimhar(y = y, x = x2, externalRegressor = externalRegressor)
     model$fitted.values <- harInsanityFilter(fittedValues = model$fitted.values, lower = min(RM1), upper = max(RM1), replacement = mean(RM1))
-    model$type <- "CHARRVQ"
-    model$dates <- alldates[(maxp+h):n]
     model$RVest <- RVest[1]
-
+    if(!is.null(externalRegressor)){
+      type <- paste0(type, "-X")
+    }
   } #End CHAR-RVQ if cond
+  
+  
+  if(!is.null(externalRegressor)){
+    model$fitted.values <- harInsanityFilter(fittedValues = model$fitted.values, lower = min(RM1), upper = max(RM1), replacement = mean(RM1))
+  }
+  
+  model$dates <- alldates[(maxp+h):n]
+  model$type <- type
   
   model$NeweyWestSE <- sandwich::NeweyWest(model)
   model$transform <- transform
@@ -471,7 +519,7 @@ plot.harModel <- function(x, which = c(1L:3L, 5L), caption = list("Residuals vs 
   type     <- x$type
 
   g_range <- range(fitted,observed)
-  g_range[1] <- 0.95*g_range[1]
+  g_range[1] <- 0.95 * g_range[1]
   g_range[2] <- 1.05 * g_range[2]
   #ind = seq(1,length(fitted),length.out=5);
   title <- paste("Observed and forecasted RV based on HAR Model:",type);

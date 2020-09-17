@@ -4,9 +4,8 @@ using namespace Rcpp;
 using namespace arma;
 
 //[[Rcpp::export]]
-arma::mat har_agg(arma::vec RM , arma::vec periods, int iNperiods){
-  int iT       = RM.size();
-  //int iLags    = vLags.size();
+arma::mat har_agg(arma::vec RM, arma::vec periods, int iNperiods){
+  int iT = RM.size();
   arma::mat mHARData(iT , iNperiods);
   mHARData.fill(NA_REAL);
   // make return with NA's

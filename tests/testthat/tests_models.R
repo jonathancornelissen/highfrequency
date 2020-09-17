@@ -1,5 +1,5 @@
 library(xts)
-
+library(testthat)
 context("HARmodel")
 test_that("HARModel",{
   expect_equal(
@@ -44,16 +44,8 @@ test_that("HARModel",{
                c("(Intercept)" = 0.004452336, "RV1" = 0.589002342, "RV5" = 0.351905075, "RV22" = 0.105652537, "J1" = -0.339255775, "RQ1" = -0.326558434)
                )
   
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
+  model <- HARmodel(SP500RM[, "RV"], periods = c(1,5,22), externalRegressor = xts(1:nrow(SP500RM), order.by = index(SP500RM)), periodsExternal = c(1))
+  expect_true(all(model$model[,"externalRegressor"] == 22:(nrow(SP500RM)-1)))
   
   
 })
