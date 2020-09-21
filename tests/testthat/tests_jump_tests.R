@@ -5,7 +5,7 @@ context("AJjumpTest unit test")
 test_that("AJjumpTest unit test",{
   expect_equal(
     formatC(AJjumpTest(sampleTData$PRICE, p = 2, k = 3, alignBy = "seconds", alignPeriod = 5, makeReturns = TRUE)$ztest, digits = 10),
-    "-2.991107301"
+    "-2.462012017"
   )
 })
 
@@ -16,7 +16,7 @@ test_that("JO jump test unit test",{
     formatC(as.numeric(JOjumpTest(sample5MinPricesJumps[,1], power = 6)$ztest), digits = 10),
     c("0.2237433282","0.8492610224", "8.714153635", "-18.43875721",  "33.00286362",   "-1.12530156",   
       "-0.1693194718", "1.946341487", "-0.8662709953", "14.27443109", " 2.90820588", "5.505960335","-1.437705957",
-      "-0.07068737283","0.7935449771", "-10.81545189", "1.577474946", "-0.09450737237","-3.262432421")  
+      "-0.07068737283","0.7935449771", "-10.81545189", "1.577474946", "-0.09450737237","-3.262432421")
   )
   
   expect_equal(
