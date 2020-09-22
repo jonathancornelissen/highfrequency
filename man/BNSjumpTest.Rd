@@ -26,7 +26,7 @@ BNSjumpTest(
 
 \item{type}{a method of BNS testing: can be linear or ratio. Linear by default.}
 
-\item{logTransform}{boolean, should be TRUE when QVestimator and IVestimator are in logarith form. FALSE by default.}
+\item{logTransform}{boolean, should be TRUE when QVestimator and IVestimator are in logarithm form. FALSE by default.}
 
 \item{max}{boolean, should be TRUE when max adjustment in SE. FALSE by default.}
 
@@ -43,7 +43,7 @@ list or xts in case the input prices span more than one day.
 }
 \description{
 This test examines the presence of jumps in highfrequency price series. It is based on theory of Barndorff- Nielsen and Shephard (BNS). The null hypothesis is no jumps. 
-Depending on the choice of estimator (integrated variance (IVestimator), integrated quarticity (IQestimator)), mechanism (linear, ratio) and adjustment (logarith), the function returns the result.
+Depending on the choice of estimator (integrated variance (IVestimator), integrated quarticity (IQestimator)), mechanism (linear, ratio) and adjustment (logarithm), the function returns the result.
 Function returns three outcomes: 1.z-test value 2.critical value(with confidence level of 95\%) and 3.pvalue of the test. 
 Assume there is \eqn{N} equispaced returns in period \eqn{t}. 
 

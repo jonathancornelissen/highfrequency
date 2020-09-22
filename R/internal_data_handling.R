@@ -1,3 +1,38 @@
+#' @importFrom zoo zoo na.locf `index<-`
+#' @importFrom stats start end
+#' @keywords internal
+fastTickAgregation <- function (ts, on = "minutes", k = 1, tz = "GMT") {
+  
+  if (on == "secs" | on == "seconds") {
+    secs <- k
+    tby <- paste(k, "sec", sep = " ")
+  } 
+  if (on == "mins" | on == "minutes") {
+    secs <- 60 * k
+    tby <- paste(60 * k, "sec", sep = " ")
+  } 
+  if (on == "hours"){
+    secs <- 3600 * k
+    tby <- paste(3600 * k, "sec", sep = " ")
+  }
+  g <- base::seq(start(ts), end(ts), by = tby)
+  rawg <- as.numeric(as.POSIXct(g, tz = tz))
+  newg <- rawg + (secs - rawg %% secs)
+  if(as.numeric(end(ts)) == newg[length(newg)-1]){
+    newg  <- newg[-length(newg)]
+  }
+  g    <- as.POSIXct(newg, origin = "1970-01-01", tz = tz)
+  
+  firstObs <- ts[1,]
+  ts <- na.locf(merge(ts, zoo(NULL, g)))[as.POSIXct(g, tz = tz)]
+  if(index(ts[1]) > index(firstObs)){
+    index(firstObs) <- index(ts[1]) - secs
+    ts <- c(firstObs, ts)
+  }
+  return(ts)
+}
+
+
 # # Necessary for check-package not throwing errors
 # #' @keywords internal
 # ..keepCols <- NULL
@@ -292,7 +327,7 @@ has.Vo<-function (x, which = FALSE){
 #' position of those columns.
 #' 
 #' @param x data object
-#' @param which disply position of match
+#' @param which display position of match
 #' 
 #' @export
 hasQty <- function(x, which = FALSE) {

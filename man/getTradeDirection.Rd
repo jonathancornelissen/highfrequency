@@ -15,7 +15,7 @@ is buy or sell respectively.
 }
 \description{
 Function returns a vector with the inferred trade direction which is 
-determined using the Lee and Ready algorithym (Lee and Ready, 1991).
+determined using the Lee and Ready algorithm (Lee and Ready, 1991).
 }
 \details{
 NOTE: The value of the first (and second) observation of the output should be ignored if price == midpoint

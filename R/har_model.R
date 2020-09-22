@@ -39,7 +39,7 @@ harInsanityFilter <- function(fittedValues, lower, upper, replacement) {
 #'
 #' @description Function returns the estimates for the Heterogeneous Autoregressive model
 #' for Realized volatility discussed in Andersen et al. (2007) and Corsi (2009).
-#' This model is mainly used to forecast the next days'volatility based on the high-frequency returns of the past. Consult the vignette for more information.
+#' This model is mainly used to forecast the next day's volatility based on the high-frequency returns of the past. Consult the vignette for more information.
 #'
 #' @param data  an xts object containing either: intra-day (log-)returns or realized measures already computed from such returns. 
 #' In case more than one realized measure is needed, the object should have the as many columns as realized measures needed. 
