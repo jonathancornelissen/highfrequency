@@ -56,7 +56,7 @@
 #'    so this is were the time indication refers to (and thus not to the registered quote timestamp).
 #'  } 
 #'  
-#'  \item{depthImbalanceRatio: depth imbalace (as ratio)}{
+#'  \item{depthImbalanceRatio: depth imbalance (as ratio)}{
 #'    \deqn{
 #'      \mbox{depth imbalance (as ratio)}_t =  (\frac{\mbox{OFRSIZ}_{t}}{\mbox{BIDSIZ}_{t}})^{D_t},
 #'    }
@@ -311,7 +311,7 @@ getLiquidityMeasures <- function(tqData, win = 300, type = NULL) {
 #' Get trade direction
 #' 
 #' @description Function returns a vector with the inferred trade direction which is 
-#' determined using the Lee and Ready algorithym (Lee and Ready, 1991). 
+#' determined using the Lee and Ready algorithm (Lee and Ready, 1991). 
 #' 
 #' @param tqData data.table or xts object, containing joined trades and quotes (e.g. using \code{\link{matchTradesQuotes}})
 #' 

@@ -16,7 +16,7 @@ exchangeHoursOnly(
 Multiple days of input are allowed.}
 
 \item{dayBegin}{character in the format of \"HH:MM:SS\",
-specifying the starting hour, minute and second of an exhange
+specifying the starting hour, minute and second of an exchange
 trading day.}
 
 \item{dayEnd}{character in the format of \"HH:MM:SS\^",
