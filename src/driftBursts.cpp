@@ -11,7 +11,6 @@ const double dC = 2.6614;
 
 
 
-// [[Rcpp::export]]
 arma::colvec HACWeightC(int iLag){ 
   // Input will always be non-zero and positive, thus, we can ignore the 0 case and save some time
   arma::colvec vW = linspace(1, iLag,iLag) / iLag;
@@ -24,7 +23,6 @@ arma::colvec HACWeightC(int iLag){
 
 
 //[[Rcpp::export]]
-
 double AsymptoticVarianceC(const arma::colvec& vIn, int iLag){  
   int iT = vIn.size();
   if(iT<=iLag){ //We cannot calculate the variance in this case as there are not enough observations.
@@ -44,6 +42,9 @@ double AsymptoticVarianceC(const arma::colvec& vIn, int iLag){
     return(dOut);
   }
 }
+
+
+
 
 // [[Rcpp::export]]
 int AutomaticLagSelectionC(const arma::colvec& vX, double dMu){
@@ -75,7 +76,6 @@ int AutomaticLagSelectionC(const arma::colvec& vX, double dMu){
   int iOut = round(dGamma * pow(dMu, 0.2));
   
   return(iOut);
-  
   
 }
 

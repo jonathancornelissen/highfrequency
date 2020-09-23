@@ -9,10 +9,6 @@ tradeIntensityProcessCpp <- function(time, bandwidth) {
     .Call(`_highfrequency_tradeIntensityProcessCpp`, time, bandwidth)
 }
 
-HACWeightC <- function(iLag) {
-    .Call(`_highfrequency_HACWeightC`, iLag)
-}
-
 AsymptoticVarianceC <- function(vIn, iLag) {
     .Call(`_highfrequency_AsymptoticVarianceC`, vIn, iLag)
 }

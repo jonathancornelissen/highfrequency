@@ -29,17 +29,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// HACWeightC
-arma::colvec HACWeightC(int iLag);
-RcppExport SEXP _highfrequency_HACWeightC(SEXP iLagSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< int >::type iLag(iLagSEXP);
-    rcpp_result_gen = Rcpp::wrap(HACWeightC(iLag));
-    return rcpp_result_gen;
-END_RCPP
-}
 // AsymptoticVarianceC
 double AsymptoticVarianceC(const arma::colvec& vIn, int iLag);
 RcppExport SEXP _highfrequency_AsymptoticVarianceC(SEXP vInSEXP, SEXP iLagSEXP) {
@@ -394,7 +383,6 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_highfrequency_quadraticKernel", (DL_FUNC) &_highfrequency_quadraticKernel, 1},
     {"_highfrequency_tradeIntensityProcessCpp", (DL_FUNC) &_highfrequency_tradeIntensityProcessCpp, 2},
-    {"_highfrequency_HACWeightC", (DL_FUNC) &_highfrequency_HACWeightC, 1},
     {"_highfrequency_AsymptoticVarianceC", (DL_FUNC) &_highfrequency_AsymptoticVarianceC, 2},
     {"_highfrequency_AutomaticLagSelectionC", (DL_FUNC) &_highfrequency_AutomaticLagSelectionC, 2},
     {"_highfrequency_DriftBurstLoopC", (DL_FUNC) &_highfrequency_DriftBurstLoopC, 8},
