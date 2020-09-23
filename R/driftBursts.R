@@ -315,7 +315,7 @@ plot.DBH <- function(x, ...){
     tstat <- as.numeric(tstat)
     sigma <- as.numeric(sigma)
     mu    <- as.numeric(mu)
-  }
+  } 
   # if(testTimes[1] == startTime){
   #   testTimes <- testTimes[-1]
   #   sigma     <- sigma[-1]
