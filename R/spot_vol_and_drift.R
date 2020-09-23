@@ -127,7 +127,7 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
 #' An \code{xts} or \code{matrix} object (depending on the input) containing
 #' spot volatility estimates \eqn{\sigma_{t,i}}, reported for each interval
 #' \eqn{i} between \code{marketOpen} and \code{marketClose} for every day
-#' \eqn{t} in \code{data}. The length of the intervals is specifiedby \code{k}
+#' \eqn{t} in \code{data}. The length of the intervals is specified by \code{k}
 #' and \code{on}. Methods that provide this output: All.
 #'
 #' \code{daily}
@@ -254,7 +254,7 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
 #' If \code{h} is a scalar, it will be assumed equal throughout the sample. If
 #' it is a vector, it should contain bandwidths for each day. If left empty,
 #' it will be estimated. Default = \code{NULL}. \cr
-#' \code{est} \tab String specifiying the bandwidth estimation method. Possible
+#' \code{est} \tab String specifying the bandwidth estimation method. Possible
 #' values include \code{"cv", "quarticity"}. Method \code{"cv"} equals
 #' cross-validation, which chooses the bandwidth that minimizes the Integrated
 #' Square Error. \code{"quarticity"} multiplies the simple plug-in estimator
@@ -283,7 +283,7 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
 #' come up with a method that determines the optimal bandwidth for any kind of
 #' data or kernel that can be used. Although some estimation methods are
 #' provided, it is advised that you specify \eqn{h} yourself, or make sure that
-#' the estimation results are appropiate.
+#' the estimation results are appropriate.
 #'
 #' One way to estimate \eqn{h}, is by using cross-validation. For each day in
 #' the sample, \eqn{h} is chosen as to minimize the Integrated Square Error,

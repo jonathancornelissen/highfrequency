@@ -12,7 +12,7 @@ context("medRQ")
 test_that("", {
   expect_equal(
     formatC(medRQ(sampleTData$PRICE,alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE) * 1000000, digits = 5),
-    "0.23646"
+    "0.23952"
   )
 })
 # minRV
@@ -28,7 +28,7 @@ context("minRQ")
 test_that("minRQ", {
   expect_equal(
     minRQ(sampleTData$PRICE, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE) * 1000000,
-    0.1306161
+    0.1325120781
   )
 })
 
@@ -105,7 +105,7 @@ context("rMPV")
 test_that("rMPV", {
   expect_equal(
     formatC(rMPV(sampleTData$PRICE, alignBy ="minutes", alignPeriod = 5, makeReturns = TRUE), digits = 5),
-    "0.00042302"
+    "0.00042925"
   )
 })
 # rOWCov
@@ -138,11 +138,11 @@ context("rKernelCov")
 test_that("rKernelCov", {
   expect_equal(
     formatC(rKernelCov(rData = sampleTData$PRICE, alignBy = "minutes",  alignPeriod = 5, makeReturns = TRUE), digits = 5),
-    "0.00059641"
+    "0.00060559"
   )
   expect_equal(
     formatC(sum(rKernelCov(rData = cbind(lltc, sbux, fill = 0), alignBy = "minutes", alignPeriod = 5, makeReturns = FALSE)) * 1000, digits = 5),
-    "0.021378"
+    "0.021281"
   )
 })
 
@@ -159,7 +159,7 @@ context("rSV")
 test_that("rSV", {
   expect_equal(
     rSV(sampleTData$PRICE,alignBy ="minutes", alignPeriod = 5, makeReturns = TRUE),
-    list(rSVdownside = 0.0002913423, rSVupside = 0.000163109843602460)
+    list(rSVdownside = 0.0002913423039, rSVupside = 0.0001642838323)
   )
 })
 # rThresholdCov
@@ -167,7 +167,7 @@ context("rThresholdCov")
 test_that("rThresholdCov", {
   expect_equal(
     formatC(sum(rThresholdCov(cbind(lltc, sbux), alignBy = "minutes", alignPeriod = 1)) * 10000, digits = 5),
-    "0.59455"
+    "0.59423"
   )
   expect_equal(
     formatC(sum(rThresholdCov(cbind(lltc, sbux), alignBy = "minutes", alignPeriod = 1), cor = TRUE), digits = 1),
@@ -179,7 +179,7 @@ context("rTPVar")
 test_that("rTPVar", {
   expect_equal(
     formatC(rTPVar(sampleTData$PRICE,alignBy ="minutes", alignPeriod = 5, makeReturns = TRUE) * 1000000, digits = 5),
-    "0.41333"
+    "0.42755"
   )
 })
 # rTSCov univariate
@@ -368,3 +368,4 @@ test_that("ReMeDI kn choosing algorithm", {
   expect_equal(optimalKn, 4L)
 
 })
+

@@ -22,7 +22,7 @@ intradayJumpTest(
 
 \item{volEstimator}{character denoting which volatility estimator to use for the tests. See \link{spotVol}. Default = \code{"RM"} denoting realized measures.}
 
-\item{driftEstimator}{character denoting which drift estimator to use for the tests. See \link{spotDrift}. Default = \code{"none"} denoting no drift esitmation.}
+\item{driftEstimator}{character denoting which drift estimator to use for the tests. See \link{spotDrift}. Default = \code{"none"} denoting no drift estimation.}
 
 \item{alpha}{numeric of length one determining what confidence level to use when constructing the critical values.}
 

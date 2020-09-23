@@ -24,7 +24,7 @@ getAlphaVantageData(
 \item{doSleep}{logical when the length of symbols > 5 the function will sleep for 12 seconds by default.}
 }
 \value{
-An object of type xts or data.table in case the length of symbols is 1. If the lenght of symbols > 1 the xts and 
+An object of type xts or data.table in case the length of symbols is 1. If the length of symbols > 1 the xts and 
 data.table objects will be put into a list.
 }
 \description{
@@ -56,6 +56,6 @@ data <- getAlphaVantageData(symbols = c("JPM", "C"), interval = "15min",
 The getSymbols.av function in the quantMod package
 }
 \author{
-Emil Sjørup (wrapper only) Paul Teetor (for quantMod's getSymbols.av)
+Emil Sjoerup (wrapper only) Paul Teetor (for quantMod's getSymbols.av)
 }
 \keyword{data}

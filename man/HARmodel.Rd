@@ -66,7 +66,7 @@ The function outputs an object of class \code{HARmodel} and \code{\link{lm}} (so
 \description{
 Function returns the estimates for the Heterogeneous Autoregressive model
 for Realized volatility discussed in Andersen et al. (2007) and Corsi (2009).
-This model is mainly used to forecast the next days'volatility based on the high-frequency returns of the past. Consult the vignette for more information.
+This model is mainly used to forecast the next day's volatility based on the high-frequency returns of the past. Consult the vignette for more information.
 }
 \examples{
 ##### Example 1: HARRVCJ #####
