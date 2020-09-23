@@ -18,6 +18,9 @@ driftBursts(
 )
 }
 \arguments{
+\item{pData}{Either a data.table or an xts object. If pData is a data.table, columns DT and PRICE must be present, containing timestamps of the trades and the price of the 
+trades (in levels) respectively. If pData is an xts object and the number of columns is greater than one, PRICE must be present.}
+
 \item{testTimes}{A \code{numeric} containing the times at which to calculate the tests. The standard of \code{seq(34260, 57600, 60)} 
 denotes calculating the test-statistic once per minute, i.e. 390 times for a typical 6.5 hour trading day from 9:31:00 to 16:00:00. See details. Default is seq(34260, 57600, 60.}
 
@@ -36,15 +39,6 @@ of \code{-1} denotes using an automatic lag selection algorithm for each iterati
 If this argument is not provided, sequential evaluation will be used even though \code{parallelize} is TRUE. Default is NA}
 
 \item{warnings}{A \code{logical} denoting whether warnings should be shown. Default is TRUE}
-
-\item{timestamps}{Either: A \code{numeric} of \code{timestamps} for the trades in seconds after midnight.
-Or: \code{NULL}, when the time argument is \code{NULL}, the \code{logprices} argument must be an \code{xts} object.}
-
-\item{logPrices}{A \code{numeric} or \code{xts} object containing the log-prices.}
-
-\item{sessionStart}{A \code{double} to denote the start of the trading session in seconds after midnight. Default is 34200}
-
-\item{sessionEnd}{A \code{double} to denote the end of the trading session in seconds after midnight. Default is 57600}
 }
 \value{
 An object of class \code{DBH} and \code{list} containing the series of the drift burst hypothesis test-statistic as well as the estimated spot drift and variance series. 
@@ -63,6 +57,53 @@ When using \code{xts} objects, be careful to use the correct time zones. For exa
 Same correction will have to be made to the \code{startTime} and \code{endTime} arguments in the plotting methods.
 The lags from the Newey-West algorithm is increased by \code{2 * (preAveage-1)} due to the pre-averaging we know at least this many lags should be corrected for.
 The maximum of 20 lags is also increased by this factor for the same reason.
+}
+\examples{
+## Usage with data.table object
+dat <- sampleTDataMicroseconds[as.Date(DT) == "2018-01-02"]
+## Testing every 60 seconds after 09:45:00
+DBH1 <- driftBursts(dat, testTimes = seq(35100, 57600, 60), preAverage = 2, ACLag = -1L,
+                    meanBandwidth = 300L, varianceBandwidth = 900L)
+print(DBH1)
+
+plot(DBH1, pData = dat)
+## Usage with xts object (1 column)
+library("xts")
+dat <- xts(sampleTDataMicroseconds[as.Date(DT) == "2018-01-03"]$PRICE, 
+           order.by = sampleTDataMicroseconds[as.Date(DT) == "2018-01-03"]$DT)
+## Testing every 60 seconds after 09:45:00
+DBH2 <- driftBursts(dat, testTimes = seq(35100, 57600, 60), preAverage = 2, ACLag = -1L,
+                    meanBandwidth = 300L, varianceBandwidth = 900L)
+plot(DBH2, pData = dat)
+
+## Usage with xts object with multiple columns and price in character format
+dat <- sampleTData
+## Testing every 30 seconds after 09:45:00
+DBH3 <- driftBursts(dat, testTimes = seq(35100, 57600, 30), preAverage = 2, ACLag = -1L,
+                    meanBandwidth = 300L, varianceBandwidth = 900L)
+
+plot(DBH3, pData = dat)
+
+\dontrun{ ## This block takes some time
+dat <- 10 + cumsum(lltc)
+index(dat) <- index(dat) - 6 * 3600
+## Testing every 60 seconds after 09:45:00
+system.time({DBH4 <- driftBursts(dat, testTimes = seq(35100, 57600, 1), preAverage = 2, 
+                                 ACLag = -1L, meanBandwidth = 300L, varianceBandwidth = 900L)})
+# On my machine with an i5-8250U, the following is 2-3 times faster
+system.time({DBH4 <- driftBursts(dat, testTimes = seq(35100, 57600, 1), preAverage = 2, 
+                                 ACLag = -1L, meanBandwidth = 300L, varianceBandwidth = 900L,
+                                 parallelize = TRUE, nCores = 8)})
+plot(DBH4, pData = dat)
+
+# The print method for DBH objects takes an argument alpha that determines the confidence level
+# of the test performed
+print(DBH4, alpha = 0.99)
+# Additionally, criticalValue can be passed directly
+print(DBH4, criticalValue = 3)
+max(abs(DBH4$driftBursts)) > getCriticalValues(DBH4, 0.99)$quantile
+}
+
 }
 \author{
 Emil Sjoerup

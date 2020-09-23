@@ -169,7 +169,7 @@ fit2d3rdDegree <- function(A, X, Y){
 #' @importFrom stats acf approx
 #' @keywords internal
 DBHCriticalValues <- function(x, alpha){
-  tStat <- x$driftBursts
+  tStat <- x$tStat
   alpha_used <- alpha
   nObs <- length(tStat)
   rho <- DBHSysData$rho

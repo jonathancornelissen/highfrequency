@@ -123,7 +123,7 @@ Rcpp::List DriftBurstLoopC(const arma::colvec& vPreAveraged, const arma::colvec&
   }
   // Calculate the test statistic and create a nice named list containing the estimates, which we will return.
   arma::colvec vDB = sqrt(iMeanBandwidth) * (vMu / iMeanBandwidth) / sqrt(vSigma/ iVarBandwidth) ; 
-  Rcpp::List lOut = Rcpp::List::create(Rcpp::Named("driftBursts") = vDB,
+  Rcpp::List lOut = Rcpp::List::create(Rcpp::Named("tStat") = vDB,
                                        Rcpp::Named("sigma") = vSigma / iVarBandwidth,
                                        Rcpp::Named("mu") = vMu / iMeanBandwidth);
   return(lOut);
@@ -176,7 +176,7 @@ Rcpp::List DriftBurstLoopCPAR(const arma::colvec& vPreAveraged, const arma::colv
     }
     
     arma::colvec vDB = sqrt(iMeanBandwidth) * (vMu/ iMeanBandwidth) / sqrt(vSigma/ iVarBandwidth) ; 
-  Rcpp::List lOut =  Rcpp::List::create(Rcpp::Named("driftBursts") = vDB,
+  Rcpp::List lOut =  Rcpp::List::create(Rcpp::Named("tStat") = vDB,
                                         Rcpp::Named("sigma") = vSigma / iVarBandwidth,
                                         Rcpp::Named("mu") = vMu / iMeanBandwidth);
 #else

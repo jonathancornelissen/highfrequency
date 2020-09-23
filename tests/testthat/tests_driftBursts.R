@@ -22,14 +22,12 @@ test_that("DBH sim test", {
   dat <- data.table(DT = as.POSIXct(timestamps, tz = randomTZ, origin = as.POSIXct("1970-01-01", tz = randomTZ)), PRICE = exp(p))
   DBH <- driftBursts(dat, testtimes, preAverage = 1, ACLag = -1, meanBandwidth = meanBandwidth, varianceBandwidth = 5*meanBandwidth, parallelize = FALSE)
   
-  
-  plot(DBH)
-  plot(DBH, price = p, timestamps = timestamps)
-  expect_equal(mean(DBH$driftBursts), 0.34463614)
+  expect_equal(mean(DBH$tStat), 0.34463614)
   expect_equal(mean(DBH$sigma), 2.054827e-05)
   expect_equal(mean(DBH$mu), 8.359077e-05)
+  expect_equal(as.numeric(var(DBH$tStat)),0.774545510068)
   
-  
+  expect_equal(lapply(getCriticalValues(DBH, 0.99), round, digits = 4), list(normalizedQuantile = 3.9557, quantile = 4.1752))
   
   
 })
