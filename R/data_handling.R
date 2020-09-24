@@ -228,7 +228,7 @@ aggregateTS <- function (ts, FUN = "previoustick", on = "minutes", k = 1, weight
 aggregatePrice <- function(pData, on = "minutes", k = 1, marketOpen = "09:30:00", marketClose = "16:00:00" , fill = FALSE, tz = NULL) {
   ## checking
   pData <- checkColumnNames(pData)
-  .I <- .N <- N <- DATE <- DT <- FIRST_DT <- DT_ROUND <- LAST_DT <- SYMBOL <- PRICE <- NULL
+  N <- DATE <- DT <- FIRST_DT <- DT_ROUND <- LAST_DT <- SYMBOL <- PRICE <- NULL
 
   on_true <- NULL
 
@@ -874,7 +874,7 @@ autoSelectExchangeQuotes <- function(qData) {
 #' @param data a data.table or xts object containing the time series data. 
 #' Multiple days of input are allowed.
 #' @param dayBegin character in the format of \"HH:MM:SS\",
-#' specifying the starting hour, minute and second of an exchange
+#' specifying the starting hour, minute and second of an exhange
 #' trading day.
 #' @param dayEnd character in the format of \"HH:MM:SS\^",
 #' specifying the closing hour, minute and second of an exchange
@@ -1121,7 +1121,7 @@ matchTradesQuotes <- function(tData, qData, adjustment = 2) {
   
   
   if (dummy_was_xts == TRUE) {
-    return(xts(as.matrix(tqData[, -c("DT")]), order.by = tqData$DT, tzone = tz))
+    return(xts(as.matrix(tqData[, -c("DT")]), order.by = tqData$DT, tz = tz))
   } else {
     return(tqData)
   }
@@ -1954,7 +1954,7 @@ selectExchange <- function(data, exch = "N") {
 #' 
 #' Since the function \code{\link{rmTradeOutliersUsingQuotes}}
 #' also requires cleaned quote data as input, it is not incorporated here and
-#' there is a separate wrapper called \code{\link{tradesCleanupUsingQuotes}}.
+#' there is a seperate wrapper called \code{\link{tradesCleanupUsingQuotes}}.
 #' 
 #' @param dataSource character indicating the folder in which the original data is stored.
 #' @param dataDestination character indicating the folder in which the cleaned data is stored.
@@ -2251,7 +2251,7 @@ tradesCleanupUsingQuotes <- function(tradeDataSource = NULL, quoteDataSource = N
 #' 
 #' @return An xts object containing the synchronized time series.
 #' 
-#' @references Harris, F., T. McInish, G. Shoesmith, and R. Wood (1995). Cointegration, error correction, and price discovery on informationally linked security markets. Journal of Financial and Quantitative Analysis 30, 563-581.
+#' @references Harris, F., T. McInish, G. Shoesmith, and R. Wood (1995). Cointegration, error correction, and price discovery on infomationally linked security markets. Journal of Financial and Quantitative Analysis 30, 563-581.
 #' 
 #' @examples 
 #' # Suppose irregular timepoints:
@@ -2388,7 +2388,7 @@ businessTimeAggregation <- function(pData, measure = "volume", obs = 390, bandwi
     }
   }
   
-  setkey(pData, DT)
+  
   dates <- as.character(unique(as.Date(pData[,DT])))
   pDataBackcup <- copy(pData)
   ITP <- list() # Container for trade intensity process.
@@ -2438,6 +2438,7 @@ businessTimeAggregation <- function(pData, measure = "volume", obs = 390, bandwi
     ITP[[date]] <- intensityProcess
     aggregated <- rbind(aggregated, pData)
   }
+  
   
   
   if(inputWasXTS){

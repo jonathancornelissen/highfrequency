@@ -4,19 +4,14 @@
 \alias{exchangeHoursOnly}
 \title{Extract data from an xts object for the Exchange Hours Only}
 \usage{
-exchangeHoursOnly(
-  data,
-  marketOpen = "09:30:00",
-  marketClose = "16:00:00",
-  tz = NULL
-)
+exchangeHoursOnly(data, dayBegin = "09:30:00", dayEnd = "16:00:00")
 }
 \arguments{
 \item{data}{a data.table or xts object containing the time series data. 
 Multiple days of input are allowed.}
 
 \item{dayBegin}{character in the format of \"HH:MM:SS\",
-specifying the starting hour, minute and second of an exchange
+specifying the starting hour, minute and second of an exhange
 trading day.}
 
 \item{dayEnd}{character in the format of \"HH:MM:SS\^",

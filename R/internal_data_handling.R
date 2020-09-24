@@ -33,6 +33,39 @@ fastTickAgregation <- function (ts, on = "minutes", k = 1, tz = "GMT") {
 }
 
 
+#' @importFrom data.table rbindlist setkey setnafill
+#' @keywords internal
+fastTickAgregation_DATA.TABLE <- function(dat, on = "minutes", k = 1, tz = "GMT"){
+  firstDT <- DT <- PRICE <- DATE <- NULL
+  if (on == "secs" | on == "seconds") {
+    secs <- k
+  } 
+  if (on == "mins" | on == "minutes") {
+    secs <- 60 * k
+  } 
+  if (on == "hours"){
+    secs <- 3600 * k
+  }
+  #n
+  g <- dat[, list(DT = seq(first(DT), last(DT), by = secs)), by = list(DATE = as.Date(DT))]
+  g$DT <- as.POSIXct(as.numeric(g$DT) + (secs - as.numeric(g$DT) %% secs), origin = "1970-01-01")
+  
+  out <- dat[g , roll = TRUE, on = "DT"]
+  prependingCheck <- cbind(out[, list(firstDT = first(DT)), by = DATE],
+        dat[, lapply(.SD, first), by = list(DATE = as.Date(DT)), .SDcols = names(dat)][, "DATE" := NULL]
+        )
+  out <- rbindlist(list(out[, "DATE" := NULL], prependingCheck[DT < firstDT, DT := firstDT - secs][, c("firstDT","DATE") := NULL]),
+                   use.names = TRUE)
+
+  setkey(out, "DT")
+  setnafill(out, type = "locf")
+  return(out)
+  
+}
+
+
+
+
 # # Necessary for check-package not throwing errors
 # #' @keywords internal
 # ..keepCols <- NULL
