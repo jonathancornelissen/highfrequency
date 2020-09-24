@@ -202,6 +202,7 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
       stop("When using the externalRegressor argument, the input must be of type xts and have same number of rows as the data input. externalRegressor must have one column")
     }
   }
+    
   
   if (inputType != "RM") { #If it is returns as input
     # Get the daily RMs
