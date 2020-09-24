@@ -11,6 +11,6 @@ data.table object
 sampleQDataRawMicroseconds
 }
 \description{
-An imaginary xts object containing the raw quotes for stock XXX for 2 days, in the typical NYSE TAQ database format.
+An data.table object containing the raw quotes for stock XXX for 2 days, in the typical NYSE TAQ database format.
 }
 \keyword{datasets}

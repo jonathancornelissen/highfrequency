@@ -4,16 +4,34 @@
 \alias{matchTradesQuotes}
 \title{Match trade and quote data}
 \usage{
-matchTradesQuotes(tData, qData, adjustment = 2)
+matchTradesQuotes(
+  tData,
+  qData,
+  lagQuotes = 2,
+  BFM = FALSE,
+  backwardsWindow = 3600,
+  forwardsWindow = 0.5,
+  plot = FALSE
+)
 }
 \arguments{
 \item{tData}{data.table or xts-object containing the trade data (multiple days possible).}
 
 \item{qData}{data.table or xts-object containing the quote data (multiple days possible).}
 
-\item{adjustment}{numeric, number of seconds the quotes are registered faster than
+\item{lagQuotes}{numeric, number of seconds the quotes are registered faster than
 the trades (should be round and positive). Based on the research of
 Vergote (2005), we set 2 seconds as the default.}
+
+\item{BFM}{a logical determining whether to conduct 'Backwards - Forwards matching' of trades and quotes.
+The algorithm tries to match trades that fall outside the bid - ask and first tries to match a small window forwards and if this fails, it tries to match backwards in a bigger window.
+The small window is a tolerance for inaccuracies in the timestamps of bids and asks. The backwards window allow for matching of late reported trades. I.e. block trades.}
+
+\item{backwardsWindow}{a numeric denoting the length of the backwards window. Default is 3600, corresponding to one hour.}
+
+\item{forwardsWindow}{a numeric denoting the length of the forwards window. Default is 0.5, dorresponding to one half second.}
+
+\item{plot}{a logical denoting whether to visualize the forwards, backwards, and unmatched trades in a plot.}
 }
 \value{
 data.table or xts-object containing the matched trade and quote data

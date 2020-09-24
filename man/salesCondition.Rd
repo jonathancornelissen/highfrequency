@@ -30,4 +30,4 @@ The current version (as of May 2020) can be found online at \href{https://www.ny
 \author{
 Jonathan Cornelissen and Kris Boudt
 }
-\keyword{leaning}
+\keyword{cleaning}
