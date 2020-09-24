@@ -57,9 +57,25 @@ listAvailableKernels <- function() {
 medRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE) {
   
   # self-reference for multi-day input
-  if (checkMultiDays(rData)) {
+  if (is.xts(rData) && checkMultiDays(rData)) {
     result <- apply.daily(rData, medRQ, alignBy, alignPeriod, makeReturns) 
     return(result)
+  } else if (is.data.table(rData)){ 
+    DT <- NULL  
+    if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+      rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
+    }
+    dates <- as.character(unique(as.Date(rData$DT)))
+    res <- vector(mode = "list", length = length(dates))
+    names(res) <- dates
+    for (date in dates) {
+      res[[date]] <- medRQ(as.matrix(rData[as.Date(DT) == date][, !"DT"]), makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL) ## aligning is done above.
+    }
+    res <- setDT(transpose(res))[, DT := dates]
+    setcolorder(res, "DT")
+    colnames(res) <- colnames(rData)
+    return(res)
+    
   } else {
     if ((!is.null(alignBy)) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation(rData, on = alignBy, k = alignPeriod)
@@ -67,10 +83,19 @@ medRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
     if (makeReturns) {
       rData <- makeReturns(rData)
     }
+    
+    if(ncol(rData) == 1){
     q <- abs(as.numeric(rData))
     q <- as.numeric(rollmedian(q, k = 3,align="center"))
     N <- length(q) + 2
     medRQ <- 3 * pi * N / (9 * pi + 72 - 52 * sqrt(3)) * (N / (N-2)) * sum(q^4)
+    } else { #multivariate
+      q <- abs(as.matrix(rData))
+      q <- rollmedian(q, k = 3, align = "center")
+      N <- nrow(q) + 2
+      medRQ <- 3 * pi * N / (9 * pi + 72 - 52 * sqrt(3)) * (N / (N-2)) * colSums(q^4)
+    }
+    
     return(medRQ)
   } 
 }
@@ -104,9 +129,24 @@ medRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 minRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE) {
   
   # self-reference for multi-day input
-  if (checkMultiDays(rData)) {
+  if (is.xts(rData) && checkMultiDays(rData)) {
     result <- apply.daily(rData, minRQ, alignBy, alignPeriod, makeReturns)
     return(result)
+  } else if (is.data.table(rData)){ 
+    DT <- NULL  
+    if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+      rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
+    }
+    dates <- as.character(unique(as.Date(rData$DT)))
+    res <- vector(mode = "list", length = length(dates))
+    names(res) <- dates
+    for (date in dates) {
+      res[[date]] <- minRQ(as.matrix(rData[as.Date(DT) == date][, !"DT"]), makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL) ## aligning is done above.
+    }
+    res <- setDT(transpose(res))[, DT := dates]
+    setcolorder(res, "DT")
+    colnames(res) <- colnames(rData)
+    return(res)
   } else {
     if ((!is.null(alignBy)) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation(rData, on = alignBy, k = alignPeriod)
@@ -114,10 +154,17 @@ minRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
     if (makeReturns) {
       rData = makeReturns(rData)
     }
-    q     <- as.zoo(abs(as.numeric(rData)))
-    q     <- as.numeric(rollapply(q, width = 2, FUN = min, by = 1, align = "left"))
-    N     <- length(q) + 1
-    minRQ <- pi * N/(3 * pi - 8)*(N / (N - 1)) * sum(q^4)
+    if(ncol(rData) == 1){
+      q     <- as.zoo(abs(as.numeric(rData)))
+      q     <- as.numeric(rollapply(q, width = 2, FUN = min, by = 1, align = "left"))
+      N     <- length(q) + 1
+      minRQ <- pi * N/(3 * pi - 8)*(N / (N - 1)) * sum(q^4)
+    } else { #multivariate
+      q <- abs(as.matrix(rData))
+      q <- rollapply(q, width = 2, FUN = min, by = 1, align = "left")
+      N <- nrow(q) + 1
+      minRQ <- pi * N/(3 * pi - 8)*(N / (N - 1)) * colSums(q^4)
+    }
     return(minRQ)
   }
 }
@@ -216,15 +263,31 @@ minRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #' medrv <- medRV(rData = sampleTData$PRICE, alignBy = "minutes", 
 #'                alignPeriod = 5, makeReturns = TRUE)
 #' medrv 
-#'  
+#' @importFrom data.table setDT transpose setcolorder
 #' @keywords volatility
 #' @export
 medRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE){
   
   # self-reference for multi-day input
-  if (checkMultiDays(rData)) {
+  if (is.xts(rData) && checkMultiDays(rData)) {
     result <- apply.daily(rData, medRV, alignBy, alignPeriod, makeReturns)
     return(result)
+  } else if (is.data.table(rData)){ 
+    DT <- NULL  
+    if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+      rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
+    }
+    dates <- as.character(unique(as.Date(rData$DT)))
+    res <- vector(mode = "list", length = length(dates))
+    names(res) <- dates
+    for (date in dates) {
+      res[[date]] <- medRV(as.matrix(rData[as.Date(DT) == date][, !"DT"]), makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL) ## aligning is done above.
+    }
+    res <- setDT(transpose(res))[, DT := dates]
+    setcolorder(res, "DT")
+    colnames(res) <- colnames(rData)
+    return(res)
+    
   } else {
     if ((!is.null(alignBy)) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation(rData, on = alignBy, k = alignPeriod)
@@ -232,11 +295,17 @@ medRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
     if (makeReturns) {
       rData <- makeReturns(rData)
     }
-    
-    q <- abs(as.numeric(rData)) #absolute value
-    q <- as.numeric(rollmedian(q, k=3, align="center"))
-    N <- length(q) + 2
-    medrv <- (pi / (6 - 4 * sqrt(3) + pi)) * (N/(N - 2)) * sum(q^2)
+    if(ncol(rData) == 1){
+      q <- abs(as.numeric(rData)) #absolute value
+      q <- as.numeric(rollmedian(q, k=3, align="center"))
+      N <- length(q) + 2
+      medrv <- (pi / (6 - 4 * sqrt(3) + pi)) * (N/(N - 2)) * sum(q^2)
+    } else { #multivariate
+      q <- abs(as.matrix(rData))
+      q <- rollmedian(q, k = 3, align = "center")
+      N <- nrow(q) + 2
+      medrv <- (pi / (6 - 4 * sqrt(3) + pi)) * (N / (N - 2)) * colSums(q^2)
+    }
     return(medrv)
   }
 }
@@ -327,7 +396,7 @@ MRC <- function(pData, pairwise = FALSE, makePsd = FALSE) {
     }
     
     if (pairwise) {
-      cov <- matrix(rep(0, n * n), ncol = n)
+      cov <- matrix(rep(0, n * n), ncol = n, dimnames = list(colnames(pData), colnames(pData)))
       diagonal <- c()
       for (i in 1:n) {
         diagonal[i] <- crv(pData[[i]])
@@ -805,9 +874,9 @@ rBeta <- function(rData, rIndex, RCOVestimator = "rCov", RVestimator = "RV", mak
 #' @keywords volatility
 #' @export
 rBPCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, makePsd = FALSE) {
-  
+  DT <- NULL
   # self-reference for multi-day input
-  if (checkMultiDays(rData)) { 
+  if (is.xts(rData) && checkMultiDays(rData)) { 
     if (is.null(dim(rData))) {  
       n <- 1
     } else { 
@@ -821,6 +890,29 @@ rBPCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeR
       names(result) <- unique(as.Date(index(rData)))
     }    
     return(result)
+  } else if (is.data.table(rData)){
+    
+    
+    if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+      rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
+    }
+    dates <- as.character(unique(as.Date(rData$DT)))
+    res <- vector(mode = "list", length = length(dates))
+    names(res) <- dates
+    for (date in dates) {
+      res[[date]] <- rBPCov(as.matrix(rData[as.Date(DT) == date][, !"DT"]), cor = cor, makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL) ## aligning is done above.
+    }
+    if(ncol(rData) == 2){ ## Univariate case
+      res <- data.table(DT = names(res), BPV = as.numeric(res))
+    } else {
+      
+      for (date in dates) {
+        colnames(res[[date]]) <- rownames(res[[date]]) <- colnames(rData[,!"DT"])
+      }
+    } 
+    
+    return(res)
+    
   } else { #single day code
     if ((!is.null(alignBy)) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation(rData, on = alignBy, k = alignPeriod);
@@ -839,19 +931,19 @@ rBPCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeR
     }
     
     ## ACTUAL RBPCOV calculation:   
-    if (n > 1) {    
+    if (n > 1) {
       
-      rData  <- as.matrix(rData);
+      rData  <- as.matrix(rData)
       n <- dim(rData)[2]
-      cov <- matrix(rep(0, n * n), ncol = n)
-      diagonal <- c()
+      cov <- matrix(rep(0, n * n), ncol = n, dimnames = list(colnames(rData), colnames(rData)))
+      diagonal <- numeric(n)
       for (i in 1:n) {
         diagonal[i] <- RBPVar(rData[, i])
       }
       diag(cov) <- diagonal
       for (i in 2:n) {
         for (j in 1:(i - 1)) {
-          cov[i, j] = cov[j, i] = RBPCov_bi(rData[, i], rData[, j])
+          cov[i, j] <- cov[j, i] <- RBPCov_bi(rData[, i], rData[, j])
         }
       }
       
@@ -881,8 +973,17 @@ rBPCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeR
 #' Then, the rCov is given by
 #' \deqn{
 #'  \mbox{rCov}_{t}=\sum_{i=1}^{M}r_{t,i}r'_{t,i}.
-#'  }
+#' }
 #'  
+#'  
+#' @param rData a either one of matrix, xts, or zoo, or a data.table. In case it is one of the former \code{rData} should contain returns or prices
+#' 
+#' an \eqn{(M x N)} matrix/zoo/xts or data.table object containing the \eqn{N}
+#' return series over period \eqn{t}, with \eqn{M} observations during \eqn{t}.
+#' In case of a matrix, no multi-day adjustment is possible.
+#' 
+#' 
+#' 
 #' @param rData a \eqn{(M x N)} matrix/zoo/xts object containing the \eqn{N}
 #' return series over period \eqn{t}, with \eqn{M} observations during \eqn{t}.
 #' In case of a matrix, no multi-day adjustment is possible.
@@ -912,9 +1013,10 @@ rBPCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeR
 #' @keywords volatility
 #' @export
 rCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE) {
-  
+  DT <- NULL
+  ## xts case multiday case:
   # Multiday adjustment: 
-  if (checkMultiDays(rData)) { 
+  if (is.xts(rData) && checkMultiDays(rData)) { 
     if (is.null(dim(rData))) {  
       n <- 1
     } else { 
@@ -928,6 +1030,28 @@ rCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeRet
       names(result) <- unique(as.Date(index(rData)))
     }    
     return(result)
+  } else if (is.data.table(rData)){
+
+    if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+      rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
+    }
+    dates <- as.character(unique(as.Date(rData$DT)))
+    res <- vector(mode = "list", length = length(dates))
+    names(res) <- dates
+    for (date in dates) {
+      res[[date]] <- rCov(as.matrix(rData[as.Date(DT) == date][, !"DT"]), cor = cor, makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL) ## aligning is done above.
+    }
+    if(ncol(rData) == 2){ ## Univariate case
+      res <- data.table(DT = names(res), RV = as.numeric(res))
+    } else {
+      
+      for (date in dates) {
+        colnames(res[[date]]) <- rownames(res[[date]]) <- colnames(rData[,!"DT"])
+      }
+    } 
+    
+    return(res)
+    
   } else {
     #single day code
     if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
@@ -946,7 +1070,6 @@ rCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeRet
       return(RV(rData))
     }
     if (n > 1) {
-      
       rData <- as.matrix(rData)
       covariance <- t(rData) %*% rData
       if (!cor) {
@@ -1791,19 +1914,19 @@ rRTSCov <- function (pData, cor = FALSE, startIV = NULL, noisevar = NULL,
     }
     
     cov <- matrix(rep(0, n * n), ncol = n)
-    diagonal <- c()
-    if (is.null(K_cov)) { 
+    diagonal <- numeric(n)
+    if (is.null(K_cov)) {
       K_cov <- K 
     }
-    if (is.null(J_cov)) { 
+    if (is.null(J_cov)) {
       J_cov <- J 
-    }  
-    if (is.null(K_var)) { 
+    }
+    if (is.null(K_var)) {
       K_var <- rep(K,n) 
     }
-    if (is.null(J_var)) { 
+    if (is.null(J_var)) {
       J_var <- rep(J,n) 
-    }        
+    }
     for (i in 1:n){ 
       diagonal[i] <- RTSRV(pData[[i]], startIV = startIV[i], 
                            noisevar = noisevar[i], K = K_var[i], J = J_var[i], 
@@ -1811,7 +1934,7 @@ rRTSCov <- function (pData, cor = FALSE, startIV = NULL, noisevar = NULL,
     }
     diag(cov) <- diagonal
     if( is.null(K_cov)){ K_cov = K }
-    if( is.null(J_cov)){ J_cov = J }                        
+    if( is.null(J_cov)){ J_cov = J }
     for (i in 2:n) {
       for (j in 1:(i - 1)) {
         cov[i, j] = cov[j, i] = RTSCov_bi(pData[[i]], 

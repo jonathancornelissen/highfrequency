@@ -36,7 +36,7 @@ the number of intraday returns.
 Then, the rCov is given by
 \deqn{
  \mbox{rCov}_{t}=\sum_{i=1}^{M}r_{t,i}r'_{t,i}.
- }
+}
 }
 \examples{
 # Realized Variance/Covariance for prices aligned   

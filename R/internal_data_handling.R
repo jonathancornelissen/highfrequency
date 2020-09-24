@@ -33,10 +33,10 @@ fastTickAgregation <- function (ts, on = "minutes", k = 1, tz = "GMT") {
 }
 
 
-#' @importFrom data.table rbindlist setkey setnafill
+#' @importFrom data.table rbindlist setkey setnafill set
 #' @keywords internal
 fastTickAgregation_DATA.TABLE <- function(dat, on = "minutes", k = 1, tz = "GMT"){
-  firstDT <- DT <- PRICE <- DATE <- NULL
+  MAXDT <- .SD <- firstDT <- DT <- PRICE <- DATE <- NULL
   if (on == "secs" | on == "seconds") {
     secs <- k
   } 
@@ -47,18 +47,34 @@ fastTickAgregation_DATA.TABLE <- function(dat, on = "minutes", k = 1, tz = "GMT"
     secs <- 3600 * k
   }
   #n
-  g <- dat[, list(DT = seq(first(DT), last(DT), by = secs)), by = list(DATE = as.Date(DT))]
-  g$DT <- as.POSIXct(as.numeric(g$DT) + (secs - as.numeric(g$DT) %% secs), origin = "1970-01-01")
+  timeZone <- attr(dat$DT, "tzone")
+  if(timeZone == ""){
+    if(is.null(tz)){
+      tz <- "UTC"
+    }
+    if(!("POSIXct" %in% class(dat$DT))) dat[, DT := as.POSIXct(format(DT, digits = 20, nsmall = 20), tz = tz)]
+  } else {
+    tz <- timeZone
+  }
+  g <- dat[, list(DT = seq(first(DT), last(DT), by = secs, tz = tz), MAXDT = max(DT)), by = list(DATE = as.Date(DT, tz = tz))]
   
-  out <- dat[g , roll = TRUE, on = "DT"]
+  g$DT <- as.POSIXct(as.numeric(g$DT, tz = tz) + (secs - as.numeric(g$DT, tz = tz) %% secs), origin = as.POSIXct("1970-01-01", tz = tz), tz = tz)
+  
+  out <- dat[g , roll = TRUE, on = "DT"][DT<= MAXDT]
   prependingCheck <- cbind(out[, list(firstDT = first(DT)), by = DATE],
-        dat[, lapply(.SD, first), by = list(DATE = as.Date(DT)), .SDcols = names(dat)][, "DATE" := NULL]
+        dat[, lapply(.SD, first), by = list(DATE = as.Date(DT, tz = tz)), .SDcols = names(dat)][, "DATE" := NULL]
         )
-  out <- rbindlist(list(out[, "DATE" := NULL], prependingCheck[DT < firstDT, DT := firstDT - secs][, c("firstDT","DATE") := NULL]),
+  out <- rbindlist(list(out[, c("DATE", "MAXDT") := NULL], prependingCheck[DT < firstDT, DT := firstDT - secs][, c("firstDT","DATE") := NULL]),
                    use.names = TRUE)
 
   setkey(out, "DT")
-  setnafill(out, type = "locf")
+  
+  numericColumns <- colnames(out)[colnames(out) != "DT"]
+  
+  for(col in numericColumns){
+    set(out, j = col, value = as.numeric(out[[col]]))
+  }
+  setnafill(out, type = "locf", cols = colnames(out)[colnames(out) != "DT"])
   return(out)
   
 }

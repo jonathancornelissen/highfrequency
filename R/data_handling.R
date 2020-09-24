@@ -466,7 +466,7 @@ aggregateQuotes <- function(qData, on = "minutes", k = 5, marketOpen = "09:30:00
     if(is.null(tz)){
       tz <- "UTC"
     }
-    qData[, DT := as.POSIXct(format(DT, digits = 20, nsmall = 20), tz = tz)]
+    if(!("POSIXct" %in% class(qData$DT))) qData[, DT := as.POSIXct(format(DT, digits = 20, nsmall = 20), tz = tz)]
   } else {
     tz <- timeZone
   }
@@ -625,7 +625,7 @@ aggregateTrades <- function(tData, on = "minutes", k = 5, marketOpen = "09:30:00
     if(is.null(tz)){
       tz <- "UTC"
     }
-    tData[, DT := as.POSIXct(format(DT, digits = 20, nsmall = 20), tz = tz)]
+    if(!("POSIXct" %in% class(tData$DT))) tData[, DT := as.POSIXct(format(DT, digits = 20, nsmall = 20), tz = tz)]
   } else {
     tz <- timeZone
   }
@@ -916,7 +916,7 @@ exchangeHoursOnly <- function(data, marketOpen = "09:30:00", marketClose = "16:0
     if(is.null(tz)){
       tz <- "UTC"
     }
-    data[, DT := as.POSIXct(format(DT, digits = 20, nsmall = 20), tz = tz)]
+    if(!("POSIXct" %in% class(data$DT))) data[, DT := as.POSIXct(format(DT, digits = 20, nsmall = 20), tz = tz)]
   } else {
     tz <- timeZone
   }
@@ -1025,12 +1025,15 @@ getPrice <- function (x, symbol = NULL, prefer = NULL) {
 #' @importFrom zoo index
 #' @export
 makeReturns <- function(ts) {
+  wasXTS <- is.xts(ts)
   l <- dim(ts)[1]
   col_names <- names(ts)
   x <- matrix(as.numeric(ts), nrow = l)
   x[(2:l), ] <- log(x[(2:l), ]) - log(x[(1:(l - 1)), ])
   x[1, ] <- rep(0, dim(ts)[2])
-  x <- xts(x, order.by = index(ts))
+  if(wasXTS){
+    x <- xts(x, order.by = index(ts))
+  }
   names(x) <- col_names
   return(x)
 }
@@ -2290,13 +2293,22 @@ refreshTime <- function (pData, sort = FALSE, criterion = "squared duration") {
   if(!is.list(pData)){
     stop("pData must be a list of atleast length one")
   }
-  if(!all(as.logical(lapply(pData, is.xts)))){
-    stop("All the series in pData must be xts objects")
+  if((!all(as.logical(lapply(pData, is.xts))) & !all(as.logical(lapply(pData, is.data.table))))){
+    stop("All the series in pData must be either xts or data.table objects")
+  }
+  wasXTS <- is.xts(pData[[1]])
+  
+  if(wasXTS){ ## xts case
+    if(any(as.logical(lapply(pData, function(x) ndays(x) > 1)))){
+      stop("All the series in pData must contain data for a single day")
+    }
+  } else { 
+    if(any(as.logical(lapply(pData, function(x) length(unique(floor(as.numeric(x$DT)/ 86400))) > 1)))){
+      stop("All the series in pData must contain data for a single day")
+    }
   }
   
-  if(any(as.logical(lapply(pData, function(x) ndays(x) > 1)))){
-    stop("All the series in pData must contain data for a single day")
-  }
+  
   
   if (length(pData) < 1) {
     stop("pData should contain at least two time series")
@@ -2305,38 +2317,90 @@ refreshTime <- function (pData, sort = FALSE, criterion = "squared duration") {
     return(pData[[1]])
   }
   
-  tz_ <- tzone(pData[[1]])
-  if(sort){
-    
-    if(criterion == "squared duration"){
-      criterion <- function(x) sum(as.numeric(diff(index(x)))^2)
-    } else if( criterion == "duration"){
-      criterion <- function(x) sum(as.numeric(diff(index(x))))
+  if(wasXTS){
+    tz_ <- tzone(pData[[1]])
+    if(sort){
+      
+      if(criterion == "squared duration"){
+        criterion <- function(x) sum(as.numeric(diff(index(x)))^2)
+      } else if( criterion == "duration"){
+        criterion <- function(x) sum(as.numeric(diff(index(x))))
+      } else {
+        stop("Criterion must be either 'squared duration' or 'duration'")
+      }
+      
+      vec <- sort(sapply(pData, criterion), index.return = TRUE)$ix
+      nameVec <- names(pData)[vec]
+      temp <- pData[[vec[1]]]
+      for (i in vec[-1]) {
+        temp <- merge(temp, pData[[i]])
+      }
+      
     } else {
-      stop("Criterion must be either 'squared duration' or 'duration'")
+      nameVec <- names(pData)
+      temp <- pData[[1]]
+      for (i in 2:length(pData)) {
+        temp <- merge(temp, pData[[i]])
+      }  
     }
     
-    vec <- sort(sapply(pData, criterion), index.return = TRUE)$ix
-    nameVec <- names(pData)[vec]
-    temp <- pData[[vec[1]]]
-    for (i in vec[-1]) {
-      temp <- merge(temp, pData[[i]])
-    }
     
+    temp <- refreshTimeMathing(coredata(temp), index(temp))
+    temp <- xts(temp[[1]], order.by = as.POSIXct(temp[[2]], tz = tz_, origin = as.POSIXct("1970-01-01", tz = tz_)))
+    names(temp) <- nameVec # Set names 
+    return(temp)
   } else {
-    nameVec <- names(pData)
-    temp <- pData[[1]]
-    for (i in 2:length(pData)) {
-      temp <- merge(temp, pData[[i]])
-    }  
+    DT <- NULL
+    
+    timeZone <- attr(pData[[1]]$DT, "tzone")
+    
+    if(timeZone == ""){
+      tz <- "UTC"
+    } else {
+      tz <- timeZone
+    }
+    
+    
+    if(!all(sapply(pData, function(x) "DT" %in% colnames(x)))){
+      stop("DT must be present in all elements of pData")
+    }
+    
+    if(sort){
+      if(criterion == "squared duration"){
+        criterion <- function(x) sum(diff(as.numeric(x$DT))^2)
+      } else if( criterion == "duration"){
+        criterion <- function(x) sum(diff(as.numeric(x$DT)))
+      } else {
+        stop("Criterion must be either 'squared duration' or 'duration'")
+      }
+      vec <- sort(sapply(pData, criterion), index.return = TRUE)$ix + 1
+      
+    } else {
+      vec <- 2:(length(pData) + 1)
+    }
+    
+    names <- names(pData)
+    pData <- lapply(pData, copy)
+    
+    for (i in 1:length(pData)) {
+      pData[[i]][,DT := as.numeric(DT, tz = tz)]
+      setkey(pData[[i]], "DT")
+      
+      # if(flag)  setnames(pData[[i]],  c("DT", paste0(colnames(pData[[i]])[-1] , i)))
+    }
+    # mergeOverload <- function(x,y) merge.data.table(x, y, all = TRUE, on = "DT")
+    
+    # pData <- Reduce(mergeOverload, pData)
+    
+    pData <- Reduce(function(x,y) merge.data.table(x, y, all = TRUE, on = "DT"), pData)
+    
+    
+    pData <- refreshTimeMathing(as.matrix(pData[,-"DT"]), pData$DT)
+    pData <- data.table(pData[[2]], pData[[1]])
+    colnames(pData) <- c("DT", names)
+    pData[, DT := as.POSIXct(DT, origin = as.POSIXct("1970-01-01", tz = tz), tz = tz)]
+    return(pData)
   }
-  
-  
-  
-  temp <- refreshTimeMathing(coredata(temp), index(temp))
-  temp <- xts(temp[[1]], order.by = as.POSIXct(temp[[2]], tz = tz_, origin = "1970-01-01"))
-  names(temp) <- nameVec # Set names 
-  return(temp)
 }
 
 
