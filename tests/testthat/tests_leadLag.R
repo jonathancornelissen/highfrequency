@@ -4,7 +4,7 @@ library(highfrequency)
 
 context("leadLag")
 test_that("leadLag", {
-  skip_on_os("solaris")
+  #skip_on_os("solaris")
   ## Test that the contrasts are as expected
   ll <- leadLag(100 + cumsum(sbux), 100 + cumsum(lltc), seq(-10,10), normalize = TRUE)
   
