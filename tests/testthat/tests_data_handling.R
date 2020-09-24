@@ -1,4 +1,5 @@
 library(xts)
+library(testthat)
 context("autoSelectExchangeTrades")
 test_that("autoSelectExchangeTrades", {
   expect_equal(
@@ -110,7 +111,7 @@ test_that("tradesCleanup gives same data as the shipped data", {
 
 test_that("tradesCleanup on-disk functionality", {
   skip_on_cran()
-  if(Sys.getenv("USERNAME") != "emil"){
+  if(Sys.getenv("USER") != "emil"){
     skip("Skipped to not mess with other people's files")
   }
   library(data.table)

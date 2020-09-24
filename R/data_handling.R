@@ -228,7 +228,7 @@ aggregateTS <- function (ts, FUN = "previoustick", on = "minutes", k = 1, weight
 aggregatePrice <- function(pData, on = "minutes", k = 1, marketOpen = "09:30:00", marketClose = "16:00:00" , fill = FALSE, tz = NULL) {
   ## checking
   pData <- checkColumnNames(pData)
-  N <- DATE <- DT <- FIRST_DT <- DT_ROUND <- LAST_DT <- SYMBOL <- PRICE <- NULL
+  .N <- .I <- N <- DATE <- DT <- FIRST_DT <- DT_ROUND <- LAST_DT <- SYMBOL <- PRICE <- NULL
 
   on_true <- NULL
 
@@ -260,6 +260,7 @@ aggregatePrice <- function(pData, on = "minutes", k = 1, marketOpen = "09:30:00"
       dummy_was_xts <- TRUE
       pData <- setnames(as.data.table(pData)[, PRICE := as.numeric(as.character(PRICE))],
                         old = "index", new = "DT")
+      
     } else {
       stop("Input has to be data.table or xts.")
     }
@@ -272,16 +273,18 @@ aggregatePrice <- function(pData, on = "minutes", k = 1, marketOpen = "09:30:00"
       stop("Data.table neeeds PRICE column.")
     }
   }
-
   timeZone <- attr(pData$DT, "tzone")
   if(timeZone == ""){
     if(is.null(tz)){
       tz <- "UTC"
     }
-    pData[, DT := as.POSIXct(format(DT, digits = 20, nsmall = 20), tz = tz)]
+    if(!("POSIXct" %in% class(pData$DT))){
+      pData[, DT := as.POSIXct(format(DT, digits = 20, nsmall = 20), tz = tz)]
+    }
   } else {
     tz <- timeZone
   }
+  setkey(pData, DT) # The below code MAY fail with data with unordered DT column. Also setkey inceases speed of grouping
   ## Checking ends
   # Convert DT to numeric. This is much faster than dealing with the strings (POSIXct)
   pData[, DT := as.numeric(DT, tz = tz)]
@@ -467,7 +470,7 @@ aggregateQuotes <- function(qData, on = "minutes", k = 5, marketOpen = "09:30:00
   } else {
     tz <- timeZone
   }
-  
+  setkey(qData, DT) # The below code MAY fail with data with unordered DT column. Also setkey inceases speed of grouping
   # Convert DT to numeric. This is much faster than dealing with the strings (POSIXct)
   qData[, DT := as.numeric(DT, tz = tz)]
   # Calculate the date in the data
@@ -627,7 +630,7 @@ aggregateTrades <- function(tData, on = "minutes", k = 5, marketOpen = "09:30:00
     tz <- timeZone
   }
   
-  
+  setkey(tData, DT) # The below code MAY fail with data with unordered DT column. Also setkey inceases speed of grouping
   # Convert DT to numeric. This is much faster than dealing with the strings (POSIXct)
   tData[, DT := as.numeric(DT, tz = tz)]
   # Calculate the date in the data
@@ -1037,10 +1040,15 @@ makeReturns <- function(ts) {
 #' 
 #' @param tData data.table or xts-object containing the trade data (multiple days possible).
 #' @param qData data.table or xts-object containing the quote data (multiple days possible).
-#' @param adjustment numeric, number of seconds the quotes are registered faster than
+#' @param lagQuotes numeric, number of seconds the quotes are registered faster than
 #' the trades (should be round and positive). Based on the research of
 #' Vergote (2005), we set 2 seconds as the default.
-#' 
+#' @param BFM a logical determining whether to conduct 'Backwards - Forwards matching' of trades and quotes.
+#' The algorithm tries to match trades that fall outside the bid - ask and first tries to match a small window forwards and if this fails, it tries to match backwards in a bigger window.
+#' The small window is a tolerance for inaccuracies in the timestamps of bids and asks. The backwards window allow for matching of late reported trades. I.e. block trades.
+#' @param backwardsWindow a numeric denoting the length of the backwards window. Default is 3600, corresponding to one hour.
+#' @param forwardsWindow a numeric denoting the length of the forwards window. Default is 0.5, dorresponding to one half second.
+#' @param plot a logical denoting whether to visualize the forwards, backwards, and unmatched trades in a plot.
 #' @return data.table or xts-object containing the matched trade and quote data
 #' 
 #' @references  Vergote, O. (2005). How to match trades and quotes for NYSE stocks?
@@ -1058,7 +1066,7 @@ makeReturns <- function(ts) {
 #' tqData <- matchTradesQuotes(sampleTDataMicroseconds, sampleQDataMicroseconds)
 #' @importFrom xts tzone<- tzone
 #' @export
-matchTradesQuotes <- function(tData, qData, adjustment = 2) {
+matchTradesQuotes <- function(tData, qData, lagQuotes = 2, BFM = FALSE, backwardsWindow = 3600, forwardsWindow = 0.5, plot = FALSE) {
   
   PRICE <- BID <- OFR <- DATE <- DT <- FIRST_DT <- DT_ROUND <- SYMBOL <- NULL
   
@@ -1072,8 +1080,8 @@ matchTradesQuotes <- function(tData, qData, adjustment = 2) {
   }
   
   dummy_was_xts <- FALSE
-  if (is.data.table(tData) == FALSE) {
-    if (is.xts(tData) == TRUE) {
+  if (!is.data.table(tData)) {
+    if (is.xts(tData)) {
       tData <- as.data.table(tData)
       tData <- setnames(tData , old = "index", new = "DT")
       for (col in names(tData)[-1]) {
@@ -1088,7 +1096,7 @@ matchTradesQuotes <- function(tData, qData, adjustment = 2) {
         set(qData, j = col, value = as.character(qData[[col]]))
       }
       
-      qData[, `:=` (OFR = as.numeric(OFR), BID = as.numeric(BID))]
+      qData[, `:=`(OFR = as.numeric(OFR), BID = as.numeric(BID))]
       
       dummy_was_xts <- TRUE
     } else {
@@ -1103,29 +1111,45 @@ matchTradesQuotes <- function(tData, qData, adjustment = 2) {
   if(tzone(tData$DT) != tzone(qData$DT)){
     stop("timezone of the trade data is not the same as the timezone of the quote data")
   }
-  
-  
   tz <- tzone(tData$DT)
-  qData[, DT := as.numeric(DT, tz = tz)]
-  qData[, DATE := floor(DT / 86400)]
-  qData[, FIRST_DT := min(DT), by = "DATE"]
-  # Make the adjustments to the quote timestamps.
-  qData <- qData[, DT := fifelse(DT == FIRST_DT, DT, DT + adjustment)][,-c("FIRST_DT", "DATE")]
-  qData[, DT := as.POSIXct(DT, tz = tz, origin = "1970-01-01")]
+  
+  setnames(qData, old = "EX", new = "QUOTEEX", skip_absent = TRUE)
+  
+  if(!BFM){ ## We DONT conduct a backwards- forwards matching search
+    
+    qData <- copy(qData)[, DT := as.numeric(DT, tz = tz)]
+    qData[, DATE := floor(DT / 86400)]
+    qData[, FIRST_DT := min(DT), by = "DATE"]
+    # Make the adjustments to the quote timestamps.
+    qData <- qData[, DT := fifelse(DT == FIRST_DT, DT, DT + lagQuotes)][,-c("FIRST_DT", "DATE")]
+    qData[, DT := as.POSIXct(DT, tz = tz, origin = "1970-01-01")]
+  
+    
+    setkey(tData, SYMBOL, DT)
+    setkey(qData, SYMBOL, DT)
+    tqData <- qData[tData, roll = TRUE, on = c("SYMBOL", "DT"), ]
+    tqData[, DT := as.POSIXct(DT, tz = tz, origin = "1970-01-01")]
+    
+    if (dummy_was_xts) {
+      return(xts(as.matrix(tqData[, -c("DT")]), order.by = tqData$DT, tzone = tz))
+    } else {
+      return(tqData)
+    }
+    
+  } else {
+    
+    qData <- copy(qData)[, DT := as.numeric(DT, tz = tz)]
+    qData[, DT := fifelse(DT == min(DT), DT, DT + lagQuotes), by = floor(DT / 86400)]
+    tData <- copy(tData)[, DT := as.numeric(DT, tz = tz)]
+    out <- BFMalgorithm(tData, qData, backwardsWindow = backwardsWindow, forwardsWindow = forwardsWindow, plot = plot, tz = tz)
+    
+    return(out)
+    
+  }
+  
 
   
-  setkey(tData, SYMBOL, DT)
-  setkey(qData, SYMBOL, DT)
-  tqData <- qData[tData, roll = TRUE, on = c("SYMBOL", "DT")]
-  tqData[, DT := as.POSIXct(DT, tz = tz, origin = "1970-01-01")]
-  tzone(tqData) <- tz
   
-  
-  if (dummy_was_xts == TRUE) {
-    return(xts(as.matrix(tqData[, -c("DT")]), order.by = tqData$DT, tz = tz))
-  } else {
-    return(tqData)
-  }
 }
 
 #' Merge multiple quote entries with the same time stamp
@@ -1637,6 +1661,12 @@ rmNegativeSpread <- function(qData) {
 #' @param tData a data.table or xts object containing the time series data, with at least the column "PRICE", containing the transaction price.
 #' @param qData a data.table or xts object containing the time series data with at least the columns "BID" and "OFR", containing the bid and ask prices.
 #' @param lagQuotes a numeric of length 1 that denotes how many seconds to lag the quotes. Default is 2 seconds. See Details.
+#' @param BFM a logical determining whether to conduct 'Backwards - Forwards matching' of trades and quotes.
+#' The algorithm tries to match trades that fall outside the bid - ask and first tries to match a small window forwards and if this fails, it tries to match backwards in a bigger window.
+#' The small window is a tolerance for inaccuracies in the timestamps of bids and asks. The backwards window allow for matching of late reported trades. I.e. block trades.
+#' @param backwardsWindow a numeric denoting the length of the backwards window. Default is 3600, corresponding to one hour.
+#' @param forwardsWindow a numeric denoting the length of the forwards window. Default is 0.5, dorresponding to one half second.
+#' @param plot a logical denoting whether to visualize the forwards, backwards, and unmatched trades in a plot.
 #' @details Note: in order to work correctly, the input data of this function should be
 #' cleaned trade (tData) and quote (qData) data respectively.
 #' In older high frequency datasets the trades frequently lag the quotes. In newer datasets this tends to happen 
@@ -1651,7 +1681,7 @@ rmNegativeSpread <- function(qData) {
 #' @keywords cleaning
 #' @importFrom data.table setkey set
 #' @export
-rmTradeOutliersUsingQuotes <- function(tData, qData, lagQuotes = 2) {
+rmTradeOutliersUsingQuotes <- function(tData, qData, lagQuotes = 2, BFM = FALSE, backwardsWindow = 3600, forwardsWindow = 0.5, plot = FALSE) {
   if(length(lagQuotes) != 1){
     lagQuotes <- lagQuotes[1]
   }
@@ -1696,42 +1726,26 @@ rmTradeOutliersUsingQuotes <- function(tData, qData, lagQuotes = 2) {
   }
   
   
-  qData[,DATE := as.Date(DT)]
-  tData[,DATE := as.Date(DT)]
   
-  qData <- qData[, DT := DT + lagQuotes]
-  setkey(tData, SYMBOL, DT)
-  setkey(qData, SYMBOL, DT)
-  setnames(qData, old = "EX", new = "QUOTEEX", skip_absent = TRUE)
-  dates <- unique(tData[,DATE])
-  quoteDates <- unique(qData[,DATE])
-  if(!all(dates == quoteDates)){
-    stop("The dates in the quote and trade data must be the same.")
-  }
   
-  if(length(dates)>1){ # Special case for multiday input
-    res <- list() # Container for our data
-    for (i in 1:length(dates)) {
-      # Join the data day-by-day. This cannot be done by e.g. a by argument due to the roll = TRUE flag.  
-      res[[i]] <- qData[DATE == dates[i]][tData[DATE == dates[i]], roll = TRUE, on = c("SYMBOL", "DT")]
+  tqData <- matchTradesQuotes(tData, qData, lagQuotes = lagQuotes, BFM = BFM, backwardsWindow = backwardsWindow, forwardsWindow = forwardsWindow, plot = plot)
+  
+  if(!BFM){
+    tData <- tqData[, SPREAD := OFR - BID][PRICE <= OFR + SPREAD & PRICE >= BID - SPREAD]
+  
+    if (dummy_was_xts == TRUE) {
+      return(xts(as.matrix(tData[, -c("DT", "SPREAD")]), order.by = tData$DT))
+    } else {
+      return(tData[, -c("SPREAD")])
     }
-    
-    tData <- rbindlist(res)[,-c("DATE", "i.DATE")]
-  }
-  else {
-    tData <- qData[tData, roll = TRUE, on = c("SYMBOL", "DT") ][,-c("DATE", "i.DATE")]
-  }
-  
-  
-  tData[is.na(BID)][, "BID"] <- tData$BID[min(which(is.na(tData$BID) == FALSE))]
-  tData[is.na(OFR)][, "OFR"] <- tData$OFR[min(which(is.na(tData$OFR) == FALSE))]
-  tData <- tData[, SPREAD := OFR - BID][PRICE <= OFR + SPREAD & PRICE >= BID - SPREAD]
-  
-  if (dummy_was_xts == TRUE) {
-    return(xts(as.matrix(tData[, -c("DT", "SPREAD")]), order.by = tData$DT))
   } else {
-    return(tData[, -c("SPREAD")])
+    
+    return(tqData)
+    
   }
+  
+  
+  
 }
 
 #' Delete entries for which the mid-quote is outlying with respect to surrounding entries

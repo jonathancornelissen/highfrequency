@@ -596,3 +596,105 @@ set.Trade <- function(x, error = TRUE) {
 ##   
 ## }
 
+
+#' This function is not exported, but the documentation is here to help users
+#' @keywords internal
+#' @importFrom data.table copy data.table setnafill
+BFMalgorithm <- function(tData, qData, backwardsWindow, forwardsWindow, plot, tz){
+  N <- .N <- MIDQUOTE <- SPREAD <- DT <- BID <- OFR <- PRICE <- NULL
+  qData <- qData[, list(DT, BID, OFR)]
+  # Filter quotes to only places where they actually change.
+  qData <- copy(qData[c(TRUE, diff(BID)|diff(OFR))])[, `:=`(BID = pmin(BID,OFR), OFR = pmax(BID, OFR), N = 1:.N)]
+  # Locate outliers
+  idxOutliers <- qData[, `:=`(SPREAD = pmax(OFR-BID, median(OFR-BID)), MIDQUOTE = (BID + OFR)/2)][
+    tData, roll = TRUE, on = "DT"][,N := 1:.N][PRICE > MIDQUOTE + 2.01 * SPREAD | PRICE < MIDQUOTE - 2.01 * SPREAD]$N
+  
+  # Insert quotes 
+  bid <- qData$BID
+  ask <- qData$OFR
+  qTS <- qData$DT
+  idxUp <- which(bid[-1] > ask[-length(ask)]) + 1
+  idxDown <- which(ask[-1] < bid[-length(bid)]) + 1
+  bid <- c(bid, ask[idxUp - 1], ask[idxDown])
+  ask <- c(ask, bid[idxUp], bid[idxDown + 1])
+  qTS <- c(qTS, pmax(qTS[idxUp - 1], qTS[idxUp]-1), pmax(qTS[idxDown-1], qTS[idxDown]-1))
+  idx <- sort(qTS, index.return = TRUE)$ix
+  qTS <- qTS[idx]
+  bid <- bid[idx]
+  ask <- ask[idx]
+  idx <- qData[, N := 1:.N][roll = TRUE, copy(tData), on = "DT"]$N
+  idxForward <- qData[, N := 1:.N][roll = TRUE, copy(tData)[, DT := DT + forwardsWindow], on = "DT"]$N
+  idxBackward <- copy(qData)[, `:=`(DT = DT + backwardsWindow)][roll = TRUE, tData, on = "DT"]$N + 1# Compensate for the forwards window 
+  idxBackward[is.na(idxBackward)] <- 2
+  tqData <- qData[roll = TRUE, tData, on = "DT"]
+  qData <- data.table(DT = qTS, BID = bid, OFR = ask)
+  
+  forwardsMatches <- rep(NA, (nrow(tData)))
+  for(i in idxOutliers){
+    startIdx <- idx[i]
+    endIdx <- idxForward[i]
+    mask <- tData[i, PRICE] > qData[startIdx:endIdx, BID - 1e-8] & tData[i, PRICE] < qData[startIdx:endIdx, OFR + 1e-8]
+    if(sum(mask)){
+      forwardsMatches[i] <- qData[startIdx + which(mask)[1] - 1,DT]
+    }
+  }
+  
+  forwardsMatches <- as.numeric(forwardsMatches - tData[,DT])
+  
+  backwardsMatches <- rep(NA, nrow(tData))
+  idxOutliers2 <- idxOutliers[!idxOutliers %in% which(!is.na(forwardsMatches))] ## remove already forward matched values.
+  for (i in idxOutliers2) {
+    
+    startIdx <- idxBackward[i]
+    endIdx <- idx[i]
+    mask <- tData[i, PRICE] > qData[startIdx:endIdx, BID - 1e-8] & tData[i, PRICE] < qData[startIdx:endIdx, OFR + 1e-8]
+    if(sum(mask)){
+      foo <- which(mask)
+      backwardsMatches[i] <- qData[startIdx + foo[length(foo)] - 1,DT]
+    }
+    
+  }
+  
+  
+  
+  
+  backwardsMatches <- as.numeric(tData[,DT] - backwardsMatches)
+  remaining <- idxOutliers2[!idxOutliers2 %in% which(!is.na(backwardsMatches))]
+  whichBackwards <- which(!is.na(backwardsMatches))
+  backwardsMatches <- backwardsMatches[whichBackwards]
+  whichForwards <- which(!is.na(forwardsMatches))
+  forwardsMatches <- forwardsMatches[whichForwards]
+  
+  tqData[, DT := as.POSIXct(DT, tz = tz, origin = "1970-01-01")]
+  
+  
+  if(plot){
+    yLim <- range(tqData[, list(PRICE, BID, OFR)], na.rm = TRUE)
+    plot(tqData$DT, tqData$PRICE, xaxs = 'i', pch = 20, ylim = yLim, col = fifelse(!(1:nrow(tqData) %in% remaining),
+                                                                                   1 + 1:nrow(tqData) %in% idxOutliers + 1:nrow(tqData) %in% idxOutliers2,
+                                                                                   0))
+    # axis(1, at = seq.POSIXt(as.POSIXct(range(tqData$DT), origin = as.POSIXct("1970-01-01", tz = "GMT"), tz = "GMT")[1], as.POSIXct(range(tqData$DT), origin = as.POSIXct("1970-01-01", tz = "GMT"), tz = "GMT")[2], length.out = 3, tz = "GMT"),
+    #      labels = format(seq.POSIXt(as.POSIXct(range(tqData$DT), origin = as.POSIXct("1970-01-01", tz = "GMT"), tz = "GMT")[1], as.POSIXct(range(tqData$DT), origin =as.POSIXct("1970-01-01", tz = "GMT"))[2], length.out = 3, tz = "GMT"),
+    #      format = "%H:%M"))
+    lines(tqData$DT, tqData$OFR, type = "l", col = "blue", ylim = yLim)
+    lines(tqData$DT, tqData$BID, type = "l", col = "green", ylim = yLim)
+    points(tqData[remaining, DT], tqData[remaining, PRICE], pch = 4, col = "red")
+    tzone(tqData) <- tz
+    
+  }
+  
+  tqData[c(whichBackwards, whichForwards), `:=`(DT = DT - c(na.omit(backwardsMatches), na.omit(forwardsMatches)))]
+  tqData[c(whichBackwards, whichForwards), `:=`(BID = NA)]
+  tqData[c(whichBackwards, whichForwards), `:=`(OFR = NA)]
+  
+  
+  
+  tqData <- tqData[!remaining]
+  setkey(tqData, DT)
+  setnafill(tqData, "locf", cols = c("BID", "OFR"))
+  
+  
+  
+  return(list("tqData" = tqData, "forwardMatched" = cbind(forwardsMatches, whichForwards), 
+              "backwardsMatched" = cbind(backwardsMatches, whichBackwards), "unmatched" = remaining))
+}
