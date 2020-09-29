@@ -264,6 +264,28 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// rollApplyMinWrapper
+arma::mat rollApplyMinWrapper(const arma::mat& x);
+RcppExport SEXP _highfrequency_rollApplyMinWrapper(SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::mat& >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(rollApplyMinWrapper(x));
+    return rcpp_result_gen;
+END_RCPP
+}
+// rollApplyMedianWrapper
+arma::mat rollApplyMedianWrapper(const arma::mat& x);
+RcppExport SEXP _highfrequency_rollApplyMedianWrapper(SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::mat& >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(rollApplyMedianWrapper(x));
+    return rcpp_result_gen;
+END_RCPP
+}
 // leadLagCpp
 arma::vec leadLagCpp(const arma::vec& x, const arma::vec& timestampsX, const arma::vec& y, const arma::vec& timestampsY, const arma::vec lags, const bool normalize);
 RcppExport SEXP _highfrequency_leadLagCpp(SEXP xSEXP, SEXP timestampsXSEXP, SEXP ySEXP, SEXP timestampsYSEXP, SEXP lagsSEXP, SEXP normalizeSEXP) {
@@ -399,6 +421,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_highfrequency_mSeq", (DL_FUNC) &_highfrequency_mSeq, 3},
     {"_highfrequency_cfilter", (DL_FUNC) &_highfrequency_cfilter, 2},
     {"_highfrequency_mldivide", (DL_FUNC) &_highfrequency_mldivide, 2},
+    {"_highfrequency_rollApplyMinWrapper", (DL_FUNC) &_highfrequency_rollApplyMinWrapper, 1},
+    {"_highfrequency_rollApplyMedianWrapper", (DL_FUNC) &_highfrequency_rollApplyMedianWrapper, 1},
     {"_highfrequency_leadLagCpp", (DL_FUNC) &_highfrequency_leadLagCpp, 6},
     {"_highfrequency_leadLagCppPAR", (DL_FUNC) &_highfrequency_leadLagCppPAR, 7},
     {"_highfrequency_nsmaller", (DL_FUNC) &_highfrequency_nsmaller, 5},

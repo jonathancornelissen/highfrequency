@@ -79,6 +79,14 @@ mldivide <- function(A, B) {
     .Call(`_highfrequency_mldivide`, A, B)
 }
 
+rollApplyMinWrapper <- function(x) {
+    .Call(`_highfrequency_rollApplyMinWrapper`, x)
+}
+
+rollApplyMedianWrapper <- function(x) {
+    .Call(`_highfrequency_rollApplyMedianWrapper`, x)
+}
+
 leadLagCpp <- function(x, timestampsX, y, timestampsY, lags, normalize) {
     .Call(`_highfrequency_leadLagCpp`, x, timestampsX, y, timestampsY, lags, normalize)
 }

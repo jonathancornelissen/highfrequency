@@ -12,7 +12,8 @@ rKernelCov(
   makeReturns = FALSE,
   kernelType = "rectangular",
   kernelParam = 1,
-  kernelDOFadj = TRUE
+  kernelDOFadj = TRUE,
+  ...
 )
 }
 \arguments{
@@ -32,6 +33,8 @@ return series over period \eqn{t}, with \eqn{M} observations during \eqn{t}.}
 \item{kernelParam}{Kernel parameter (usually lags)}
 
 \item{kernelDOFadj}{Kernel Degree of freedom adjustment}
+
+\item{...}{used internally, do not use.}
 }
 \value{
 Kernel estimate of realized covariance.

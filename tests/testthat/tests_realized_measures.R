@@ -72,7 +72,7 @@ test_that("minRV", {
     "0.013259"
   )
   
-  expect_equal(lapply(minRV(returnDat), sum), list("PRICE1" = 3.0696895, "PRICE2" = 2.977093559, "PRICE3" = 3.01211734))
+  expect_equal(lapply(minRV(returnDat), sum), list("PRICE1" = 3.027820575, "PRICE2" = 2.99975133, "PRICE3" = 3.001113006))
   expect_equal(lapply(minRV(returnDat), sum), lapply(minRV(dat, makeReturns = TRUE), sum))
   
   expect_equal(matrix(minRV(returnDat), ncol = 3), matrix(as.matrix(minRV(returnDatDT)[,-1]), ncol = 3))
@@ -196,6 +196,19 @@ test_that("rKurt", {
     formatC(as.numeric(rKurt(sample5MinPricesJumps[c('2010-01-04', '2010-01-05'), 1], alignBy ="minutes", alignPeriod = 5, makeReturns = TRUE))[1], digits = 5),
     "2.8936"
   )
+  expect_equal(sum(rKurt(returnDat[,1])), sum(rKurt(returnDat)[,1]))
+  expect_equal(lapply(rKurt(returnDat), sum), list("PRICE1" = 8.963908299, "PRICE2" = 9.029035031, "PRICE3" = 9.063772367))
+  expect_equal(lapply(rKurt(returnDat), sum), lapply(rKurt(dat, makeReturns = TRUE), sum))
+  
+  expect_equal(matrix(rKurt(returnDat), ncol = 3), matrix(as.matrix(rKurt(returnDatDT)[,-1]), ncol = 3))
+  expect_equal(matrix(rKurt(dat, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE), ncol = 3),
+               matrix(as.matrix(rKurt(datDT, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)[, -1]), ncol = 3))
+  
+  expect_equal(matrix(as.matrix(rKurt(as.data.table(sample5MinPrices)[,DT := index][,!"index"], makeReturns = TRUE)[,-1]), ncol = ncol(sample5MinPrices)),
+               matrix(rKurt(sample5MinPrices, makeReturns = TRUE), ncol = ncol(sample5MinPrices)))
+  
+  
+  
 })
 
 ##### rMPV ##### 
@@ -242,6 +255,8 @@ test_that("rKernelCov", {
     formatC(sum(rKernelCov(rData = cbind(lltc, sbux, fill = 0), alignBy = "minutes", alignPeriod = 5, makeReturns = FALSE)) * 1000, digits = 5),
     "0.021281"
   )
+  expect_equal(length(listAvailableKernels()) , 12)
+  
 })
 
 ##### rSkew ##### 

@@ -177,3 +177,30 @@ arma::vec cfilter(arma::vec x, arma::vec filter)
 arma::vec mldivide(arma::mat A, arma::vec B){
   return(arma::solve(A,B));
 }
+
+
+//[[Rcpp::export]]
+arma::mat rollApplyMinWrapper(const arma::mat& x){
+  
+  arma::mat out = arma::mat(x.n_rows - 1, x.n_cols); // One row less than the input as we take min of i and i-1
+  const arma::uword N = x.n_cols;
+  for(arma::uword i = 1; i < x.n_rows; i++){
+    out.row(i-1) = min(x(span(i-1, i), span(0, N-1)), 0);
+  }
+  
+  
+  return(out);
+}
+
+//[[Rcpp::export]]
+arma::mat rollApplyMedianWrapper(const arma::mat& x){
+  
+  arma::mat out = arma::mat(x.n_rows - 2, x.n_cols);
+  const arma::uword N = x.n_cols;
+  
+  for(arma::uword i = 1; i < x.n_rows - 1; i++){
+    out.row(i-1) = median(x(span(i - 1, i + 1), span(0, N - 1)), 0);
+  }
+  return(out);
+  
+}
