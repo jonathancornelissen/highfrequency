@@ -22,42 +22,42 @@ double KK(double x, int type) {
     break;
     
   case 1: // Bartlett
-    return(1-thex);
+    return(1 - thex);
     break;
     
   case 2: //2nd Order
-    return(1-2*thex+thex*thex);
+    return(1 - 2 * pow(thex, 3.0));
     break;
     
   case 3: //Epanechnikov
-    return(1-thex*thex);
+    return(1 - pow(thex, 2.0));
     break;
     
   case 4: //Cubic
-    return(1-3*thex*thex+2*thex*thex*thex);
+    return(1 - 3 * pow(thex, 2.0) + 2 * pow(thex, 3.0));
     break;
     
   case 5: //5th Order
-    return(1-10*thex*thex*thex + 15*thex*thex*thex*thex - 6*thex*thex*thex*thex*thex);
+    return(1 - 10 * pow(thex, 3.0) + 15 * pow(thex, 4.0) - 6 * pow(thex, 5.0));
     break;
     
   case 6: //6th Order
-    return(1 - 15*thex*thex*thex*thex + 24*thex*thex*thex*thex*thex - 10*thex*thex*thex*thex*thex*thex);
+    return(1 - 15 * pow(thex, 4.0) + 24 * pow(thex, 5.0) - 10 * pow(thex, 6.0));
     break;
     
   case 7: //7th Order
-    return(1 - 21*thex*thex*thex*thex*thex + 35*thex*thex*thex*thex*thex*thex - 15*thex*thex*thex*thex*thex*thex*thex);
+    return(1 - 21 * pow(thex, 5.0) + 35 * pow(thex, 6.0) - 15 * pow(thex, 7.0));
     break;
     
   case 8: //8th Order
-    return(1 - 28*thex*thex*thex*thex*thex*thex + 48*thex*thex*thex*thex*thex*thex*thex - 21*thex*thex*thex*thex*thex*thex*thex*thex);
+    return(1 - 28*pow(thex, 6.0) + 48 * pow(thex, 7.0) - 21*pow(thex, 8.0));
     break;
     
   case 9: //Parzen
     if (thex > .5) {
       return( 2*(1-thex)*(1-thex)*(1-thex));
     }  else {
-      return(1- 6*thex*thex +6*thex*thex*thex);
+      return(1- 6 * pow(thex, 2.0) +6 * pow(thex, 3.0));
     }
     break;
     
@@ -66,7 +66,7 @@ double KK(double x, int type) {
     break;
     
   case 11: //Modified Tukey-Hanning
-    return((1 - sin(M_PI_2 - M_PI *(1 - thex) *(1 - thex)) )/2);
+    return((1 - sin(M_PI_2 - M_PI * (1 - thex) * (1 - thex)) )/2.0);
     break;
   }
   return(-999);
@@ -97,7 +97,7 @@ double kernelEstimator(NumericVector a, NumericVector b, int na, int q, int adj,
     if (adj == 0) {
       theadj = 1;
     } else {
-      theadj =((double)(nab+1)/((double)(nab + 1)-(double)i));
+      theadj = ((double)(nab+1)/((double)(nab + 1)-(double)i));
     }
 
     if(i == 0) {
