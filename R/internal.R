@@ -12,9 +12,9 @@ applyGetList <- function(x, FUN, cor = FALSE, alignBy = NULL, alignPeriod = NULL
   FUN <- match.fun(FUN)
   for(i in 1:(length(INDEX)-1)){
     if (is.null(makePsd)) {
-      result[[i]] <- FUN(x[(INDEX[i] + 1):INDEX[i + 1]], cor, alignBy, alignPeriod, makeReturns)
+      result[[i]] <- FUN(x[(INDEX[i] + 1):INDEX[i + 1]], cor, alignBy, alignPeriod, makeReturns, ...)
     } else {
-      result[[i]] <- FUN(x[(INDEX[i] + 1):INDEX[i + 1]], cor, alignBy, alignPeriod, makeReturns, makePsd)
+      result[[i]] <- FUN(x[(INDEX[i] + 1):INDEX[i + 1]], cor, alignBy, alignPeriod, makeReturns, makePsd, ...)
     }
     
   }
@@ -62,6 +62,7 @@ makePsd <- function(S, method = "covariance") {
     Apsd  <- Apsd/(dApsd%*%t(dApsd))
     D     <- diag( as.numeric(D)  , ncol = length(D) )
     Spos  <- D %*% Apsd %*% D
+    colnames(Spos) <- rownames(Spos) <- colnames(S)
     return(Spos)
   } else {
     # Rousseeuw, P. and G. Molenberghs (1993). Transformation of non positive semidefinite correlation matrices. Communications in Statistics - Theory and Methods 22, 965-984.
@@ -70,6 +71,8 @@ makePsd <- function(S, method = "covariance") {
     vLambda <- out$values
     vLambda[vLambda<0] <- 0
     Apsd    <- t(mGamma) %*% diag(vLambda) %*% mGamma
+    colnames(Apsd) <- rownames(Apsd) <- colnames(S)
+    return(Apsd)
   }
 }
 
