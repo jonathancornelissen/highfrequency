@@ -337,22 +337,17 @@ test_that("refreshTime", {
   
   # Unit test for the refreshTime algorithm based on Kris' example in http://past.rinfinance.com/agenda/2015/workshop/KrisBoudt.pdf
   #suppose irregular timepoints: 
-  start = as.POSIXct("2010-01-01 09:30:00") 
-  ta = start + c(1,2,4,5,9,14); 
-  tb = start + c(1,3,6,7,8,9,10,11,15); 
-  tc = start + c(1,2,3,5,7,8,10,13); 
-  a = as.xts(1:length(ta),order.by=ta); 
-  b = as.xts(1:length(tb),order.by=tb);
-  c = as.xts(1:length(tc),order.by=tc); 
+  start = as.POSIXct("2010-01-01 09:30:00", tz = "GMT") 
+  ta = start + c(1, 2, 4, 5, 9, 14)
+  tb = start + c(1, 3, 6, 7, 8, 9, 10, 11, 15)
+  tc = start + c(1, 2, 3, 5, 7, 8, 10, 13)
+  a = as.xts(1:length(ta), order.by = ta) 
+  b = as.xts(1:length(tb), order.by = tb)
+  c = as.xts(1:length(tc), order.by = tc) 
   #Calculate the synchronized timeseries: 
-  expected <- xts(matrix(c(1,1,1,
-                           2,2,3,
-                           4,3,4,
-                           5,6,6,
-                           6,8,8), ncol = 3, byrow = TRUE), order.by = start + c(1,3,6,9,14))
+  expected <- xts(matrix(c(1,1,1, 2,2,3, 4,3,4, 5,6,6, 6,8,8), ncol = 3, byrow = TRUE), order.by = start + c(1,3,6,9,14))
   colnames(expected) <- c("a", "b", "c")
-  expect_equal(refreshTime(list("a" = a, "b" = b, "c" = c)),
-               expected)
+  expect_equal(refreshTime(list("a" = a, "b" = b, "c" = c)), expected)
   
   squaredDurationCriterion <- function(x) sum(as.numeric(diff(index(x)))^2)
   durationCriterion <- function(x) sum(as.numeric(diff(index(x))))
@@ -362,6 +357,25 @@ test_that("refreshTime", {
   expect_equal(refreshTime(list("b" = b, "a" = a, "c" = c), sort = TRUE, criterion = "squared duration"), expected[, sqDur])
   expect_equal(refreshTime(list("b" = b, "a" = a, "c" = c), sort = TRUE, criterion = "duration"), expected[, dur])
   
+  
+  aDT <- data.table(index(a), a)
+  colnames(aDT) <- c("DT", "PRICE")
+  bDT <- data.table(index(b), b)
+  colnames(bDT) <- c("DT", "PRICE")
+  cDT <- data.table(index(c), c)
+  colnames(cDT) <- c("DT", "PRICE")
+  
+  RT <- refreshTime(list("a" = aDT, "b" = bDT, "c" = cDT))
+  
+  expected <- data.table(DT =start + c(1,3,6,9,14), 
+                         matrix(c(1,1,1, 2,2,3, 4,3,4, 5,6,6, 6,8,8), ncol = 3, byrow = TRUE, dimnames = list(NULL, c("a", "b", "c"))))
+  
+  expect_equal(RT, expected)
+  
+  expect_equal(refreshTime(list("a" = aDT, "b" = bDT, "c" = cDT), sort = TRUE, criterion = "squared duration"), 
+               expected[, names(expected)[c(1, sqDur + 1)], with = FALSE])
+  expect_equal(refreshTime(list("a" = aDT, "b" = bDT, "c" = cDT), sort = TRUE, criterion = "duration"),
+               expected[, names(expected)[c(1, dur + 1)], with = FALSE])
   
 })
 

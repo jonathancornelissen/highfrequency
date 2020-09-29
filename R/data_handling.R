@@ -2262,12 +2262,11 @@ tradesCleanupUsingQuotes <- function(tradeDataSource = NULL, quoteDataSource = N
 #' The subsequent refresh time is defined as the first time when all stocks have traded again.
 #' This process is repeated until the end of one time series is reached.
 #' 
-#' @param pData a list. Each list-item contains an xts object  
-#' containing the original time series (one day only and typically a price series).
+#' @param pData a list. Each list-item contains an xts or a data.table object (with first column DT (datetime)) containing the original time series (one day only and typically a price series).
 #' @param sort logical determining whether to sort the index based on a criterion (will only sort descending (i.e. most liquid first)). Default is FALSE
 #' @param criterion character determining which criterion used. Currently supports "squared duration" and "duration". Default is "squared duration".
 #' 
-#' @return An xts object containing the synchronized time series.
+#' @return An xts or data.table object containing the synchronized time series - depending on the input.
 #' 
 #' @references Harris, F., T. McInish, G. Shoesmith, and R. Wood (1995). Cointegration, error correction, and price discovery on infomationally linked security markets. Journal of Financial and Quantitative Analysis 30, 563-581.
 #' 
@@ -2287,6 +2286,7 @@ tradesCleanupUsingQuotes <- function(tradeDataSource = NULL, quoteDataSource = N
 #' @author Jonathan Cornelissen and Kris Boudt
 #' @keywords data manipulation
 #' @importFrom xts xts tzone
+#' @importFrom data.table merge.data.table
 #' @export
 refreshTime <- function (pData, sort = FALSE, criterion = "squared duration") {
   
@@ -2307,8 +2307,9 @@ refreshTime <- function (pData, sort = FALSE, criterion = "squared duration") {
       stop("All the series in pData must contain data for a single day")
     }
   }
-  
-  
+  if((sort && is.null(names(pData)))){
+    stop("When using sort, please provide pData as a named list")
+  }
   
   if (length(pData) < 1) {
     stop("pData should contain at least two time series")
@@ -2394,11 +2395,13 @@ refreshTime <- function (pData, sort = FALSE, criterion = "squared duration") {
     
     pData <- Reduce(function(x,y) merge.data.table(x, y, all = TRUE, on = "DT"), pData)
     
-    
     pData <- refreshTimeMathing(as.matrix(pData[,-"DT"]), pData$DT)
     pData <- data.table(pData[[2]], pData[[1]])
     colnames(pData) <- c("DT", names)
     pData[, DT := as.POSIXct(DT, origin = as.POSIXct("1970-01-01", tz = tz), tz = tz)]
+    if(sort) setcolorder(pData, c(1, vec))
+    
+    
     return(pData)
   }
 }
