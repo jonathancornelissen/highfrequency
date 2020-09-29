@@ -84,18 +84,18 @@ driftBursts <- function(pData, testTimes = seq(34260, 57600, 60),
                        parallelize = FALSE, nCores = NA, warnings = TRUE){
   PRICE <- DT <- NULL
   ###Checks###
-  if (meanBandwidth<0 | meanBandwidth %% 1 != 0) {
+  if (meanBandwidth < 0 | meanBandwidth %% 1 != 0) {
     stop("meanBandwidth must be a positive integer")
   }
-  if(varianceBandwidth<0 | varianceBandwidth %% 1 != 0){
+  if(varianceBandwidth < 0 | varianceBandwidth %% 1 != 0){
     stop("varianceBandwidth must be a positive integer")
   }
-  if(ACLag !=-1 && ACLag%%1!=0 | -1>ACLag | ACLag == 1){
+  if(ACLag != -1 && ACLag %% 1 != 0 | -1 > ACLag | ACLag == 1){
     stop("ACLag must be a positive integer greater than 1, or -1. \n
          The standard of -1 designates usage of an automated lag selection algorithm.")
     #Specifically Newey-West 1994
   }
-  if(preAverage <=0 | preAverage%%1!=0 ){
+  if(preAverage <= 0 | preAverage %% 1 != 0 ){
     stop("preAverage must be a positive integer. No preaveraging is done when preAverage = 1.")
   }
   
@@ -202,19 +202,19 @@ driftBursts <- function(pData, testTimes = seq(34260, 57600, 60),
   vpreAveraged[(preAverage * 2 - 1):(iT - 1)] <- cfilter(x = logPrices, c(rep(1, preAverage),rep(-1, preAverage)))[preAverage:(iT - preAverage)]
   
   if(parallelize & !is.na(nCores)){ #Parallel evaluation or not?
-    lDriftBursts <- DriftBurstLoopCPAR(vpreAveraged, vDiff, timestamps, testTimes, meanBandwidth, 
-                                      varianceBandwidth, preAverage, ACLag, nCores)
+    lDriftBursts <- DriftBurstLoopCPAR(vpreAveraged, vDiff, timestamps, testTimes, meanBandwidth,
+                                       varianceBandwidth, preAverage, ACLag, nCores)
   }else{
     lDriftBursts <- DriftBurstLoopC(vpreAveraged, vDiff, timestamps, testTimes, meanBandwidth, 
-                                   varianceBandwidth, preAverage, ACLag)  
+                                    varianceBandwidth, preAverage, ACLag)  
   }
   
   
   
   if(pad != 0 | removedFromEnd != 0){
-    lDriftBursts[["tStat"]] <- c(rep(0,pad), lDriftBursts[["tStat"]], rep(0,removedFromEnd))
-    lDriftBursts[["sigma"]] <- c(rep(0,pad), lDriftBursts[["sigma"]], rep(0,removedFromEnd))
-    lDriftBursts[["mu"]]    <- c(rep(0,pad), lDriftBursts[["mu"]], rep(0,removedFromEnd))
+    lDriftBursts[["tStat"]] <- c(rep(0, pad), lDriftBursts[["tStat"]], rep(0,removedFromEnd))
+    lDriftBursts[["sigma"]] <- c(rep(0, pad), lDriftBursts[["sigma"]], rep(0,removedFromEnd))
+    lDriftBursts[["mu"]]    <- c(rep(0, pad), lDriftBursts[["mu"]], rep(0,removedFromEnd))
   }
   
   if(wasXTS){
@@ -334,7 +334,7 @@ plot.DBH <- function(x, ...){
     xlim <- c(min(testTimes, timestamps), max(testTimes, timestamps))
   }
   xlab  <- "Time"
-  if(all(which %in% c("tStat"))){
+  if(all(which %in% c("tstat"))){
     par(mar = c(4,3.5,2,1.25), mgp = c(2,1,0))
     if(!is.null(prices)) par(mar = c(4,3.5,4,4), mgp = c(2,1,0)) #makes room for values on the right y-axis
     main <- "Drift Bursts test statistic"
@@ -408,9 +408,6 @@ print.DBH = function(x, ...){
   cat("\n-------------Drift Burst Hypothesis------------\n")
   cat("Tests performed:                     ", length(whichToInclude))
   if(usePolynomialInterpolation){
-    
-    
-    
     cat("\nAny drift bursts (|T| > ", formatC(criticalValue, digits = 3, format = "f"), "):    ", ifelse(any(abs(x$tStat) > criticalValue) , 'yes', 'no'))
     # cat("\nAny drift bursts (|T| > ", paste0(round(criticalValue, 3)), "):    ", ifelse(any(abs(x$driftBursts) > criticalValue) , 'yes', 'no'))
   }else{
@@ -421,6 +418,7 @@ print.DBH = function(x, ...){
   cat("\nMean test statistic:                 ", round(mean(x$tStat), digits = 5))
   cat("\nVariance of test statistic:          ", round(varDB, digits = 5))
   cat("\n-----------------------------------------------\n")
+  
 }
 
 
