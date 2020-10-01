@@ -9,14 +9,14 @@ test_that("spotDrift",{
     storage.mode(price) <- "numeric"
     kerneldrift <- spotDrift(price, method = "driftKernel", on = "minutes", k = 1)
     formatC(kerneldrift$mu[1:6], digits = 5)},
-    c("-0.070876", "-0.1145", "-0.072902", "0.020546", "0.078481", "0.089241")
+    c("-0.070876", "-0.11462", "-0.073003", "0.020463", "0.078407", "0.09181")
   )
   
   dat <- data.table::copy(sampleTDataMicroseconds)
   dat[, SYMBOL := NULL]
   meandrift <- spotDrift(data = dat, k = 1, tz = "EST")
   expect_identical(formatC(meandrift$mu[1:10], digits = 5),
-    c("    NA", "    NA", "    NA", "    NA", "0.00040961", "0.000454", "0.00060476", "0.00051623", "0.00050264", "-2.5183e-05")
+    c("    NA", "    NA", "    NA", "    NA", "0.00044115", "0.00049179", "0.00060476", "0.00046592", "0.00045243", "-5.0368e-05")
   )
   
   expect_identical(

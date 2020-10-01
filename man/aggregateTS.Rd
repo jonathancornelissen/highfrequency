@@ -21,7 +21,7 @@ aggregateTS(
 Alternatively one can set e.g. FUN = "mean".
 In case weights are supplied, this argument is ignored and a weighted average is taken.}
 
-\item{on}{character, indicating the time scale in which "k" is expressed. Possible values are: "secs", "seconds", "mins", "minutes", "hours", "days", "weeks".}
+\item{on}{character, indicating the time scale in which "k" is expressed. Possible values are: "secs", "seconds", "mins", "minutes", "hours", "days", "weeks", "ticks".}
 
 \item{k}{positive integer, indicating the number of periods to aggregate over. For example, to aggregate an 
 xts object to the five-minute frequency set k = 5 and on = "minutes".}
@@ -52,11 +52,15 @@ E.g. for a weekly aggregation the new timestamp is the last day in that particul
 In case of previous tick aggregation, 
 for on = "seconds"/"minutes"/"hours",
 the element of the returned series with e.g. timestamp 09:35:00 contains 
-the last observation up to that point, excluding the value at 09:35:00 itself.
+the last observation up to that point, including the value at 09:35:00 itself.
 
 Please note: In case an interval is empty, by default an NA is returned.. In case e.g. previous 
 tick aggregation it makes sense to fill these NA's by the function \code{na.locf}
 (last observation carried forward) from the zoo package.
+
+In case on = "ticks", the sampling is done such the sampling starts on the first tick, and the last tick is always included
+For example, if 14 observations are made on one day, and these are 1, 2, 3, ... 14.
+Then, with on = "ticks" and k = 3, the output will be 1, 4, 7, 10, 13, 14.
 }
 \examples{
 #load sample price data
@@ -68,6 +72,8 @@ head(tsagg5min)
 #Previous tick aggregation to the 30-second sampling frequency:
 tsagg30sec <- aggregateTS(ts, on = "seconds", k = 30)
 tail(tsagg30sec)
+
+tsagg3ticks <- aggregateTS(ts, on = "ticks", k = 3)
 
 }
 \author{

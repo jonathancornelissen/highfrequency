@@ -12,10 +12,10 @@
 #' The function does not try to extract when the last API call was made which means that if
 #' you made successive calls to get 3 symbols in rapid succession, the function may not retrieve all the data.
 #' 
-#' @return An object of type xts or data.table in case the length of symbols is 1. If the lenght of symbols > 1 the xts and 
+#' @return An object of type xts or data.table in case the length of symbols is 1. If the length of symbols > 1 the xts and 
 #' data.table objects will be put into a list.
 #' 
-#' @author Emil Sjørup (wrapper only) Paul Teetor (for quantMod's getSymbols.av)
+#' @author Emil Sjoerup (wrapper only) Paul Teetor (for quantMod's getSymbols.av)
 #' 
 #' @seealso The getSymbols.av function in the quantMod package
 #' @examples
@@ -55,7 +55,7 @@ getAlphaVantageData <- function(symbols = NULL, interval = "5min", outputType = 
   isMultiSymbols <- ifelse(length(symbols) > 1, TRUE, FALSE)
   
   # We have more than one symbol
-  if (isMmultiSymbols) {
+  if (isMultiSymbols) {
     data <- vector("list", length = length(symbols))
     names(data) <- symbols
     for (symbol in symbols) {

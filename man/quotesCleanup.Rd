@@ -15,7 +15,8 @@ quotesCleanup(
   window = 50,
   type = "advanced",
   rmoutliersmaxi = 10,
-  saveAsXTS = TRUE
+  saveAsXTS = TRUE,
+  tz = "EST"
 )
 }
 \arguments{
@@ -57,6 +58,8 @@ from, to, dataSource and dataDestination will be ignored. (only advisable for sm
 \item{rmoutliersmaxi}{argument to be passed on to the cleaning routine \code{\link{rmOutliersQuotes}}.}
 
 \item{saveAsXTS}{indicates whether data should be saved in xts format instead of data.table when using on-disk functionality. TRUE by default.}
+
+\item{tz}{timezone to use}
 }
 \value{
 The function converts every csv file in dataSource into multiple xts or data.table files.
@@ -80,12 +83,12 @@ The following cleaning steps are performed sequentially:
 # Consider you have raw quote data for 1 stock for 2 days
 head(sampleQDataRawMicroseconds)
 dim(sampleQDataRawMicroseconds)
-qData_aftercleaning <- quotesCleanup(qDataRaw = sampleQDataRawMicroseconds, exchanges = "N")
-qData_aftercleaning$report
-dim(qData_aftercleaning$qData)
+qDataAfterCleaning <- quotesCleanup(qDataRaw = sampleQDataRawMicroseconds, exchanges = "N")
+qDataAfterCleaning$report
+dim(qDataAfterCleaning$qData)
 
 # In case you have more data it is advised to use the on-disk functionality
-# via "from","to","dataSource",etc. arguments
+#via "dataSource" and "dataDestination" arguments
 
 }
 \references{

@@ -17,7 +17,7 @@
 #' @description A data.frame object containing the daily open-close returns, daily realized variances based on 
 #' five-minute intraday returns and daily realized kernels ranging from 2000-01-03 up to 2019-06-10 for the S&P 500. 
 #' Use \code{colnames(realizedLibrary)} to see which realized measures. 
-#' The full library of the Oxford-Man Institute of Quantitative Finance can be found on their website: \url{http://realized.oxford-man.ox.ac.uk}.
+#' The full library of the Oxford-Man Institute of Quantitative Finance can be found on their website: \url{https://realized.oxford-man.ox.ac.uk/}.
 #'  
 #' @references  
 #' Gerd Heber, Asger Lunde, Neil Shephard, and Kevin Sheppard (2009)
@@ -94,7 +94,16 @@
 
 #' Sample of cleaned quotes for stock XXX for 1 day
 #' 
-#' @description An xts object containing the raw quotes for the imaginary stock XXX for 1 day, in the typical NYSE TAQ database format. This is the cleaned version of the data sample \code{\link{sampleQDataRaw}}, using \code{quotesCleanup}.
+#' @description An xts object containing the raw quotes for the imaginary stock XXX for 1 day, in the typical NYSE TAQ database format. 
+#' This is the cleaned version of the data sample \code{\link{sampleQDataRaw}}, using \code{quotesCleanup}. 
+#' @examples
+#' \dontrun{
+#' #The code to create sampleQData from raw data is 
+#' sampleQData <- quotesCleanup(
+#' qDataRaw = sampleQDataRaw, exchanges = "N", type = "standard", 
+#' report = FALSE)[, c("SYMBOL", "BID", "BIDSIZ", "OFR", "OFRSIZ", "MODE")]
+#' # These are the historically included columns.
+#' }
 #' 
 #' @format xts object
 #' 
@@ -114,7 +123,12 @@
 #' @description A data.table object containing the raw quotes for the imaginary stock XXX for 2 days. This is the cleaned version of the data sample \code{\link{sampleQDataRawMicroseconds}}, using \code{quotesCleanup}.
 #' 
 #' @format data.table object
-#' 
+#' @examples 
+#' \dontrun{
+#' # The code to create the sampleQDataMicroseconds dataset from raw data is
+#' sampleQDataMicroseconds <- quotesCleanup(qDataRaw = sampleQDataRawMicroseconds,
+#'                                          exchanges = "N", type = "standard", report = FALSE)
+#' }
 #' @keywords datasets
 "sampleQDataMicroseconds"
 
@@ -140,7 +154,20 @@
 #' Sample of cleaned trades for stock XXX for 1 day
 #' 
 #' @description An xts object containing the trades for the imaginary stock XXX for 1 day, in the typical NYSE TAQ database format.
-#' This is the cleaned version of the data sample \code{\link{sampleTDataRaw}}, using \code{tradesCleanup}.
+#' This is the cleaned version of the data sample \code{\link{sampleTDataRaw}}, using \code{tradesCleanup} and \code{tradesCleanupUsingQuotes}.
+#' @examples 
+#' \dontrun{
+#' #The code to create sampleTData from raw data is 
+#' tradesAfterFirstCleaning <- tradesCleanup(tDataRaw = sampleTDataRaw, 
+#'                                           exchanges = "N", report = FALSE)
+#'                                           
+#' cleanedQuotes <- quotesCleanup(qDataRaw = sampleQDataRaw, exchanges = "N", 
+#'                                type = "standard", report = FALSE)
+#' sampleTData <- tradesCleanupUsingQuotes(tData = tradesAfterFirstCleaning,
+#'                                         qData = cleanedQuotes, lagQuotes = 2)
+#' sampleTData <- sampleTData[,c("SYMBOL", "EX",  "PRICE", "SIZE", "COND", "CORR", "G127")]
+#' # These are the historically included columns.
+#' }
 #' 
 #' @docType data
 #'
@@ -155,6 +182,21 @@
 #' This is the cleaned version of the data sample \code{\link{sampleTDataRawMicroseconds}}, using \code{tradesCleanup}.
 #' 
 #' @docType data
+#' @examples 
+#' \dontrun{
+#' # The code to create the sampleTDataMicroseconds dataset from raw data is
+#' sampleQDataMicroseconds <- quotesCleanup(qDataRaw = sampleQDataRawMicroseconds,
+#'                                          exchanges = "N", type = "standard", report = FALSE)
+#' 
+#' tradesAfterFirstCleaning <- tradesCleanup(tDataRaw = sampleTDataRawMicroseconds, 
+#'                                           exchanges = "N", report = FALSE)
+#' 
+#' sampleTDataMicroseconds <- tradesCleanupUsingQuotes(
+#'   tData = tradesAfterFirstCleaning,
+#'   qData = sampleQDataMicroseconds,
+#'   lagQuotes = 0)[, c("DT", "SYMBOL", "PRICE", "SIZE")]
+#' # Only some columns are included. These are the ones that were historically included.
+#' }
 #'
 #' @format A data.table object.
 #' 

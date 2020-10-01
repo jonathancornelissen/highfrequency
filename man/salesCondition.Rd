@@ -4,11 +4,16 @@
 \alias{salesCondition}
 \title{Delete entries with abnormal Sale Condition.}
 \usage{
-salesCondition(tData)
+salesCondition(
+  tData,
+  validConds = c("", "@", "E", "@E", "F", "FI", "@F", "@FI", "I", "@I")
+)
 }
 \arguments{
 \item{tData}{an xts or data.table object containing the time series data, with 
 one column named "COND" indicating the Sale Condition.}
+
+\item{validConds}{a character vector containing valid sales conditions defaults to \code{c('', '@', 'E', '@E', 'F', 'FI', '@F', '@FI', 'I', '@I')}. See details.}
 }
 \value{
 xts or data.table object depending on input
@@ -17,6 +22,10 @@ xts or data.table object depending on input
 Function deletes entries with abnormal Sale Condition: 
 trades where column "COND" has
 a letter code, except for "E" and "F".
+}
+\details{
+To get more information on the sales conditions, see the NYSE documentation. Section about Daily TAQ Trades File.
+The current version (as of May 2020) can be found online at \href{https://www.nyse.com/publicdocs/nyse/data/Daily_TAQ_Client_Spec_v3.3.pdf}{NYSE's webpage}
 }
 \author{
 Jonathan Cornelissen and Kris Boudt

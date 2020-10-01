@@ -31,7 +31,7 @@ In case the data spans more than one day, the list for each day will be put into
 }
 \description{
 Function returns the Realized Semicovariances (rSemiCov).
-Let \eqn{r_{t,i}} be an intraday \eqn{N x M} return vector and \eqn{i=1,...,M}
+Let \eqn{r_{t,i}} be an intraday \eqn{M x N} return matrix and \eqn{i=1,...,M}
 the number of intraday returns. Then, let p = max(r_{t,i},0) and n = min(r_{t,i}).
 
 Then, the realized semicovariance is given by the following three matrices:
@@ -78,11 +78,12 @@ covariances <- xts(cbind(mixed, neg, pos), as.Date(rownames(pos)))
 colnames(covariances) <- c("mixed", "neg", "pos")
 # We make a quick plot of the different covariances
 plot(covariances)
-addLegend(lty = 1)
+addLegend(lty = 1) # Add legend so we can distinguish the series.
 }
-
 }
 \author{
+Emil Sjoerup
+
 Emil Sjoerup
 }
 \keyword{volatility}

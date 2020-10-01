@@ -1,4 +1,41 @@
+#' @importFrom zoo zoo na.locf `index<-`
+#' @importFrom stats start end
+#' @keywords internal
+fastTickAgregation <- function (ts, on = "minutes", k = 1, tz = "GMT") {
+  
+  if (on == "secs" | on == "seconds") {
+    secs <- k
+    tby <- paste(k, "sec", sep = " ")
+  } 
+  if (on == "mins" | on == "minutes") {
+    secs <- 60 * k
+    tby <- paste(60 * k, "sec", sep = " ")
+  } 
+  if (on == "hours"){
+    secs <- 3600 * k
+    tby <- paste(3600 * k, "sec", sep = " ")
+  }
+  g <- base::seq(start(ts), end(ts), by = tby)
+  rawg <- as.numeric(as.POSIXct(g, tz = tz))
+  newg <- rawg + (secs - rawg %% secs)
+  if(as.numeric(end(ts)) == newg[length(newg)-1]){
+    newg  <- newg[-length(newg)]
+  }
+  g    <- as.POSIXct(newg, origin = "1970-01-01", tz = tz)
+  
+  firstObs <- ts[1,]
+  ts <- na.locf(merge(ts, zoo(NULL, g)))[as.POSIXct(g, tz = tz)]
+  if(index(ts[1]) > index(firstObs)){
+    index(firstObs) <- index(ts[1]) - secs
+    ts <- c(firstObs, ts)
+  }
+  return(ts)
+}
 
+
+# # Necessary for check-package not throwing errors
+# #' @keywords internal
+# ..keepCols <- NULL
 # Necessary for check-package not throwing errors
 #' @keywords internal
 `:=` <- function(...) {
@@ -8,41 +45,60 @@
 #' @importFrom xts xtsAttributes
 #' @keywords internal
 checkColumnNames <- function(data) { 
-  # FUNCTION sets column names according to RTAQ format using quantmod conventions, such that all the other functions find the correct information.
+  # FUNCTION sets column names according to RTAQ format using quantmod conventions, 
+  # such that all the other functions find the correct information.
   # First step: assign the xts attributes:
-  data <- set.AllColumns(data)
   
+  
+  if(is.xts(data)){
+    data <- set.AllColumns(data)
+    # Change column names to previous RTAQ format! 
+    # Adjust price col naming:  
+    try((colnames(data)[xtsAttributes(data)[['Price']]] = 'PRICE'), silent = TRUE)
+    # Adjust Bid col naming:    
+    try((colnames(data)[xtsAttributes(data)[['Bid']]] = 'BID'))  
+    # Adjust Ask col naming:    
+    try((colnames(data)[xtsAttributes(data)[['Ask']]] = 'OFR'))
+    # Adjust SYMBOL col naming:    
+    try((colnames(data)[xtsAttributes(data)[['SYM_ROOT']]] = 'SYMBOL'))
+    # Adjust Ask size col naming:
+    try((colnames(data)[xtsAttributes(data)[['BidSize']]] = 'BIDSIZ'))
+    # Adjust Bid size col naming:    
+    try((colnames(data)[xtsAttributes(data)[['AskSize']]] = 'OFRSIZ'))
+    # Adjust correction column, if necessary:
+    if (any(colnames(data) == "CR")) {
+      colnames(data)[colnames(data) == "CR"] <- "CORR"
+    }
+    
+  }
+  
+  if(is.data.table(data)){
+    
   # Change column names to previous RTAQ format! 
   # Adjust price col naming:  
-  try((colnames(data)[xtsAttributes(data)[['Price']]] = 'PRICE'), silent = TRUE)
   try(setnames(data, "Price", "PRICE", skip_absent = TRUE), silent = TRUE)
+  
   # Adjust Bid col naming:    
-  try((colnames(data)[xtsAttributes(data)[['Bid']]] = 'BID'))
   try(setnames(data, "Bid", "BID", skip_absent = TRUE), silent = TRUE)
   # Adjust Ask col naming:    
-  try((colnames(data)[xtsAttributes(data)[['Ask']]] = 'OFR'))
   try(setnames(data, "Ask", "OFR", skip_absent = TRUE), silent = TRUE)
+  try(setnames(data, "ASK", "OFR", skip_absent = TRUE), silent = TRUE)
   # Adjust SYMBOL col naming:    
-  try((colnames(data)[xtsAttributes(data)[['SYM_ROOT']]] = 'SYMBOL'))
   try(setnames(data, "SYM_ROOT", "SYMBOL", skip_absent = TRUE), silent = TRUE)
   
   # Adjust Ask size col naming:
-  try((colnames(data)[xtsAttributes(data)[['BidSize']]] = 'BIDSIZ'))
   try(setnames(data, "BidSize", "BIDSIZ", skip_absent = TRUE), silent = TRUE)
   
   # Adjust Bid size col naming:    
-  try((colnames(data)[xtsAttributes(data)[['AskSize']]] = 'OFRSIZ'))
   try(setnames(data, "AskSize", "OFRSIZ", skip_absent = TRUE), silent = TRUE)
+  # Adjust Bid size col naming:    
   try(setnames(data, "ASKSIZ", "OFRSIZ", skip_absent = TRUE), silent = TRUE)
   
   
   try(setnames(data, "TR_SCOND", "COND", skip_absent = TRUE), silent = TRUE)
-  
-  
-  # Adjust correction column, if necessary:
-  if (any(colnames(data) == "CR")) {
-    colnames(data)[colnames(data) == "CR"] <- "CORR"
+  try(setnames(data, "CR", "CORR", skip_absent = TRUE), silent = TRUE)  
   }
+  
   
   return(data)
 } 
@@ -271,7 +327,7 @@ has.Vo<-function (x, which = FALSE){
 #' position of those columns.
 #' 
 #' @param x data object
-#' @param which disply position of match
+#' @param which display position of match
 #' 
 #' @export
 hasQty <- function(x, which = FALSE) {
@@ -304,7 +360,7 @@ checktData <- function(tData) {
   
   if (is.data.table(tData)) {
     if (typeof(tData$PRICE) != "double") {
-      stop("Column PRICE should be of type double.")
+      warning("Column PRICE should be of type double.")
     }
   }
 }
@@ -314,7 +370,7 @@ checktData <- function(tData) {
 #' @keywords internal
 checkqData <- function(qData) {
   if (!is.xts(qData) & !is.data.table(qData)) {
-    stop("The argument qData should be an data.table or xts object.")
+    stop("The argument qData should be a data.table or xts object.")
   }
   if (!any(colnames(qData) == "BID")) {
     stop("The argument qData should have a column containing the BID. Could not find that column.")
@@ -327,10 +383,10 @@ checkqData <- function(qData) {
   }
   if (is.data.table(qData)) {
     if (typeof(qData$BID) != "double") {
-      stop("Column BID should be of type double.")
+      warning("Column BID should be of type double.")
     }
     if (typeof(qData$OFR) != "double") {
-      stop("Column OFR should be of type double.")
+      warning("Column OFR should be of type double.")
     }
   }
 }
@@ -490,3 +546,21 @@ set.Trade <- function(x, error = TRUE) {
     attr(x,"Trade") <- has.Trade(x, which = TRUE)
   return(x)
 }
+
+
+## #' @keywords internal
+## #' @importFrom data.table fread
+## readDataset <- function(path){
+##   extension <- regexpr("*.[a-z]{0,}$", path) # Extract the extension of the file.
+##   extension <- substr(path, start = extension[[1]], stop = extension[[1]] + attr(extension, "match.length"))
+##   
+##   if(extension == ".rds"){
+##     return(try(readRDS(path)))
+##   } else if( extension == ".csv"){
+##     return(try(fread(path)))
+##   }else {
+##      stop("Extension not recognized")
+##    }
+##   
+## }
+

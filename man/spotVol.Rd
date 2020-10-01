@@ -51,7 +51,7 @@ following outputs, depending on the method used:
 An \code{xts} or \code{matrix} object (depending on the input) containing
 spot volatility estimates \eqn{\sigma_{t,i}}, reported for each interval
 \eqn{i} between \code{marketOpen} and \code{marketClose} for every day
-\eqn{t} in \code{data}. The length of the intervals is specifiedby \code{k}
+\eqn{t} in \code{data}. The length of the intervals is specified by \code{k}
 and \code{on}. Methods that provide this output: All.
 
 \code{daily}
@@ -182,7 +182,7 @@ include \code{"gaussian", "epanechnikov", "beta"}. Default = \code{"gaussian"}.\
 If \code{h} is a scalar, it will be assumed equal throughout the sample. If
 it is a vector, it should contain bandwidths for each day. If left empty,
 it will be estimated. Default = \code{NULL}. \cr
-\code{est} \tab String specifiying the bandwidth estimation method. Possible
+\code{est} \tab String specifying the bandwidth estimation method. Possible
 values include \code{"cv", "quarticity"}. Method \code{"cv"} equals
 cross-validation, which chooses the bandwidth that minimizes the Integrated
 Square Error. \code{"quarticity"} multiplies the simple plug-in estimator
@@ -211,7 +211,7 @@ is important that this parameter is well chosen. However, it is difficult to
 come up with a method that determines the optimal bandwidth for any kind of
 data or kernel that can be used. Although some estimation methods are
 provided, it is advised that you specify \eqn{h} yourself, or make sure that
-the estimation results are appropiate.
+the estimation results are appropriate.
 
 One way to estimate \eqn{h}, is by using cross-validation. For each day in
 the sample, \eqn{h} is chosen as to minimize the Integrated Square Error,
@@ -304,7 +304,7 @@ Along with the spot volatility estimates, this method will return the
 Parameters:
 \tabular{ll}{
 \code{RM} \tab String denoting which realized measure to use to estimate the local volatility. Possible values are: "bipower", "medrv", "minrv", "rv"
-Default = "BPV" \cr
+Default = "bipower" \cr
 \code{lookBackPeriod} \tab positive integer denoting the amount of sub-sampled returns to use for the estimation of the local volatility. Default = 10. \cr
 \code{dontIncludeLast} \tab logical indicating whether to omit the last return in the calculation of the local volatility. This is done in e.g. Lee-Mykland (2008) to produce jump-robust estimates of spot volatility. 
 Setting this to TRUE will then use lookBackPeriod - 1 returns in the construction of the realized measures. Default = FALSE\cr
@@ -344,7 +344,7 @@ vol1 <- spotVol(sampleReal5MinPrices)
 plot(vol1)
 
 # Compare to stochastic periodicity
-\donttest{
+\dontrun{
 init <- list(sigma = 0.03, sigma_mu = 0.005, sigma_h = 0.007,
              sigma_k = 0.06, phi = 0.194, rho = 0.986, mu = c(1.87,-0.42),
              delta_c = c(0.25, -0.05, -0.2, 0.13, 0.02),
@@ -357,7 +357,7 @@ lines(as.numeric(vol2$spot[1:780]), col="red")
 legend("topright", c("detPer", "stochper"), col = c("black", "red"), lty=1)}
 
 # Various kernel estimates
-\donttest{
+\dontrun{
 h1 <- bw.nrd0((1:nrow(sampleReal5MinPrices))*(5*60))
 vol3 <- spotVol(sampleReal5MinPrices, method = "kernel", h = h1)
 vol4 <- spotVol(sampleReal5MinPrices, method = "kernel", est = "quarticity")
@@ -369,13 +369,13 @@ legend("topright", c("h = simple estimate", "h = quarticity corrected",
                      "h = crossvalidated"), col = c("black", "red", "blue"), lty=1)}
 
 # Piecewise constant volatility
-\donttest{
+\dontrun{
 vol6 <- spotVol(sampleReal5MinPrices, method = "piecewise", m = 200, n  = 100,
                 online = FALSE)
 plot(vol6)}
 
 # Compare regular GARCH(1,1) model to eGARCH, both with external regressors
-\donttest{
+\dontrun{
 vol7 <- spotVol(sampleReal5MinPrices, method = "garch", model = "sGARCH")
 vol8 <- spotVol(sampleReal5MinPrices, method = "garch", model = "eGARCH")
 plot(as.numeric(t(vol7$spot)), type = "l")

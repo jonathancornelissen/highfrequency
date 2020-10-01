@@ -6,6 +6,29 @@
 
 using namespace Rcpp;
 
+// quadraticKernel
+arma::vec quadraticKernel(const arma::vec& x);
+RcppExport SEXP _highfrequency_quadraticKernel(SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::vec& >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(quadraticKernel(x));
+    return rcpp_result_gen;
+END_RCPP
+}
+// tradeIntensityProcessCpp
+arma::vec tradeIntensityProcessCpp(arma::vec& time, const double bandwidth);
+RcppExport SEXP _highfrequency_tradeIntensityProcessCpp(SEXP timeSEXP, SEXP bandwidthSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec& >::type time(timeSEXP);
+    Rcpp::traits::input_parameter< const double >::type bandwidth(bandwidthSEXP);
+    rcpp_result_gen = Rcpp::wrap(tradeIntensityProcessCpp(time, bandwidth));
+    return rcpp_result_gen;
+END_RCPP
+}
 // har_agg
 arma::mat har_agg(arma::vec RM, arma::vec periods, int iNperiods);
 RcppExport SEXP _highfrequency_har_agg(SEXP RMSEXP, SEXP periodsSEXP, SEXP iNperiodsSEXP) {
@@ -83,12 +106,12 @@ BEGIN_RCPP
 END_RCPP
 }
 // colCumsum
-arma::mat colCumsum(arma::mat& x);
+arma::mat colCumsum(const arma::mat& x);
 RcppExport SEXP _highfrequency_colCumsum(SEXP xSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::mat& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type x(xSEXP);
     rcpp_result_gen = Rcpp::wrap(colCumsum(x));
     return rcpp_result_gen;
 END_RCPP
@@ -106,14 +129,86 @@ BEGIN_RCPP
 END_RCPP
 }
 // preAveragingReturnsInternal
-arma::mat preAveragingReturnsInternal(arma::mat ret, const int kn);
+arma::mat preAveragingReturnsInternal(arma::mat& ret, const int kn);
 RcppExport SEXP _highfrequency_preAveragingReturnsInternal(SEXP retSEXP, SEXP knSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::mat >::type ret(retSEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type ret(retSEXP);
     Rcpp::traits::input_parameter< const int >::type kn(knSEXP);
     rcpp_result_gen = Rcpp::wrap(preAveragingReturnsInternal(ret, kn));
+    return rcpp_result_gen;
+END_RCPP
+}
+// findFirst
+arma::uword findFirst(arma::vec& x, const int thresh);
+RcppExport SEXP _highfrequency_findFirst(SEXP xSEXP, SEXP threshSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const int >::type thresh(threshSEXP);
+    rcpp_result_gen = Rcpp::wrap(findFirst(x, thresh));
+    return rcpp_result_gen;
+END_RCPP
+}
+// overlap
+bool overlap(double min1, double max1, double min2, double max2);
+RcppExport SEXP _highfrequency_overlap(SEXP min1SEXP, SEXP max1SEXP, SEXP min2SEXP, SEXP max2SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< double >::type min1(min1SEXP);
+    Rcpp::traits::input_parameter< double >::type max1(max1SEXP);
+    Rcpp::traits::input_parameter< double >::type min2(min2SEXP);
+    Rcpp::traits::input_parameter< double >::type max2(max2SEXP);
+    rcpp_result_gen = Rcpp::wrap(overlap(min1, max1, min2, max2));
+    return rcpp_result_gen;
+END_RCPP
+}
+// mSeq
+arma::vec mSeq(arma::vec starts, arma::vec ends, double scaleFactor);
+RcppExport SEXP _highfrequency_mSeq(SEXP startsSEXP, SEXP endsSEXP, SEXP scaleFactorSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type starts(startsSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type ends(endsSEXP);
+    Rcpp::traits::input_parameter< double >::type scaleFactor(scaleFactorSEXP);
+    rcpp_result_gen = Rcpp::wrap(mSeq(starts, ends, scaleFactor));
+    return rcpp_result_gen;
+END_RCPP
+}
+// leadLagCpp
+arma::vec leadLagCpp(const arma::vec& x, const arma::vec& timestampsX, const arma::vec& y, const arma::vec& timestampsY, const arma::vec lags, const bool normalize);
+RcppExport SEXP _highfrequency_leadLagCpp(SEXP xSEXP, SEXP timestampsXSEXP, SEXP ySEXP, SEXP timestampsYSEXP, SEXP lagsSEXP, SEXP normalizeSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::vec& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type timestampsX(timestampsXSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type y(ySEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type timestampsY(timestampsYSEXP);
+    Rcpp::traits::input_parameter< const arma::vec >::type lags(lagsSEXP);
+    Rcpp::traits::input_parameter< const bool >::type normalize(normalizeSEXP);
+    rcpp_result_gen = Rcpp::wrap(leadLagCpp(x, timestampsX, y, timestampsY, lags, normalize));
+    return rcpp_result_gen;
+END_RCPP
+}
+// leadLagCppPAR
+arma::vec leadLagCppPAR(const arma::vec& x, const arma::vec& timestampsX, const arma::vec& y, const arma::vec& timestampsY, const arma::vec lags, const bool normalize, const int iCores);
+RcppExport SEXP _highfrequency_leadLagCppPAR(SEXP xSEXP, SEXP timestampsXSEXP, SEXP ySEXP, SEXP timestampsYSEXP, SEXP lagsSEXP, SEXP normalizeSEXP, SEXP iCoresSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::vec& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type timestampsX(timestampsXSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type y(ySEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type timestampsY(timestampsYSEXP);
+    Rcpp::traits::input_parameter< const arma::vec >::type lags(lagsSEXP);
+    Rcpp::traits::input_parameter< const bool >::type normalize(normalizeSEXP);
+    Rcpp::traits::input_parameter< const int >::type iCores(iCoresSEXP);
+    rcpp_result_gen = Rcpp::wrap(leadLagCppPAR(x, timestampsX, y, timestampsY, lags, normalize, iCores));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -201,6 +296,8 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_highfrequency_quadraticKernel", (DL_FUNC) &_highfrequency_quadraticKernel, 1},
+    {"_highfrequency_tradeIntensityProcessCpp", (DL_FUNC) &_highfrequency_tradeIntensityProcessCpp, 2},
     {"_highfrequency_har_agg", (DL_FUNC) &_highfrequency_har_agg, 3},
     {"_highfrequency_heavy_parameter_transformR_", (DL_FUNC) &_highfrequency_heavy_parameter_transformR_, 9},
     {"_highfrequency_heavy_parameter_transform_RetrackR_", (DL_FUNC) &_highfrequency_heavy_parameter_transform_RetrackR_, 10},
@@ -208,6 +305,11 @@ static const R_CallMethodDef CallEntries[] = {
     {"_highfrequency_colCumsum", (DL_FUNC) &_highfrequency_colCumsum, 1},
     {"_highfrequency_refreshTimeMathing", (DL_FUNC) &_highfrequency_refreshTimeMathing, 2},
     {"_highfrequency_preAveragingReturnsInternal", (DL_FUNC) &_highfrequency_preAveragingReturnsInternal, 2},
+    {"_highfrequency_findFirst", (DL_FUNC) &_highfrequency_findFirst, 2},
+    {"_highfrequency_overlap", (DL_FUNC) &_highfrequency_overlap, 4},
+    {"_highfrequency_mSeq", (DL_FUNC) &_highfrequency_mSeq, 3},
+    {"_highfrequency_leadLagCpp", (DL_FUNC) &_highfrequency_leadLagCpp, 6},
+    {"_highfrequency_leadLagCppPAR", (DL_FUNC) &_highfrequency_leadLagCppPAR, 7},
     {"_highfrequency_nsmaller", (DL_FUNC) &_highfrequency_nsmaller, 5},
     {"_highfrequency_KK", (DL_FUNC) &_highfrequency_KK, 2},
     {"_highfrequency_kernelEstimator", (DL_FUNC) &_highfrequency_kernelEstimator, 8},

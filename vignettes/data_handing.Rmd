@@ -50,7 +50,7 @@ tDataCleaned$report
 summary(tDataCleaned$tData[, c("DT", "SIZE", "PRICE")])
 ```
 
-As just one example, one can see that all trades that had time stamps outside the openinig hours of the NYSE. The report of the cleaning procedure shows us that most of the observations are removed either due to originating from another exchange or having irregular sales conditions.
+As just one example, one can see that all trades that had time stamps outside the opening hours of the NYSE. The report of the cleaning procedure shows us that most of the observations are removed either due to originating from another exchange or having irregular sales conditions.
 
 As a last step for cleaning tick data on trades it is advised to check whether compatible quotes have been made before the recorded transaction. For doing so, we first need to implement a similar cleaning procedure for quotes data.
 

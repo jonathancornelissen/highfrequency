@@ -1,71 +1,3 @@
-#' @importFrom zoo rollmean
-#' @keywords internal
-aggRV <- function(RM1, periods, type = "RV") {
-  n <- length(RM1);
-  nperiods <- length(periods)
-  RVmatrix1 <- matrix(nrow = n, ncol = nperiods)
-  for (i in 1:nperiods) {
-    if (periods[i]==1) {
-      RVmatrix1[,i] <- RM1
-    } else {
-      RVmatrix1[(periods[i]:n),i] = rollmean(x = RM1,k = periods[i], align = "left")
-    }
-  } #end loop over periods for standard RV estimator
-  colnames(RVmatrix1) <- paste(type, periods, sep = "")
-  return(RVmatrix1)
-}
-
-#' @importFrom zoo rollmean
-#' @keywords internal
-aggJ <- function(J, periodsJ) {
-  n <- length(J);
-  nperiods <- length(periodsJ)
-  JM <- matrix(nrow = n, ncol = nperiods)
-  for (i in c(1:nperiods)) {
-    if (periodsJ[i] == 1) {
-      JM[,i] <- J
-    } else {
-      JM[(periodsJ[i]:n),i] <- rollmean(x = J, k = periodsJ[i], align = "left")
-    }
-  } # End loop over periods for standard RV estimator
-  colnames(JM) <- paste("J",periodsJ, sep = "")
-  return(JM)
-}
-
-#' @importFrom zoo rollmean
-#' @keywords internal
-aggY <- function(RM1,h,maxp) {
-  n <-  length(RM1)
-  if (h == 1) {
-    y <- RM1[(maxp+1):n]
-  }
-  if (h != 1) {
-    y <- matrix( nrow=length(RM1), ncol=1 )
-    colnames(y) <- "y"
-    y[(h:n),] <- rollmean(x = RM1,k = h,align = "left")
-    y <- matrix(y[((maxp+h):n),], ncol = 1)
-    y <- as.data.frame(y)
-  }
-  return(y)
-}
-
-#' @importFrom zoo rollmean
-#' @keywords internal
-aggRQ <- function(RM3, periods, type = "RQ"){
-  n <- length(RM3)
-  nperiods <- length(periods)
-  RQmatrix <- matrix(nrow = n, ncol = nperiods)
-  for(i in 1:nperiods){
-    if (periods[i]==1) {
-      RQmatrix[,i] <- RM3
-    } else {
-      RQmatrix[(periods[i]:n),i] <- rollmean(x = RM3, k = periods[i], align = "left")
-    }
-  } #end loop over periods for standard RV estimator
-  colnames(RQmatrix) <- paste(type, periods, sep = "")
-  return(RQmatrix)
-}
-
 #' @importFrom stats lm formula
 #' @keywords internal
 estimhar <- function(y, x){ #Potentially add stuff here
@@ -107,9 +39,11 @@ harInsanityFilter <- function(fittedValues, lower, upper, replacement) {
 #'
 #' @description Function returns the estimates for the Heterogeneous Autoregressive model
 #' for Realized volatility discussed in Andersen et al. (2007) and Corsi (2009).
-#' This model is mainly used to forecast the next days'volatility based on the high-frequency returns of the past. Consult the vignette for more information.
+#' This model is mainly used to forecast the next day's volatility based on the high-frequency returns of the past. Consult the vignette for more information.
 #'
-#' @param data  an xts object containing either: intra-day (log-)returns or realized measures already computed from such returns. In case more than one realized measure is needed, the object should have the as many columns as realized measures needed.
+#' @param data  an xts object containing either: intra-day (log-)returns or realized measures already computed from such returns. 
+#' In case more than one realized measure is needed, the object should have the as many columns as realized measures needed. 
+#' The first column should always be the realized variance proxy. In case type is either "HARRVQJ" or "CHARRVQ" the order should be "RV", "BPV", "RQ", or the relevant proxies.
 #' @param periods a vector of integers indicating over how days the realized measures in the model should be aggregated. By default  periods = c(1,5,22), which corresponds to one day, one week and one month respectively. This default is in line with Andersen et al. (2007).
 #' @param periodsJ a vector of integers indicating over what time periods the jump components in the model should be aggregated. By default periodsJ = c(1,5,22), which corresponds to one day, one week and one month respectively.
 #' @param periodsQ a vector of integers indicating over what time periods the realized quarticity in the model should be aggregated. By default periodsQ = c(1,5,22), which corresponds to one day, one week and one month respectively.
@@ -236,7 +170,9 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
   jumpModels <- c("HARRVJ", "HARRVCJ", "HARRVQJ", "CHARRV", "CHARRVQ")
   quarticityModels <- c("HARRVQ", "HARRVQJ", "CHARRVQ")
   bpvModels <- c("CHARRV", "CHARRVQ")
-
+  if(!is.xts(data)){
+    stop("The data in the HARmodel function must be of xts format.")
+  }
   if (!is.null(transform)) {
     Ftransform = match.fun(transform)
   }
@@ -325,7 +261,7 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
     } else { #compute jump contributions
       J <- pmax(RM1 - RM2, 0) # Jump contributions should be positive
     }
-    J <- as.data.frame(har_agg(J, periodsJ, length(periodsJ)))
+    J <- as.matrix(har_agg(J, periodsJ, length(periodsJ)))
     colnames(J) <- paste0("J", periodsJ)
   }
 
@@ -368,7 +304,7 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
     if (!is.null(transform) && transform == "log") {
       J <- J + 1
     }
-    J <- J[(maxp:(n-h)),]
+    J <- J[(maxp:(n-h)),,drop = FALSE]
     x <- cbind(x1,J)         # bind jumps to RV data
     if (!is.null(transform)) {
       y <- Ftransform(y)
@@ -436,6 +372,9 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
     if (is.null(colnames(RQmatrix))) { #special case for 1 aggregation period of realized quarticity. This appends the RQ1 name
       colnames(x1) <- c(colnames(x1[,1:nperiods]),"RQ1")
     }
+    if(all(colnames(x1) == c(paste0("RV", periods), rep("", nperiodsQ)))){
+      colnames(x1) <- c(colnames(x1[,1:nperiods]), paste0("RQ", periodsQ))
+    }
     x1 <- cbind(x1,rmin)
     model <- estimhar(y=y,x=x1)
     model$fitted.values <- harInsanityFilter(fittedValues = model$fitted.values, lower = min(RM1), upper = max(RM1), replacement = mean(RM1))
@@ -448,7 +387,7 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
     if (!is.null(transform) && transform == "log") {
       J <- J + 1
     }
-    J <- J[(maxp:(n-h)),]
+    J <- J[(maxp:(n-h)),, drop = FALSE]
     if (!is.null(transform)) {
       y <- Ftransform(y); x1 = Ftransform(x1)
       warning("The realized quarticity is already transformed with sqrt() thus only realized variance is transformed")
@@ -456,6 +395,9 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
     x1 <- cbind(x1, J, RQmatrix[,1:nperiodsQ] * x1[,1:nperiodsQ])
     if(is.null(colnames(RQmatrix))){ #special case for 1 aggregation period of realized quarticity. This appends the RQ1 name
       colnames(x1) <- c(colnames(x1[,1:(dim(x1)[2]-1)]), "RQ1")
+    }
+    if(all(colnames(x1) == c(paste0("RV", periods), paste0("J", periodsJ), rep("", nperiodsQ)))){
+      colnames(x1) <- c(colnames(x1[,1:(nperiods+length(periodsJ))]), paste0("RQ", periodsQ))
     }
     x1 <- cbind(x1,rmin);
     model <-  estimhar(y = y, x = x1)
@@ -715,8 +657,8 @@ predict.harModel <- function(object, newdata = NULL, warnings = TRUE, ...) {
       x2 <- RVmatrix2[(maxp:(n-h)), ]
     }  # In case a jumprobust estimator is supplied
     if (type %in% quarticityModels) { #in case realized quarticity estimator is supplied
-      RQmatrix <- aggRQ(RM3,periodsQ)[(maxp:(n - h)), ]
-      RVmatrix1 <- har_agg(RM3, periodsQ, nperiodsQ)
+      # RQmatrix <- aggRQ(RM3,periodsQ)[(maxp:(n - h)), ]
+      RQmatrix <- har_agg(RM3, periodsQ, nperiodsQ)
       colnames(RVmatrix1) <- paste0("RV", periods)
       if(nperiodsQ == 1){
         RQmatrix <- as.matrix(sqrt(RQmatrix) - sqrt(mean(RM3)))

@@ -2,7 +2,7 @@
 % Please edit documentation in R/jump_tests.R
 \name{rankJumpTest}
 \alias{rankJumpTest}
-\title{General framework for testing for jumps on an intraday basis}
+\title{Rank jump test}
 \usage{
 rankJumpTest(
   marketPrice,
@@ -38,6 +38,8 @@ rankJumpTest(
 
 \item{nBoot}{numeric denoting how many replications to be used for the bootstrap algorithm. Default is \code{1000}}
 
+\item{dontTestAtBoundaries}{logical determining whether to exclude data across different days. Default is \code{TRUE}}
+
 \item{on}{string indicating the time scale in which \code{k} is expressed.
 Possible values are: \code{"secs", "seconds", "mins", "minutes", "hours"}.}
 
@@ -55,6 +57,28 @@ specified by \code{tz}. By default, \code{marketClose = "16:00:00"}.}
 and/or \code{marketOpen}/ \code{marketClose} belong. Default = \code{"GMT"}.
 This parameter will also help determine the testing times as the test is done on non-overlapping pre-averaged returns.}
 }
+\value{
+A list containing "criticalValues" which are the bootstrapped critcal values, "testStatistic" the test statistic of the jump test, "dimensions" which are the dimensions of the jump matrix
+ "marketJumpDetections" the jumps detected in the market prices, "stockJumpDetections" the co-jumps detected in the individual stock prices, and "jumpIndices" which are the indices of the detected jumps.
+}
 \description{
-General framework for testing for jumps on an intraday basis
+Rank jump test
+}
+\examples{
+\dontrun{
+#Rank jump test using simulated sample data that includes jumps
+## pretend that the marketPrice is the first asset in the data:
+marketPrice <- sample5MinPricesJumps[,1] 
+## construct stockPrice as a list:
+stockPrice <- list() 
+for (i in 1:(ncol(sample5MinPricesJumps)-1)) {
+  stockPrice[[i]] <- sample5MinPricesJumps[,i+1]
+}
+## This can take a long time due to the bootstrapping
+rankTest <- rankJumpTest(marketPrice, stockPrice, coarseFreq = 10, k = 1, alpha = c(5,3), 
+                         tz = "GMT", marketOpen = "09:30:00", marketClose = "16:00:00")
+# Plot the detected stock jump detections
+plot(rankTest$stockJumpDetections)
+}
+
 }

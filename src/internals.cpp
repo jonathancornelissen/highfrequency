@@ -1,5 +1,4 @@
 #include <RcppArmadillo.h>
-
 using namespace arma;
 using namespace Rcpp;
 
@@ -7,19 +6,19 @@ using namespace Rcpp;
 
 //' @keywords internal
 // [[Rcpp::export]]
-arma::mat colCumsum(arma::mat& x) {
-  
+arma::mat colCumsum(const arma::mat& x) {
+  arma::mat y = x;
   // We loop through the columns of x and apply cumsum
   for(uword col = 0; col < x.n_cols; col++){
-    x.col(col) = cumsum(x.col(col));
+    y.col(col) = cumsum(x.col(col));
   }
   
-  return(x);
+  return(y);
   
 }
 
 
-
+//' @keywords internal
 // [[Rcpp::export]]
 Rcpp::List refreshTimeMathing(const arma::mat& x, arma::vec& idx) {
   
@@ -74,14 +73,14 @@ Rcpp::List refreshTimeMathing(const arma::mat& x, arma::vec& idx) {
 
 
 //' @keywords internal
-inline double weightedSumPreAveragingInternal(const arma::vec x, const arma::vec series){
+inline double weightedSumPreAveragingInternal(const arma::vec& x, const arma::vec& series){
   
   return(arma::dot(x,series));
 }
 
-
+//' @keywords internal
 // [[Rcpp::export]]
-arma::mat preAveragingReturnsInternal(arma::mat ret, const int kn){
+arma::mat preAveragingReturnsInternal(arma::mat& ret, const int kn){
   
   const int N = ret.n_rows + 1;
   const int D = ret.n_cols;
@@ -105,3 +104,43 @@ arma::mat preAveragingReturnsInternal(arma::mat ret, const int kn){
   
   
 }
+
+
+
+// Armadillo version of bisect_left needed for the lead-lag estimation, didn't find a version in base R
+// [[Rcpp::export]]
+arma::uword findFirst(arma::vec& x , const int thresh){
+  arma::uword i;
+  for(i = 0; i < x.n_elem; i++){ 
+    
+    if(x[i] >= thresh){
+      return i; 
+    }
+    
+  }
+  return i; 
+}
+
+
+// [[Rcpp::export]]
+bool overlap(double min1, double max1, double min2, double max2){
+  return (std::max(0.0, ((double) std::min(max1, max2) - (double) std::max(min1, min2))) > 0.0);
+}
+
+
+// [[Rcpp::export]]
+arma::vec mSeq(arma::vec starts, arma::vec ends, double scaleFactor){ // multiple sequence with same step length but differing start and end (the differences between these are the same)
+  
+  arma::mat out = mat(floor((ends(0) - starts(0))/scaleFactor) + 1, starts.n_elem);
+
+  for(arma::uword j = 0; j < out.n_cols; j++){
+    out.col(j) = regspace(starts(j), scaleFactor, ends(j));
+  }
+  //arma::mat out = regspace<arma::mat>(starts, scaleFactor, ends);
+  return vectorise(out);
+  
+}
+
+
+
+

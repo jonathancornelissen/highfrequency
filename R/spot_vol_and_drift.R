@@ -20,7 +20,7 @@
 #' These arguments default to 300 and 5 respectively.
 #'
 #'
-#' @references Christensen, Oomen and Reno (2018) <DOI:10.2139/ssrn.2842535>.
+#' @references Christensen, Oomen and Reno (2018): The drift burst hypothesis (working paper) <DOI:10.2139/ssrn.2842535>.
 #' @author Emil Sjoerup
 #' @keywords Drift
 #'
@@ -73,23 +73,12 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
   }
   datad <- aggregatePrice(data, on = on, k = k , marketOpen = marketOpen,
                           marketClose = marketClose, tz = tz, fill = TRUE)
-  # datad2 <- aggregatePrice2(data, on = on, k = k , marketOpen = marketOpen,
-  #                         marketClose = marketClose, tz = tz, fill = TRUE)
-  # 
   datad[, DATE := as.Date(DT)]
   setkeyv(datad, "DT")
   datad <- datad[, RETURN := log(PRICE) - shift(log(PRICE), type = "lag"), by = "DATE"][!is.na(RETURN)]
   datad <- split(datad, by = "DATE")
   mR <- matrix(unlist(lapply(datad, FUN = function(x) as.numeric(x$RETURN))), ncol = length(datad[[1]]$RETURN), byrow = TRUE)
 
-  # datad2[, DATE := as.Date(DT)]
-  # setkeyv(datad2, "DT")
-  # datad2 <- datad2[, RETURN := log(PRICE) - shift(log(PRICE), type = "lag"), by = "DATE"][!is.na(RETURN)]
-  # datad2 <- split(datad2, by = "DATE")
-  # mR2 <- matrix(unlist(lapply(datad2, FUN = function(x) as.numeric(x$RETURN))), ncol = length(datad2[[1]]$RETURN), byrow = TRUE)
-  # 
-  # 
-  
   if (method != "driftKernel") {
     mR <- t(mR)
     # mR2 <- t(mR2)
@@ -104,11 +93,6 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
                 driftMean   = driftMean(mR = mR, options),
                 driftMedian = driftMedian(mR = mR, options))
   
-  # out2 <- switch(method, ### driftKernel works only for one day at a time! Does the rest of data preparation in the function.
-  #                driftKernel = driftKernel(data = data, intraday, options),
-  #                driftMean   = driftMean(mR = mR2, options),
-  #                driftMedian = driftMedian(mR = mR, options))
-  # browser()
 
   return(out)
 }
@@ -143,7 +127,7 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
 #' An \code{xts} or \code{matrix} object (depending on the input) containing
 #' spot volatility estimates \eqn{\sigma_{t,i}}, reported for each interval
 #' \eqn{i} between \code{marketOpen} and \code{marketClose} for every day
-#' \eqn{t} in \code{data}. The length of the intervals is specifiedby \code{k}
+#' \eqn{t} in \code{data}. The length of the intervals is specified by \code{k}
 #' and \code{on}. Methods that provide this output: All.
 #'
 #' \code{daily}
@@ -270,7 +254,7 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
 #' If \code{h} is a scalar, it will be assumed equal throughout the sample. If
 #' it is a vector, it should contain bandwidths for each day. If left empty,
 #' it will be estimated. Default = \code{NULL}. \cr
-#' \code{est} \tab String specifiying the bandwidth estimation method. Possible
+#' \code{est} \tab String specifying the bandwidth estimation method. Possible
 #' values include \code{"cv", "quarticity"}. Method \code{"cv"} equals
 #' cross-validation, which chooses the bandwidth that minimizes the Integrated
 #' Square Error. \code{"quarticity"} multiplies the simple plug-in estimator
@@ -299,7 +283,7 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
 #' come up with a method that determines the optimal bandwidth for any kind of
 #' data or kernel that can be used. Although some estimation methods are
 #' provided, it is advised that you specify \eqn{h} yourself, or make sure that
-#' the estimation results are appropiate.
+#' the estimation results are appropriate.
 #'
 #' One way to estimate \eqn{h}, is by using cross-validation. For each day in
 #' the sample, \eqn{h} is chosen as to minimize the Integrated Square Error,
@@ -392,7 +376,7 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
 #' Parameters:
 #' \tabular{ll}{
 #' \code{RM} \tab String denoting which realized measure to use to estimate the local volatility. Possible values are: "bipower", "medrv", "minrv", "rv"
-#' Default = "BPV" \cr
+#' Default = "bipower" \cr
 #' \code{lookBackPeriod} \tab positive integer denoting the amount of sub-sampled returns to use for the estimation of the local volatility. Default = 10. \cr
 #' \code{dontIncludeLast} \tab logical indicating whether to omit the last return in the calculation of the local volatility. This is done in e.g. Lee-Mykland (2008) to produce jump-robust estimates of spot volatility. 
 #' Setting this to TRUE will then use lookBackPeriod - 1 returns in the construction of the realized measures. Default = FALSE\cr
@@ -432,7 +416,7 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
 #' plot(vol1)
 #'
 #' # Compare to stochastic periodicity
-#' \donttest{
+#' \dontrun{
 #' init <- list(sigma = 0.03, sigma_mu = 0.005, sigma_h = 0.007,
 #'              sigma_k = 0.06, phi = 0.194, rho = 0.986, mu = c(1.87,-0.42),
 #'              delta_c = c(0.25, -0.05, -0.2, 0.13, 0.02),
@@ -445,7 +429,7 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
 #' legend("topright", c("detPer", "stochper"), col = c("black", "red"), lty=1)}
 #'
 #' # Various kernel estimates
-#' \donttest{
+#' \dontrun{
 #' h1 <- bw.nrd0((1:nrow(sampleReal5MinPrices))*(5*60))
 #' vol3 <- spotVol(sampleReal5MinPrices, method = "kernel", h = h1)
 #' vol4 <- spotVol(sampleReal5MinPrices, method = "kernel", est = "quarticity")
@@ -457,13 +441,13 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
 #'                      "h = crossvalidated"), col = c("black", "red", "blue"), lty=1)}
 #'
 #' # Piecewise constant volatility
-#' \donttest{
+#' \dontrun{
 #' vol6 <- spotVol(sampleReal5MinPrices, method = "piecewise", m = 200, n  = 100,
 #'                 online = FALSE)
 #' plot(vol6)}
 #'
 #' # Compare regular GARCH(1,1) model to eGARCH, both with external regressors
-#' \donttest{
+#' \dontrun{
 #' vol7 <- spotVol(sampleReal5MinPrices, method = "garch", model = "sGARCH")
 #' vol8 <- spotVol(sampleReal5MinPrices, method = "garch", model = "eGARCH")
 #' plot(as.numeric(t(vol7$spot)), type = "l")

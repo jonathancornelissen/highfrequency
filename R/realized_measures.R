@@ -260,7 +260,8 @@ medRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #'   
 #'   \eqn{\epsilon_{\tau}} is an i.i.d process with \eqn{X}. 
 #'   
-#'   It is intuitive that under mean zero i.i.d. microstructure noise some form of smoothing of the observed log-price should tend to diminish the impact of the noise. Effectively, we are going to approximate a continuous function by an average of observations of Y in a neighborhood, the noise being averaged away. 
+#'   It is intuitive that under mean zero i.i.d. microstructure noise some form of smoothing of the observed log-price should tend to diminish the impact of the noise. 
+#'   Effectively, we are going to approximate a continuous function by an average of observations of Y in a neighborhood, the noise being averaged away. 
 #'   
 #'   Assume there is \eqn{N} equispaced returns in period \eqn{\tau} of a list (after refeshing data). Let \eqn{r_{\tau_i}} be a return (with \eqn{i=1, \ldots,N}) of an asset in period \eqn{\tau}. Assume there is \eqn{d} assets. 
 #'   
@@ -268,7 +269,10 @@ medRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #'   \deqn{
 #'     \bar{r}_{\tau_j}^{(k)}= \sum_{h=1}^{k_N-1}g\left(\frac{h}{k_N}\right)r_{\tau_{j+h}}^{(k)}
 #'   }
-#'   where g is a non-zero real-valued function \eqn{g:[0,1]} \eqn{\rightarrow} \eqn{R} given by \eqn{g(x)} = \eqn{\min(x,1-x)}. \eqn{k_N} is a sequence of integers satisfying  \eqn{\mbox{k}_{N} = \lfloor\theta N^{1/2}\rfloor}. We use \eqn{\theta = 0.8} as recommended in Hautsch & Podolskij (2013). The pre-averaged returns are simply a weighted average over the returns in a local window. This averaging diminishes the influence of the noise. The order of the window size \eqn{k_n} is chosen to lead to optimal convergence rates. The pre-averaging estimator is then simply the analogue of the Realized Variance but based on pre-averaged returns and an additional term to remove bias due to noise
+#'   where g is a non-zero real-valued function \eqn{g:[0,1]} \eqn{\rightarrow} \eqn{R} given by \eqn{g(x)} = \eqn{\min(x,1-x)}. \eqn{k_N} is a sequence of integers satisfying  \eqn{\mbox{k}_{N} = \lfloor\theta N^{1/2}\rfloor}. 
+#'   We use \eqn{\theta = 0.8} as recommended in Hautsch & Podolskij (2013). The pre-averaged returns are simply a weighted average over the returns in a local window. 
+#'   This averaging diminishes the influence of the noise. The order of the window size \eqn{k_n} is chosen to lead to optimal convergence rates. 
+#'   The pre-averaging estimator is then simply the analogue of the Realized Variance but based on pre-averaged returns and an additional term to remove bias due to noise
 #'   \deqn{
 #'     \hat{C}= \frac{N^{-1/2}}{\theta \psi_2}\sum_{i=0}^{N-k_N+1}  (\bar{r}_{\tau_i})^2-\frac{\psi_1^{k_N}N^{-1}}{2\theta^2\psi_2^{k_N}}\sum_{i=0}^{N}r_{\tau_i}^2
 #'   }
@@ -286,7 +290,9 @@ medRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #'   \deqn{
 #'     \mbox{MRC}= \frac{N}{N-k_N+2}\frac{1}{\psi_2k_N}\sum_{i=0}^{N-k_N+1}\bar{\boldsymbol{r}}_{\tau_i}\cdot \bar{\boldsymbol{r}}'_{\tau_i} -\frac{\psi_1^{k_N}}{\theta^2\psi_2^{k_N}}\hat{\Psi}
 #' }
-#' where \eqn{\hat{\Psi}_N = \frac{1}{2N}\sum_{i=1}^N \boldsymbol{r}_{\tau_i}(\boldsymbol{r}_{\tau_i})'}. It is a bias correction to make it consistent. However, due to this correction, the estimator is not ensured PSD. An alternative is to slightly enlarge the bandwidth such that \eqn{\mbox{k}_{N} = \lfloor\theta N^{1/2+\delta}\rfloor}. \eqn{\delta = 0.1} results in a consistent estimate without the bias correction and a PSD estimate, in which case:
+#' where \eqn{\hat{\Psi}_N = \frac{1}{2N}\sum_{i=1}^N \boldsymbol{r}_{\tau_i}(\boldsymbol{r}_{\tau_i})'}. It is a bias correction to make it consistent. 
+#' However, due to this correction, the estimator is not ensured PSD. 
+#' An alternative is to slightly enlarge the bandwidth such that \eqn{\mbox{k}_{N} = \lfloor\theta N^{1/2+\delta}\rfloor}. \eqn{\delta = 0.1} results in a consistent estimate without the bias correction and a PSD estimate, in which case:
 #'   \deqn{
 #'     \mbox{MRC}^{\delta}= \frac{N}{N-k_N+2}\frac{1}{\psi_2k_N}\sum_{i=0}^{N-k_N+1}\bar{\boldsymbol{r}}_i\cdot \bar{\boldsymbol{r}}'_i
 #' }
@@ -1078,7 +1084,7 @@ rHYCov <- function(rData, cor = FALSE, period = 1, alignBy = "seconds", alignPer
 #' @references
 #' Ole E. Barndorff-Nielsen, Peter Reinhard Hansen, Asger Lunde, and Neil Shephard (2008). Designing Realized Kernels to Measure the ex post Variation of Equity Prices in the Presence of Noise. \emph{Econometrica}, 76, pp. 1481-1536.
 #'
-#' B. Zhou. High-frequency data and volatility in foreign-exchange rates. \emph{Journal of Buiness & Economic Statistics}, 14:45-52, 1996.
+#' B. Zhou. High-frequency data and volatility in foreign-exchange rates. \emph{Journal of Business & Economic Statistics}, 14:45-52, 1996.
 #'
 #' P. Hansen and A. Lunde. Realized variance and market microstructure noise. \emph{Journal of Business and Economic Statistics}, 24:127-218, 2006.
 #'
@@ -1728,7 +1734,7 @@ rThresholdCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL
 #' @references 
 #' Boudt K. and Zhang, J. 2010. Jump robust two time scale covariance estimation and realized volatility budgets. Mimeo.
 #' 
-#' Harris, F., T. McInish, G. Shoesmith, and R. Wood (1995). Cointegration, error correction, and price discovery on infomationally linked security markets. Journal of Financial and Quantitative Analysis 30, 563-581.
+#' Harris, F., T. McInish, G. Shoesmith, and R. Wood (1995). Cointegration, error correction, and price discovery on informartionally linked security markets. Journal of Financial and Quantitative Analysis 30, 563-581.
 #' 
 #' Zhang, L., P. A. Mykland, and Y. Ait-Sahalia (2005). A tale of two time scales: Determining integrated volatility with noisy high-frequency data. Journal of the American Statistical Association 100, 1394-1411.
 #' 
@@ -2065,7 +2071,7 @@ rQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #' matrix. This function replaces the negative eigenvalues with zeroes.
 #' 
 #' @references 
-#' Harris, F., T. McInish, G. Shoesmith, and R. Wood (1995). Cointegration, error correction, and price discovery on infomationally linked security markets. Journal of Financial and Quantitative Analysis 30, 563-581.
+#' Harris, F., T. McInish, G. Shoesmith, and R. Wood (1995). Cointegration, error correction, and price discovery on informationally linked security markets. Journal of Financial and Quantitative Analysis 30, 563-581.
 #' Zhang, L., P. A. Mykland, and Y. Ait-Sahalia (2005). A tale of two time scales: Determining integrated volatility with noisy high-frequency data. Journal of the American Statistical Association 100, 1394-1411.
 #' Zhang, L. (2011). Estimating covariation: Epps effect, microstructure noise. Journal of Econometrics 160, 33-47.
 #' 
@@ -2164,21 +2170,27 @@ rTSCov <- function (pData, cor = FALSE, K = 300, J = 1, K_cov = NULL, J_cov = NU
 
 
 #' rCholCov positive semi-definite covariance estimation using the CholCov algorithm
-#' @description Function that estimates the integrated covariance matrix using the CholCov algorithm
+#' @description Function that estimates the integrated covariance matrix using the CholCov algorithm. 
+#' The algorithm estimates the integrated covariance matrix by sequentially adding series and using `refreshTime` to synchronize the observations. 
+#' This is done in order of liquidity, which means that the algorithm uses more data points than most other estimation techniques. 
 #' @param pData a list. Each list-item i contains an xts object with the intraday price data 
 #' of stock i for day t. The order of the data does not matter as it will be sorted according to the criterion specified in the \code{criterion} argument
-#' @param IVest integrated variance estimator
-#' @param COVest covariance estimator
+#' @param IVest integrated variance estimator, default is \code{"MRC"}. For a list of implemented estimators, use listCholCovEstimators().
+#' @param COVest covariance estimator, default is \code{"MRC"}. For a list of implemented estimators, use listCholCovEstimators().
 #' @param criterion criterion to use for sorting the data according to liquidity. Possible values are ["squared duration"|"duration"|"count"], defaults to \code{"squared duration"}.
 #' @param ... additional arguments to pass to IVest and COVest. See details.
 #' 
-#' @return a list containing the covariance matrix "CholCov", and the Cholesky Decomposition of "L" "G"
-#' such that L * G * L' = CholCov
+#' @return a list containing the covariance matrix "CholCov", and the Cholesky decomposition "L" and "G" such that L * G * L' = CholCov
 #' 
-#' @details 
+#' @details
+#' additional arguments for IVest and COVest should be passed in the ... argument. For the MRC estimator, which is the default, the theta and delta parameters can be set. These default to 1 and 0.1 respectively.
 #' 
-#' delta = 0.1
-#' theta = 1
+#' @references 
+#' Boudt, Laurent, Lunde, Quaedvlieg, Sauri(2017) Positive semidefinite integrated covariance estimation, factorizations and asynchronicity. Journal of Econometrics 196, 347-367
+#' @author Emil Sjoerup
+#' 
+#' @importFrom xts xts
+#' @importFrom zoo coredata
 #' @export
 rCholCov <- function(pData, IVest = "MRC", COVest = "MRC", criterion = "squared duration", ...){
   
@@ -2198,11 +2210,34 @@ rCholCov <- function(pData, IVest = "MRC", COVest = "MRC", criterion = "squared 
     stop("Criterion must be either 'squared duration' or 'duration' or 'count'")
   }
   
+  if(!(IVest %in% listCholCovEstimators() & COVest %in% listCholCovEstimators())){
+    stop("rCholCov IVest or COVest not in the available CholCov estimators. See listCholCovEstimators() for list of implemented estimators.")
+  }
+  
+  
   options <- list(...)
-  op <- list("delta" = 0.1, "theta" = 1)
+  op <- list("delta" = 0.1, "theta" = 1, "alignBy" = "minutes", "alignPeriod" = 5, "kernelType" = "rectangular", "kernelParam" = 1, "kernelDOFadj" = TRUE,
+             "startIV" = NULL, "noisevar" = NULL, "K" = 300, "J" = 1, "K_cov" = NULL, "J_cov" = NULL, "K_var" = NULL, "J_var" = NULL, "eta" = 9, "makePsd" = FALSE, "k" = 1)
   op[names(options)] <- options
   delta <- op[["delta"]]
   theta <- op[["theta"]]
+  alignBy <- op[["alignBy"]]
+  alignPeriod <- op[["alignPeriod"]]
+  kernelType <- op[["kernelType"]]
+  kernelParam <- op[["kernelParam"]]
+  kernelDOFadj <- op[["kernelDOFadj"]]
+  startIV <- op[["startIV"]]
+  noisevar <- op[["noisevar"]]
+  K_cov <- op[["K_cov"]]
+  J_cov <- op[["J_cov"]]
+  K_var <- op[["K_var"]]
+  J_var <- op[["J_var"]]
+  eta <- op[["eta"]]
+  makePsd <- op[["makePsd"]]
+  K <- op[["K"]]
+  J <- op[["J"]]
+  k <- op[["k"]]
+  
   if(length(delta) != 1 | !is.numeric(delta)){
     stop("delta must be a numeric of length one")
   }
@@ -2231,7 +2266,21 @@ rCholCov <- function(pData, IVest = "MRC", COVest = "MRC", criterion = "squared 
           
           for (m in 1:(l-1)) {
             
-            COV <- cholCovMRC(as.matrix(coredata(cbind(returns[,l], f[,m]))), delta = delta, theta = theta)
+            COV <- switch(COVest,
+                   MRC = cholCovMRC(as.matrix(coredata(cbind(returns[,l], f[,m]))), delta = delta, theta = theta),
+                   rCov = rCov(exp(cumsum(cbind(returns[,l], f[,m]))), alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = TRUE),
+                   rAVGCov = rAVGCov(exp(cumsum(cbind(returns[,l], f[,m]))), alignBy = alignBy, alignPeriod = alignPeriod, k = k, makeReturns = TRUE),
+                   rBPCov = rBPCov(exp(cumsum(cbind(returns[,l], f[,m]))), alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = TRUE),
+                   rHYCov = rHYCov(exp(cumsum(cbind(returns[,l], f[,m]))), alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = TRUE),
+                   rKernelCov = rKernelCov(exp(cumsum(cbind(returns[,l], f[,m]))), alignBy = alignBy, alignPeriod = alignPeriod,
+                                           makeReturns = TRUE, kernelType = kernelType, kernelParam = kernelParam, kernelDOFadj = kernelDOFadj),
+                   rOWCov = rOWCov(exp(cumsum(cbind(returns[,l], f[,m]))), alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = TRUE),
+                   rRTSCov = rRTSCov(exp(cumsum(cbind(returns[,l], f[,m]))), cor = FALSE, startIV = startIV, noisevar = noisevar, K = K, J = J, 
+                                     K_cov = K_cov, J_cov=J_cov, K_var=K_var, J_var = J_var, eta = eta, makePsd = makePsd ),
+                   rThresholdCov = rThresholdCov(exp(cumsum(cbind(returns[,l], f[,m]))), alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = TRUE),
+                   rSemiCov = rSemiCov(exp(cumsum(cbind(returns[,l], f[,m]))), alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = TRUE)
+                   )
+            
             
             Ltemp[l,m] <- COV[1,2]/COV[2,2]
             
@@ -2244,7 +2293,21 @@ rCholCov <- function(pData, IVest = "MRC", COVest = "MRC", criterion = "squared 
       L[d ,] <- Ltemp[d,]
       
       
-      G[d,d] <- cholCovMRC(as.matrix(coredata(f[,d])) , delta = delta, theta = theta)
+      # In this switch, we need to use xts on the data to get the aggregation to work
+      G[d,d] <- switch(IVest, 
+                       MRC = cholCovMRC(as.matrix(coredata(f[,d])), delta = delta, theta = theta),
+                       rCov =          rCov(xts(exp(cumsum(f[,d])), order.by = index(returns)), alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = TRUE),
+                       rAVGCov =       rAVGCov(xts(exp(cumsum(f[,d])), order.by = index(returns)), alignBy = alignBy, alignPeriod = alignPeriod, k = k, makeReturns = TRUE),
+                       rBPCov =        rBPCov(xts(exp(cumsum(f[,d])), order.by = index(returns)), alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = TRUE),
+                       rHYCov =        rHYCov(xts(exp(cumsum(f[,d])), order.by = index(returns)), alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = TRUE),
+                       rKernelCov =    rKernelCov(xts(exp(cumsum(f[,d])), order.by = index(returns)), alignBy = alignBy, alignPeriod = alignPeriod,                                        
+                                                  makeReturns = TRUE, kernelType = kernelType, kernelParam = kernelParam, kernelDOFadj = kernelDOFadj),
+                       rOWCov =        rOWCov(xts(exp(cumsum(f[,d])), order.by = index(returns)), alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = TRUE),
+                       rRTSCov =       rRTSCov(xts(exp(cumsum(f[,d])), order.by = index(returns)), cor = FALSE, startIV = startIV, noisevar = noisevar, K = K, J = J,                              
+                                               K_cov = K_cov, J_cov=J_cov, K_var=K_var, J_var = J_var, eta = eta, makePsd = makePsd ),
+                       rThresholdCov = rThresholdCov(xts(exp(cumsum(f[,d])), order.by = index(returns)), alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = TRUE),
+                       rSemiCov = rSemiCov(xts(exp(cumsum(f[,d])), order.by = index(returns)), alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = TRUE)
+                       )
     }
     
   
@@ -2263,7 +2326,7 @@ rCholCov <- function(pData, IVest = "MRC", COVest = "MRC", criterion = "squared 
 #' Realized Semicovariance
 #' 
 #' @description Function returns the Realized Semicovariances (rSemiCov).
-#' Let \eqn{r_{t,i}} be an intraday \eqn{N x M} return vector and \eqn{i=1,...,M}
+#' Let \eqn{r_{t,i}} be an intraday \eqn{M x N} return matrix and \eqn{i=1,...,M}
 #' the number of intraday returns. Then, let p = max(r_{t,i},0) and n = min(r_{t,i}).
 #' 
 #' Then, the realized semicovariance is given by the following three matrices:
@@ -2323,9 +2386,9 @@ rCholCov <- function(pData, IVest = "MRC", COVest = "MRC", criterion = "squared 
 #' colnames(covariances) <- c("mixed", "neg", "pos")
 #' # We make a quick plot of the different covariances
 #' plot(covariances)
-#' addLegend(lty = 1)
+#' addLegend(lty = 1) # Add legend so we can distinguish the series.
 #' }
-#' 
+#' @author Emil Sjoerup
 #' @keywords volatility
 #' @importFrom data.table between
 #' @export
@@ -2391,3 +2454,396 @@ rSemiCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, mak
   return(list("mixed" = mixCov, "negative" = negCov,  "positive" = posCov, "concordant" = concordantCov))
   
 }
+
+#' Utility function listing the available estimators for the CholCov estimation
+#' 
+#' 
+#' @return This function returns a character vector containing the available estimators.
+#' @export
+listCholCovEstimators <- function(){
+  c("MRC",
+    "rCov",
+    "rAVGCov",
+    "rBPCov",
+    "rHYCov",
+    "rKernelCov",
+    "rOWCov",
+    "rRTSCov",
+    "rThresholdCov",
+    "rSemiCov")
+}
+
+# ### #' @param correctTime logical indicating whether to use the time-adjusted ReMeDI measure, default is FALSE               #To put into documentation when time-fix is found
+# ### #' @param jumpsIndex Indices of jump(s) detected               #To put into documentation when time-fix is found
+# 
+#' ReMeDI
+#' This function estimates the auto-covariance of market-microstructure noise
+#'
+#' @param pData xts or data.table containing the log-prices of the asset
+#' @param kn numeric of length 1 determining the tuning parameter kn this controls the lengths of the non-overlapping interval in the ReMeDI estimation
+#' @param lags numeric containing integer values indicating
+#' @param knEqual Use an altered version of the ReMeDI estimator, where we instead use equal kn, instead of kn and 2*kn for the windows. See Figure 1 of paper in reference section.
+#' @param makeCorrelation logical indicating whether to transform the autocovariances into autocorrelations. The estimate of variance is imprecise and thus, constructing the correlation like this may show correlations that fall outside (-1,1)
+#' 
+#' @references Li and Linton (2019) (Working paper): "A ReMeDI for microstructure noise."
+#' @keywords microstructure noise autocovariance autocorrelation
+#'
+#' @examples
+#' remed <- ReMeDI(sampleTDataMicroseconds[as.Date(DT) == "2018-01-02", ], kn = 2, lags = 1:8)
+#' # We can also use the algorithm for choosing the kn to 
+#' optimalKn <- knChooseReMeDI(sampleTDataMicroseconds[as.Date(DT) == "2018-01-02",],
+#'                             knMax = 10, tol = 0.05, size = 3,
+#'                             lower = 2, upper = 5, plot = TRUE)
+#' optimalKn 
+#' remed <- ReMeDI(sampleTDataMicroseconds[as.Date(DT) == "2018-01-02", ], kn = optimalKn, lags = 1:8)
+
+#' @author Emil Sjoerup
+#' @export
+ReMeDI <- function(pData, kn = 1, lags = 1, knEqual = FALSE,
+                   #correctTime = FALSE, jumpsIndex = NULL,
+                   makeCorrelation = FALSE){
+  time <- DT <- PRICE <- NULL
+  # Check input
+
+  if(!is.logical(knEqual)){
+    stop("knEqual must be logical")
+  }
+  
+  if(is.data.table(pData)){ # We have a data.table
+
+    if(!("PRICE" %in% colnames(pData))){
+      stop("ReMeDI with data.table input requires a PRICE column")
+    }
+    
+    # if(correctTime){
+    #   if(!("DT" %in% colnames(pData))){
+    #     stop("ReMeDI with correctTime set to TRUE needs a DT (date-time) column when the input is a data.table")
+    #   } else {
+    #     time <- as.numeric(pData[, DT])
+    #   }
+    # }
+
+    prices <- as.numeric(pData[, PRICE])
+
+  } else if( is.xts(pData) ) { # We have an xts object
+    # if(correctTime){
+    #   time <- as.numeric(index(pData))
+    # }
+    if(ncol(pData) != 1){
+      if(!("PRICE" %in% colnames(pData))){
+        stop("ReMeDI with data.table input requires a PRICE column")
+      }
+      prices <- as.numeric(pData[,"PRICE"])
+    } else {
+      prices <- as.numeric(pData)
+    }
+  } else {
+    stop("Error in ReMeDI: pData must be an xts or a data.table")
+  }
+
+  # correctJumps <- FALSE
+  #
+  # if(is.numeric(jumpsIndex)){
+  #   if(!all(jumpsIndex %% 1 == 0)){
+  #     stop("Error in ReMeDI: jumpsIndex must be a numeric of integer values")
+  #   }
+  #   correctJumps <- TRUE
+  # }
+
+  if(!all(lags %% 1 == 0 )){
+    stop("lags must be contain integer values")
+  }
+
+  res <- numeric(length(lags))
+  nObs <- length(prices)
+
+  kn <- c(-kn, 2 * kn)
+  resIDX <- 1
+
+  if(makeCorrelation){
+    lags <- c(0,lags) # We make sure we have 0 lag first in the series (we remove it later again)
+  }
+  
+  foo <- FALSE
+  if(knEqual){
+    foo <- TRUE
+  }
+  
+  for (lag in lags) {
+
+    # thisLag <- c(lag, 0)
+    #remedi <- (kn[2] + 1):(nObs - lag + kn[1])
+    #idx <- 1
+    remedi <- 0
+    # for(i in 1:(nObs - 3 * (-kn[1]) - lag)){
+    #   remedi <- remedi + ((prices[i + 2 * (-kn[1])] - prices[i]) * (prices[i + 3 * (-kn[1]) + lag] - prices[i + 2 * (-kn[1]) + lag]))
+    # }
+    # browser()
+    
+    idx <- seq_len((nObs - (3-foo) * (-kn[1]) - lag))
+    remedi <- sum((prices[idx + (2-foo) * (-kn[1])] - prices[idx]) * (prices[idx + (3-foo) * (-kn[1]) + lag] - prices[idx + (2-foo) * (-kn[1]) + lag]))
+
+    # ## Use the time corrections Muzafer provided
+    # if(correctTime){
+    # 
+    #  ## We need to make corrections in the code for time adjustment when this is ready.
+      # for (i in (kn[2] + 1):(nObs - lag + kn[1])) { # Calculate ReMeDI
+      #   remedi[idx] <- prod(prices[i + thisLag] - prices[i + thisLag - kn])
+      #   idx <- idx + 1
+      # }
+      
+      
+      
+      
+    #
+    #   timeIDX <- sweep(matrix(rep((kn[2] + 1):(nObs - lag + kn[1]), 4), ncol = 4),2, c(thisLag , thisLag - kn), FUN = "+")
+    #
+    #   ## Follow up with muzafer whether this is correct
+    #   timeCorrection <- (time[timeIDX[,3]] - time[timeIDX[,1]]) * (time[timeIDX[,2]] - time[timeIDX[,4]])
+    #
+    #   remedi <- remedi * timeCorrection
+    #
+    # }
+    #
+    #
+    # ## Use the jump correction Muzafer provided
+    # if(correctJumps){
+    #   jumpIDX <- matrix(0, nrow = length(jumpsIndex), ncol = 3 + (thisLag[1] != 0))
+    #
+    #   for (i in 1:length(jumpsIndex)) {
+    #     if(thisLag[1] != 0){
+    #       jumpIDX[i,] <- c(jumpsIndex[i] - sum(abs(kn)) - thisLag[1], jumpsIndex[i] - rep(kn[2], 1 + sum(thisLag != 0)) - thisLag, jumpsIndex[i] )
+    #     } else {
+    #       jumpIDX[i,] <- c(jumpsIndex[i] - sum(abs(kn)) - thisLag[1], jumpsIndex[i] - kn[2] - thisLag[1], jumpsIndex[i])
+    #     }
+    #
+    #     remedi <- remedi[-as.numeric(jumpIDX)]
+    #   }
+    #
+    #
+    # }
+    #
+    #
+
+    res[resIDX] <- -remedi/(nObs - (3-foo) * (-kn[1]) - lag)
+
+    resIDX <- resIDX +1
+  }
+
+
+  if(makeCorrelation){
+    res <- res[-1]/res[1] # We transform the autocovariances into autocorrelations (and remove the 0-lag we added earlier)
+  }
+
+  return(res)
+}
+
+## For when correcTime is solved:
+# #' @examples
+# #' optimalKn <- knChooseReMeDI(sampleTDataMicroseconds, correctTime = FALSE,
+# #'                             jumpsIndex = NULL, knMax = 10, tol = 0.05,
+# #'                             size = 3, lower = 2, upper = 5, plot = TRUE)
+# #' optimalKn
+# #' \dontrun{
+# #' # We can also have a much larger search-space
+# #' optimalKn <- knChooseReMeDI(sampleTDataMicroseconds, correctTime = FALSE,
+# #'                             jumpsIndex = NULL, knMax = 50, tol = 0.05,
+# #'                             size = 3, lower = 2, upper = 5, plot = TRUE)
+# #' optimalKn
+# #' }
+# #' @param correctTime logical indicating whether to use the time-adjusted ReMeDI measure, default is FALSE
+# #' @param jumpsIndex Indices of jump(s) detected
+
+
+
+#' ReMeDI tuning parameter
+#' function to choose the tuning parameter, kn in ReMeDI estimation
+#'
+#' @param pData xts or data.table containing the log-prices of the asset.
+#' @param knEqual Use an altered version of the ReMeDI estimator, where we instead use equal kn, instead of kn and 2*kn for the windows. See Figure 1 of paper in reference section.
+#' @param knMax max value of kn to be considered
+#' @param tol tolerance for the minimizing value. If tol is high, the algorithm will choose a lower optimal value.
+#' @param size size of the local window
+#' @param lower lower boundary for the method if it fails to find an optimal value. If this is the case, the best kn between lower and upper is returned
+#' @param upper upper boundary for the method if it fails to find an optimal value. If this is the case, the best kn between lower and upper is returned
+#' @param plot logical whether to plot the errors.
+#' @details This is the algorithm B.2 in the appendix of the Li and Linton (2019) working paper
+#'
+#' @examples
+#' optimalKn <- knChooseReMeDI(sampleTDataMicroseconds[as.Date(DT) == "2018-01-02",],
+#'                             knMax = 10, tol = 0.05, size = 3,
+#'                             lower = 2, upper = 5, plot = TRUE)
+#' optimalKn
+#' \dontrun{
+#' # We can also have a much larger search-space
+#' optimalKn <- knChooseReMeDI(sampleTDataMicroseconds[, as.Date(DT) == "2018-01-02"],
+#'                             knMax = 50, tol = 0.05,
+#'                             size = 3, lower = 2, upper = 5, plot = TRUE)
+#' optimalKn
+#' }
+#'
+#' @author Emil Sjoerup
+#' @importFrom stats plot.ts
+#' @references A ReMeDI for Microstructure Noise
+#' @return integer containing the optimal kn
+#' @export
+knChooseReMeDI <- function(pData, knEqual = FALSE,
+                           #correctTime = FALSE, jumpsIndex = NULL,
+                           knMax = 10, tol = 0.05, size = 3, lower = 2, upper = 5, plot = FALSE){
+
+  kn <- 1:(knMax + size +1)
+  err <- vapply(kn, ReMeDI, FUN.VALUE = numeric(4), pData = pData,
+                #correctTime = correctTime, jumpsIndex = jumpsIndex, ## For when correctTime is fixed
+                lags = 0:3, knEqual = knEqual)
+  err <- (err[1,] - err[2,] - err[3,] + err[4,] - ReMeDI(pData, kn = 1, lags = 0, knEqual = knEqual ))^2
+          #                                               , correctTime = correctTime, jumpsIndex = jumpsIndex) ## For when correctTime is fixed
+
+
+  if(plot){
+    plot.ts(err, ylab = "error", xlab = "kn")
+  }
+
+  errMax <- max(err[1:(round(knMax/2))])
+
+  kns <- vapply(1:(knMax+1), flat, FUN.VALUE = numeric(1), err = err, errMax = errMax, size = size, tol = tol)
+  kns <- kns[!is.na(kns)]
+  kn <- kns[1]
+
+  if(is.na(kn)){
+    kn <- which(err == min(err[lower:upper]))
+  }
+
+  return(as.integer(kn))
+
+}
+
+#### #' 
+#### #' #' Autocorrelation of noise estimation
+#### #' #' @importFrom zoo coredata
+#### #' #' @export
+#### #' autoCorrelationOfNoise <- function(pData, kn, lags){
+#### #'   ## Make general:
+#### #'   reticulate::source_python("../pickle_reader.py")
+#### #'   dat <- read_pickle_file("/data/data/pickles/AIG_Tr_20140102_cleaned.pickle")
+#### #'   pData <- xts(dat$price, anytime::anytime(dat$timestamp))
+#### #'   colnames(pData) <- "PRICE"
+#### #'   prices <- pData$PRICE
+#### #'   kn <- 2
+#### #'   lags <- 30
+#### #'   averagedPrices <- filter(coredata(prices), rep(1, kn)/kn, sides = 1)[-seq(1, (kn-1))]
+#### #'   nObs <- length(averagedPrices)
+#### #'   J <- lags
+#### #'   R_est <- rep(0, J + 1)
+#### #'   r_est <- rep(0, J + 1)
+#### #'   
+#### #'   U_0 <- rep(0, J + 1)
+#### #'   
+#### #'   for (j in 0:J) {
+#### #'     
+#### #'     ind <- seq(1, nObs + 1 - j - 2 * 2 * kn)
+#### #'     U_0[(j+1)] <- sum((prices[ind] - averagedPrices[(j + kn + ind)]) * (prices[ j+ ind] - averagedPrices[(j + 3 * kn + ind)]))
+#### #'     R_est[(j+1)] <- U_0[j + 1]/length(ind)
+#### #'     
+#### #'   }
+#### #'   
+#### #'   
+#### #'   UU_2 <- UU_3 <- UU_4 <- UU_1 <- matrix(0 ,nrow= kn + 1, ncol= J + 1) 
+#### #'   
+#### #'   for (m in 0:kn) {
+#### #'     for (j in 0:J) {
+#### #'       mu <- j + m
+#### #'       ind <- seq(1, nObs + 1 - mu - 8 * kn)
+#### #'       
+#### #'       UU_1[(m+1), (j+1)] <- 
+#### #'         sum((prices[ind] - averagedPrices[(mu + kn + ind)]) * 
+#### #'             (prices[j + ind] - averagedPrices[(mu + 3 * kn + ind)]) *
+#### #'             (prices[m + ind] - averagedPrices[(mu + 5 * kn + ind)]) *
+#### #'             (prices[j + m + ind] - averagedPrices[(mu + 7 * kn + ind)])) 
+#### #'       
+#### #'       UU_2[(m+1),(j+1)] <- 
+#### #'         sum( (prices[m + ind] - averagedPrices[(mu + kn + ind)]) * 
+#### #'              (prices[j + m + ind] - averagedPrices[(mu + 3 * kn + ind)] ) *
+#### #'              (prices[ind] - averagedPrices[(mu + 5 * kn + ind)] ) *
+#### #'              (prices[j + ind] - averagedPrices[(mu + 7 * kn + ind)] )  )  
+#### #'       
+#### #'       UU_3[(m+1),(j+1)] <- 
+#### #'         sum( (prices[ind] - averagedPrices[(mu + kn + ind)]) * 
+#### #'              (prices[j + ind] - averagedPrices[(mu + 3 * kn + ind)] ) *
+#### #'              (prices[m + ind] - averagedPrices[(mu + 5 * kn + ind)] ) *
+#### #'              (prices[m + ind] - averagedPrices[(mu + 7 * kn + ind)] )  )  
+#### #'       
+#### #'       
+#### #'       UU_4[(m+1),(j+1)] <- 
+#### #'         sum( (prices[m + ind] - averagedPrices[(mu + kn + ind)]) * 
+#### #'              (prices[j + m + ind] - averagedPrices[(mu + 3 * kn + ind)] ) *
+#### #'              (prices[ind] - averagedPrices[(mu + 5 * kn + ind)] ) *
+#### #'              (prices[ind] - averagedPrices[(mu + 7 * kn + ind)] ))  
+#### #'     }
+#### #'   }
+#### #'   
+#### #'   U_bar_1 <- rep(0, J + 1) # U_bar(0,j,0,j)
+#### #'   U_bar_2 <- rep(0, J + 1) # U_bar(0,j,0,0)
+#### #'   
+#### #'   
+#### #'   for (j in 0:J) {
+#### #'     mu <- j
+#### #'     mu_pp <- j + j
+#### #'     
+#### #'     ind <- seq(1, nObs + 1 - mu_pp - 9 * kn)
+#### #'     
+#### #'     U_bar_1[(j+1)] <- sum( (prices[ind] - averagedPrices[(mu + kn + ind)]) * 
+#### #'                            (prices[j+ ind] - averagedPrices[(mu + 3 * kn + ind)] ) *
+#### #'                            (prices[mu + 5 * kn + ind] - averagedPrices[(mu_pp + 5 * kn + kn + ind)] ) *
+#### #'                            (prices[mu + 5 * kn + j + ind] - averagedPrices[(mu_pp + 5 * kn + 3 * kn + ind)] ) )
+#### #'     
+#### #'     U_bar_2[(j+1)] <- sum( (prices[ind] - averagedPrices[(mu + kn + ind)]) * 
+#### #'                            (prices[ j+ ind] - averagedPrices[(mu + 3*kn + ind)] ) *
+#### #'                            (prices[ mu + 5*kn + ind] - averagedPrices[(mu + 5 * kn + kn + ind)] ) *
+#### #'                            (prices[ mu + 5*kn + ind] - averagedPrices[(mu + 5 * kn + 3 * kn + ind)] ) )
+#### #'   }
+#### #'   
+#### #'   S <- rep(0, J + 1) # S[0,j,0,j]
+#### #'   Bza <- rep(0, J + 1) # Bza[0,j,0,j]
+#### #'   
+#### #'   S_1 <- rep(0, J + 1) # S[0,j,0,0]
+#### #'   Bza_1 <- rep(0, J + 1) # Bza[0,j,0,0]
+#### #'   sigma_r <- rep(1, J) # 
+#### #'   
+#### #'   j<-0
+#### #'   S[(j+1)] <- (sum(UU_1[,(j+1)]) + sum(UU_2[,(j+1)]) - UU_1[1,(j+1)]) - (2*kn + 1)*U_bar_1[(j+1)]
+#### #'   Bza[(j+1)] <- S[(j+1)]/nObs + U_bar_1[(j+1)]/nObs - R_est[(j+1)]^2
+#### #'   
+#### #'   S_1[(j+1)] <- (sum(UU_3[,(j+1)]) + sum(UU_4[,(j+1)]) - UU_3[1,(j+1)] ) - (2*kn + 1)*U_bar_2[(j+1)]
+#### #'   Bza_1[(j+1)] <- S_1[(j+1)]/nObs + U_bar_2[(j+1)]/nObs - R_est[1]*R_est[(j+1)]
+#### #'   
+#### #'   
+#### #'   for (j in 1:J) {
+#### #'     S[(j+1)] <- (sum(UU_1[,(j+1)]) + sum(UU_2[,(j+1)]) - UU_1[1,(j+1)]) - (2*kn + 1)*U_bar_1[(j+1)]
+#### #'     Bza[(j+1)] <- S[(j+1)]/nObs + U_bar_1[(j+1)]/nObs - R_est[(j+1)]^2
+#### #'     
+#### #'     S_1[(j+1)] <- (sum(UU_3[,(j+1)]) + sum(UU_4[,(j+1)]) - UU_3[1,(j+1)] ) - (2*kn + 1)*U_bar_2[(j+1)]
+#### #'     Bza_1[(j+1)] <- S_1[(j+1)]/nObs + U_bar_2[(j+1)]/nObs - R_est[1]*R_est[(j+1)]
+#### #'     sigma_r[j] <- (R_est[1]^2*Bza[(j+1)] + R_est[(j+1)]^2 * Bza[1] - (2 * R_est[1] * R_est[(j+1)] * Bza_1[(j+1)]))/(R_est[1]^4)
+#### #'   }
+#### #'   
+#### #'   
+#### #'   
+#### #'   
+#### #'   
+#### #'   plot.ts(R_est)
+#### #'   
+#### #'   #plot.ts(sigma_r)
+#### #'   
+#### #' }
+#### #' 
+#### #' 
+#### #' 
+#### #' 
+#### #' 
+#### #' 
+#### #' 
+#### #' 
+#### #' 
+#### #' 
+#### #' 
+#### 

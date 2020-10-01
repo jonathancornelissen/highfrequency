@@ -1,6 +1,6 @@
 Package: highfrequency
-Version: 0.5.0
-Date: 2020-04-14
+Version: 0.7.0.1
+Date: 2020-09-21
 Title: Tools for Highfrequency Data Analysis
 Authors@R: 
     c(person(given = "Kris",
@@ -21,7 +21,10 @@ Authors@R:
       person(given = "Onno",
              family = "Kleen",
              role = "aut",
-             comment = c(ORCID = "0000-0003-4731-4640")))
+             comment = c(ORCID = "0000-0003-4731-4640")),
+      person(given = "Emil",
+             family = "Sjoerup",
+             role = "aut"))
 Maintainer: Kris Boudt
     <kris.boudt@ugent.be>
 Description: Provide functionality to manage, clean and match highfrequency
@@ -49,7 +52,6 @@ Imports:
     mvtnorm,
     data.table (>= 1.12.0),
     RcppRoll,
-    readr,
     quantmod,
     sandwich
 LinkingTo: Rcpp, RcppArmadillo
@@ -61,5 +63,5 @@ Suggests:
     testthat,
     knitr,
     rmarkdown
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1
 VignetteBuilder: knitr
