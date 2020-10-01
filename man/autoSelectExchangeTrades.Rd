@@ -4,12 +4,15 @@
 \alias{autoSelectExchangeTrades}
 \title{Retain only data from the stock exchange with the highest trading volume}
 \usage{
-autoSelectExchangeTrades(tData)
+autoSelectExchangeTrades(tData, printExchange = TRUE)
 }
 \arguments{
 \item{tData}{an xts object with at least a column "EX", 
 indicating the exchange symbol and "SIZE", 
-indicating the trade volume. The chosen exchange is printed on the console.
+indicating the trade volume.}
+
+\item{printExchange}{indicates whether the chosen exchange is printed on the console, default is TRUE.
+The possible exchanges are:
 \itemize{
 \item A: AMEX
 \item N: NYSE

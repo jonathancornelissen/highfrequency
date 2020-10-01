@@ -597,7 +597,6 @@ aggregateTrades <- function(tData, on = "minutes", k = 5, marketOpen = "09:30:00
     scaleFactor <- k * 60 * 60
   }
   
-  
   dummy_was_xts <- FALSE
   if (!is.data.table(tData)) {
     if (is.xts(tData)) {
@@ -664,8 +663,6 @@ aggregateTrades <- function(tData, on = "minutes", k = 5, marketOpen = "09:30:00
     } else {
       stop("unknown error occured in aggregateQuotes")
     }
-    
-    
   }
   
   # Find the first observation per day.  
@@ -710,7 +707,9 @@ aggregateTrades <- function(tData, on = "minutes", k = 5, marketOpen = "09:30:00
 #' i.e. the highest trade volume.
 #' @param tData an xts object with at least a column "EX", 
 #' indicating the exchange symbol and "SIZE", 
-#' indicating the trade volume. The chosen exchange is printed on the console.
+#' indicating the trade volume. 
+#' @param printExchange indicates whether the chosen exchange is printed on the console, default is TRUE.
+#' The possible exchanges are:
 #' \itemize{
 #' \item A: AMEX
 #' \item N: NYSE
@@ -733,7 +732,7 @@ aggregateTrades <- function(tData, on = "minutes", k = 5, marketOpen = "09:30:00
 #' 
 #' @keywords cleaning
 #' @export
-autoSelectExchangeTrades <- function(tData) {
+autoSelectExchangeTrades <- function(tData, printExchange = TRUE) {
   DATE <- SIZE <- DT <- SIZESUM <- NULL
   
   exchanges <- c("T", "Q", "A", "P", "B", "C", "N", "D", "X", "I", "M", "W", "Z")
@@ -763,14 +762,14 @@ autoSelectExchangeTrades <- function(tData) {
     }
   } 
   
-  
   tData[, SIZESUM := sum(SIZE), by = "EX"]
   tData <- tData[SIZESUM == max(SIZESUM)][, -c("SIZESUM")]
   
-  exch <- unique(tData$EX)
-  
-  namechosen <- exchangenames[exch == exchanges]  
-  print(paste("The ", namechosen, "is the exchange with the highest volume."))
+  if (printExchange) {
+    exch <- unique(tData$EX)
+    namechosen <- exchangenames[exch == exchanges]  
+    print(paste("The ", namechosen, "is the exchange with the highest volume."))
+  }
   
   if (dummy_was_xts == TRUE) {
     return(xts(as.matrix(tData[, -c("DT")]), order.by = tData$DT, tzone = tzone(tData$DT)))
@@ -789,7 +788,7 @@ autoSelectExchangeTrades <- function(tData) {
 #' @param qData a data.table or xts object with at least a column "EX", indicating the exchange symbol 
 #' and columns "BIDSIZ" and "OFRSIZ", indicating 
 #' the volume available at the bid and ask respectively.
-#' The chosen exchange is printed on the console.
+#' @param printExchange indicates whether the chosen exchange is printed on the console, default is TRUE.
 #' The possible exchanges are:
 #' \itemize{
 #' \item A: AMEX
@@ -815,12 +814,12 @@ autoSelectExchangeTrades <- function(tData) {
 #' 
 #' @keywords cleaning
 #' @export
-autoSelectExchangeQuotes <- function(qData) {
+autoSelectExchangeQuotes <- function(qData, printExchange = TRUE) {
   
   BIDSIZ <- OFRSIZ <- DT <- EX <- SUMVOL <- NULL
   
-  exchanges = c("Q","A","P","B","C","N","D","X","I","M","W","Z");
-  exchangenames = c("NASDAQ","AMEX","ARCA","Boston","NSX","NYSE","NASD ADF and TRF","Philadelphia","ISE","Chicago","CBOE","BATS");
+  exchanges = c("T","Q","A","P","B","C","N","D","X","I","M","W","Z")
+  exchangenames = c("NASDAQ","NASDAQ","AMEX","ARCA","Boston","NSX","NYSE","NASD ADF and TRF","Philadelphia","ISE","Chicago","CBOE","BATS")
   
   qData <- checkColumnNames(qData)
   checkqData(qData)
@@ -852,12 +851,13 @@ autoSelectExchangeQuotes <- function(qData) {
   qData[, SUMVOL := sum(BIDSIZ + OFRSIZ), by = "EX"]
   qData <- qData[SUMVOL == max(SUMVOL)][, -c("SUMVOL")]
   
-  exch <- unique(qData$EX)
+  if (printExchange) {
+    exch <- unique(qData$EX)
+    namechosen <- exchangenames[exch == exchanges]
+    print(paste("The ", namechosen, "is the exchange with the highest volume."))
+  }
   
-  namechosen <- exchangenames[exch == exchanges]  
-  print(paste("The ", namechosen, "is the exchange with the highest volume."))
-  
-  if (dummy_was_xts == TRUE) {
+  if (dummy_was_xts) {
     return(xts(as.matrix(qData[, -c("DT")]), order.by = qData$DT, tzone = tzone(qData$DT)))
   } else {
     return(qData)
