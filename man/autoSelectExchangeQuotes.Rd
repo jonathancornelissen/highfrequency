@@ -4,13 +4,14 @@
 \alias{autoSelectExchangeQuotes}
 \title{Retain only data from the stock exchange with the highest volume}
 \usage{
-autoSelectExchangeQuotes(qData)
+autoSelectExchangeQuotes(qData, printExchange = TRUE)
 }
 \arguments{
 \item{qData}{a data.table or xts object with at least a column "EX", indicating the exchange symbol 
 and columns "BIDSIZ" and "OFRSIZ", indicating 
-the volume available at the bid and ask respectively.
-The chosen exchange is printed on the console.
+the volume available at the bid and ask respectively.}
+
+\item{printExchange}{indicates whether the chosen exchange is printed on the console, default is TRUE.
 The possible exchanges are:
 \itemize{
 \item A: AMEX
