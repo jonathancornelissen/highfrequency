@@ -703,8 +703,8 @@ aggregateTrades <- function(tData, on = "minutes", k = 5, marketOpen = "09:30:00
 autoSelectExchangeTrades <- function(tData) {
   DATE = SIZE = DT = SIZESUM = NULL
   
-  exchanges <- c("Q", "A", "P", "B", "C", "N", "D", "X", "I", "M", "W", "Z")
-  exchangenames <- c("NASDAQ", "AMEX", "ARCA", "Boston", "NSX", "NYSE", "NASD ADF and TRF", "Philadelphia", "ISE", "Chicago", "CBOE", "BATS")
+  exchanges <- c("T", "Q", "A", "P", "B", "C", "N", "D", "X", "I", "M", "W", "Z")
+  exchangenames <- c("NASDAQ", "NASDAQ", "AMEX", "ARCA", "Boston", "NSX", "NYSE", "NASD ADF and TRF", "Philadelphia", "ISE", "Chicago", "CBOE", "BATS")
   
   tData <- checkColumnNames(tData)
   checktData(tData)
