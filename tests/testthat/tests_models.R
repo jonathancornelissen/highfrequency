@@ -1,5 +1,6 @@
 library(xts)
 library(testthat)
+
 context("HARmodel")
 test_that("HARModel",{
   expect_equal(

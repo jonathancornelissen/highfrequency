@@ -198,7 +198,7 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
     warning("Please provide a valid argument for type, see documentation.")
   }
   if(!is.null(externalRegressor)){
-    if(!is.xts(externalRegressor) || (nrow(externalRegressor) != nrow(data) | ncol(externalRegressor) != 1)){
+    if(!is.xts(externalRegressor) && !(nrow(externalRegressor) != nrow(data) | ncol(externalRegressor) != 1)){
       stop("When using the externalRegressor argument, the input must be of type xts and have same number of rows as the data input. externalRegressor must have one column")
     }
   }
