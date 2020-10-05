@@ -168,6 +168,7 @@ detPer <- function(mR, rData = NULL, options = list()) {
 # This function estimates the spot volatility by using the stochastic periodcity
 # model of Beltratti & Morana (2001)
 #' @keywords internal
+#' @importFrom FKF fkf
 stochPer <- function(mR, rData = NULL, options = list()) {
   #require(FKF)
   # default options, replace if user-specified
@@ -251,6 +252,7 @@ stochPer <- function(mR, rData = NULL, options = list()) {
 # This function returns the average log likehood value of the stochastic
 # periodicity model, given the input parameters.
 #' @keywords internal
+#' @importFrom FKF fkf
 loglikBM <- function(par_t, yt, days, N = 288, P1 = 5, P2 = 5) {
   ss <- ssmodel(par_t, days, N, P1 = P1, P2 = P2)
   yt <- matrix(yt, ncol = length(yt))
