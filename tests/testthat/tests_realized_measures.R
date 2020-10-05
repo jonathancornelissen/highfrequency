@@ -218,6 +218,18 @@ test_that("rMPV", {
     formatC(rMPV(sampleTData$PRICE, alignBy ="minutes", alignPeriod = 5, makeReturns = TRUE), digits = 5),
     "0.00042925"
   )
+  
+  expect_equal(lapply(rMPV(returnDat), sum), list("PRICE1" = 3.016532757, "PRICE2" = 3.004313242, "PRICE3" = 3.002691466))
+  expect_equal(lapply(rMPV(returnDat), sum), lapply(rMPV(dat, makeReturns = TRUE), sum))
+  
+  expect_equal(matrix(rMPV(returnDat), ncol = 3), matrix(as.matrix(rMPV(returnDatDT)[,-1]), ncol = 3))
+  expect_equal(matrix(rMPV(dat, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE), ncol = 3),
+               matrix(as.matrix(rMPV(datDT, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)[, -1]), ncol = 3))
+  
+  expect_equal(matrix(as.matrix(rMPV(as.data.table(sample5MinPrices)[,DT := index][,!"index"], makeReturns = TRUE)[,-1]), ncol = ncol(sample5MinPrices)),
+               matrix(rMPV(sample5MinPrices, makeReturns = TRUE), ncol = ncol(sample5MinPrices)))
+  
+  
 })
 ##### rOWCov ##### 
 context("rOWCov")
@@ -257,6 +269,14 @@ test_that("rKernelCov", {
   )
   expect_equal(length(listAvailableKernels()) , 12)
   
+  expect_equal(lapply(rKernelCov(returnDat), sum), list("1970-01-01" = 2.941858941, "1970-01-02" = 3.009886185, "1970-01-03" = 3.009261885))
+  expect_equal(lapply(rKernelCov(returnDat), sum), lapply(rKernelCov(dat, makeReturns = TRUE), sum))
+  expect_equal(rKernelCov(returnDat),  rKernelCov(returnDatDT))
+  expect_equal(rKernelCov(dat, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE),
+               rKernelCov(datDT, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE))
+  
+  
+  
 })
 
 ##### rSkew ##### 
@@ -266,6 +286,17 @@ test_that("rSkew", {
     formatC(as.numeric(rSkew(sample5MinPricesJumps[c('2010-01-04', '2010-01-05'), 1], alignBy ="minutes", alignPeriod = 5, makeReturns = TRUE))[1], digits = 5),
     "0.078047"
   )
+  expect_equal(sum(rSkew(returnDat[,1])), sum(rSkew(returnDat)[,1]))
+  expect_equal(lapply(rSkew(returnDat), sum), list("PRICE1" = 0.03781808902, "PRICE2" = 0.0146462315, "PRICE3" = 0.03046798416))
+  expect_equal(lapply(rSkew(returnDat), sum), lapply(rSkew(dat, makeReturns = TRUE), sum))
+  
+  expect_equal(matrix(rSkew(returnDat), ncol = 3), matrix(as.matrix(rSkew(returnDatDT)[,-1]), ncol = 3))
+  expect_equal(matrix(rSkew(dat, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE), ncol = 3),
+               matrix(as.matrix(rSkew(datDT, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)[, -1]), ncol = 3))
+  
+  expect_equal(matrix(as.matrix(rSkew(as.data.table(sample5MinPrices)[,DT := index][,!"index"], makeReturns = TRUE)[,-1]), ncol = ncol(sample5MinPrices)),
+               matrix(rSkew(sample5MinPrices, makeReturns = TRUE), ncol = ncol(sample5MinPrices)))
+  
 })
 ##### rSV ##### 
 context("rSV")
@@ -274,6 +305,11 @@ test_that("rSV", {
     rSV(sampleTData$PRICE,alignBy ="minutes", alignPeriod = 5, makeReturns = TRUE),
     list(rSVdownside = 0.0002913423039, rSVupside = 0.0001642838323)
   )
+  
+  
+  
+  
+  
 })
 ##### rThresholdCov ##### 
 context("rThresholdCov")

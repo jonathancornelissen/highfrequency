@@ -87,6 +87,10 @@ rollApplyMedianWrapper <- function(x) {
     .Call(`_highfrequency_rollApplyMedianWrapper`, x)
 }
 
+rollApplyProdWrapper <- function(x, m) {
+    .Call(`_highfrequency_rollApplyProdWrapper`, x, m)
+}
+
 leadLagCpp <- function(x, timestampsX, y, timestampsY, lags, normalize) {
     .Call(`_highfrequency_leadLagCpp`, x, timestampsX, y, timestampsY, lags, normalize)
 }

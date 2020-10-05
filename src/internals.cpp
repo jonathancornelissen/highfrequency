@@ -187,8 +187,6 @@ arma::mat rollApplyMinWrapper(const arma::mat& x){
   for(arma::uword i = 1; i < x.n_rows; i++){
     out.row(i-1) = min(x(span(i-1, i), span(0, N-1)), 0);
   }
-  
-  
   return(out);
 }
 
@@ -200,6 +198,18 @@ arma::mat rollApplyMedianWrapper(const arma::mat& x){
   
   for(arma::uword i = 1; i < x.n_rows - 1; i++){
     out.row(i-1) = median(x(span(i - 1, i + 1), span(0, N - 1)), 0);
+  }
+  return(out);
+  
+}
+
+//[[Rcpp::export]]
+arma::mat rollApplyProdWrapper(const arma::mat& x, int m){
+  m = m - 1;
+  arma::mat out = arma::mat(x.n_rows - m, x.n_cols); 
+  const arma::uword N = x.n_cols;
+  for(arma::uword i = m; i < x.n_rows; i++){
+    out.row(i-m) = prod(x(span(i-m, i), span(0, N-1)), 0);
   }
   return(out);
   

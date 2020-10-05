@@ -1468,9 +1468,27 @@ rKurt <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 rMPV <- function(rData, m = 2, p = 2, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE) {
   
   # self-reference for multi-day input
-  if (checkMultiDays(rData)) { 
-    result <- apply.daily(rData, rMPV, alignBy, alignPeriod, makeReturns)
+  if (is.xts(rData) && checkMultiDays(rData)) { 
+    result <- apply.daily(rData, rMPV, alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = makeReturns, m = m, p = p)
     return(result)
+    
+  } else if (is.data.table(rData)){ 
+    DT <- NULL  
+    if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+      rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
+    }
+    setcolorder(rData, "DT")
+    dates <- as.character(unique(as.Date(rData$DT)))
+    res <- vector(mode = "list", length = length(dates))
+    names(res) <- dates
+    for (date in dates) {
+      res[[date]] <- rMPV(as.matrix(rData[as.Date(DT) == date][, !"DT"]), m = m, p = p, makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL) ## aligning is done above.
+    }
+    res <- setDT(transpose(res))[, DT := dates]
+    setcolorder(res, "DT")
+    colnames(res) <- colnames(rData)
+    return(res)
+    
   } else {
     if ((!is.null(alignBy)) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation(rData, on = alignBy, k = alignPeriod)
@@ -1482,13 +1500,15 @@ rMPV <- function(rData, m = 2, p = 2, alignBy = NULL, alignPeriod = NULL, makeRe
     if (m > p/2) { 
       m <- as.numeric(m) ##m> p/2
       p <- as.numeric(p)
-      q <- as.numeric(rData)
-      q <- abs(rollapply(q,width=m,FUN=prod,align="left"))
-      N <- length(rData)
+      q <- as.matrix(rData)
+      
+      q <- abs(rollApplyProdWrapper(q, m))
+      #q <- abs(rollapply(q,width=m,FUN=prod,align="left"))
+      N <- nrow(rData)
       
       dmp <- (2^((p/m)/2) * gamma((p/m + 1)/2) / gamma(1/2))^(-m)
       
-      rmpv <- dmp * N^(p/2) / (N - m + 1) * sum(q^(p/m))
+      rmpv <- dmp * N^(p/2) / (N - m + 1) * colSums(q^(p/m))
       return(rmpv)
     } else{ 
       warning("Please supply m>p/2 for the arguments m and p")
