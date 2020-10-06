@@ -3,12 +3,12 @@ library(testthat)
 context("autoSelectExchangeTrades")
 test_that("autoSelectExchangeTrades", {
   expect_equal(
-    unique(autoSelectExchangeTrades(sampleTDataRaw)$EX),
+    unique(autoSelectExchangeTrades(sampleTDataRaw, printExchange = FALSE)$EX),
     "N"
   )
   
   expect_equal(
-    unique(autoSelectExchangeQuotes(sampleQDataRaw)$EX),
+    unique(autoSelectExchangeQuotes(sampleQDataRaw, printExchange = FALSE)$EX),
     "N"
   )
 
