@@ -174,12 +174,19 @@ aggregateTS <- function (ts, FUN = "previoustick", on = "minutes", k = 1, weight
     if(as.numeric(end(ts)) == newg[length(newg)-1]){
       newg  <- newg[-length(newg)]
     }
-
-    g    <- as.POSIXct(newg, origin = "1970-01-01", tz = "GMT")
-    ts3  <- na.locf(merge(ts, zoo(, g)))[as.POSIXct(g, tz = "GMT")]
-    ts3 <- ts3[!duplicated(index(ts3), fromLast = TRUE)]
     
-    return(ts3) 
+    
+    g <- as.POSIXct(newg, origin = "1970-01-01", tz = "GMT")
+    firstObs <- ts[1,]
+    ts <- na.locf(merge(ts, zoo(NULL, g)))[as.POSIXct(g, tz = tz)]
+    if(index(ts[1]) > index(firstObs)){
+      index(firstObs) <- index(ts[1]) - secs
+      ts <- c(firstObs, ts)
+    }
+    
+    ts <- ts[!duplicated(index(ts), fromLast = TRUE)]
+    
+    return(ts) 
   }
 }
 
