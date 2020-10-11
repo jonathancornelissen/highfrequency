@@ -540,7 +540,7 @@ test_that("rSemiCov", {
 
 ##### ReMeDI #####
 context("ReMeDI")
-test_that("ReMeDI", {
+test_that("ReMeDI Estimation matches Merrick Li's code", { # We thank Merrick li for contributing Matlab code.
   # print("Make sure to implement tests for correctTime = TRUE") ## When it becomes relevant.
   #remed <- ReMeDI(sampleTDataMicroseconds, correctTime = FALSE, lags = 0:25, kn = 2) ##Changed due to correctTime bug
   remed <- ReMeDI(sampleTDataMicroseconds, lags = 0:25, kn = 2)
@@ -567,7 +567,7 @@ test_that("ReMeDI", {
 
 })
 
-test_that("ReMeDI kn choosing algorithm", {
+test_that("ReMeDI lag choosing algorithm chooses the correct values", {
 
   # optimalKn <- knChooseReMeDI(sampleTDataMicroseconds, correctTime = FALSE, jumpsIndex = NULL, knMax = 10, tol = 0.05, size = 3, lower = 1, upper = 10, plot = FALSE)##Changed due to correctTime bug
   optimalKn <- knChooseReMeDI(sampleTDataMicroseconds, knMax = 10, tol = 0.05, size = 3, lower = 1, upper = 10, plot = FALSE)
@@ -581,3 +581,23 @@ test_that("ReMeDI kn choosing algorithm", {
 
 })
 
+
+test_that("ReMeDI asymptotic variance gives same result as Merrick Li's code", {
+  dat <- sampleTData$PRICE
+  storage.mode(dat) <- "numeric"
+  dat <- log(dat)
+  avar <- ReMeDIAsymptoticVariance(dat, phi = 0.5, lags = 0:10, kn = 3, int = 1)
+  remed <- ReMeDI(dat, 3, 0:10)
+  expected <- c(4.420651e-13, 2.083090e-13, 6.915452e-14, 1.867677e-14, 5.907554e-14, 5.129904e-14,
+                 1.399077e-14, 1.433821e-14, 3.475069e-14, 2.972763e-14, 2.250913e-14)
+  expect_equal(avar$asympVar, expected)
+  ## We correctly calculate the remedi
+  expect_equal(avar$ReMeDI, remed)
+  
+  
+  avar <- ReMeDIAsymptoticVariance(dat, phi = 1, lags = 0:10, kn = 6, int = 2)  
+  expected <- c(2.637164e-12, 1.613527e-12, 1.057763e-12, 6.532975e-13, 4.462853e-13, 3.568027e-13, 2.155630e-13, 
+                2.985189e-13, 1.176854e-13, 6.341883e-14, 7.769585e-16)
+  expect_equal(avar$asympVar, expected)
+  
+})

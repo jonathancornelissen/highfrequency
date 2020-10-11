@@ -502,7 +502,7 @@ MRC <- function(pData, pairwise = FALSE, makePsd = FALSE) {
 #' @export
 #' 
 rAVGCov <- function(rData, cor = FALSE, alignBy = "minutes", alignPeriod = 5, k = 1, makeReturns = FALSE) {
-  DT <- DT_ROUND <- DT_SUBSAMPLE <- FIRST_DT <- MAXDT <- RETURN <- RETURN1 <- RETURN2 <- NULL
+  .SD <- DT <- DT_ROUND <- DT_SUBSAMPLE <- FIRST_DT <- MAXDT <- RETURN <- RETURN1 <- RETURN2 <- NULL
   
   if (is.xts(rData) && checkMultiDays(rData)) { 
     if (is.null(dim(rData))) {  
@@ -1956,7 +1956,7 @@ rThresholdCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL
     }    
     return(result)
   }  else if (is.data.table(rData)){
-    
+    DT <- NULL
     if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
     }
@@ -2802,7 +2802,7 @@ rSemiCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, mak
     }    
     return(result)
   }  else if (is.data.table(rData)){
-    
+    DT <- NULL
     if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
     }
@@ -3136,6 +3136,94 @@ knChooseReMeDI <- function(pData, knEqual = FALSE,
   return(as.integer(kn))
 
 }
+
+#' @export
+ReMeDIAsymptoticVariance <- function(pData, phi, lags, kn, int){
+  PRICE <- DT <- NULL
+  
+  if(is.data.table(pData)){ # We have a data.table
+    
+    if(!("PRICE" %in% colnames(pData))){
+      stop("ReMeDI with data.table input requires a PRICE column")
+    }
+    
+    # if(correctTime){
+    #   if(!("DT" %in% colnames(pData))){
+    #     stop("ReMeDI with correctTime set to TRUE needs a DT (date-time) column when the input is a data.table")
+    #   } else {
+    #     time <- as.numeric(pData[, DT])
+    #   }
+    # }
+    
+    prices <- as.numeric(pData[, PRICE])
+    timestamps <- as.numeric(pData[, DT])
+  } else if( is.xts(pData) ) { # We have an xts object
+    # if(correctTime){
+    #   time <- as.numeric(index(pData))
+    # }
+    if(ncol(pData) != 1){
+      if(!("PRICE" %in% colnames(pData))){
+        stop("ReMeDI with data.table input requires a PRICE column")
+      }
+      prices <- as.numeric(pData[,"PRICE"])
+    } else {
+      prices <- as.numeric(pData)
+    }
+    
+    timestamps <- as.numeric(index(pData))
+  } else {
+    stop("Error in ReMeDI: pData must be an xts or a data.table")
+  }
+  
+  N <- length(prices)
+  timestamps <- timestamps - timestamps[1]
+  timestamps <- timestamps/timestamps[N]
+  
+  diffTS <- diff(timestamps)
+  diffKNTS <- timestamps[(1+kn):N] - timestamps[1:(N-kn)]
+  
+  dn1 <- kn * diffTS[(2 + kn):(N-kn-1)] - diffTS[(3 + kn):(N-kn)]
+  dn2 <- dn1 / pmax(phi, diffKNTS[1:(N-2-2*kn)])
+  dn <- dn2^2
+  U1 <- sum(dn)
+  
+  diffKNOnce <- prices[1:(N-kn)] - prices[(kn+1):N]
+  diffKNTwice <- prices[(2 * kn + 1):N] - prices[1:(N - 2 * kn)]
+  diffKNThrice <- prices[(3 * kn + 1):N] - prices[1:(N - 3 * kn)]
+  nLags <- length(lags)
+  U2 <- S1 <- S2 <- Rj <- numeric(nLags)
+  for (l in 1:nLags) {
+    Rj[l] <- sum(diffKNOnce[(1 + 2 * kn + lags[l]):(N - kn)] * diffKNTwice[1:(N-lags[l]-3*kn)])
+    
+    U2[l] <- sum(diffKNTwice[(3 + 3 * kn):(N - lags[l] - 3 * kn)] * diffKNOnce[(3 + 5 * kn + lags[l]):(N - kn)] * dn[1:(N - 2 - 6 * kn - lags[l])])
+    S2[l] <- sum(diffKNOnce[(3 + 5 * kn + lags[l]):(N - lags[l] - 5 * kn)] * diffKNOnce[(3 + 9 * kn + 2 * lags[l]):(N - kn)] * 
+                diffKNTwice[(3 + 3 * kn):(N - 7 * kn - 2 * lags[l])] * diffKNTwice[(3 + 7 * kn + lags[l]):(N - 3 * kn - lags[l])] * dn[1:(N - 10 * kn - 2 * lags[l] - 2)])
+    
+    U4 <- -sum(diffKNOnce[(1 + 2 * kn + lags[l]):(N - lags[l] - 5 * kn)] *  diffKNOnce[(1 + 6 * kn + 2 * lags[l]):(N - kn)] * diffKNTwice[1:(N - 7 * kn - 2 * lags[l])] *  diffKNTwice[(1 + 4 * kn + lags[l]):(N - 3 * kn - lags[l])])
+    
+    S1[l] <- sum(diffKNOnce[(6*kn):(N-5*kn-2*lags[l])] * diffKNOnce[(10*kn+2*lags[l]):(N-kn)] * diffKNTwice[(8*kn+2*lags[l]):(N-3*kn)] * diffKNTwice[(8*kn+lags[l]):(N-3*kn-lags[l])]) + 
+      sum(diffKNOnce[(1+3*kn+lags[l]):(N-kn)] * diffKNOnce[(1+3*kn):(N-kn-lags[l])] * diffKNTwice[(1+kn+lags[l]):(N-3*kn)] * diffKNThrice[1:(N-4*kn-lags[l])]) + U4
+    
+    for (k in 1:int) {
+      Uk1 <- sum(diffKNOnce[(6*kn+2*k):(N-5*kn-k-2*lags[l])] * diffKNOnce[(10*kn+2*lags[l]+3*k):(N-kn)] * diffKNTwice[(8*kn+2*lags[l]+3*k):(N-3*kn)] * diffKNTwice[(8*kn+lags[l]+2*k):(N-3*kn-k-lags[l])])
+      
+      Uk2 <- sum(diffKNOnce[(1+3*kn+lags[l]+k):(N-kn)] * diffKNOnce[(1+3*kn+k):(N-kn-lags[l])] * diffKNTwice[(1+kn+lags[l]):(N-3*kn-k)] * diffKNThrice[1:(N-4*kn-k-lags[l])])
+      
+      S1[l] <- S1[l] + 2*(3*Uk1+Uk2+U4)
+    }
+    
+  }
+  Rj <- Rj/(N - 3 * kn - lags)
+  S3 <- Rj^3 * U1 - 2 * Rj * U2
+  
+  asympVar <- (S1 + S2 + S3)/N 
+  asympVar <- pmax(-asympVar, asympVar)
+  return(list("ReMeDI" = Rj, "asympVar" = asympVar))
+  
+  
+}
+
+
 
 #### #' 
 #### #' #' Autocorrelation of noise estimation
