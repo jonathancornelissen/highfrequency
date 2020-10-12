@@ -2,7 +2,7 @@
 % Please edit documentation in R/data_handling.R
 \name{salesCondition}
 \alias{salesCondition}
-\title{Delete entries with abnormal Sale Condition.}
+\title{\link{salesCondition} is deprecated. Use \link{tradesCondition} instead.}
 \usage{
 salesCondition(
   tData,
@@ -14,8 +14,6 @@ salesCondition(
 one column named "COND" indicating the Sale Condition.}
 }
 \description{
-Function deletes entries with abnormal Sale Condition: 
-trades where column "COND" has
-a letter code, except for "E" and "F".
+Function deletes entries with abnormal trades condition
 }
 \keyword{leaning}
