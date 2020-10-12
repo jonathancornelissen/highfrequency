@@ -772,8 +772,9 @@ autoSelectExchangeTrades <- function(tData, printExchange = TRUE) {
     }
   } 
   
-  tData[, SIZESUM := sum(SIZE), by = "EX"]
-  tData <- tData[SIZESUM == max(SIZESUM)][, -c("SIZESUM")]
+  tData[, SIZESUM := sum(SIZE), by = list(EX,SYMBOL)]
+  tData[, MAXSIZESUM := max(SIZESUM), by = "SYMBOL"]
+  tData <- tData[SIZESUM == MAXSIZESUM][, -c("SIZESUM", "MAXSIZESUM")]
   
   if (printExchange) {
     exch <- unique(tData$EX)
@@ -1871,11 +1872,22 @@ rmOutliersQuotes <- function (qData, maxi = 10, window = 50, type = "advanced") 
   }
 }
 
-#' Delete entries with abnormal Sale Condition.
+#' \link{salesCondition} is deprecated. Use \link{tradesCondition} instead.
 #' 
-#' @description Function deletes entries with abnormal Sale Condition: 
-#' trades where column "COND" has
-#' a letter code, except for "E" and "F".
+#' @description Function deletes entries with abnormal trades condition
+#' 
+#' @param tData an xts or data.table object containing the time series data, with 
+#' one column named "COND" indicating the Sale Condition.
+#' @keywords leaning
+#' @export
+salesCondition <- function(tData, validConds = c('', '@', 'E', '@E', 'F', 'FI', '@F', '@FI', 'I', '@I')) {
+  .Deprecated("tradesCondition")
+  tradesCondition(tData = tData, validConds = validConds)
+}
+
+#' Delete entries with abnormal trades condition.
+#' 
+#' @description Function deletes entries with abnormal trades condition
 #' 
 #' @param tData an xts or data.table object containing the time series data, with 
 #' one column named "COND" indicating the Sale Condition.
@@ -1889,7 +1901,7 @@ rmOutliersQuotes <- function (qData, maxi = 10, window = 50, type = "advanced") 
 #' 
 #' @keywords cleaning
 #' @export
-salesCondition <- function(tData, validConds = c('', '@', 'E', '@E', 'F', 'FI', '@F', '@FI', 'I', '@I')) {
+tradesCondition <- function(tData, validConds = c('', '@', 'E', '@E', 'F', 'FI', '@F', '@FI', 'I', '@I')) {
   COND <- NULL
   tData <- checkColumnNames(tData)
   checktData(tData)
@@ -2106,7 +2118,7 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, 
     nresult[2] <- dim(tDataRaw)[1] 
     tDataRaw <- tDataRaw[EX %in% exchanges]
     nresult[3] <- dim(tDataRaw)[1] 
-    tDataRaw <- salesCondition(tDataRaw, validConds)
+    tDataRaw <- tradesCondition(tDataRaw, validConds)
     nresult[4] <- dim(tDataRaw)[1] 
     tDataRaw <- mergeTradesSameTimestamp(tDataRaw, selection = selection)
     nresult[5] <- dim(tDataRaw)[1] 
