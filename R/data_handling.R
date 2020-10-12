@@ -762,8 +762,9 @@ autoSelectExchangeTrades <- function(tData, printExchange = TRUE) {
     }
   } 
   
-  tData[, SIZESUM := sum(SIZE), by = "EX"]
-  tData <- tData[SIZESUM == max(SIZESUM)][, -c("SIZESUM")]
+  tData[, SIZESUM := sum(SIZE), by = list(EX,SYMBOL)]
+  tData[, MAXSIZESUM := max(SIZESUM), by = "SYMBOL"]
+  tData <- tData[SIZESUM == MAXSIZESUM][, -c("SIZESUM", "MAXSIZESUM")]
   
   if (printExchange) {
     exch <- unique(tData$EX)
