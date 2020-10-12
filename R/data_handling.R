@@ -1828,17 +1828,36 @@ rmOutliersQuotes <- function (qData, maxi = 10, window = 50, type = "advanced") 
   }
 }
 
-#' Delete entries with abnormal Sale Condition.
+#' \link{salesCondition} is deprecated. Use \link{tradesCondition} instead.
 #' 
-#' @description Function deletes entries with abnormal Sale Condition: 
-#' trades where column "COND" has
-#' a letter code, except for "E" and "F".
+#' @description Function deletes entries with abnormal trades condition
 #' 
 #' @param tData an xts or data.table object containing the time series data, with 
 #' one column named "COND" indicating the Sale Condition.
 #' @keywords leaning
 #' @export
 salesCondition <- function(tData, validConds = c('', '@', 'E', '@E', 'F', 'FI', '@F', '@FI', 'I', '@I')) {
+  .Deprecated("tradesCondition")
+  tradesCondition(tData = tData, validConds = validConds)
+}
+
+#' Delete entries with abnormal trades condition.
+#' 
+#' @description Function deletes entries with abnormal trades condition
+#' 
+#' @param tData an xts or data.table object containing the time series data, with 
+#' one column named "COND" indicating the Sale Condition.
+#' @param validConds a character vector containing valid sales conditions defaults to \code{c('', '@', 'E', '@E', 'F', 'FI', '@F', '@FI', 'I', '@I')}. See details.
+#' 
+#' @details To get more information on the sales conditions, see the NYSE documentation. Section about Daily TAQ Trades File.
+#' The current version (as of May 2020) can be found online at \href{https://www.nyse.com/publicdocs/nyse/data/Daily_TAQ_Client_Spec_v3.3.pdf}{NYSE's webpage}
+#' @return xts or data.table object depending on input
+#' 
+#' @author Jonathan Cornelissen and Kris Boudt
+#' 
+#' @keywords leaning
+#' @export
+tradesCondition <- function(tData, validConds = c('', '@', 'E', '@E', 'F', 'FI', '@F', '@FI', 'I', '@I')) {
   COND <- NULL
   tData <- checkColumnNames(tData)
   checktData(tData)
@@ -2055,7 +2074,7 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, 
     nresult[2] <- dim(tDataRaw)[1] 
     tDataRaw <- tDataRaw[EX %in% exchanges]
     nresult[3] <- dim(tDataRaw)[1] 
-    tDataRaw <- salesCondition(tDataRaw, validConds)
+    tDataRaw <- tradesCondition(tDataRaw, validConds)
     nresult[4] <- dim(tDataRaw)[1] 
     tDataRaw <- mergeTradesSameTimestamp(tDataRaw, selection = selection)
     nresult[5] <- dim(tDataRaw)[1] 
