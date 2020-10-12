@@ -1828,11 +1828,22 @@ rmOutliersQuotes <- function (qData, maxi = 10, window = 50, type = "advanced") 
   }
 }
 
-#' Delete entries with abnormal Sale Condition.
+#' \link{salesCondition} is deprecated. Use \link{tradesCondition} instead.
 #' 
-#' @description Function deletes entries with abnormal Sale Condition: 
-#' trades where column "COND" has
-#' a letter code, except for "E" and "F".
+#' @description Function deletes entries with abnormal trades condition
+#' 
+#' @param tData an xts or data.table object containing the time series data, with 
+#' one column named "COND" indicating the Sale Condition.
+#' @keywords leaning
+#' @export
+salesCondition <- function(tData, validConds = c('', '@', 'E', '@E', 'F', 'FI', '@F', '@FI', 'I', '@I')) {
+  .Deprecated("tradesCondition")
+  tradesCondition(tData = tData, validConds = validConds)
+}
+
+#' Delete entries with abnormal trades condition.
+#' 
+#' @description Function deletes entries with abnormal trades condition
 #' 
 #' @param tData an xts or data.table object containing the time series data, with 
 #' one column named "COND" indicating the Sale Condition.
@@ -1846,7 +1857,7 @@ rmOutliersQuotes <- function (qData, maxi = 10, window = 50, type = "advanced") 
 #' 
 #' @keywords leaning
 #' @export
-salesCondition <- function(tData, validConds = c('', '@', 'E', '@E', 'F', 'FI', '@F', '@FI', 'I', '@I')) {
+tradesCondition <- function(tData, validConds = c('', '@', 'E', '@E', 'F', 'FI', '@F', '@FI', 'I', '@I')) {
   COND <- NULL
   tData <- checkColumnNames(tData)
   checktData(tData)
@@ -1931,7 +1942,7 @@ selectExchange <- function(data, exch = "N") {
 #' and the function returns an xts or data.table object.
 #' 
 #' The following cleaning functions are performed sequentially:
-#' \code{\link{noZeroPrices}}, \code{\link{selectExchange}}, \code{\link{salesCondition}},
+#' \code{\link{noZeroPrices}}, \code{\link{selectExchange}}, \code{\link{tradesCondition}},
 #' \code{\link{mergeTradesSameTimestamp}}.
 #' 
 #' Since the function \code{\link{rmTradeOutliersUsingQuotes}}
@@ -1962,7 +1973,7 @@ selectExchange <- function(data, exch = "N") {
 #' from, to, dataSource and dataDestination will be ignored. (only advisable for small chunks of data)
 #' @param report boolean and TRUE by default. In case it is true the function returns (also) a vector indicating how many trades remained after each cleaning step.
 #' @param selection argument to be passed on to the cleaning routine \code{\link{mergeTradesSameTimestamp}}. The default is "median".
-#' @param validConds character vector containing valid sales conditions. Passed through to \code{\link{salesCondition}}.
+#' @param validConds character vector containing valid sales conditions. Passed through to \code{\link{tradesCondition}}.
 #' @param saveAsXTS indicates whether data should be saved in xts format instead of data.table when using on-disk functionality. TRUE by default.
 #' @param tz timezone to use
 #' @return For each day an xts or data.table object is saved into the folder of that date, containing the cleaned data.
@@ -2063,7 +2074,7 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, 
     nresult[2] <- dim(tDataRaw)[1] 
     tDataRaw <- tDataRaw[EX %in% exchanges]
     nresult[3] <- dim(tDataRaw)[1] 
-    tDataRaw <- salesCondition(tDataRaw, validConds)
+    tDataRaw <- tradesCondition(tDataRaw, validConds)
     nresult[4] <- dim(tDataRaw)[1] 
     tDataRaw <- mergeTradesSameTimestamp(tDataRaw, selection = selection)
     nresult[5] <- dim(tDataRaw)[1] 
