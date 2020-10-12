@@ -254,10 +254,10 @@ aggregatePrice <- function(pData, on = "minutes", k = 1, marketOpen = "09:30:00"
     stop("on not valid value. Valid values are: \"milliseconds\", \"secs\", \"seconds\", \"mins\", \"minutes\", \"hours\", and \"ticks\".")
   }
 
-  dummy_was_xts <- FALSE
+  inputWasXTS <- FALSE
   if (!is.data.table(pData)) {
     if (is.xts(pData)) {
-      dummy_was_xts <- TRUE
+      inputWasXTS <- TRUE
       pData <- setnames(as.data.table(pData)[, PRICE := as.numeric(as.character(PRICE))],
                         old = "index", new = "DT")
     } else {
@@ -296,8 +296,8 @@ aggregatePrice <- function(pData, on = "minutes", k = 1, marketOpen = "09:30:00"
   obsPerDay <- pData[, .N, by = DATE][,N]
 
   ## Here we make sure that we can correctly handle times that happen before midnight in the corrected timestamps from the flag if statements
-  if(length(marketOpenNumeric) != length(obsPerDay)){
-    if(length(marketOpenNumeric) < length(obsPerDay)){ ## Here we add entries
+  if (length(marketOpenNumeric) != length(obsPerDay)) {
+    if (length(marketOpenNumeric) < length(obsPerDay)) { ## Here we add entries
       marketOpenNumeric <- rep(marketOpenNumeric, length(obsPerDay))[1:length(obsPerDay)]
       marketCloseNumeric <- rep(marketCloseNumeric, length(obsPerDay))[1:length(obsPerDay)]
     } else {
@@ -312,18 +312,16 @@ aggregatePrice <- function(pData, on = "minutes", k = 1, marketOpen = "09:30:00"
   obsPerDay <- pData[, .N, by = DATE][,N]
 
   ## Here (AGAIN!) we make sure that we can correctly handle if we deleted a day in the subsetting step above
-  if(length(marketOpenNumeric) != length(obsPerDay)){
-    if(length(marketOpenNumeric) > length(obsPerDay)){ ## Here we delete entries
+  if (length(marketOpenNumeric) != length(obsPerDay)) {
+    if (length(marketOpenNumeric) > length(obsPerDay)) { ## Here we delete entries
       marketOpenNumeric <- rep(marketOpenNumeric, length(obsPerDay))[1:length(obsPerDay)]
       marketCloseNumeric <- rep(marketCloseNumeric, length(obsPerDay))[1:length(obsPerDay)]
     } else {
       stop("unknown error occured in aggregatePrice")
     }
-
-
   }
 
-  if(on == "ticks"){ ## Special case for on = "ticks"
+  if (on == "ticks") { ## Special case for on = "ticks"
     if(k < 1 | k%%1 != 0){
       stop("When on is `ticks`, must be a positive integer valued numeric")
     }
@@ -369,7 +367,7 @@ aggregatePrice <- function(pData, on = "minutes", k = 1, marketOpen = "09:30:00"
   }
 
   pData[, DT := as.POSIXct(DT, origin = as.POSIXct("1970-01-01", tz = "UTC"), tz = tz)]
-  if (dummy_was_xts) {
+  if (inputWasXTS) {
     return(xts(as.matrix(pData[, -c("DT")]), order.by = pData$DT, tzone = tz))
   } else {
     return(pData)
@@ -432,16 +430,16 @@ aggregateQuotes <- function(qData, on = "minutes", k = 5, marketOpen = "09:30:00
   if(on == "hours"){
     scaleFactor <- k * 60 * 60
   }
-  dummy_was_xts <- FALSE
+  inputWasXTS <- FALSE
   if (is.data.table(qData) == FALSE) {
-    if (is.xts(qData) == TRUE) {
+    if (is.xts(qData)) {
       qData <- as.data.table(qData)
       qData <- setnames(qData , old = "index", new = "DT")
       for (col in names(qData)[-1]) {
         set(qData, j = col, value = as.character(qData[[col]]))
       }
       qData[, `:=`(BID = as.numeric(BID), BIDSIZ = as.numeric(BIDSIZ), OFR = as.numeric(OFR), OFRSIZ = as.numeric(OFRSIZ))]
-      dummy_was_xts <- TRUE
+      inputWasXTS <- TRUE
     } else {
       stop("Input has to be data.table or xts.")
     }
@@ -504,8 +502,6 @@ aggregateQuotes <- function(qData, on = "minutes", k = 5, marketOpen = "09:30:00
     } else {
       stop("unknown error occured in aggregateQuotes")
     }
-    
-    
   }
   
   # Find the first observation per day.  
@@ -534,7 +530,7 @@ aggregateQuotes <- function(qData, on = "minutes", k = 5, marketOpen = "09:30:00
   qData[, DT := as.POSIXct(DT, origin = as.POSIXct("1970-01-01", tz = "UTC"), tz = tz)]
   
   
-  if (dummy_was_xts == TRUE) {
+  if (inputWasXTS) {
     return(xts(as.matrix(qData[, -c("DT")]), order.by = qData$DT, tzone = tz))
   } else {
     return(qData)
@@ -597,7 +593,7 @@ aggregateTrades <- function(tData, on = "minutes", k = 5, marketOpen = "09:30:00
     scaleFactor <- k * 60 * 60
   }
   
-  dummy_was_xts <- FALSE
+  inputWasXTS <- FALSE
   if (!is.data.table(tData)) {
     if (is.xts(tData)) {
       tData <- as.data.table(tData)
@@ -606,7 +602,7 @@ aggregateTrades <- function(tData, on = "minutes", k = 5, marketOpen = "09:30:00
         set(tData, j = col, value = as.character(tData[[col]]))
       }
       tData[, `:=` (SIZE = as.numeric(SIZE), PRICE = as.numeric(PRICE))]
-      dummy_was_xts <- TRUE
+      inputWasXTS <- TRUE
     } else {
       stop("Input has to be data.table or xts.")
     }
@@ -691,9 +687,7 @@ aggregateTrades <- function(tData, on = "minutes", k = 5, marketOpen = "09:30:00
   
   tData[, DT := as.POSIXct(DT, origin = as.POSIXct("1970-01-01", tz = "UTC"), tz = tz)]
   
-  
-  
-  if (dummy_was_xts == TRUE) {
+  if (inputWasXTS) {
     return(xts(as.matrix(tData[, -c("DT")]), order.by = tData$DT, tzone = tz))
   } else {
     return(tData)
@@ -741,9 +735,9 @@ autoSelectExchangeTrades <- function(tData, printExchange = TRUE) {
   tData <- checkColumnNames(tData)
   checktData(tData)
   
-  dummy_was_xts <- FALSE
+  inputWasXTS <- FALSE
   if (is.data.table(tData) == FALSE) {
-    if (is.xts(tData) == TRUE) {
+    if (is.xts(tData)) {
       tData <- as.data.table(tData)
       tData <- setnames(tData , old = "index", new = "DT")
       for (col in names(tData)[-1]) {
@@ -752,7 +746,7 @@ autoSelectExchangeTrades <- function(tData, printExchange = TRUE) {
       
       tData[, SIZE := as.numeric(SIZE)]
       
-      dummy_was_xts <- TRUE
+      inputWasXTS <- TRUE
     } else {
       stop("Input has to be data.table or xts.")
     }
@@ -772,7 +766,7 @@ autoSelectExchangeTrades <- function(tData, printExchange = TRUE) {
     print(paste("The ", namechosen, "is the exchange with the highest volume."))
   }
   
-  if (dummy_was_xts == TRUE) {
+  if (inputWasXTS) {
     return(xts(as.matrix(tData[, -c("DT")]), order.by = tData$DT, tzone = tzone(tData$DT)))
   } else {
     return(tData)
@@ -825,9 +819,9 @@ autoSelectExchangeQuotes <- function(qData, printExchange = TRUE) {
   qData <- checkColumnNames(qData)
   checkqData(qData)
   
-  dummy_was_xts <- FALSE
+  inputWasXTS <- FALSE
   if (is.data.table(qData) == FALSE) {
-    if (is.xts(qData) == TRUE) {
+    if (is.xts(qData)) {
       qData <- as.data.table(qData)
       qData <- setnames(qData , old = "index", new = "DT")
       for (col in names(qData)[-1]) {
@@ -835,7 +829,7 @@ autoSelectExchangeQuotes <- function(qData, printExchange = TRUE) {
       }
       
       qData[, `:=` (BIDSIZ = as.numeric(BIDSIZ), OFRSIZ = as.numeric(OFRSIZ))]
-      dummy_was_xts <- TRUE
+      inputWasXTS <- TRUE
     } else {
       stop("Input has to be data.table or xts.")
     }
@@ -858,7 +852,7 @@ autoSelectExchangeQuotes <- function(qData, printExchange = TRUE) {
     print(paste("The ", namechosen, "is the exchange with the highest volume."))
   }
   
-  if (dummy_was_xts) {
+  if (inputWasXTS) {
     return(xts(as.matrix(qData[, -c("DT")]), order.by = qData$DT, tzone = tzone(qData$DT)))
   } else {
     return(qData)
@@ -894,11 +888,11 @@ exchangeHoursOnly <- function(data, dayBegin = "09:30:00", dayEnd = "16:00:00") 
   DT <- NULL # needed for data table (otherwise notes pop up in check())
   data <- checkColumnNames(data)
   
-  dummy_was_xts <- FALSE
+  inputWasXTS <- FALSE
   if (is.data.table(data) == FALSE) {
-    if (is.xts(data) == TRUE) {
+    if (is.xts(data)) {
       data <- setnames(as.data.table(data), old = "index", new = "DT")
-      dummy_was_xts <- TRUE
+      inputWasXTS <- TRUE
     } else {
       stop("Input has to be data.table or xts.")
     }
@@ -915,7 +909,7 @@ exchangeHoursOnly <- function(data, dayBegin = "09:30:00", dayEnd = "16:00:00") 
   
   data <- data[between(as.numeric(DT, tz = tzone(data$DT)) %% 86400, marketOpenNumeric, marketCloseNumeric)]
   
-  if (dummy_was_xts == TRUE) {
+  if (inputWasXTS) {
     return(xts(as.matrix(data[, -c("DT")]), order.by = data$DT, tzone = tzone(data$DT)))
   } else {
     return(data)
@@ -945,14 +939,13 @@ getPrice <- function (x, symbol = NULL, prefer = NULL) {
       stop(paste("Subscript out of bounds: no column name containing ",symbol,"."))
     }
   }
-  if (is.null(prefer) == TRUE) {
+  if (is.null(prefer)) {
     # default to trying Price, then Trade, then Close
     if(has.Price(x)) prefer = 'price'
     else if(has.Trade(x)) prefer = 'trade'
     else if(has.Cl(x))    prefer = 'close'
     else stop("Subscript out of bounds, no price was discernible from the data.")
-  }
-  if (is.null(prefer) == FALSE) {
+  } else {
     loc <- NULL
     switch(prefer,
            Op =, open =, Open = { loc <- has.Op(x,which=TRUE) },
@@ -1041,9 +1034,9 @@ matchTradesQuotes <- function(tData, qData, adjustment = 2) {
     stop("tData and qData should be of the same data type, either xts or data.table.")
   }
   
-  dummy_was_xts <- FALSE
+  inputWasXTS <- FALSE
   if (is.data.table(tData) == FALSE) {
-    if (is.xts(tData) == TRUE) {
+    if (is.xts(tData)) {
       tData <- as.data.table(tData)
       tData <- setnames(tData , old = "index", new = "DT")
       for (col in names(tData)[-1]) {
@@ -1060,7 +1053,7 @@ matchTradesQuotes <- function(tData, qData, adjustment = 2) {
       
       qData[, `:=` (OFR = as.numeric(OFR), BID = as.numeric(BID))]
       
-      dummy_was_xts <- TRUE
+      inputWasXTS <- TRUE
     } else {
       stop("Input has to be data.table or xts.")
     }
@@ -1091,7 +1084,7 @@ matchTradesQuotes <- function(tData, qData, adjustment = 2) {
   tzone(tqData) <- tz
   
   
-  if (dummy_was_xts == TRUE) {
+  if (inputWasXTS) {
     return(xts(as.matrix(tqData[, -c("DT")]), order.by = tqData$DT, tzone = tz))
   } else {
     return(tqData)
@@ -1132,7 +1125,7 @@ mergeQuotesSameTimestamp <- function(qData, selection = "median") {
     stop(paste("Selection has to be \"median\", \"max.volume\" or \"weighted.average\" "))
   }
   
-  dummy_was_xts <- FALSE
+  inputWasXTS <- FALSE
   if (is.data.table(qData) == FALSE) {
     if (is.xts(qData)) {
       qData <- as.data.table(qData)
@@ -1142,7 +1135,7 @@ mergeQuotesSameTimestamp <- function(qData, selection = "median") {
       }
       qData[, `:=` (BID = as.numeric(BID), OFR = as.numeric(OFR), BIDSIZ = as.numeric(BIDSIZ), OFRSIZ = as.numeric(OFRSIZ))]      
       
-      dummy_was_xts <- TRUE
+      inputWasXTS <- TRUE
     } else {
       stop("Input has to be data.table or xts.")
     }
@@ -1180,7 +1173,7 @@ mergeQuotesSameTimestamp <- function(qData, selection = "median") {
   qData <- cbind(qData, keptData)
   qData <- merge(qData, qData_size, by = c("DT", "SYMBOL"))
   
-  if (dummy_was_xts == TRUE) {
+  if (inputWasXTS) {
     return(xts(as.matrix(qData[, -c("DT")]), order.by = qData$DT))
   } else {
     return(qData)
@@ -1224,12 +1217,12 @@ mergeTradesSameTimestamp <- function(tData, selection = "median") {
     stop(paste("Selection has to be \"median\", \"max.volume\" or \"weighted.average\" "))
   }
   
-  dummy_was_xts <- FALSE
+  inputWasXTS <- FALSE
   if (is.data.table(tData) == FALSE) {
-    if (is.xts(tData) == TRUE) {
+    if (is.xts(tData)) {
       tData <- setnames(as.data.table(tData)[, SIZE := as.numeric(as.character(SIZE))][, PRICE := as.numeric(as.character(PRICE))], 
                         old = "index", new = "DT")
-      dummy_was_xts <- TRUE
+      inputWasXTS <- TRUE
     } else {
       stop("Input has to be data.table or xts.")
     }
@@ -1268,7 +1261,7 @@ mergeTradesSameTimestamp <- function(tData, selection = "median") {
     tData <- unique(tData[, c("DT", "SYMBOL", "PRICE", "SIZE", "NUMTRADES")])
   }
   tData <- cbind(tData, keptData)
-  if (dummy_was_xts == TRUE) {
+  if (inputWasXTS) {
     return(xts(as.matrix(tData[, -c("DT")]), order.by = tData$DT))
   } else {
     return(tData)
@@ -1291,11 +1284,11 @@ noZeroPrices <- function(tData) {
   tData <- checkColumnNames(tData)
   checktData(tData)
   
-  dummy_was_xts <- FALSE
+  inputWasXTS <- FALSE
   if (is.data.table(tData) == FALSE) {
-    if (is.xts(tData) == TRUE) {
+    if (is.xts(tData)) {
       tData <- setnames(as.data.table(tData)[, PRICE := as.numeric(as.character(PRICE))], old = "index", new = "DT")
-      dummy_was_xts <- TRUE
+      inputWasXTS <- TRUE
     } else {
       stop("Input has to be data.table or xts.")
     }
@@ -1307,7 +1300,7 @@ noZeroPrices <- function(tData) {
   
   tData <- tData[PRICE != 0]
   
-  if (dummy_was_xts == TRUE) {
+  if (inputWasXTS) {
     return(xts(as.matrix(tData[, -c("DT")]), order.by = tData$DT))
   } else {
     return(tData)
@@ -1329,11 +1322,11 @@ noZeroQuotes <- function(qData) {
   qData <- checkColumnNames(qData)
   checkqData(qData)
   
-  dummy_was_xts <- FALSE
+  inputWasXTS <- FALSE
   if (is.data.table(qData) == FALSE) {
-    if (is.xts(qData) == TRUE) {
+    if (is.xts(qData)) {
       qData <- setnames(as.data.table(qData)[, BID := as.numeric(as.character(BID))][, OFR := as.numeric(as.character(OFR))], old = "index", new = "DT")
-      dummy_was_xts <- TRUE
+      inputWasXTS <- TRUE
     } else {
       stop("Input has to be data.table or xts.")
     }
@@ -1345,7 +1338,7 @@ noZeroQuotes <- function(qData) {
   
   qData <- qData[BID != 0 & OFR != 0]
   
-  if (dummy_was_xts == TRUE) {
+  if (inputWasXTS) {
     return(xts(as.matrix(qData[, -c("DT")]), order.by = qData$DT))
   } else {
     return(qData)
@@ -1474,16 +1467,16 @@ quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, 
     qDataRaw <- checkColumnNames(qDataRaw)
     checkqData(qDataRaw)
     
-    dummy_was_xts <- FALSE
+    inputWasXTS <- FALSE
     if (is.data.table(qDataRaw) == FALSE) {
-      if (is.xts(qDataRaw) == TRUE) {
+      if (is.xts(qDataRaw)) {
         qDataRaw <- as.data.table(qDataRaw)
         qDataRaw[, `:=`(BID = as.numeric(as.character(BID)), OFR = as.numeric(as.character(OFR)), 
                      BIDSIZ = as.numeric(as.character(BIDSIZ)), OFRSIZ = as.numeric(as.character(OFRSIZ)),
                      SYMBOL = as.character(SYMBOL), EX = as.character(EX))]
         
         setnames(qDataRaw, old = "index", new = "DT")
-        dummy_was_xts <- TRUE
+        inputWasXTS <- TRUE
       } else {
         stop("Input has to be data.table or xts.")
       }
@@ -1507,7 +1500,7 @@ quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, 
     
     qDataRaw <- rmOutliersQuotes(qDataRaw, window = window, type = type, maxi = rmoutliersmaxi)
     nresult[7] <- dim(qDataRaw)[1]
-    if (dummy_was_xts) {
+    if (inputWasXTS) {
       df_result <- xts(as.matrix(qDataRaw[, -c("DT",  "DATE")]), order.by = qDataRaw$DT)
     } else {
       df_result <- qDataRaw[, -c( "DATE")]
@@ -1539,11 +1532,11 @@ rmLargeSpread <- function(qData, maxi = 50) {
   BID <- OFR <- DATE <- DT <- SPREAD <- SPREAD_MEDIAN <- NULL
   qData <- checkColumnNames(qData)
   checkqData(qData)
-  dummy_was_xts <- FALSE
+  inputWasXTS <- FALSE
   if (is.data.table(qData) == FALSE) {
-    if (is.xts(qData) == TRUE) {
+    if (is.xts(qData)) {
       qData <- setnames(as.data.table(qData)[, BID := as.numeric(as.character(BID))][, OFR := as.numeric(as.character(OFR))], old = "index", new = "DT")
-      dummy_was_xts <- TRUE
+      inputWasXTS <- TRUE
     } else {
       stop("Input has to be data.table or xts.")
     }
@@ -1553,7 +1546,7 @@ rmLargeSpread <- function(qData, maxi = 50) {
     , SPREAD := OFR - BID][
     , SPREAD_MEDIAN := median(SPREAD), by = "DATE"][SPREAD < (SPREAD_MEDIAN * maxi)]
   
-  if (dummy_was_xts == TRUE) {
+  if (inputWasXTS) {
     return(xts(as.matrix(qData[, -c("DT", "DATE", "SPREAD", "SPREAD_MEDIAN")]), order.by = qData$DT))
   } else {
     return(qData[, -c("DATE", "SPREAD", "SPREAD_MEDIAN")])
@@ -1578,13 +1571,13 @@ rmNegativeSpread <- function(qData) {
   BID <- OFR <- DATE <- DT <- NULL
   qData <- checkColumnNames(qData)
   checkqData(qData)
-  dummy_was_xts <- FALSE
+  inputWasXTS <- FALSE
   if (is.data.table(qData) == FALSE) {
-    if (is.xts(qData) == TRUE) {
+    if (is.xts(qData)) {
       qData <- setnames(as.data.table(qData), old = "index", new = "DT")
       qData[, BID := as.numeric(as.character(BID))]
       qData[, OFR := as.numeric(as.character(OFR))]
-      dummy_was_xts <- TRUE
+      inputWasXTS <- TRUE
     } else {
       stop("Input has to be data.table or xts.")
     }
@@ -1592,7 +1585,7 @@ rmNegativeSpread <- function(qData) {
   
   qData <- qData[OFR > BID]
   
-  if (dummy_was_xts == TRUE) {
+  if (inputWasXTS) {
     return(xts(as.matrix(qData[, -c("DT")]), order.by = qData$DT))
   } else {
     return(qData)
@@ -1646,9 +1639,9 @@ rmTradeOutliersUsingQuotes <- function(tData, qData, lagQuotes = 2) {
     stop("tData and qData should be of the same data type, either xts or data.table.")
   }
   
-  dummy_was_xts <- FALSE
+  inputWasXTS <- FALSE
   if (is.data.table(tData) == FALSE) {
-    if (is.xts(tData) == TRUE) {
+    if (is.xts(tData)) {
       tData <- as.data.table(tData)
       setnames(tData , old = "index", new = "DT")
       # Change the columns to character instead of factor, this means we can roll them in the merge.
@@ -1665,7 +1658,7 @@ rmTradeOutliersUsingQuotes <- function(tData, qData, lagQuotes = 2) {
         set(qData, j = col, value = as.character(qData[[col]]))
       }
       qData[, `:=`(BID = as.numeric(BID), OFR = as.numeric(OFR))]
-      dummy_was_xts <- TRUE
+      inputWasXTS <- TRUE
       
     } else {
       stop("Input has to be data.table or xts.")
@@ -1690,7 +1683,7 @@ rmTradeOutliersUsingQuotes <- function(tData, qData, lagQuotes = 2) {
     stop("The dates in the quote and trade data must be the same.")
   }
   
-  if(length(dates)>1){ # Special case for multiday input
+  if (length(dates) > 1) { # Special case for multiday input
     res <- list() # Container for our data
     for (i in 1:length(dates)) {
       # Join the data day-by-day. This cannot be done by e.g. a by argument due to the roll = TRUE flag.  
@@ -1698,8 +1691,7 @@ rmTradeOutliersUsingQuotes <- function(tData, qData, lagQuotes = 2) {
     }
     
     tData <- rbindlist(res)[,-c("DATE", "i.DATE")]
-  }
-  else {
+  } else {
     tData <- qData[tData, roll = TRUE, on = c("SYMBOL", "DT") ][,-c("DATE", "i.DATE")]
   }
   
@@ -1708,7 +1700,7 @@ rmTradeOutliersUsingQuotes <- function(tData, qData, lagQuotes = 2) {
   tData[is.na(OFR)][, "OFR"] <- tData$OFR[min(which(is.na(tData$OFR) == FALSE))]
   tData <- tData[, SPREAD := OFR - BID][PRICE <= OFR + SPREAD & PRICE >= BID - SPREAD]
   
-  if (dummy_was_xts == TRUE) {
+  if (inputWasXTS == TRUE) {
     return(xts(as.matrix(tData[, -c("DT", "SPREAD")]), order.by = tData$DT))
   } else {
     return(tData[, -c("SPREAD")])
@@ -1772,9 +1764,9 @@ rmOutliersQuotes <- function (qData, maxi = 10, window = 50, type = "advanced") 
   qData <- checkColumnNames(qData)
   checkqData(qData)
   
-  dummy_was_xts <- FALSE
+  inputWasXTS <- FALSE
   if (is.data.table(qData) == FALSE) {
-    if (is.xts(qData) == TRUE) {
+    if (is.xts(qData)) {
       qData <- as.data.table(qData)
       setnames(qData , old = "index", new = "DT")
       # Change the columns to character instead of factor, this means we can roll them in the merge.
@@ -1784,7 +1776,7 @@ rmOutliersQuotes <- function (qData, maxi = 10, window = 50, type = "advanced") 
       qData[, `:=`(BID = as.numeric(BID), OFR = as.numeric(OFR))]
       
       
-      dummy_was_xts <- TRUE
+      inputWasXTS <- TRUE
     } else {
       stop("Input has to be data.table or xts.")
     }
@@ -1821,18 +1813,16 @@ rmOutliersQuotes <- function (qData, maxi = 10, window = 50, type = "advanced") 
                                        na.rm = TRUE)][
                                          CRITERION < maxi * MADALL]
   }
-  if (dummy_was_xts == TRUE) {
+  if (inputWasXTS) {
     return(xts(as.matrix(qData[, -c("DT", "DATE", "MADALL", "CRITERION", "MIDQUOTE")]), order.by = qData$DT))
   } else {
     return(qData[, -c("MADALL", "CRITERION")])
   }
 }
 
-#' Delete entries with abnormal Sale Condition.
+#' \link{salesCondition} is deprecated. Use \link{tradesCondition} instead.
 #' 
-#' @description Function deletes entries with abnormal Sale Condition: 
-#' trades where column "COND" has
-#' a letter code, except for "E" and "F".
+#' @description Function deletes entries with abnormal trades condition
 #' 
 #' @param tData an xts or data.table object containing the time series data, with 
 #' one column named "COND" indicating the Sale Condition.
@@ -1847,6 +1837,27 @@ rmOutliersQuotes <- function (qData, maxi = 10, window = 50, type = "advanced") 
 #' @keywords leaning
 #' @export
 salesCondition <- function(tData, validConds = c('', '@', 'E', '@E', 'F', 'FI', '@F', '@FI', 'I', '@I')) {
+  .Deprecated("tradesCondition")
+  tradesCondition(tData = tData, validConds = validConds)
+}
+
+#' Delete entries with abnormal trades condition.
+#' 
+#' @description Function deletes entries with abnormal trades condition
+#' 
+#' @param tData an xts or data.table object containing the time series data, with 
+#' one column named "COND" indicating the Sale Condition.
+#' @param validConds a character vector containing valid sales conditions defaults to \code{c('', '@', 'E', '@E', 'F', 'FI', '@F', '@FI', 'I', '@I')}. See details.
+#' 
+#' @details To get more information on the sales conditions, see the NYSE documentation. Section about Daily TAQ Trades File.
+#' The current version (as of May 2020) can be found online at \href{https://www.nyse.com/publicdocs/nyse/data/Daily_TAQ_Client_Spec_v3.3.pdf}{NYSE's webpage}
+#' @return xts or data.table object depending on input
+#' 
+#' @author Jonathan Cornelissen and Kris Boudt
+#' 
+#' @keywords leaning
+#' @export
+tradesCondition <- function(tData, validConds = c('', '@', 'E', '@E', 'F', 'FI', '@F', '@FI', 'I', '@I')) {
   COND <- NULL
   tData <- checkColumnNames(tData)
   checktData(tData)
@@ -1855,12 +1866,12 @@ salesCondition <- function(tData, validConds = c('', '@', 'E', '@E', 'F', 'FI', 
     stop("The argument tData should have a column containing sales conditions named COND. Could not find that column.")
   }
   
-  dummy_was_xts <- FALSE
+  inputWasXTS <- FALSE
   if (is.data.table(tData) == FALSE) {
-    if (is.xts(tData) == TRUE) {
+    if (is.xts(tData)) {
       tData <- setnames(as.data.table(tData), old = "index", new = "DT")
       tData[, COND := as.character(COND)]
-      dummy_was_xts <- TRUE
+      inputWasXTS <- TRUE
     } else {
       stop("Input has to be data.table or xts.")
     }
@@ -1868,7 +1879,7 @@ salesCondition <- function(tData, validConds = c('', '@', 'E', '@E', 'F', 'FI', 
   
   tData <- tData[COND %in% validConds]
   
-  if (dummy_was_xts == TRUE) {
+  if (inputWasXTS == TRUE) {
     return(xts(as.matrix(tData), order.by = tData$DT))
   } else {
     return(tData)
@@ -1907,7 +1918,7 @@ selectExchange <- function(data, exch = "N") {
   # checkqData(data)
   
   if (is.data.table(data) == FALSE) {
-    if (is.xts(data) == TRUE) {
+    if (is.xts(data)) {
       filteredts <- data[is.element(data$EX , exch)]
       return(filteredts)
     } else {
@@ -1931,7 +1942,7 @@ selectExchange <- function(data, exch = "N") {
 #' and the function returns an xts or data.table object.
 #' 
 #' The following cleaning functions are performed sequentially:
-#' \code{\link{noZeroPrices}}, \code{\link{selectExchange}}, \code{\link{salesCondition}},
+#' \code{\link{noZeroPrices}}, \code{\link{selectExchange}}, \code{\link{tradesCondition}},
 #' \code{\link{mergeTradesSameTimestamp}}.
 #' 
 #' Since the function \code{\link{rmTradeOutliersUsingQuotes}}
@@ -1962,7 +1973,7 @@ selectExchange <- function(data, exch = "N") {
 #' from, to, dataSource and dataDestination will be ignored. (only advisable for small chunks of data)
 #' @param report boolean and TRUE by default. In case it is true the function returns (also) a vector indicating how many trades remained after each cleaning step.
 #' @param selection argument to be passed on to the cleaning routine \code{\link{mergeTradesSameTimestamp}}. The default is "median".
-#' @param validConds character vector containing valid sales conditions. Passed through to \code{\link{salesCondition}}.
+#' @param validConds character vector containing valid sales conditions. Passed through to \code{\link{tradesCondition}}.
 #' @param saveAsXTS indicates whether data should be saved in xts format instead of data.table when using on-disk functionality. TRUE by default.
 #' @param tz timezone to use
 #' @return For each day an xts or data.table object is saved into the folder of that date, containing the cleaned data.
@@ -1995,7 +2006,7 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, 
                           validConds = c('', '@', 'E', '@E', 'F', 'FI', '@F', '@FI', 'I', '@I'), saveAsXTS = TRUE, tz = "EST") {
   SIZE <- SYMBOL <- PRICE <- EX <- COND <- DT <- DATE <- TIME_M <- NULL
   
-  if (is.null(tDataRaw) == TRUE) {
+  if (is.null(tDataRaw)) {
     try(dir.create(dataDestination), silent = TRUE)
     tradesfiles <- list.files(dataSource, recursive = TRUE)[grepl("trades", list.files(dataSource, recursive = TRUE))]
     for (ii in tradesfiles) {
@@ -2037,9 +2048,9 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, 
     tDataRaw <- checkColumnNames(tDataRaw)
     checktData(tDataRaw)
     
-    dummy_was_xts <- FALSE
+    inputWasXTS <- FALSE
     if (is.data.table(tDataRaw) == FALSE) {
-      if (is.xts(tDataRaw) == TRUE) {
+      if (is.xts(tDataRaw)) {
         
         tDataRaw <- as.data.table(tDataRaw)
         
@@ -2049,7 +2060,7 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, 
         tDataRaw[, `:=`(PRICE = as.numeric(PRICE), SIZE = as.numeric(SIZE))]
         
         setnames(tDataRaw , old = "index", new = "DT")
-        dummy_was_xts <- TRUE
+        inputWasXTS <- TRUE
       } else {
         stop("Input has to be data.table or xts.")
       }
@@ -2063,12 +2074,12 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, 
     nresult[2] <- dim(tDataRaw)[1] 
     tDataRaw <- tDataRaw[EX %in% exchanges]
     nresult[3] <- dim(tDataRaw)[1] 
-    tDataRaw <- salesCondition(tDataRaw, validConds)
+    tDataRaw <- tradesCondition(tDataRaw, validConds)
     nresult[4] <- dim(tDataRaw)[1] 
     tDataRaw <- mergeTradesSameTimestamp(tDataRaw, selection = selection)
     nresult[5] <- dim(tDataRaw)[1] 
     
-    if (dummy_was_xts) {
+    if (inputWasXTS) {
       df_result <- xts(as.matrix(tDataRaw[, -c("DT")]), order.by = tDataRaw$DT)
     } else {
       df_result <- tDataRaw
@@ -2139,7 +2150,7 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, 
 #' @export
 tradesCleanupUsingQuotes <- function(tradeDataSource = NULL, quoteDataSource = NULL, dataDestination = NULL, tData = NULL, qData = NULL, lagQuotes = 2) {
   
-  if (is.null(dataDestination) == TRUE) {
+  if (is.null(dataDestination)) {
     dataDestination <- tradeDataSource
   }
   
@@ -2152,7 +2163,7 @@ tradesCleanupUsingQuotes <- function(tradeDataSource = NULL, quoteDataSource = N
     return(tData)
   } else {
     
-    if(tradeDataSource == quoteDataSource){
+    if (tradeDataSource == quoteDataSource) {
       tradeFiles <- list.files(tradeDataSource, recursive = TRUE, full.names = TRUE)
       quoteFiles <- tradeFiles[grepl("quote", tradeFiles)] # quoteFiles is defined as the files with quote in them
       tradeFiles <- tradeFiles[!grepl("quote", tradeFiles)]
@@ -2354,7 +2365,6 @@ businessTimeAggregation <- function(pData, measure = "volume", obs = 390, bandwi
     stop("measure not a valid choice, valid choices are: \"intensity\", \"vol\", and \"volume\"")
   }
   
-    
   inputWasXTS <- FALSE
   if (!is.data.table(pData)) {
     if (is.xts(pData)) {
@@ -2420,7 +2430,6 @@ businessTimeAggregation <- function(pData, measure = "volume", obs = 390, bandwi
     ITP[[date]] <- intensityProcess
     aggregated <- rbind(aggregated, pData)
   }
-  
   
   if(inputWasXTS){
     aggregated <- xts(aggregated[, -"DT"], order.by = aggregated[, DT])
