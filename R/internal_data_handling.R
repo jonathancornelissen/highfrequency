@@ -33,7 +33,7 @@ fastTickAgregation <- function (ts, on = "minutes", k = 1, tz = "GMT") {
 }
 
 
-#' @importFrom data.table rbindlist setkey setnafill set
+#' @importFrom data.table rbindlist setkey nafill set
 #' @keywords internal
 fastTickAgregation_DATA.TABLE <- function(dat, on = "minutes", k = 1, tz = "GMT"){
   MAXDT <- .SD <- firstDT <- DT <- PRICE <- DATE <- NULL
@@ -56,12 +56,14 @@ fastTickAgregation_DATA.TABLE <- function(dat, on = "minutes", k = 1, tz = "GMT"
   } else {
     tz <- timeZone
   }
-  g <- dat[, list(DT = seq(first(DT), last(DT), by = secs, tz = tz), MAXDT = max(DT)), by = list(DATE = as.Date(DT, tz = tz))]
+  ## These are used to make sure we dont have na's back and forth and to recude the chance we erroneously produce NA's
+  dat <- dat[, lapply(.SD, nafill, type = "locf"), .SDcols = colnames(dat), by = list(DATE = as.Date(DT, tz = tz))]
+  dat <- dat[, lapply(.SD, nafill, type = "nocb"), by = DATE]
+  g <- dat[, list(DT = seq(first(DT), last(DT), by = secs, tz = tz), MAXDT = max(DT)), by = DATE]
   
   g$DT <- as.POSIXct(as.numeric(g$DT, tz = tz) + (secs - as.numeric(g$DT, tz = tz) %% secs), origin = as.POSIXct("1970-01-01", tz = tz), tz = tz)
   # dropDATE <- ifelse("DATE" %in% colnames(dat), "i.DATE", character(0))
   out <- dat[g, roll = TRUE, on = "DT"][DT<= MAXDT]
-  
   
   prependingCheck <- cbind(out[, list(firstDT = first(DT)), by = DATE],
         dat[, lapply(.SD, first), by = list(DATE = as.Date(DT, tz = tz)), .SDcols = names(dat)][, "DATE" := NULL]
@@ -85,7 +87,7 @@ fastTickAgregation_DATA.TABLE <- function(dat, on = "minutes", k = 1, tz = "GMT"
   for(col in numericColumns){
     set(out, j = col, value = as.numeric(out[[col]]))
   }
-  setnafill(out, type = "locf", cols = colnames(out)[colnames(out) != "DT"])
+  #setnafill(out, type = "locf", cols = colnames(out)[colnames(out) != "DT"])
   return(out)
   
 }

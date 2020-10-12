@@ -1328,7 +1328,7 @@ rKernelCov <- function(rData, cor = FALSE,  alignBy = "seconds", alignPeriod = 1
                                 kernelType = kernelType, kernelParam = kernelParam, kernelDOFadj = kernelDOFadj) ## aligning is done above.
     }
     if(ncol(rData) == 2){ ## Univariate case
-      res <- data.table(DT = names(res), RV = as.numeric(res))
+      res <- data.table(DT = names(res), RK = as.numeric(res))
     } else {
       
       for (date in dates) {
@@ -1452,7 +1452,7 @@ rKurt <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
     res <- setDT(transpose(res))[, DT := dates]
     setcolorder(res, "DT")
     if(ncol(res) == 2){
-      colnames(res) <- c("DT", "medRV")
+      colnames(res) <- c("DT", "rKurt")
     } else {
       colnames(res) <- colnames(rData)
     }
@@ -1540,7 +1540,11 @@ rMPV <- function(rData, m = 2, p = 2, alignBy = NULL, alignPeriod = NULL, makeRe
     }
     res <- setDT(transpose(res))[, DT := dates]
     setcolorder(res, "DT")
-    colnames(res) <- colnames(rData)
+    if(ncol(res) == 2){
+      colnames(res) <- c("DT", "MPV")
+    } else {
+      colnames(res) <- colnames(rData)
+    }
     return(res)
     
   } else {
@@ -1787,7 +1791,7 @@ rSkew <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
     res <- setDT(transpose(res))[, DT := dates]
     setcolorder(res, "DT")
     if(ncol(res) == 2){
-      colnames(res) <- c("DT", "medRV")
+      colnames(res) <- c("DT", "Skew")
     } else {
       colnames(res) <- colnames(rData)
     }
@@ -1973,10 +1977,10 @@ rThresholdCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL
     for (date in dates) {
       res[[date]] <- rThresholdCov(as.matrix(rData[as.Date(DT) == date][, !"DT"]), cor = cor, makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL) ## aligning is done above.
     }
+    
     if(length(res[[1]]) == 1){ ## Univariate case
       res <- data.table(DT = names(res), ThresholdCov = as.numeric(res))
     } else {
-      
       for (date in dates) {
         colnames(res[[date]]) <- rownames(res[[date]]) <- colnames(rData[,!"DT"])
       }
@@ -2907,7 +2911,7 @@ listCholCovEstimators <- function(){
 #'
 #' @param pData xts or data.table containing the log-prices of the asset
 #' @param kn numeric of length 1 determining the tuning parameter kn this controls the lengths of the non-overlapping interval in the ReMeDI estimation
-#' @param lags numeric containing integer values indicating
+#' @param lags numeric containing integer values indicating the lags for which to estimate the (co)variance
 #' @param knEqual Use an altered version of the ReMeDI estimator, where we instead use equal kn, instead of kn and 2*kn for the windows. See Figure 1 of paper in reference section.
 #' @param makeCorrelation logical indicating whether to transform the autocovariances into autocorrelations. The estimate of variance is imprecise and thus, constructing the correlation like this may show correlations that fall outside (-1,1)
 #' 
@@ -3143,8 +3147,17 @@ knChooseReMeDI <- function(pData, knEqual = FALSE,
 
 }
 
+#' Asymptotic variance of ReMeDI estimator
+#' 
+#' @param pData xts or data.table containing the log-prices of the asset
+#' @param kn numeric of length 1 determining the tuning parameter kn this controls the lengths of the non-overlapping interval in the ReMeDI estimation
+#' @param lags numeric containing integer values indicating the lags for which to estimate the (co)variance
+#' @param phi tuning parameter phi
+#' @param i tuning parameter i
+#' 
+#' @return a list with compontents ReMeDI and asympVar
 #' @export
-ReMeDIAsymptoticVariance <- function(pData, phi, lags, kn, int){
+ReMeDIAsymptoticVariance <- function(pData, kn, lags, phi, i){
   PRICE <- DT <- NULL
   
   if(is.data.table(pData)){ # We have a data.table
@@ -3210,7 +3223,7 @@ ReMeDIAsymptoticVariance <- function(pData, phi, lags, kn, int){
     S1[l] <- sum(diffKNOnce[(6*kn):(N-5*kn-2*lags[l])] * diffKNOnce[(10*kn+2*lags[l]):(N-kn)] * diffKNTwice[(8*kn+2*lags[l]):(N-3*kn)] * diffKNTwice[(8*kn+lags[l]):(N-3*kn-lags[l])]) + 
       sum(diffKNOnce[(1+3*kn+lags[l]):(N-kn)] * diffKNOnce[(1+3*kn):(N-kn-lags[l])] * diffKNTwice[(1+kn+lags[l]):(N-3*kn)] * diffKNThrice[1:(N-4*kn-lags[l])]) + U4
     
-    for (k in 1:int) {
+    for (k in 1:i) {
       Uk1 <- sum(diffKNOnce[(6*kn+2*k):(N-5*kn-k-2*lags[l])] * diffKNOnce[(10*kn+2*lags[l]+3*k):(N-kn)] * diffKNTwice[(8*kn+2*lags[l]+3*k):(N-3*kn)] * diffKNTwice[(8*kn+lags[l]+2*k):(N-3*kn-k-lags[l])])
       
       Uk2 <- sum(diffKNOnce[(1+3*kn+lags[l]+k):(N-kn)] * diffKNOnce[(1+3*kn+k):(N-kn-lags[l])] * diffKNTwice[(1+kn+lags[l]):(N-3*kn-k)] * diffKNThrice[1:(N-4*kn-k-lags[l])])
