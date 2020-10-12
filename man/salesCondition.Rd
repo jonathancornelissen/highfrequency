@@ -10,10 +10,17 @@ salesCondition(
 )
 }
 \arguments{
-\item{tData}{an xts or data.table object containing the time series data, with 
+\item{tData}{an xts or data.table object containing the time series data, with
 one column named "COND" indicating the Sale Condition.}
 }
 \description{
 Function deletes entries with abnormal trades condition
+}
+\details{
+To get more information on the sales conditions, see the NYSE documentation. Section about Daily TAQ Trades File.
+The current version (as of May 2020) can be found online at \href{https://www.nyse.com/publicdocs/nyse/data/Daily_TAQ_Client_Spec_v3.3.pdf}{NYSE's webpage}
+}
+\author{
+Jonathan Cornelissen and Kris Boudt
 }
 \keyword{leaning}
