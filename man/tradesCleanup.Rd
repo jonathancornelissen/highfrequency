@@ -46,7 +46,7 @@ from, to, dataSource and dataDestination will be ignored. (only advisable for sm
 
 \item{selection}{argument to be passed on to the cleaning routine \code{\link{mergeTradesSameTimestamp}}. The default is "median".}
 
-\item{validConds}{character vector containing valid sales conditions. Passed through to \code{\link{tradesCondition}}.}
+\item{validConds}{character vector containing valid sales conditions. Passed through to \code{\link{salesCondition}}.}
 
 \item{saveAsXTS}{indicates whether data should be saved in xts format instead of data.table when using on-disk functionality. TRUE by default.}
 
@@ -69,7 +69,7 @@ indicating how many trades were removed at each cleaning step in this case.
 and the function returns an xts or data.table object.
 
 The following cleaning functions are performed sequentially:
-\code{\link{noZeroPrices}}, \code{\link{selectExchange}}, \code{\link{tradesCondition}},
+\code{\link{noZeroPrices}}, \code{\link{selectExchange}}, \code{\link{salesCondition}},
 \code{\link{mergeTradesSameTimestamp}}.
 
 Since the function \code{\link{rmTradeOutliersUsingQuotes}}
