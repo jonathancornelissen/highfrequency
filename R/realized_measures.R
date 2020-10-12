@@ -213,6 +213,12 @@ minRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
     res <- setDT(transpose(res))[, DT := dates]
     setcolorder(res, "DT")
     colnames(res) <- colnames(rData)
+    
+    if(ncol(rData) == 2){ ## Univariate case
+      res <- data.table(DT = names(res), minRV = as.numeric(res))
+    }
+    
+    
     return(res)
   } else {
     if ((!is.null(alignBy)) && (!is.null(alignPeriod))) {

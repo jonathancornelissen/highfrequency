@@ -12,9 +12,9 @@ applyGetList <- function(x, FUN, cor = FALSE, alignBy = NULL, alignPeriod = NULL
   FUN <- match.fun(FUN)
   for(i in 1:(length(INDEX)-1)){
     if (is.null(makePsd)) {
-      result[[i]] <- FUN(x[(INDEX[i] + 1):INDEX[i + 1]], cor, alignBy, alignPeriod, makeReturns, ...)
+      result[[i]] <- FUN(x[(INDEX[i] + 1):INDEX[i + 1]], cor = cor, alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = makeReturns, ...)
     } else {
-      result[[i]] <- FUN(x[(INDEX[i] + 1):INDEX[i + 1]], cor, alignBy, alignPeriod, makeReturns, makePsd, ...)
+      result[[i]] <- FUN(x[(INDEX[i] + 1):INDEX[i + 1]], cor = cor, alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = makeReturns, makePsd = makePsd, ...)
     }
     
   }

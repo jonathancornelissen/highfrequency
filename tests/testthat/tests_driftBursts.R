@@ -1,8 +1,8 @@
-library(testthat)
-library(data.table)
+library("testthat")
+library("data.table")
 context("DBH C++ error tests")
 test_that("DBH C++ error tests",{
-  #these functions has broken before, hopefully they won't break again.
+  #these functions have broken before, hopefully they won't break again.
   expect_equal(highfrequency:::AsymptoticVarianceC(c(1:3), 3), NaN) 
   expect_equal(highfrequency:::AsymptoticVarianceC(c(1:3), 4), NaN)
   expect_equal(highfrequency:::AutomaticLagSelectionC(1:10, 30) , 7)
