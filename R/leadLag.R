@@ -22,8 +22,10 @@
 #' @references M. Hoffmann, M. Rosenbaum, and N. Yoshida (2013) : Estimation of the lead-lag parameter from non-synchronous data. Bernoulli 19, pages 1-37
 #' 
 #' @examples 
+#' \dontrun{
 #' ll <- leadLag(100 + cumsum(sbux), 100 + cumsum(lltc), lags = seq(-50,50))
 #' plot(ll)
+#' }
 #' 
 #' @export
 leadLag <- function(price1 = NULL, price2 = NULL, lags = NULL, resolution = "seconds", normalize = TRUE, parallelize = FALSE, nCores = NA){

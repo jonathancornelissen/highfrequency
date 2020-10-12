@@ -57,9 +57,26 @@ listAvailableKernels <- function() {
 medRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE) {
   
   # self-reference for multi-day input
-  if (checkMultiDays(rData)) {
+  if (is.xts(rData) && checkMultiDays(rData)) {
     result <- apply.daily(rData, medRQ, alignBy, alignPeriod, makeReturns) 
     return(result)
+  } else if (is.data.table(rData)){ 
+    DT <- NULL  
+    if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+      rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
+    }
+    setcolorder(rData, "DT")
+    dates <- as.character(unique(as.Date(rData$DT)))
+    res <- vector(mode = "list", length = length(dates))
+    names(res) <- dates
+    for (date in dates) {
+      res[[date]] <- medRQ(as.matrix(rData[as.Date(DT) == date][, !"DT"]), makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL) ## aligning is done above.
+    }
+    res <- setDT(transpose(res))[, DT := dates]
+    setcolorder(res, "DT")
+    colnames(res) <- colnames(rData)
+    return(res)
+    
   } else {
     if ((!is.null(alignBy)) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation(rData, on = alignBy, k = alignPeriod)
@@ -67,10 +84,14 @@ medRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
     if (makeReturns) {
       rData <- makeReturns(rData)
     }
-    q <- abs(as.numeric(rData))
-    q <- as.numeric(rollmedian(q, k = 3,align="center"))
-    N <- length(q) + 2
-    medRQ <- 3 * pi * N / (9 * pi + 72 - 52 * sqrt(3)) * (N / (N-2)) * sum(q^4)
+    
+
+    q <- abs(as.matrix(rData))
+    q <- rollApplyMedianWrapper(q)
+    # q <- rollmedian(q, k = 3, align = "center")
+    N <- nrow(q) + 2
+    medRQ <- 3 * pi * N / (9 * pi + 72 - 52 * sqrt(3)) * (N / (N-2)) * colSums(q^4)
+    
     return(medRQ)
   } 
 }
@@ -104,9 +125,25 @@ medRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 minRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE) {
   
   # self-reference for multi-day input
-  if (checkMultiDays(rData)) {
+  if (is.xts(rData) && checkMultiDays(rData)) {
     result <- apply.daily(rData, minRQ, alignBy, alignPeriod, makeReturns)
     return(result)
+  } else if (is.data.table(rData)){ 
+    DT <- NULL  
+    if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+      rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
+    }
+    setcolorder(rData, "DT")
+    dates <- as.character(unique(as.Date(rData$DT)))
+    res <- vector(mode = "list", length = length(dates))
+    names(res) <- dates
+    for (date in dates) {
+      res[[date]] <- minRQ(as.matrix(rData[as.Date(DT) == date][, !"DT"]), makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL) ## aligning is done above.
+    }
+    res <- setDT(transpose(res))[, DT := dates]
+    setcolorder(res, "DT")
+    colnames(res) <- colnames(rData)
+    return(res)
   } else {
     if ((!is.null(alignBy)) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation(rData, on = alignBy, k = alignPeriod)
@@ -114,10 +151,11 @@ minRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
     if (makeReturns) {
       rData = makeReturns(rData)
     }
-    q     <- as.zoo(abs(as.numeric(rData)))
-    q     <- as.numeric(rollapply(q, width = 2, FUN = min, by = 1, align = "left"))
-    N     <- length(q) + 1
-    minRQ <- pi * N/(3 * pi - 8)*(N / (N - 1)) * sum(q^4)
+    q <- abs(as.matrix(rData))
+    q <- rollApplyMinWrapper(q)
+    N <- nrow(q) + 1
+    minRQ <- pi * N/(3 * pi - 8)*(N / (N - 1)) * colSums(q^4)
+  
     return(minRQ)
   }
 }
@@ -156,9 +194,32 @@ minRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 minRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE){
   
   # self-reference for multi-day input
-  if (checkMultiDays(rData)) {
+  if (is.xts(rData) && checkMultiDays(rData)) {
     result <- apply.daily(rData, minRV, alignBy, alignPeriod, makeReturns)
     return(result)
+    
+  } else if (is.data.table(rData)){ 
+    DT <- NULL  
+    if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+      rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
+    }
+    setcolorder(rData, "DT")
+    dates <- as.character(unique(as.Date(rData$DT)))
+    res <- vector(mode = "list", length = length(dates))
+    names(res) <- dates
+    for (date in dates) {
+      res[[date]] <- minRV(as.matrix(rData[as.Date(DT) == date][, !"DT"]), makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL) ## aligning is done above.
+    }
+    res <- setDT(transpose(res))[, DT := dates]
+    setcolorder(res, "DT")
+    colnames(res) <- colnames(rData)
+    
+    if(ncol(rData) == 2){ ## Univariate case
+      res <- data.table(DT = names(res), minRV = as.numeric(res))
+    }
+    
+    
+    return(res)
   } else {
     if ((!is.null(alignBy)) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation(rData, on = alignBy, k = alignPeriod)
@@ -166,12 +227,14 @@ minRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
     if (makeReturns) {
       rData <- makeReturns(rData)
     }  
-    q <- abs(rData)#as.zoo(abs(as.numeric(rData))) #absolute value
-    q <- rollapply(q, width = 2, FUN = min, by = 1, align = "left", by.column = TRUE, fill = NULL)
+    q <- abs(rData)#as.zoo(abs(as.nueric(rData))) #absolute value
+    q <- rollApplyMinWrapper(q)
+    # q <- rollapply(q, width = 2, FUN = min, by = 1, align = "left", by.column = TRUE, fill = NULL)
     N <- dim(q)[1] + 1 #number of obs because of fill = NULL
+    colnames(q) <- names(rData)
     minrv <- (pi/(pi - 2)) * (N/(N - 1)) * colSums(q^2, na.rm = TRUE)
     return(minrv) 
-  }  
+  }
 }  
 
 #' medRV
@@ -216,15 +279,38 @@ minRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #' medrv <- medRV(rData = sampleTData$PRICE, alignBy = "minutes", 
 #'                alignPeriod = 5, makeReturns = TRUE)
 #' medrv 
-#'  
+#' @importFrom data.table setDT transpose setcolorder
 #' @keywords volatility
 #' @export
 medRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE){
   
   # self-reference for multi-day input
-  if (checkMultiDays(rData)) {
+  if (is.xts(rData) && checkMultiDays(rData)) {
     result <- apply.daily(rData, medRV, alignBy, alignPeriod, makeReturns)
     return(result)
+  } else if (is.data.table(rData)){ 
+    DT <- NULL  
+    setcolorder(rData, "DT")
+    if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+      rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
+    }
+    dates <- as.character(unique(as.Date(rData$DT)))
+    res <- vector(mode = "list", length = length(dates))
+    names(res) <- dates
+    for (date in dates) {
+      res[[date]] <- medRV(as.matrix(rData[as.Date(DT) == date][, !"DT"]), makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL) ## aligning is done above.
+    }
+    res <- setDT(transpose(res))[, DT := dates]
+    setcolorder(res, "DT")
+    if(ncol(res) == 2){
+      colnames(res) <- c("DT", "medRV")
+    } else {
+      colnames(res) <- colnames(rData)
+    }
+    
+    setkey(res, "DT")
+    return(res)
+    
   } else {
     if ((!is.null(alignBy)) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation(rData, on = alignBy, k = alignPeriod)
@@ -233,10 +319,12 @@ medRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
       rData <- makeReturns(rData)
     }
     
-    q <- abs(as.numeric(rData)) #absolute value
-    q <- as.numeric(rollmedian(q, k=3, align="center"))
-    N <- length(q) + 2
-    medrv <- (pi / (6 - 4 * sqrt(3) + pi)) * (N/(N - 2)) * sum(q^2)
+    
+    q <- abs(as.matrix(rData))
+    q <- rollApplyMedianWrapper(q)
+    # q <- rollmedian(q, k = 3, align = "center")
+    N <- nrow(q) + 2
+    medrv <- (pi / (6 - 4 * sqrt(3) + pi)) * (N / (N - 2)) * colSums(q^2)
     return(medrv)
   }
 }
@@ -327,7 +415,7 @@ MRC <- function(pData, pairwise = FALSE, makePsd = FALSE) {
     }
     
     if (pairwise) {
-      cov <- matrix(rep(0, n * n), ncol = n)
+      cov <- matrix(rep(0, n * n), ncol = n, dimnames = list(colnames(pData), colnames(pData)))
       diagonal <- c()
       for (i in 1:n) {
         diagonal[i] <- crv(pData[[i]])
@@ -420,118 +508,166 @@ MRC <- function(pData, pairwise = FALSE, makePsd = FALSE) {
 #' @export
 #' 
 rAVGCov <- function(rData, cor = FALSE, alignBy = "minutes", alignPeriod = 5, k = 1, makeReturns = FALSE) {
-  DT <- DT_ROUND <- DT_SUBSAMPLE <- FIRST_DT <- MAXDT <- RETURN <- RETURN1 <- RETURN2 <- NULL
+  .SD <- DT <- DT_ROUND <- DT_SUBSAMPLE <- FIRST_DT <- MAXDT <- RETURN <- RETURN1 <- RETURN2 <- NULL
   
-  if (isMultiXts(rData)) {
-    stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")
-  }
-  
-  if (is.null(dim(rData))) {
-    n <- 1
-  } else {
-    n <- dim(rData)[2]
-  }
-  
-  if(alignBy == "secs" | alignBy == "seconds"){
-    scaleFactor <- alignPeriod
-    scaleFactorFast <- k
-  }
-  if(alignBy == "mins" | alignBy == "minutes"){
-    scaleFactor <- alignPeriod * 60
-    scaleFactorFast <- k * 60 
-  }
-  if(alignBy == "hours"){
-    scaleFactor <- alignPeriod * 60 * 60
-    scaleFactorFast <- k * 60 * 60 
-  }
-  
-  # We calculate how many times the fast alignment period divides the slow one and makes sure it is a positive integer.
-  scalingFraction <- alignPeriod/k
-  if(scalingFraction < 0 | scalingFraction %% 1){
-    stop("alignPeriod must be greater than k, and the fraction of these must be an integer value")
-  }
-  
-  
-  if (n == 1) {
-    rdatabackup <- data.table(DT = as.numeric(index(rData), tz = tzone(rData)), RETURN = as.numeric(rData))
-    rData <- rdatabackup
-    rData[, FIRST_DT := min(DT)]
-    if (makeReturns) {
-      
-      rData[, DT_ROUND := ifelse(DT == FIRST_DT,
-                                  floor(DT/scaleFactorFast) * scaleFactorFast,
-                                  ceiling(DT / scaleFactorFast) * scaleFactorFast)]
-
-      
-      rData[, MAXDT := max(DT), by = "DT_ROUND"]
-      rData <- rData[DT == MAXDT]
-      rData[, RETURN := log(RETURN) - shift(log(RETURN), n = 1, type = "lag")]
-      rData <- rData[!is.na(RETURN)]
-      rData <- rData[, c("DT_ROUND", "RETURN")]
-      
+  if (is.xts(rData) && checkMultiDays(rData)) { 
+    if (is.null(dim(rData))) {  
+      n <- 1
+    } else { 
+      n <- dim(rData)[2]
+    }
+    if (n == 1) { 
+      result <- apply.daily(rData, rAVGCov, alignBy = alignBy, alignPeriod = alignPeriod, k = k, makeReturns = makeReturns) 
+    }
+    if (n > 1) { 
+      result <- applyGetList(rData, rAVGCov, cor=cor, alignBy = alignBy, alignPeriod = alignPeriod, k = k, makeReturns = makeReturns)
+      names(result) <- unique(as.Date(index(rData)))
+    }    
+    return(result)
+  } else if (is.data.table(rData)){
+    
+    setcolorder(rData, "DT")
+    dates <- as.character(unique(as.Date(rData$DT)))
+    res <- vector(mode = "list", length = length(dates))
+    names(res) <- dates
+    for (date in dates) {
+      res[[date]] <- rAVGCov(as.matrix(rData[as.Date(DT) == date, lapply(.SD, as.numeric), .SDcols = colnames(rData)]), cor = cor, makeReturns = makeReturns, alignBy = alignBy, alignPeriod = alignPeriod, k = k)
+    }
+    if(length(res[[1]]) == 1){ ## Univariate case
+      res <- data.table(DT = names(res), rAVGCov = as.numeric(res))
     } else {
-      rData[, DT_ROUND := ceiling(DT / scaleFactorFast) * scaleFactorFast]
+      
+      for (date in dates) {
+        colnames(res[[date]]) <- rownames(res[[date]]) <- colnames(rData[,!"DT"])
+      }
+    } 
+    
+    return(res)
+    
+  } else {
+    
+    if (is.null(dim(rData))) {
+      n <- 1
+    } else {
+      n <- dim(rData)[2] - !is.xts(rData)
       
     }
-
-    rvavg <- sum(rData[, DT_SUBSAMPLE := ceiling(DT_ROUND/scaleFactor) * scaleFactor][, list(RETURN = sum(RETURN)), by = list(DT_SUBSAMPLE)]$RETURN^2)
     
-    
-    
-    for (ii in c(1:(scalingFraction - 1))) {
-      rdatasub <- rData[-c(1:ii, (dim(rData)[1]-scalingFraction + ii + 1):dim(rData)[1]), ]
-      rdatasub[, DT_ROUND := DT_ROUND - ii * scaleFactorFast] 
-      rvavg <- rvavg + sum(rdatasub[, DT_SUBSAMPLE := ceiling(DT_ROUND/scaleFactor) * scaleFactor][, list(RETURN = sum(RETURN)), by = list(DT_SUBSAMPLE)]$RETURN^2) * (dim(rdatasub)[1]/scalingFraction + 1) / (dim(rdatasub)[1]/scalingFraction)
+    if(alignBy == "secs" | alignBy == "seconds"){
+      scaleFactor <- alignPeriod
+      scaleFactorFast <- k
     }
+    if(alignBy == "mins" | alignBy == "minutes"){
+      scaleFactor <- alignPeriod * 60
+      scaleFactorFast <- k * 60 
+    }
+    if(alignBy == "hours"){
+      scaleFactor <- alignPeriod * 60 * 60
+      scaleFactorFast <- k * 60 * 60 
+    }
+    
+    # We calculate how many times the fast alignment period divides the slow one and makes sure it is a positive integer.
+    scalingFraction <- alignPeriod/k
+    if(scalingFraction < 0 | scalingFraction %% 1){
+      stop("alignPeriod must be greater than k, and the fraction of these must be an integer value")
+    }
+    
+    
+    if (n == 1) {
+      if(is.xts(rData)){
+        rdatabackup <- data.table(DT = as.numeric(index(rData), tz = tzone(rData)), RETURN = as.numeric(rData))
+      } else {
+        rdatabackup <- data.table(rData)
+        colnames(rdatabackup) <- c("DT", "RETURN")
+      }
+      rData <- rdatabackup
+      rData[, FIRST_DT := min(DT)]
+      if (makeReturns) {
+        
+        rData[, DT_ROUND := ifelse(DT == FIRST_DT,
+                                   floor(DT/scaleFactorFast) * scaleFactorFast,
+                                   ceiling(DT / scaleFactorFast) * scaleFactorFast)]
+        
+        
+        rData[, MAXDT := max(DT), by = "DT_ROUND"]
+        rData <- rData[DT == MAXDT]
+        rData[, RETURN := log(RETURN) - shift(log(RETURN), n = 1, type = "lag")]
+        rData <- rData[!is.na(RETURN)]
+        rData <- rData[, c("DT_ROUND", "RETURN")]
+        
+      } else {
+        rData[, DT_ROUND := ceiling(DT / scaleFactorFast) * scaleFactorFast]
+        
+      }
+      
+      rvavg <- sum(rData[, DT_SUBSAMPLE := ceiling(DT_ROUND/scaleFactor) * scaleFactor][, list(RETURN = sum(RETURN)), by = list(DT_SUBSAMPLE)]$RETURN^2)
+      
+      
+      
+      for (ii in c(1:(scalingFraction - 1))) {
+        rdatasub <- rData[-c(1:ii, (dim(rData)[1]-scalingFraction + ii + 1):dim(rData)[1]), ]
+        rdatasub[, DT_ROUND := DT_ROUND - ii * scaleFactorFast] 
+        rvavg <- rvavg + sum(rdatasub[, DT_SUBSAMPLE := ceiling(DT_ROUND/scaleFactor) * scaleFactor][, list(RETURN = sum(RETURN)), by = list(DT_SUBSAMPLE)]$RETURN^2) * (dim(rdatasub)[1]/scalingFraction + 1) / (dim(rdatasub)[1]/scalingFraction)
+      }
       return(rvavg / scalingFraction)
-  }
-  
-  if (n > 1) {
-    rdatamatrix <- matrix(0, nrow = n, ncol = n)
-    for (ii in 1:n) {
-      # calculate variances
-      rdatamatrix[ii, ii] <- rAVGCov(rData[, ii], cor = cor, alignBy = alignBy, alignPeriod = alignPeriod, k = k, makeReturns = makeReturns)
-      if (ii < n) {
-        for (jj in (ii+1):n) {
-          rdatabackup <- data.table(DT = as.numeric(index(rData), tz = tzone(rData)), RETURN1 = as.numeric(rData[, ii]), RETURN2 = as.numeric(rData[,jj]))
-          rdatabackup[, FIRST_DT := min(DT)]
-          if (makeReturns) {
+    }
+    
+    if (n > 1) {
+      rdatamatrix <- matrix(0, nrow = n, ncol = n)
+      for (ii in 1:n) {
+        # calculate variances
+        if(is.xts(rData)){
+          rdatamatrix[ii, ii] <- rAVGCov(rData[, ii], cor = cor, alignBy = alignBy, alignPeriod = alignPeriod, k = k, makeReturns = makeReturns)
+        } else {
+          rdatamatrix[ii, ii] <- rAVGCov(rData[, c(1, ii + 1)], cor = cor, alignBy = alignBy, alignPeriod = alignPeriod, k = k, makeReturns = makeReturns)
+        }
+        if (ii < n) {
+          for (jj in (ii+1):n) {
+            if(is.xts(rData)){
+              rdatabackup <- data.table(DT = as.numeric(index(rData), tz = tzone(rData)), RETURN1 = as.numeric(rData[, ii]), RETURN2 = as.numeric(rData[,jj]))
+            } else {
+              rdatabackup <- data.table(DT = rData[,"DT"], RETURN1 = rData[, ii+1], RETURN2 = rData[, jj+1])
+            }
+            rdatabackup[, FIRST_DT := min(DT)]
+            if (makeReturns) {
+              
+              rdatabackup[, DT_ROUND := ifelse(DT == FIRST_DT,
+                                               floor(DT/scaleFactorFast) * scaleFactorFast,
+                                               ceiling(DT/scaleFactorFast) * scaleFactorFast)]
+              rdatabackup[, MAXDT := max(DT), by = "DT_ROUND"]
+              rdatabackup <- rdatabackup[DT == MAXDT]
+              rdatabackup[, RETURN1 := log(RETURN1) - shift(log(RETURN1), n = 1, type = "lag")]
+              rdatabackup[, RETURN2 := log(RETURN2) - shift(log(RETURN2), n = 1, type = "lag")]
+              rdatabackup <- rdatabackup[!is.na(RETURN1)][!is.na(RETURN2)][, c("DT_ROUND", "RETURN1", "RETURN2")]
+            } else {
+              
+              rdatabackup[, DT_ROUND := ceiling(DT/scaleFactorFast) * scaleFactorFast]
+              
+              
+            }
+            returns <- rdatabackup[, DT_SUBSAMPLE := ceiling(DT_ROUND / scaleFactor) * scaleFactor][, list(RETURN1 = sum(RETURN1), RETURN2 = sum(RETURN2)), by = list(DT_SUBSAMPLE)]
+            # Calculate off-diagonals
+            covavg <- t(returns$RETURN1) %*% returns$RETURN2
             
-            rdatabackup[, DT_ROUND := ifelse(DT == FIRST_DT,
-                                                    floor(DT/scaleFactorFast) * scaleFactorFast,
-                                                    ceiling(DT/scaleFactorFast) * scaleFactorFast)]
-            rdatabackup[, MAXDT := max(DT), by = "DT_ROUND"]
-            rdatabackup <- rdatabackup[DT == MAXDT]
-            rdatabackup[, RETURN1 := log(RETURN1) - shift(log(RETURN1), n = 1, type = "lag")]
-            rdatabackup[, RETURN2 := log(RETURN2) - shift(log(RETURN2), n = 1, type = "lag")]
-            rdatabackup <- rdatabackup[!is.na(RETURN1)][!is.na(RETURN2)][, c("DT_ROUND", "RETURN1", "RETURN2")]
-          } else {
-
-            rdatabackup[, DT_ROUND := ceiling(DT/scaleFactorFast) * scaleFactorFast]
+            for (kk in c(1:(scalingFraction - 1))) {
+              returns <- rdatabackup[, DT_SUBSAMPLE := ceiling(DT_ROUND/scaleFactorFast) * scaleFactorFast][, list(RETURN1 = sum(RETURN1), RETURN2 = sum(RETURN2)), by = list(DT_SUBSAMPLE)]
+              rdatasub <- returns[-c(1:kk, (dim(returns)[1]-scalingFraction + kk + 1):dim(returns)[1]), ]
+              rdatasub[, DT_SUBSAMPLE := DT_SUBSAMPLE - kk * scaleFactorFast] 
+              returns <- rdatasub[, DT_SUBSAMPLE := ceiling(DT_SUBSAMPLE/scaleFactor) * scaleFactor][, list(RETURN1 = sum(RETURN1), RETURN2 = sum(RETURN2)), by = list(DT_SUBSAMPLE)]
+              covavg <- covavg + t(returns$RETURN1) %*% returns$RETURN2
+            }
             
+            
+            rdatamatrix[ii, jj] <- rdatamatrix[jj, ii] <- covavg / scalingFraction
             
           }
-          returns <- rdatabackup[, DT_SUBSAMPLE := ceiling(DT_ROUND / scaleFactor) * scaleFactor][, list(RETURN1 = sum(RETURN1), RETURN2 = sum(RETURN2)), by = list(DT_SUBSAMPLE)]
-          # Calculate off-diagonals
-          covavg <- t(returns$RETURN1) %*% returns$RETURN2
-          
-          for (kk in c(1:(scalingFraction - 1))) {
-            returns <- rdatabackup[, DT_SUBSAMPLE := ceiling(DT_ROUND/scaleFactorFast) * scaleFactorFast][, list(RETURN1 = sum(RETURN1), RETURN2 = sum(RETURN2)), by = list(DT_SUBSAMPLE)]
-            rdatasub <- returns[-c(1:kk, (dim(returns)[1]-scalingFraction + kk + 1):dim(returns)[1]), ]
-            rdatasub[, DT_SUBSAMPLE := DT_SUBSAMPLE - kk * scaleFactorFast] 
-            returns <- rdatasub[, DT_SUBSAMPLE := ceiling(DT_SUBSAMPLE/scaleFactor) * scaleFactor][, list(RETURN1 = sum(RETURN1), RETURN2 = sum(RETURN2)), by = list(DT_SUBSAMPLE)]
-            covavg <- covavg + t(returns$RETURN1) %*% returns$RETURN2
-          }
-          
-          
-          rdatamatrix[ii, jj] <- rdatamatrix[jj, ii] <- covavg / scalingFraction
-          
         }
       }
+      colnames(rdatamatrix) <- rownames(rdatamatrix) <- colnames(rData)[!colnames(rData) == "DT"] # So we get column names for both xts and data.table input
     }
-    
+    return(rdatamatrix)
   }
-  return(rdatamatrix)
+  
   # 
   # r# Aggregate:
   # if (makeReturns) {
@@ -805,9 +941,9 @@ rBeta <- function(rData, rIndex, RCOVestimator = "rCov", RVestimator = "RV", mak
 #' @keywords volatility
 #' @export
 rBPCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, makePsd = FALSE) {
-  
+  DT <- NULL
   # self-reference for multi-day input
-  if (checkMultiDays(rData)) { 
+  if (is.xts(rData) && checkMultiDays(rData)) { 
     if (is.null(dim(rData))) {  
       n <- 1
     } else { 
@@ -821,6 +957,30 @@ rBPCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeR
       names(result) <- unique(as.Date(index(rData)))
     }    
     return(result)
+  } else if (is.data.table(rData)){
+    
+    
+    if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+      rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
+    }
+    setcolorder(rData, "DT")
+    dates <- as.character(unique(as.Date(rData$DT)))
+    res <- vector(mode = "list", length = length(dates))
+    names(res) <- dates
+    for (date in dates) {
+      res[[date]] <- rBPCov(as.matrix(rData[as.Date(DT) == date,][, !"DT"]), cor = cor, makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL) ## aligning is done above.
+    }
+    if(ncol(rData) == 2){ ## Univariate case
+      res <- data.table(DT = names(res), BPV = as.numeric(res))
+    } else {
+      
+      for (date in dates) {
+        colnames(res[[date]]) <- rownames(res[[date]]) <- colnames(rData[,!"DT"])
+      }
+    } 
+    
+    return(res)
+    
   } else { #single day code
     if ((!is.null(alignBy)) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation(rData, on = alignBy, k = alignPeriod);
@@ -839,19 +999,19 @@ rBPCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeR
     }
     
     ## ACTUAL RBPCOV calculation:   
-    if (n > 1) {    
+    if (n > 1) {
       
-      rData  <- as.matrix(rData);
+      rData  <- as.matrix(rData)
       n <- dim(rData)[2]
-      cov <- matrix(rep(0, n * n), ncol = n)
-      diagonal <- c()
+      cov <- matrix(rep(0, n * n), ncol = n, dimnames = list(colnames(rData), colnames(rData)))
+      diagonal <- numeric(n)
       for (i in 1:n) {
         diagonal[i] <- RBPVar(rData[, i])
       }
       diag(cov) <- diagonal
       for (i in 2:n) {
         for (j in 1:(i - 1)) {
-          cov[i, j] = cov[j, i] = RBPCov_bi(rData[, i], rData[, j])
+          cov[i, j] <- cov[j, i] <- RBPCov_bi(rData[, i], rData[, j])
         }
       }
       
@@ -881,8 +1041,17 @@ rBPCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeR
 #' Then, the rCov is given by
 #' \deqn{
 #'  \mbox{rCov}_{t}=\sum_{i=1}^{M}r_{t,i}r'_{t,i}.
-#'  }
+#' }
 #'  
+#'  
+#' @param rData a either one of matrix, xts, or zoo, or a data.table. In case it is one of the former \code{rData} should contain returns or prices
+#' 
+#' an \eqn{(M x N)} matrix/zoo/xts or data.table object containing the \eqn{N}
+#' return series over period \eqn{t}, with \eqn{M} observations during \eqn{t}.
+#' In case of a matrix, no multi-day adjustment is possible.
+#' 
+#' 
+#' 
 #' @param rData a \eqn{(M x N)} matrix/zoo/xts object containing the \eqn{N}
 #' return series over period \eqn{t}, with \eqn{M} observations during \eqn{t}.
 #' In case of a matrix, no multi-day adjustment is possible.
@@ -912,9 +1081,10 @@ rBPCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeR
 #' @keywords volatility
 #' @export
 rCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE) {
-  
+  DT <- NULL
+  ## xts case multiday case:
   # Multiday adjustment: 
-  if (checkMultiDays(rData)) { 
+  if (is.xts(rData) && checkMultiDays(rData)) { 
     if (is.null(dim(rData))) {  
       n <- 1
     } else { 
@@ -928,6 +1098,29 @@ rCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeRet
       names(result) <- unique(as.Date(index(rData)))
     }    
     return(result)
+  } else if (is.data.table(rData)){
+
+    if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+      rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
+    }
+    setcolorder(rData, "DT")
+    dates <- as.character(unique(as.Date(rData$DT)))
+    res <- vector(mode = "list", length = length(dates))
+    names(res) <- dates
+    for (date in dates) {
+      res[[date]] <- rCov(as.matrix(rData[as.Date(DT) == date][, !"DT"]), cor = cor, makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL) ## aligning is done above.
+    }
+    if(length(res[[1]]) == 1){ ## Univariate case
+      res <- data.table(DT = names(res), RV = as.numeric(res))
+    } else {
+      
+      for (date in dates) {
+        colnames(res[[date]]) <- rownames(res[[date]]) <- colnames(rData[,!"DT"])
+      }
+    } 
+    
+    return(res)
+    
   } else {
     #single day code
     if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
@@ -946,7 +1139,6 @@ rCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeRet
       return(RV(rData))
     }
     if (n > 1) {
-      
       rData <- as.matrix(rData)
       covariance <- t(rData) %*% rData
       if (!cor) {
@@ -1076,7 +1268,7 @@ rHYCov <- function(rData, cor = FALSE, period = 1, alignBy = "seconds", alignPer
 #' @param kernelType Kernel name (or number)
 #' @param kernelParam Kernel parameter (usually lags)
 #' @param kernelDOFadj Kernel Degree of freedom adjustment
-#'
+#' @param ... used internally, do not use.
 #' @details The different types of kernels can be found using \code{\link{listAvailableKernels}}.
 #' 
 #' @return Kernel estimate of realized covariance.
@@ -1104,68 +1296,107 @@ rHYCov <- function(rData, cor = FALSE, period = 1, alignBy = "seconds", alignPer
 #' @export
 rKernelCov <- function(rData, cor = FALSE,  alignBy = "seconds", alignPeriod = 1,
                        makeReturns = FALSE, kernelType = "rectangular", kernelParam = 1,
-                       kernelDOFadj = TRUE) {
+                       kernelDOFadj = TRUE, ...) {
   
-  if (isMultiXts(rData)) {
-    stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")
-  }
-  
-  # # Aggregate:
-  if ((!is.null(alignBy)) && (!is.null(alignPeriod))) {
-    rData <- fastTickAgregation(rData, on = alignBy, k = alignPeriod)
-  }
-  if (makeReturns) {
-    rData <- makeReturns(rData)
-  }
-  
-  if (is.null(dim(rData))) {
-    n <- 1
-  } else {
-    n <- dim(rData)[2]
-  }
-  type <- kernelCharToInt(kernelType)
-  if (n == 1) {
-    return(kernelEstimator(as.double(rData),
-                           as.double(rData),
-                           as.integer(length(rData)),
-                           as.integer(kernelParam),
-                           as.integer(ifelse(kernelDOFadj, 1, 0)),
-                           as.integer(type),
-                           ab = double(kernelParam + 1),
-                           ab2 = double(kernelParam + 1)))
-  }
-  
-  if (n > 1) {
-    cov <- matrix(rep(0, n * n), ncol = n)
-    diagonal <- c()
-    for (i in 1:n) {
-      diagonal[i] <- 
-        kernelEstimator(as.double(rData[, i]), as.double(rData[, i]), as.integer(length(rData[, i])),
-                        as.integer(kernelParam), as.integer(ifelse(kernelDOFadj, 1, 0)),
-                        as.integer(type), ab = double(kernelParam + 1),
-                        ab2 = double(kernelParam + 1))
+  if (is.xts(rData) && checkMultiDays(rData)) {
+    if (is.null(dim(rData))) {
+      n <- 1
+    } else {
+      n <- dim(rData)[2]
     }
-    diag(cov) <- diagonal
+    if(n == 1){
+      result <- apply.daily(rData, rKernelCov, cor = cor, alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = makeReturns, 
+                            kernelType = kernelType, kernelParam = kernelParam, kernelDOFadj = kernelDOFadj)
+      return(result)
+    } else {
+      result <- applyGetList(rData, rKernelCov, cor = cor, alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = makeReturns, 
+                             kernelType = kernelType, kernelParam = kernelParam, kernelDOFadj = kernelDOFadj)
+      names(result) <- unique(as.Date(index(rData)))
+      return(result)
+    }
+  } else if (is.data.table(rData)){
+    DT <- NULL
+    if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+      rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
+    }
+    setcolorder(rData, "DT")
+    dates <- as.character(unique(as.Date(rData$DT)))
+    res <- vector(mode = "list", length = length(dates))
+    names(res) <- dates
+    for (date in dates) {
+      res[[date]] <- rKernelCov(as.matrix(rData[as.Date(DT) == date, !"DT"]), cor = cor, alignBy = NULL, alignPeriod = NULL, makeReturns = makeReturns,
+                                kernelType = kernelType, kernelParam = kernelParam, kernelDOFadj = kernelDOFadj) ## aligning is done above.
+    }
+    if(ncol(rData) == 2){ ## Univariate case
+      res <- data.table(DT = names(res), RV = as.numeric(res))
+    } else {
+      
+      for (date in dates) {
+        colnames(res[[date]]) <- rownames(res[[date]]) <- colnames(rData[,!"DT"])
+      }
+    } 
     
-    for (i in 2:n) {
-      for (j in 1:(i - 1)) {
-        cov[i, j] = cov[j, i] = kernelEstimator(as.double(rData[, i]), as.double(rData[, j]), as.integer(length(rData[, i])),
-                                   as.integer(kernelParam), as.integer(ifelse(kernelDOFadj, 1, 0)),
-                                   as.integer(type), ab = double(kernelParam + 1),
-                                   ab2 = double(kernelParam + 1))
+    return(res)
+    
+  } else { ## Actual calculations
+    # # Aggregate:
+    if ((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+      rData <- fastTickAgregation(rData, on = alignBy, k = alignPeriod)
+    }
+    if (makeReturns) {
+      rData <- makeReturns(rData)
+    }
+    
+    if (is.null(dim(rData))) {
+      n <- 1
+    } else {
+      n <- dim(rData)[2]
+    }
+    type <- kernelCharToInt(kernelType)
+    if (n == 1) {
+      return(kernelEstimator(as.double(rData),
+                             as.double(rData),
+                             as.integer(length(rData)),
+                             as.integer(kernelParam),
+                             as.integer(ifelse(kernelDOFadj, 1, 0)),
+                             as.integer(type),
+                             ab = double(kernelParam + 1),
+                             ab2 = double(kernelParam + 1)))
+    }
+    
+    if (n > 1) {
+      cov <- matrix(rep(0, n * n), ncol = n, dimnames = list(colnames(rData), colnames(rData)))
+      diagonal <- numeric(n)
+      for (i in 1:n) {
+        diagonal[i] <- kernelEstimator(as.double(rData[, i]), as.double(rData[, i]), as.integer(length(rData[, i])),
+                                       as.integer(kernelParam), as.integer(ifelse(kernelDOFadj, 1, 0)),
+                                       as.integer(type), ab = double(kernelParam + 1),
+                                       ab2 = double(kernelParam + 1))
       }
-    }
-    if (!cor) {
-      return(makePsd(cov))
-    }
-    if (cor) {
-      invsdmatrix <- try(solve(sqrt(diag(diag(cov)))), silent = F)
-      if (!inherits(invsdmatrix, "try-error")) {
-        rcor <- invsdmatrix %*% cov %*% invsdmatrix
-        return(rcor)
+      diag(cov) <- diagonal
+      
+      for (i in 2:n) {
+        for (j in 1:(i - 1)) {
+          cov[i, j] = cov[j, i] = kernelEstimator(as.double(rData[, i]), as.double(rData[, j]), as.integer(length(rData[, i])),
+                                                  as.integer(kernelParam), as.integer(ifelse(kernelDOFadj, 1, 0)),
+                                                  as.integer(type), ab = double(kernelParam + 1),
+                                                  ab2 = double(kernelParam + 1))
+        }
+      }
+      if (!cor) {
+        return(makePsd(cov))
+      }
+      if (cor) {
+        invsdmatrix <- try(solve(sqrt(diag(diag(cov)))), silent = F)
+        if (!inherits(invsdmatrix, "try-error")) {
+          rcor <- invsdmatrix %*% cov %*% invsdmatrix
+          return(rcor)
+        }
       }
     }
   }
+  
+  
 }
 
 #' Realized kurtosis of highfrequency return series. 
@@ -1180,7 +1411,7 @@ rKernelCov <- function(rData, cor = FALSE,  alignBy = "seconds", alignPeriod = 1
 #'   }
 #'  in which \eqn{RV_t:} realized variance
 #'   
-#' @param rData a zoo/xts object containing all returns in period t for one asset.
+#' @param rData a zoo/xts object containing all returns in period t for D assets.
 #' @param alignBy a string, align the tick data to "seconds"|"minutes"|"hours".
 #' @param alignPeriod an integer, align the tick data to this many [seconds|minutes|hours].
 #' @param makeReturns boolean, should be TRUE when rData contains prices instead of returns. FALSE by   default.
@@ -1197,13 +1428,38 @@ rKernelCov <- function(rData, cor = FALSE,  alignBy = "seconds", alignPeriod = 1
 #' 
 #' @keywords highfrequency rKurt
 #' @importFrom xts apply.daily
+#' @importFrom data.table setcolorder setkey
 #' @export
 rKurt <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE) {
   
   # self-reference for multi-day input
-  if (checkMultiDays(rData)) { 
+  if (is.xts(rData) && checkMultiDays(rData)) { 
     result <- apply.daily(rData, rKurt, alignBy, alignPeriod, makeReturns)
     return(result)
+  } else if (is.data.table(rData)){
+    DT <- NULL
+    if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+      rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
+    }
+    setcolorder(rData, "DT")
+    dates <- as.character(unique(as.Date(rData$DT)))
+    res <- vector(mode = "list", length = length(dates))
+    names(res) <- dates
+    for (date in dates) {
+      res[[date]] <- rKurt(as.matrix(rData[as.Date(DT) == date][, !"DT"]), makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL) ## aligning is done above.
+    }
+    
+    res <- setDT(transpose(res))[, DT := dates]
+    setcolorder(res, "DT")
+    if(ncol(res) == 2){
+      colnames(res) <- c("DT", "medRV")
+    } else {
+      colnames(res) <- colnames(rData)
+    }
+    
+    setkey(res, "DT")
+    
+    return(res)
   } else {
     if ((!is.null(alignBy)) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation(rData, on = alignBy, k = alignPeriod)
@@ -1212,12 +1468,10 @@ rKurt <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
       rData <- makeReturns(rData)
     }
     
-    q <- as.numeric(rData)
-    N <- length(q)
+    q <- as.matrix(rData)
+    N <- nrow(q)
     
-    rv <- RV(rData)
-    
-    rkurt <- N * sum(q^4) / rv^(2)
+    rkurt <- N * colSums(q^4) / (colSums(q^2)^2)
     
     return(rkurt)
     
@@ -1268,9 +1522,27 @@ rKurt <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 rMPV <- function(rData, m = 2, p = 2, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE) {
   
   # self-reference for multi-day input
-  if (checkMultiDays(rData)) { 
-    result <- apply.daily(rData, rMPV, alignBy, alignPeriod, makeReturns)
+  if (is.xts(rData) && checkMultiDays(rData)) { 
+    result <- apply.daily(rData, rMPV, alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = makeReturns, m = m, p = p)
     return(result)
+    
+  } else if (is.data.table(rData)){ 
+    DT <- NULL  
+    if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+      rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
+    }
+    setcolorder(rData, "DT")
+    dates <- as.character(unique(as.Date(rData$DT)))
+    res <- vector(mode = "list", length = length(dates))
+    names(res) <- dates
+    for (date in dates) {
+      res[[date]] <- rMPV(as.matrix(rData[as.Date(DT) == date][, !"DT"]), m = m, p = p, makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL) ## aligning is done above.
+    }
+    res <- setDT(transpose(res))[, DT := dates]
+    setcolorder(res, "DT")
+    colnames(res) <- colnames(rData)
+    return(res)
+    
   } else {
     if ((!is.null(alignBy)) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation(rData, on = alignBy, k = alignPeriod)
@@ -1282,13 +1554,15 @@ rMPV <- function(rData, m = 2, p = 2, alignBy = NULL, alignPeriod = NULL, makeRe
     if (m > p/2) { 
       m <- as.numeric(m) ##m> p/2
       p <- as.numeric(p)
-      q <- as.numeric(rData)
-      q <- abs(rollapply(q,width=m,FUN=prod,align="left"))
-      N <- length(rData)
+      q <- as.matrix(rData)
+      
+      q <- abs(rollApplyProdWrapper(q, m))
+      #q <- abs(rollapply(q,width=m,FUN=prod,align="left"))
+      N <- nrow(rData)
       
       dmp <- (2^((p/m)/2) * gamma((p/m + 1)/2) / gamma(1/2))^(-m)
       
-      rmpv <- dmp * N^(p/2) / (N - m + 1) * sum(q^(p/m))
+      rmpv <- dmp * N^(p/2) / (N - m + 1) * colSums(q^(p/m))
       return(rmpv)
     } else{ 
       warning("Please supply m>p/2 for the arguments m and p")
@@ -1494,9 +1768,33 @@ rOWCov <- function (rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, make
 rSkew <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE) {
   
   # self-reference for multi-day input
-  if (checkMultiDays(rData)) { 
+  if (is.xts(rData) && checkMultiDays(rData)) { 
     result <- apply.daily(rData, rSkew, alignBy, alignPeriod, makeReturns)
     return(result)
+  } else if (is.data.table(rData)){
+    DT <- NULL
+    if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+      rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
+    }
+    setcolorder(rData, "DT")
+    dates <- as.character(unique(as.Date(rData$DT)))
+    res <- vector(mode = "list", length = length(dates))
+    names(res) <- dates
+    for (date in dates) {
+      res[[date]] <- rSkew(as.matrix(rData[as.Date(DT) == date][, !"DT"]), makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL) ## aligning is done above.
+    }
+    
+    res <- setDT(transpose(res))[, DT := dates]
+    setcolorder(res, "DT")
+    if(ncol(res) == 2){
+      colnames(res) <- c("DT", "medRV")
+    } else {
+      colnames(res) <- colnames(rData)
+    }
+    
+    setkey(res, "DT")
+    
+    return(res)
   } else {
     if ((!is.null(alignBy)) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation(rData, on = alignBy, k = alignPeriod)
@@ -1505,11 +1803,11 @@ rSkew <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
       rData <- makeReturns(rData)
     }
     
-    q <-as.numeric(rData)
-    N <- length(q)
+    q <- as.matrix(rData)
+    N <- nrow(q)
     
-    rv <- RV(rData)
-    rSkew <- sqrt(N)*sum(q^3)/rv^(3/2)
+    #rv <- RV(rData)
+    rSkew <- sqrt(N)*colSums(q^3)/(colSums(q^2)^(3/2))
     
     return(rSkew)
   }
@@ -1533,6 +1831,7 @@ rSkew <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #' @param alignBy a string, align the tick data to "seconds"|"minutes"|"hours".
 #' @param alignPeriod an integer, align the tick data to this many [seconds|minutes|hours].
 #' @param makeReturns boolean, should be TRUE when rData contains prices instead of returns. FALSE by   default.
+#' @param ... used internally, any input is ignored.
 #' @return list with to arguments. The realized positive and negative semivariance.
 #' @examples 
 #' \dontrun{
@@ -1543,13 +1842,45 @@ rSkew <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
 #' @keywords  highfrequency rSV
 #' @export
-rSV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE) {
+rSV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, ...) {
   
   # self-reference for multi-day input
-  if (checkMultiDays(rData)) {
-    result <- apply.daily(rData, rSV, alignBy, alignPeriod, makeReturns)
-    colnames(result) = c("downside", "upside")
+  if (is.xts(rData) && checkMultiDays(rData)) {
+    if(ncol(rData) == 1){
+      result <- apply.daily(rData, function(x){
+        tmp <- rSV(x, alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = makeReturns) 
+        return(cbind(tmp[[1]], tmp[[2]]))
+      })
+      colnames(result) = c("downside", "upside")
+    } else {
+      result <- applyGetList(rData, rSV, alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = makeReturns)  
+      names(result) <- unique(as.Date(index(rData)))
+      ## Names
+    }
     return(result)
+  } else if (is.data.table(rData)){ 
+    DT <- NULL  
+    setcolorder(rData, "DT")
+    if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+      rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
+    }
+    dates <- as.character(unique(as.Date(rData$DT)))
+    res <- vector(mode = "list", length = length(dates))
+    names(res) <- dates
+    for (date in dates) {
+      res[[date]] <- rSV(as.matrix(rData[as.Date(DT) == date][, !"DT"]), makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL) ## aligning is done above.
+    }
+    # res <- setDT(transpose(res))[, DT := dates]
+    # setcolorder(res, "DT")
+    # if(ncol(res) == 2){
+    #   colnames(res) <- c("DT", "SV")
+    # } else {
+    #   colnames(res) <- colnames(rData)
+    # }
+    
+    #setkey(res, "DT")
+    return(res)
+    
   } else {
     
     if ((!is.null(alignBy)) && (!is.null(alignPeriod))) {
@@ -1558,13 +1889,11 @@ rSV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE) 
     if (makeReturns)  {
       rData <- makeReturns(rData)
     }
-    
-    q <- as.numeric(rData)
+    q <- as.matrix(rData)
     select.down <- rData < 0
     select.up <- rData > 0
-    
-    rSVd <- sum(q[select.down]^2)
-    rSVu <- sum(q[select.up]^2)
+    rSVd <- colSums((q * select.down)^2)
+    rSVu <- colSums((q * select.up)^2)
     
     out <- list(rSVdownside = rSVd, rSVupside = rSVu)
     return(out)
@@ -1614,9 +1943,9 @@ rSV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE) 
 #' @keywords volatility
 #' @export
 rThresholdCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE) {
-  rdatacheck(rData, multi = TRUE)
+
   # Multiday adjustment: 
-  if (isMultiXts(rData)) { 
+  if (is.xts(rData) && isMultiXts(rData)) { 
     if (is.null(dim(rData))) {  
       n <- 1
     } else { 
@@ -1632,6 +1961,29 @@ rThresholdCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL
       names(result) <- unique(as.Date(index(rData)))
     }    
     return(result)
+  }  else if (is.data.table(rData)){
+    DT <- NULL
+    if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+      rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
+    }
+    setcolorder(rData, "DT")
+    dates <- as.character(unique(as.Date(rData$DT)))
+    res <- vector(mode = "list", length = length(dates))
+    names(res) <- dates
+    for (date in dates) {
+      res[[date]] <- rThresholdCov(as.matrix(rData[as.Date(DT) == date][, !"DT"]), cor = cor, makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL) ## aligning is done above.
+    }
+    if(length(res[[1]]) == 1){ ## Univariate case
+      res <- data.table(DT = names(res), ThresholdCov = as.numeric(res))
+    } else {
+      
+      for (date in dates) {
+        colnames(res[[date]]) <- rownames(res[[date]]) <- colnames(rData[,!"DT"])
+      }
+    } 
+    
+    return(res)
+    
   } else { #single day code
     if (!is.null(alignBy) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation(rData, on = alignBy, k = alignPeriod)
@@ -1791,19 +2143,19 @@ rRTSCov <- function (pData, cor = FALSE, startIV = NULL, noisevar = NULL,
     }
     
     cov <- matrix(rep(0, n * n), ncol = n)
-    diagonal <- c()
-    if (is.null(K_cov)) { 
+    diagonal <- numeric(n)
+    if (is.null(K_cov)) {
       K_cov <- K 
     }
-    if (is.null(J_cov)) { 
+    if (is.null(J_cov)) {
       J_cov <- J 
-    }  
-    if (is.null(K_var)) { 
+    }
+    if (is.null(K_var)) {
       K_var <- rep(K,n) 
     }
-    if (is.null(J_var)) { 
+    if (is.null(J_var)) {
       J_var <- rep(J,n) 
-    }        
+    }
     for (i in 1:n){ 
       diagonal[i] <- RTSRV(pData[[i]], startIV = startIV[i], 
                            noisevar = noisevar[i], K = K_var[i], J = J_var[i], 
@@ -1811,7 +2163,7 @@ rRTSCov <- function (pData, cor = FALSE, startIV = NULL, noisevar = NULL,
     }
     diag(cov) <- diagonal
     if( is.null(K_cov)){ K_cov = K }
-    if( is.null(J_cov)){ J_cov = J }                        
+    if( is.null(J_cov)){ J_cov = J }
     for (i in 2:n) {
       for (j in 1:(i - 1)) {
         cov[i, j] = cov[j, i] = RTSCov_bi(pData[[i]], 
@@ -1885,9 +2237,26 @@ RV <- function(rData) {
 rTPVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE) {
   
   # self-reference for multi-day input
-  if (checkMultiDays(rData)) { 
+  if (is.xts(rData) && checkMultiDays(rData)) { 
     result <- apply.daily(rData, rTPVar, alignBy, alignPeriod, makeReturns)
     return(result)
+  } else if (is.data.table(rData)){ 
+    DT <- NULL  
+    if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+      rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
+    }
+    setcolorder(rData, "DT")
+    dates <- as.character(unique(as.Date(rData$DT)))
+    res <- vector(mode = "list", length = length(dates))
+    names(res) <- dates
+    for (date in dates) {
+      res[[date]] <- rTPVar(as.matrix(rData[as.Date(DT) == date][, !"DT"]), makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL) ## aligning is done above.
+    }
+    res <- setDT(transpose(res))[, DT := dates]
+    setcolorder(res, "DT")
+    colnames(res) <- colnames(rData)
+    return(res)
+    
   } else {
     if ((!is.null(alignBy)) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation(rData, on = alignBy, k = alignPeriod)
@@ -1896,10 +2265,11 @@ rTPVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
       rData <- makeReturns(rData)
     }
     
-    q      <- as.numeric(rData)
-    q      <- abs(rollapply(q, width = 3, FUN = prod, align = "left"))
-    N      <- length(q)+2
-    rTPVar <- N * (N/(N - 2)) * ((gamma(0.5)/(2^(2/3)*gamma( 7/6 ) ))^3) * sum(q^(4/3))
+    q <- abs(as.matrix(rData))
+    q <- rollApplyProdWrapper(q, 3)
+    #q <- abs(rollapply(q, width = 3, FUN = prod, align = "left"))
+    N <- nrow(q)+2
+    rTPVar <- N * (N/(N - 2)) * ((gamma(0.5)/(2^(2/3)*gamma( 7/6 ) ))^3) * colSums(q^(4/3))
     return(rTPVar)
   }
 }
@@ -1948,9 +2318,26 @@ RTQ <- function(rData) {
 rQPVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE) {
   
   # self-reference for multi-day input
-  if (checkMultiDays(rData)) { 
+  if (is.xts(rData) && checkMultiDays(rData)) { 
     result <- apply.daily(rData, rQPVar, alignBy, alignPeriod, makeReturns)
     return(result)
+  } else if (is.data.table(rData)){ 
+    DT <- NULL  
+    if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+      rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
+    }
+    setcolorder(rData, "DT")
+    dates <- as.character(unique(as.Date(rData$DT)))
+    res <- vector(mode = "list", length = length(dates))
+    names(res) <- dates
+    for (date in dates) {
+      res[[date]] <- rQPVar(as.matrix(rData[as.Date(DT) == date][, !"DT"]), makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL) ## aligning is done above.
+    }
+    res <- setDT(transpose(res))[, DT := dates]
+    setcolorder(res, "DT")
+    colnames(res) <- colnames(rData)
+    return(res)
+    
   } else {
     if (!is.null(alignBy) && !is.null(alignPeriod)) {
       rData <-fastTickAgregation(rData, on = alignBy, k = alignPeriod)
@@ -1958,10 +2345,11 @@ rQPVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
     if (makeReturns) {
       rData <- makeReturns(rData)
     }
-    q <- abs(as.numeric(rData))
-    q <- rollapply(q, width = 4, FUN = prod, align = "left")
-    N <- length(q) + 3
-    rQPVar <- N* (N / (N-3)) * (pi^2 / 4) * sum(q)
+    q <- abs(as.matrix(rData))
+    q <- rollApplyProdWrapper(q, 4)
+    #q <- rollapply(q, width = 4, FUN = prod, align = "left")
+    N <- nrow(q) + 3
+    rQPVar <- N* (N / (N-3)) * (pi^2 / 4) * colSums(q)
     return(rQPVar)
   }
 }
@@ -1995,9 +2383,26 @@ rQPVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
 rQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE) {
   
   # self-reference for multi-day input
-  if (checkMultiDays(rData)) { 
+  if (is.xts(rData) && checkMultiDays(rData)) { 
     result <- apply.daily(rData, rQuar, alignBy, alignPeriod, makeReturns)
     return(result)
+  }  else if (is.data.table(rData)){ 
+    DT <- NULL  
+    if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+      rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
+    }
+    setcolorder(rData, "DT")
+    dates <- as.character(unique(as.Date(rData$DT)))
+    res <- vector(mode = "list", length = length(dates))
+    names(res) <- dates
+    for (date in dates) {
+      res[[date]] <- rQuar(as.matrix(rData[as.Date(DT) == date][, !"DT"]), makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL) ## aligning is done above.
+    }
+    res <- setDT(transpose(res))[, DT := dates]
+    setcolorder(res, "DT")
+    colnames(res) <- colnames(rData)
+    return(res)
+    
   } else {
     if ((!is.null(alignBy)) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation(rData, on = alignBy, k = alignPeriod)
@@ -2005,9 +2410,9 @@ rQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
     if (makeReturns) {
       rData <- makeReturns(rData)
     }
-    q <- as.numeric(rData)
-    N <- length(q) + 1
-    rQuar <- N/3 * sum(q^4)
+    q <- as.matrix(rData)
+    N <- nrow(q) + 1
+    rQuar <- N/3 * colSums(q^4)
     return(rQuar)
   }
 }
@@ -2394,64 +2799,85 @@ rCholCov <- function(pData, IVest = "MRC", COVest = "MRC", criterion = "squared 
 #' @export
 rSemiCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE){
   
-  N <- ncol(rData)
-  if (checkMultiDays(rData)) { 
-    if (N == 1) { 
+  if (is.xts(rData) && checkMultiDays(rData)) { 
+    if (ncol(rData) == 1) { 
       result <- apply.daily(rData, rSemiCov, alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = makeReturns) 
-    }
-    if (N > 1) { 
+    } else { 
       result <- applyGetList(rData, rSemiCov, cor=cor, alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = makeReturns)
       names(result) <- unique(as.Date(index(rData)))
     }    
     return(result)
+  }  else if (is.data.table(rData)){
+    DT <- NULL
+    if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+      rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
+    }
+    setcolorder(rData, "DT")
+    dates <- as.character(unique(as.Date(rData$DT)))
+    res <- vector(mode = "list", length = length(dates))
+    names(res) <- dates
+    for (date in dates) {
+      res[[date]] <- rSemiCov(as.matrix(rData[as.Date(DT) == date][, !"DT"]), cor = cor, makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL) ## aligning is done above.
+    }
+    
+    for (i in 1:length(res)) {
+      for (j in 1:length(res[[i]])) {
+        colnames(res[[i]][[j]]) <- rownames(res[[i]][[j]]) <- colnames(rData[,!"DT"])
+      }
+    }
+    
+    return(res)
+    
+  } else {
+    
+    if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+      rData <- fastTickAgregation(rData, on = alignBy, k = alignPeriod)
+    } 
+    if (makeReturns) {  
+      rData <- makeReturns(rData) 
+    }  
+    N <- ncol(rData)
+    rData <- as.matrix(rData)
+    # create p and n
+    pos <- pmax(rData, 0)
+    neg <- pmin(rData, 0)
+    
+    # calculate the mixed covariance (variances will be 0)
+    mixCov <- t(pos) %*% neg + t(neg) %*% pos
+    
+    # Calculate negative covariance
+    negCov <- t(neg) %*% neg
+    # Calculate positive covariance
+    posCov <- t(pos) %*% pos
+    
+    # Construct the concordant covariance
+    concordantCov <- negCov + posCov
+    # We also return the realized covariance 
+    rCovEst <- mixCov + concordantCov
+    
+    if(cor){
+      
+      ## Calculate the correlations from the covariance matrices.
+      mixCor <- matrix(NA, N, N)
+      
+      sdmatrix <- sqrt(diag(diag(negCov)))
+      negCor <- solve(sdmatrix) %*% negCov %*% solve(sdmatrix)  
+      
+      sdmatrix <- sqrt(diag(diag(posCov)))
+      posCor <- solve(sdmatrix) %*% posCov %*% solve(sdmatrix)  
+      
+      sdmatrix <- sqrt(diag(diag(concordantCov)))
+      concordantCor <- solve(sdmatrix) %*% concordantCov %*% solve(sdmatrix)  
+      
+      sdmatrix <- sqrt(diag(diag(rCovEst)))
+      rCorEst <- solve(sdmatrix) %*% rCovEst %*% solve(sdmatrix)  
+      
+      return(list("mixed" = mixCor, "negative" = negCor,  "positive" = posCor, "concordant" = concordantCor))
+    }
+    
+    return(list("mixed" = mixCov, "negative" = negCov,  "positive" = posCov, "concordant" = concordantCov))
+    
   }
-  
-  if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
-    rData <- fastTickAgregation(rData, on = alignBy, k = alignPeriod)
-  } 
-  if (makeReturns) {  
-    rData <- makeReturns(rData) 
-  }  
-  
-  
-  # create p and n
-  pos <- pmax(rData, 0)
-  neg <- pmin(rData, 0)
-  
-  # calculate the mixed covariance (variances will be 0)
-  mixCov <- t(pos) %*% neg + t(neg) %*% pos
-  
-  # Calculate negative covariance
-  negCov <- t(neg) %*% neg
-  # Calculate positive covariance
-  posCov <- t(pos) %*% pos
-  
-  # Construct the concordant covariance
-  concordantCov <- negCov + posCov
-  # We also return the realized covariance 
-  rCovEst <- mixCov + concordantCov
-  
-  if(cor){
-    
-    ## Calculate the correlations from the covariance matrices.
-    mixCor <- matrix(NA, N, N)
-    
-    sdmatrix <- sqrt(diag(diag(negCov)))
-    negCor <- solve(sdmatrix) %*% negCov %*% solve(sdmatrix)  
-    
-    sdmatrix <- sqrt(diag(diag(posCov)))
-    posCor <- solve(sdmatrix) %*% posCov %*% solve(sdmatrix)  
-    
-    sdmatrix <- sqrt(diag(diag(concordantCov)))
-    concordantCor <- solve(sdmatrix) %*% concordantCov %*% solve(sdmatrix)  
-    
-    sdmatrix <- sqrt(diag(diag(rCovEst)))
-    rCorEst <- solve(sdmatrix) %*% rCovEst %*% solve(sdmatrix)  
-    
-    return(list("mixed" = mixCor, "negative" = negCor,  "positive" = posCor, "concordant" = concordantCor))
-  }
-  
-  return(list("mixed" = mixCov, "negative" = negCov,  "positive" = posCov, "concordant" = concordantCov))
   
 }
 
@@ -2716,6 +3142,94 @@ knChooseReMeDI <- function(pData, knEqual = FALSE,
   return(as.integer(kn))
 
 }
+
+#' @export
+ReMeDIAsymptoticVariance <- function(pData, phi, lags, kn, int){
+  PRICE <- DT <- NULL
+  
+  if(is.data.table(pData)){ # We have a data.table
+    
+    if(!("PRICE" %in% colnames(pData))){
+      stop("ReMeDI with data.table input requires a PRICE column")
+    }
+    
+    # if(correctTime){
+    #   if(!("DT" %in% colnames(pData))){
+    #     stop("ReMeDI with correctTime set to TRUE needs a DT (date-time) column when the input is a data.table")
+    #   } else {
+    #     time <- as.numeric(pData[, DT])
+    #   }
+    # }
+    
+    prices <- as.numeric(pData[, PRICE])
+    timestamps <- as.numeric(pData[, DT])
+  } else if( is.xts(pData) ) { # We have an xts object
+    # if(correctTime){
+    #   time <- as.numeric(index(pData))
+    # }
+    if(ncol(pData) != 1){
+      if(!("PRICE" %in% colnames(pData))){
+        stop("ReMeDI with data.table input requires a PRICE column")
+      }
+      prices <- as.numeric(pData[,"PRICE"])
+    } else {
+      prices <- as.numeric(pData)
+    }
+    
+    timestamps <- as.numeric(index(pData))
+  } else {
+    stop("Error in ReMeDI: pData must be an xts or a data.table")
+  }
+  
+  N <- length(prices)
+  timestamps <- timestamps - timestamps[1]
+  timestamps <- timestamps/timestamps[N]
+  
+  diffTS <- diff(timestamps)
+  diffKNTS <- timestamps[(1+kn):N] - timestamps[1:(N-kn)]
+  
+  dn1 <- kn * diffTS[(2 + kn):(N-kn-1)] - diffTS[(3 + kn):(N-kn)]
+  dn2 <- dn1 / pmax(phi, diffKNTS[1:(N-2-2*kn)])
+  dn <- dn2^2
+  U1 <- sum(dn)
+  
+  diffKNOnce <- prices[1:(N-kn)] - prices[(kn+1):N]
+  diffKNTwice <- prices[(2 * kn + 1):N] - prices[1:(N - 2 * kn)]
+  diffKNThrice <- prices[(3 * kn + 1):N] - prices[1:(N - 3 * kn)]
+  nLags <- length(lags)
+  U2 <- S1 <- S2 <- Rj <- numeric(nLags)
+  for (l in 1:nLags) {
+    Rj[l] <- sum(diffKNOnce[(1 + 2 * kn + lags[l]):(N - kn)] * diffKNTwice[1:(N-lags[l]-3*kn)])
+    
+    U2[l] <- sum(diffKNTwice[(3 + 3 * kn):(N - lags[l] - 3 * kn)] * diffKNOnce[(3 + 5 * kn + lags[l]):(N - kn)] * dn[1:(N - 2 - 6 * kn - lags[l])])
+    S2[l] <- sum(diffKNOnce[(3 + 5 * kn + lags[l]):(N - lags[l] - 5 * kn)] * diffKNOnce[(3 + 9 * kn + 2 * lags[l]):(N - kn)] * 
+                diffKNTwice[(3 + 3 * kn):(N - 7 * kn - 2 * lags[l])] * diffKNTwice[(3 + 7 * kn + lags[l]):(N - 3 * kn - lags[l])] * dn[1:(N - 10 * kn - 2 * lags[l] - 2)])
+    
+    U4 <- -sum(diffKNOnce[(1 + 2 * kn + lags[l]):(N - lags[l] - 5 * kn)] *  diffKNOnce[(1 + 6 * kn + 2 * lags[l]):(N - kn)] * diffKNTwice[1:(N - 7 * kn - 2 * lags[l])] *  diffKNTwice[(1 + 4 * kn + lags[l]):(N - 3 * kn - lags[l])])
+    
+    S1[l] <- sum(diffKNOnce[(6*kn):(N-5*kn-2*lags[l])] * diffKNOnce[(10*kn+2*lags[l]):(N-kn)] * diffKNTwice[(8*kn+2*lags[l]):(N-3*kn)] * diffKNTwice[(8*kn+lags[l]):(N-3*kn-lags[l])]) + 
+      sum(diffKNOnce[(1+3*kn+lags[l]):(N-kn)] * diffKNOnce[(1+3*kn):(N-kn-lags[l])] * diffKNTwice[(1+kn+lags[l]):(N-3*kn)] * diffKNThrice[1:(N-4*kn-lags[l])]) + U4
+    
+    for (k in 1:int) {
+      Uk1 <- sum(diffKNOnce[(6*kn+2*k):(N-5*kn-k-2*lags[l])] * diffKNOnce[(10*kn+2*lags[l]+3*k):(N-kn)] * diffKNTwice[(8*kn+2*lags[l]+3*k):(N-3*kn)] * diffKNTwice[(8*kn+lags[l]+2*k):(N-3*kn-k-lags[l])])
+      
+      Uk2 <- sum(diffKNOnce[(1+3*kn+lags[l]+k):(N-kn)] * diffKNOnce[(1+3*kn+k):(N-kn-lags[l])] * diffKNTwice[(1+kn+lags[l]):(N-3*kn-k)] * diffKNThrice[1:(N-4*kn-k-lags[l])])
+      
+      S1[l] <- S1[l] + 2*(3*Uk1+Uk2+U4)
+    }
+    
+  }
+  Rj <- Rj/(N - 3 * kn - lags)
+  S3 <- Rj^3 * U1 - 2 * Rj * U2
+  
+  asympVar <- (S1 + S2 + S3)/N 
+  asympVar <- pmax(-asympVar, asympVar)
+  return(list("ReMeDI" = Rj, "asympVar" = asympVar))
+  
+  
+}
+
+
 
 #### #' 
 #### #' #' Autocorrelation of noise estimation

@@ -7,15 +7,14 @@
 refreshTime(pData, sort = FALSE, criterion = "squared duration")
 }
 \arguments{
-\item{pData}{a list. Each list-item contains an xts object
-containing the original time series (one day only and typically a price series).}
+\item{pData}{a list. Each list-item contains an xts or a data.table object (with first column DT (datetime)) containing the original time series (one day only and typically a price series).}
 
 \item{sort}{logical determining whether to sort the index based on a criterion (will only sort descending (i.e. most liquid first)). Default is FALSE}
 
 \item{criterion}{character determining which criterion used. Currently supports "squared duration" and "duration". Default is "squared duration".}
 }
 \value{
-An xts object containing the synchronized time series.
+An xts or data.table object containing the synchronized time series - depending on the input.
 }
 \description{
 This function implements the refresh time synchronization scheme proposed by Harris et al. (1995). 
@@ -39,7 +38,7 @@ refreshTime(list(a,b))
 
 }
 \references{
-Harris, F., T. McInish, G. Shoesmith, and R. Wood (1995). Cointegration, error correction, and price discovery on informationally linked security markets. Journal of Financial and Quantitative Analysis 30, 563-581.
+Harris, F., T. McInish, G. Shoesmith, and R. Wood (1995). Cointegration, error correction, and price discovery on infomationally linked security markets. Journal of Financial and Quantitative Analysis 30, 563-581.
 }
 \author{
 Jonathan Cornelissen and Kris Boudt

@@ -43,7 +43,7 @@ test_that("spotVol", {
                delta_c = c(0.25, -0.05, -0.2, 0.13, 0.02),
                delta_s = c(-1.2, 0.11, 0.26, -0.03, 0.08))
   expect_identical(
-    formatC(as.numeric(spotVol(sampleReal5MinPrices["2005-03-04/2005-03-05"], method = "stochper", init = init)$spot[1:10]), digits = 3),
+    formatC(as.numeric(spotVol(sampleReal5MinPrices["2005-03-04/2005-03-05"], method = "stochper", init = init, control = list(trace = as.integer(interactive())))$spot[1:10]), digits = 3),
     c("0.00227", "0.00223", "0.00218", "0.00214", "0.00209", "0.00205", "0.00202", "0.00198", "0.00195", "0.00193")
   )
   

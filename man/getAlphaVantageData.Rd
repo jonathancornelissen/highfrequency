@@ -48,7 +48,7 @@ data <- getAlphaVantageData(symbols = c("MMM", "GS"), interval = "5min",
 # Get data for JPM and Citicorp at a 15 minute interval in the xts format. 
 # The xts objects will be put in a list.
 data <- getAlphaVantageData(symbols = c("JPM", "C"), interval = "15min", 
-                  outputType = "xts", apiKey = 'yourKey')
+                  outputType = "xts", apiKey = "yourKey")
 }
 
 }

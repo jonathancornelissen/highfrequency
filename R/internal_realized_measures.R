@@ -528,7 +528,7 @@ RTSRV <- function(pData, startIV = NULL, noisevar = NULL, K = 300, J = 1, eta = 
   }
   if (is.null(startIV)) {
     sel <- seq(1, n, K)
-    RTSRV <- medRV(diff(logprices[sel]))
+    RTSRV <- medRV(as.matrix(diff(logprices[sel])))
   }
   iter <- 1
   while (iter <= 20) {

@@ -173,7 +173,10 @@ stochPer <- function(mR, rData = NULL, options = list()) {
   # default options, replace if user-specified
   op <- list(init = list(), P1 = 5, P2 = 5, control = list(trace=1, maxit=500))
   op[names(options)] <- options
-
+  
+  ## Make sure we have trace and maxit set to default if use specifies only one or the other.
+  if(is.null(op$control$trace)) op$control$trace <- 1
+  if(is.null(op$control$maxit)) op$control$maxit <- 500
   N <- ncol(mR)
   days <- nrow(mR)
   mR[mR == 0] <- NA

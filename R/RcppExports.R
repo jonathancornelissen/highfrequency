@@ -9,6 +9,22 @@ tradeIntensityProcessCpp <- function(time, bandwidth) {
     .Call(`_highfrequency_tradeIntensityProcessCpp`, time, bandwidth)
 }
 
+AsymptoticVarianceC <- function(vIn, iLag) {
+    .Call(`_highfrequency_AsymptoticVarianceC`, vIn, iLag)
+}
+
+AutomaticLagSelectionC <- function(vX, dMu) {
+    .Call(`_highfrequency_AutomaticLagSelectionC`, vX, dMu)
+}
+
+DriftBurstLoopC <- function(vPreAveraged, diffedlogprices, vTime, vTesttime, iMeanBandwidth, iVarBandwidth, iPreAverage, iAcLag) {
+    .Call(`_highfrequency_DriftBurstLoopC`, vPreAveraged, diffedlogprices, vTime, vTesttime, iMeanBandwidth, iVarBandwidth, iPreAverage, iAcLag)
+}
+
+DriftBurstLoopCPAR <- function(vPreAveraged, diffedlogprices, vTime, vTesttime, iMeanBandwidth, iVarBandwidth, iPreAverage, iAcLag, iCores) {
+    .Call(`_highfrequency_DriftBurstLoopCPAR`, vPreAveraged, diffedlogprices, vTime, vTesttime, iMeanBandwidth, iVarBandwidth, iPreAverage, iAcLag, iCores)
+}
+
 har_agg <- function(RM, periods, iNperiods) {
     .Call(`_highfrequency_har_agg`, RM, periods, iNperiods)
 }
@@ -53,6 +69,26 @@ overlap <- function(min1, max1, min2, max2) {
 
 mSeq <- function(starts, ends, scaleFactor) {
     .Call(`_highfrequency_mSeq`, starts, ends, scaleFactor)
+}
+
+cfilter <- function(x, filter) {
+    .Call(`_highfrequency_cfilter`, x, filter)
+}
+
+mldivide <- function(A, B) {
+    .Call(`_highfrequency_mldivide`, A, B)
+}
+
+rollApplyMinWrapper <- function(x) {
+    .Call(`_highfrequency_rollApplyMinWrapper`, x)
+}
+
+rollApplyMedianWrapper <- function(x) {
+    .Call(`_highfrequency_rollApplyMedianWrapper`, x)
+}
+
+rollApplyProdWrapper <- function(x, m) {
+    .Call(`_highfrequency_rollApplyProdWrapper`, x, m)
 }
 
 leadLagCpp <- function(x, timestampsX, y, timestampsY, lags, normalize) {

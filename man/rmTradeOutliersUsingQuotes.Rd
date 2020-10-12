@@ -4,7 +4,15 @@
 \alias{rmTradeOutliersUsingQuotes}
 \title{Delete transactions with unlikely transaction prices}
 \usage{
-rmTradeOutliersUsingQuotes(tData, qData, lagQuotes = 2)
+rmTradeOutliersUsingQuotes(
+  tData,
+  qData,
+  lagQuotes = 2,
+  BFM = FALSE,
+  backwardsWindow = 3600,
+  forwardsWindow = 0.5,
+  plot = FALSE
+)
 }
 \arguments{
 \item{tData}{a data.table or xts object containing the time series data, with at least the column "PRICE", containing the transaction price.}
@@ -12,6 +20,16 @@ rmTradeOutliersUsingQuotes(tData, qData, lagQuotes = 2)
 \item{qData}{a data.table or xts object containing the time series data with at least the columns "BID" and "OFR", containing the bid and ask prices.}
 
 \item{lagQuotes}{a numeric of length 1 that denotes how many seconds to lag the quotes. Default is 2 seconds. See Details.}
+
+\item{BFM}{a logical determining whether to conduct 'Backwards - Forwards matching' of trades and quotes.
+The algorithm tries to match trades that fall outside the bid - ask and first tries to match a small window forwards and if this fails, it tries to match backwards in a bigger window.
+The small window is a tolerance for inaccuracies in the timestamps of bids and asks. The backwards window allow for matching of late reported trades. I.e. block trades.}
+
+\item{backwardsWindow}{a numeric denoting the length of the backwards window. Default is 3600, corresponding to one hour.}
+
+\item{forwardsWindow}{a numeric denoting the length of the forwards window. Default is 0.5, dorresponding to one half second.}
+
+\item{plot}{a logical denoting whether to visualize the forwards, backwards, and unmatched trades in a plot.}
 }
 \value{
 xts or data.table object depending on input

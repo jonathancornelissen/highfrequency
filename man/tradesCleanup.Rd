@@ -74,7 +74,7 @@ The following cleaning functions are performed sequentially:
 
 Since the function \code{\link{rmTradeOutliersUsingQuotes}}
 also requires cleaned quote data as input, it is not incorporated here and
-there is a separate wrapper called \code{\link{tradesCleanupUsingQuotes}}.
+there is a seperate wrapper called \code{\link{tradesCleanupUsingQuotes}}.
 }
 \examples{
 # Consider you have raw trade data for 1 stock for 2 days 

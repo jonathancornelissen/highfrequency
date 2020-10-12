@@ -45,8 +45,10 @@ Function that estimates whether one series leads (or lags) another.
 The lead-lag-ratio (LLR) can be used to see if one asset leads the other. If LLR < 1, then price1 MAY be leading price2 and vice versa if LLR > 1.
 }
 \examples{
+\dontrun{
 ll <- leadLag(100 + cumsum(sbux), 100 + cumsum(lltc), lags = seq(-50,50))
 plot(ll)
+}
 
 }
 \references{

@@ -12,9 +12,9 @@ applyGetList <- function(x, FUN, cor = FALSE, alignBy = NULL, alignPeriod = NULL
   FUN <- match.fun(FUN)
   for(i in 1:(length(INDEX)-1)){
     if (is.null(makePsd)) {
-      result[[i]] <- FUN(x[(INDEX[i] + 1):INDEX[i + 1]], cor, alignBy, alignPeriod, makeReturns)
+      result[[i]] <- FUN(x[(INDEX[i] + 1):INDEX[i + 1]], cor = cor, alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = makeReturns, ...)
     } else {
-      result[[i]] <- FUN(x[(INDEX[i] + 1):INDEX[i + 1]], cor, alignBy, alignPeriod, makeReturns, makePsd)
+      result[[i]] <- FUN(x[(INDEX[i] + 1):INDEX[i + 1]], cor = cor, alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = makeReturns, makePsd = makePsd, ...)
     }
     
   }
@@ -62,6 +62,7 @@ makePsd <- function(S, method = "covariance") {
     Apsd  <- Apsd/(dApsd%*%t(dApsd))
     D     <- diag( as.numeric(D)  , ncol = length(D) )
     Spos  <- D %*% Apsd %*% D
+    colnames(Spos) <- rownames(Spos) <- colnames(S)
     return(Spos)
   } else {
     # Rousseeuw, P. and G. Molenberghs (1993). Transformation of non positive semidefinite correlation matrices. Communications in Statistics - Theory and Methods 22, 965-984.
@@ -70,6 +71,8 @@ makePsd <- function(S, method = "covariance") {
     vLambda <- out$values
     vLambda[vLambda<0] <- 0
     Apsd    <- t(mGamma) %*% diag(vLambda) %*% mGamma
+    colnames(Apsd) <- rownames(Apsd) <- colnames(S)
+    return(Apsd)
   }
 }
 
@@ -138,3 +141,93 @@ checkMultiDays <- function(x) {
     return(FALSE)
   }
 } 
+
+
+
+
+### functions used to calculate whether a burst of drift has occured.
+#' @keywords internal
+fit2d3rdDegree <- function(A, X, Y){
+  
+  X <- matrix(rep(as.numeric(X), 4), ncol = 4)
+  Y <- matrix(Y, ncol = 16, nrow = length(Y), byrow = FALSE)
+  Z <- matrix(1, ncol = ncol(Y), nrow = nrow(Y))
+  
+  for (i in 1:3) {
+    Z[,1:i] <- Z[,1:i] * X[,1:i]
+  }
+  
+  for (i in 1:3) {
+    
+    foo <- 4*i
+    Z[, 1:foo] <- Z[, 1:foo] * Y[, 1:foo]
+    for (j in 1:3) {
+      Z[, (foo+1):(foo+j)] <- Z[, (foo+1):(foo+j)] * X[,1:j]
+    }
+  }
+  p <- mldivide(Z, as.numeric(A))
+  return(p)
+}
+
+#' @importFrom stats acf approx
+#' @keywords internal
+DBHCriticalValues <- function(x, alpha){
+  tStat <- x$tStat
+  alpha_used <- alpha
+  nObs <- length(tStat)
+  rho <- DBHSysData$rho
+  alpha <- DBHSysData$alpha
+  if(!alpha_used %in% alpha){
+   warning(c("alpha is not available please set alpha to one of: ", paste(as.numeric(alpha), collapse = ", ")))
+  }
+  m <- DBHSysData$m
+  arr <- array(DBHSysData$arr, dim = c(23, 14, 6), dimnames = list('m' = m, 'rho' = rho,'alpha' = alpha))  
+  
+  rho_used   <- acf(tStat, plot = FALSE)$acf[2]
+  A          <- matrix(NA, ncol = nrow(arr), nrow = nrow(arr))
+  P          <- matrix(NA, ncol = dim(arr)[3], nrow = 16)
+  rho        <- as.numeric(dimnames(arr)$rho)
+  add_rho    <- c(0.75,0.85,0.91,0.92,0.93,0.94,0.96,0.97,0.98)
+  rho_i      <- sort(c(rho, add_rho))
+  logRho     <- log(1 - rho)
+  logRho_i   <- log(1 - rho_i)
+  logM       <- matrix(log(as.numeric(dimnames(arr)$m)), ncol = nrow(arr), nrow = nrow(arr), byrow = TRUE)
+  logRho_mat <- matrix(logRho_i, ncol = nrow(arr), nrow = nrow(arr), byrow = FALSE)
+  
+  for (i in 1:length(alpha)) {
+    
+    for (j in 1:nrow(arr)) {
+      A[ ,j] <- approx(logRho, arr[j, ,i], logRho_i)$y
+    }
+    P[,i] <- fit2d3rdDegree(A, logM, logRho_mat)
+  }
+  
+  idx <- alpha %in% alpha_used
+  normalizedQuantile <- P[1,idx]
+  for (i in 1:3) {
+    normalizedQuantile  <- normalizedQuantile * log(nObs) + P[1+i, idx]
+  }
+  
+  
+  for (i in 1:3) {
+    foo <- 4 * i + 1
+    g <- P[foo, idx]
+    
+    for (j in 1:3) {
+      g <- g * log(nObs) + P[j+ foo, idx]
+    }
+    normalizedQuantile <- normalizedQuantile * log(1 - rho_used) + g
+    
+  }
+  
+  AM <- sqrt(2 * log(nObs))
+  BM <- AM - 0.5 * log(pi * log(nObs)) / AM
+  
+  quantile <- normalizedQuantile / AM + BM
+  return(list("normalizedQuantile" = normalizedQuantile, "quantile" = quantile))
+}
+
+
+
+
+

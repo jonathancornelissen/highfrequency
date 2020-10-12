@@ -1,38 +1,111 @@
 library(testthat)
+library(xts)
+library(data.table)
 library(highfrequency)
+set.seed(123)
+start <- strptime("1970-01-01", format = "%Y-%m-%d", tz = "UTC")
+timestamps <- start + rep(seq(34200, 57600, length.out = 23401), 3) + rep(0:2 * 86400, each = 23401)
+
+dat <- rbind(cbind(rnorm(23401) * sqrt(1/23401), rnorm(23401) * sqrt(1/23401), rnorm(23401) * sqrt(1/23401)),
+             cbind(rnorm(23401) * sqrt(1/23401), rnorm(23401) * sqrt(1/23401), rnorm(23401) * sqrt(1/23401)),
+             cbind(rnorm(23401) * sqrt(1/23401), rnorm(23401) * sqrt(1/23401), rnorm(23401) * sqrt(1/23401)))
+
+dat <- exp(cumsum(xts(dat, timestamps)))
+colnames(dat) <- c("PRICE1", "PRICE2", "PRICE3")
+datDT <- as.data.table(dat)
+setnames(datDT, old = "index", new = "DT")
+
+
+returnDat <- NULL
+for (date in c("1970-01-01", "1970-01-02", "1970-01-03")) {
+  returnDat <- rbind(returnDat, makeReturns(dat[date]))
+}
+
+returnDatDT <- as.data.table(returnDat)
+setnames(returnDatDT, old = "index", new = "DT")
+
+##### medRV #####
 context("medRV")
-test_that("", {
+test_that("medRV", {
   expect_equal(
     formatC(as.numeric(medRV(sample5MinPricesJumps[c('2010-01-04', '2010-01-05'), 1], alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)[1]), digits = 5),
     "0.013105"
   )
+  
+  expect_equal(lapply(medRV(returnDat), sum), list("PRICE1" = 3.022290125, "PRICE2" = 3.003088657, "PRICE3" = 3.013543419))
+  expect_equal(lapply(medRV(returnDat), sum), lapply(medRV(dat, makeReturns = TRUE), sum))
+  
+  expect_equal(matrix(medRV(returnDat), ncol = 3), matrix(as.matrix(medRV(returnDatDT)[,-1]), ncol = 3))
+  expect_equal(matrix(medRV(dat, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE), ncol = 3),
+               matrix(as.matrix(medRV(datDT, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)[, -1]), ncol = 3))
+  
+  expect_equal(matrix(as.matrix(medRV(as.data.table(sample5MinPrices)[,DT := index][,!"index"], makeReturns = TRUE)[,-1]), ncol = ncol(sample5MinPrices)),
+    matrix(medRV(sample5MinPrices, makeReturns = TRUE), ncol = ncol(sample5MinPrices)))
+  
+
 })
-# medRQ
+##### medRQ ##### 
 context("medRQ")
 test_that("", {
   expect_equal(
     formatC(medRQ(sampleTData$PRICE,alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE) * 1000000, digits = 5),
     "0.23952"
   )
+  
+  expect_equal(lapply(medRQ(returnDat), sum), list("PRICE1" = 3.06573359, "PRICE2" = 3.010144579, "PRICE3" = 3.030828633))
+  expect_equal(lapply(medRQ(returnDat), sum), lapply(medRQ(dat, makeReturns = TRUE), sum))
+  
+  expect_equal(matrix(medRQ(returnDat), ncol = 3), matrix(as.matrix(medRQ(returnDatDT)[,-1]), ncol = 3))
+  expect_equal(matrix(medRQ(dat, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE), ncol = 3),
+               matrix(as.matrix(medRQ(datDT, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)[, -1]), ncol = 3))
+  
+  expect_equal(matrix(as.matrix(medRQ(as.data.table(sample5MinPrices)[,DT := index][,!"index"], makeReturns = TRUE)[,-1]), ncol = ncol(sample5MinPrices)),
+               matrix(medRQ(sample5MinPrices, makeReturns = TRUE), ncol = ncol(sample5MinPrices)))
+  
+  
 })
-# minRV
+##### minRV ##### 
 context("minRV")
 test_that("minRV", {  
   expect_equal(
     formatC(as.numeric(minRV(sample5MinPricesJumps[c('2010-01-04', '2010-01-05'), 1:2], alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)[1,1]), digits = 5),
     "0.013259"
   )
+  
+  expect_equal(lapply(minRV(returnDat), sum), list("PRICE1" = 3.027820575, "PRICE2" = 2.99975133, "PRICE3" = 3.001113006))
+  expect_equal(lapply(minRV(returnDat), sum), lapply(minRV(dat, makeReturns = TRUE), sum))
+  
+  expect_equal(matrix(minRV(returnDat), ncol = 3), matrix(as.matrix(minRV(returnDatDT)[,-1]), ncol = 3))
+  expect_equal(matrix(minRV(dat, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE), ncol = 3),
+               matrix(as.matrix(minRV(datDT, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)[, -1]), ncol = 3))
+  
+  expect_equal(matrix(as.matrix(minRV(as.data.table(sample5MinPrices)[,DT := index][,!"index"], makeReturns = TRUE)[,-1]), ncol = ncol(sample5MinPrices)),
+               matrix(minRV(sample5MinPrices, makeReturns = TRUE), ncol = ncol(sample5MinPrices)))
+  
+  
+  
 })
-# minRQ
+##### minRQ ##### 
 context("minRQ")
 test_that("minRQ", {
   expect_equal(
     minRQ(sampleTData$PRICE, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE) * 1000000,
     0.1325120781
   )
+  expect_equal(lapply(minRQ(returnDat), sum), list("PRICE1" = 3.0696895, "PRICE2" = 2.977093559, "PRICE3" = 3.01211734))
+  expect_equal(lapply(minRQ(returnDat), sum), lapply(minRQ(dat, makeReturns = TRUE), sum))
+  
+  expect_equal(matrix(minRQ(returnDat), ncol = 3), matrix(as.matrix(minRQ(returnDatDT)[,-1]), ncol = 3))
+  expect_equal(matrix(minRQ(dat, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE), ncol = 3),
+               matrix(as.matrix(minRQ(datDT, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)[, -1]), ncol = 3))
+  
+  expect_equal(matrix(as.matrix(minRQ(as.data.table(sample5MinPrices)[,DT := index][,!"index"], makeReturns = TRUE)[,-1]), ncol = ncol(sample5MinPrices)),
+               matrix(minRQ(sample5MinPrices, makeReturns = TRUE), ncol = ncol(sample5MinPrices)))
+  
+  
 })
 
-# MRC
+##### MRC #####  
 context("MRC")
 test_that("MRC", {
   expect_equal({
@@ -45,9 +118,11 @@ test_that("MRC", {
   },
   "0.034393"
   )
+  
+  
 })
 
-# rBeta
+##### rBeta #####
 context("rBeta")
 test_that("rBeta", {
   expect_equal({
@@ -65,7 +140,7 @@ test_that("rBeta", {
   )
 })
 
-# rBPCov
+##### rBPCov ##### 
 context("rBPCov")
 test_that("rBPCov", {
   expect_equal(
@@ -73,42 +148,92 @@ test_that("rBPCov", {
     formatC(sum(rBPCov(rData = sample5MinPricesJumps[c('2010-01-04'), 1:2], makeReturns=TRUE)[1:2,1:2]) * 1000000, digits = 5),
     "29778"
   )
+  
+  expect_equal(lapply(rBPCov(returnDat), sum), list("1970-01-01" = 2.98622886, "1970-01-02" = 3.026269417, "1970-01-03" = 2.99293847))
+  expect_equal(lapply(rBPCov(returnDat), sum), lapply(rBPCov(dat, makeReturns = TRUE), sum))
+  
+  expect_equal(rBPCov(returnDat),  rBPCov(returnDatDT))
+  expect_equal(rBPCov(dat, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE),
+               rBPCov(datDT, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE))
+  
+  expect_equal(rBPCov(as.data.table(sample5MinPrices)[,DT := index][,!"index"], makeReturns = TRUE),  rBPCov(sample5MinPrices, makeReturns = TRUE))
+  
+  
+  
 })
-# RBPVar
+##### RBPVar ##### 
 context("RBPVar")
 test_that("RBPVar", {
-  expect_equal(
-    formatC(sum(RBPVar(rData = sample5MinPricesJumps['2010-01-04', 1])), digits = 5),
-    "118.93"
-  )
+  
+  if(!interactive()){ ## I don't want to test this everytime I manually run this script interactively
+    expect_equal(
+      formatC(sum(RBPVar(rData = sample5MinPricesJumps['2010-01-04', 1])), digits = 5),
+      "118.93"
+    )
+  }
 })
-# rCov
+##### rCov #####
 context("rCov")
 test_that("rCov", {
   expect_equal(
     formatC(sum(rCov(rData = sample5MinPricesJumps[c('2010-01-04', '2010-01-05'), 1:2], makeReturns = TRUE)[[1]][1:2,1:2]), digits = 5),
     "0.028614"
   )
+  
+  
+  expect_equal(lapply(rCov(returnDat), sum), list("1970-01-01" = 2.971967832, "1970-01-02" = 3.032179598, "1970-01-03" = 3.012844796))
+  expect_equal(lapply(rCov(returnDat), sum), lapply(rCov(dat, makeReturns = TRUE), sum))
+  expect_equal(rCov(returnDat),  rCov(returnDatDT))
+  expect_equal(rCov(dat, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE),
+               rCov(datDT, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE))
+  
+  expect_equal(rCov(as.data.table(sample5MinPrices)[,DT := index][,!"index"], makeReturns = TRUE),  rCov(sample5MinPrices, makeReturns = TRUE))
+  
 })
 
-# rKurt
+##### rKurt ##### 
 context("rKurt")
 test_that("rKurt", {
   expect_equal(
     formatC(as.numeric(rKurt(sample5MinPricesJumps[c('2010-01-04', '2010-01-05'), 1], alignBy ="minutes", alignPeriod = 5, makeReturns = TRUE))[1], digits = 5),
     "2.8936"
   )
+  expect_equal(sum(rKurt(returnDat[,1])), sum(rKurt(returnDat)[,1]))
+  expect_equal(lapply(rKurt(returnDat), sum), list("PRICE1" = 8.963908299, "PRICE2" = 9.029035031, "PRICE3" = 9.063772367))
+  expect_equal(lapply(rKurt(returnDat), sum), lapply(rKurt(dat, makeReturns = TRUE), sum))
+  
+  expect_equal(matrix(rKurt(returnDat), ncol = 3), matrix(as.matrix(rKurt(returnDatDT)[,-1]), ncol = 3))
+  expect_equal(matrix(rKurt(dat, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE), ncol = 3),
+               matrix(as.matrix(rKurt(datDT, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)[, -1]), ncol = 3))
+  
+  expect_equal(matrix(as.matrix(rKurt(as.data.table(sample5MinPrices)[,DT := index][,!"index"], makeReturns = TRUE)[,-1]), ncol = ncol(sample5MinPrices)),
+               matrix(rKurt(sample5MinPrices, makeReturns = TRUE), ncol = ncol(sample5MinPrices)))
+  
+  
+  
 })
 
-# rMPV
+##### rMPV ##### 
 context("rMPV")
 test_that("rMPV", {
   expect_equal(
     formatC(rMPV(sampleTData$PRICE, alignBy ="minutes", alignPeriod = 5, makeReturns = TRUE), digits = 5),
     "0.00042925"
   )
+  
+  expect_equal(lapply(rMPV(returnDat), sum), list("PRICE1" = 3.016532757, "PRICE2" = 3.004313242, "PRICE3" = 3.002691466))
+  expect_equal(lapply(rMPV(returnDat), sum), lapply(rMPV(dat, makeReturns = TRUE), sum))
+  
+  expect_equal(matrix(rMPV(returnDat), ncol = 3), matrix(as.matrix(rMPV(returnDatDT)[,-1]), ncol = 3))
+  expect_equal(matrix(rMPV(dat, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE), ncol = 3),
+               matrix(as.matrix(rMPV(datDT, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)[, -1]), ncol = 3))
+  
+  expect_equal(matrix(as.matrix(rMPV(as.data.table(sample5MinPrices)[,DT := index][,!"index"], makeReturns = TRUE)[,-1]), ncol = ncol(sample5MinPrices)),
+               matrix(rMPV(sample5MinPrices, makeReturns = TRUE), ncol = ncol(sample5MinPrices)))
+  
+  
 })
-# rOWCov
+##### rOWCov ##### 
 context("rOWCov")
 test_that("rOWCov", {
   expect_equal(
@@ -120,7 +245,7 @@ test_that("rOWCov", {
     "0.0101"
   )
 })
-# rRTSCov
+##### rRTSCov ##### 
 context("rRTSCov")
 test_that("rRTSCov", {
   expect_equal(
@@ -133,7 +258,7 @@ test_that("rRTSCov", {
   )
 })
 
-# rKernel
+##### rKernel ##### 
 context("rKernelCov")
 test_that("rKernelCov", {
   expect_equal(
@@ -144,25 +269,54 @@ test_that("rKernelCov", {
     formatC(sum(rKernelCov(rData = cbind(lltc, sbux, fill = 0), alignBy = "minutes", alignPeriod = 5, makeReturns = FALSE)) * 1000, digits = 5),
     "0.021281"
   )
+  expect_equal(length(listAvailableKernels()) , 12)
+  
+  expect_equal(lapply(rKernelCov(returnDat), sum), list("1970-01-01" = 2.941858941, "1970-01-02" = 3.009886185, "1970-01-03" = 3.009261885))
+  expect_equal(lapply(rKernelCov(returnDat), sum), lapply(rKernelCov(dat, makeReturns = TRUE), sum))
+  expect_equal(rKernelCov(returnDat),  rKernelCov(returnDatDT))
+  expect_equal(rKernelCov(dat, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE),
+               rKernelCov(datDT, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE))
+  
+  
+  
 })
 
-# rSkew
+##### rSkew ##### 
 context("rSkew")
 test_that("rSkew", {
   expect_equal(
     formatC(as.numeric(rSkew(sample5MinPricesJumps[c('2010-01-04', '2010-01-05'), 1], alignBy ="minutes", alignPeriod = 5, makeReturns = TRUE))[1], digits = 5),
     "0.078047"
   )
+  expect_equal(sum(rSkew(returnDat[,1])), sum(rSkew(returnDat)[,1]))
+  expect_equal(lapply(rSkew(returnDat), sum), list("PRICE1" = 0.03781808902, "PRICE2" = 0.0146462315, "PRICE3" = 0.03046798416))
+  expect_equal(lapply(rSkew(returnDat), sum), lapply(rSkew(dat, makeReturns = TRUE), sum))
+  
+  expect_equal(matrix(rSkew(returnDat), ncol = 3), matrix(as.matrix(rSkew(returnDatDT)[,-1]), ncol = 3))
+  expect_equal(matrix(rSkew(dat, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE), ncol = 3),
+               matrix(as.matrix(rSkew(datDT, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)[, -1]), ncol = 3))
+  
+  expect_equal(matrix(as.matrix(rSkew(as.data.table(sample5MinPrices)[,DT := index][,!"index"], makeReturns = TRUE)[,-1]), ncol = ncol(sample5MinPrices)),
+               matrix(rSkew(sample5MinPrices, makeReturns = TRUE), ncol = ncol(sample5MinPrices)))
+  
 })
-# rSV
+##### rSV ##### 
 context("rSV")
 test_that("rSV", {
   expect_equal(
     rSV(sampleTData$PRICE,alignBy ="minutes", alignPeriod = 5, makeReturns = TRUE),
-    list(rSVdownside = 0.0002913423039, rSVupside = 0.0001642838323)
+    list(rSVdownside = c("PRICE" = 0.0002913423039), rSVupside = c("PRICE" = 0.0001642838323))
   )
+  expect_equal(lapply(rSV(returnDat), function(x) lapply(x, sum))[[1]], list("rSVdownside" = 1.501497027, "rSVupside" = 1.50206646))
+  expect_equal(rSV(returnDat), rSV(dat, makeReturns = TRUE))
+  
+  expect_equal(rSV(returnDat), rSV(returnDatDT))
+  expect_true(all.equal(rSV(dat, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE),
+               rSV(datDT, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE), check.attributes = FALSE))
+
+  
 })
-# rThresholdCov
+##### rThresholdCov ##### 
 context("rThresholdCov")
 test_that("rThresholdCov", {
   expect_equal(
@@ -173,32 +327,55 @@ test_that("rThresholdCov", {
     formatC(sum(rThresholdCov(cbind(lltc, sbux), alignBy = "minutes", alignPeriod = 1), cor = TRUE), digits = 1),
     " 1"
   )
+  
+  expect_equal(lapply(rThresholdCov(returnDat), sum), list("1970-01-01" = 2.943885754, "1970-01-02" = 2.992550689, "1970-01-03" = 2.963583828))
+  expect_equal(lapply(rThresholdCov(returnDat), sum), lapply(rThresholdCov(dat, makeReturns = TRUE), sum))
+  expect_equal(rThresholdCov(returnDat),  rThresholdCov(returnDatDT))
+  expect_equal(rThresholdCov(dat, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE),
+               rThresholdCov(datDT, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE))
+  
+  expect_equal(rThresholdCov(as.data.table(sample5MinPrices)[,DT := index][,!"index"], makeReturns = TRUE),  rThresholdCov(sample5MinPrices, makeReturns = TRUE))
+  
+  
+  
+  
 })
-# rTPVar
+##### rTPVar ##### 
 context("rTPVar")
 test_that("rTPVar", {
   expect_equal(
     formatC(rTPVar(sampleTData$PRICE,alignBy ="minutes", alignPeriod = 5, makeReturns = TRUE) * 1000000, digits = 5),
     "0.42755"
   )
+  expect_equal(lapply(rTPVar(returnDat), sum), list("PRICE1" = 3.023117658, "PRICE2" = 3.003898984, "PRICE3" = 2.966162109))
+  expect_equal(lapply(rTPVar(returnDat), sum), lapply(rTPVar(dat, makeReturns = TRUE), sum))
+  
+  expect_equal(matrix(rTPVar(returnDat), ncol = 3), matrix(as.matrix(rTPVar(returnDatDT)[,-1]), ncol = 3))
+  expect_equal(matrix(rTPVar(dat, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE), ncol = 3),
+               matrix(as.matrix(rTPVar(datDT, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)[, -1]), ncol = 3))
+  
+  expect_equal(matrix(as.matrix(rTPVar(as.data.table(sample5MinPrices)[,DT := index][,!"index"], makeReturns = TRUE)[,-1]), ncol = ncol(sample5MinPrices)),
+               matrix(rTPVar(sample5MinPrices, makeReturns = TRUE), ncol = ncol(sample5MinPrices)))
+  
+  
 })
-# rTSCov univariate
+##### rTSCov univariate ##### 
 context("rTSCov")
-test_that("rTSCov", {
+test_that("rTSCov univariate", {
   expect_equal(
     formatC(rTSCov(pData = sampleTData$PRICE), digits = 5),
     "0.00052838"
   )
 })
-# rTSCov multivariate
+##### rTSCov multivariate ##### 
 context("rTSCov")
-test_that("rTSCov", {
+test_that("rTSCov multivariate", {
   expect_equal(
     formatC(sum(rTSCov(pData = list(cumsum(lltc) + 100, cumsum(sbux) + 100))) * 10000, digits = 5),
     "0.0024262"
   )
 })
-# RV
+##### RV  #####
 context("RV")
 test_that("RV", {
   expect_equal(
@@ -207,25 +384,47 @@ test_that("RV", {
   )
 })
 
-# rQPVar
+##### rQPVar  ##### 
 context("rQPVar")
 test_that("rQPVar", {
   expect_equal(
     formatC(as.numeric(rQPVar(sample5MinPricesJumps[c('2010-01-04', '2010-01-05'), 1], alignBy ="minutes", alignPeriod = 5, makeReturns = TRUE))[1] * 1000000, digits = 5),
     "115.62"
   )
+  
+  expect_equal(lapply(rQPVar(returnDat), sum), list("PRICE1" = 3.018535259, "PRICE2" = 3.006780968, "PRICE3" = 2.95202662))
+  expect_equal(lapply(rQPVar(returnDat), sum), lapply(rQPVar(dat, makeReturns = TRUE), sum))
+  
+  expect_equal(matrix(rQPVar(returnDat), ncol = 3), matrix(as.matrix(rQPVar(returnDatDT)[,-1]), ncol = 3))
+  expect_equal(matrix(rQPVar(dat, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE), ncol = 3),
+               matrix(as.matrix(rQPVar(datDT, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)[, -1]), ncol = 3))
+  
+  expect_equal(matrix(as.matrix(rQPVar(as.data.table(sample5MinPrices)[,DT := index][,!"index"], makeReturns = TRUE)[,-1]), ncol = ncol(sample5MinPrices)),
+               matrix(rQPVar(sample5MinPrices, makeReturns = TRUE), ncol = ncol(sample5MinPrices)))
+  
+  
 })
 
-# rQuar
+##### rQuar  ##### 
 context("rQuar")
 test_that("rQuar", {
   expect_equal(
     formatC(as.numeric(rQuar(sample5MinPricesJumps[c('2010-01-04', '2010-01-05'), 1], alignBy ="minutes", alignPeriod = 5, makeReturns = TRUE))[1] * 1000000, digits = 5),
     "116.57"
   )
+  
+  expect_equal(lapply(rQuar(returnDat), sum), list("PRICE1" = 2.997549025, "PRICE2" = 3.030800189, "PRICE3" = 3.055064757))
+  expect_equal(lapply(rQuar(returnDat), sum), lapply(rQuar(dat, makeReturns = TRUE), sum))
+  
+  expect_equal(matrix(rQuar(returnDat), ncol = 3), matrix(as.matrix(rQuar(returnDatDT)[,-1]), ncol = 3))
+  expect_equal(matrix(rQuar(dat, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE), ncol = 3),
+               matrix(as.matrix(rQuar(datDT, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)[, -1]), ncol = 3))
+  
+  expect_equal(matrix(as.matrix(rQuar(as.data.table(sample5MinPrices)[,DT := index][,!"index"], makeReturns = TRUE)[,-1]), ncol = ncol(sample5MinPrices)),
+               matrix(rQuar(sample5MinPrices, makeReturns = TRUE), ncol = ncol(sample5MinPrices)))
 })
 
-
+##### ivInference #####
 context("ivInference")
 test_that("ivInference", {
   expect_equal(
@@ -234,6 +433,7 @@ test_that("ivInference", {
   )
 })
 
+##### rAVGCov #####
 context("rAVGCov")
 test_that("rAVGCov",{
   rcovSub <- rAVGCov(rData = cbind(lltc, sbux, fill = 0), alignBy = "minutes",alignPeriod = 5, k = 1, makeReturns = FALSE)
@@ -241,32 +441,28 @@ test_that("rAVGCov",{
   # Correct handling of seconds?
   rcovSubSeconds <- rAVGCov(rData = cbind(lltc, sbux, fill = 0), alignBy = "seconds",alignPeriod = 5 * 60 , k = 60 , makeReturns = FALSE)
   expect_equal(rcovSub , rcovSubSeconds)
-  
-  
-  
   rcovSubUnivariate <- rAVGCov(rData = cbind(lltc, sbux, fill = 0)[,1], alignBy = "minutes",alignPeriod = 5, makeReturns = FALSE)
-  
   expect_equal(rcovSub[[1]], rcovSubUnivariate)
-  
   rcovSub_makeReturns <- rAVGCov(rData = exp(cumsum(cbind(lltc, sbux, fill = 0))), alignBy = "minutes",alignPeriod = 5, k = 1, makeReturns = TRUE)
-  
   expect_equal(as.numeric(rcovSub_makeReturns) , c(0.0005881636, 0.0004307105,0.0004307105, 0.0005710761))
-  
   # Correct handling of fractional minute specification.
   rcovSub <- rAVGCov(rData = cbind(lltc, sbux, fill = 0), alignBy = "minutes",alignPeriod = 2.5, k = 0.5, makeReturns = FALSE)
   expect_equal(as.numeric(rcovSub), c(0.0005945100, 0.0003883607, 0.0003883607, 0.0006608860))
-  
-  
   # We the fast alignment is not a factor of the slow alignment period
-  expect_error(rAVGCov(rData = cbind(lltc, sbux, fill = 0), alignBy = "minutes",alignPeriod = 2.75, k = 0.5, makeReturns = FALSE))  
+  expect_error(rAVGCov(rData = cbind(lltc, sbux, fill = 0), alignBy = "minutes",alignPeriod = 2.75, k = 0.5, makeReturns = FALSE))
+  
+  
+  expect_equal(lapply(rAVGCov(returnDat), sum), list("1970-01-01" = 2.6334856, "1970-01-02" = 2.491597803, "1970-01-03" = 2.974218965))
+  expect_equal(rAVGCov(dat, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE),
+               rAVGCov(datDT, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE))
+  
+  
+  
+  
+  
   
 })
-
-
-
-
-
-
+##### rCholCov #####
 context("rCholCov")
 test_that("rCholCov", {
   
@@ -309,6 +505,7 @@ test_that("rCholCov", {
   
 })
 
+##### rSemiCov #####
 context("rSemiCov")
 test_that("rSemiCov", {
   rSC <- rSemiCov(sample5MinPrices, makeReturns = TRUE)
@@ -324,11 +521,26 @@ test_that("rSemiCov", {
   realized <- do.call(rbind, lapply(rCv, function(x) x[1,2]))
   # Test whether the realized covariance is equal to the sum of the decomposed realized semicovariances.
   expect_equal(realized , (mixed + neg + pos))
+  
+  
+  expect_equal(lapply(rSemiCov(returnDat) , function(x) sum(as.numeric(lapply(x[1:3], sum)))),  lapply(rCov(returnDat), sum))
+  expect_equal(rSemiCov(returnDat), rSemiCov(dat, makeReturns = TRUE))
+  expect_equal(rSemiCov(returnDat),  rSemiCov(returnDatDT))
+  expect_equal(rSemiCov(dat, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE),
+               rSemiCov(datDT, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE))
+  
+  expect_equal(rSemiCov(as.data.table(sample5MinPrices)[,DT := index][,!"index"], makeReturns = TRUE),
+               rSemiCov(sample5MinPrices, makeReturns = TRUE))
+  
+  
 })
 
-context("ReMeDI")
 
-test_that("ReMeDI", {
+
+
+##### ReMeDI #####
+context("ReMeDI")
+test_that("ReMeDI Estimation matches Merrick Li's code", { # We thank Merrick li for contributing Matlab code.
   # print("Make sure to implement tests for correctTime = TRUE") ## When it becomes relevant.
   #remed <- ReMeDI(sampleTDataMicroseconds, correctTime = FALSE, lags = 0:25, kn = 2) ##Changed due to correctTime bug
   remed <- ReMeDI(sampleTDataMicroseconds, lags = 0:25, kn = 2)
@@ -355,7 +567,7 @@ test_that("ReMeDI", {
 
 })
 
-test_that("ReMeDI kn choosing algorithm", {
+test_that("ReMeDI lag choosing algorithm chooses the correct values", {
 
   # optimalKn <- knChooseReMeDI(sampleTDataMicroseconds, correctTime = FALSE, jumpsIndex = NULL, knMax = 10, tol = 0.05, size = 3, lower = 1, upper = 10, plot = FALSE)##Changed due to correctTime bug
   optimalKn <- knChooseReMeDI(sampleTDataMicroseconds, knMax = 10, tol = 0.05, size = 3, lower = 1, upper = 10, plot = FALSE)
@@ -369,3 +581,23 @@ test_that("ReMeDI kn choosing algorithm", {
 
 })
 
+
+test_that("ReMeDI asymptotic variance gives same result as Merrick Li's code", {
+  dat <- sampleTData$PRICE
+  storage.mode(dat) <- "numeric"
+  dat <- log(dat)
+  avar <- ReMeDIAsymptoticVariance(dat, phi = 0.5, lags = 0:10, kn = 3, int = 1)
+  remed <- ReMeDI(dat, 3, 0:10)
+  expected <- c(4.420651e-13, 2.083090e-13, 6.915452e-14, 1.867677e-14, 5.907554e-14, 5.129904e-14,
+                 1.399077e-14, 1.433821e-14, 3.475069e-14, 2.972763e-14, 2.250913e-14)
+  expect_equal(avar$asympVar, expected)
+  ## We correctly calculate the remedi
+  expect_equal(avar$ReMeDI, remed)
+  
+  
+  avar <- ReMeDIAsymptoticVariance(dat, phi = 1, lags = 0:10, kn = 6, int = 2)  
+  expected <- c(2.637164e-12, 1.613527e-12, 1.057763e-12, 6.532975e-13, 4.462853e-13, 3.568027e-13, 2.155630e-13, 
+                2.985189e-13, 1.176854e-13, 6.341883e-14, 7.769585e-16)
+  expect_equal(avar$asympVar, expected)
+  
+})

@@ -17,6 +17,8 @@ HARmodel(
   alpha = 0.05,
   h = 1,
   transform = NULL,
+  externalRegressor = NULL,
+  periodsExternal = c(1),
   ...
 )
 }
@@ -51,6 +53,10 @@ By default RVest = c("rCov","rBPCov","rQuar"), i.e. using the Realized Volatilit
 By default, h=1, i.e. no aggregation takes place, you just model the daily realized volatility.}
 
 \item{transform}{optionally a string referring to a function that transforms both the dependent and explanatory variables in the model. By default transform=NULL, so no transformation is done. Typical other choices in this context would be "log" or "sqrt".}
+
+\item{externalRegressor}{an xts object of same number of rows as \code{data}, and one column. This is used as an external regressor. Default is NULL}
+
+\item{periodsExternal}{a vector of integers indicating over how days \code{externalRegressor} should be aggregated.}
 
 \item{...}{extra arguments for jump test.}
 }
