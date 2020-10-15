@@ -55,6 +55,10 @@ test_that("HARModel",{
   model <- HARmodel(SP500RM[, "RV"], periods = c(1,5,22), externalRegressor = xts(1:nrow(SP500RM), order.by = index(SP500RM)), periodsExternal = c(1))
   expect_true(all(model$model[,"externalRegressor"] == 22:(nrow(SP500RM)-1)))
   
+  model <- HARmodel(SP500RM$RV[1:3704]) 
+  expect_equal(predict(model), sum(coefficients(model) * tail(cbind(1, model$model[,-1]),1)))
+  
+  
   
 })
 

@@ -175,7 +175,6 @@ harInsanityFilter <- function(fittedValues, lower, upper, replacement) {
 #' plot(x)
 #' predict(x)
 #'
-#' @importFrom sandwich NeweyWest
 #' @import RcppArmadillo
 #' @export
 HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), periodsQ = c(1),
@@ -319,7 +318,6 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
   
   
   
-  ###############################
   # Estimate the model parameters, according to type of model :
   # First model type: traditional HAR-RV:
   if (type == "HARRV") {
@@ -351,6 +349,7 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
     }
     x <- cbind(x, rmin)
     model <- estimhar(y = y, x = x, externalRegressor = externalRegressor)
+    model$fitted.values <- harInsanityFilter(fittedValues = model$fitted.values, lower = min(RM1), upper = max(RM1), replacement = mean(RM1))
     if(!is.null(externalRegressor)){
       type <- paste0(type, "-X")
     }
@@ -396,6 +395,7 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
     model$RVest <- RVest
     model$jumpTest <- jumpTest
     model$alpha_jumps <- alpha
+    model$fitted.values <- harInsanityFilter(fittedValues = model$fitted.values, lower = min(RM1), upper = max(RM1), replacement = mean(RM1))
     if(!is.null(externalRegressor)){
       type <- paste0(type, "-X")
     }
@@ -491,7 +491,7 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
   model$dates <- alldates[(maxp+h):n]
   model$type <- type
   
-  model$NeweyWestSE <- sandwich::NeweyWest(model)
+  
   model$transform <- transform
   model$inputType <- inputType
   model$h <- h
@@ -554,24 +554,24 @@ predict.harModel <- function(object, newdata = NULL, warnings = TRUE, ...) {
 
   if (is.null(newdata)) {
     if (is.null(object$transform) ) {
-      return(as.numeric(c(1, xts::last(object$model$x))  %*%  object$coefficients))
+      return(as.numeric(as.numeric(c(1, xts::last(object$model[,-1])))  %*%  object$coefficients))
     }
     if (object$transform == "log") {
       if (warnings) {
         warning("Due to log-transform, forecast of RV is derived under assumption of log-normality.")
       }
-      return(as.numeric(exp(c(1, xts::last(object$model$x))  %*%  object$coefficients + 1/2 * var(object$residuals))))
+      return(as.numeric(exp(as.numeric(c(1, xts::last(object$model[,-1])))  %*%  object$coefficients + 1/2 * var(object$residuals))))
     }
     if (object$transform == "sqrt") {
       if (warnings) {
         warning("Forecast for sqrt(RV) due to transform == \"sqrt\".")
       }
-      return(as.numeric(c(1, xts::last(object$model$x))  %*%  object$coefficients))
+      return(as.numeric(as.numeric(c(1, xts::last(object$model[,-1])))  %*%  object$coefficients))
     }
   }
 
   # Check whether newdata is in right format
-  if (sum(colnames(newdata) == colnames(object$model$x)) == length(colnames(object$model$x))) {
+  if (sum(colnames(newdata) == colnames(object$model[,-1])) == length(colnames(object$model[,-1]))) {
     if (is.null(object$transform)) {
       return(as.numeric(cbind(1, newdata)  %*%  object$coefficients))
     }
@@ -882,6 +882,7 @@ print.harModel <- function(x, digits = max(3, getOption("digits") - 3), ...){
       "\n\n", sep = "")
 
   coefs <- coef(x);
+  x$NeweyWestSE <- sandwich::NeweyWest(x)
   NeweyWestSE <- x$NeweyWestSE
   names(coefs) <- c("beta0",betas)
   colnames(NeweyWestSE) <- rownames(NeweyWestSE) <- c("beta0",betas)
@@ -902,6 +903,7 @@ print.harModel <- function(x, digits = max(3, getOption("digits") - 3), ...){
 }
 
 #' @importFrom stats summary.lm
+#' @importFrom sandwich NeweyWest
 #' @export
 summary.harModel <- function(object, correlation = FALSE, symbolic.cor = FALSE, ...){
   x <- object
