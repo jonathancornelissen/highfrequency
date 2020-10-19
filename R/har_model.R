@@ -906,9 +906,11 @@ print.harModel <- function(x, digits = max(3, getOption("digits") - 3), ...){
 #' @importFrom sandwich NeweyWest
 #' @export
 summary.harModel <- function(object, correlation = FALSE, symbolic.cor = FALSE, ...){
-  x <- object
-  dd <- summary.lm(x)
-  formula <- getHarmodelformula(x)
+  dd <- summary.lm(object)
+  dd$coefficients[,"Std. Error"] <- sqrt(diag(NeweyWest(object, lag = 22)))
+  dd$coefficients[,"t value"] <- dd$coefficients[,"Estimate"] / dd$coefficients[,"Std. Error"]
+  dd$coefficients[,"Pr(>|t|)"] <- 2 * pt(abs(dd$coefficients[, "t value"]), object$df.residual, lower.tail = FALSE)
+  formula <- getHarmodelformula(object)
   modeldescription <- formula[[1]]
   betas <- formula[[2]]
   dd$call <- modeldescription
