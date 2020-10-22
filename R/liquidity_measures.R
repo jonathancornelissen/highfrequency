@@ -315,8 +315,7 @@ getLiquidityMeasures <- function(tqData, win = 300, type = NULL) {
 #' 
 #' @param tqData data.table or xts object, containing joined trades and quotes (e.g. using \code{\link{matchTradesQuotes}})
 #' 
-#' @details NOTE: The value of the first (and second) observation of the output should be ignored if price == midpoint
-#' for the first (second) observation.
+#' @details NOTE: By convention the first observation is always marked as a buy.
 #' 
 #' @return A vector which has values 1 or (-1) if the inferred trade direction
 #' is buy or sell respectively.
@@ -334,21 +333,18 @@ getLiquidityMeasures <- function(tqData, win = 300, type = NULL) {
 #' @keywords liquidity
 #' @export
 getTradeDirection <- function(tqData) {
-  
-  BID = OFR = PRICE = NULL
+  BID <- OFR <- PRICE <- NULL
   
   tqData <- checkColumnNames(tqData)
   checktData(tqData)
   checkqData(tqData)
 
-  wasXts <- FALSE
   if (!is.data.table(tqData)) {
     if (is.xts(tqData)) {
       tqData <- setnames(as.data.table(tqData), old = "index", new = "DT")
       tqData[, BID := as.numeric(as.character(BID))]
       tqData[, PRICE := as.numeric(as.character(PRICE))]
       tqData[, OFR := as.numeric(as.character(OFR))]
-      wasXts <- TRUE
     } else {
       stop("Input has to be data.table or xts.")
     }
@@ -365,38 +361,52 @@ getTradeDirection <- function(tqData) {
   offer <- tqData[, OFR]
   midpoints <- (bid + offer)/2
   price <- tqData[, PRICE]
-  
-  buy1 <- price > midpoints           # definitely a buy
+
   equal <- price == midpoints
+  rets <- diff(price)
+  buys <- nafill(c(TRUE, fifelse(test = rets > 0, yes = TRUE, no = fifelse(test = rets < 0, FALSE, NA))) * 2 -1, "locf")
+  buys <- fifelse(price < midpoints, -1, fifelse(price > midpoints, 1, buys))
+  return(buys)
   
-  ## for trades=midpoints: if uptick=>buy (ie p_t - p_{t-1} > 0)
-  dif1 <- c(TRUE, 0 < price[2:length(price)] - price[1:(length(price)-1)])
-  ## for trades=midpoints: zero-uptick=>buy
-  equal1 <- c(TRUE, 0 == price[2:length(price)] - price[1:(length(price)-1)])
-  dif2 <- c(TRUE, TRUE, 0 < price[3:length(price)] - price[1:(length(price)-2)])
-  
-  buy <- buy1 | (dif1 & equal) | (equal1 & dif2 & equal)
-  
-  buy[buy == TRUE] <- 1                 # 2*as.integer(buy) - 1   does the same
-  buy[buy == FALSE] <- -1
-  
-  
-  ## The tick rule is the most commonly used level-1 algorithm. This
-  ## rule is rather simple and classifies a trade as buyer-initiated if the
-  ## trade price is above the preceding trade price (an uptick trade) and
-  ## as seller-initiated if the trade price is below the preceding trade
-  ## price (a downtick trade). If the trade price is the same as the
-  ## previous trade price (a zero-tick trade), the rule looks for the
-  ## closest prior price that differs from the current trade price.
-  ## Zero-uptick trades are classified as buys, and zero-downtick trades
-  ## are classified as sells.
-  ##
-  ## -- Chakrabarty, Pascual and Shkilko (2013), "Trade
-  ##    Classification Algorithms: A Horse Race between then
-  ##    Builk-based and Tick-based Rules"
-  ##
-  ##    http://dee.uib.es/digitalAssets/234/234006_Pascual.pdf
-  
-  return(buy)
+  # ## for trades=midpoints: if uptick=>buy (ie p_t - p_{t-1} > 0)
+  # dif1 <- c(TRUE, 0 < price[2:length(price)] - price[1:(length(price)-1)])
+  # ## for trades=midpoints: zero-uptick=>buy
+  # equal1 <- c(TRUE, 0 == price[2:length(price)] - price[1:(length(price)-1)])
+  # dif2 <- c(TRUE, TRUE, 0 < price[3:length(price)] - price[1:(length(price)-2)])
+  # 
+  # 
+  # 
+  # 
+  # buy <- buy1 | (dif1 & equal) | (equal1 & dif2 & equal)
+  # 
+  # buy[buy == TRUE] <- 1                 # 2*as.integer(buy) - 1   does the same
+  # buy[buy == FALSE] <- -1
+  # 
+  # 
+  # ## The tick rule is the most commonly used level-1 algorithm. This
+  # ## rule is rather simple and classifies a trade as buyer-initiated if the
+  # ## trade price is above the preceding trade price (an uptick trade) and
+  # ## as seller-initiated if the trade price is below the preceding trade
+  # ## price (a downtick trade). If the trade price is the same as the
+  # ## previous trade price (a zero-tick trade), the rule looks for the
+  # ## closest prior price that differs from the current trade price.
+  # ## Zero-uptick trades are classified as buys, and zero-downtick trades
+  # ## are classified as sells.
+  # ##
+  # ## -- Chakrabarty, Pascual and Shkilko (2013), "Trade
+  # ##    Classification Algorithms: A Horse Race between then
+  # ##    Builk-based and Tick-based Rules"
+  # ##
+  # ##    http://dee.uib.es/digitalAssets/234/234006_Pascual.pdf
+  # 
+  # browser()
+  # return(buy)
+
+  # price <- tqData[, PRICE]
+  # rets <- diff(price)
+  # c(TRUE, fifelse(test = rets > 0, yes = TRUE, no = fifelse(test = rets < 0, FALSE, NA))) * 2 -1
+  # 
+  # 
+  # return(nafill(c(TRUE, fifelse(test = rets > 0, yes = TRUE, no = fifelse(test = rets < 0, FALSE, NA))) * 2 -1 , type = "locf"))
 }
 

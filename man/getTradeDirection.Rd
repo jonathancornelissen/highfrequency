@@ -18,8 +18,7 @@ Function returns a vector with the inferred trade direction which is
 determined using the Lee and Ready algorithm (Lee and Ready, 1991).
 }
 \details{
-NOTE: The value of the first (and second) observation of the output should be ignored if price == midpoint
-for the first (second) observation.
+NOTE: By convention the first observation is always marked as a buy.
 }
 \examples{
 # generate matched trades and quote data set
