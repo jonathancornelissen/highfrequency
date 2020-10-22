@@ -359,7 +359,13 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
   if (type == "HARRVCJ") {
     # Are the jumps significant? if not set to zero:
     if (jumpTest == "ABDJumptest" ) {
-      TQ <- apply.daily(data, RTQ)
+      
+      if(inputType != "RM"){
+        TQ <- apply.daily(data, RTQ) 
+      } else {
+        TQ <- RM3
+      }
+      
       J <- J[,1]
       teststats <- ABDJumptest(RV=RM1,BPV=RM2,TQ=TQ )
     } else {
@@ -496,7 +502,7 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
   model$inputType <- inputType
   model$h <- h
   model$leverage <- leverage
-  class(model) <- c("harModel","lm")
+  class(model) <- c("HARmodel", "lm")
   return (model)
 }
 
@@ -505,7 +511,7 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
 #' @importFrom stats residuals
 #' @importFrom xts addLegend
 #' @export
-plot.harModel <- function(x, which = c(1L:3L, 5L), caption = list("Residuals vs Fitted",
+plot.HARmodel <- function(x, which = c(1L:3L, 5L), caption = list("Residuals vs Fitted",
                                                                   "Normal Q-Q", "Scale-Location", "Cook's distance", "Residuals vs Leverage",
                                                                   expression("Cook's dist vs Leverage  " * h[ii]/(1 - h[ii]))),
                           panel = if (add.smooth) panel.smooth else points, sub.caption = NULL,
@@ -541,7 +547,7 @@ plot.harModel <- function(x, which = c(1L:3L, 5L), caption = list("Residuals vs 
 
 #' @importFrom stats var
 #' @export
-predict.harModel <- function(object, newdata = NULL, warnings = TRUE, ...) {
+predict.HARmodel <- function(object, newdata = NULL, warnings = TRUE, ...) {
   # If no new data is provided - just forecast on the last day of your estimation sample
   # If new data with colnames as in object$model$x is provided, i.e. right measures for that model, just use that data
   ##### These 4 lines are added to make adding new models (hopefully) easier
@@ -875,7 +881,7 @@ predict.harModel <- function(object, newdata = NULL, warnings = TRUE, ...) {
 #' @importFrom stats coef
 #' @importFrom sandwich NeweyWest
 #' @export
-print.harModel <- function(x, digits = max(3, getOption("digits") - 3), ...){
+print.HARmodel <- function(x, digits = max(3, getOption("digits") - 3), ...){
   formula <- getHarmodelformula(x); modeldescription = formula[[1]]; betas = formula[[2]];
 
   cat("\nModel:\n", paste(modeldescription, sep = "\n", collapse = "\n"),
@@ -905,7 +911,7 @@ print.harModel <- function(x, digits = max(3, getOption("digits") - 3), ...){
 #' @importFrom stats summary.lm
 #' @importFrom sandwich NeweyWest
 #' @export
-summary.harModel <- function(object, correlation = FALSE, symbolic.cor = FALSE, ...){
+summary.HARmodel <- function(object, correlation = FALSE, symbolic.cor = FALSE, ...){
   dd <- summary.lm(object)
   dd$coefficients[,"Std. Error"] <- sqrt(diag(NeweyWest(object, lag = 22)))
   dd$coefficients[,"t value"] <- dd$coefficients[,"Estimate"] / dd$coefficients[,"Std. Error"]
