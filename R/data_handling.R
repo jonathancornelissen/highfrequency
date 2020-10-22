@@ -1484,7 +1484,7 @@ noZeroQuotes <- function(qData) {
 #' @importFrom data.table fread
 #' @keywords cleaning
 #' @export
-quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, qDataRaw = NULL, report = TRUE, 
+quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges = NULL, qDataRaw = NULL, report = TRUE, 
                           selection = "median", maxi = 50, window = 50, type = "advanced", rmoutliersmaxi = 10, saveAsXTS = TRUE, tz = "EST") {
   
   BID <- OFR <- DT <- SPREAD <- SPREAD_MEDIAN <- EX <- DATE <- BIDSIZ <- OFRSIZ <- TIME_M <- SYMBOL <- NULL
@@ -1922,7 +1922,7 @@ tradesCondition <- function(tData, validConds = c('', '@', 'E', '@E', 'F', 'FI',
     }
   } 
   
-  tData <- tData[COND %in% validConds]
+  tData <- tData[trimws(COND) %in% validConds]
   
   if (inputWasXts) {
     return(xts(as.matrix(tData), order.by = tData$DT))
@@ -2325,6 +2325,9 @@ refreshTime <- function (pData, sort = FALSE, criterion = "squared duration") {
   } else { 
     if(any(as.logical(lapply(pData, function(x) length(unique(floor(as.numeric(x$DT)/ 86400))) > 1)))){
       stop("All the series in pData must contain data for a single day")
+    }
+    if(!all(sapply(pData, function(x) c("DT", "PRICE") %in% colnames(x)))){
+      stop("DT and PRICE must be present in the data")
     }
   }
   if((sort && is.null(names(pData)))){
