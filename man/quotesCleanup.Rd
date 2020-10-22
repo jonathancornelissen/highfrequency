@@ -7,7 +7,7 @@
 quotesCleanup(
   dataSource = NULL,
   dataDestination = NULL,
-  exchanges,
+  exchanges = NULL,
   qDataRaw = NULL,
   report = TRUE,
   selection = "median",
