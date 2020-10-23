@@ -1077,7 +1077,7 @@ rBPCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeR
 #' @keywords volatility
 #' @export
 rCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE) {
-  DT <- NULL
+  
   ## xts case multiday case:
   # Multiday adjustment: 
   if (is.xts(rData) && checkMultiDays(rData)) { 
@@ -1095,24 +1095,25 @@ rCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeRet
     }    
     return(result)
   } else if (is.data.table(rData)){
-
+    DT <- .N <- NULL
     if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
     }
     setcolorder(rData, "DT")
-    dates <- as.character(unique(as.Date(rData$DT)))
-    res <- vector(mode = "list", length = length(dates))
-    names(res) <- dates
-    for (date in dates) {
-      res[[date]] <- rCov(as.matrix(rData[as.Date(DT) == date][, !"DT"]), cor = cor, makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL) ## aligning is done above.
+    
+    dates <- rData[, list(end = .N), by = list(DATE = as.Date(DT))][, `:=`(end = cumsum(end), DATE = as.character(DATE))][, start := shift(end, fill = 0) + 1]
+    
+    res <- vector(mode = "list", length = nrow(dates))
+    names(res) <- as.character(dates$DATE)
+    starts <- dates$start
+    ends <- dates$end
+    dates <- dates$DATE
+    for (i in 1:length(dates)) {
+      res[[dates[i]]] <- rCov(as.matrix(rData[starts[i]:ends[i], !"DT"]), cor = cor, makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
     }
+    
     if(length(res[[1]]) == 1){ ## Univariate case
       res <- data.table(DT = names(res), RV = as.numeric(res))
-    } else {
-      
-      for (date in dates) {
-        colnames(res[[date]]) <- rownames(res[[date]]) <- colnames(rData[,!"DT"])
-      }
     } 
     
     return(res)
