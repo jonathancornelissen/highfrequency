@@ -61,17 +61,30 @@ medRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
     result <- apply.daily(rData, medRQ, alignBy, alignPeriod, makeReturns) 
     return(result)
   } else if (is.data.table(rData)){ 
-    DT <- NULL  
+    DT <- NULL
+    setcolorder(rData, "DT")
     if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
     }
-    setcolorder(rData, "DT")
-    dates <- as.character(unique(as.Date(rData$DT)))
-    res <- vector(mode = "list", length = length(dates))
-    names(res) <- dates
-    for (date in dates) {
-      res[[date]] <- medRQ(as.matrix(rData[as.Date(DT) == date][, !"DT"]), makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL) ## aligning is done above.
+    # dates <- as.character(unique(as.Date(rData$DT)))
+    # res <- vector(mode = "list", length = length(dates))
+    # names(res) <- dates
+    # for (date in dates) {
+    #   res[[date]] <- medRQ(as.matrix(rData[as.Date(DT) == date][, !"DT"]), makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL) ## aligning is done above.
+    # }
+    
+    setkey(rData, "DT")
+    dates <- rData[, list(end = .N), by = list(DATE = as.Date(DT))][, `:=`(end = cumsum(end), DATE = as.character(DATE))][, start := shift(end, fill = 0) + 1]
+    res <- vector(mode = "list", length = nrow(dates))
+    names(res) <- as.character(dates$DATE)
+    starts <- dates$start
+    ends <- dates$end
+    dates <- dates$DATE
+    for (i in 1:length(dates)) {
+      res[[dates[i]]] <- medRQ(as.matrix(rData[starts[i]:ends[i], !"DT"]), makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
     }
+    
+    
     res <- setDT(transpose(res))[, DT := dates]
     setcolorder(res, "DT")
     colnames(res) <- colnames(rData)
@@ -130,15 +143,19 @@ minRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
     return(result)
   } else if (is.data.table(rData)){ 
     DT <- NULL  
+    setcolorder(rData, "DT")
     if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
     }
-    setcolorder(rData, "DT")
-    dates <- as.character(unique(as.Date(rData$DT)))
-    res <- vector(mode = "list", length = length(dates))
-    names(res) <- dates
-    for (date in dates) {
-      res[[date]] <- minRQ(as.matrix(rData[as.Date(DT) == date][, !"DT"]), makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL) ## aligning is done above.
+    setkey(rData, "DT")
+    dates <- rData[, list(end = .N), by = list(DATE = as.Date(DT))][, `:=`(end = cumsum(end), DATE = as.character(DATE))][, start := shift(end, fill = 0) + 1]
+    res <- vector(mode = "list", length = nrow(dates))
+    names(res) <- as.character(dates$DATE)
+    starts <- dates$start
+    ends <- dates$end
+    dates <- dates$DATE
+    for (i in 1:length(dates)) {
+      res[[dates[i]]] <- minRQ(as.matrix(rData[starts[i]:ends[i], !"DT"]), makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
     }
     res <- setDT(transpose(res))[, DT := dates]
     setcolorder(res, "DT")
@@ -200,15 +217,19 @@ minRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
     
   } else if (is.data.table(rData)){ 
     DT <- NULL  
+    setcolorder(rData, "DT")
     if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
     }
-    setcolorder(rData, "DT")
-    dates <- as.character(unique(as.Date(rData$DT)))
-    res <- vector(mode = "list", length = length(dates))
-    names(res) <- dates
-    for (date in dates) {
-      res[[date]] <- minRV(as.matrix(rData[as.Date(DT) == date][, !"DT"]), makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL) ## aligning is done above.
+    setkey(rData, "DT")
+    dates <- rData[, list(end = .N), by = list(DATE = as.Date(DT))][, `:=`(end = cumsum(end), DATE = as.character(DATE))][, start := shift(end, fill = 0) + 1]
+    res <- vector(mode = "list", length = nrow(dates))
+    names(res) <- as.character(dates$DATE)
+    starts <- dates$start
+    ends <- dates$end
+    dates <- dates$DATE
+    for (i in 1:length(dates)) {
+      res[[dates[i]]] <- minRV(as.matrix(rData[starts[i]:ends[i], !"DT"]), makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
     }
     res <- setDT(transpose(res))[, DT := dates]
     setcolorder(res, "DT")
@@ -521,21 +542,21 @@ rAVGCov <- function(rData, cor = FALSE, alignBy = "minutes", alignPeriod = 5, k 
     }    
     return(result)
   } else if (is.data.table(rData)){
-    
-    setcolorder(rData, "DT")
-    dates <- as.character(unique(as.Date(rData$DT)))
-    res <- vector(mode = "list", length = length(dates))
-    names(res) <- dates
-    for (date in dates) {
-      res[[date]] <- rAVGCov(as.matrix(rData[as.Date(DT) == date, lapply(.SD, as.numeric), .SDcols = colnames(rData)]), cor = cor, makeReturns = makeReturns, alignBy = alignBy, alignPeriod = alignPeriod, k = k)
+    .N <- NULL
+    setkey(rData, "DT")
+    dates <- rData[, list(end = .N), by = list(DATE = as.Date(DT))][, `:=`(end = cumsum(end), DATE = as.character(DATE))][, start := shift(end, fill = 0) + 1]
+    res <- vector(mode = "list", length = nrow(dates))
+    names(res) <- as.character(dates$DATE)
+    starts <- dates$start
+    ends <- dates$end
+    dates <- dates$DATE
+    for (i in 1:length(dates)) {
+      res[[dates[i]]] <- rAVGCov(as.matrix(rData[starts[i]:ends[i], lapply(.SD, as.numeric), .SDcols = colnames(rData)]), cor = cor, makeReturns = makeReturns, alignBy = alignBy, alignPeriod = alignPeriod, k = k)
     }
+    
+
     if(length(res[[1]]) == 1){ ## Univariate case
       res <- data.table(DT = names(res), rAVGCov = as.numeric(res))
-    } else {
-      
-      for (date in dates) {
-        colnames(res[[date]]) <- rownames(res[[date]]) <- colnames(rData[,!"DT"])
-      }
     } 
     
     return(res)
@@ -959,21 +980,21 @@ rBPCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeR
     if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
     }
-    setcolorder(rData, "DT")
-    dates <- as.character(unique(as.Date(rData$DT)))
-    res <- vector(mode = "list", length = length(dates))
-    names(res) <- dates
-    for (date in dates) {
-      res[[date]] <- rBPCov(as.matrix(rData[as.Date(DT) == date,][, !"DT"]), cor = cor, makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL) ## aligning is done above.
+    setkey(rData, "DT")
+    dates <- rData[, list(end = .N), by = list(DATE = as.Date(DT))][, `:=`(end = cumsum(end), DATE = as.character(DATE))][, start := shift(end, fill = 0) + 1]
+    res <- vector(mode = "list", length = nrow(dates))
+    names(res) <- as.character(dates$DATE)
+    starts <- dates$start
+    ends <- dates$end
+    dates <- dates$DATE
+    for (i in 1:length(dates)) {
+      res[[dates[i]]] <- rBPCov(as.matrix(rData[starts[i]:ends[i], !"DT"]), cor = cor, makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
     }
+    
     if(ncol(rData) == 2){ ## Univariate case
       res <- data.table(DT = names(res), BPV = as.numeric(res))
-    } else {
-      
-      for (date in dates) {
-        colnames(res[[date]]) <- rownames(res[[date]]) <- colnames(rData[,!"DT"])
-      }
     } 
+     
     
     return(res)
     
@@ -1099,10 +1120,8 @@ rCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeRet
     if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
     }
-    setcolorder(rData, "DT")
-    
+    setkey(rData, "DT")
     dates <- rData[, list(end = .N), by = list(DATE = as.Date(DT))][, `:=`(end = cumsum(end), DATE = as.character(DATE))][, start := shift(end, fill = 0) + 1]
-    
     res <- vector(mode = "list", length = nrow(dates))
     names(res) <- as.character(dates$DATE)
     starts <- dates$start
@@ -1317,20 +1336,20 @@ rKernelCov <- function(rData, cor = FALSE,  alignBy = "seconds", alignPeriod = 1
       rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
     }
     setcolorder(rData, "DT")
-    dates <- as.character(unique(as.Date(rData$DT)))
-    res <- vector(mode = "list", length = length(dates))
-    names(res) <- dates
-    for (date in dates) {
-      res[[date]] <- rKernelCov(as.matrix(rData[as.Date(DT) == date, !"DT"]), cor = cor, alignBy = NULL, alignPeriod = NULL, makeReturns = makeReturns,
-                                kernelType = kernelType, kernelParam = kernelParam, kernelDOFadj = kernelDOFadj) ## aligning is done above.
+    setkey(rData, "DT")
+    dates <- rData[, list(end = .N), by = list(DATE = as.Date(DT))][, `:=`(end = cumsum(end), DATE = as.character(DATE))][, start := shift(end, fill = 0) + 1]
+    res <- vector(mode = "list", length = nrow(dates))
+    names(res) <- as.character(dates$DATE)
+    starts <- dates$start
+    ends <- dates$end
+    dates <- dates$DATE
+    for (i in 1:length(dates)) {
+      res[[dates[i]]] <- rKernelCov(as.matrix(rData[starts[i]:ends[i], !"DT"]), cor = cor, alignBy = NULL, alignPeriod = NULL, makeReturns = makeReturns,
+                              kernelType = kernelType, kernelParam = kernelParam, kernelDOFadj = kernelDOFadj)
     }
+
     if(ncol(rData) == 2){ ## Univariate case
       res <- data.table(DT = names(res), RK = as.numeric(res))
-    } else {
-      
-      for (date in dates) {
-        colnames(res[[date]]) <- rownames(res[[date]]) <- colnames(rData[,!"DT"])
-      }
     } 
     
     return(res)
@@ -1435,15 +1454,21 @@ rKurt <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
     return(result)
   } else if (is.data.table(rData)){
     DT <- NULL
+    setcolorder(rData, "DT")
     if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
     }
-    setcolorder(rData, "DT")
-    dates <- as.character(unique(as.Date(rData$DT)))
-    res <- vector(mode = "list", length = length(dates))
-    names(res) <- dates
-    for (date in dates) {
-      res[[date]] <- rKurt(as.matrix(rData[as.Date(DT) == date][, !"DT"]), makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL) ## aligning is done above.
+    
+    setkey(rData, DT)
+    dates <- rData[, list(end = .N), by = list(DATE = as.Date(DT))][, `:=`(end = cumsum(end), DATE = as.character(DATE))][, start := shift(end, fill = 0) + 1]
+    res <- vector(mode = "list", length = nrow(dates))
+    names(res) <- as.character(dates$DATE)
+    starts <- dates$start
+    ends <- dates$end
+    dates <- dates$DATE
+    
+    for (i in 1:length(dates)) {
+      res[[dates[i]]] <- rKurt(as.matrix(rData[starts[i]:ends[i], !"DT"]), makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
     }
     
     res <- setDT(transpose(res))[, DT := dates]
@@ -1454,8 +1479,7 @@ rKurt <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
       colnames(res) <- colnames(rData)
     }
     
-    setkey(res, "DT")
-    
+    setkey(res, DT)
     return(res)
   } else {
     if ((!is.null(alignBy)) && (!is.null(alignPeriod))) {
@@ -1528,12 +1552,15 @@ rMPV <- function(rData, m = 2, p = 2, alignBy = NULL, alignPeriod = NULL, makeRe
     if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
     }
-    setcolorder(rData, "DT")
-    dates <- as.character(unique(as.Date(rData$DT)))
-    res <- vector(mode = "list", length = length(dates))
-    names(res) <- dates
-    for (date in dates) {
-      res[[date]] <- rMPV(as.matrix(rData[as.Date(DT) == date][, !"DT"]), m = m, p = p, makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL) ## aligning is done above.
+    setkey(rData, "DT")
+    dates <- rData[, list(end = .N), by = list(DATE = as.Date(DT))][, `:=`(end = cumsum(end), DATE = as.character(DATE))][, start := shift(end, fill = 0) + 1]
+    res <- vector(mode = "list", length = nrow(dates))
+    names(res) <- as.character(dates$DATE)
+    starts <- dates$start
+    ends <- dates$end
+    dates <- dates$DATE
+    for (i in 1:length(dates)) {
+      res[[dates[i]]] <- rMPV(as.matrix(rData[starts[i]:ends[i], !"DT"]), m = m, p = p, makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
     }
     res <- setDT(transpose(res))[, DT := dates]
     setcolorder(res, "DT")
@@ -1777,12 +1804,16 @@ rSkew <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
     if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
     }
+    setkey(rData, "DT")
     setcolorder(rData, "DT")
-    dates <- as.character(unique(as.Date(rData$DT)))
-    res <- vector(mode = "list", length = length(dates))
-    names(res) <- dates
-    for (date in dates) {
-      res[[date]] <- rSkew(as.matrix(rData[as.Date(DT) == date][, !"DT"]), makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL) ## aligning is done above.
+    dates <- rData[, list(end = .N), by = list(DATE = as.Date(DT))][, `:=`(end = cumsum(end), DATE = as.character(DATE))][, start := shift(end, fill = 0) + 1]
+    res <- vector(mode = "list", length = nrow(dates))
+    names(res) <- as.character(dates$DATE)
+    starts <- dates$start
+    ends <- dates$end
+    dates <- dates$DATE
+    for (i in 1:length(dates)) {
+      res[[dates[i]]] <- rSkew(as.matrix(rData[starts[i]:ends[i], !"DT"]), makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
     }
     
     res <- setDT(transpose(res))[, DT := dates]
@@ -1865,11 +1896,15 @@ rSV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, 
     if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
     }
-    dates <- as.character(unique(as.Date(rData$DT)))
-    res <- vector(mode = "list", length = length(dates))
-    names(res) <- dates
-    for (date in dates) {
-      res[[date]] <- rSV(as.matrix(rData[as.Date(DT) == date][, !"DT"]), makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL) ## aligning is done above.
+    setkey(rData, "DT")
+    dates <- rData[, list(end = .N), by = list(DATE = as.Date(DT))][, `:=`(end = cumsum(end), DATE = as.character(DATE))][, start := shift(end, fill = 0) + 1]
+    res <- vector(mode = "list", length = nrow(dates))
+    names(res) <- as.character(dates$DATE)
+    starts <- dates$start
+    ends <- dates$end
+    dates <- dates$DATE
+    for (i in 1:length(dates)) {
+      res[[dates[i]]] <- rSV(as.matrix(rData[starts[i]:ends[i], !"DT"]), makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
     }
     # res <- setDT(transpose(res))[, DT := dates]
     # setcolorder(res, "DT")
@@ -1878,8 +1913,9 @@ rSV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, 
     # } else {
     #   colnames(res) <- colnames(rData)
     # }
-    
-    #setkey(res, "DT")
+    # 
+    # setkey(res, "DT")
+    # setcolorder(res, "DT")
     return(res)
     
   } else {
@@ -1967,21 +2003,21 @@ rThresholdCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL
     if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
     }
-    setcolorder(rData, "DT")
-    dates <- as.character(unique(as.Date(rData$DT)))
-    res <- vector(mode = "list", length = length(dates))
-    names(res) <- dates
-    for (date in dates) {
-      res[[date]] <- rThresholdCov(as.matrix(rData[as.Date(DT) == date][, !"DT"]), cor = cor, makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL) ## aligning is done above.
+      
+    setkey(rData, "DT")
+    dates <- rData[, list(end = .N), by = list(DATE = as.Date(DT))][, `:=`(end = cumsum(end), DATE = as.character(DATE))][, start := shift(end, fill = 0) + 1]
+    res <- vector(mode = "list", length = nrow(dates))
+    names(res) <- as.character(dates$DATE)
+    starts <- dates$start
+    ends <- dates$end
+    dates <- dates$DATE
+    for (i in 1:length(dates)) {
+      res[[dates[i]]] <- rThresholdCov(as.matrix(rData[starts[i]:ends[i], !"DT"]), cor = cor, makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
     }
     
     if(length(res[[1]]) == 1){ ## Univariate case
       res <- data.table(DT = names(res), ThresholdCov = as.numeric(res))
-    } else {
-      for (date in dates) {
-        colnames(res[[date]]) <- rownames(res[[date]]) <- colnames(rData[,!"DT"])
-      }
-    } 
+    }
     
     return(res)
     
@@ -2246,12 +2282,15 @@ rTPVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
     if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
     }
-    setcolorder(rData, "DT")
-    dates <- as.character(unique(as.Date(rData$DT)))
-    res <- vector(mode = "list", length = length(dates))
-    names(res) <- dates
-    for (date in dates) {
-      res[[date]] <- rTPVar(as.matrix(rData[as.Date(DT) == date][, !"DT"]), makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL) ## aligning is done above.
+    setkey(rData, "DT")
+    dates <- rData[, list(end = .N), by = list(DATE = as.Date(DT))][, `:=`(end = cumsum(end), DATE = as.character(DATE))][, start := shift(end, fill = 0) + 1]
+    res <- vector(mode = "list", length = nrow(dates))
+    names(res) <- as.character(dates$DATE)
+    starts <- dates$start
+    ends <- dates$end
+    dates <- dates$DATE
+    for (i in 1:length(dates)) {
+      res[[dates[i]]] <- rTPVar(as.matrix(rData[starts[i]:ends[i], !"DT"]), makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
     }
     res <- setDT(transpose(res))[, DT := dates]
     setcolorder(res, "DT")
@@ -2327,12 +2366,15 @@ rQPVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
     if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
     }
-    setcolorder(rData, "DT")
-    dates <- as.character(unique(as.Date(rData$DT)))
-    res <- vector(mode = "list", length = length(dates))
-    names(res) <- dates
-    for (date in dates) {
-      res[[date]] <- rQPVar(as.matrix(rData[as.Date(DT) == date][, !"DT"]), makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL) ## aligning is done above.
+    setkey(rData, "DT")
+    dates <- rData[, list(end = .N), by = list(DATE = as.Date(DT))][, `:=`(end = cumsum(end), DATE = as.character(DATE))][, start := shift(end, fill = 0) + 1]
+    res <- vector(mode = "list", length = nrow(dates))
+    names(res) <- as.character(dates$DATE)
+    starts <- dates$start
+    ends <- dates$end
+    dates <- dates$DATE
+    for (i in 1:length(dates)) {
+      res[[dates[i]]] <- rQPVar(as.matrix(rData[starts[i]:ends[i], !"DT"]), makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
     }
     res <- setDT(transpose(res))[, DT := dates]
     setcolorder(res, "DT")
@@ -2388,16 +2430,19 @@ rQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
     result <- apply.daily(rData, rQuar, alignBy, alignPeriod, makeReturns)
     return(result)
   }  else if (is.data.table(rData)){ 
-    DT <- NULL  
+    .N <- DT <- NULL  
     if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
     }
-    setcolorder(rData, "DT")
-    dates <- as.character(unique(as.Date(rData$DT)))
-    res <- vector(mode = "list", length = length(dates))
-    names(res) <- dates
-    for (date in dates) {
-      res[[date]] <- rQuar(as.matrix(rData[as.Date(DT) == date][, !"DT"]), makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL) ## aligning is done above.
+    setkey(rData, "DT")
+    dates <- rData[, list(end = .N), by = list(DATE = as.Date(DT))][, `:=`(end = cumsum(end), DATE = as.character(DATE))][, start := shift(end, fill = 0) + 1]
+    res <- vector(mode = "list", length = nrow(dates))
+    names(res) <- as.character(dates$DATE)
+    starts <- dates$start
+    ends <- dates$end
+    dates <- dates$DATE
+    for (i in 1:length(dates)) {
+      res[[dates[i]]] <- rQuar(as.matrix(rData[starts[i]:ends[i], !"DT"]), makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
     }
     res <- setDT(transpose(res))[, DT := dates]
     setcolorder(res, "DT")
@@ -2813,18 +2858,16 @@ rSemiCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, mak
     if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
     }
-    setcolorder(rData, "DT")
-    dates <- as.character(unique(as.Date(rData$DT)))
-    res <- vector(mode = "list", length = length(dates))
-    names(res) <- dates
-    for (date in dates) {
-      res[[date]] <- rSemiCov(as.matrix(rData[as.Date(DT) == date][, !"DT"]), cor = cor, makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL) ## aligning is done above.
-    }
     
-    for (i in 1:length(res)) {
-      for (j in 1:length(res[[i]])) {
-        colnames(res[[i]][[j]]) <- rownames(res[[i]][[j]]) <- colnames(rData[,!"DT"])
-      }
+    setkey(rData, "DT")
+    dates <- rData[, list(end = .N), by = list(DATE = as.Date(DT))][, `:=`(end = cumsum(end), DATE = as.character(DATE))][, start := shift(end, fill = 0) + 1]
+    res <- vector(mode = "list", length = nrow(dates))
+    names(res) <- as.character(dates$DATE)
+    starts <- dates$start
+    ends <- dates$end
+    dates <- dates$DATE
+    for (i in 1:length(dates)) {
+      res[[dates[i]]] <- rSemiCov(as.matrix(rData[starts[i]:ends[i], !"DT"]), cor = cor, makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
     }
     
     return(res)
