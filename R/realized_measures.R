@@ -61,7 +61,7 @@ medRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
     result <- apply.daily(rData, medRQ, alignBy, alignPeriod, makeReturns) 
     return(result)
   } else if (is.data.table(rData)){ 
-    DT <- NULL
+    DATE <- .N <- DT <- NULL
     setcolorder(rData, "DT")
     if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
@@ -80,8 +80,9 @@ medRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
     starts <- dates$start
     ends <- dates$end
     dates <- dates$DATE
+    dat <- as.matrix(rData[, !"DT"])
     for (i in 1:length(dates)) {
-      res[[dates[i]]] <- medRQ(as.matrix(rData[starts[i]:ends[i], !"DT"]), makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
+      res[[dates[i]]] <- medRQ(dat[starts[i]:ends[i],], makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
     }
     
     
@@ -142,7 +143,7 @@ minRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
     result <- apply.daily(rData, minRQ, alignBy, alignPeriod, makeReturns)
     return(result)
   } else if (is.data.table(rData)){ 
-    DT <- NULL  
+    DATE <- .N <- DT <- NULL
     setcolorder(rData, "DT")
     if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
@@ -154,8 +155,9 @@ minRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
     starts <- dates$start
     ends <- dates$end
     dates <- dates$DATE
+    dat <- as.matrix(rData[, !"DT"])
     for (i in 1:length(dates)) {
-      res[[dates[i]]] <- minRQ(as.matrix(rData[starts[i]:ends[i], !"DT"]), makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
+      res[[dates[i]]] <- minRQ(dat[starts[i]:ends[i], ], makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
     }
     res <- setDT(transpose(res))[, DT := dates]
     setcolorder(res, "DT")
@@ -216,7 +218,7 @@ minRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
     return(result)
     
   } else if (is.data.table(rData)){ 
-    DT <- NULL  
+    DATE <- .N <- DT <- NULL
     setcolorder(rData, "DT")
     if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
@@ -228,8 +230,9 @@ minRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
     starts <- dates$start
     ends <- dates$end
     dates <- dates$DATE
+    dat <- as.matrix(rData[, !"DT"])
     for (i in 1:length(dates)) {
-      res[[dates[i]]] <- minRV(as.matrix(rData[starts[i]:ends[i], !"DT"]), makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
+      res[[dates[i]]] <- minRV(dat[starts[i]:ends[i], ], makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
     }
     res <- setDT(transpose(res))[, DT := dates]
     setcolorder(res, "DT")
@@ -310,17 +313,23 @@ medRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
     result <- apply.daily(rData, medRV, alignBy, alignPeriod, makeReturns)
     return(result)
   } else if (is.data.table(rData)){ 
-    DT <- NULL  
+    DATE <- .N <- DT <- NULL
     setcolorder(rData, "DT")
     if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
     }
-    dates <- as.character(unique(as.Date(rData$DT)))
-    res <- vector(mode = "list", length = length(dates))
-    names(res) <- dates
-    for (date in dates) {
-      res[[date]] <- medRV(as.matrix(rData[as.Date(DT) == date][, !"DT"]), makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL) ## aligning is done above.
+    setkey(rData, "DT")
+    dates <- rData[, list(end = .N), by = list(DATE = as.Date(DT))][, `:=`(end = cumsum(end), DATE = as.character(DATE))][, start := shift(end, fill = 0) + 1]
+    res <- vector(mode = "list", length = nrow(dates))
+    names(res) <- as.character(dates$DATE)
+    starts <- dates$start
+    ends <- dates$end
+    dates <- dates$DATE
+    dat <- as.matrix(rData[, !"DT"])
+    for (i in 1:length(dates)) {
+      res[[dates[i]]] <- medRV(dat[starts[i]:ends[i],], makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
     }
+    
     res <- setDT(transpose(res))[, DT := dates]
     setcolorder(res, "DT")
     if(ncol(res) == 2){
@@ -542,7 +551,7 @@ rAVGCov <- function(rData, cor = FALSE, alignBy = "minutes", alignPeriod = 5, k 
     }    
     return(result)
   } else if (is.data.table(rData)){
-    .N <- NULL
+    DATE <- .N <- DT <- NULL
     setkey(rData, "DT")
     dates <- rData[, list(end = .N), by = list(DATE = as.Date(DT))][, `:=`(end = cumsum(end), DATE = as.character(DATE))][, start := shift(end, fill = 0) + 1]
     res <- vector(mode = "list", length = nrow(dates))
@@ -550,8 +559,9 @@ rAVGCov <- function(rData, cor = FALSE, alignBy = "minutes", alignPeriod = 5, k 
     starts <- dates$start
     ends <- dates$end
     dates <- dates$DATE
+    dat <- as.matrix(rData[, lapply(.SD, as.numeric), .SDcols = colnames(rData)])
     for (i in 1:length(dates)) {
-      res[[dates[i]]] <- rAVGCov(as.matrix(rData[starts[i]:ends[i], lapply(.SD, as.numeric), .SDcols = colnames(rData)]), cor = cor, makeReturns = makeReturns, alignBy = alignBy, alignPeriod = alignPeriod, k = k)
+      res[[dates[i]]] <- rAVGCov(dat[starts[i]:ends[i],], cor = cor, makeReturns = makeReturns, alignBy = alignBy, alignPeriod = alignPeriod, k = k)
     }
     
 
@@ -958,7 +968,6 @@ rBeta <- function(rData, rIndex, RCOVestimator = "rCov", RVestimator = "RV", mak
 #' @keywords volatility
 #' @export
 rBPCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, makePsd = FALSE) {
-  DT <- NULL
   # self-reference for multi-day input
   if (is.xts(rData) && checkMultiDays(rData)) { 
     if (is.null(dim(rData))) {  
@@ -975,8 +984,7 @@ rBPCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeR
     }    
     return(result)
   } else if (is.data.table(rData)){
-    
-    
+    DATE <- .N <- DT <- NULL
     if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
     }
@@ -987,8 +995,10 @@ rBPCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeR
     starts <- dates$start
     ends <- dates$end
     dates <- dates$DATE
+    
+    dat <- as.matrix(rData[, !"DT"])
     for (i in 1:length(dates)) {
-      res[[dates[i]]] <- rBPCov(as.matrix(rData[starts[i]:ends[i], !"DT"]), cor = cor, makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
+      res[[dates[i]]] <- rBPCov(dat[starts[i]:ends[i], ], cor = cor, makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
     }
     
     if(ncol(rData) == 2){ ## Univariate case
@@ -1116,7 +1126,7 @@ rCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeRet
     }    
     return(result)
   } else if (is.data.table(rData)){
-    DT <- .N <- NULL
+    DATE <- .N <- DT <- NULL
     if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
     }
@@ -1127,8 +1137,9 @@ rCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeRet
     starts <- dates$start
     ends <- dates$end
     dates <- dates$DATE
+    dat <- as.matrix(rData[, !"DT"])
     for (i in 1:length(dates)) {
-      res[[dates[i]]] <- rCov(as.matrix(rData[starts[i]:ends[i], !"DT"]), cor = cor, makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
+      res[[dates[i]]] <- rCov(dat[starts[i]:ends[i], ], cor = cor, makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
     }
     
     if(length(res[[1]]) == 1){ ## Univariate case
@@ -1331,7 +1342,7 @@ rKernelCov <- function(rData, cor = FALSE,  alignBy = "seconds", alignPeriod = 1
       return(result)
     }
   } else if (is.data.table(rData)){
-    DT <- NULL
+    DATE <- .N <- DT <- NULL
     if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
     }
@@ -1343,8 +1354,9 @@ rKernelCov <- function(rData, cor = FALSE,  alignBy = "seconds", alignPeriod = 1
     starts <- dates$start
     ends <- dates$end
     dates <- dates$DATE
+    dat <- as.matrix(rData[, !"DT"])
     for (i in 1:length(dates)) {
-      res[[dates[i]]] <- rKernelCov(as.matrix(rData[starts[i]:ends[i], !"DT"]), cor = cor, alignBy = NULL, alignPeriod = NULL, makeReturns = makeReturns,
+      res[[dates[i]]] <- rKernelCov(dat[starts[i]:ends[i], ], cor = cor, alignBy = NULL, alignPeriod = NULL, makeReturns = makeReturns,
                               kernelType = kernelType, kernelParam = kernelParam, kernelDOFadj = kernelDOFadj)
     }
 
@@ -1453,7 +1465,7 @@ rKurt <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
     result <- apply.daily(rData, rKurt, alignBy, alignPeriod, makeReturns)
     return(result)
   } else if (is.data.table(rData)){
-    DT <- NULL
+    DATE <- .N <- DT <- NULL
     setcolorder(rData, "DT")
     if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
@@ -1466,9 +1478,9 @@ rKurt <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
     starts <- dates$start
     ends <- dates$end
     dates <- dates$DATE
-    
+    dat <- as.matrix(rData[, !"DT"])
     for (i in 1:length(dates)) {
-      res[[dates[i]]] <- rKurt(as.matrix(rData[starts[i]:ends[i], !"DT"]), makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
+      res[[dates[i]]] <- rKurt(dat[starts[i]:ends[i], ], makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
     }
     
     res <- setDT(transpose(res))[, DT := dates]
@@ -1548,7 +1560,7 @@ rMPV <- function(rData, m = 2, p = 2, alignBy = NULL, alignPeriod = NULL, makeRe
     return(result)
     
   } else if (is.data.table(rData)){ 
-    DT <- NULL  
+    DATE <- .N <- DT <- NULL
     if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
     }
@@ -1559,8 +1571,9 @@ rMPV <- function(rData, m = 2, p = 2, alignBy = NULL, alignPeriod = NULL, makeRe
     starts <- dates$start
     ends <- dates$end
     dates <- dates$DATE
+    dat <- as.matrix(rData[, !"DT"])
     for (i in 1:length(dates)) {
-      res[[dates[i]]] <- rMPV(as.matrix(rData[starts[i]:ends[i], !"DT"]), m = m, p = p, makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
+      res[[dates[i]]] <- rMPV(dat[starts[i]:ends[i], ], m = m, p = p, makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
     }
     res <- setDT(transpose(res))[, DT := dates]
     setcolorder(res, "DT")
@@ -1800,7 +1813,7 @@ rSkew <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
     result <- apply.daily(rData, rSkew, alignBy, alignPeriod, makeReturns)
     return(result)
   } else if (is.data.table(rData)){
-    DT <- NULL
+    DATE <- .N <- DT <- NULL
     if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
     }
@@ -1812,8 +1825,9 @@ rSkew <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
     starts <- dates$start
     ends <- dates$end
     dates <- dates$DATE
+    dat <- as.matrix(rData[, !"DT"])
     for (i in 1:length(dates)) {
-      res[[dates[i]]] <- rSkew(as.matrix(rData[starts[i]:ends[i], !"DT"]), makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
+      res[[dates[i]]] <- rSkew(dat[starts[i]:ends[i],], makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
     }
     
     res <- setDT(transpose(res))[, DT := dates]
@@ -1891,7 +1905,7 @@ rSV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, 
     }
     return(result)
   } else if (is.data.table(rData)){ 
-    DT <- NULL  
+    DATE <- .N <- DT <- NULL
     setcolorder(rData, "DT")
     if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
@@ -1903,8 +1917,9 @@ rSV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, 
     starts <- dates$start
     ends <- dates$end
     dates <- dates$DATE
+    dat <- as.matrix(rData[, !"DT"])
     for (i in 1:length(dates)) {
-      res[[dates[i]]] <- rSV(as.matrix(rData[starts[i]:ends[i], !"DT"]), makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
+      res[[dates[i]]] <- rSV(dat[starts[i]:ends[i],], makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
     }
     # res <- setDT(transpose(res))[, DT := dates]
     # setcolorder(res, "DT")
@@ -1999,7 +2014,7 @@ rThresholdCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL
     }    
     return(result)
   }  else if (is.data.table(rData)){
-    DT <- NULL
+    DATE <- .N <- DT <- NULL
     if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
     }
@@ -2011,8 +2026,9 @@ rThresholdCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL
     starts <- dates$start
     ends <- dates$end
     dates <- dates$DATE
+    dat <- as.matrix(rData[, !"DT"])
     for (i in 1:length(dates)) {
-      res[[dates[i]]] <- rThresholdCov(as.matrix(rData[starts[i]:ends[i], !"DT"]), cor = cor, makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
+      res[[dates[i]]] <- rThresholdCov(dat[starts[i]:ends[i],], cor = cor, makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
     }
     
     if(length(res[[1]]) == 1){ ## Univariate case
@@ -2278,7 +2294,7 @@ rTPVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
     result <- apply.daily(rData, rTPVar, alignBy, alignPeriod, makeReturns)
     return(result)
   } else if (is.data.table(rData)){ 
-    DT <- NULL  
+    DATE <- .N <- DT <- NULL
     if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
     }
@@ -2289,8 +2305,9 @@ rTPVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
     starts <- dates$start
     ends <- dates$end
     dates <- dates$DATE
+    dat <- as.matrix(rData[, !"DT"])
     for (i in 1:length(dates)) {
-      res[[dates[i]]] <- rTPVar(as.matrix(rData[starts[i]:ends[i], !"DT"]), makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
+      res[[dates[i]]] <- rTPVar(dat[starts[i]:ends[i], ], makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
     }
     res <- setDT(transpose(res))[, DT := dates]
     setcolorder(res, "DT")
@@ -2362,7 +2379,7 @@ rQPVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
     result <- apply.daily(rData, rQPVar, alignBy, alignPeriod, makeReturns)
     return(result)
   } else if (is.data.table(rData)){ 
-    DT <- NULL  
+    DATE <- .N <- DT <- NULL
     if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
     }
@@ -2373,8 +2390,9 @@ rQPVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
     starts <- dates$start
     ends <- dates$end
     dates <- dates$DATE
+    dat <- as.matrix(rData[, !"DT"])
     for (i in 1:length(dates)) {
-      res[[dates[i]]] <- rQPVar(as.matrix(rData[starts[i]:ends[i], !"DT"]), makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
+      res[[dates[i]]] <- rQPVar(dat[starts[i]:ends[i],], makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
     }
     res <- setDT(transpose(res))[, DT := dates]
     setcolorder(res, "DT")
@@ -2430,7 +2448,7 @@ rQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
     result <- apply.daily(rData, rQuar, alignBy, alignPeriod, makeReturns)
     return(result)
   }  else if (is.data.table(rData)){ 
-    .N <- DT <- NULL  
+    DATE <- .N <- DT <- NULL
     if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
     }
@@ -2441,8 +2459,9 @@ rQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
     starts <- dates$start
     ends <- dates$end
     dates <- dates$DATE
+    dat <- as.matrix(rData[, !"DT"])
     for (i in 1:length(dates)) {
-      res[[dates[i]]] <- rQuar(as.matrix(rData[starts[i]:ends[i], !"DT"]), makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
+      res[[dates[i]]] <- rQuar(dat[starts[i]:ends[i], ], makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
     }
     res <- setDT(transpose(res))[, DT := dates]
     setcolorder(res, "DT")
@@ -2854,7 +2873,7 @@ rSemiCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, mak
     }    
     return(result)
   }  else if (is.data.table(rData)){
-    DT <- NULL
+    DATE <- .N <- DT <- NULL
     if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
     }
@@ -2866,8 +2885,9 @@ rSemiCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, mak
     starts <- dates$start
     ends <- dates$end
     dates <- dates$DATE
+    dat <- as.matrix(rData[, !"DT"])
     for (i in 1:length(dates)) {
-      res[[dates[i]]] <- rSemiCov(as.matrix(rData[starts[i]:ends[i], !"DT"]), cor = cor, makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
+      res[[dates[i]]] <- rSemiCov(dat[starts[i]:ends[i], ], cor = cor, makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
     }
     
     return(res)
