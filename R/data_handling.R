@@ -1035,14 +1035,14 @@ getPrice <- function (x, symbol = NULL, prefer = NULL) {
 makeReturns <- function(ts) {
   inputWasXts <- is.xts(ts)
   l <- dim(ts)[1]
-  col_names <- names(ts)
+  col_names <- colnames(ts)
   x <- matrix(as.numeric(ts), nrow = l)
   x[(2:l), ] <- log(x[(2:l), ]) - log(x[(1:(l - 1)), ])
   x[1, ] <- rep(0, dim(ts)[2])
   if(inputWasXts){
     x <- xts(x, order.by = index(ts))
   }
-  names(x) <- col_names
+  colnames(x) <- col_names
   return(x)
 }
 
