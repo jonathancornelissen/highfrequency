@@ -908,7 +908,7 @@ print.HARmodel <- function(x, digits = max(3, getOption("digits") - 3), ...){
   invisible(x)
 }
 
-#' @importFrom stats summary.lm
+#' @importFrom stats summary.lm pt
 #' @importFrom sandwich NeweyWest
 #' @export
 summary.HARmodel <- function(object, correlation = FALSE, symbolic.cor = FALSE, ...){

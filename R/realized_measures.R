@@ -473,6 +473,7 @@ MRC <- function(pData, pairwise = FALSE, makePsd = FALSE) {
       ##psi:
       psi2 <- 1 / 12
       if(is.data.table(x)){
+        DT <- NULL
         x <- x[, DT := NULL]
         x <- as.matrix(x)
       }
