@@ -1034,11 +1034,19 @@ getPrice <- function (x, symbol = NULL, prefer = NULL) {
 #' @export
 makeReturns <- function(ts) {
   inputWasXts <- is.xts(ts)
-  l <- dim(ts)[1]
+  l <- nrow(ts)
+  if(is.null(l)) { ## Special case for ts is numeric vector
+    l <- length(ts)
+    D <- 1
+  } else {
+    D <- ncol(ts)
+  }
+  
   col_names <- colnames(ts)
   x <- matrix(as.numeric(ts), nrow = l)
+  
   x[(2:l), ] <- log(x[(2:l), ]) - log(x[(1:(l - 1)), ])
-  x[1, ] <- rep(0, dim(ts)[2])
+  x[1, ] <- rep(0, D)
   if(inputWasXts){
     x <- xts(x, order.by = index(ts))
   }
