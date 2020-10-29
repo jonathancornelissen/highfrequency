@@ -372,7 +372,7 @@ aggregatePrice <- function(pData, on = "minutes", k = 1, marketOpen = "09:30:00"
 
   if (fill) {
     # Construct timestamps that go from marketOpenNumeric to marketClose numeric each day with step of scaleFactor e.g. 1 min (60)
-    dt_full_index <- data.table(DT = as.numeric(mSeq(marketOpenNumeric, marketCloseNumeric, scaleFactor)))
+    dt_full_index <- data.table(DT = as.numeric(mSeq(marketOpenNumeric, marketCloseNumeric, as.double(scaleFactor))))
     setkey(dt_full_index, DT)
     # Merge the construct the NA.LOCF filled in data.
     pData <- unique(pData[dt_full_index, roll = TRUE, on = "DT"])
