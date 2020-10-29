@@ -48,7 +48,7 @@ fastTickAgregation_DATA.TABLE <- function(dat, on = "minutes", k = 1, tz = "GMT"
   }
   #n
   timeZone <- attr(dat$DT, "tzone")
-  if(timeZone == ""){
+  if(is.null(timeZone) | timeZone == ""){
     if(is.null(tz)){
       tz <- "UTC"
     }
@@ -63,12 +63,11 @@ fastTickAgregation_DATA.TABLE <- function(dat, on = "minutes", k = 1, tz = "GMT"
   
   g$DT <- as.POSIXct(as.numeric(g$DT, tz = tz) + (secs - as.numeric(g$DT, tz = tz) %% secs), origin = as.POSIXct("1970-01-01", tz = tz), tz = tz)
   # dropDATE <- ifelse("DATE" %in% colnames(dat), "i.DATE", character(0))
-  out <- dat[g, roll = TRUE, on = "DT"][DT<= MAXDT]
+  out <- dat[g, roll = TRUE, on = "DT"][DT < MAXDT + secs]
   
   prependingCheck <- cbind(out[, list(firstDT = first(DT)), by = DATE],
         dat[, lapply(.SD, first), by = list(DATE = as.Date(DT, tz = tz)), .SDcols = names(dat)][, "DATE" := NULL]
         )[, "DATE" := NULL]
-  
   
   ## Hacky fix - need further investigation later.
   if("DATE" %in% colnames(prependingCheck)){
