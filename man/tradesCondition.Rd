@@ -25,6 +25,9 @@ Function deletes entries with abnormal trades condition
 To get more information on the sales conditions, see the NYSE documentation. Section about Daily TAQ Trades File.
 The current version (as of May 2020) can be found online at \href{https://www.nyse.com/publicdocs/nyse/data/Daily_TAQ_Client_Spec_v3.3.pdf}{NYSE's webpage}
 }
+\note{
+Some CSV readers and the WRDS API parses empty strings as NA's. We transform \code{NA} values in COND to \code{""}.
+}
 \author{
 Jonathan Cornelissen and Kris Boudt
 }

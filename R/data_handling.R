@@ -1904,6 +1904,7 @@ salesCondition <- function(tData, validConds = c('', '@', 'E', '@E', 'F', 'FI', 
 #' 
 #' @details To get more information on the sales conditions, see the NYSE documentation. Section about Daily TAQ Trades File.
 #' The current version (as of May 2020) can be found online at \href{https://www.nyse.com/publicdocs/nyse/data/Daily_TAQ_Client_Spec_v3.3.pdf}{NYSE's webpage}
+#' @note Some CSV readers and the WRDS API parses empty strings as NA's. We transform \code{NA} values in COND to \code{""}.
 #' @return xts or data.table object depending on input
 #' 
 #' @author Jonathan Cornelissen and Kris Boudt
@@ -1928,9 +1929,11 @@ tradesCondition <- function(tData, validConds = c('', '@', 'E', '@E', 'F', 'FI',
     } else {
       stop("Input has to be data.table or xts.")
     }
-  } 
+  }
+  tData[is.na(COND), COND := ""]
   
-  tData <- tData[trimws(COND) %in% validConds | is.na(COND)]
+  # setnafill(tData, type = "const", fill = "", cols = "COND") ## For when characters become supported :)
+  tData <- tData[trimws(COND) %in% validConds]
   
   if (inputWasXts) {
     return(xts(as.matrix(tData), order.by = tData$DT))
