@@ -1998,7 +1998,7 @@ selectExchange <- function(data, exch = "N") {
 #' and the function returns an xts or data.table object.
 #' 
 #' The following cleaning functions are performed sequentially:
-#' \code{\link{noZeroPrices}}, \code{\link{selectExchange}}, \code{\link{salesCondition}},
+#' \code{\link{noZeroPrices}}, \code{\link{selectExchange}}, \code{\link{tradesCondition}},
 #' \code{\link{mergeTradesSameTimestamp}}.
 #' 
 #' Since the function \code{\link{rmTradeOutliersUsingQuotes}}
@@ -2029,7 +2029,7 @@ selectExchange <- function(data, exch = "N") {
 #' from, to, dataSource and dataDestination will be ignored. (only advisable for small chunks of data)
 #' @param report boolean and TRUE by default. In case it is true the function returns (also) a vector indicating how many trades remained after each cleaning step.
 #' @param selection argument to be passed on to the cleaning routine \code{\link{mergeTradesSameTimestamp}}. The default is "median".
-#' @param validConds character vector containing valid sales conditions. Passed through to \code{\link{salesCondition}}.
+#' @param validConds character vector containing valid sales conditions. Passed through to \code{\link{tradesCondition}}.
 #' @param saveAsXTS indicates whether data should be saved in xts format instead of data.table when using on-disk functionality. TRUE by default.
 #' @param tz timezone to use
 #' @return For each day an xts or data.table object is saved into the folder of that date, containing the cleaned data.
