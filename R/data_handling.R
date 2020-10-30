@@ -345,7 +345,7 @@ aggregatePrice <- function(pData, on = "minutes", k = 1, marketOpen = "09:30:00"
       idx <- c(idx, nrow(pData))
     }
     pData <- pData[idx,]
-    return(pData)
+    return(pData[])
   }
 
   # Find the first observation per day.
@@ -382,7 +382,7 @@ aggregatePrice <- function(pData, on = "minutes", k = 1, marketOpen = "09:30:00"
   if (inputWasXts) {
     return(xts(as.matrix(pData[, -c("DT")]), order.by = pData$DT, tzone = tz))
   } else {
-    return(pData)
+    return(pData[])
   }
 }
 
@@ -547,7 +547,7 @@ aggregateQuotes <- function(qData, on = "minutes", k = 5, marketOpen = "09:30:00
   if (inputWasXts == TRUE) {
     return(xts(as.matrix(qData[, -c("DT")]), order.by = qData$DT, tzone = tz))
   } else {
-    return(qData)
+    return(qData[])
   }
 }
 
@@ -706,7 +706,7 @@ aggregateTrades <- function(tData, on = "minutes", k = 5, marketOpen = "09:30:00
   if (inputWasXts) {
     return(xts(as.matrix(tData[, -c("DT")]), order.by = tData$DT, tzone = tz))
   } else {
-    return(tData)
+    return(tData[])
   }
 }
 
@@ -785,7 +785,7 @@ autoSelectExchangeTrades <- function(tData, printExchange = TRUE) {
   if (inputWasXts) {
     return(xts(as.matrix(tData[, -c("DT")]), order.by = tData$DT, tzone = tzone(tData$DT)))
   } else {
-    return(tData)
+    return(tData[])
   }
 }
 
@@ -871,7 +871,7 @@ autoSelectExchangeQuotes <- function(qData, printExchange = TRUE) {
   if (inputWasXts) {
     return(xts(as.matrix(qData[, -c("DT")]), order.by = qData$DT, tzone = tzone(qData$DT)))
   } else {
-    return(qData)
+    return(qData[])
   }
 }
 
@@ -956,7 +956,7 @@ exchangeHoursOnly <- function(data, marketOpen = "09:30:00", marketClose = "16:0
   if (inputWasXts) {
     return(xts(as.matrix(data[, -c("DT")]), order.by = data$DT, tzone = tzone(data$DT)))
   } else {
-    return(data)
+    return(data[])
   }
 }
 
@@ -1051,7 +1051,7 @@ makeReturns <- function(ts) {
     x <- xts(x, order.by = index(ts))
   }
   colnames(x) <- col_names
-  return(x)
+  return(x[])
 }
 
 #' Match trade and quote data
@@ -1152,7 +1152,7 @@ matchTradesQuotes <- function(tData, qData, lagQuotes = 2, BFM = FALSE, backward
     if (inputWasXts) {
       return(xts(as.matrix(tqData[, -c("DT")]), order.by = tqData$DT, tzone = tz))
     } else {
-      return(tqData)
+      return(tqData[])
     }
     
   } else {
@@ -1162,7 +1162,7 @@ matchTradesQuotes <- function(tData, qData, lagQuotes = 2, BFM = FALSE, backward
     tData <- copy(tData)[, DT := as.numeric(DT, tz = tz)]
     out <- BFMalgorithm(tData, qData, backwardsWindow = backwardsWindow, forwardsWindow = forwardsWindow, plot = plot, tz = tz)
     
-    return(out)
+    return(out[])
     
   }
   
@@ -1256,7 +1256,7 @@ mergeQuotesSameTimestamp <- function(qData, selection = "median") {
   if (inputWasXts) {
     return(xts(as.matrix(qData[, -c("DT")]), order.by = qData$DT))
   } else {
-    return(qData)
+    return(qData[])
   }
 }
 # microbenchmark::microbenchmark(quotesCleanup(qDataRaw = sampleQDataRaw, exchanges = "N", selection = "max.volume"), times = 10, unit = "s")
@@ -1344,7 +1344,7 @@ mergeTradesSameTimestamp <- function(tData, selection = "median") {
   if (inputWasXts) {
     return(xts(as.matrix(tData[, -c("DT")]), order.by = tData$DT))
   } else {
-    return(tData)
+    return(tData[])
   }
 }
 
@@ -1383,7 +1383,7 @@ noZeroPrices <- function(tData) {
   if (inputWasXts) {
     return(xts(as.matrix(tData[, -c("DT")]), order.by = tData$DT))
   } else {
-    return(tData)
+    return(tData[])
   }
 }
 
@@ -1421,7 +1421,7 @@ noZeroQuotes <- function(qData) {
   if (inputWasXts) {
     return(xts(as.matrix(qData[, -c("DT")]), order.by = qData$DT))
   } else {
-    return(qData)
+    return(qData[])
   }
 }
 
@@ -1589,7 +1589,7 @@ quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
     if (report) {
       return(list(qData = df_result, report = nresult))
     } else {
-      return(df_result)
+      return(df_result[])
     }
   }
 }
@@ -1629,7 +1629,7 @@ rmLargeSpread <- function(qData, maxi = 50) {
   if (inputWasXts) {
     return(xts(as.matrix(qData[, -c("DT", "DATE", "SPREAD", "SPREAD_MEDIAN")]), order.by = qData$DT))
   } else {
-    return(qData[, -c("DATE", "SPREAD", "SPREAD_MEDIAN")])
+    return(qData[, -c("DATE", "SPREAD", "SPREAD_MEDIAN")][])
   }
 }
 
@@ -1668,7 +1668,7 @@ rmNegativeSpread <- function(qData) {
   if (inputWasXts == TRUE) {
     return(xts(as.matrix(qData[, -c("DT")]), order.by = qData$DT))
   } else {
-    return(qData)
+    return(qData[])
   }
 }
 
@@ -1755,11 +1755,11 @@ rmTradeOutliersUsingQuotes <- function(tData, qData, lagQuotes = 2, BFM = FALSE,
     if (inputWasXts) {
       return(xts(as.matrix(tData[, -c("DT", "SPREAD")]), order.by = tData$DT))
     } else {
-      return(tData[, -c("SPREAD")])
+      return(tData[, -c("SPREAD")][])
     }
   } else {
     
-    return(tqData)
+    return(tqData[])
     
   }
   
@@ -1876,7 +1876,7 @@ rmOutliersQuotes <- function (qData, maxi = 10, window = 50, type = "advanced") 
   if (inputWasXts) {
     return(xts(as.matrix(qData[, -c("DT", "DATE", "MADALL", "CRITERION", "MIDQUOTE")]), order.by = qData$DT))
   } else {
-    return(qData[, -c("MADALL", "CRITERION")])
+    return(qData[, -c("MADALL", "CRITERION")][])
   }
 }
 
@@ -1930,12 +1930,12 @@ tradesCondition <- function(tData, validConds = c('', '@', 'E', '@E', 'F', 'FI',
     }
   } 
   
-  tData <- tData[trimws(COND) %in% validConds]
+  tData <- tData[trimws(COND) %in% validConds | is.na(COND)]
   
   if (inputWasXts) {
     return(xts(as.matrix(tData), order.by = tData$DT))
   } else {
-    return(tData)
+    return(tData[])
   }
 }
 
@@ -2141,7 +2141,7 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, 
     if (report) {
       return(list(tData = df_result, report = nresult))
     } else {
-      return(df_result)
+      return(df_result[])
     }
   }
 }
@@ -2433,7 +2433,7 @@ refreshTime <- function (pData, sort = FALSE, criterion = "squared duration") {
     if(sort) setcolorder(pData, c(1, vec))
     
     
-    return(pData)
+    return(pData[])
   }
 }
 
