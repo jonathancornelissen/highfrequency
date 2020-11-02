@@ -73,18 +73,15 @@ In general, the lag length for the model innovation and the conditional covarian
 In this version, the parameters vector to be estimated is \eqn{\left( w, w_R,\alpha_1, \alpha_R, \alpha_2, \beta, \beta_R \right) }.
 }
 \examples{
-# Implementation of the heavy model on DJI:
-returns <-  realizedLibrary$open_to_close
-bv      <-  realizedLibrary$bv
+returns <-  makeReturns(SPYRM$CLOSE)
+bv      <-  SPYRM$BPV5
 returns <- returns[!is.na(bv)]
 bv <- bv[!is.na(bv)] # Remove NA's
 data <- cbind( returns^2, bv) # Make data matrix with returns and realized measures
 backCast <- matrix(c(var(returns), mean(bv)), ncol = 1)
 
 #For traditional (default) version:
-startvalues <- c(0.004,0.02,0.44,0.41,0.74,0.56) # Initial values
-output <- HEAVYmodel(data = as.matrix(data,ncol=2), compConst=FALSE,
-                     startingValues = startvalues, backCast=backCast)
+output <- HEAVYmodel(data = as.matrix(data,ncol=2), compConst = FALSE, backCast = backCast)
 #For general version:
 startvalues <- c(0.004, 0.02, 0.44, 0.4, 0.41, 0.74, 0.56) # Initial values;
 p <- matrix(c(2, 0, 0, 1), ncol = 2)

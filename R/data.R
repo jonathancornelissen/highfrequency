@@ -1,5 +1,3 @@
-
-
 #' LLTC Data
 #'
 #' @description Tick data for LLTC 2011/07/01, cleaned with \code{tradesCleanup}.
@@ -12,21 +10,21 @@
 #' @keywords datasets
 "lltc"
 
-#' The realized library from the Oxford-Man Institute of Quantitative Finance
-#' 
-#' @description A data.frame object containing the daily open-close returns, daily realized variances based on 
-#' five-minute intraday returns and daily realized kernels ranging from 2000-01-03 up to 2019-06-10 for the S&P 500. 
-#' Use \code{colnames(realizedLibrary)} to see which realized measures. 
-#' The full library of the Oxford-Man Institute of Quantitative Finance can be found on their website: \url{https://realized.oxford-man.ox.ac.uk/}.
-#'  
-#' @references  
-#' Gerd Heber, Asger Lunde, Neil Shephard, and Kevin Sheppard (2009)
-#' "Oxford-Man Institute's realized library, version 0.3", Oxford-Man
-#' Institute, University of Oxford. 
-#' 
-#' @format data.frame
-#' @keywords datasets
-"realizedLibrary"
+# #' The realized library from the Oxford-Man Institute of Quantitative Finance
+# #' 
+# #' @description A data.frame object containing the daily open-close returns, daily realized variances based on 
+# #' five-minute intraday returns and daily realized kernels ranging from 2000-01-03 up to 2019-06-10 for the S&P 500. 
+# #' Use \code{colnames(realizedLibrary)} to see which realized measures. 
+# #' The full library of the Oxford-Man Institute of Quantitative Finance can be found on their website: \url{https://realized.oxford-man.ox.ac.uk/}.
+# #'  
+# #' @references  
+# #' Gerd Heber, Asger Lunde, Neil Shephard, and Kevin Sheppard (2009)
+# #' "Oxford-Man Institute's realized library, version 0.3", Oxford-Man
+# #' Institute, University of Oxford. 
+# #' 
+# #' @format data.frame
+# #' @keywords datasets
+# "realizedLibrary"
 
 
 #' Ten artificial time series for the NYSE trading days during January 2010
@@ -239,15 +237,37 @@
 #' @keywords datasets
 "sbux"
 
-#' SP500 Realized Measures calculated with 5 minute sampling
-#' 
-#' @description Realized measures from the SP500 index from April 1997 to August 2013.
-#' 
-#' @format A large \code{xts} object.
-#' 
-#' @source \url{http://public.econ.duke.edu/~ap172/code.html}
-#' @references Bollerslev, T., A. J. Patton, and R. Quaedvlieg, 2016, Exploiting the Errors: A Simple Approach for Improved Volatility Forecasting, Journal of Econometrics, 192, 1-18.
-#' 
-#' @keywords datasets
-"SP500RM"
+# #' SP500 Realized Measures calculated with 5 minute sampling
+# #' 
+# #' @description Realized measures from the SP500 index from April 1997 to August 2013.
+# #' 
+# #' @format A large \code{xts} object.
+# #' 
+# #' @source \url{http://public.econ.duke.edu/~ap172/code.html}
+# #' @references Bollerslev, T., A. J. Patton, and R. Quaedvlieg, 2016, Exploiting the Errors: A Simple Approach for Improved Volatility Forecasting, Journal of Econometrics, 192, 1-18.
+# #' 
+# #' @keywords datasets
+# "SP500RM"
 
+#' One minute data
+#' 
+#' @description One minute data price of one stock and a market proxy. This is data from the US market.
+#' @format A \code{data.table} object
+#' @keywords datasets
+"sampleOneMinuteData"
+
+
+
+#' European data
+#' 
+#' @description Trade data of one stock on one day in the European stock market.
+#' @format A \code{data.table} object
+#' @keywords datasets
+"sampleTDataEurope"
+
+#' SPY realized measures
+#' @description Realized measures for the SPY ETF calculated at 1 and 5 minute sampling
+#' @note The CLOSE column is NOT the official close price, but simply the last recorded price of the day. Thus this may be slightly different from other datasets
+#' @format A \code{data.table} object
+#' @keywords datasets
+"SPYRM"

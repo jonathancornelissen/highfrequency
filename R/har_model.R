@@ -108,9 +108,9 @@ harInsanityFilter <- function(fittedValues, lower, upper, replacement) {
 #' ##### Example 2: HAR #####
 #' # Forecasting daily Realized volatility for the S&P 500 using the basic HARmodel: HAR
 #' library(xts)
-#' RV_SP500 <- as.xts(realizedLibrary$rv5, order.by = realizedLibrary$date)
+#' RV_SPY <- as.xts(SPYRM$RV5, order.by = SPYRM$DT)
 #'
-#' x <- HARmodel(data = RV_SP500 , periods = c(1,5,22), RVest = c("rCov"),
+#' x <- HARmodel(data = RV_SPY , periods = c(1,5,22), RVest = c("rCov"),
 #'               type = "HAR", h = 1, transform = NULL, inputType = "RM")
 #' class(x)
 #' x
@@ -133,8 +133,8 @@ harInsanityFilter <- function(fittedValues, lower, upper, replacement) {
 #' #predict(x)
 #' 
 #' ##### Example 4: HARQJ with already computed realized measures #####
-#' dat <- SP500RM[, c("RV", "BPV", "RQ")]
-#' x <- HARmodel(dat, periods = c(1,5,22), periodsJ = c(1),
+#' dat <- SPYRM[, list(DT, RV5, BPV5, RQ5)]
+#' x <- HARmodel(as.xts(dat), periods = c(1,5,22), periodsJ = c(1),
 #'               periodsQ = c(1), type = "HARQJ")
 #' ## Estimate the HAR model of type HARQJ
 #' class(x)
@@ -143,9 +143,9 @@ harInsanityFilter <- function(fittedValues, lower, upper, replacement) {
 #' predict(x)
 #'
 #' ##### Example 5: CHAR with already computed realized measures #####
-#' dat <- SP500RM[, c("RV", "BPV")]
+#' dat <- SPYRM[, list(DT, RV5, BPV5)]
 #'
-#' x <- HARmodel(dat, periods = c(1, 5, 22), type = "CHAR")
+#' x <- HARmodel(as.xts(dat), periods = c(1, 5, 22), type = "CHAR")
 #' # Estimate the HAR model of type CHAR
 #' class(x)
 #' x
@@ -153,26 +153,13 @@ harInsanityFilter <- function(fittedValues, lower, upper, replacement) {
 #' predict(x)
 #'
 #' ##### Example 6: CHARQ with already computed realized measures #####
-#' dat <- SP500RM[, c("RV", "BPV", "RQ")]
+#' dat <- SPYRM[, list(DT, RV5, BPV5, RQ5)]
 #' 
-#' x <- HARmodel(dat, periods = c(1,5,22), periodsQ = c(1), type = "CHARQ")
+#' x <- HARmodel(as.xts(dat), periods = c(1,5,22), periodsQ = c(1), type = "CHARQ")
 #' # Estimate the HAR model of type CHARQ
 #' class(x)
 #' x
 #' # plot(x)
-#' predict(x)
-#'
-#'#' ##### Example 7: HAR #####
-#' # Forecasting weekly Realized volatility for the S&P 500 using the basic HARmodel: HAR
-#' library(xts)
-#' RV_SP500 <- as.xts(realizedLibrary$rv5, order.by = realizedLibrary$date)
-#'
-#' x <- HARmodel(data = RV_SP500 , periods = c(1,5,22), RVest = c("rCov"),
-#'               type = "HAR", h = 5, transform = NULL, inputType = "RM")
-#' class(x)
-#' x
-#' summary(x)
-#' plot(x)
 #' predict(x)
 #'
 #' @import RcppArmadillo
