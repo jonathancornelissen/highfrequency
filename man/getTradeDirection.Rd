@@ -22,7 +22,8 @@ NOTE: By convention the first observation is always marked as a buy.
 }
 \examples{
 # generate matched trades and quote data set
-tqData <- matchTradesQuotes(sampleTData, sampleQData)
+tqData <- matchTradesQuotes(sampleTDataMicroseconds[as.Date(DT) == "2018-01-02"], 
+                            sampleQDataMicroseconds[as.Date(DT) == "2018-01-02"])
 directions <- getTradeDirection(tqData)
 head(directions)
 

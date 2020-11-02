@@ -50,9 +50,9 @@ Function returns the rMPV, defined in Andersen et al. (2012).
   and \eqn{m} > \eqn{p/2}.
 }
 \examples{
-data(sampleTData)
-rMPV(sampleTData$PRICE, m = 2, p = 3, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)
-
+mpv <- rMPV(sampleTDataMicroseconds[, list(DT, PRICE)], m = 2, p = 3, alignBy = "minutes", 
+            alignPeriod = 5, makeReturns = TRUE)
+mpv
 }
 \references{
 Andersen, T. G., D. Dobrev, and E. Schaumburg (2012). Jump-robust volatility estimation using nearest neighbor truncation. Journal of Econometrics, 169(1), 75- 93.

@@ -47,7 +47,7 @@ The different types of kernels can be found using \code{\link{listAvailableKerne
 }
 \examples{
 # Univariate:
-rvKernel <- rKernelCov(rData = sampleTData$PRICE, alignBy = "minutes",
+rvKernel <- rKernelCov(rData = sampleTDataMicroseconds[, list(DT, PRICE)], alignBy = "minutes",
                        alignPeriod = 5, makeReturns = TRUE)
 rvKernel
 

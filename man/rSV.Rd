@@ -36,10 +36,9 @@ Then, the rSV is given by
 }
 }
 \examples{
-\dontrun{
-data(sampleTData)
-rSV(sampleTData$PRICE, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)
-}
+sv <- rSV(sampleTDataMicroseconds[, list(DT, PRICE)], alignBy = "minutes", 
+          alignPeriod = 5, makeReturns = TRUE)
+sv
 }
 \references{
 Barndorff-Nielsen, O.E., Kinnebrock, S. and Shephard N. (2008). Measuring downside risk - realized semivariance. CREATES research paper. p. 3-5.

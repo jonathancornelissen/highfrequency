@@ -42,7 +42,8 @@
 #' 
 #' @examples 
 #' #load sample price data
-#' ts <- sampleTData$PRICE
+#' \dontrun{
+#' ts <- as.xts(sampleTDataMicroseconds[, list(DT, PRICE, SIZE)])
 #' 
 #' #Previous tick aggregation to the 5-minute sampling frequency:
 #' tsagg5min <- aggregateTS(ts, on = "minutes", k = 5)
@@ -50,8 +51,9 @@
 #' #Previous tick aggregation to the 30-second sampling frequency:
 #' tsagg30sec <- aggregateTS(ts, on = "seconds", k = 30)
 #' tail(tsagg30sec)
-#' 
 #' tsagg3ticks <- aggregateTS(ts, on = "ticks", k = 3)
+#' }
+#' 
 #' 
 #' @importFrom zoo zoo na.locf
 #' @importFrom stats start end
@@ -392,7 +394,7 @@ aggregatePrice <- function(pData, on = "minutes", k = 1, marketOpen = "09:30:00"
 #' Aggregate a data.table or xts object containing quote data
 #' 
 #' @description Function returns a data.table or xts object containing the aggregated quote data with columns "SYMBOL", "EX", "BID","BIDSIZ","OFR","OFRSIZ". 
-#' See \code{\link{sampleQData}} for an example of the argument qData.
+#' See \code{\link{sampleQDataMicroseconds}} for an example of the argument qData.
 #' 
 #' @param qData data.table or xts object to be aggregated, containing the intraday quote data of a stock for one day.
 #' @param on character, indicating the time scale in which "k" is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".
@@ -420,8 +422,8 @@ aggregatePrice <- function(pData, on = "minutes", k = 1, marketOpen = "09:30:00"
 #' 
 #' @examples
 #' # aggregate quote data to the 30 second frequency
-#' qDataAggregated <- aggregateQuotes(sampleQData, on = "seconds", k = 30)
-#' head(qDataAggregated)
+#' qDataAggregated <- aggregateQuotes(sampleQDataMicroseconds, on = "seconds", k = 30)
+#' qDataAggregated # Show the aggregated data
 #' @export
 aggregateQuotes <- function(qData, on = "minutes", k = 5, marketOpen = "09:30:00", marketClose = "16:00:00", tz = "GMT") {
   .I <- .N <- N <- DATE <- BID <- OFR <- BIDSIZ <- OFRSIZ <- DT <- FIRST_DT <- DT_ROUND <-LAST_DT <- SYMBOL <- NULL
@@ -584,8 +586,8 @@ aggregateQuotes <- function(qData, on = "minutes", k = 5, marketOpen = "09:30:00
 #' 
 #' @examples 
 #' # aggregate trade data to 5 minute frequency
-#' tDataAggregated <- aggregateTrades(sampleTData, on = "minutes", k = 5)
-#' head(tDataAggregated)
+#' tDataAggregated <- aggregateTrades(sampleTDataMicroseconds, on = "minutes", k = 5)
+#' tDataAggregated
 #' @export
 aggregateTrades <- function(tData, on = "minutes", k = 5, marketOpen = "09:30:00", marketClose = "16:00:00", tz = "GMT") {
   .I <- .N <- N <- DATE <- SIZE <- DT <- FIRST_DT <- DT_ROUND <- LAST_DT <- SYMBOL <- PRICE <- VWPRICE <- SIZETPRICE <- SIZESUM <- NULL
@@ -624,6 +626,7 @@ aggregateTrades <- function(tData, on = "minutes", k = 5, marketOpen = "09:30:00
     if (("DT" %in% colnames(tData)) == FALSE) {
       stop("Data.table neeeds DT column (date-time).")
     }
+    tData <- copy(tData)
   }
   
   timeZone <- attr(tData$DT, "tzone")
@@ -1043,9 +1046,9 @@ makeReturns <- function(ts) {
   }
   
   col_names <- colnames(ts)
-  x <- matrix(as.numeric(ts), nrow = l)
+  x <- log(matrix(as.numeric(ts), nrow = l))
   
-  x[(2:l), ] <- log(x[(2:l), ]) - log(x[(1:(l - 1)), ])
+  x[(2:l), ] <- x[(2:l), ] - x[(1:(l - 1)), ]
   x[1, ] <- rep(0, D)
   if(inputWasXts){
     x <- xts(x, order.by = index(ts))
@@ -1078,16 +1081,15 @@ makeReturns <- function(ts) {
 #' @keywords data manipulation
 #' 
 #' @examples 
-#' # match the trade and quote data
-#' tqData <- matchTradesQuotes(sampleTData, sampleQData)
-#' head(tqData)
 #' # multi-day input allowed
 #' tqData <- matchTradesQuotes(sampleTDataMicroseconds, sampleQDataMicroseconds)
+#' # Show output
+#' tqData
 #' @importFrom xts tzone<- tzone
 #' @export
 matchTradesQuotes <- function(tData, qData, lagQuotes = 2, BFM = FALSE, backwardsWindow = 3600, forwardsWindow = 0.5, plot = FALSE) {
   
-  PRICE <- BID <- OFR <- DATE <- DT <- FIRST_DT <- DT_ROUND <- SYMBOL <- NULL
+  PRICE <- BID <- OFR <- DATE <- DT <- FIRST_DT <- SYMBOL <- NULL
   
   tData <- checkColumnNames(tData)
   qData <- checkColumnNames(qData)
@@ -1136,6 +1138,7 @@ matchTradesQuotes <- function(tData, qData, lagQuotes = 2, BFM = FALSE, backward
   
   if(!BFM){ ## We DONT conduct a backwards- forwards matching search
     
+    # qData <- copy(qData[c(TRUE, diff(BID)|diff(OFR))])[, DT := as.numeric(DT, tz = tz)]
     qData <- copy(qData)[, DT := as.numeric(DT, tz = tz)]
     qData[, DATE := floor(DT / 86400)]
     qData[, FIRST_DT := min(DT), by = "DATE"]
@@ -1245,6 +1248,7 @@ mergeQuotesSameTimestamp <- function(qData, selection = "median") {
       , lapply(.SD, unique), by = list(DT, SYMBOL), .SDcols = c("BID", "OFR")]
   }
   if (selection == "weighted.average") {
+    qData[, `:=`(BIDSIZ = as.numeric(BIDSIZ), OFRSIZ = as.numeric(OFRSIZ))]
     qData <- qData[, `:=` (BIDSIZ = BIDSIZ / sum(BIDSIZ), OFRSIZ = OFRSIZ / sum(OFRSIZ)), by = list(DT, SYMBOL)][
       , `:=` (BID = sum(BID * BIDSIZ), OFR = sum(OFR * OFRSIZ)), by = list(DT, SYMBOL)][
         , -c("BIDSIZ", "OFRSIZ")][
@@ -2043,10 +2047,10 @@ selectExchange <- function(data, exch = "N") {
 #' # Consider you have raw trade data for 1 stock for 2 days 
 #' head(sampleTDataRawMicroseconds)
 #' dim(sampleTDataRawMicroseconds)
-#' tDataAfterFirstCleaning <- tradesCleanup(tDataRaw = sampleTDataRaw, exchanges = list("N"))
+#' tDataAfterFirstCleaning <- tradesCleanup(tDataRaw = sampleTDataRawMicroseconds, 
+#'                                          exchanges = list("N"))
 #' tDataAfterFirstCleaning$report
 #' dim(tDataAfterFirstCleaning$tData)
-#' 
 #' #In case you have more data it is advised to use the on-disk functionality
 #' #via "dataSource" and "dataDestination" arguments
 #' 
@@ -2456,19 +2460,18 @@ refreshTime <- function (pData, sort = FALSE, criterion = "squared duration") {
 #' @return A list containing "pData" which is the aggregated data and a list containing the intensity process, split up day by day.
 #' 
 #' @examples
-#' pData <- sampleTData[,c("PRICE", "SIZE")]
-#' storage.mode(pData) <- "numeric"
+#' pData <- sampleTDataMicroseconds[,list(DT, PRICE, SIZE)]
 #' # Aggregate based on the trade intensity measure. Getting 390 observations.
 #' agged <- businessTimeAggregation(pData, measure = "intensity", obs = 390, bandwidth = 0.075)
 #' # Plot the trade intensity measure
-#' plot.ts(agged$intensityProcess$`2008-01-04`)
-#' rCov(agged$pData[,"PRICE"], makeReturns = TRUE)
-#' rCov(pData[,"PRICE"], makeReturns = TRUE, alignBy = "minutes", alignPeriod = 1)
+#' plot.ts(agged$intensityProcess$`2018-01-02`)
+#' rCov(agged$pData[, list(DT, PRICE)], makeReturns = TRUE)
+#' rCov(pData[,list(DT, PRICE)], makeReturns = TRUE, alignBy = "minutes", alignPeriod = 1)
 #' 
 #' # Aggregate based on the volume measure. Getting 78 observations.
 #' agged <- businessTimeAggregation(pData, measure = "volume", obs = 78)
-#' rCov(agged$pData[,"PRICE"], makeReturns = TRUE)
-#' rCov(pData[,"PRICE"], makeReturns = TRUE, alignBy = "minutes", alignPeriod = 5)
+#' rCov(agged$pData[,list(DT, PRICE)], makeReturns = TRUE)
+#' rCov(pData[,list(DT, PRICE)], makeReturns = TRUE, alignBy = "minutes", alignPeriod = 5)
 #' 
 #' @references Roel C. A. Oomen Properties of realized variance under alternative sampling schemes. (2006) Journal of Business & Economic Statistics 24, pages 219-237
 #' 

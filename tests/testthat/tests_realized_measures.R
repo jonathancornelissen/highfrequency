@@ -48,8 +48,8 @@ test_that("medRV", {
 context("medRQ")
 test_that("", {
   expect_equal(
-    formatC(medRQ(sampleTData$PRICE,alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE) * 1000000, digits = 5),
-    "0.23952"
+    as.numeric(medRQ(as.xts(sampleTDataMicroseconds[, list(DT, PRICE)]),alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE) * 1000000),
+    c(0.010922500356, 0.003618836787)
   )
   
   expect_equal(lapply(medRQ(returnDat), sum), list("PRICE1" = 3.06573359, "PRICE2" = 3.010144579, "PRICE3" = 3.030828633))
@@ -89,8 +89,8 @@ test_that("minRV", {
 context("minRQ")
 test_that("minRQ", {
   expect_equal(
-    minRQ(sampleTData$PRICE, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE) * 1000000,
-    0.1325120781
+    as.numeric(minRQ(as.xts(sampleTDataMicroseconds[, list(DT, PRICE)]), alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE) * 1000000),
+    c(0.011852089820, 0.002546123569)
   )
   expect_equal(lapply(minRQ(returnDat), sum), list("PRICE1" = 3.0696895, "PRICE2" = 2.977093559, "PRICE3" = 3.01211734))
   expect_equal(lapply(minRQ(returnDat), sum), lapply(minRQ(dat, makeReturns = TRUE), sum))
@@ -217,8 +217,8 @@ test_that("rKurt", {
 context("rMPV")
 test_that("rMPV", {
   expect_equal(
-    formatC(rMPV(sampleTData$PRICE, alignBy ="minutes", alignPeriod = 5, makeReturns = TRUE), digits = 5),
-    "0.00042925"
+    as.numeric(rMPV(as.xts(sampleTDataMicroseconds[, list(DT, PRICE)]), alignBy ="minutes", alignPeriod = 5, makeReturns = TRUE)),
+    c(9.393123822e-05, 5.623885699e-05)
   )
   
   expect_equal(lapply(rMPV(returnDat), sum), list("PRICE1" = 3.016532757, "PRICE2" = 3.004313242, "PRICE3" = 3.002691466))
@@ -249,8 +249,8 @@ test_that("rOWCov", {
 context("rRTSCov")
 test_that("rRTSCov", {
   expect_equal(
-    formatC(rRTSCov(pData = sampleTData$PRICE) * 10000, digits = 5),
-    "3.5676"
+    as.numeric(rRTSCov(pData = as.xts(sampleTDataMicroseconds[as.Date(DT) == "2018-01-02", list(DT, PRICE)])) * 10000),
+    0.3681962867
   )
   expect_equal(
     formatC(sum(rRTSCov(pData = list(cumsum(lltc) + 100, cumsum(sbux) + 100))) * 1000000, digits = 5),
@@ -258,12 +258,12 @@ test_that("rRTSCov", {
   )
 })
 
-##### rKernel ##### 
+##### rKernelCov ##### 
 context("rKernelCov")
 test_that("rKernelCov", {
   expect_equal(
-    formatC(rKernelCov(rData = sampleTData$PRICE, alignBy = "minutes",  alignPeriod = 5, makeReturns = TRUE), digits = 5),
-    "0.00060559"
+    as.numeric(rKernelCov(rData = as.xts(sampleTDataMicroseconds[, list(DT, PRICE)]), alignBy = "minutes",  alignPeriod = 5, makeReturns = TRUE)),
+    c(1.253773e-04, 6.087867e-05)
   )
   expect_equal(
     formatC(sum(rKernelCov(rData = cbind(lltc, sbux, fill = 0), alignBy = "minutes", alignPeriod = 5, makeReturns = FALSE)) * 1000, digits = 5),
@@ -304,8 +304,8 @@ test_that("rSkew", {
 context("rSV")
 test_that("rSV", {
   expect_equal(
-    rSV(sampleTData$PRICE,alignBy ="minutes", alignPeriod = 5, makeReturns = TRUE),
-    list(rSVdownside = c("PRICE" = 0.0002913423039), rSVupside = c("PRICE" = 0.0001642838323))
+    sum(rSV(as.xts(sampleTDataMicroseconds[, list(DT, PRICE)]), alignBy ="minutes", alignPeriod = 5, makeReturns = TRUE)),
+    0.000166891
   )
   expect_equal(lapply(rSV(returnDat), function(x) lapply(x, sum))[[1]], list("rSVdownside" = 1.501497027, "rSVupside" = 1.50206646))
   expect_equal(rSV(returnDat), rSV(dat, makeReturns = TRUE))
@@ -344,8 +344,8 @@ test_that("rThresholdCov", {
 context("rTPVar")
 test_that("rTPVar", {
   expect_equal(
-    formatC(rTPVar(sampleTData$PRICE,alignBy ="minutes", alignPeriod = 5, makeReturns = TRUE) * 1000000, digits = 5),
-    "0.42755"
+    as.numeric(rTPVar(as.xts(sampleTDataMicroseconds[, list(DT, PRICE)]),alignBy ="minutes", alignPeriod = 5, makeReturns = TRUE) * 1000000),
+    c(0.013510877, 0.002967281)
   )
   expect_equal(lapply(rTPVar(returnDat), sum), list("PRICE1" = 3.023117658, "PRICE2" = 3.003898984, "PRICE3" = 2.966162109))
   expect_equal(lapply(rTPVar(returnDat), sum), lapply(rTPVar(dat, makeReturns = TRUE), sum))
@@ -363,8 +363,8 @@ test_that("rTPVar", {
 context("rTSCov")
 test_that("rTSCov univariate", {
   expect_equal(
-    formatC(rTSCov(pData = sampleTData$PRICE), digits = 5),
-    "0.00052838"
+    as.numeric(rTSCov(pData = as.xts(sampleTDataMicroseconds[as.Date(DT) == "2018-01-02", list(DT, PRICE)]))),
+    0.0001097988
   )
 })
 ##### rTSCov multivariate ##### 
@@ -379,8 +379,8 @@ test_that("rTSCov multivariate", {
 context("RV")
 test_that("RV", {
   expect_equal(
-    formatC(RV(makeReturns(sampleTData$PRICE)), digits = 5),
-    "0.00064815"
+    formatC(RV(makeReturns(as.xts(sampleTDataMicroseconds[as.Date(DT) == "2018-01-02", list(DT, PRICE)]))), digits = 5),
+    "0.0001032"
   )
 })
 
@@ -428,8 +428,9 @@ test_that("rQuar", {
 context("ivInference")
 test_that("ivInference", {
   expect_equal(
-    formatC(ivInference(sampleTData$PRICE, IVestimator= "minRV", IQestimator = "medRQ", confidence = 0.95, makeReturns = TRUE)$cb * 10000, digits = 5),
-    c("4.8088", "5.7948")
+    formatC(ivInference(as.xts(sampleTDataMicroseconds[, list(DT, PRICE)]), IVestimator= "minRV", IQestimator = "medRQ", 
+                        confidence = 0.95, makeReturns = TRUE)[[1]]$cb * 10000, digits = 5),
+    c("0.84827", "1.0328")
   )
 })
 
@@ -540,26 +541,23 @@ test_that("rSemiCov", {
 
 ##### ReMeDI #####
 context("ReMeDI")
-test_that("ReMeDI Estimation matches Merrick Li's code", { # We thank Merrick li for contributing Matlab code.
+test_that("ReMeDI Estimation matches expected output", { # We thank Merrick li for contributing Matlab code.
   # print("Make sure to implement tests for correctTime = TRUE") ## When it becomes relevant.
   #remed <- ReMeDI(sampleTDataMicroseconds, correctTime = FALSE, lags = 0:25, kn = 2) ##Changed due to correctTime bug
-  remed <- ReMeDI(sampleTDataMicroseconds, lags = 0:25, kn = 2)
+  remed <- ReMeDI(sampleTDataMicroseconds[, list(DT, PRICE = log(PRICE))], lags = 0:25, kn = 2)
 
-  expected <- c(1.431069e-05, 9.651728e-05, 1.060440e-04, 7.762527e-05, 3.823010e-05, 1.709553e-05, -9.089181e-06, -4.940754e-06, -2.070274e-06, 
-                -2.682253e-05, -4.762974e-05, -6.670733e-05, -7.923285e-05, -7.106233e-05, -2.953979e-05, -1.200891e-05, 1.211180e-06,  2.670063e-05, 
-                2.620544e-05, 3.368025e-05, 3.087709e-05, -3.367455e-06, -2.308410e-05, -4.196142e-05, -4.182684e-05, -5.326772e-06)
+  expected <- c(5.391986e-10,  3.873739e-09,  4.261547e-09,  3.118519e-09,  1.538245e-09,  6.805792e-10, -3.835125e-10, -2.232302e-10, -1.157490e-10, -1.110401e-09, -1.934303e-09,
+  -2.685536e-09, -3.174416e-09, -2.839272e-09, -1.163387e-09, -4.468208e-10,  7.741021e-11,  1.093390e-09,  1.071914e-09,  1.360021e-09,  1.237765e-09, -1.382685e-10,
+  -9.406390e-10, -1.695860e-09, -1.667980e-09, -1.982078e-10)
+  
   
   expect_equal(remed, expected)
 
-  # Different data-set
-  dat <- sampleTData$PRICE
-  storage.mode(dat) <- "numeric"
+  # Same data-set but xts format
+  dat <- sampleTDataMicroseconds[, list(DT, PRICE = log(PRICE))]
   #remed <- ReMeDI(dat, correctTime = FALSE, jumpsIndex = NULL, lags = 0:25, kn = 4) ##Changed due to correctTime bug
-  remed <- ReMeDI(dat, lags = 0:25, kn = 4)
+  remed <- ReMeDI(as.xts(dat), lags = 0:25, kn = 2)
   
-  expected <- c(1.946686e-04, -3.945028e-04, -5.868124e-04,  -8.010601e-04, -8.411491e-04, -9.121411e-04, -8.848654e-04, -8.964487e-04,-7.963612e-04,
-                -6.367172e-04, -4.734131e-04, -2.349435e-04, -1.945647e-04,  -1.113470e-04, -4.221193e-05,  9.638518e-06, 8.949410e-05, 
-                7.872398e-05,-1.349880e-05, -1.493591e-04, -1.288487e-04, -3.294210e-05,  1.014176e-04, 2.808128e-04,  2.813373e-04,  1.856106e-04)
   
 
   expect_equal(remed, expected)
@@ -573,19 +571,17 @@ test_that("ReMeDI lag choosing algorithm chooses the correct values", {
   optimalKn <- knChooseReMeDI(sampleTDataMicroseconds, knMax = 10, tol = 0.05, size = 3, lower = 1, upper = 10, plot = FALSE)
   expect_equal(optimalKn, 1L)
 
-  dat <- sampleTData$PRICE
-  storage.mode(dat) <- "numeric"
+  
+  
   # optimalKn <- knChooseReMeDI(dat, correctTime = FALSE, jumpsIndex = NULL, knMax = 10, tol = 0.05, size = 3, lower = 3, upper = 5, plot = FALSE) ##Changed due to correctTime bug
-  optimalKn <- knChooseReMeDI(dat, knMax = 10, tol = 0.05, size = 3, lower = 3, upper = 5, plot = FALSE)
-  expect_equal(optimalKn, 4L)
+  optimalKn <- knChooseReMeDI(sampleTDataMicroseconds[as.Date(DT) == "2018-01-02"], knMax = 10, tol = 0.05, size = 3, lower = 3, upper = 5, plot = FALSE)
+  expect_equal(optimalKn, 5L)
 
 })
 
 
 test_that("ReMeDI asymptotic variance gives same result as Merrick Li's code", {
-  dat <- sampleTData$PRICE
-  storage.mode(dat) <- "numeric"
-  dat <- log(dat)
+  dat <- sampleTDataMicroseconds[, list(DT, PRICE = log(PRICE))]
   avar <- ReMeDIAsymptoticVariance(dat, phi = 0.5, lags = 0:10, kn = 3, i = 1)
   remed <- ReMeDI(dat, 3, 0:10)
   expected <- c(4.420651e-13, 2.083090e-13, 6.915452e-14, 1.867677e-14, 5.907554e-14, 5.129904e-14,

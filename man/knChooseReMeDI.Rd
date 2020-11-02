@@ -50,7 +50,7 @@ optimalKn <- knChooseReMeDI(sampleTDataMicroseconds[as.Date(DT) == "2018-01-02",
 optimalKn
 \dontrun{
 # We can also have a much larger search-space
-optimalKn <- knChooseReMeDI(sampleTDataMicroseconds[, as.Date(DT) == "2018-01-02"],
+optimalKn <- knChooseReMeDI(sampleTDataMicroseconds[as.Date(DT) == "2018-01-02",],
                             knMax = 50, tol = 0.05,
                             size = 3, lower = 2, upper = 5, plot = TRUE)
 optimalKn

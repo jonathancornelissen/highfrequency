@@ -86,12 +86,6 @@ matrix. This function replaces the negative eigenvalues with zeroes.
 }
 \examples{
 # Robust Realized two timescales Variance/Covariance
-
-# Univariate: 
-rvts <- rTSCov(pData = sampleTData$PRICE)
-# Note: Prices as input
-rvts 
-
 # Multivariate:
 rcovts <- rTSCov(pData = list(cumsum(lltc) + 100, cumsum(sbux) + 100))
 # Note: List of prices as input

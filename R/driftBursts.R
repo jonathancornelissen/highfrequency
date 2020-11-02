@@ -46,22 +46,14 @@
 #'                     meanBandwidth = 300L, varianceBandwidth = 900L)
 #' plot(DBH2, pData = dat)
 #' 
-#' ## Usage with xts object with multiple columns and price in character format
-#' dat <- sampleTData
-#' ## Testing every 30 seconds after 09:45:00
-#' DBH3 <- driftBursts(dat, testTimes = seq(35100, 57600, 30), preAverage = 2, ACLag = -1L,
-#'                     meanBandwidth = 300L, varianceBandwidth = 900L)
-#' 
-#' plot(DBH3, pData = dat)
-#' 
 #' \dontrun{ ## This block takes some time
 #' dat <- 10 + cumsum(lltc)
 #' index(dat) <- index(dat) - 6 * 3600
 #' ## Testing every 60 seconds after 09:45:00
-#' system.time({DBH4 <- driftBursts(dat, testTimes = seq(35100, 57600, 1), preAverage = 2, 
-#'                                  ACLag = -1L, meanBandwidth = 300L, varianceBandwidth = 900L)})
+#' system.time({DBH4 <- driftBursts(dat, testTimes = seq(35100, 57600, 60), preAverage = 2, 
+#'              ACLag = -1L, meanBandwidth = 300L, varianceBandwidth = 900L)})
 #' # On my machine with an i5-8250U, the following is 2-3 times faster
-#' system.time({DBH4 <- driftBursts(dat, testTimes = seq(35100, 57600, 1), preAverage = 2, 
+#' system.time({DBH4 <- driftBursts(dat, testTimes = seq(35100, 57600, 60), preAverage = 2, 
 #'                                  ACLag = -1L, meanBandwidth = 300L, varianceBandwidth = 900L,
 #'                                  parallelize = TRUE, nCores = 8)})
 #' plot(DBH4, pData = dat)
@@ -71,7 +63,7 @@
 #' print(DBH4, alpha = 0.99)
 #' # Additionally, criticalValue can be passed directly
 #' print(DBH4, criticalValue = 3)
-#' max(abs(DBH4$driftBursts)) > getCriticalValues(DBH4, 0.99)$quantile
+#' max(abs(DBH4$tStat)) > getCriticalValues(DBH4, 0.99)$quantile
 #' }
 #' 
 #' @author Emil Sjoerup
@@ -200,7 +192,6 @@ driftBursts <- function(pData, testTimes = seq(34260, 57600, 60),
   ###Checks end###
   vpreAveraged <- rep(0, iT - 1)
   vpreAveraged[(preAverage * 2 - 1):(iT - 1)] <- cfilter(x = logPrices, c(rep(1, preAverage),rep(-1, preAverage)))[preAverage:(iT - preAverage)]
-  
   if(parallelize & !is.na(nCores)){ #Parallel evaluation or not?
     lDriftBursts <- DriftBurstLoopCPAR(vpreAveraged, vDiff, timestamps, testTimes, meanBandwidth,
                                        varianceBandwidth, preAverage, ACLag, nCores)

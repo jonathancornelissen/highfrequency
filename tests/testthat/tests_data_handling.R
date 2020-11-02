@@ -1,14 +1,15 @@
 library(xts)
 library(testthat)
+library(data.table)
 context("autoSelectExchangeTrades")
 test_that("autoSelectExchangeTrades", {
   expect_equal(
-    unique(autoSelectExchangeTrades(sampleTDataRaw, printExchange = FALSE)$EX),
-    "N"
+    unique(autoSelectExchangeTrades(sampleTDataRawMicroseconds, printExchange = FALSE)$EX),
+    "D"
   )
   
   expect_equal(
-    unique(autoSelectExchangeQuotes(sampleQDataRaw, printExchange = FALSE)$EX),
+    unique(autoSelectExchangeQuotes(sampleQDataRawMicroseconds, printExchange = FALSE)$EX),
     "N"
   )
 
@@ -18,8 +19,8 @@ test_that("autoSelectExchangeTrades", {
 context("quotesCleanup")
 test_that("quotesCleanup", {
   expect_equal(
-    quotesCleanup(qDataRaw = sampleQDataRaw, exchanges = "N")$report["remove_outliers"],
-    c(remove_outliers = 7706)
+    quotesCleanup(qDataRaw = sampleQDataRawMicroseconds, exchanges = "N")$report["remove_outliers"],
+    c(remove_outliers = 46566)
   )
 })
 
@@ -27,74 +28,63 @@ test_that("quotesCleanup", {
 context("aggregatePrice")
 test_that("aggregatePrice", {
   expect_equal(
-    formatC(sum(head(aggregatePrice(sampleTData$PRICE, on = "secs", k = 30))), digits = 10),
-    "   1157.465"
+    formatC(sum(head(aggregatePrice(sampleTDataMicroseconds[, list(DT, PRICE)], on = "secs", k = 30))$PRICE), digits = 10),
+    "     950.73"
   )
 })
 
 context("selectExchange and data cleaning functions")
 test_that("selectExchange and data cleaning functions", {
   expect_equal(
-    unique(selectExchange(sampleQDataRaw, c("N", "W"))$EX),
-    c("N", "W")
+    unique(selectExchange(sampleQDataRawMicroseconds, c("N", "P"))$EX),
+    c("P", "N")
   )
   
   expect_equal(
-    dim(rmOutliersQuotes(selectExchange(sampleQDataRaw, "W"))),
-    dim(rmOutliersQuotes(selectExchange(sampleQDataRaw, "W"), type = "standard"))
+    dim(rmOutliersQuotes(selectExchange(sampleQDataRawMicroseconds, "N"))),
+    dim(rmOutliersQuotes(selectExchange(sampleQDataRawMicroseconds, "N"), type = "standard"))
   )
   
   expect_equal(
-    dim(rmTradeOutliersUsingQuotes(selectExchange(sampleTDataRaw, "W"), selectExchange(sampleQDataRaw, "W"))),
-    c(203, 13)
+    dim(rmTradeOutliersUsingQuotes(selectExchange(sampleTDataRawMicroseconds, "P"), selectExchange(sampleQDataRawMicroseconds, "N"))),
+    c(5502, 22)
   )
   
   expect_equal(
-    dim(rmLargeSpread(selectExchange(sampleQDataRaw, "N"))),
-    c(9794, 7)
+    dim(rmLargeSpread(selectExchange(sampleQDataRawMicroseconds, "N"))),
+    c(94422, 13)
   )
   
   expect_equal(
-    dim(mergeQuotesSameTimestamp(selectExchange(sampleQDataRaw, "N"), selection = "max.volume")),
-    c(7707, 7)
+    dim(mergeQuotesSameTimestamp(selectExchange(sampleQDataRawMicroseconds, "N"), selection = "max.volume")),
+    c(46566, 13)
   )
   
   expect_equal(
-    dim(mergeQuotesSameTimestamp(selectExchange(sampleQDataRaw, "N"), selection = "weighted.average")),
-    c(7707, 7)
+    dim(mergeQuotesSameTimestamp(selectExchange(sampleQDataRawMicroseconds, "N"), selection = "weighted.average")),
+    c(46566, 13)
   )
   
   expect_equal(
-    dim(noZeroQuotes(selectExchange(sampleQDataRaw, "N"))),
-    c(9792, 7)
+    dim(noZeroQuotes(selectExchange(sampleQDataRawMicroseconds, "N"))),
+    c(94422, 13)
   )
   
   
   expect_equal(
-  dim(tradesCleanupUsingQuotes(tData = sampleTData, qData = sampleQData)),
-  c(8340, 12)
+  dim(tradesCleanupUsingQuotes(tData = sampleTDataRawMicroseconds, qData = sampleQDataMicroseconds)),
+  c(72035, 23)
   )
   
   expect_equal(
-  dim(tradesCleanup(tDataRaw = sampleTDataRaw, exchanges = "N", report = FALSE)),
-  c(9208, 8)
+  dim(tradesCleanup(tDataRaw = sampleTDataRawMicroseconds, exchanges = "N", report = FALSE)),
+  c(6140, 12)
   )
 })
 
 context("tradesCleanup")
 
 test_that("tradesCleanup gives same data as the shipped data", {
-  rawTrades <- sampleTDataRaw
-  rawQuotes <- sampleQDataRaw
-  
-  cleanedTrades <- tradesCleanupUsingQuotes(
-    tData = tradesCleanup(tDataRaw = rawTrades, 
-                          exchanges = "N", report = FALSE),
-    qData = quotesCleanup(qDataRaw = rawQuotes,
-                          exchanges = "N", type = "standard", report = FALSE),
-    lagQuotes = 2)[,c("SYMBOL", "EX",  "PRICE", "SIZE", "COND", "CORR", "G127")]
-  expect_equal(cleanedTrades, sampleTData)
-  
   
   cleanedMicroseconds <-
     tradesCleanupUsingQuotes(
@@ -315,17 +305,17 @@ test_that("business time aggregation",{
   agged3 <- suppressWarnings(businessTimeAggregation(pData, measure = "vol", obs = 39, method = "PARM", RM = "rv", lookBackPeriod = 5))
   expect_equal(nrow(agged3$pData), 76)
   
-  pData <- sampleTData[,c("PRICE", "SIZE")]
-  storage.mode(pData) <- "numeric"
-  agged4 <- businessTimeAggregation(pData, measure = "intensity", obs = 390, bandwidth = 0.075)
-  expect_equal(nrow(agged4$pData), 390) # We return the correct number of observations
-  
-  
-  agged5 <- suppressWarnings(businessTimeAggregation(pData, measure = "volume", obs = 78))
-  expect_equal(nrow(agged5$pData), 78)
-  
-  agged6 <- suppressWarnings(businessTimeAggregation(pData, measure = "vol", obs = 39, method = "PARM", RM = "rv", lookBackPeriod = 5))
-  expect_equal(nrow(agged6$pData), 39)
+  # pData <- sampleTData[,c("PRICE", "SIZE")]
+  # storage.mode(pData) <- "numeric"
+  # agged4 <- businessTimeAggregation(pData, measure = "intensity", obs = 390, bandwidth = 0.075)
+  # expect_equal(nrow(agged4$pData), 390) # We return the correct number of observations
+  # 
+  # 
+  # agged5 <- suppressWarnings(businessTimeAggregation(pData, measure = "volume", obs = 78))
+  # expect_equal(nrow(agged5$pData), 78)
+  # 
+  # agged6 <- suppressWarnings(businessTimeAggregation(pData, measure = "vol", obs = 39, method = "PARM", RM = "rv", lookBackPeriod = 5))
+  # expect_equal(nrow(agged6$pData), 39)
   
 })
 
@@ -378,4 +368,3 @@ test_that("refreshTime", {
                expected[, names(expected)[c(1, dur + 1)], with = FALSE])
   
 })
-

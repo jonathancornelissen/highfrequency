@@ -29,9 +29,9 @@ Function returns the rTPVar, defined in Andersen et al. (2012).
  }
 }
 \examples{
-data(sampleTData)
-rTPVar(rData = sampleTData$PRICE, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)
-rTPVar
+tpv <- rTPVar(rData = sampleTDataMicroseconds[, list(DT, PRICE)], alignBy = "minutes", 
+              alignPeriod = 5, makeReturns = TRUE)
+tpv
 
 }
 \references{

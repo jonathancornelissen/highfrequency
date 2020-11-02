@@ -1,11 +1,11 @@
 library(testthat)
 library(highfrequency)
-
+library(xts)
 context("AJjumpTest unit test")
 test_that("AJjumpTest unit test",{
   expect_equal(
-    formatC(AJjumpTest(sampleTData$PRICE, p = 2, k = 3, alignBy = "seconds", alignPeriod = 5, makeReturns = TRUE)$ztest, digits = 10),
-    "-2.462012017"
+    as.numeric(AJjumpTest(as.xts(sampleTDataMicroseconds[,list(DT, PRICE)]), p = 2, k = 3, alignBy = "seconds", alignPeriod = 5, makeReturns = TRUE)[,1]),
+    c(-1.1620534373, -0.1330522019)
   )
 })
 
@@ -29,8 +29,8 @@ test_that("JO jump test unit test",{
 context("BNSjumpTest")
 test_that("BNSjumpTest", {
   expect_equal(
-    formatC(BNSjumpTest(sampleTData$PRICE, IVestimator= "minRV", 209, IQestimator = "medRQ", type= "linear", makeReturns = TRUE)$pvalue, digits = 0),
-    c(PRICE = "0")
+    as.numeric(BNSjumpTest(as.xts(sampleTDataMicroseconds[, list(DT, PRICE)]), IVestimator= "minRV", IQestimator = "medRQ", type= "linear", makeReturns = TRUE)[, "p.value"]),
+    c(1.794624516e-02, 2.913249385e-05)
   )
 })
 
@@ -57,22 +57,13 @@ test_that("LM test",{
 })
 
 test_that("FoF test",{
-  dat <- sampleTData$PRICE
-  tzone(dat) <- "GMT"
-  storage.mode(dat) <- "numeric"
+  dat <- sampleTDataMicroseconds[, list(DT, PRICE)]
   FoFtest <- intradayJumpTest(pData = dat, volEstimator = "PARM", driftEstimator = "none", alpha = 0.95, RM = "bipower", 
                               theta = 1, lookBackPeriod = 50, marketOpen = "9:30:00", marketClose = "16:00:00", tz = "GMT")
   
-  
-  P1 <- plot(FoFtest)
-  lims <- P1$get_xlim()
-  
-  expect_equal(
-    lims[1], as.numeric(index(dat))[1]
-  )
-  expect_equal(
-    lims[2], as.numeric(index(dat))[nrow(dat)]
-  )
+  expect_equal(sum(FoFtest$ztest), -17.62862858)
+  expect_equal(sum(FoFtest$vol$spot), 0.03685386024)
+  expect_equal(sum(FoFtest$drift), 0)
   
 })
 

@@ -1,4 +1,3 @@
-#### Standard error and confidence band of RV measures.####
 # User can choose integrated variance (IV) estimators RV, BV, minRV or medRV; 
 #and integrated quarticity (IQ) estimators: rQuar, TP, QP, minRQ or medRQ.
 # Output: 1)value of IVestimator; 
@@ -98,14 +97,22 @@ IV <- function(IVestimator, iq) {
 #' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
 #' 
 #' @examples 
-#' ivInference(sampleTData$PRICE, IVestimator= "minRV", IQestimator = "medRQ",
-#'             confidence = 0.95, makeReturns = TRUE)
+#' \dontrun{
+#' library("xts") # This function only accepts xts data currently
+#' ivInf <- ivInference(as.xts(sampleTDataMicroseconds[, list(DT, PRICE)]), IVestimator= "minRV",
+#'                      IQestimator = "medRQ", confidence = 0.95, makeReturns = TRUE)
+#' ivInf
+#' }
+#'             
 #' @keywords highfrequency ivInference
 #' @export 
 ivInference <- function(rData, IVestimator = "RV", IQestimator = "rQuar", confidence = 0.95, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, ...) {
   
   if (checkMultiDays(rData)) { 
-    result <- apply.daily(rData, ivInference, alignBy, alignPeriod, makeReturns)
+    
+    result <- applyGetList(rData, ivInference, IVestimator = IVestimator, IQestimator = IQestimator, confidence = confidence, alignBy = alignBy, 
+                          alignPeriod = alignPeriod, makeReturns = makeReturns)
+    names(result) <- unique(as.Date(index(rData)))
     return(result)
   } else {
     if((!is.null(alignBy)) && (!is.null(alignPeriod))){
@@ -131,7 +138,7 @@ ivInference <- function(rData, IVestimator = "RV", IQestimator = "rQuar", confid
     cb <- c(lowband, highband)
     
     ## reports: 
-    out       <- {}
+    out       <- list()
     out$hativ <- hatIV
     out$se    <- stderr
     out$cb    <- cb

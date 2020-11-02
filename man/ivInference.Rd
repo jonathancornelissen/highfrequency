@@ -70,8 +70,13 @@ The theoretical framework is the logarithmic price process \eqn{X_t} belongs to 
 where \eqn{a} is the drift term, \eqn{\sigma} denotes the spot volatility process, \eqn{W} is a standard Brownian motion (assume that there are no jumps).
 }
 \examples{
-ivInference(sampleTData$PRICE, IVestimator= "minRV", IQestimator = "medRQ",
-            confidence = 0.95, makeReturns = TRUE)
+\dontrun{
+library("xts") # This function only accepts xts data currently
+ivInf <- ivInference(as.xts(sampleTDataMicroseconds[, list(DT, PRICE)]), IVestimator= "minRV",
+                     IQestimator = "medRQ", confidence = 0.95, makeReturns = TRUE)
+ivInf
+}
+            
 }
 \references{
 Andersen, T. G., D. Dobrev, and E. Schaumburg (2012). Jump-robust volatility estimation using nearest neighbor truncation. Journal of Econometrics, 169(1), 75- 93.

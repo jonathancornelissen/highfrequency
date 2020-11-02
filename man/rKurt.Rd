@@ -31,9 +31,9 @@ Then, the rKurt is given by
  in which \eqn{RV_t:} realized variance
 }
 \examples{
-data(sampleTData)
-rKurt(sampleTData$PRICE, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)
-
+rk <- rKurt(sampleTDataMicroseconds[, list(DT, PRICE)], alignBy = "minutes", 
+            alignPeriod = 5, makeReturns = TRUE)
+rk
 }
 \references{
 Amaya, D., Christoffersen, P., Jacobs, K. and Vasquez, A. (2011). Do realized skewness and kurtosis predict the cross-section of equity returns?. CREATES research paper. p. 3-7.

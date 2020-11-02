@@ -30,7 +30,7 @@ AJjumpTest(
 
 \item{makeReturns}{boolean, should be TRUE when rData contains prices instead of returns. FALSE by default.}
 
-\item{...}{additional arguments.}
+\item{...}{used internally}
 }
 \value{
 list or xts in case the input prices span more than one day.
@@ -98,8 +98,8 @@ The theoretical framework underlying jump test is that the logarithmic price pro
  The Ait-Sahalia and Jacod test is that: Using the convergence properties of power variation and its dependence on the time scale on which it is measured, Ait-Sahalia and Jacod (2009) define a new variable which converges to 1 in the presence of jumps in the underlying return series, or to another deterministic and known number in the absence of jumps. (Theodosiou& Zikes(2009))
 }
 \examples{
-AJjumpTest(sampleTData$PRICE, p = 2, k = 3, alignBy = "seconds", 
-  alignPeriod = 5, makeReturns = TRUE)
+jt <- AJjumpTest(sampleTDataMicroseconds[, list(DT, PRICE)], p = 2, k = 3, 
+                 alignBy = "seconds", alignPeriod = 5, makeReturns = TRUE)
 
 }
 \references{

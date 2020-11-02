@@ -57,13 +57,11 @@ In the case that cor is TRUE, the mixed matrix will be an \eqn{N x N} matrix fil
 \examples{
 # Realized semi-variance/semi-covariance for prices aligned   
 # at 5 minutes.
-data(sampleTData)
-data(sample5MinPricesJumps)
 
 # Univariate: 
-rSV = rSemiCov(rData = sampleTData$PRICE, alignBy = "minutes", 
+rSV = rSemiCov(rData = sampleTDataMicroseconds[, list(DT, PRICE)], alignBy = "minutes", 
                    alignPeriod = 5, makeReturns = TRUE)
-
+rSV
 # Multivariate single day: 
 rSC = rSemiCov(rData = sample5MinPricesJumps['2010-01-04'], makeReturns=TRUE)
 

@@ -29,10 +29,9 @@ Assume there is \eqn{N} equispaced returns in period \eqn{t}. Let \eqn{r_{t,i}} 
  }
 }
 \examples{
-\dontrun{
-data(sampleTData)
-rQuar(rData = sampleTData$PRICE, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)
-}
+rq <- rQuar(rData = sampleTDataMicroseconds[, list(DT, PRICE)], alignBy = "minutes", 
+            alignPeriod = 5, makeReturns = TRUE)
+rq
 }
 \references{
 Andersen, T. G., D. Dobrev, and E. Schaumburg (2012). Jump-robust volatility estimation using nearest neighbor truncation. Journal of Econometrics, 169(1), 75- 93.

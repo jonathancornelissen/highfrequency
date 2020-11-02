@@ -64,7 +64,8 @@ Then, with on = "ticks" and k = 3, the output will be 1, 4, 7, 10, 13, 14.
 }
 \examples{
 #load sample price data
-ts <- sampleTData$PRICE
+\dontrun{
+ts <- as.xts(sampleTDataMicroseconds[, list(DT, PRICE, SIZE)])
 
 #Previous tick aggregation to the 5-minute sampling frequency:
 tsagg5min <- aggregateTS(ts, on = "minutes", k = 5)
@@ -72,8 +73,9 @@ head(tsagg5min)
 #Previous tick aggregation to the 30-second sampling frequency:
 tsagg30sec <- aggregateTS(ts, on = "seconds", k = 30)
 tail(tsagg30sec)
-
 tsagg3ticks <- aggregateTS(ts, on = "ticks", k = 3)
+}
+
 
 }
 \author{

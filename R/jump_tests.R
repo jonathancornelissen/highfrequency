@@ -65,7 +65,7 @@ ABDJumptest <- function(RV, BPV, TQ) { # Compute jump detection stat mentioned i
 #' @param alignPeriod an integer, align the tick data to this many [seconds|minutes|hours].
 #' @param alphaMultiplier alpha multiplier
 #' @param makeReturns boolean, should be TRUE when rData contains prices instead of returns. FALSE by default.
-#' @param ... additional arguments.
+#' @param ... used internally
 #' 
 #' @return list or xts in case the input prices span more than one day.
 #' 
@@ -90,16 +90,20 @@ ABDJumptest <- function(RV, BPV, TQ) { # Compute jump detection stat mentioned i
 #' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
 #'
 #' @examples
-#' AJjumpTest(sampleTData$PRICE, p = 2, k = 3, alignBy = "seconds", 
-#'   alignPeriod = 5, makeReturns = TRUE)
+#' jt <- AJjumpTest(sampleTDataMicroseconds[, list(DT, PRICE)], p = 2, k = 3, 
+#'                  alignBy = "seconds", alignPeriod = 5, makeReturns = TRUE)
 #' 
 #' @keywords highfrequency AJjumpTest
-#' @importFrom stats qnorm
-#' @importFrom stats pnorm
+#' @importFrom stats qnorm pnorm
 #' @export
 AJjumpTest <- function(pData, p = 4 , k = 2, alignBy = NULL, alignPeriod = NULL, alphaMultiplier = 4, makeReturns = FALSE, ...) {
-
-  if (checkMultiDays(pData)) {
+  op <- list(...)
+  flag <- TRUE
+  if("flag" %in% names(op)){
+    flag <- FALSE
+  }
+  
+  if(is.xts(pData) && checkMultiDays(pData)) {
     
     result <- 
       apply.daily(pData, 
@@ -114,15 +118,41 @@ AJjumpTest <- function(pData, p = 4 , k = 2, alignBy = NULL, alignPeriod = NULL,
     result$universalThresholdUpper <- -qnorm(universalThreshold)
     
     return(result)
+  } else if (is.data.table(pData) && flag){
+    DATE <- .N <- DT <- NULL
+    
+    setkey(pData, "DT")
+    dates <- pData[, list(end = .N), by = list(DATE = as.Date(DT))][, `:=`(end = cumsum(end), DATE = as.character(DATE))][, start := shift(end, fill = 0) + 1]
+    res <- vector(mode = "list", length = nrow(dates))
+    names(res) <- as.character(dates$DATE)
+    starts <- dates$start
+    ends <- dates$end
+    dates <- dates$DATE
+    for (i in 1:length(dates)) {
+      res[[dates[i]]] <- AJjumpTest(pData[starts[i]:ends[i], ], p = p, k = k, alignBy = alignBy, alignPeriod = alignPeriod,
+                                    alphaMultiplier = alphaMultiplier, makeReturns = makeReturns, flag = FALSE)
+    }
+    
+    return(res)
+    
   } else {
-    pData <- fastTickAgregation(pData, on = "seconds", k = 1)
+    if(is.data.table(pData)){
+      pData <- fastTickAgregation_DATA.TABLE(pData, on = "seconds", k = 1)
+    } else {
+      pData <- fastTickAgregation(pData, on = "seconds", k = 1)
+    }
   }
 
-  N <- length(pData)-1
   p <- as.numeric(p)
   k <- as.numeric(k)
-
-  alpha <- alphaMultiplier * sqrt(rCov(pData, alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = makeReturns))
+  if(is.data.table(pData)){
+    alpha <- alphaMultiplier * sqrt(rCov(pData, alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = makeReturns)$RV)
+    pData <- as.matrix(pData[, !"DT"])
+    
+  } else {
+    alpha <- alphaMultiplier * sqrt(rCov(pData, alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = makeReturns))
+  }
+  N <- length(pData)-1
   w <- 0.47
   cvalue <- alpha * (1/N)^w
 
@@ -215,8 +245,9 @@ AJjumpTest <- function(pData, p = 4 , k = 2, alignBy = NULL, alignPeriod = NULL,
 #' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
 #' 
 #' @examples 
-#' BNSjumpTest(sampleTData$PRICE, IVestimator= "minRV", 
-#'             IQestimator = "medRQ", type= "linear", makeReturns = TRUE)
+#' bns <- BNSjumpTest(sampleTDataMicroseconds[, list(DT, PRICE)], IVestimator= "minRV",
+#'                    IQestimator = "medRQ", type= "linear", makeReturns = TRUE)
+#' bns
 #' 
 #' @keywords highfrequency BNSjumpTest
 #' @export
@@ -224,12 +255,13 @@ BNSjumpTest <- function (rData, IVestimator = "BV", IQestimator = "TP", type = "
                          logTransform = FALSE, max = FALSE, alignBy = NULL, alignPeriod = NULL,
                          makeReturns = FALSE, alpha = 0.975) {
   
-  if (checkMultiDays(rData)) {
+  if (is.xts(rData) && checkMultiDays(rData)) {
     
     result <- 
       apply.daily(rData, 
                   function(x) {
-                    tmp <- BNSjumpTest(x, IVestimator, IQestimator, type, logTransform, max, alignBy, alignPeriod, makeReturns, alpha)
+                    tmp <- BNSjumpTest(rData = x, IVestimator = IVestimator, IQestimator = IQestimator, type = type, logTransform = logTransform, 
+                                       max = max, alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = makeReturns, alpha = alpha)
                     return(cbind(tmp[[1]], tmp[[2]][1], tmp[[2]][2], tmp[[3]]))
                   })
     
@@ -245,6 +277,26 @@ BNSjumpTest <- function (rData, IVestimator = "BV", IQestimator = "TP", type = "
     # result$ztest
     
     return(result)
+  } else if (is.data.table(rData)){
+    DATE <- .N <- DT <- NULL
+    if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+      rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
+    }
+    setkey(rData, "DT")
+    dates <- rData[, list(end = .N), by = list(DATE = as.Date(DT))][, `:=`(end = cumsum(end), DATE = as.character(DATE))][, start := shift(end, fill = 0) + 1]
+    res <- vector(mode = "list", length = nrow(dates))
+    names(res) <- as.character(dates$DATE)
+    starts <- dates$start
+    ends <- dates$end
+    dates <- dates$DATE
+    dat <- as.matrix(rData[, !"DT"])
+    for (i in 1:length(dates)) {
+      res[[dates[i]]] <- BNSjumpTest(dat[starts[i]:ends[i], ], IVestimator = IVestimator, IQestimator = IQestimator, type = type, logTransform = logTransform, 
+                                    max = max, alignBy = NULL, alignPeriod = NULL, makeReturns = makeReturns, alpha = alpha)
+    }
+    
+    return(res)
+    
   } else {
     if ((!is.null(alignBy)) && (!is.null(alignPeriod))) {
       rData <- fastTickAgregation(rData, on = alignBy, k = alignPeriod)
@@ -364,8 +416,10 @@ BNSjumpTest <- function (rData, IVestimator = "BV", IQestimator = "TP", type = "
 #' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
 #' 
 #' @examples
-#' JOjumpTest(sample5MinPricesJumps$stock1, power = 6)
-#' 
+#' # Multi asset multi day xts functionality
+#' jo <- JOjumpTest(sample5MinPricesJumps$stock1, power = 6)
+#' # Univariate multi day data.table
+#' joDT <- JOjumpTest(sampleTDataMicroseconds[, list(DT, PRICE)])
 #' @keywords highfrequency JOjumpTest
 #' @importFrom stats qnorm
 #' @importFrom stats pnorm
@@ -373,12 +427,12 @@ BNSjumpTest <- function (rData, IVestimator = "BV", IQestimator = "TP", type = "
 #' @export
 JOjumpTest <- function(pData, power = 4, alignBy = NULL, alignPeriod = NULL, alpha = 0.975, ...) {
   
-  if (checkMultiDays(pData)) {
+  if (is.xts(pData) && checkMultiDays(pData)) {
     
     result <- 
       apply.daily(pData,
                   function(x){
-                    tmp <- JOjumpTest(x, power, alignBy, alignPeriod, alpha, ...)
+                    tmp <- JOjumpTest(x, power = power, alignBy = alignBy, alignPeriod = alignPeriod, alpha = alpha, ...)
                     return(cbind(tmp[[1]], tmp[[2]][1], tmp[[2]][2], tmp[[3]]))})
     
     colnames(result) <- c("ztest", "lower", "upper", "p-value")
@@ -388,46 +442,68 @@ JOjumpTest <- function(pData, power = 4, alignBy = NULL, alignPeriod = NULL, alp
     result$universalThresholdUpper <- -qnorm(universalThreshold)
     
     return(result)
-  }
+  } else if (is.data.table(pData)){
+    DATE <- .N <- DT <- NULL
+    if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+      pData <- fastTickAgregation_DATA.TABLE(pData, on = alignBy, k = alignPeriod)
+    }
+    setkey(pData, "DT")
+    dates <- pData[, list(end = .N), by = list(DATE = as.Date(DT))][, `:=`(end = cumsum(end), DATE = as.character(DATE))][, start := shift(end, fill = 0) + 1]
+    res <- vector(mode = "list", length = nrow(dates))
+    names(res) <- as.character(dates$DATE)
+    starts <- dates$start
+    ends <- dates$end
+    dates <- dates$DATE
+    dat <- as.matrix(pData[, !"DT"])
+    for (i in 1:length(dates)) {
+      res[[dates[i]]] <- JOjumpTest(dat[starts[i]:ends[i], ], power = power, alignBy = alignBy, alignPeriod = alignPeriod, alpha = alpha, ...)
+    }
+    
+    return(res)
+    
+  } else {
+    if ((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+      pData <- fastTickAgregation(pData, on = alignBy, k = alignPeriod)
+    }
+    
+    R  <- as.zoo(simre(pData))
+    r  <- as.zoo(makeReturns(pData))
+    N  <- length(pData) - 1
+    bv <- RBPVar(r)
+    rv <- RV(r)
   
-  if ((!is.null(alignBy)) && (!is.null(alignPeriod))) {
-    pData <- fastTickAgregation(pData, on = alignBy, k = alignPeriod)
-  }
+    SwV <- 2 * sum(R-r, na.rm = TRUE)
+    mu1 <- 2^(6/2) * gamma(1/2*(6+1)) / gamma(1/2)
   
-  R  <- as.zoo(simre(pData))
-  r  <- as.zoo(makeReturns(pData))
-  N  <- length(pData) - 1
-  bv <- RBPVar(r)
-  rv <- RV(r)
-
-  SwV <- 2 * sum(R-r, na.rm = TRUE)
-  mu1 <- 2^(6/2) * gamma(1/2*(6+1)) / gamma(1/2)
-
-  ##mupower:
-  if (power == 4) {
-    q      <- abs(rollapply(r, width = 4, FUN = prod, align = "left",na.rm = TRUE))
-    mu2    <- 2^((6/4)/2) * gamma(1/2 * (6/4+1)) / gamma(1/2)
-    av     <- mu1/9 * N^3 * (mu2)^(-4) / (N-4-1) * sum(q^(6/4),na.rm = TRUE)   ##check formula
-    JOtest <- N * bv / sqrt(av) * (1- rv/SwV)
-
-    out                <- {}
-    out$ztest          <- JOtest
-    out$critical.value <- qnorm(c(1-alpha, alpha))
-    out$pvalue         <- 2 * pnorm(-abs(JOtest))
-    return(out)
-  }
-
-  if (power == 6) {
-    q <- abs(rollapply(r, width = 6, FUN = prod, align = "left",na.rm = TRUE))
-    mu2 <- 2^((6/6)/2)*gamma(1/2*(6/6+1))/gamma(1/2)
-    av <- mu1/9 * N^3*(mu2)^(-6)/(N-6-1)*sum(q^(6/6),na.rm= TRUE)   ##check formula
-    JOtest <- N*bv/sqrt(av)*(1- rv/SwV)
-
-    out                <- {}
-    out$ztest          <- JOtest
-    out$critical.value <- qnorm(c(1-alpha,alpha))
-    out$pvalue         <- 2*pnorm(-abs(JOtest))
-    return(out)
+    ##mupower:
+    if (power == 4) {
+      q      <- abs(rollApplyProdWrapper(r, 4))
+      mu2    <- 2^((6/4)/2) * gamma(1/2 * (6/4+1)) / gamma(1/2)
+      av     <- mu1/9 * N^3 * (mu2)^(-4) / (N-4-1) * sum(q^(6/4), na.rm = TRUE)   ##check formula
+      JOtest <- N * bv / sqrt(av) * (1- rv/SwV)
+  
+      out                <- {}
+      out$ztest          <- JOtest
+      out$critical.value <- qnorm(c(1-alpha, alpha))
+      out$pvalue         <- 2 * pnorm(-abs(JOtest))
+      return(out)
+    }
+  
+    if (power == 6) {
+      
+      
+      q <- abs(rollApplyProdWrapper(r, 6))
+      mu2 <- 2^((6/6)/2)*gamma(1/2*(6/6+1))/gamma(1/2)
+      av <- mu1/9 * N^3*(mu2)^(-6)/(N-6-1)*sum(q^(6/6),na.rm= TRUE)   ##check formula
+      JOtest <- N*bv/sqrt(av)*(1- rv/SwV)
+  
+      out                <- {}
+      out$ztest          <- JOtest
+      out$critical.value <- qnorm(c(1-alpha,alpha))
+      out$pvalue         <- 2*pnorm(-abs(JOtest))
+      return(out)
+    }
+    
   }
 }
 
@@ -723,8 +799,8 @@ plot.intradayJumpTest <- function(x, ...){
       shade <- na.omit(shade)
       p1 <- addPolygon(shade, on = -1, col = 2)
       plot(p1)
-
-      if(readline("Press Enter for next figure or 0 to exit:\n") == "0"){
+      
+      if(interactive() && readline("Press Enter for next figure or 0 to exit:\n") == "0"){
         break # We break out of the for loop of plotting
       }
 
@@ -792,23 +868,6 @@ plot.intradayJumpTest <- function(x, ...){
 #' 
 #' @return A list containing "criticalValues" which are the bootstrapped critcal values, "testStatistic" the test statistic of the jump test, "dimensions" which are the dimensions of the jump matrix
 #'  "marketJumpDetections" the jumps detected in the market prices, "stockJumpDetections" the co-jumps detected in the individual stock prices, and "jumpIndices" which are the indices of the detected jumps.
-#' 
-#' @examples 
-#' \dontrun{
-#' #Rank jump test using simulated sample data that includes jumps
-#' ## pretend that the marketPrice is the first asset in the data:
-#' marketPrice <- sample5MinPricesJumps[,1] 
-#' ## construct stockPrice as a list:
-#' stockPrice <- list() 
-#' for (i in 1:(ncol(sample5MinPricesJumps)-1)) {
-#'   stockPrice[[i]] <- sample5MinPricesJumps[,i+1]
-#' }
-#' ## This can take a long time due to the bootstrapping
-#' rankTest <- rankJumpTest(marketPrice, stockPrice, coarseFreq = 10, k = 1, alpha = c(5,3), 
-#'                          tz = "GMT", marketOpen = "09:30:00", marketClose = "16:00:00")
-#' # Plot the detected stock jump detections
-#' plot(rankTest$stockJumpDetections)
-#' }
 #' 
 #' @importFrom stats na.omit quantile runif
 #' @importFrom zoo coredata

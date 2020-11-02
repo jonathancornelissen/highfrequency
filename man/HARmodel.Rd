@@ -11,7 +11,7 @@ HARmodel(
   periodsQ = c(1),
   leverage = NULL,
   RVest = c("rCov", "rBPCov", "rQuar"),
-  type = "HARRV",
+  type = "HAR",
   inputType = "RM",
   jumpTest = "ABDJumptest",
   alpha = 0.05,
@@ -25,7 +25,7 @@ HARmodel(
 \arguments{
 \item{data}{an xts object containing either: intra-day (log-)returns or realized measures already computed from such returns. 
 In case more than one realized measure is needed, the object should have the as many columns as realized measures needed. 
-The first column should always be the realized variance proxy. In case type is either "HARRVQJ" or "CHARRVQ" the order should be "RV", "BPV", "RQ", or the relevant proxies.}
+The first column should always be the realized variance proxy. In case type is either "HARQJ" or "CHARQ" the order should be "RV", "BPV", "RQ", or the relevant proxies.}
 
 \item{periods}{a vector of integers indicating over how days the realized measures in the model should be aggregated. By default  periods = c(1,5,22), which corresponds to one day, one week and one month respectively. This default is in line with Andersen et al. (2007).}
 
@@ -37,11 +37,11 @@ The first column should always be the realized variance proxy. In case type is e
 See Corsi and Reno (2012) for more information. By default leverage = NULL and the model assumes the absence of a  leverage effect. Set leverage = c(1,5,22) to mimic the analysis in Corsi and Reno (2012).}
 
 \item{RVest}{a character vector with one, two, or three elements. The first element always refers to the name of the function to estimate the daily integrated variance (non-jump-robust).
-The second and third element depends on which type of model is estimated: If type = "HARRVJ", type = "HARRVCJ", type = "HARRVQJ" the second element refers to the name of the function to estimate the continuous component of daily volatility (jump robust). If type = "HARRVQ", the second element refers to the name of the function used to estimate the integrated quarticity.
-If type = "HARRVQJ" the third element always refers to the name of the function used to estimate integrated quarticity.
+The second and third element depends on which type of model is estimated: If type = "HARJ", type = "HARCJ", type = "HARQJ" the second element refers to the name of the function to estimate the continuous component of daily volatility (jump robust). If type = "HARQ", the second element refers to the name of the function used to estimate the integrated quarticity.
+If type = "HARQJ" the third element always refers to the name of the function used to estimate integrated quarticity.
 By default RVest = c("rCov","rBPCov","rQuar"), i.e. using the Realized Volatility, Realized Bi-Power Variance, and Realized Quarticity.}
 
-\item{type}{a string referring to the type of HAR model you would like to estimate. By default type = "HARRV", the most basic model. Other valid options are type = "HARRVJ", type = "HARRVCJ", type = "HARRVQ", type = "HARRVQJ", type = "CHARRV", or type = "CHARRVQ".}
+\item{type}{a string referring to the type of HAR model you would like to estimate. By default type = "HAR", the most basic model. Other valid options are type = "HARJ", type = "HARCJ", type = "HARQ", type = "HARQJ", type = "CHAR", or type = "CHARQ".}
 
 \item{inputType}{a string denoting if the input data consists of realized measures or high-frequency returns, default "RM" is the only way to denote realized measures and everything else denotes returns.}
 
@@ -69,27 +69,27 @@ for Realized volatility discussed in Andersen et al. (2007) and Corsi (2009).
 This model is mainly used to forecast the next day's volatility based on the high-frequency returns of the past. Consult the vignette for more information.
 }
 \examples{
-##### Example 1: HARRVCJ #####
+##### Example 1: HARCJ #####
 dat <- sample5MinPricesJumps$stock1
 dat <- makeReturns(dat) #Get the high-frequency return data
 
 x <- HARmodel(dat, periods = c(1,5,10), periodsJ = c(1,5,10),
-             RVest = c("rCov","rBPCov"),
-             type = "HARRVCJ",transform = "sqrt", inputType = "returns")
-# Estimate the HAR model of type HARRVCJ
+              RVest = c("rCov","rBPCov"),
+              type = "HARCJ",transform = "sqrt", inputType = "returns")
+# Estimate the HAR model of type HARCJ
 class(x)
 x
 # plot(x)
 predict(x)
 
 
-##### Example 2: HARRV #####
-# Forecasting daily Realized volatility for the S&P 500 using the basic HARmodel: HARRV
+##### Example 2: HAR #####
+# Forecasting daily Realized volatility for the S&P 500 using the basic HARmodel: HAR
 library(xts)
 RV_SP500 <- as.xts(realizedLibrary$rv5, order.by = realizedLibrary$date)
 
 x <- HARmodel(data = RV_SP500 , periods = c(1,5,22), RVest = c("rCov"),
-              type = "HARRV", h = 1, transform = NULL, inputType = "RM")
+              type = "HAR", h = 1, transform = NULL, inputType = "RM")
 class(x)
 x
 summary(x)
@@ -97,56 +97,56 @@ plot(x)
 predict(x)
 
 
-##### Example 3: HARRVQ #####
+##### Example 3: HARQ #####
 dat <- sample5MinPricesJumps$stock1
 dat <- makeReturns(dat) #Get the high-frequency return data
 #
 x <- HARmodel(dat, periods = c(1,5,10), periodsJ = c(1,5,10),
             periodsQ = c(1), RVest = c("rCov", "rQuar"),
-              type="HARRVQ", inputType = "returns")
-## Estimate the HAR model of type HARRVQ
+              type="HARQ", inputType = "returns")
+## Estimate the HAR model of type HARQ
 class(x)
 x
 # plot(x)
 #predict(x)
 
-##### Example 4: HARRVQJ with already computed realized measures #####
+##### Example 4: HARQJ with already computed realized measures #####
 dat <- SP500RM[, c("RV", "BPV", "RQ")]
 x <- HARmodel(dat, periods = c(1,5,22), periodsJ = c(1),
-              periodsQ = c(1), type = "HARRVQJ")
-## Estimate the HAR model of type HARRVQJ
+              periodsQ = c(1), type = "HARQJ")
+## Estimate the HAR model of type HARQJ
 class(x)
 x
 # plot(x)
 predict(x)
 
-##### Example 5: CHARRV with already computed realized measures #####
+##### Example 5: CHAR with already computed realized measures #####
 dat <- SP500RM[, c("RV", "BPV")]
 
-x <- HARmodel(dat, periods = c(1, 5, 22), type = "CHARRV")
-# Estimate the HAR model of type CHARRV
+x <- HARmodel(dat, periods = c(1, 5, 22), type = "CHAR")
+# Estimate the HAR model of type CHAR
 class(x)
 x
 # plot(x)
 predict(x)
 
-##### Example 6: CHARRVQ with already computed realized measures #####
+##### Example 6: CHARQ with already computed realized measures #####
 dat <- SP500RM[, c("RV", "BPV", "RQ")]
 
-x <- HARmodel(dat, periods = c(1,5,22), periodsQ = c(1), type = "CHARRVQ")
-# Estimate the HAR model of type CHARRVQ
+x <- HARmodel(dat, periods = c(1,5,22), periodsQ = c(1), type = "CHARQ")
+# Estimate the HAR model of type CHARQ
 class(x)
 x
 # plot(x)
 predict(x)
 
-#' ##### Example 7: HARRV #####
-# Forecasting weekly Realized volatility for the S&P 500 using the basic HARmodel: HARRV
+#' ##### Example 7: HAR #####
+# Forecasting weekly Realized volatility for the S&P 500 using the basic HARmodel: HAR
 library(xts)
 RV_SP500 <- as.xts(realizedLibrary$rv5, order.by = realizedLibrary$date)
 
 x <- HARmodel(data = RV_SP500 , periods = c(1,5,22), RVest = c("rCov"),
-              type = "HARRV", h = 5, transform = NULL, inputType = "RM")
+              type = "HAR", h = 5, transform = NULL, inputType = "RM")
 class(x)
 x
 summary(x)

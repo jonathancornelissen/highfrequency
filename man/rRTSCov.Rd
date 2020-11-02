@@ -101,14 +101,6 @@ By setting the argument makePsd = TRUE, the function  \code{\link{makePsd}} is u
 matrix. This function replaces the negative eigenvalues with zeroes.
 }
 \examples{
-# Robust Realized two timescales Variance/Covariance
-data(sampleTData)
-# Univariate: 
-rvRTS <- rRTSCov(pData = sampleTData$PRICE)
-# Note: Prices as input
-rvRTS 
-
-# Multivariate:
 rcRTS <- rRTSCov(pData = list(cumsum(lltc) + 100, cumsum(sbux) + 100))
 # Note: List of prices as input
 rcRTS 

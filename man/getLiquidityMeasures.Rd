@@ -231,9 +231,10 @@ The respective liquidity measures are defined as follows:
  }
 }
 \examples{
-tqData <- matchTradesQuotes(sampleTData, sampleQData)
+tqData <- matchTradesQuotes(sampleTDataMicroseconds[as.Date(DT) == "2018-01-02"], 
+                            sampleQDataMicroseconds[as.Date(DT) == "2018-01-02"])
 res <- getLiquidityMeasures(tqData)
-head(res)
+res
 }
 \references{
 Bessembinder, H. (2003). Issues in assessing trade execution costs. Journal of Financial Markets, 223-257.

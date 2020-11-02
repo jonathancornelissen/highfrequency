@@ -217,9 +217,10 @@
 #' Venkataraman, K. (2001). Automated versus floor trading: An analysis of execution costs on the paris and new york exchanges. The Journal of Finance, 56, 1445-1485.
 #' 
 #' @examples
-#' tqData <- matchTradesQuotes(sampleTData, sampleQData)
+#' tqData <- matchTradesQuotes(sampleTDataMicroseconds[as.Date(DT) == "2018-01-02"], 
+#'                             sampleQDataMicroseconds[as.Date(DT) == "2018-01-02"])
 #' res <- getLiquidityMeasures(tqData)
-#' head(res)
+#' res
 #' @importFrom data.table shift
 #' @export
 getLiquidityMeasures <- function(tqData, win = 300, type = NULL) {
@@ -249,6 +250,8 @@ getLiquidityMeasures <- function(tqData, win = 300, type = NULL) {
       stop("Data.table neeeds DT column (date-time ).")
     }
   }
+  
+  tqData <- copy(tqData)
   
   tqData[, BID := as.numeric(as.character(BID))]
   tqData[, PRICE := as.numeric(as.character(PRICE))] # just for being sure
@@ -304,7 +307,7 @@ getLiquidityMeasures <- function(tqData, win = 300, type = NULL) {
       return(xts(as.matrix(tqData[, -c("DT")]), order.by = tqData$DT)[, type])
     }
   } else {
-    return(tqData)
+    return(tqData[])
   }
 }
 
@@ -326,7 +329,8 @@ getLiquidityMeasures <- function(tqData, win = 300, type = NULL) {
 #' 
 #' @examples 
 #' # generate matched trades and quote data set
-#' tqData <- matchTradesQuotes(sampleTData, sampleQData)
+#' tqData <- matchTradesQuotes(sampleTDataMicroseconds[as.Date(DT) == "2018-01-02"], 
+#'                             sampleQDataMicroseconds[as.Date(DT) == "2018-01-02"])
 #' directions <- getTradeDirection(tqData)
 #' head(directions)
 #' 

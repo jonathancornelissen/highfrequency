@@ -31,12 +31,12 @@
 #'                          on = "seconds", k = 30, tz = "EST")
 #' plot(meandrift)
 #' plot(mediandrift)
-#'
-#' # Example 2: Kernel based estimator for one day
-#' price <- sampleTData$PRICE
-#' storage.mode(price) <- "numeric"
-#' #kerneldrift <- spotDrift(price, method = "driftKernel", on = "minutes", k = 1)
-#' #plot(kerneldrift)
+#'\dontrun{
+#' # Example 2: Kernel based estimator for one day with data.table format
+#' price <- sampleTDataMicroseconds[as.Date(DT) == "2018-01-02", list(DT, PRICE)]
+#' kerneldrift <- spotDrift(price, method = "driftKernel", on = "minutes", k = 1)
+#' plot(kerneldrift)
+#'}
 #'
 #' @importFrom stats filter time
 #' @importFrom utils tail

@@ -32,9 +32,9 @@ in which
 \eqn{RV_{t}:} realized variance
 }
 \examples{
-data(sampleTData)
-rSkew(sampleTData$PRICE,alignBy ="minutes", alignPeriod =5, makeReturns = TRUE)
-
+rs <- rSkew(sampleTDataMicroseconds[, list(DT, PRICE)],alignBy ="minutes", alignPeriod =5,
+            makeReturns = TRUE)
+rs
 }
 \references{
 Amaya, D., Christoffersen, P., Jacobs, K. and Vasquez, A. (2011). Do realized skewness and kurtosis predict the cross-section of equity returns?. CREATES research paper. p. 3-7.

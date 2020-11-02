@@ -29,9 +29,9 @@ Function returns the realized quad-power variation, defined in Andersen et al. (
  }
 }
 \examples{
-data(sampleTData)
-rQPVar(rData= sampleTData$PRICE, alignBy= "minutes", alignPeriod =5, makeReturns= TRUE)
-rQPVar
+qpv <- rQPVar(rData= sampleTDataMicroseconds[, list(DT, PRICE)], alignBy= "minutes", 
+              alignPeriod =5, makeReturns= TRUE)
+qpv
 
 }
 \references{

@@ -80,10 +80,10 @@ there is a seperate wrapper called \code{\link{tradesCleanupUsingQuotes}}.
 # Consider you have raw trade data for 1 stock for 2 days 
 head(sampleTDataRawMicroseconds)
 dim(sampleTDataRawMicroseconds)
-tDataAfterFirstCleaning <- tradesCleanup(tDataRaw = sampleTDataRaw, exchanges = list("N"))
+tDataAfterFirstCleaning <- tradesCleanup(tDataRaw = sampleTDataRawMicroseconds, 
+                                         exchanges = list("N"))
 tDataAfterFirstCleaning$report
 dim(tDataAfterFirstCleaning$tData)
-
 #In case you have more data it is advised to use the on-disk functionality
 #via "dataSource" and "dataDestination" arguments
 

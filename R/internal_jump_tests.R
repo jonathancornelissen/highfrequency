@@ -77,12 +77,27 @@ scale <- function (alignBy) {
 #Function to calculate simple returns#
 #' @keywords internal
 simre <- function (pData) {
+  inputWasXts <- is.xts(pData)
   l <- dim(pData)[1]
+  if(is.null(l)) { ## Special case for ts is numeric vector
+    l <- length(pData)
+    D <- 1
+  } else {
+    D <- dim(pData)[2]
+  }
+  
+  col_names <- colnames(pData)
   x <- matrix(as.numeric(pData), nrow = l)
+  
   x[(2:l), ] <- x[(2:l), ]/x[(1:(l - 1)), ]-1
-  x[1, ] <- rep(0, dim(pData)[2])
-  x <- xts(x, order.by = index(pData))
-  return(x)
+  x[1, ] <- rep(0, D)
+  if(inputWasXts){
+    x <- xts(x, order.by = index(pData))
+  }
+  colnames(x) <- col_names
+  return(x[])
+  
+  
 }
 
 tqfun <- function(rData){ #Calculate the realized tripower quarticity

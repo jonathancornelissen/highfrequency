@@ -60,8 +60,8 @@ fastTickAgregation_DATA.TABLE <- function(dat, on = "minutes", k = 1, tz = "GMT"
   dat <- dat[, lapply(.SD, nafill, type = "locf"), .SDcols = colnames(dat), by = list(DATE = as.Date(DT, tz = tz))]
   dat <- dat[, lapply(.SD, nafill, type = "nocb"), by = DATE]
   g <- dat[, list(DT = seq(first(DT), last(DT), by = secs, tz = tz), MAXDT = max(DT)), by = DATE]
-  
-  g$DT <- as.POSIXct(as.numeric(g$DT, tz = tz) + (secs - as.numeric(g$DT, tz = tz) %% secs), origin = as.POSIXct("1970-01-01", tz = tz), tz = tz)
+  g$DT <- g$DT + (secs - as.numeric(g$DT, tz = tz) %% secs)
+  # g$DT <- as.POSIXct(as.numeric(g$DT, tz = tz) + (secs - as.numeric(g$DT, tz = tz) %% secs), origin = as.POSIXct("1970-01-01", tz = tz), tz = tz)
   # dropDATE <- ifelse("DATE" %in% colnames(dat), "i.DATE", character(0))
   out <- dat[g, roll = TRUE, on = "DT"][DT < MAXDT + secs]
   

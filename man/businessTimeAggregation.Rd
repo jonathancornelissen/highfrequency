@@ -32,19 +32,18 @@ Time series aggregation based on `business time` statistics. Instead of equidist
 For example when sampling based on volume, business time aggregation will result in a time series that has an equal amount of volume between each observation (if possible).
 }
 \examples{
-pData <- sampleTData[,c("PRICE", "SIZE")]
-storage.mode(pData) <- "numeric"
+pData <- sampleTDataMicroseconds[,list(DT, PRICE, SIZE)]
 # Aggregate based on the trade intensity measure. Getting 390 observations.
 agged <- businessTimeAggregation(pData, measure = "intensity", obs = 390, bandwidth = 0.075)
 # Plot the trade intensity measure
-plot.ts(agged$intensityProcess$`2008-01-04`)
-rCov(agged$pData[,"PRICE"], makeReturns = TRUE)
-rCov(pData[,"PRICE"], makeReturns = TRUE, alignBy = "minutes", alignPeriod = 1)
+plot.ts(agged$intensityProcess$`2018-01-02`)
+rCov(agged$pData[, list(DT, PRICE)], makeReturns = TRUE)
+rCov(pData[,list(DT, PRICE)], makeReturns = TRUE, alignBy = "minutes", alignPeriod = 1)
 
 # Aggregate based on the volume measure. Getting 78 observations.
 agged <- businessTimeAggregation(pData, measure = "volume", obs = 78)
-rCov(agged$pData[,"PRICE"], makeReturns = TRUE)
-rCov(pData[,"PRICE"], makeReturns = TRUE, alignBy = "minutes", alignPeriod = 5)
+rCov(agged$pData[,list(DT, PRICE)], makeReturns = TRUE)
+rCov(pData[,list(DT, PRICE)], makeReturns = TRUE, alignBy = "minutes", alignPeriod = 5)
 
 }
 \references{

@@ -29,10 +29,9 @@ Function returns the medRQ, defined in Andersen et al. (2012).
   }
 }
 \examples{
-\dontrun{
-medRQ(rData = sampleTData$PRICE, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)
-medRQ
-}
+rq <- medRQ(rData = sampleTDataMicroseconds[, list(DT, PRICE)], alignBy = "minutes", 
+            alignPeriod = 5, makeReturns = TRUE)
+rq
 }
 \references{
 Andersen, T. G., D. Dobrev, and E. Schaumburg (2012). Jump-robust volatility estimation using nearest neighbor truncation. Journal of Econometrics, 169(1), 75- 93.

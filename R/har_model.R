@@ -59,17 +59,17 @@ harInsanityFilter <- function(fittedValues, lower, upper, replacement) {
 #'
 #' @param data  an xts object containing either: intra-day (log-)returns or realized measures already computed from such returns. 
 #' In case more than one realized measure is needed, the object should have the as many columns as realized measures needed. 
-#' The first column should always be the realized variance proxy. In case type is either "HARRVQJ" or "CHARRVQ" the order should be "RV", "BPV", "RQ", or the relevant proxies.
+#' The first column should always be the realized variance proxy. In case type is either "HARQJ" or "CHARQ" the order should be "RV", "BPV", "RQ", or the relevant proxies.
 #' @param periods a vector of integers indicating over how days the realized measures in the model should be aggregated. By default  periods = c(1,5,22), which corresponds to one day, one week and one month respectively. This default is in line with Andersen et al. (2007).
 #' @param periodsJ a vector of integers indicating over what time periods the jump components in the model should be aggregated. By default periodsJ = c(1,5,22), which corresponds to one day, one week and one month respectively.
 #' @param periodsQ a vector of integers indicating over what time periods the realized quarticity in the model should be aggregated. By default periodsQ = c(1,5,22), which corresponds to one day, one week and one month respectively.
 #' @param leverage a vector of integers indicating over what periods the negative returns should be aggregated.
 #' See Corsi and Reno (2012) for more information. By default leverage = NULL and the model assumes the absence of a  leverage effect. Set leverage = c(1,5,22) to mimic the analysis in Corsi and Reno (2012).
 #' @param RVest a character vector with one, two, or three elements. The first element always refers to the name of the function to estimate the daily integrated variance (non-jump-robust).
-#' The second and third element depends on which type of model is estimated: If type = "HARRVJ", type = "HARRVCJ", type = "HARRVQJ" the second element refers to the name of the function to estimate the continuous component of daily volatility (jump robust). If type = "HARRVQ", the second element refers to the name of the function used to estimate the integrated quarticity.
-#' If type = "HARRVQJ" the third element always refers to the name of the function used to estimate integrated quarticity.
+#' The second and third element depends on which type of model is estimated: If type = "HARJ", type = "HARCJ", type = "HARQJ" the second element refers to the name of the function to estimate the continuous component of daily volatility (jump robust). If type = "HARQ", the second element refers to the name of the function used to estimate the integrated quarticity.
+#' If type = "HARQJ" the third element always refers to the name of the function used to estimate integrated quarticity.
 #' By default RVest = c("rCov","rBPCov","rQuar"), i.e. using the Realized Volatility, Realized Bi-Power Variance, and Realized Quarticity.
-#' @param type a string referring to the type of HAR model you would like to estimate. By default type = "HARRV", the most basic model. Other valid options are type = "HARRVJ", type = "HARRVCJ", type = "HARRVQ", type = "HARRVQJ", type = "CHARRV", or type = "CHARRVQ".
+#' @param type a string referring to the type of HAR model you would like to estimate. By default type = "HAR", the most basic model. Other valid options are type = "HARJ", type = "HARCJ", type = "HARQ", type = "HARQJ", type = "CHAR", or type = "CHARQ".
 #' @param inputType a string denoting if the input data consists of realized measures or high-frequency returns, default "RM" is the only way to denote realized measures and everything else denotes returns.
 #' @param jumpTest the function name of a function used to test whether the test statistic which determines whether the jump variability is significant that day. By default jumpTest = "ABDJumptest", hence using the test statistic in Equation or Equation (18) of Andersen et al. (2007).
 #' @param alpha a real indicating the confidence level used in testing for jumps. By default alpha = 0.05.
@@ -91,27 +91,27 @@ harInsanityFilter <- function(fittedValues, lower, upper, replacement) {
 #' @keywords forecasting
 #'
 #' @examples
-#' ##### Example 1: HARRVCJ #####
+#' ##### Example 1: HARCJ #####
 #' dat <- sample5MinPricesJumps$stock1
 #' dat <- makeReturns(dat) #Get the high-frequency return data
 #'
 #' x <- HARmodel(dat, periods = c(1,5,10), periodsJ = c(1,5,10),
-#'              RVest = c("rCov","rBPCov"),
-#'              type = "HARRVCJ",transform = "sqrt", inputType = "returns")
-#' # Estimate the HAR model of type HARRVCJ
+#'               RVest = c("rCov","rBPCov"),
+#'               type = "HARCJ",transform = "sqrt", inputType = "returns")
+#' # Estimate the HAR model of type HARCJ
 #' class(x)
 #' x
 #' # plot(x)
 #' predict(x)
 #'
 #'
-#' ##### Example 2: HARRV #####
-#' # Forecasting daily Realized volatility for the S&P 500 using the basic HARmodel: HARRV
+#' ##### Example 2: HAR #####
+#' # Forecasting daily Realized volatility for the S&P 500 using the basic HARmodel: HAR
 #' library(xts)
 #' RV_SP500 <- as.xts(realizedLibrary$rv5, order.by = realizedLibrary$date)
 #'
 #' x <- HARmodel(data = RV_SP500 , periods = c(1,5,22), RVest = c("rCov"),
-#'               type = "HARRV", h = 1, transform = NULL, inputType = "RM")
+#'               type = "HAR", h = 1, transform = NULL, inputType = "RM")
 #' class(x)
 #' x
 #' summary(x)
@@ -119,56 +119,56 @@ harInsanityFilter <- function(fittedValues, lower, upper, replacement) {
 #' predict(x)
 #'
 #'
-#' ##### Example 3: HARRVQ #####
+#' ##### Example 3: HARQ #####
 #' dat <- sample5MinPricesJumps$stock1
 #' dat <- makeReturns(dat) #Get the high-frequency return data
 #' #
 #' x <- HARmodel(dat, periods = c(1,5,10), periodsJ = c(1,5,10),
 #'             periodsQ = c(1), RVest = c("rCov", "rQuar"),
-#'               type="HARRVQ", inputType = "returns")
-#' ## Estimate the HAR model of type HARRVQ
+#'               type="HARQ", inputType = "returns")
+#' ## Estimate the HAR model of type HARQ
 #' class(x)
 #' x
 #' # plot(x)
 #' #predict(x)
 #' 
-#' ##### Example 4: HARRVQJ with already computed realized measures #####
+#' ##### Example 4: HARQJ with already computed realized measures #####
 #' dat <- SP500RM[, c("RV", "BPV", "RQ")]
 #' x <- HARmodel(dat, periods = c(1,5,22), periodsJ = c(1),
-#'               periodsQ = c(1), type = "HARRVQJ")
-#' ## Estimate the HAR model of type HARRVQJ
+#'               periodsQ = c(1), type = "HARQJ")
+#' ## Estimate the HAR model of type HARQJ
 #' class(x)
 #' x
 #' # plot(x)
 #' predict(x)
 #'
-#' ##### Example 5: CHARRV with already computed realized measures #####
+#' ##### Example 5: CHAR with already computed realized measures #####
 #' dat <- SP500RM[, c("RV", "BPV")]
 #'
-#' x <- HARmodel(dat, periods = c(1, 5, 22), type = "CHARRV")
-#' # Estimate the HAR model of type CHARRV
+#' x <- HARmodel(dat, periods = c(1, 5, 22), type = "CHAR")
+#' # Estimate the HAR model of type CHAR
 #' class(x)
 #' x
 #' # plot(x)
 #' predict(x)
 #'
-#' ##### Example 6: CHARRVQ with already computed realized measures #####
+#' ##### Example 6: CHARQ with already computed realized measures #####
 #' dat <- SP500RM[, c("RV", "BPV", "RQ")]
 #' 
-#' x <- HARmodel(dat, periods = c(1,5,22), periodsQ = c(1), type = "CHARRVQ")
-#' # Estimate the HAR model of type CHARRVQ
+#' x <- HARmodel(dat, periods = c(1,5,22), periodsQ = c(1), type = "CHARQ")
+#' # Estimate the HAR model of type CHARQ
 #' class(x)
 #' x
 #' # plot(x)
 #' predict(x)
 #'
-#'#' ##### Example 7: HARRV #####
-#' # Forecasting weekly Realized volatility for the S&P 500 using the basic HARmodel: HARRV
+#'#' ##### Example 7: HAR #####
+#' # Forecasting weekly Realized volatility for the S&P 500 using the basic HARmodel: HAR
 #' library(xts)
 #' RV_SP500 <- as.xts(realizedLibrary$rv5, order.by = realizedLibrary$date)
 #'
 #' x <- HARmodel(data = RV_SP500 , periods = c(1,5,22), RVest = c("rCov"),
-#'               type = "HARRV", h = 5, transform = NULL, inputType = "RM")
+#'               type = "HAR", h = 5, transform = NULL, inputType = "RM")
 #' class(x)
 #' x
 #' summary(x)
@@ -178,22 +178,22 @@ harInsanityFilter <- function(fittedValues, lower, upper, replacement) {
 #' @import RcppArmadillo
 #' @export
 HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), periodsQ = c(1),
-                     leverage=NULL, RVest = c("rCov","rBPCov", "rQuar"), type = "HARRV", inputType = "RM",
+                     leverage=NULL, RVest = c("rCov","rBPCov", "rQuar"), type = "HAR", inputType = "RM",
                      jumpTest = "ABDJumptest", alpha = 0.05, h = 1, transform = NULL, externalRegressor = NULL, periodsExternal = c(1), ...){
 
   nperiods <- length(periods) # Number of periods to aggregate over
   nest <- length(RVest)      # Number of RV estimators
   nperiodsQ <- length(periodsQ) #Number of periods to aggregate realized quarticity over
-  jumpModels <- c("HARRVJ", "HARRVCJ", "HARRVQJ", "CHARRV", "CHARRVQ")
-  quarticityModels <- c("HARRVQ", "HARRVQJ", "CHARRVQ")
-  bpvModels <- c("CHARRV", "CHARRVQ")
+  jumpModels <- c("HARJ", "HARCJ", "HARQJ", "CHAR", "CHARQ")
+  quarticityModels <- c("HARQ", "HARQJ", "CHARQ")
+  bpvModels <- c("CHAR", "CHARQ")
   if(!is.xts(data)){
     stop("The data in the HARmodel function must be of xts format.")
   }
   if (!is.null(transform)) {
     Ftransform = match.fun(transform)
   }
-  if (!(type %in% c("HARRV", jumpModels, quarticityModels))) {
+  if (!(type %in% c("HAR", jumpModels, quarticityModels))) {
     warning("Please provide a valid argument for type, see documentation.")
   }
   if(!is.null(externalRegressor)){
@@ -214,13 +214,13 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
       RM2 <- apply.daily(data, RV2)
     }
     if( type %in% quarticityModels ) {
-      if(type %in% c("HARRVQJ","CHARRVQ")){##HARRVQJ and CHARRVQ are the only models that need both BPV and realized quarticity.
+      if(type %in% c("HARQJ","CHARQ")){##HARQJ and CHARQ are the only models that need both BPV and realized quarticity.
         RV2 <- match.fun(RVest[2])
         RM2 <- apply.daily(data, RV2)
         RV3 <- match.fun(RVest[3])
         RM3 <- apply.daily(data, RV3)
       }
-      if(type == "HARRVQ"){
+      if(type == "HARQ"){
         RV3 <- match.fun( RVest[2])
         RM3 <- apply.daily( data, RV3 )
         periodsJ <- periods
@@ -235,10 +235,10 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
     if (type %in% jumpModels) {
       RM2 <- data[,2]
     }
-    if (type == "HARRVQ") {
+    if (type == "HARQ") {
       RM3 <- data[,2]
     }
-    if (type %in% c("HARRVQJ", "CHARRVQ")) {
+    if (type %in% c("HARQJ", "CHARQ")) {
       RM2 <- data[, 2]
       RM3 <- data[, 3]
     }
@@ -320,7 +320,7 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
   
   # Estimate the model parameters, according to type of model :
   # First model type: traditional HAR-RV:
-  if (type == "HARRV") {
+  if (type == "HAR") {
     if (!is.null(transform)) {
       y  <- Ftransform(y)
       x1 <- Ftransform(x1)
@@ -337,7 +337,7 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
 
   } #End HAR-RV if cond
 
-  if (type == "HARRVJ") {
+  if (type == "HARJ") {
     if (!is.null(transform) && transform == "log") {
       J <- J + 1
     }
@@ -356,7 +356,7 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
     model$RVest <- RVest
   }#End HAR-RV-J if cond
 
-  if (type == "HARRVCJ") {
+  if (type == "HARCJ") {
     # Are the jumps significant? if not set to zero:
     if (jumpTest == "ABDJumptest" ) {
       
@@ -407,7 +407,7 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
     }
   }
 
-  if (type == "HARRVQ") {
+  if (type == "HARQ") {
     if (!is.null(transform)) {
       y  <- Ftransform(y)
       x1 <- Ftransform(x1)
@@ -430,7 +430,7 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
     }
   }
 
-  if (type == "HARRVQJ") {
+  if (type == "HARQJ") {
     if (!is.null(transform) && transform == "log") {
       J <- J + 1
     }
@@ -455,7 +455,7 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
     }
   }
 
-  if (type == "CHARRV") {
+  if (type == "CHAR") {
     if (!is.null(transform)) {
       y  <- Ftransform(y)
       x2 <- Ftransform(x2)
@@ -469,7 +469,7 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
     }
   } #End CHAR-RV if cond
 
-  if (type == "CHARRVQ") {
+  if (type == "CHARQ") {
     if (!is.null(transform)) {
       y  <- Ftransform(y)
       x2 <- Ftransform(x2)
@@ -551,9 +551,9 @@ predict.HARmodel <- function(object, newdata = NULL, warnings = TRUE, ...) {
   # If no new data is provided - just forecast on the last day of your estimation sample
   # If new data with colnames as in object$model$x is provided, i.e. right measures for that model, just use that data
   ##### These 4 lines are added to make adding new models (hopefully) easier
-  jumpModels <- c("HARRVJ", "HARRVCJ", "HARRVQJ", "CHARRV", "CHARRVQ")
-  quarticityModels <- c("HARRVQ", "HARRVQJ", "CHARRVQ")
-  bpvModels <- c("CHARRV", "CHARRVQ")
+  jumpModels <- c("HARJ", "HARCJ", "HARQJ", "CHAR", "CHARQ")
+  quarticityModels <- c("HARQ", "HARQJ", "CHARQ")
+  bpvModels <- c("CHAR", "CHARQ")
   #### Initialization
   type <- object$type
   inputType <- object$inputType
@@ -593,14 +593,14 @@ predict.HARmodel <- function(object, newdata = NULL, warnings = TRUE, ...) {
     # Aggregate price data as in HARmodel function
 
     # Extract periods from coefficient names
-    if (type == "HARRV") {
+    if (type == "HAR") {
       # RV component
       periods <- as.numeric(substring(names(object$coefficients[-1])[grep("RV", names(object$coefficients[-1]))], first = 4))
       periodsJ <- 0
       periodsQ <- 0
       nperiodsQ <- length(periodsQ)
     }
-    if (type == "HARRVJ") {
+    if (type == "HARJ") {
       # RV component
       periods <- as.numeric(substring(names(object$coefficients[-1])[grep("RV", names(object$coefficients[-1]))], first = 4))
       # Jump components
@@ -609,7 +609,7 @@ predict.HARmodel <- function(object, newdata = NULL, warnings = TRUE, ...) {
       periodsQ <- 0
       nperiodsJ <- length(periodsJ)
     }
-    if (type == "HARRVCJ") {
+    if (type == "HARCJ") {
       # Continuous component
       periods <- as.numeric(substring(names(object$coefficients[-1])[grep("C", names(object$coefficients[-1]))], first = 3))
       # Jump component
@@ -618,7 +618,7 @@ predict.HARmodel <- function(object, newdata = NULL, warnings = TRUE, ...) {
       periodsQ <- 0
       nperiodsJ <- length(periodsJ)
     }
-    if (type == "HARRVQ") {
+    if (type == "HARQ") {
       # RV component
       periods <- as.numeric(substring(names(object$coefficients[-1])[grep("RV", names(object$coefficients[-1]))], first = 4))
       # Jump component
@@ -627,7 +627,7 @@ predict.HARmodel <- function(object, newdata = NULL, warnings = TRUE, ...) {
       periodsQ <- as.numeric(substring(names(object$coefficients[-1])[grep("RQ", names(object$coefficients[-1]))], first = 4))
       nperiodsQ <- length(periodsQ)
     }
-    if (type == "HARRVQJ") {
+    if (type == "HARQJ") {
       # RV component
       periods <- as.numeric(substring(names(object$coefficients[-1])[grep("RV", names(object$coefficients[-1]))], first = 4))
       # Jump component
@@ -637,7 +637,7 @@ predict.HARmodel <- function(object, newdata = NULL, warnings = TRUE, ...) {
       nperiodsQ <- length(periodsQ)
       nperiodsJ <- length(periodsJ)
     }
-    if (type == "CHARRV") {
+    if (type == "CHAR") {
       # Continuous component
       periods <- as.numeric(substring(names(object$coefficients[-1])[grep("RV", names(object$coefficients[-1]))], first = 4))
       # Jump component
@@ -646,7 +646,7 @@ predict.HARmodel <- function(object, newdata = NULL, warnings = TRUE, ...) {
       periodsQ <- 0
       nperiodsQ <- length(periodsQ)
     }
-    if (type == "CHARRVQ") {
+    if (type == "CHARQ") {
       # Continuous component
       periods <- as.numeric(substring(names(object$coefficients[-1])[grep("RV", names(object$coefficients[-1]))], first = 4))
       # Jump component
@@ -673,13 +673,13 @@ predict.HARmodel <- function(object, newdata = NULL, warnings = TRUE, ...) {
         RM2 <- apply.daily(newdata, RV2)
       }
       if (type %in% quarticityModels ) {
-        if(type %in% c("HARRVQJ","CHARRVQ")){##HARRVQJ and CHARRVQ are the only models that need both BPV and realized quarticity.
+        if(type %in% c("HARQJ","CHARQ")){##HARQJ and CHARQ are the only models that need both BPV and realized quarticity.
           RV2 <- match.fun( RVest[2])
           RM2 <- apply.daily(newdata, RV2 )
           RV3 <- match.fun( RVest[3])
           RM3 <- apply.daily(newdata, RV3 )
         }
-        if(type == "HARRVQ"){
+        if(type == "HARQ"){
           RV3 <- match.fun(RVest[2])
           RM3 <- apply.daily(newdata, RV3)
         }
@@ -753,14 +753,14 @@ predict.HARmodel <- function(object, newdata = NULL, warnings = TRUE, ...) {
       rmin <- matrix(ncol=0,nrow=dim(x1)[1])
     }
 
-    if (type == "HARRV") {
+    if (type == "HAR") {
       if (!is.null(object$transform)) {
         x1 <- Ftransform(x1)
       }
       x <- cbind(x1, rmin)
     }
 
-    if (type == "HARRVJ") {
+    if (type == "HARJ") {
 
       if (!is.null(object$transform) && transform=="log") {
         J <- J + 1
@@ -773,7 +773,7 @@ predict.HARmodel <- function(object, newdata = NULL, warnings = TRUE, ...) {
       x <- cbind(x,rmin)
     }
 
-    if (type == "HARRVCJ") {
+    if (type == "HARCJ") {
 
       if (object$jumpTest=="ABDJumptest") {
         TQ <- apply.daily(newdata, RTQ)
@@ -809,7 +809,7 @@ predict.HARmodel <- function(object, newdata = NULL, warnings = TRUE, ...) {
       x <- cbind(x, rmin)
     }
 
-    if (type == "HARRVQ") {
+    if (type == "HARQ") {
       if (!is.null(transform)) {
         y  <- Ftransform(y)
         x1 <- Ftransform(x1)
@@ -822,7 +822,7 @@ predict.HARmodel <- function(object, newdata = NULL, warnings = TRUE, ...) {
       x <- cbind(x1,rmin)
     }
 
-    if (type == "HARRVQJ") {
+    if (type == "HARQJ") {
       if (!is.null(transform) && transform=="log") {
         J <- J + 1
       }
@@ -839,7 +839,7 @@ predict.HARmodel <- function(object, newdata = NULL, warnings = TRUE, ...) {
       x <- cbind(x1,rmin)
     }
 
-    if (type == "CHARRV") {
+    if (type == "CHAR") {
       if (!is.null(transform)) {
         y <- Ftransform(y)
         x2 <- Ftransform(x2)
@@ -847,7 +847,7 @@ predict.HARmodel <- function(object, newdata = NULL, warnings = TRUE, ...) {
       x <- cbind(x2,rmin)
     } #End CHAR-RV if cond
 
-    if (type == "CHARRVQ") {
+    if (type == "CHARQ") {
       if (!is.null(transform)) {
         y  <- Ftransform(y)
         x2 <- Ftransform(x2)

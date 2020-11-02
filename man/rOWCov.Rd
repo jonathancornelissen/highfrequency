@@ -83,8 +83,7 @@ a zero weight, due to which the rOWCov can have a low finite sample efficiency i
 # at 5 minutes.
 
 # Univariate: 
-rvoutw <- rOWCov(rData = sampleTData$PRICE, alignBy = "minutes",
-                   alignPeriod = 5, makeReturns = TRUE)
+rvoutw <- rOWCov(rData = sample5MinPricesJumps['2010-01-04', 1])
 rvoutw 
 
 # Multivariate: 
