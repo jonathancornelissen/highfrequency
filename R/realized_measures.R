@@ -416,9 +416,13 @@ medRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
 #' 
 #' @examples 
-#' a <- list(sample5MinPricesJumps["2010-01-04",1], sample5MinPricesJumps["2010-01-04",2])
+#' \dontrun{
+#' library("xts")
+#' a <- list(as.xts(sampleOneMinuteData[as.Date(DT) == "2001-08-04", list(DT, MARKET)]), 
+#'           as.xts(sampleOneMinuteData[as.Date(DT) == "2001-08-04", list(DT, STOCK)]))
 #' MRC(a, pairwise = TRUE, makePsd = TRUE)
 #' 
+#' }
 #' @keywords highfrequency preaveraging
 #' @export
 MRC <- function(pData, pairwise = FALSE, makePsd = FALSE) {
@@ -833,9 +837,12 @@ rAVGCov <- function(rData, cor = FALSE, alignBy = "minutes", alignPeriod = 5, k 
 #' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
 #' 
 #' @examples 
-#' a <- sample5MinPricesJumps['2010-01-04', 1]
-#' b <- sample5MinPricesJumps['2010-01-04', 2]
+#' \dontrun{
+#' library("xts")
+#' a <- as.xts(sampleOneMinuteData[as.Date(DT) == "2001-08-04", list(DT, MARKET)])
+#' b <-  as.xts(sampleOneMinuteData[as.Date(DT) == "2001-08-04", list(DT, STOCK)])
 #' rBeta(a, b, RCOVestimator = "rBPCov", RVestimator = "minRV", makeReturns = TRUE)
+#' }
 #' 
 #' @keywords highfrequency rBeta
 #' @importFrom methods hasArg
@@ -956,10 +963,8 @@ rBeta <- function(rData, rIndex, RCOVestimator = "rCov", RVestimator = "RV", mak
 #' # Univariate: 
 #' rbpv <- rBPCov(rData = sampleTDataMicroseconds[, list(DT, PRICE)], alignBy ="minutes", 
 #'                alignPeriod = 5, makeReturns = TRUE) 
-#' rbpv 
-#'  
 #' # Multivariate: 
-#' rbpc <- rBPCov(rData = sample5MinPricesJumps['2010-01-04'], makeReturns = TRUE, makePsd = TRUE)
+#' rbpc <- rBPCov(rData = sampleOneMinuteData, makeReturns = TRUE, makePsd = TRUE)
 #' rbpc
 #'  
 #' @keywords volatility
@@ -1097,7 +1102,7 @@ rBPCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeR
 #' rv
 #' 
 #' # Multivariate: 
-#' rc = rCov(rData = sample5MinPricesJumps['2010-01-04'], makeReturns=TRUE)
+#' rc = rCov(rData = sampleOneMinuteData, makeReturns=TRUE)
 #' rc
 #' @keywords volatility
 #' @export
@@ -1664,16 +1669,21 @@ rMPV <- function(rData, m = 2, p = 2, alignBy = NULL, alignPeriod = NULL, makeRe
 #' @author Jonathan Cornelissen and Kris Boudt
 #' 
 #' @examples 
+#' \dontrun{
+#' library("xts")
 #' # Realized Outlyingness Weighted Variance/Covariance for prices aligned   
 #' # at 5 minutes.
 #' 
 #' # Univariate: 
-#' rvoutw <- rOWCov(rData = sample5MinPricesJumps['2010-01-04', 1])
-#' rvoutw 
+#' row <- rOWCov(rData = as.xts(sampleOneMinuteData[as.Date(DT) == "2001-08-04", 
+#'                                                  list(DT, MARKET)]), makeReturns = TRUE)
+#' row
 #' 
 #' # Multivariate: 
-#' rcoutw <- rOWCov(rData = sample5MinPricesJumps['2010-01-04'], makeReturns = TRUE)
-#' rcoutw
+#' rowc <- rOWCov(rData = as.xts(sampleOneMinuteData[as.Date(DT) == "2001-08-04",]), 
+#'                makeReturns = TRUE)
+#' rowc
+#' }
 #' 
 #' @keywords volatility
 #' @export
@@ -2817,12 +2827,9 @@ rCholCov <- function(pData, IVest = "MRC", COVest = "MRC", criterion = "squared 
 #' rSV = rSemiCov(rData = sampleTDataMicroseconds[, list(DT, PRICE)], alignBy = "minutes", 
 #'                    alignPeriod = 5, makeReturns = TRUE)
 #' rSV
-#' # Multivariate single day: 
-#' rSC = rSemiCov(rData = sample5MinPricesJumps['2010-01-04'], makeReturns=TRUE)
-#' 
 #' \dontrun{
 #' # Multivariate multi day:
-#' rSC <- rSemiCov(sample5MinPrices, makeReturns = TRUE) # rSC is a list of lists
+#' rSC <- rSemiCov(sampleOneMinuteData, makeReturns = TRUE) # rSC is a list of lists
 #' # We extract the covariance between stock 1 and stock 2 for all three covariances.
 #' mixed <- do.call(rbind, lapply(rSC, function(x) x[["mixed"]][1,2]))
 #' neg <- do.call(rbind, lapply(rSC, function(x) x[["negative"]][1,2]))

@@ -124,10 +124,11 @@ BoxCox__ <- function(x, lambda){
 #' @keywords internal
 timeOfDayAdjustments <- function(returns, n, m, polyOrder){
   
-  
   timePolyMatrix <- matrix(rep(1:nrow(returns), each = polyOrder + 1)^(0:polyOrder), nrow = nrow(returns), ncol = polyOrder + 1, byrow = TRUE)
   
-  timeOfDayScatter <- 1.249531 * rowMeans((abs(returns[,1:(m-2)])* abs(returns[,2:(m-1)]) * abs(returns[,3:m]))^(2/3))
+  timeOfDayScatter <- 1.249531 * rowMeans((abs(returns[,1:(m-2), drop = FALSE]) * 
+                                             abs(returns[,2:(m-1), drop = FALSE]) * 
+                                             abs(returns[,3:m, drop = FALSE]))^(2/3))
   
   timeOfDayBeta <- as.numeric(solve(t(timePolyMatrix) %*% timePolyMatrix) %*% t(timePolyMatrix) %*% timeOfDayScatter)
   
@@ -146,9 +147,8 @@ timeOfDayAdjustments <- function(returns, n, m, polyOrder){
 #' @keywords internal
 #' @importFrom zoo coredata
 jumpDetection <- function(returns, alpha, nRets, nDays){
-  
   returns <- matrix(coredata(returns), nrow = nRets, ncol = nDays, byrow = FALSE) #remap returns
-  bpv <- pi/2 * colSums(abs(returns[1:(nRets-1),]) * abs(returns[2:nRets,]))
+  bpv <- pi/2 * colSums(abs(returns[1:(nRets-1),, drop = FALSE]) * abs(returns[2:nRets,, drop = FALSE]))
   rv <- colSums(returns^2)
   TODadjustments <- timeOfDayAdjustments(returns, n=nRets,  m = nDays, polyOrder = 2)
   Un <- alpha * sqrt(kronecker(pmin(bpv,rv), TODadjustments$timeOfDayFit)) * (1/nRets) ^0.49

@@ -91,21 +91,7 @@ harInsanityFilter <- function(fittedValues, lower, upper, replacement) {
 #' @keywords forecasting
 #'
 #' @examples
-#' ##### Example 1: HARCJ #####
-#' dat <- sample5MinPricesJumps$stock1
-#' dat <- makeReturns(dat) #Get the high-frequency return data
-#'
-#' x <- HARmodel(dat, periods = c(1,5,10), periodsJ = c(1,5,10),
-#'               RVest = c("rCov","rBPCov"),
-#'               type = "HARCJ",transform = "sqrt", inputType = "returns")
-#' # Estimate the HAR model of type HARCJ
-#' class(x)
-#' x
-#' # plot(x)
-#' predict(x)
-#'
-#'
-#' ##### Example 2: HAR #####
+#' ##### Example 1: HAR #####
 #' # Forecasting daily Realized volatility for the S&P 500 using the basic HARmodel: HAR
 #' library(xts)
 #' RV_SPY <- as.xts(SPYRM$RV5, order.by = SPYRM$DT)
@@ -119,10 +105,9 @@ harInsanityFilter <- function(fittedValues, lower, upper, replacement) {
 #' predict(x)
 #'
 #'
-#' ##### Example 3: HARQ #####
-#' dat <- sample5MinPricesJumps$stock1
-#' dat <- makeReturns(dat) #Get the high-frequency return data
-#' #
+#' ##### Example 2: HARQ #####
+#' # Get the highfrequency returns
+#' dat <- as.xts(sampleOneMinuteData[, makeReturns(STOCK), by = list(DATE = as.Date(DT))])
 #' x <- HARmodel(dat, periods = c(1,5,10), periodsJ = c(1,5,10),
 #'             periodsQ = c(1), RVest = c("rCov", "rQuar"),
 #'               type="HARQ", inputType = "returns")
@@ -132,7 +117,7 @@ harInsanityFilter <- function(fittedValues, lower, upper, replacement) {
 #' # plot(x)
 #' #predict(x)
 #' 
-#' ##### Example 4: HARQJ with already computed realized measures #####
+#' ##### Example 3: HARQJ with already computed realized measures #####
 #' dat <- SPYRM[, list(DT, RV5, BPV5, RQ5)]
 #' x <- HARmodel(as.xts(dat), periods = c(1,5,22), periodsJ = c(1),
 #'               periodsQ = c(1), type = "HARQJ")
@@ -142,7 +127,7 @@ harInsanityFilter <- function(fittedValues, lower, upper, replacement) {
 #' # plot(x)
 #' predict(x)
 #'
-#' ##### Example 5: CHAR with already computed realized measures #####
+#' ##### Example 4: CHAR with already computed realized measures #####
 #' dat <- SPYRM[, list(DT, RV5, BPV5)]
 #'
 #' x <- HARmodel(as.xts(dat), periods = c(1, 5, 22), type = "CHAR")
@@ -152,7 +137,7 @@ harInsanityFilter <- function(fittedValues, lower, upper, replacement) {
 #' # plot(x)
 #' predict(x)
 #'
-#' ##### Example 6: CHARQ with already computed realized measures #####
+#' ##### Example 5: CHARQ with already computed realized measures #####
 #' dat <- SPYRM[, list(DT, RV5, BPV5, RQ5)]
 #' 
 #' x <- HARmodel(as.xts(dat), periods = c(1,5,22), periodsQ = c(1), type = "CHARQ")
@@ -369,7 +354,7 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
     # Aggregate again:
     Cmatrix <- har_agg(Cmatrix, periods, nperiods)
     colnames(Cmatrix) <- paste0("C", periods)
-    Jmatrix <- har_agg(J, periodsJ, nperiods)
+    Jmatrix <- har_agg(J, periodsJ, length(periodsJ))
     colnames(Jmatrix) <- paste0("J", periodsJ)
     # subset again:
     Cmatrix <- Cmatrix[(maxp:(n-h)), ]

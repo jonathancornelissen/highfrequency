@@ -416,9 +416,6 @@ BNSjumpTest <- function (rData, IVestimator = "BV", IQestimator = "TP", type = "
 #' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
 #' 
 #' @examples
-#' # Multi asset multi day xts functionality
-#' jo <- JOjumpTest(sample5MinPricesJumps$stock1, power = 6)
-#' # Univariate multi day data.table
 #' joDT <- JOjumpTest(sampleTDataMicroseconds[, list(DT, PRICE)])
 #' @keywords highfrequency JOjumpTest
 #' @importFrom stats qnorm
@@ -869,6 +866,7 @@ plot.intradayJumpTest <- function(x, ...){
 #' @return A list containing "criticalValues" which are the bootstrapped critcal values, "testStatistic" the test statistic of the jump test, "dimensions" which are the dimensions of the jump matrix
 #'  "marketJumpDetections" the jumps detected in the market prices, "stockJumpDetections" the co-jumps detected in the individual stock prices, and "jumpIndices" which are the indices of the detected jumps.
 #' 
+#' 
 #' @importFrom stats na.omit quantile runif
 #' @importFrom zoo coredata
 #' @export
@@ -878,7 +876,9 @@ rankJumpTest <- function(marketPrice, stockPrices, alpha = c(5,3), coarseFreq = 
   
   ## Preparation of data
   PRICE = DATE = RETURN = DT = NULL
-  
+  if(!is.list(stockPrices)){
+    stop("stockPrices must be a list")
+  }
   if (!all.equal(class(marketPrice), class(stockPrices[[1]]))) {
     stop("Please provide marketPrice and stockPrice as the same class (either xts or data.table)")
   }
@@ -891,13 +891,11 @@ rankJumpTest <- function(marketPrice, stockPrices, alpha = c(5,3), coarseFreq = 
     }
   }
   
-  dummyWasXts <- FALSE
   if (!is.data.table(marketPrice)) {
     if (is.xts(marketPrice)) {
       marketPrice <- setnames(as.data.table(marketPrice), old = "index", new = "DT")
       marketPrice[, PRICE := as.numeric(PRICE)]
       
-      dataWasXts <- TRUE
     } else {
       stop("Input has to be data.table or xts.")
     }
@@ -917,7 +915,7 @@ rankJumpTest <- function(marketPrice, stockPrices, alpha = c(5,3), coarseFreq = 
   
   stockReturns <- NULL
   for (stock in 1:length(stockPrices)) {
-    tmp <- setnames(as.data.table(stockPrices[[stock]]), old = "index", new = "DT")
+    tmp <- setnames(as.data.table(stockPrices[[stock]]), old = "index", new = "DT", skip_absent = TRUE)
     colnames(tmp) <- c("DT", "PRICE")
     tmp <- aggregatePrice(tmp, on = on, k = k , marketOpen = marketOpen,
                                  marketClose = marketClose, tz = tz, fill = TRUE)
@@ -966,6 +964,9 @@ rankJumpTest <- function(marketPrice, stockPrices, alpha = c(5,3), coarseFreq = 
   
   jumps <- t(jumps) # Transpose here so we don't have to transpose every time in the loop.
   
+  if(dim(jumps) == c(1,1)){
+    stop("Singular value decomposition cannot be calculated")
+  }
   # Set nu and nv because we need full SVD (see https://stackoverflow.com/questions/41972419/different-svd-result-in-rank-and-matlab)
   decomp <- svd(jumps, nu = nrow(jumps), nv = ncol(jumps))
   U2 <- decomp$u[, (rank+1):ncol(decomp$u)]

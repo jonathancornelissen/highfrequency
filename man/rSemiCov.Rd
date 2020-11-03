@@ -62,12 +62,9 @@ In the case that cor is TRUE, the mixed matrix will be an \eqn{N x N} matrix fil
 rSV = rSemiCov(rData = sampleTDataMicroseconds[, list(DT, PRICE)], alignBy = "minutes", 
                    alignPeriod = 5, makeReturns = TRUE)
 rSV
-# Multivariate single day: 
-rSC = rSemiCov(rData = sample5MinPricesJumps['2010-01-04'], makeReturns=TRUE)
-
 \dontrun{
 # Multivariate multi day:
-rSC <- rSemiCov(sample5MinPrices, makeReturns = TRUE) # rSC is a list of lists
+rSC <- rSemiCov(sampleOneMinuteData, makeReturns = TRUE) # rSC is a list of lists
 # We extract the covariance between stock 1 and stock 2 for all three covariances.
 mixed <- do.call(rbind, lapply(rSC, function(x) x[["mixed"]][1,2]))
 neg <- do.call(rbind, lapply(rSC, function(x) x[["negative"]][1,2]))

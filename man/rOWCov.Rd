@@ -79,16 +79,21 @@ of the series. This means that a potentially large proportion of the returns rec
 a zero weight, due to which the rOWCov can have a low finite sample efficiency in higher dimensions
 }
 \examples{
+\dontrun{
+library("xts")
 # Realized Outlyingness Weighted Variance/Covariance for prices aligned   
 # at 5 minutes.
 
 # Univariate: 
-rvoutw <- rOWCov(rData = sample5MinPricesJumps['2010-01-04', 1])
-rvoutw 
+row <- rOWCov(rData = as.xts(sampleOneMinuteData[as.Date(DT) == "2001-08-04", 
+                                                 list(DT, MARKET)]), makeReturns = TRUE)
+row
 
 # Multivariate: 
-rcoutw <- rOWCov(rData = sample5MinPricesJumps['2010-01-04'], makeReturns = TRUE)
-rcoutw
+rowc <- rOWCov(rData = as.xts(sampleOneMinuteData[as.Date(DT) == "2001-08-04",]), 
+               makeReturns = TRUE)
+rowc
+}
 
 }
 \references{

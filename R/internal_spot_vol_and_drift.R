@@ -128,8 +128,7 @@ detPer <- function(mR, rData = NULL, options = list()) {
     }
   }
   if (cDays <= 50) {
-    print("Periodicity estimation requires at least 50 observations.
-          Periodic component set to unity")
+    print("Periodicity estimation requires at least 50 observations.\nPeriodic component set to unity")
     estimperiodicvol = rep(1, M)
   } else {
     mstdR <- mR/sqrt(as.numeric(estimdailyvol) * (1/M))

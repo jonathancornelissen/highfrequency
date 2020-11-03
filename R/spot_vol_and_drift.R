@@ -410,12 +410,6 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
 #' }
 #'
 #' @examples
-#' # Default method, deterministic periodicity
-#'
-#' vol1 <- spotVol(sampleReal5MinPrices)
-#' plot(vol1)
-#'
-#' # Compare to stochastic periodicity
 #' \dontrun{
 #' init <- list(sigma = 0.03, sigma_mu = 0.005, sigma_h = 0.007,
 #'              sigma_k = 0.06, phi = 0.194, rho = 0.986, mu = c(1.87,-0.42),
@@ -423,35 +417,37 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
 #'              delta_s = c(-1.2, 0.11, 0.26, -0.03, 0.08))
 #'
 #' # next method will take around 110 iterations
-#' vol2 <- spotVol(sampleReal5MinPrices, method = "stochper", init = init)
+#' vol1 <- spotVol(sampleOneMinuteData[, list(DT, PRICE = MARKET)], method = "stochper", init = init)
 #' plot(as.numeric(vol1$spot[1:780]), type="l")
-#' lines(as.numeric(vol2$spot[1:780]), col="red")
 #' legend("topright", c("detPer", "stochper"), col = c("black", "red"), lty=1)}
 #'
 #' # Various kernel estimates
 #' \dontrun{
-#' h1 <- bw.nrd0((1:nrow(sampleReal5MinPrices))*(5*60))
-#' vol3 <- spotVol(sampleReal5MinPrices, method = "kernel", h = h1)
-#' vol4 <- spotVol(sampleReal5MinPrices, method = "kernel", est = "quarticity")
-#' vol5 <- spotVol(sampleReal5MinPrices, method = "kernel", est = "cv")
-#' plot(vol3, length = 2880)
-#' lines(as.numeric(t(vol4$spot))[1:2880], col = "red")
-#' lines(as.numeric(t(vol5$spot))[1:2880], col = "blue")
+#' h1 <- bw.nrd0((1:nrow(sampleOneMinuteData[, list(DT, PRICE = MARKET)]))*(5*60))
+#' vol2 <- spotVol(sampleOneMinuteData[, list(DT, PRICE = MARKET)],
+#'                 method = "kernel", h = h1)
+#' vol3 <- spotVol(sampleOneMinuteData[, list(DT, PRICE = MARKET)], 
+#'                 method = "kernel", est = "quarticity")
+#' vol4 <- spotVol(sampleOneMinuteData[, list(DT, PRICE = MARKET)],
+#'                 method = "kernel", est = "cv")
+#' plot(vol2, length = 2880)
+#' lines(as.numeric(t(vol3$spot))[1:2880], col = "red")
+#' lines(as.numeric(t(vol4$spot))[1:2880], col = "blue")
 #' legend("topright", c("h = simple estimate", "h = quarticity corrected",
 #'                      "h = crossvalidated"), col = c("black", "red", "blue"), lty=1)}
 #'
 #' # Piecewise constant volatility
 #' \dontrun{
-#' vol6 <- spotVol(sampleReal5MinPrices, method = "piecewise", m = 200, n  = 100,
-#'                 online = FALSE)
-#' plot(vol6)}
+#' vol5 <- spotVol(sampleOneMinuteData[, list(DT, PRICE = MARKET)], 
+#'                 method = "piecewise", m = 200, n  = 100, online = FALSE)
+#' plot(vol5)}
 #'
 #' # Compare regular GARCH(1,1) model to eGARCH, both with external regressors
 #' \dontrun{
-#' vol7 <- spotVol(sampleReal5MinPrices, method = "garch", model = "sGARCH")
-#' vol8 <- spotVol(sampleReal5MinPrices, method = "garch", model = "eGARCH")
-#' plot(as.numeric(t(vol7$spot)), type = "l")
-#' lines(as.numeric(t(vol8$spot)), col = "red")
+#' vol6 <- spotVol(sampleOneMinuteData[, list(DT, PRICE = MARKET)], method = "garch", model = "sGARCH")
+#' vol7 <- spotVol(sampleOneMinuteData[, list(DT, PRICE = STOCK)], method = "garch", model = "eGARCH")
+#' plot(as.numeric(t(vol6$spot)), type = "l")
+#' lines(as.numeric(t(vol7$spot)), col = "red")
 #' legend("topleft", c("GARCH", "eGARCH"), col = c("black", "red"), lty=1)
 #' }
 #'

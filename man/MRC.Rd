@@ -66,9 +66,13 @@ An alternative is to slightly enlarge the bandwidth such that \eqn{\mbox{k}_{N} 
 }
 }
 \examples{
-a <- list(sample5MinPricesJumps["2010-01-04",1], sample5MinPricesJumps["2010-01-04",2])
+\dontrun{
+library("xts")
+a <- list(as.xts(sampleOneMinuteData[as.Date(DT) == "2001-08-04", list(DT, MARKET)]), 
+          as.xts(sampleOneMinuteData[as.Date(DT) == "2001-08-04", list(DT, STOCK)]))
 MRC(a, pairwise = TRUE, makePsd = TRUE)
 
+}
 }
 \references{
 Hautsch, N., & Podolskij, M. (2013). Preaveraging-Based Estimation of Quadratic Variation in the Presence of Noise and Jumps: Theory, Implementation, and Empirical Evidence. Journal of Business & Economic Statistics, 31(2), 165-183.

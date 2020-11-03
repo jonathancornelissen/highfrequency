@@ -1,6 +1,6 @@
 library(xts)
 library(testthat)
-rets <- sample5MinPricesJumps[, 1]
+rets <- as.xts(sampleOneMinuteData)[, 1]
 
 for (date in unique(as.character(as.Date(index(rets))))) {
  rets[date] <- makeReturns(rets[date])
@@ -11,10 +11,18 @@ context("HARmodel")
 test_that("HARModel",{
   
   expect_equal(
-    formatC(sum(sum(HARmodel(rets, periods = c(1, 5, 10), periodsJ = c(1, 5, 10),
-                             RVest = c("rCov", "rBPCov"), type = "HARCJ", transform = "sqrt", inputType = "returns")$coefficients)), 
+    formatC(sum(HARmodel(rets, periods = c(1, 5, 10), periodsJ = c(1),
+                             RVest = c("rCov", "rBPCov"), type = "HARCJ", transform = "sqrt", inputType = "returns")$coefficients, na.rm = TRUE), 
             digits = 5),
-    "7.6069"
+    "0.58084"
+  )
+  
+  expect_identical(
+    {blub <- HARmodel(rets, periods = c(1, 5, 10), periodsJ = c(1),
+                      RVest = c("rCov", "rBPCov"), type = "HARCJ", transform = "sqrt", inputType = "returns")
+    blub2 <- plot(blub)
+    blub2$get_xlim()},
+    c(998150400, 999532800)
   )
   
   expect_identical(
@@ -22,15 +30,7 @@ test_that("HARModel",{
                       RVest = c("rCov", "rBPCov"), type = "HARCJ", transform = "sqrt", inputType = "returns")
     blub2 <- plot(blub)
     blub2$get_xlim()},
-    c(1263916800, 1264780800)
-  )
-  
-  expect_identical(
-    {blub <- HARmodel(rets, periods = c(1, 5, 10), periodsJ = c(1, 5, 10),
-                      RVest = c("rCov", "rBPCov"), type = "HARCJ", transform = "sqrt", inputType = "returns")
-    blub2 <- plot(blub)
-    blub2$get_xlim()},
-    c(1263916800, 1264780800)
+    c(998150400, 999532800)
   )
   model <- HARmodel(as.xts(SPYRM[, list(DT, RV5)]))
   info <- summary(model)
