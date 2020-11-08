@@ -2251,15 +2251,15 @@ RV <- function(rData) {
 }
 
 
-#' Realized tri-power variation estimator of quarticity for a highfrequency return series.
+#' Realized tri-power quarticity for a highfrequency return series.
 #' 
-#' @description Function returns the rTPVar, defined in Andersen et al. (2012).
+#' @description Function returns the rTPQuar, defined in Andersen et al. (2012).
 #'  
 #'  Assume there is \eqn{N} equispaced returns in period \eqn{t}. Let \eqn{r_{t,i}} be a return (with \eqn{i=1, \ldots,N}) in period \eqn{t}.
 #'  
-#'  Then, the rTPVar is given by
+#'  Then, the rTPQuar is given by
 #'  \deqn{
-#'    \mbox{rTPVar}_{t}=N\frac{N}{N-2} \left(\frac{\Gamma \left(0.5\right)}{ 2^{2/3}\Gamma \left(7/6\right)} \right)^{3} \sum_{i=3}^{N} \mbox({|r_{t,i}|}^{4/3} {|r_{t,i-1}|}^{4/3} {|r_{t,i-2}|}^{4/3})
+#'    \mbox{rTPQuar}_{t}=N\frac{N}{N-2} \left(\frac{\Gamma \left(0.5\right)}{ 2^{2/3}\Gamma \left(7/6\right)} \right)^{3} \sum_{i=3}^{N} \mbox({|r_{t,i}|}^{4/3} {|r_{t,i-1}|}^{4/3} {|r_{t,i-2}|}^{4/3})
 #'  }
 #'  
 #' @param rData a zoo/xts object containing all returns in period t for one asset.
@@ -2274,18 +2274,18 @@ RV <- function(rData) {
 #' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
 #'  
 #' @examples 
-#' tpv <- rTPVar(rData = sampleTDataMicroseconds[, list(DT, PRICE)], alignBy = "minutes", 
+#' tpv <- rTPQuar(rData = sampleTDataMicroseconds[, list(DT, PRICE)], alignBy = "minutes", 
 #'               alignPeriod = 5, makeReturns = TRUE)
 #' tpv
 #' 
 #' @importFrom zoo rollapply
-#' @keywords highfrequency rTPVar
+#' @keywords highfrequency rTPQuar
 #' @export
-rTPVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE) {
+rTPQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE) {
   
   # self-reference for multi-day input
   if (is.xts(rData) && checkMultiDays(rData)) { 
-    result <- apply.daily(rData, rTPVar, alignBy, alignPeriod, makeReturns)
+    result <- apply.daily(rData, rTPQuar, alignBy, alignPeriod, makeReturns)
     return(result)
   } else if (is.data.table(rData)){ 
     DATE <- .N <- DT <- NULL
@@ -2301,7 +2301,7 @@ rTPVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
     dates <- dates$DATE
     dat <- as.matrix(rData[, !"DT"])
     for (i in 1:length(dates)) {
-      res[[dates[i]]] <- rTPVar(dat[starts[i]:ends[i], ], makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
+      res[[dates[i]]] <- rTPQuar(dat[starts[i]:ends[i], ], makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
     }
     res <- setDT(transpose(res))[, DT := dates]
     setcolorder(res, "DT")
@@ -2324,20 +2324,6 @@ rTPVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
     return(rTPVar)
   }
 }
-
-#' Calculate the realized tripower quarticity
-#' 
-#' @param rData a zoo/xts object containing all returns in period t for one asset.
-#' 
-#' @return numeric
-#' 
-#' @export
-RTQ <- function(rData) { 
-  returns <- as.vector(as.numeric(rData))
-  n <- length(returns)
-  tq <- n * (n/(n-2)) *((2^(2/3) * gamma(7/6) * gamma(1/2)^(-1))^(-3)) *  sum(abs(returns[1:(n - 2)])^(4/3) * abs(returns[2:(n-1)])^(4/3) * abs(returns[3:n])^(4/3))
-  return(tq)
-} 
 
 #' Realized quad-power variation of highfrequency return series. 
 #' @description Function returns the realized quad-power variation, defined in Andersen et al. (2012).
