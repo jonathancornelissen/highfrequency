@@ -333,7 +333,7 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
     if (jumpTest == "ABDJumptest" ) {
       
       if(inputType != "RM"){
-        TQ <- apply.daily(data, RTQ) 
+        TQ <- apply.daily(data, rTPQuar) 
       } else {
         TQ <- RM3
       }

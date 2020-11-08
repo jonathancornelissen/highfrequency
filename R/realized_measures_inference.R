@@ -10,7 +10,6 @@ hatIV <- function(rData, IVestimator, startV = NULL) {
   switch(IVestimator,
          RV = RV(rData),
          BV = RBPVar(rData),
-         TV = rTPVar(rData),
          minRV = minRV(rData),
          medRV = medRV(rData),
          ROWvar = rOWCov(rData),
@@ -24,7 +23,7 @@ hatIQ <- function (rData, IQestimator) {
   switch(IQestimator,
          rQuar = rQuar(rData),
          QP = rQPVar(rData),
-         TP = rTPVar(rData),
+         TP = rTPQuar(rData),
          minRQ = minRQ(rData),
          medRQ = medRQ(rData),
          CTTPV = ctTPV(rData))
@@ -74,7 +73,7 @@ IV <- function(IVestimator, iq) {
 #' \eqn{\hat{IQ}} integrated quarticity estimator.
 #' 
 #' @param rData zoo/xts object containing all returns in period t for one asset.
-#' @param IVestimator can be chosen among integrated variance estimators: RV, BV, TV, minRV or medRV. RV by default.
+#' @param IVestimator can be chosen among integrated variance estimators: RV, BV, minRV or medRV. RV by default.
 #' @param IQestimator can be chosen among integrated quarticity estimators: rQuar, realized tri-power quarticity (TPQ), quad-power quarticity (QPQ), minRQ or medRQ. TPQ by default.
 #' @param confidence confidence level set by users. 0.95 by default. 
 #' @param alignBy a string, align the tick data to "seconds"|"minutes"|"hours"

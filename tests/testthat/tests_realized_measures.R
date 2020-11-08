@@ -332,24 +332,28 @@ test_that("rThresholdCov", {
   
   
 })
-##### rTPVar ##### 
-context("rTPVar")
-test_that("rTPVar", {
+
+
+
+##### rTPQuar ##### 
+context("rTPQuar")
+test_that("rTPQuar", {
   expect_equal(
-    as.numeric(rTPVar(as.xts(sampleTDataMicroseconds[, list(DT, PRICE)]),alignBy ="minutes", alignPeriod = 5, makeReturns = TRUE) * 1000000),
+    as.numeric(rTPQuar(as.xts(sampleTDataMicroseconds[, list(DT, PRICE)]),alignBy ="minutes", alignPeriod = 5, makeReturns = TRUE) * 1000000),
     c(0.013510877, 0.002967281)
   )
-  expect_equal(lapply(rTPVar(returnDat), sum), list("PRICE1" = 3.023117658, "PRICE2" = 3.003898984, "PRICE3" = 2.966162109))
-  expect_equal(lapply(rTPVar(returnDat), sum), lapply(rTPVar(dat, makeReturns = TRUE), sum))
+  expect_equal(lapply(rTPQuar(returnDat), sum), list("PRICE1" = 3.023117658, "PRICE2" = 3.003898984, "PRICE3" = 2.966162109))
+  expect_equal(lapply(rTPQuar(returnDat), sum), lapply(rTPQuar(dat, makeReturns = TRUE), sum))
   
-  expect_equal(matrix(rTPVar(returnDat), ncol = 3), matrix(as.matrix(rTPVar(returnDatDT)[,-1]), ncol = 3))
-  expect_equal(matrix(rTPVar(dat, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE), ncol = 3),
-               matrix(as.matrix(rTPVar(datDT, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)[, -1]), ncol = 3))
+  expect_equal(matrix(rTPQuar(returnDat), ncol = 3), matrix(as.matrix(rTPQuar(returnDatDT)[,-1]), ncol = 3))
+  expect_equal(matrix(rTPQuar(dat, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE), ncol = 3),
+               matrix(as.matrix(rTPQuar(datDT, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)[, -1]), ncol = 3))
   
-  expect_equal(matrix(as.matrix(rTPVar(sampleOneMinuteData, makeReturns = TRUE)[,-1]), ncol = 2),
-               matrix(rTPVar(as.xts(sampleOneMinuteData), makeReturns = TRUE), ncol = 2))
+  expect_equal(matrix(as.matrix(rTPQuar(sampleOneMinuteData, makeReturns = TRUE)[,-1]), ncol = 2),
+               matrix(rTPQuar(as.xts(sampleOneMinuteData), makeReturns = TRUE), ncol = 2))
   
 })
+
 ##### rTSCov univariate ##### 
 context("rTSCov")
 test_that("rTSCov univariate", {
