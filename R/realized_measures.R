@@ -1672,7 +1672,7 @@ rMPV <- function(rData, m = 2, p = 2, alignBy = NULL, alignPeriod = NULL, makeRe
 #' \dontrun{
 #' library("xts")
 #' # Realized Outlyingness Weighted Variance/Covariance for prices aligned   
-#' # at 5 minutes.
+#' # at 1 minutes.
 #' 
 #' # Univariate: 
 #' row <- rOWCov(rData = as.xts(sampleOneMinuteData[as.Date(DT) == "2001-08-04", 
