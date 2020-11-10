@@ -38,7 +38,7 @@ listAvailableKernels <- function() {
 #'  \deqn{
 #'    \mbox{medRQ}_{t}=\frac{3\pi N}{9\pi +72 - 52\sqrt{3}} \left(\frac{N}{N-2}\right) \sum_{i=2}^{N-1} \mbox{med}(|r_{t,i-1}|, |r_{t,i}|, |r_{t,i+1}|)^4
 #'   }
-#' @param rData a zoo/xts object containing all returns in period t for one asset.
+#' @param rData an xts or data.table object containing returns or prices, possibly for multiple assets over multiple days
 #' @param alignBy a string, align the tick data to "seconds"|"minutes"|"hours".
 #' @param alignPeriod an integer, align the tick data to this many [seconds|minutes|hours]. 
 #' @param makeReturns boolean, should be TRUE when rData contains prices instead of returns. FALSE by  default.
@@ -62,8 +62,12 @@ medRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
   } else if (is.data.table(rData)){ 
     DATE <- .N <- DT <- NULL
     setcolorder(rData, "DT")
-    if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+    if(!is.null(alignBy) && !is.null(alignPeriod) && makeReturns) {
       rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
+    }
+    
+    if(!is.null(alignBy) && !is.null(alignPeriod) && !makeReturns) {
+      rData <- fastTickAgregation_DATA.TABLE_RETURNS(rData, on = alignBy, k = alignPeriod)
     }
     # dates <- as.character(unique(as.Date(rData$DT)))
     # res <- vector(mode = "list", length = length(dates))
@@ -91,8 +95,12 @@ medRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
     return(res)
     
   } else {
-    if ((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+    ## DO data transformations
+    if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && makeReturns) {
       rData <- fastTickAgregation(rData, on = alignBy, k = alignPeriod)
+    }
+    if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && !makeReturns) {
+      rData <- fastTickAgregation_RETURNS(rData, on = alignBy, k = alignPeriod)
     }
     if (makeReturns) {
       rData <- makeReturns(rData)
@@ -119,7 +127,7 @@ medRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #' \deqn{
 #'   \mbox{minRQ}_{t}=\frac{\pi N}{3 \pi - 8} \left(\frac{N}{N-1}\right) \sum_{i=1}^{N-1} \mbox{min}(|r_{t,i}| ,|r_{t,i+1}|)^4
 #' }
-#' @param rData a zoo/xts object containing all returns in period t for one asset.
+#' @param rData an xts or data.table object containing returns or prices, possibly for multiple assets over multiple days
 #' @param alignBy a string, align the tick data to "seconds"|"minutes"|"hours"
 #' @param alignPeriod an integer, align the tick data to this many [seconds|minutes|hours].
 #' @param makeReturns boolean, should be TRUE when rData contains prices instead of returns. FALSE by  default.
@@ -143,8 +151,12 @@ minRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
   } else if (is.data.table(rData)){ 
     DATE <- .N <- DT <- NULL
     setcolorder(rData, "DT")
-    if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+    if(!is.null(alignBy) && !is.null(alignPeriod) && makeReturns) {
       rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
+    }
+    
+    if(!is.null(alignBy) && !is.null(alignPeriod) && !makeReturns) {
+      rData <- fastTickAgregation_DATA.TABLE_RETURNS(rData, on = alignBy, k = alignPeriod)
     }
     setkey(rData, "DT")
     dates <- rData[, list(end = .N), by = list(DATE = as.Date(DT))][, `:=`(end = cumsum(end), DATE = as.character(DATE))][, start := shift(end, fill = 0) + 1]
@@ -162,11 +174,15 @@ minRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
     colnames(res) <- colnames(rData)
     return(res)
   } else {
-    if ((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+    ## DO data transformations
+    if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && makeReturns) {
       rData <- fastTickAgregation(rData, on = alignBy, k = alignPeriod)
     }
+    if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && !makeReturns) {
+      rData <- fastTickAgregation_RETURNS(rData, on = alignBy, k = alignPeriod)
+    }
     if (makeReturns) {
-      rData = makeReturns(rData)
+      rData <- makeReturns(rData)
     }
     q <- abs(as.matrix(rData))
     q <- rollApplyMinWrapper(q)
@@ -188,7 +204,7 @@ minRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #' \mbox{minRV}_{t}=\frac{\pi}{\pi - 2}\left(\frac{M}{M-1}\right) \sum_{i=1}^{M-1} \mbox{min}(|r_{t,i}| ,|r_{t,i+1}|)^2
 #' }
 #' 
-#' @param rData a zoo/xts object containing all returns in period t for one asset.
+#' @param rData an xts or data.table object containing returns or prices, possibly for multiple assets over multiple days
 #' @param alignBy a string, align the tick data to "seconds"|"minutes"|"hours".
 #' @param alignPeriod an integer, align the tick data to this many [seconds|minutes|hours].
 #' @param makeReturns boolean, should be TRUE when rData contains prices instead of returns. FALSE by default.
@@ -217,8 +233,12 @@ minRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
   } else if (is.data.table(rData)){ 
     DATE <- .N <- DT <- NULL
     setcolorder(rData, "DT")
-    if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+    if(!is.null(alignBy) && !is.null(alignPeriod) && makeReturns) {
       rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
+    }
+    
+    if(!is.null(alignBy) && !is.null(alignPeriod) && !makeReturns) {
+      rData <- fastTickAgregation_DATA.TABLE_RETURNS(rData, on = alignBy, k = alignPeriod)
     }
     setkey(rData, "DT")
     dates <- rData[, list(end = .N), by = list(DATE = as.Date(DT))][, `:=`(end = cumsum(end), DATE = as.character(DATE))][, start := shift(end, fill = 0) + 1]
@@ -242,9 +262,13 @@ minRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
     
     return(res)
   } else {
-    if ((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+    ## DO data transformations
+    if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && makeReturns) {
       rData <- fastTickAgregation(rData, on = alignBy, k = alignPeriod)
-    } 
+    }
+    if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && !makeReturns) {
+      rData <- fastTickAgregation_RETURNS(rData, on = alignBy, k = alignPeriod)
+    }
     if (makeReturns) {
       rData <- makeReturns(rData)
     }  
@@ -270,7 +294,7 @@ minRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #'  \mbox{medRV}_{t}=\frac{\pi}{6-4\sqrt{3}+\pi}\left(\frac{M}{M-2}\right) \sum_{i=2}^{M-1} \mbox{med}(|r_{t,i-1}|,|r_{t,i}|, |r_{t,i+1}|)^2
 #' }
 #'  
-#' @param rData a zoo/xts object containing all returns in period t for one asset.
+#' @param rData an xts or data.table object containing returns or prices, possibly for multiple assets over multiple days
 #' @param alignBy a string, align the tick data to "seconds"|"minutes"|"hours".
 #' @param alignPeriod an integer, align the tick data to this many [seconds|minutes|hours].
 #' @param makeReturns boolean, should be TRUE when rData contains prices instead of returns. FALSE by   default.
@@ -311,8 +335,12 @@ medRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
   } else if (is.data.table(rData)){ 
     DATE <- .N <- DT <- NULL
     setcolorder(rData, "DT")
-    if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+    if(!is.null(alignBy) && !is.null(alignPeriod) && makeReturns) {
       rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
+    }
+    
+    if(!is.null(alignBy) && !is.null(alignPeriod) && !makeReturns) {
+      rData <- fastTickAgregation_DATA.TABLE_RETURNS(rData, on = alignBy, k = alignPeriod)
     }
     setkey(rData, "DT")
     dates <- rData[, list(end = .N), by = list(DATE = as.Date(DT))][, `:=`(end = cumsum(end), DATE = as.character(DATE))][, start := shift(end, fill = 0) + 1]
@@ -338,8 +366,12 @@ medRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
     return(res)
     
   } else {
-    if ((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+    ## DO data transformations
+    if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && makeReturns) {
       rData <- fastTickAgregation(rData, on = alignBy, k = alignPeriod)
+    }
+    if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && !makeReturns) {
+      rData <- fastTickAgregation_RETURNS(rData, on = alignBy, k = alignPeriod)
     }
     if (makeReturns) {
       rData <- makeReturns(rData)
@@ -418,6 +450,7 @@ medRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #' @examples 
 #' \dontrun{
 #' library("xts")
+#' ## Note that this ought to be tick-by-tick data and this example is only to show the usage!
 #' a <- list(as.xts(sampleOneMinuteData[as.Date(DT) == "2001-08-04", list(DT, MARKET)]), 
 #'           as.xts(sampleOneMinuteData[as.Date(DT) == "2001-08-04", list(DT, STOCK)]))
 #' MRC(a, pairwise = TRUE, makePsd = TRUE)
@@ -495,7 +528,7 @@ MRC <- function(pData, pairwise = FALSE, makePsd = FALSE) {
 #' 
 #' @description Realized Covariance using average subsample.
 #' 
-#' @param rData a \eqn{(M x N)} matrix/zoo/xts object containing the \eqn{N}
+#' @param rData an xts or data.table object containing returns or prices, possibly for multiple assets over multiple days
 #' return series over period \eqn{t}, with \eqn{M} observations during \eqn{t}.
 #' @param cor boolean, in case it is TRUE, the correlation is returned. FALSE by default.
 #' @param alignBy Align the tick data to seconds|minutes|hours. Default is \code{"minutes"}
@@ -939,8 +972,7 @@ rBeta <- function(rData, rIndex, RCOVestimator = "rCov", RVestimator = "RV", mak
 #'  where \eqn{r_{(k)t,i}} is the
 #'  \eqn{k}-th component of the return vector \eqn{r_{i,t}}.
 #'  
-#' @param rData a \eqn{(M x N)} matrix/zoo/xts object containing the \eqn{N}
-#'    return series over period \eqn{t}, with \eqn{M} observations during \eqn{t}.
+#' @param rData an xts or data.table object containing returns or prices, possibly for multiple assets over multiple days
 #' @param cor boolean, in case it is TRUE, the correlation is returned. FALSE by default.
 #' @param alignBy a string, align the tick data to "seconds"|"minutes"|"hours".
 #' @param alignPeriod an integer, align the tick data to this many [seconds|minutes|hours]. 
@@ -987,8 +1019,12 @@ rBPCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeR
     return(result)
   } else if (is.data.table(rData)){
     DATE <- .N <- DT <- NULL
-    if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+    if(!is.null(alignBy) && !is.null(alignPeriod) && makeReturns) {
       rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
+    }
+    
+    if(!is.null(alignBy) && !is.null(alignPeriod) && !makeReturns) {
+      rData <- fastTickAgregation_DATA.TABLE_RETURNS(rData, on = alignBy, k = alignPeriod)
     }
     setkey(rData, "DT")
     dates <- rData[, list(end = .N), by = list(DATE = as.Date(DT))][, `:=`(end = cumsum(end), DATE = as.character(DATE))][, start := shift(end, fill = 0) + 1]
@@ -1011,12 +1047,16 @@ rBPCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeR
     return(res)
     
   } else { #single day code
-    if ((!is.null(alignBy)) && (!is.null(alignPeriod))) {
-      rData <- fastTickAgregation(rData, on = alignBy, k = alignPeriod);
-    } 
-    if (makeReturns) {  
-      rData <- makeReturns(rData) 
-    }  
+    ## DO data transformations
+    if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && makeReturns) {
+      rData <- fastTickAgregation(rData, on = alignBy, k = alignPeriod)
+    }
+    if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && !makeReturns) {
+      rData <- fastTickAgregation_RETURNS(rData, on = alignBy, k = alignPeriod)
+    }
+    if (makeReturns) {
+      rData <- makeReturns(rData)
+    }
     if (is.null(dim(rData))) {
       n <- 1
     } else { 
@@ -1081,9 +1121,7 @@ rBPCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeR
 #' 
 #' 
 #' 
-#' @param rData a \eqn{(M x N)} matrix/zoo/xts object containing the \eqn{N}
-#' return series over period \eqn{t}, with \eqn{M} observations during \eqn{t}.
-#' In case of a matrix, no multi-day adjustment is possible.
+#' @param rData an xts or data.table object containing returns or prices, possibly for multiple assets over multiple days
 #' @param cor boolean, in case it is TRUE, the correlation is returned. FALSE by default.
 #' @param alignBy a string, align the tick data to "seconds"|"minutes"|"hours".
 #' @param alignPeriod an integer, align the tick data to this many [seconds|minutes|hours].
@@ -1126,9 +1164,16 @@ rCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeRet
     return(result)
   } else if (is.data.table(rData)){
     DATE <- .N <- DT <- NULL
-    if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+    if(!is.null(alignBy) && !is.null(alignPeriod) && makeReturns) {
       rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
     }
+    
+    if(!is.null(alignBy) && !is.null(alignPeriod) && !makeReturns) {
+      rData <- fastTickAgregation_DATA.TABLE_RETURNS(rData, on = alignBy, k = alignPeriod)
+    }
+    
+    
+    
     setkey(rData, "DT")
     dates <- rData[, list(end = .N), by = list(DATE = as.Date(DT))][, `:=`(end = cumsum(end), DATE = as.character(DATE))][, start := shift(end, fill = 0) + 1]
     res <- vector(mode = "list", length = nrow(dates))
@@ -1148,13 +1193,16 @@ rCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeRet
     return(res)
     
   } else {
-    #single day code
-    if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+    ## DO data transformations
+    if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && makeReturns) {
       rData <- fastTickAgregation(rData, on = alignBy, k = alignPeriod)
-    } 
-    if (makeReturns) {  
-      rData <- makeReturns(rData) 
-    }  
+    }
+    if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && !makeReturns) {
+      rData <- fastTickAgregation_RETURNS(rData, on = alignBy, k = alignPeriod)
+    }
+    if (makeReturns) {
+      rData <- makeReturns(rData)
+    }
     if (is.null(dim(rData))) {  
       n <- 1
     } else { 
@@ -1182,7 +1230,7 @@ rCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeRet
 #' Hayashi-Yoshida Covariance
 #' @description Calculates the Hayashi-Yoshida Covariance estimator
 #' 
-#' @param rData a possibly multivariate xts object.
+#' @param rData an xts or data.table object containing returns or prices, possibly for multiple assets.
 #' @param cor boolean, in case it is TRUE, the correlation is returned. FALSE by default.
 #' @param period Sampling period 
 #' @param alignBy Align the tick data to seconds|minutes|hours
@@ -1285,8 +1333,7 @@ rHYCov <- function(rData, cor = FALSE, period = 1, alignBy = "seconds", alignPer
 #'
 #' @description Realized covariance calculation using a kernel estimator.
 #'
-#' @param rData a \eqn{(M x N)} matrix/zoo/xts object containing the \eqn{N}
-#' return series over period \eqn{t}, with \eqn{M} observations during \eqn{t}.
+#' @param rData an xts or data.table object containing returns or prices, possibly for multiple assets over multiple days
 #' @param cor boolean, in case it is TRUE, the correlation is returned. FALSE by default.
 #' @param alignBy Align the tick data to seconds|minutes|hours
 #' @param alignPeriod Align the tick data to this many [seconds|minutes|hours]
@@ -1342,8 +1389,12 @@ rKernelCov <- function(rData, cor = FALSE,  alignBy = "seconds", alignPeriod = 1
     }
   } else if (is.data.table(rData)){
     DATE <- .N <- DT <- NULL
-    if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+    if(!is.null(alignBy) && !is.null(alignPeriod) && makeReturns) {
       rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
+    }
+    
+    if(!is.null(alignBy) && !is.null(alignPeriod) && !makeReturns) {
+      rData <- fastTickAgregation_DATA.TABLE_RETURNS(rData, on = alignBy, k = alignPeriod)
     }
     setcolorder(rData, "DT")
     setkey(rData, "DT")
@@ -1367,8 +1418,12 @@ rKernelCov <- function(rData, cor = FALSE,  alignBy = "seconds", alignPeriod = 1
     
   } else { ## Actual calculations
     # # Aggregate:
-    if ((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+    ## DO data transformations
+    if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && makeReturns) {
       rData <- fastTickAgregation(rData, on = alignBy, k = alignPeriod)
+    }
+    if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && !makeReturns) {
+      rData <- fastTickAgregation_RETURNS(rData, on = alignBy, k = alignPeriod)
     }
     if (makeReturns) {
       rData <- makeReturns(rData)
@@ -1438,7 +1493,7 @@ rKernelCov <- function(rData, cor = FALSE,  alignBy = "seconds", alignPeriod = 1
 #'   }
 #'  in which \eqn{RV_t:} realized variance
 #'   
-#' @param rData a zoo/xts object containing all returns in period t for D assets.
+#' @param rData an xts or data.table object containing returns or prices, possibly for multiple assets over multiple days
 #' @param alignBy a string, align the tick data to "seconds"|"minutes"|"hours".
 #' @param alignPeriod an integer, align the tick data to this many [seconds|minutes|hours].
 #' @param makeReturns boolean, should be TRUE when rData contains prices instead of returns. FALSE by   default.
@@ -1466,8 +1521,12 @@ rKurt <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
   } else if (is.data.table(rData)){
     DATE <- .N <- DT <- NULL
     setcolorder(rData, "DT")
-    if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+    if(!is.null(alignBy) && !is.null(alignPeriod) && makeReturns) {
       rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
+    }
+    
+    if(!is.null(alignBy) && !is.null(alignPeriod) && !makeReturns) {
+      rData <- fastTickAgregation_DATA.TABLE_RETURNS(rData, on = alignBy, k = alignPeriod)
     }
     
     setkey(rData, DT)
@@ -1493,8 +1552,12 @@ rKurt <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
     setkey(res, DT)
     return(res)
   } else {
-    if ((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+    ## DO data transformations
+    if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && makeReturns) {
       rData <- fastTickAgregation(rData, on = alignBy, k = alignPeriod)
+    }
+    if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && !makeReturns) {
+      rData <- fastTickAgregation_RETURNS(rData, on = alignBy, k = alignPeriod)
     }
     if (makeReturns) {
       rData <- makeReturns(rData)
@@ -1532,7 +1595,7 @@ rKurt <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #'   
 #'   and \eqn{m} > \eqn{p/2}.
 #' 
-#' @param rData a zoo/xts object containing all returns in period t for one asset.
+#' @param rData an xts or data.table object containing returns or prices, possibly for multiple assets over multiple days
 #' @param m the window size of return blocks. 2 by default.
 #' @param p the power of the variation. 2 by default.
 #' @param alignBy a string, align the tick data to "seconds"|"minutes"|"hours".
@@ -1560,8 +1623,12 @@ rMPV <- function(rData, m = 2, p = 2, alignBy = NULL, alignPeriod = NULL, makeRe
     
   } else if (is.data.table(rData)){ 
     DATE <- .N <- DT <- NULL
-    if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+    if(!is.null(alignBy) && !is.null(alignPeriod) && makeReturns) {
       rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
+    }
+    
+    if(!is.null(alignBy) && !is.null(alignPeriod) && !makeReturns) {
+      rData <- fastTickAgregation_DATA.TABLE_RETURNS(rData, on = alignBy, k = alignPeriod)
     }
     setkey(rData, "DT")
     dates <- rData[, list(end = .N), by = list(DATE = as.Date(DT))][, `:=`(end = cumsum(end), DATE = as.character(DATE))][, start := shift(end, fill = 0) + 1]
@@ -1584,8 +1651,12 @@ rMPV <- function(rData, m = 2, p = 2, alignBy = NULL, alignPeriod = NULL, makeRe
     return(res)
     
   } else {
-    if ((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+    ## DO data transformations
+    if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && makeReturns) {
       rData <- fastTickAgregation(rData, on = alignBy, k = alignPeriod)
+    }
+    if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && !makeReturns) {
+      rData <- fastTickAgregation_RETURNS(rData, on = alignBy, k = alignPeriod)
     }
     if (makeReturns) {
       rData <- makeReturns(rData)
@@ -1792,7 +1863,7 @@ rOWCov <- function (rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, make
 #' in which
 #' \eqn{RV_{t}:} realized variance
 #' 
-#' @param rData a zoo/xts object containing all returns in period t for one asset.
+#' @param rData an xts or data.table object containing returns or prices, possibly for multiple assets over multiple days
 #' @param alignBy a string, align the tick data to "seconds"|"minutes"|"hours".
 #' @param alignPeriod an integer, align the tick data to this many [seconds|minutes|hours].
 #' @param makeReturns boolean, should be TRUE when rData contains prices instead of returns. FALSE by   default.
@@ -1817,8 +1888,12 @@ rSkew <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
     return(result)
   } else if (is.data.table(rData)){
     DATE <- .N <- DT <- NULL
-    if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+    if(!is.null(alignBy) && !is.null(alignPeriod) && makeReturns) {
       rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
+    }
+    
+    if(!is.null(alignBy) && !is.null(alignPeriod) && !makeReturns) {
+      rData <- fastTickAgregation_DATA.TABLE_RETURNS(rData, on = alignBy, k = alignPeriod)
     }
     setkey(rData, "DT")
     setcolorder(rData, "DT")
@@ -1845,8 +1920,12 @@ rSkew <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
     
     return(res)
   } else {
-    if ((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+    ## DO data transformations
+    if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && makeReturns) {
       rData <- fastTickAgregation(rData, on = alignBy, k = alignPeriod)
+    }
+    if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && !makeReturns) {
+      rData <- fastTickAgregation_RETURNS(rData, on = alignBy, k = alignPeriod)
     }
     if (makeReturns) {
       rData <- makeReturns(rData)
@@ -1876,7 +1955,7 @@ rSkew <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #'   \deqn{
 #'   \mbox{rSVupside}_{t}= \sum_{i=1}^{N} (r_{t,i})^2 \ \times \ I [ r_{t,i} >0 ]
 #' }
-#' @param rData a zoo/xts object containing all returns in period t for one asset.
+#' @param rData an xts or data.table object containing returns or prices, possibly for multiple assets over multiple days
 #' @param alignBy a string, align the tick data to "seconds"|"minutes"|"hours".
 #' @param alignPeriod an integer, align the tick data to this many [seconds|minutes|hours].
 #' @param makeReturns boolean, should be TRUE when rData contains prices instead of returns. FALSE by   default.
@@ -1909,8 +1988,12 @@ rSV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, 
   } else if (is.data.table(rData)){ 
     DATE <- .N <- DT <- NULL
     setcolorder(rData, "DT")
-    if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+    if(!is.null(alignBy) && !is.null(alignPeriod) && makeReturns) {
       rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
+    }
+    
+    if(!is.null(alignBy) && !is.null(alignPeriod) && !makeReturns) {
+      rData <- fastTickAgregation_DATA.TABLE_RETURNS(rData, on = alignBy, k = alignPeriod)
     }
     setkey(rData, "DT")
     dates <- rData[, list(end = .N), by = list(DATE = as.Date(DT))][, `:=`(end = cumsum(end), DATE = as.character(DATE))][, start := shift(end, fill = 0) + 1]
@@ -1937,12 +2020,17 @@ rSV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, 
     
   } else {
     
-    if ((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+    ## DO data transformations
+    if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && makeReturns) {
       rData <- fastTickAgregation(rData, on = alignBy, k = alignPeriod)
     }
-    if (makeReturns)  {
+    if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && !makeReturns) {
+      rData <- fastTickAgregation_RETURNS(rData, on = alignBy, k = alignPeriod)
+    }
+    if (makeReturns) {
       rData <- makeReturns(rData)
     }
+    
     q <- as.matrix(rData)
     select.down <- rData < 0
     select.up <- rData > 0
@@ -1971,8 +2059,7 @@ rSV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, 
 #' with the treshold value \eqn{TR_{M}} set to \eqn{9 \Delta^{-1}} times the daily realized bi-power variation of asset \eqn{k}, 
 #' as suggested in Jacod and Todorov (2009).
 #' 
-#' @param rData a \eqn{(M x N)} matrix/zoo/xts object containing the \eqn{N}
-#' return series over period \eqn{t}, with \eqn{M} observations during \eqn{t}.
+#' @param rData an xts or data.table object containing returns or prices, possibly for multiple assets over multiple days
 #' @param cor boolean, in case it is TRUE, the correlation is returned. FALSE by default.
 #' @param alignBy a string, align the tick data to "seconds"|"minutes"|"hours".
 #' @param alignPeriod an integer, align the tick data to this many [seconds|minutes|hours].
@@ -2017,8 +2104,12 @@ rThresholdCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL
     return(result)
   }  else if (is.data.table(rData)){
     DATE <- .N <- DT <- NULL
-    if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+    if(!is.null(alignBy) && !is.null(alignPeriod) && makeReturns) {
       rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
+    }
+    
+    if(!is.null(alignBy) && !is.null(alignPeriod) && !makeReturns) {
+      rData <- fastTickAgregation_DATA.TABLE_RETURNS(rData, on = alignBy, k = alignPeriod)
     }
       
     setkey(rData, "DT")
@@ -2040,12 +2131,16 @@ rThresholdCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL
     return(res)
     
   } else { #single day code
-    if (!is.null(alignBy) && (!is.null(alignPeriod))) {
+    ## DO data transformations
+    if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && makeReturns) {
       rData <- fastTickAgregation(rData, on = alignBy, k = alignPeriod)
-    } 
-    if (makeReturns) { 
-      rData <- makeReturns(rData) 
-    }  
+    }
+    if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && !makeReturns) {
+      rData <- fastTickAgregation_RETURNS(rData, on = alignBy, k = alignPeriod)
+    }
+    if (makeReturns) {
+      rData <- makeReturns(rData)
+    }
     
     rData <- as.matrix(rData)
     n <- dim(rData)[1]				                  # number of observations
@@ -2262,7 +2357,7 @@ RV <- function(rData) {
 #'    \mbox{rTPQuar}_{t}=N\frac{N}{N-2} \left(\frac{\Gamma \left(0.5\right)}{ 2^{2/3}\Gamma \left(7/6\right)} \right)^{3} \sum_{i=3}^{N} \mbox({|r_{t,i}|}^{4/3} {|r_{t,i-1}|}^{4/3} {|r_{t,i-2}|}^{4/3})
 #'  }
 #'  
-#' @param rData a zoo/xts object containing all returns in period t for one asset.
+#' @param rData an xts or data.table object containing returns or prices, possibly for multiple assets over multiple days
 #' @param alignBy a string, align the tick data to "seconds"|"minutes"|"hours".
 #' @param alignPeriod an integer, align the tick data to this many [seconds|minutes|hours].  
 #' @param makeReturns boolean, should be TRUE when rData contains prices instead of returns. FALSE by   default.
@@ -2289,8 +2384,12 @@ rTPQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FAL
     return(result)
   } else if (is.data.table(rData)){ 
     DATE <- .N <- DT <- NULL
-    if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+    if(!is.null(alignBy) && !is.null(alignPeriod) && makeReturns) {
       rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
+    }
+    
+    if(!is.null(alignBy) && !is.null(alignPeriod) && !makeReturns) {
+      rData <- fastTickAgregation_DATA.TABLE_RETURNS(rData, on = alignBy, k = alignPeriod)
     }
     setkey(rData, "DT")
     dates <- rData[, list(end = .N), by = list(DATE = as.Date(DT))][, `:=`(end = cumsum(end), DATE = as.character(DATE))][, start := shift(end, fill = 0) + 1]
@@ -2309,8 +2408,12 @@ rTPQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FAL
     return(res)
     
   } else {
-    if ((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+    ## DO data transformations
+    if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && makeReturns) {
       rData <- fastTickAgregation(rData, on = alignBy, k = alignPeriod)
+    }
+    if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && !makeReturns) {
+      rData <- fastTickAgregation_RETURNS(rData, on = alignBy, k = alignPeriod)
     }
     if (makeReturns) {
       rData <- makeReturns(rData)
@@ -2335,7 +2438,7 @@ rTPQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FAL
 #'    \mbox{rQPVar}_{t}=N*\frac{N}{N-3} \left(\frac{\pi^2}{4} \right)^{-4} \mbox({|r_{t,i}|} {|r_{t,i-1}|} {|r_{t,i-2}|} {|r_{t,i-3}|})
 #'  }
 #'
-#' @param rData a zoo/xts object containing all returns in period t for one asset.
+#' @param rData an xts or data.table object containing returns or prices, possibly for multiple assets over multiple days
 #' @param alignBy a string, align the tick data to "seconds"|"minutes"|"hours".
 #' @param alignPeriod an integer, align the tick data to this many [seconds|minutes|hours].  
 #' @param makeReturns boolean, should be TRUE when rData contains prices instead of returns. FALSE by default.
@@ -2360,8 +2463,12 @@ rQPVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
     return(result)
   } else if (is.data.table(rData)){ 
     DATE <- .N <- DT <- NULL
-    if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+    if(!is.null(alignBy) && !is.null(alignPeriod) && makeReturns) {
       rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
+    }
+    
+    if(!is.null(alignBy) && !is.null(alignPeriod) && !makeReturns) {
+      rData <- fastTickAgregation_DATA.TABLE_RETURNS(rData, on = alignBy, k = alignPeriod)
     }
     setkey(rData, "DT")
     dates <- rData[, list(end = .N), by = list(DATE = as.Date(DT))][, `:=`(end = cumsum(end), DATE = as.character(DATE))][, start := shift(end, fill = 0) + 1]
@@ -2380,8 +2487,12 @@ rQPVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
     return(res)
     
   } else {
-    if (!is.null(alignBy) && !is.null(alignPeriod)) {
-      rData <-fastTickAgregation(rData, on = alignBy, k = alignPeriod)
+    ## DO data transformations
+    if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && makeReturns) {
+      rData <- fastTickAgregation(rData, on = alignBy, k = alignPeriod)
+    }
+    if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && !makeReturns) {
+      rData <- fastTickAgregation_RETURNS(rData, on = alignBy, k = alignPeriod)
     }
     if (makeReturns) {
       rData <- makeReturns(rData)
@@ -2405,7 +2516,7 @@ rQPVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
 #'    \mbox{rQuar}_{t}=\frac{N}{3} \sum_{i=1}^{N} \mbox(r_{t,i}^4)
 #'  }
 #'  
-#' @param rData a zoo/xts object containing all returns in period t for one asset.
+#' @param rData an xts or data.table object containing returns or prices, possibly for multiple assets over multiple days
 #' @param alignBy a string, align the tick data to "seconds"|"minutes"|"hours".
 #' @param alignPeriod an integer, align the tick data to this many [seconds|minutes|hours].
 #' @param makeReturns boolean, should be TRUE when rData contains prices instead of returns. FALSE by default.
@@ -2428,8 +2539,12 @@ rQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
     return(result)
   }  else if (is.data.table(rData)){ 
     DATE <- .N <- DT <- NULL
-    if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+    if(!is.null(alignBy) && !is.null(alignPeriod) && makeReturns) {
       rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
+    }
+    
+    if(!is.null(alignBy) && !is.null(alignPeriod) && !makeReturns) {
+      rData <- fastTickAgregation_DATA.TABLE_RETURNS(rData, on = alignBy, k = alignPeriod)
     }
     setkey(rData, "DT")
     dates <- rData[, list(end = .N), by = list(DATE = as.Date(DT))][, `:=`(end = cumsum(end), DATE = as.character(DATE))][, start := shift(end, fill = 0) + 1]
@@ -2448,8 +2563,12 @@ rQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
     return(res)
     
   } else {
-    if ((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+    ## DO data transformations
+    if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && makeReturns) {
       rData <- fastTickAgregation(rData, on = alignBy, k = alignPeriod)
+    }
+    if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && !makeReturns) {
+      rData <- fastTickAgregation_RETURNS(rData, on = alignBy, k = alignPeriod)
     }
     if (makeReturns) {
       rData <- makeReturns(rData)
@@ -2790,9 +2909,7 @@ rCholCov <- function(pData, IVest = "MRC", COVest = "MRC", criterion = "squared 
 #' The off-diagonals of the concordant matrix is always positive, while for the mixed matrix, it is always negative.
 #'
 #'  
-#' @param rData a \eqn{(M x N)} matrix/zoo/xts object containing the \eqn{N}
-#' return series over period \eqn{t}, with \eqn{M} observations during \eqn{t}.
-#' In case of a matrix, no multi-day adjustment is possible.
+#' @param rData an xts or data.table object containing returns or prices, possibly for multiple assets over multiple days
 #' @param cor logical, in case it is TRUE, the correlation is returned. FALSE by default.
 #' @param alignBy a string, align the tick data to "seconds"|"minutes"|"hours".
 #' @param alignPeriod an integer, align the tick data to this many [seconds|minutes|hours].
@@ -2842,8 +2959,12 @@ rSemiCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, mak
     return(result)
   }  else if (is.data.table(rData)){
     DATE <- .N <- DT <- NULL
-    if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+    if(!is.null(alignBy) && !is.null(alignPeriod) && makeReturns) {
       rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
+    }
+    
+    if(!is.null(alignBy) && !is.null(alignPeriod) && !makeReturns) {
+      rData <- fastTickAgregation_DATA.TABLE_RETURNS(rData, on = alignBy, k = alignPeriod)
     }
     
     setkey(rData, "DT")
@@ -2862,12 +2983,16 @@ rSemiCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, mak
     
   } else {
     
-    if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+    ## DO data transformations
+    if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && makeReturns) {
       rData <- fastTickAgregation(rData, on = alignBy, k = alignPeriod)
-    } 
-    if (makeReturns) {  
-      rData <- makeReturns(rData) 
-    }  
+    }
+    if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && !makeReturns) {
+      rData <- fastTickAgregation_RETURNS(rData, on = alignBy, k = alignPeriod)
+    }
+    if (makeReturns) {
+      rData <- makeReturns(rData)
+    }
     N <- ncol(rData)
     rData <- as.matrix(rData)
     # create p and n

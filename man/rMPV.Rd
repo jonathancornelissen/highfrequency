@@ -14,7 +14,7 @@ rMPV(
 )
 }
 \arguments{
-\item{rData}{a zoo/xts object containing all returns in period t for one asset.}
+\item{rData}{an xts or data.table object containing returns or prices, possibly for multiple assets over multiple days}
 
 \item{m}{the window size of return blocks. 2 by default.}
 

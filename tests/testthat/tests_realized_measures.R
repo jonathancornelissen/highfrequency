@@ -24,6 +24,10 @@ for (date in c("1970-01-01", "1970-01-02", "1970-01-03")) {
 returnDatDT <- as.data.table(returnDat)
 setnames(returnDatDT, old = "index", new = "DT")
 
+
+
+
+
 ##### medRV #####
 context("medRV")
 test_that("medRV", {
@@ -51,7 +55,8 @@ test_that("", {
     as.numeric(medRQ(as.xts(sampleTDataMicroseconds[, list(DT, PRICE)]),alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE) * 1000000),
     c(0.010922500356, 0.003618836787)
   )
-  
+  expect_true(all.equal(medRQ(returnDatDT, alignBy = "minutes", alignPeriod = 5, makeReturns = FALSE), medRQ(datDT, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)))
+  expect_true(all.equal(medRQ(dat, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE) , medRQ(returnDat, alignBy = "minutes", alignPeriod = 5, makeReturns = FALSE)))
   expect_equal(lapply(medRQ(returnDat), sum), list("PRICE1" = 3.06573359, "PRICE2" = 3.010144579, "PRICE3" = 3.030828633))
   expect_equal(lapply(medRQ(returnDat), sum), lapply(medRQ(dat, makeReturns = TRUE), sum))
   
@@ -175,6 +180,8 @@ test_that("rCov", {
     "0.00081828"
   )
   
+  expect_true(all.equal(rCov(returnDatDT, alignBy = "minutes", alignPeriod = 5) ,rCov(datDT, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)))
+  expect_true(all.equal(rCov(returnDat, alignBy = "minutes", alignPeriod = 5) ,rCov(dat, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)))
   
   expect_equal(lapply(rCov(returnDat), sum), list("1970-01-01" = 2.971967832, "1970-01-02" = 3.032179598, "1970-01-03" = 3.012844796))
   expect_equal(lapply(rCov(returnDat), sum), lapply(rCov(dat, makeReturns = TRUE), sum))
@@ -258,8 +265,8 @@ test_that("rKernelCov", {
     c(1.253773e-04, 6.087867e-05)
   )
   expect_equal(
-    formatC(sum(rKernelCov(rData = cbind(lltc, sbux, fill = 0), alignBy = "minutes", alignPeriod = 5, makeReturns = FALSE)) * 1000, digits = 5),
-    "0.021281"
+    formatC(sum(rKernelCov(rData = cbind(lltc, sbux, fill = 0), alignBy = "minutes", alignPeriod = 5, makeReturns = FALSE)), digits = 5),
+    "0.0022276"
   )
   expect_equal(length(listAvailableKernels()) , 12)
   
@@ -311,12 +318,12 @@ test_that("rSV", {
 context("rThresholdCov")
 test_that("rThresholdCov", {
   expect_equal(
-    formatC(sum(rThresholdCov(cbind(lltc, sbux), alignBy = "minutes", alignPeriod = 1)) * 10000, digits = 5),
-    "0.59423"
+    formatC(sum(rThresholdCov(cbind(lltc, sbux), alignBy = "minutes", alignPeriod = 1)), digits = 5),
+    "0.0015979"
   )
   expect_equal(
-    formatC(sum(rThresholdCov(cbind(lltc, sbux), alignBy = "minutes", alignPeriod = 1), cor = TRUE), digits = 1),
-    " 1"
+    formatC(sum(rThresholdCov(cbind(lltc, sbux), alignBy = "minutes", alignPeriod = 1, cor = TRUE)), digits = 5),
+    "3.2939"
   )
   
   expect_equal(lapply(rThresholdCov(returnDat), sum), list("1970-01-01" = 2.943885754, "1970-01-02" = 2.992550689, "1970-01-03" = 2.963583828))

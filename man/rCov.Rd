@@ -13,9 +13,7 @@ rCov(
 )
 }
 \arguments{
-\item{rData}{a \eqn{(M x N)} matrix/zoo/xts object containing the \eqn{N}
-return series over period \eqn{t}, with \eqn{M} observations during \eqn{t}.
-In case of a matrix, no multi-day adjustment is possible.}
+\item{rData}{an xts or data.table object containing returns or prices, possibly for multiple assets over multiple days}
 
 \item{cor}{boolean, in case it is TRUE, the correlation is returned. FALSE by default.}
 

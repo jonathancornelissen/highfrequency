@@ -748,7 +748,7 @@ predict.HARmodel <- function(object, newdata = NULL, warnings = TRUE, ...) {
     if (type == "HARCJ") {
 
       if (object$jumpTest=="ABDJumptest") {
-        TQ <- apply.daily(newdata, RTQ)
+        TQ <- apply.daily(newdata, rTPQuar)
         J <- J[, 1]
         teststats <- ABDJumptest(RV = RM1, BPV = RM2,TQ = TQ)
       } else {

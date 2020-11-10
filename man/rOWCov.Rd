@@ -82,7 +82,7 @@ a zero weight, due to which the rOWCov can have a low finite sample efficiency i
 \dontrun{
 library("xts")
 # Realized Outlyingness Weighted Variance/Covariance for prices aligned   
-# at 5 minutes.
+# at 1 minutes.
 
 # Univariate: 
 row <- rOWCov(rData = as.xts(sampleOneMinuteData[as.Date(DT) == "2001-08-04", 

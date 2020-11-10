@@ -68,6 +68,7 @@ An alternative is to slightly enlarge the bandwidth such that \eqn{\mbox{k}_{N} 
 \examples{
 \dontrun{
 library("xts")
+## Note that this ought to be tick-by-tick data and this example is only to show the usage!
 a <- list(as.xts(sampleOneMinuteData[as.Date(DT) == "2001-08-04", list(DT, MARKET)]), 
           as.xts(sampleOneMinuteData[as.Date(DT) == "2001-08-04", list(DT, STOCK)]))
 MRC(a, pairwise = TRUE, makePsd = TRUE)

@@ -7,7 +7,7 @@
 rQuar(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE)
 }
 \arguments{
-\item{rData}{a zoo/xts object containing all returns in period t for one asset.}
+\item{rData}{an xts or data.table object containing returns or prices, possibly for multiple assets over multiple days}
 
 \item{alignBy}{a string, align the tick data to "seconds"|"minutes"|"hours".}
 

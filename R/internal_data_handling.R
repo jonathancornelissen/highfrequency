@@ -92,6 +92,84 @@ fastTickAgregation_DATA.TABLE <- function(dat, on = "minutes", k = 1, tz = "GMT"
 }
 
 
+#' @importFrom zoo zoo na.locf `index<-`
+#' @importFrom stats start end
+#' @keywords internal
+fastTickAgregation_RETURNS <- function (ts, on = "minutes", k = 1, tz = "GMT") {
+  
+  if (on == "secs" | on == "seconds") {
+    secs <- k
+    tby <- paste(k, "sec", sep = " ")
+  } 
+  if (on == "mins" | on == "minutes") {
+    secs <- 60 * k
+    tby <- paste(60 * k, "sec", sep = " ")
+  } 
+  if (on == "hours"){
+    secs <- 3600 * k
+    tby <- paste(3600 * k, "sec", sep = " ")
+  }
+  g <- base::seq(start(ts), end(ts), by = tby)
+  rawg <- as.numeric(as.POSIXct(g, tz = tz))
+  newg <- rawg + (secs - rawg %% secs)
+  if(as.numeric(end(ts)) == newg[length(newg)-1]){
+    newg  <- newg[-length(newg)]
+  }
+  
+  firstObs <- ts[1,]
+  firstObs[] <- 0 ## We should have 0 return! We use [] to not just overwrite it as a numeric with 0
+  ts <- period.apply(ts, INDEX = merge.data.table(data.table(DT = index(ts), 1:nrow(ts)), data.table(DT = newg), by = "DT")$V2, FUN = colSums, na.rm = TRUE)
+  ts <- na.locf(ts)
+  if(index(ts[1]) > index(firstObs)){
+    index(firstObs) <- index(ts[1]) - secs
+    ts <- c(firstObs, ts)
+  }
+  
+  return(ts)
+}
+
+
+#' @importFrom data.table rbindlist setkey nafill set
+#' @keywords internal
+fastTickAgregation_DATA.TABLE_RETURNS <- function(dat, on = "minutes", k = 1, tz = "GMT"){
+  DT_ROUND <- FIRST_DT <- .SD <- FIRST_DT <- DT <- DATE <- NULL
+  if (on == "secs" | on == "seconds") {
+    secs <- k
+  } 
+  if (on == "mins" | on == "minutes") {
+    secs <- 60 * k
+  } 
+  if (on == "hours"){
+    secs <- 3600 * k
+  }
+  #n
+  timeZone <- attr(dat$DT, "tzone")
+  if(is.null(timeZone) | timeZone == ""){
+    if(is.null(tz)){
+      tz <- "UTC"
+    }
+    if(!("POSIXct" %in% class(dat$DT))) dat[, DT := as.POSIXct(format(DT, digits = 20, nsmall = 20), tz = tz)]
+  } else {
+    tz <- timeZone
+  }
+  ## These are used to make sure we dont have na's back and forth and to recude the chance we erroneously produce NA's
+  dat <- dat[, lapply(.SD, nafill, type = "locf"), .SDcols = colnames(dat), by = list(DATE = as.Date(DT, tz = tz))]
+  dat <- dat[, lapply(.SD, nafill, type = "nocb"), by = DATE]
+  dat[, DT := as.numeric(DT, tz = tz)]
+  dat[, FIRST_DT := min(DT), by = "DATE"]
+  dat[, DT_ROUND := fifelse(DT == FIRST_DT,
+                              floor(DT/secs) * secs,
+                              ceiling(DT/secs) * secs)]
+  cols = colnames(dat)
+  cols <- cols[!(cols %in% c("DATE", "DT", "FIRST_DT", "DT_ROUND"))]
+  dat <- dat[, lapply(.SD, sum), by = "DT_ROUND", .SDcols = cols]
+  setnames(dat, old = "DT_ROUND", new = "DT")
+  dat[, DT := as.POSIXct(DT, origin = as.POSIXct("1970-01-01", tz = "UTC"), tz = tz)]
+  return(dat[])
+  
+}
+
+
 
 
 # # Necessary for check-package not throwing errors

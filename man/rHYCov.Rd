@@ -15,7 +15,7 @@ rHYCov(
 )
 }
 \arguments{
-\item{rData}{a possibly multivariate xts object.}
+\item{rData}{an xts or data.table object containing returns or prices, possibly for multiple assets.}
 
 \item{cor}{boolean, in case it is TRUE, the correlation is returned. FALSE by default.}
 
