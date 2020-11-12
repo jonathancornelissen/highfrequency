@@ -16,7 +16,9 @@ rSkew(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE)
 \item{makeReturns}{boolean, should be TRUE when rData contains prices instead of returns. FALSE by   default.}
 }
 \value{
-numeric
+In case the input is an xts object with data from one day, a numeric of same length as the number of assets. 
+If the input data spans multiple days and is in xts format, an xts will be returned. 
+If the input data is a data.table object, the function returns a data.table with the same column names as the input data, containing the date and the realized measures
 }
 \description{
 Function returns Realized skewness, defined in Amaya et al. (2011).

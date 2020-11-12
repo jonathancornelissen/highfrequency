@@ -37,7 +37,8 @@ of stock i for day t.}
 \item{makePsd}{boolean, in case it is TRUE, the positive definite version of rTSCov is returned. FALSE by default.}
 }
 \value{
-an \eqn{N x N} matrix
+in case the input is and contains data from one day, an N by N matrix is returned. If the data is a univariate xts object with multiple days, an xts is returned. 
+If the data is multivariate and contains multiple days (xts or data.table), the function returns a list containing N by N matrices. Each item in the list has a name which corresponds to the date for the matrix.
 }
 \description{
 Function returns the two time scale covariance matrix proposed in Zhang et al (2005) and Zhang (2010).

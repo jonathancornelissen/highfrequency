@@ -28,7 +28,8 @@ return series over period \eqn{t}, with \eqn{M} observations during \eqn{t}.}
 \item{makeReturns}{Prices are passed make them into log returns}
 }
 \value{
-Realized covariance using average subsample.
+in case the input is and contains data from one day, an N by N matrix is returned. If the data is a univariate xts object with multiple days, an xts is returned. 
+If the data is multivariate and contains multiple days (xts or data.table), the function returns a list containing N by N matrices. Each item in the list has a name which corresponds to the date for the matrix.
 }
 \description{
 Realized Covariance using average subsample.

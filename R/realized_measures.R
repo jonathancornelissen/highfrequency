@@ -43,7 +43,9 @@ listAvailableKernels <- function() {
 #' @param alignPeriod an integer, align the tick data to this many [seconds|minutes|hours]. 
 #' @param makeReturns boolean, should be TRUE when rData contains prices instead of returns. FALSE by  default.
 #' 
-#' @return numeric
+#' @return In case the input is an xts object with data from one day, a numeric of same length as the number of assets. 
+#' If the input data spans multiple days and is in xts format, an xts will be returned. 
+#' If the input data is a data.table object, the function returns a data.table with the same column names as the input data, containing the date and the realized measures
 #' 
 #' @examples
 #' rq <- medRQ(rData = sampleTDataMicroseconds[, list(DT, PRICE)], alignBy = "minutes", 
@@ -132,7 +134,9 @@ medRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #' @param alignPeriod an integer, align the tick data to this many [seconds|minutes|hours].
 #' @param makeReturns boolean, should be TRUE when rData contains prices instead of returns. FALSE by  default.
 #' 
-#' @return numeric
+#' @return In case the input is an xts object with data from one day, a numeric of same length as the number of assets. 
+#' If the input data spans multiple days and is in xts format, an xts will be returned. 
+#' If the input data is a data.table object, the function returns a data.table with the same column names as the input data, containing the date and the realized measures
 #' 
 #' @examples
 #' rq <- minRQ(rData = sampleTDataMicroseconds[, list(DT, PRICE)], alignBy = "minutes", 
@@ -209,7 +213,9 @@ minRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #' @param alignPeriod an integer, align the tick data to this many [seconds|minutes|hours].
 #' @param makeReturns boolean, should be TRUE when rData contains prices instead of returns. FALSE by default.
 #' 
-#' @return numeric
+#' @return In case the input is an xts object with data from one day, a numeric of same length as the number of assets. 
+#' If the input data spans multiple days and is in xts format, an xts will be returned. 
+#' If the input data is a data.table object, the function returns a data.table with the same column names as the input data, containing the date and the realized measures
 #' 
 #' @references 
 #' Andersen, T. G., D. Dobrev, and E. Schaumburg (2012). Jump-robust volatility estimation using nearest neighbor truncation. Journal of Econometrics, 169 (1), 75-93.
@@ -309,7 +315,9 @@ minRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #' can lead to more precise volatility forecasts, 
 #' as shown in Andersen et al. (2007) and Corsi et al. (2010).
 #' 
-#' @return numeric
+#' @return In case the input is an xts object with data from one day, a numeric of same length as the number of assets. 
+#' If the input data spans multiple days and is in xts format, an xts will be returned. 
+#' If the input data is a data.table object, the function returns a data.table with the same column names as the input data, containing the date and the realized measures
 #' 
 #' @references Andersen, T. G., D. Dobrev, and E. Schaumburg (2012). Jump-robust volatility estimation using nearest neighbor truncation. Journal of Econometrics, 169 (1), 75-93.
 #' 
@@ -536,7 +544,8 @@ MRC <- function(pData, pairwise = FALSE, makePsd = FALSE) {
 #' @param k numeric denoting which horizon to use for the subsambles. This can be a fraction as long as k is a divisor of alignPeriod default is \code{1}
 #' @param makeReturns Prices are passed make them into log returns
 #' 
-#' @return Realized covariance using average subsample.
+#' @return in case the input is and contains data from one day, an N by N matrix is returned. If the data is a univariate xts object with multiple days, an xts is returned. 
+#' If the data is multivariate and contains multiple days (xts or data.table), the function returns a list containing N by N matrices. Each item in the list has a name which corresponds to the date for the matrix.
 #' 
 #' @references 
 #' L. Zhang, P.A Mykland, and Y. Ait-Sahalia. A tale of two time scales: Determining integrated volatility with noisy high-frequency data. \emph{Journal of the American Statistical Association}, 2005.
@@ -979,7 +988,8 @@ rBeta <- function(rData, rIndex, RCOVestimator = "rCov", RVestimator = "RV", mak
 #' @param makeReturns boolean, should be TRUE when rData contains prices instead of returns. FALSE by default.
 #' @param makePsd boolean, in case it is TRUE, the positive definite version of rBPCov is returned. FALSE by default.
 #'
-#' @return an \eqn{N x N} matrix or a list of matrices if the time period spans multiple days
+#' @return in case the input is and contains data from one day, an N by N matrix is returned. If the data is a univariate xts object with multiple days, an xts is returned. 
+#' If the data is multivariate and contains multiple days (xts or data.table), the function returns a list containing N by N matrices. Each item in the list has a name which corresponds to the date for the matrix.
 #' 
 #' @references 
 #' Barndorff-Nielsen, O. and N. Shephard (2004). Measuring the impact of
@@ -1127,7 +1137,8 @@ rBPCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeR
 #' @param alignPeriod an integer, align the tick data to this many [seconds|minutes|hours].
 #' @param makeReturns boolean, should be TRUE when rData contains prices instead of returns. FALSE by default.
 #' 
-#' @return an \eqn{N x N} matrix
+#' @return in case the input is and contains data from one day, an N by N matrix is returned. If the data is a univariate xts object with multiple days, an xts is returned. 
+#' If the data is multivariate and contains multiple days (xts or data.table), the function returns a list containing N by N matrices. Each item in the list has a name which corresponds to the date for the matrix.
 #' 
 #' @author Jonathan Cornelissen and Kris Boudt
 #' 
@@ -1211,8 +1222,7 @@ rCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeRet
     
     if (n == 1) {
       return(RV(rData))
-    }
-    if (n > 1) {
+    } else {
       rData <- as.matrix(rData)
       covariance <- t(rData) %*% rData
       if (!cor) {
@@ -1344,7 +1354,8 @@ rHYCov <- function(rData, cor = FALSE, period = 1, alignBy = "seconds", alignPer
 #' @param ... used internally, do not use.
 #' @details The different types of kernels can be found using \code{\link{listAvailableKernels}}.
 #' 
-#' @return Kernel estimate of realized covariance.
+#' @return in case the input is and contains data from one day, an N by N matrix is returned. If the data is a univariate xts object with multiple days, an xts is returned. 
+#' If the data is multivariate and contains multiple days (xts or data.table), the function returns a list containing N by N matrices. Each item in the list has a name which corresponds to the date for the matrix.
 #' 
 #' @references
 #' Ole E. Barndorff-Nielsen, Peter Reinhard Hansen, Asger Lunde, and Neil Shephard (2008). Designing Realized Kernels to Measure the ex post Variation of Equity Prices in the Presence of Noise. \emph{Econometrica}, 76, pp. 1481-1536.
@@ -1498,7 +1509,9 @@ rKernelCov <- function(rData, cor = FALSE,  alignBy = "seconds", alignPeriod = 1
 #' @param alignPeriod an integer, align the tick data to this many [seconds|minutes|hours].
 #' @param makeReturns boolean, should be TRUE when rData contains prices instead of returns. FALSE by   default.
 #'
-#' @return numeric
+#' @return In case the input is an xts object with data from one day, a numeric of same length as the number of assets. 
+#' If the input data spans multiple days and is in xts format, an xts will be returned. 
+#' If the input data is a data.table object, the function returns a data.table with the same column names as the input data, containing the date and the realized measures
 #'
 #' @references Amaya, D., Christoffersen, P., Jacobs, K. and Vasquez, A. (2011). Do realized skewness and kurtosis predict the cross-section of equity returns?. CREATES research paper. p. 3-7.
 #'
@@ -1868,7 +1881,9 @@ rOWCov <- function (rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, make
 #' @param alignPeriod an integer, align the tick data to this many [seconds|minutes|hours].
 #' @param makeReturns boolean, should be TRUE when rData contains prices instead of returns. FALSE by   default.
 #' 
-#' @return numeric
+#' @return In case the input is an xts object with data from one day, a numeric of same length as the number of assets. 
+#' If the input data spans multiple days and is in xts format, an xts will be returned. 
+#' If the input data is a data.table object, the function returns a data.table with the same column names as the input data, containing the date and the realized measures
 #' 
 #' @references  Amaya, D., Christoffersen, P., Jacobs, K. and Vasquez, A. (2011). Do realized skewness and kurtosis predict the cross-section of equity returns?. CREATES research paper. p. 3-7.
 #'
@@ -2065,7 +2080,8 @@ rSV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, 
 #' @param alignPeriod an integer, align the tick data to this many [seconds|minutes|hours].
 #' @param makeReturns boolean, should be TRUE when rData contains prices instead of returns. FALSE by default.
 #' 
-#' @return an \eqn{N x N} matrix
+#' @return in case the input is and contains data from one day, an N by N matrix is returned. If the data is a univariate xts object with multiple days, an xts is returned. 
+#' If the data is multivariate and contains multiple days (xts or data.table), the function returns a list containing N by N matrices. Each item in the list has a name which corresponds to the date for the matrix.
 #' 
 #' @references
 #' Barndorff-Nielsen, O. and N. Shephard (2004). Measuring the impact of jumps in multivariate price processes using bipower covariation. Discussion paper, Nuffield College, Oxford University.
@@ -2362,8 +2378,10 @@ RV <- function(rData) {
 #' @param alignPeriod an integer, align the tick data to this many [seconds|minutes|hours].  
 #' @param makeReturns boolean, should be TRUE when rData contains prices instead of returns. FALSE by   default.
 #'  
-#' @return numeric
-#'  
+#' @return In case the input is an xts object with data from one day, a numeric of same length as the number of assets. 
+#' If the input data spans multiple days and is in xts format, an xts will be returned. 
+#' If the input data is a data.table object, the function returns a data.table with the same column names as the input data, containing the date and the realized measures
+#' 
 #' @references Andersen, T. G., D. Dobrev, and E. Schaumburg (2012). Jump-robust volatility estimation using nearest neighbor truncation. Journal of Econometrics, 169(1), 75- 93.
 #'  
 #' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
@@ -2443,7 +2461,9 @@ rTPQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FAL
 #' @param alignPeriod an integer, align the tick data to this many [seconds|minutes|hours].  
 #' @param makeReturns boolean, should be TRUE when rData contains prices instead of returns. FALSE by default.
 #'
-#' @return numeric
+#' @return In case the input is an xts object with data from one day, a numeric of same length as the number of assets. 
+#' If the input data spans multiple days and is in xts format, an xts will be returned. 
+#' If the input data is a data.table object, the function returns a data.table with the same column names as the input data, containing the date and the realized measures
 #' 
 #' @references Andersen, T. G., D. Dobrev, and E. Schaumburg (2012). Jump-robust volatility estimation using nearest neighbor truncation. Journal of Econometrics, 169(1), 75- 93.
 #' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
@@ -2521,7 +2541,9 @@ rQPVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
 #' @param alignPeriod an integer, align the tick data to this many [seconds|minutes|hours].
 #' @param makeReturns boolean, should be TRUE when rData contains prices instead of returns. FALSE by default.
 #' 
-#' @return numeric
+#' @return In case the input is an xts object with data from one day, a numeric of same length as the number of assets. 
+#' If the input data spans multiple days and is in xts format, an xts will be returned. 
+#' If the input data is a data.table object, the function returns a data.table with the same column names as the input data, containing the date and the realized measures
 #'
 #' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
 #' @references  Andersen, T. G., D. Dobrev, and E. Schaumburg (2012). Jump-robust volatility estimation using nearest neighbor truncation. Journal of Econometrics, 169(1), 75- 93.
@@ -2597,7 +2619,8 @@ rQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #' @param J_var vector of positive integers, for the diagonal variance elements the fast time scale returns are computed on prices that are J steps apart.
 #' @param makePsd boolean, in case it is TRUE, the positive definite version of rTSCov is returned. FALSE by default.
 #' 
-#' @return an \eqn{N x N} matrix
+#' @return in case the input is and contains data from one day, an N by N matrix is returned. If the data is a univariate xts object with multiple days, an xts is returned. 
+#' If the data is multivariate and contains multiple days (xts or data.table), the function returns a list containing N by N matrices. Each item in the list has a name which corresponds to the date for the matrix.
 #' 
 #' @details The rTSCov requires the tick-by-tick transaction prices. (Co)variances are then computed using log-returns calculated on a rolling basis 
 #' on stock prices that are \eqn{K} (slow time scale) and \eqn{J} (fast time scale) steps apart.
@@ -2644,7 +2667,6 @@ rQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #' Zhang, L. (2011). Estimating covariation: Epps effect, microstructure noise. Journal of Econometrics 160, 33-47.
 #' 
 #' @author Jonathan Cornelissen and Kris Boudt
-
 #' @examples 
 #' # Robust Realized two timescales Variance/Covariance
 #' # Multivariate:
