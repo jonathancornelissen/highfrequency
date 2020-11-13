@@ -29,7 +29,7 @@ test_that("JO jump test unit test",{
 context("BNSjumpTest")
 test_that("BNSjumpTest", {
   expect_equal(
-    as.numeric(BNSjumpTest(as.xts(sampleTDataMicroseconds[, list(DT, PRICE)]), IVestimator= "minRV", IQestimator = "medRQ", type= "linear", makeReturns = TRUE)[, "p.value"]),
+    as.numeric(BNSjumpTest(as.xts(sampleTDataMicroseconds[, list(DT, PRICE)]), IVestimator= "rMinRV", IQestimator = "rMedRQ", type= "linear", makeReturns = TRUE)[, "p.value"]),
     c(1.794624516e-02, 2.913249385e-05)
   )
 })

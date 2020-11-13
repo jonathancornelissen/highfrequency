@@ -20,9 +20,9 @@ BNSjumpTest(
 \arguments{
 \item{rData}{a zoo/xts object containing all returns in period t for one asset.}
 
-\item{IVestimator}{can be chosen among jump robust integrated variance estimators: BV, minRV, medRV and corrected threshold bipower variation (CTBV). If CTBV is chosen, an argument of \eqn{startV}, start point of auxiliary estimators in threshold estimation (Corsi et al. (2010) can be included. BV by default.}
+\item{IVestimator}{can be chosen among jump robust integrated variance estimators: BV, rMinRV, rMedRV and corrected threshold bipower variation (CTBV). If CTBV is chosen, an argument of \eqn{startV}, start point of auxiliary estimators in threshold estimation (Corsi et al. (2010) can be included. BV by default.}
 
-\item{IQestimator}{can be chosen among jump robust integrated quarticity estimators: TP, QP, minRQ and medRQ. TP by default.}
+\item{IQestimator}{can be chosen among jump robust integrated quarticity estimators: TP, QP, rMinRQ and rMedRQ. TP by default.}
 
 \item{type}{a method of BNS testing: can be linear or ratio. Linear by default.}
 
@@ -55,8 +55,8 @@ Then the BNSjumpTest is given by:
 \deqn{
 \mbox{BNSjumpTest}= \frac{RV - IVestimator}{\sqrt{(\theta-2)\frac{1}{N} {IQestimator}}}
 }
-in which, \eqn{IVestimator} can be: bipower variance (BV), minRV, medRV. 
-\eqn{IQestimator} can be: tripower quarticity (TP), quadpower quarticity (QP), minRQ, medRQ.
+in which, \eqn{IVestimator} can be: bipower variance (BV), rMinRV, rMedRV. 
+\eqn{IQestimator} can be: tripower quarticity (TP), quadpower quarticity (QP), rMinRQ, rMedRQ.
 
 \eqn{\theta}: depends on IVestimator (Huang and Tauchen (2005)).
 }
@@ -74,8 +74,8 @@ where \eqn{k_j} are nonzero random variables. The counting process can be either
 Since the realized volatility converges to the sum of integrated variance and jump variation, while the robust IVestimator converges to the integrated variance,  it follows that the difference between #' \eqn{RV_{t,N}} and the IVestimator captures the jump part only, and this observation underlines the BNS test for jumps. (Theodosiou& Zikes(2009))
 }
 \examples{
-bns <- BNSjumpTest(sampleTDataMicroseconds[, list(DT, PRICE)], IVestimator= "minRV",
-                   IQestimator = "medRQ", type= "linear", makeReturns = TRUE)
+bns <- BNSjumpTest(sampleTDataMicroseconds[, list(DT, PRICE)], IVestimator= "rMinRV",
+                   IQestimator = "rMedRQ", type= "linear", makeReturns = TRUE)
 bns
 
 }

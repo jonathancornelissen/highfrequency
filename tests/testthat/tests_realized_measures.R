@@ -28,99 +28,99 @@ setnames(returnDatDT, old = "index", new = "DT")
 
 
 
-##### medRV #####
-context("medRV")
-test_that("medRV", {
+##### rMedRV #####
+context("rMedRV")
+test_that("rMedRV", {
   expect_equal(
-    as.numeric(colSums(medRV(sampleOneMinuteData, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)[,!"DT"])),
+    as.numeric(colSums(rMedRV(sampleOneMinuteData, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)[,!"DT"])),
     c(0.003387052289,0.001451676499)
   )
   
-  expect_equal(lapply(medRV(returnDat), sum), list("PRICE1" = 3.022290125, "PRICE2" = 3.003088657, "PRICE3" = 3.013543419))
-  expect_equal(lapply(medRV(returnDat), sum), lapply(medRV(dat, makeReturns = TRUE), sum))
+  expect_equal(lapply(rMedRV(returnDat), sum), list("PRICE1" = 3.022290125, "PRICE2" = 3.003088657, "PRICE3" = 3.013543419))
+  expect_equal(lapply(rMedRV(returnDat), sum), lapply(rMedRV(dat, makeReturns = TRUE), sum))
   
-  expect_equal(matrix(medRV(returnDat), ncol = 3), matrix(as.matrix(medRV(returnDatDT)[,-1]), ncol = 3))
-  expect_equal(matrix(medRV(dat, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE), ncol = 3),
-               matrix(as.matrix(medRV(datDT, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)[, -1]), ncol = 3))
+  expect_equal(matrix(rMedRV(returnDat), ncol = 3), matrix(as.matrix(rMedRV(returnDatDT)[,-1]), ncol = 3))
+  expect_equal(matrix(rMedRV(dat, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE), ncol = 3),
+               matrix(as.matrix(rMedRV(datDT, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)[, -1]), ncol = 3))
   
-  expect_equal(matrix(as.matrix(medRV(sampleOneMinuteData, makeReturns = TRUE)[,-1]), ncol = 2),
-               matrix(medRV(as.xts(sampleOneMinuteData), makeReturns = TRUE), ncol = 2))
+  expect_equal(matrix(as.matrix(rMedRV(sampleOneMinuteData, makeReturns = TRUE)[,-1]), ncol = 2),
+               matrix(rMedRV(as.xts(sampleOneMinuteData), makeReturns = TRUE), ncol = 2))
   
 
 })
-##### medRQ ##### 
-context("medRQ")
+##### rMedRQ ##### 
+context("rMedRQ")
 test_that("", {
   expect_equal(
-    as.numeric(medRQ(as.xts(sampleTDataMicroseconds[, list(DT, PRICE)]),alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE) * 1000000),
+    as.numeric(rMedRQ(as.xts(sampleTDataMicroseconds[, list(DT, PRICE)]),alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE) * 1000000),
     c(0.010922500356, 0.003618836787)
   )
-  expect_true(all.equal(medRQ(returnDatDT, alignBy = "minutes", alignPeriod = 5, makeReturns = FALSE), medRQ(datDT, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)))
-  expect_true(all.equal(medRQ(dat, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE) , medRQ(returnDat, alignBy = "minutes", alignPeriod = 5, makeReturns = FALSE)))
-  expect_equal(lapply(medRQ(returnDat), sum), list("PRICE1" = 3.06573359, "PRICE2" = 3.010144579, "PRICE3" = 3.030828633))
-  expect_equal(lapply(medRQ(returnDat), sum), lapply(medRQ(dat, makeReturns = TRUE), sum))
+  expect_true(all.equal(rMedRQ(returnDatDT, alignBy = "minutes", alignPeriod = 5, makeReturns = FALSE), rMedRQ(datDT, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)))
+  expect_true(all.equal(rMedRQ(dat, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE) , rMedRQ(returnDat, alignBy = "minutes", alignPeriod = 5, makeReturns = FALSE)))
+  expect_equal(lapply(rMedRQ(returnDat), sum), list("PRICE1" = 3.06573359, "PRICE2" = 3.010144579, "PRICE3" = 3.030828633))
+  expect_equal(lapply(rMedRQ(returnDat), sum), lapply(rMedRQ(dat, makeReturns = TRUE), sum))
   
-  expect_equal(matrix(medRQ(returnDat), ncol = 3), matrix(as.matrix(medRQ(returnDatDT)[,-1]), ncol = 3))
-  expect_equal(matrix(medRQ(dat, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE), ncol = 3),
-               matrix(as.matrix(medRQ(datDT, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)[, -1]), ncol = 3))
+  expect_equal(matrix(rMedRQ(returnDat), ncol = 3), matrix(as.matrix(rMedRQ(returnDatDT)[,-1]), ncol = 3))
+  expect_equal(matrix(rMedRQ(dat, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE), ncol = 3),
+               matrix(as.matrix(rMedRQ(datDT, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)[, -1]), ncol = 3))
   
-  expect_equal(matrix(as.matrix(medRQ(sampleOneMinuteData, makeReturns = TRUE)[,-1]), ncol = 2),
-               matrix(medRQ(as.xts(sampleOneMinuteData), makeReturns = TRUE), ncol = 2))
+  expect_equal(matrix(as.matrix(rMedRQ(sampleOneMinuteData, makeReturns = TRUE)[,-1]), ncol = 2),
+               matrix(rMedRQ(as.xts(sampleOneMinuteData), makeReturns = TRUE), ncol = 2))
   
   
 })
-##### minRV ##### 
-context("minRV")
-test_that("minRV", {  
+##### rMinRV ##### 
+context("rMinRV")
+test_that("rMinRV", {  
   expect_equal(
-    as.numeric(colSums(minRV(sampleOneMinuteData, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)[, !"DT"])),
+    as.numeric(colSums(rMinRV(sampleOneMinuteData, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)[, !"DT"])),
     c(0.003344205602,0.001438168861)
   )
   
-  expect_equal(lapply(minRV(returnDat), sum), list("PRICE1" = 3.027820575, "PRICE2" = 2.99975133, "PRICE3" = 3.001113006))
-  expect_equal(lapply(minRV(returnDat), sum), lapply(minRV(dat, makeReturns = TRUE), sum))
+  expect_equal(lapply(rMinRV(returnDat), sum), list("PRICE1" = 3.027820575, "PRICE2" = 2.99975133, "PRICE3" = 3.001113006))
+  expect_equal(lapply(rMinRV(returnDat), sum), lapply(rMinRV(dat, makeReturns = TRUE), sum))
   
-  expect_equal(matrix(minRV(returnDat), ncol = 3), matrix(as.matrix(minRV(returnDatDT)[,-1]), ncol = 3))
-  expect_equal(matrix(minRV(dat, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE), ncol = 3),
-               matrix(as.matrix(minRV(datDT, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)[, -1]), ncol = 3))
+  expect_equal(matrix(rMinRV(returnDat), ncol = 3), matrix(as.matrix(rMinRV(returnDatDT)[,-1]), ncol = 3))
+  expect_equal(matrix(rMinRV(dat, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE), ncol = 3),
+               matrix(as.matrix(rMinRV(datDT, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)[, -1]), ncol = 3))
   
-  expect_equal(matrix(as.matrix(minRV(sampleOneMinuteData, makeReturns = TRUE)[,-1]), ncol = 2),
-               matrix(minRV(as.xts(sampleOneMinuteData), makeReturns = TRUE), ncol = 2))
+  expect_equal(matrix(as.matrix(rMinRV(sampleOneMinuteData, makeReturns = TRUE)[,-1]), ncol = 2),
+               matrix(rMinRV(as.xts(sampleOneMinuteData), makeReturns = TRUE), ncol = 2))
   
   
   
   
 })
-##### minRQ ##### 
-context("minRQ")
-test_that("minRQ", {
+##### rMinRQ ##### 
+context("rMinRQ")
+test_that("rMinRQ", {
   expect_equal(
-    as.numeric(minRQ(as.xts(sampleTDataMicroseconds[, list(DT, PRICE)]), alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE) * 1000000),
+    as.numeric(rMinRQ(as.xts(sampleTDataMicroseconds[, list(DT, PRICE)]), alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE) * 1000000),
     c(0.011852089820, 0.002546123569)
   )
-  expect_equal(lapply(minRQ(returnDat), sum), list("PRICE1" = 3.0696895, "PRICE2" = 2.977093559, "PRICE3" = 3.01211734))
-  expect_equal(lapply(minRQ(returnDat), sum), lapply(minRQ(dat, makeReturns = TRUE), sum))
+  expect_equal(lapply(rMinRQ(returnDat), sum), list("PRICE1" = 3.0696895, "PRICE2" = 2.977093559, "PRICE3" = 3.01211734))
+  expect_equal(lapply(rMinRQ(returnDat), sum), lapply(rMinRQ(dat, makeReturns = TRUE), sum))
   
-  expect_equal(matrix(minRQ(returnDat), ncol = 3), matrix(as.matrix(minRQ(returnDatDT)[,-1]), ncol = 3))
-  expect_equal(matrix(minRQ(dat, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE), ncol = 3),
-               matrix(as.matrix(minRQ(datDT, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)[, -1]), ncol = 3))
+  expect_equal(matrix(rMinRQ(returnDat), ncol = 3), matrix(as.matrix(rMinRQ(returnDatDT)[,-1]), ncol = 3))
+  expect_equal(matrix(rMinRQ(dat, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE), ncol = 3),
+               matrix(as.matrix(rMinRQ(datDT, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)[, -1]), ncol = 3))
   
-  expect_equal(matrix(as.matrix(minRQ(sampleOneMinuteData, makeReturns = TRUE)[,-1]), ncol = 2),
-               matrix(minRQ(as.xts(sampleOneMinuteData), makeReturns = TRUE), ncol = 2))
+  expect_equal(matrix(as.matrix(rMinRQ(sampleOneMinuteData, makeReturns = TRUE)[,-1]), ncol = 2),
+               matrix(rMinRQ(as.xts(sampleOneMinuteData), makeReturns = TRUE), ncol = 2))
   
   
 })
 
-##### MRC #####  
-context("MRC")
-test_that("MRC", {
+##### rMRC #####  
+context("rMRC")
+test_that("rMRC", {
   expect_equal({
-    formatC(sum(MRC(list(as.xts(sampleOneMinuteData)["2001-08-04","MARKET"], as.xts(sampleOneMinuteData)["2001-08-04","STOCK"]), pairwise = TRUE, makePsd = TRUE)), digits = 5)
+    formatC(sum(rMRC(list(as.xts(sampleOneMinuteData)["2001-08-04","MARKET"], as.xts(sampleOneMinuteData)["2001-08-04","STOCK"]), pairwise = TRUE, makePsd = TRUE)), digits = 5)
   },
   "0.00061674"
   )
   expect_equal({
-    formatC(sum(MRC(list(as.xts(sampleOneMinuteData)["2001-08-04","MARKET"], as.xts(sampleOneMinuteData)["2001-08-04","STOCK"]), pairwise = FALSE, makePsd = TRUE)), digits = 5)
+    formatC(sum(rMRC(list(as.xts(sampleOneMinuteData)["2001-08-04","MARKET"], as.xts(sampleOneMinuteData)["2001-08-04","STOCK"]), pairwise = FALSE, makePsd = TRUE)), digits = 5)
   },
   "0.00065676"
   )
@@ -134,14 +134,14 @@ test_that("rBeta", {
   expect_equal({
     a <- as.xts(sampleOneMinuteData)["2001-08-04",1]
     b <- as.xts(sampleOneMinuteData)["2001-08-04",2]
-    formatC(rBeta(a,b, RCOVestimator = "rBPCov", RVestimator = "minRV", makeReturns = TRUE), digits = 5)
+    formatC(rBeta(a,b, RCOVestimator = "rBPCov", RVestimator = "rMinRV", makeReturns = TRUE), digits = 5)
   },
   c(MARKET = "0.97877")
   )
   expect_equal({
     a <- as.xts(sampleOneMinuteData)["2001-08-04",1]
     b <- as.xts(sampleOneMinuteData)["2001-08-04",2]
-    formatC(rBeta(a,b, RCOVestimator = "rOWCov", RVestimator = "medRV", makeReturns = TRUE), digits = 5)},
+    formatC(rBeta(a,b, RCOVestimator = "rOWCov", RVestimator = "rMedRV", makeReturns = TRUE), digits = 5)},
     c("1.0577")
   )
 })
@@ -430,7 +430,7 @@ test_that("rQuar", {
 context("ivInference")
 test_that("ivInference", {
   expect_equal(
-    formatC(ivInference(as.xts(sampleTDataMicroseconds[, list(DT, PRICE)]), IVestimator= "minRV", IQestimator = "medRQ", 
+    formatC(ivInference(as.xts(sampleTDataMicroseconds[, list(DT, PRICE)]), IVestimator= "rMinRV", IQestimator = "rMedRQ", 
                         confidence = 0.95, makeReturns = TRUE)[[1]]$cb * 10000, digits = 5),
     c("0.84827", "1.0328")
   )

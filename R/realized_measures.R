@@ -30,13 +30,13 @@ listAvailableKernels <- function() {
 
 #' An estimator of integrated quarticity from applying the median operator on blocks of three returns.
 #' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
-#' @description Function returns the medRQ, defined in Andersen et al. (2012).
+#' @description Function returns the rMedRQ, defined in Andersen et al. (2012).
 #'   
 #'   Assume there is \eqn{N} equispaced returns in period \eqn{t}. Let \eqn{r_{t,i}} be a return (with \eqn{i=1, \ldots,N}) in period \eqn{t}.
 #'   
-#'   Then, the medRQ is given by
+#'   Then, the rMedRQ is given by
 #'  \deqn{
-#'    \mbox{medRQ}_{t}=\frac{3\pi N}{9\pi +72 - 52\sqrt{3}} \left(\frac{N}{N-2}\right) \sum_{i=2}^{N-1} \mbox{med}(|r_{t,i-1}|, |r_{t,i}|, |r_{t,i+1}|)^4
+#'    \mbox{rMedRQ}_{t}=\frac{3\pi N}{9\pi +72 - 52\sqrt{3}} \left(\frac{N}{N-2}\right) \sum_{i=2}^{N-1} \mbox{med}(|r_{t,i-1}|, |r_{t,i}|, |r_{t,i+1}|)^4
 #'   }
 #' @param rData an xts or data.table object containing returns or prices, possibly for multiple assets over multiple days
 #' @param alignBy a string, align the tick data to "seconds"|"minutes"|"hours".
@@ -48,18 +48,18 @@ listAvailableKernels <- function() {
 #' If the input data is a data.table object, the function returns a data.table with the same column names as the input data, containing the date and the realized measures
 #' 
 #' @examples
-#' rq <- medRQ(rData = sampleTDataMicroseconds[, list(DT, PRICE)], alignBy = "minutes", 
+#' rq <- rMedRQ(rData = sampleTDataMicroseconds[, list(DT, PRICE)], alignBy = "minutes", 
 #'             alignPeriod = 5, makeReturns = TRUE)
 #' rq
-#' @keywords highfrequency medRQ
+#' @keywords highfrequency rMedRQ
 #' @references Andersen, T. G., D. Dobrev, and E. Schaumburg (2012). Jump-robust volatility estimation using nearest neighbor truncation. Journal of Econometrics, 169(1), 75- 93.
 #' @importFrom zoo rollmedian
 #' @export
-medRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE) {
+rMedRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE) {
   
   # self-reference for multi-day input
   if (is.xts(rData) && checkMultiDays(rData)) {
-    result <- apply.daily(rData, medRQ, alignBy, alignPeriod, makeReturns) 
+    result <- apply.daily(rData, rMedRQ, alignBy, alignPeriod, makeReturns) 
     return(result)
   } else if (is.data.table(rData)){ 
     DATE <- .N <- DT <- NULL
@@ -75,7 +75,7 @@ medRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
     # res <- vector(mode = "list", length = length(dates))
     # names(res) <- dates
     # for (date in dates) {
-    #   res[[date]] <- medRQ(as.matrix(rData[as.Date(DT) == date][, !"DT"]), makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL) ## aligning is done above.
+    #   res[[date]] <- rMedRQ(as.matrix(rData[as.Date(DT) == date][, !"DT"]), makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL) ## aligning is done above.
     # }
     
     setkey(rData, "DT")
@@ -87,7 +87,7 @@ medRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
     dates <- dates$DATE
     dat <- as.matrix(rData[, !"DT"])
     for (i in 1:length(dates)) {
-      res[[dates[i]]] <- medRQ(dat[starts[i]:ends[i],], makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
+      res[[dates[i]]] <- rMedRQ(dat[starts[i]:ends[i],], makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
     }
     
     
@@ -113,21 +113,21 @@ medRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
     q <- rollApplyMedianWrapper(q)
     # q <- rollmedian(q, k = 3, align = "center")
     N <- nrow(q) + 2
-    medRQ <- 3 * pi * N / (9 * pi + 72 - 52 * sqrt(3)) * (N / (N-2)) * colSums(q^4)
+    rMedRQ <- 3 * pi * N / (9 * pi + 72 - 52 * sqrt(3)) * (N / (N-2)) * colSums(q^4)
     
-    return(medRQ)
+    return(rMedRQ)
   } 
 }
 
 #' An estimator of integrated quarticity from applying the minimum operator on blocks of two returns.
 #' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
-#' @description Function returns the minRQ, defined in Andersen et al. (2012).
+#' @description Function returns the rMinRQ, defined in Andersen et al. (2012).
 #' 
 #' Assume there is \eqn{N} equispaced returns in period \eqn{t}. Let \eqn{r_{t,i}} be a return (with \eqn{i=1, \ldots,N}) in period \eqn{t}.
 #' 
-#' Then, the minRQ is given by
+#' Then, the rMinRQ is given by
 #' \deqn{
-#'   \mbox{minRQ}_{t}=\frac{\pi N}{3 \pi - 8} \left(\frac{N}{N-1}\right) \sum_{i=1}^{N-1} \mbox{min}(|r_{t,i}| ,|r_{t,i+1}|)^4
+#'   \mbox{rMinRQ}_{t}=\frac{\pi N}{3 \pi - 8} \left(\frac{N}{N-1}\right) \sum_{i=1}^{N-1} \mbox{min}(|r_{t,i}| ,|r_{t,i+1}|)^4
 #' }
 #' @param rData an xts or data.table object containing returns or prices, possibly for multiple assets over multiple days
 #' @param alignBy a string, align the tick data to "seconds"|"minutes"|"hours"
@@ -139,18 +139,18 @@ medRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #' If the input data is a data.table object, the function returns a data.table with the same column names as the input data, containing the date and the realized measures
 #' 
 #' @examples
-#' rq <- minRQ(rData = sampleTDataMicroseconds[, list(DT, PRICE)], alignBy = "minutes", 
+#' rq <- rMinRQ(rData = sampleTDataMicroseconds[, list(DT, PRICE)], alignBy = "minutes", 
 #'             alignPeriod = 5, makeReturns = TRUE)
 #' rq
 #'@references Andersen, T. G., D. Dobrev, and E. Schaumburg (2012). Jump-robust volatility estimation using nearest neighbor truncation. Journal of Econometrics, 169(1), 75- 93.
 #' @importFrom zoo as.zoo
 #' @importFrom zoo rollapply
 #' @export
-minRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE) {
+rMinRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE) {
   
   # self-reference for multi-day input
   if (is.xts(rData) && checkMultiDays(rData)) {
-    result <- apply.daily(rData, minRQ, alignBy, alignPeriod, makeReturns)
+    result <- apply.daily(rData, rMinRQ, alignBy, alignPeriod, makeReturns)
     return(result)
   } else if (is.data.table(rData)){ 
     DATE <- .N <- DT <- NULL
@@ -171,7 +171,7 @@ minRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
     dates <- dates$DATE
     dat <- as.matrix(rData[, !"DT"])
     for (i in 1:length(dates)) {
-      res[[dates[i]]] <- minRQ(dat[starts[i]:ends[i], ], makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
+      res[[dates[i]]] <- rMinRQ(dat[starts[i]:ends[i], ], makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
     }
     res <- setDT(transpose(res))[, DT := dates]
     setcolorder(res, "DT")
@@ -191,21 +191,21 @@ minRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
     q <- abs(as.matrix(rData))
     q <- rollApplyMinWrapper(q)
     N <- nrow(q) + 1
-    minRQ <- pi * N/(3 * pi - 8)*(N / (N - 1)) * colSums(q^4)
+    rMinRQ <- pi * N/(3 * pi - 8)*(N / (N - 1)) * colSums(q^4)
   
-    return(minRQ)
+    return(rMinRQ)
   }
 }
 
-#' minRV
+#' rMinRV
 #' 
-#' @description Function returns the minRV, defined in Andersen et al. (2009).
+#' @description Function returns the rMinRV, defined in Andersen et al. (2009).
 #' 
 #' Let \eqn{r_{t,i}} be a return (with \eqn{i=1,\ldots,M}) in period \eqn{t}.
 #' 
-#' Then, the minRV is given by
+#' Then, the rMinRV is given by
 #' \deqn{
-#' \mbox{minRV}_{t}=\frac{\pi}{\pi - 2}\left(\frac{M}{M-1}\right) \sum_{i=1}^{M-1} \mbox{min}(|r_{t,i}| ,|r_{t,i+1}|)^2
+#' \mbox{rMinRV}_{t}=\frac{\pi}{\pi - 2}\left(\frac{M}{M-1}\right) \sum_{i=1}^{M-1} \mbox{min}(|r_{t,i}| ,|r_{t,i+1}|)^2
 #' }
 #' 
 #' @param rData an xts or data.table object containing returns or prices, possibly for multiple assets over multiple days
@@ -223,17 +223,17 @@ minRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #' @author Jonathan Cornelissen and Kris Boudt
 #' 
 #' @examples
-#' minrv <- minRV(rData = sampleTDataMicroseconds[, list(DT, PRICE)], alignBy = "minutes",
+#' minrv <- rMinRV(rData = sampleTDataMicroseconds[, list(DT, PRICE)], alignBy = "minutes",
 #'                alignPeriod = 5, makeReturns = TRUE)
 #' minrv 
 #' 
 #' @keywords volatility
 #' @export
-minRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE){
+rMinRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE){
   
   # self-reference for multi-day input
   if (is.xts(rData) && checkMultiDays(rData)) {
-    result <- apply.daily(rData, minRV, alignBy, alignPeriod, makeReturns)
+    result <- apply.daily(rData, rMinRV, alignBy, alignPeriod, makeReturns)
     return(result)
     
   } else if (is.data.table(rData)){ 
@@ -255,14 +255,14 @@ minRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
     dates <- dates$DATE
     dat <- as.matrix(rData[, !"DT"])
     for (i in 1:length(dates)) {
-      res[[dates[i]]] <- minRV(dat[starts[i]:ends[i], ], makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
+      res[[dates[i]]] <- rMinRV(dat[starts[i]:ends[i], ], makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
     }
     res <- setDT(transpose(res))[, DT := dates]
     setcolorder(res, "DT")
     colnames(res) <- colnames(rData)
     
     if(ncol(rData) == 2){ ## Univariate case
-      colnames(res) <- c("DT", "minRV")
+      colnames(res) <- c("DT", "rMinRV")
     }
     
     
@@ -288,16 +288,16 @@ minRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
   }
 }  
 
-#' medRV
+#' rMedRV
 #' 
 #' @description 
-#' Function returns the medRV, defined in Andersen et al. (2009).
+#' Function returns the rMedRV, defined in Andersen et al. (2009).
 #' 
 #' Let \eqn{r_{t,i}} be a return (with \eqn{i=1,\ldots,M}) in period \eqn{t}.
 #' 
-#' Then, the medRV is given by
+#' Then, the rMedRV is given by
 #' \deqn{
-#'  \mbox{medRV}_{t}=\frac{\pi}{6-4\sqrt{3}+\pi}\left(\frac{M}{M-2}\right) \sum_{i=2}^{M-1} \mbox{med}(|r_{t,i-1}|,|r_{t,i}|, |r_{t,i+1}|)^2
+#'  \mbox{rMedRV}_{t}=\frac{\pi}{6-4\sqrt{3}+\pi}\left(\frac{M}{M-2}\right) \sum_{i=2}^{M-1} \mbox{med}(|r_{t,i-1}|,|r_{t,i}|, |r_{t,i+1}|)^2
 #' }
 #'  
 #' @param rData an xts or data.table object containing returns or prices, possibly for multiple assets over multiple days
@@ -306,11 +306,11 @@ minRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #' @param makeReturns boolean, should be TRUE when rData contains prices instead of returns. FALSE by   default.
 #'  
 #' @details
-#' The medRV belongs to the class of realized volatility measures in this package
+#' The rMedRV belongs to the class of realized volatility measures in this package
 #' that use the series of high-frequency returns \eqn{r_{t,i}} of a day \eqn{t} 
 #' to produce an ex post estimate of the realized volatility of that day \eqn{t}. 
-#' medRV is designed to be robust to price jumps. 
-#' The difference between RV and medRV is an estimate of the realized jump 
+#' rMedRV is designed to be robust to price jumps. 
+#' The difference between RV and rMedRV is an estimate of the realized jump 
 #' variability. Disentangling the continuous and jump components in RV 
 #' can lead to more precise volatility forecasts, 
 #' as shown in Andersen et al. (2007) and Corsi et al. (2010).
@@ -328,17 +328,17 @@ minRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #' @author Jonathan Cornelissen and Kris Boudt
 #' 
 #' @examples 
-#' medrv <- medRV(rData = sampleTDataMicroseconds[, list(DT, PRICE)], alignBy = "minutes", 
+#' medrv <- rMedRV(rData = sampleTDataMicroseconds[, list(DT, PRICE)], alignBy = "minutes", 
 #'                alignPeriod = 5, makeReturns = TRUE)
 #' medrv 
 #' @importFrom data.table setDT transpose setcolorder
 #' @keywords volatility
 #' @export
-medRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE){
+rMedRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE){
   
   # self-reference for multi-day input
   if (is.xts(rData) && checkMultiDays(rData)) {
-    result <- apply.daily(rData, medRV, alignBy, alignPeriod, makeReturns)
+    result <- apply.daily(rData, rMedRV, alignBy, alignPeriod, makeReturns)
     return(result)
   } else if (is.data.table(rData)){ 
     DATE <- .N <- DT <- NULL
@@ -359,13 +359,13 @@ medRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
     dates <- dates$DATE
     dat <- as.matrix(rData[, !"DT"])
     for (i in 1:length(dates)) {
-      res[[dates[i]]] <- medRV(dat[starts[i]:ends[i],], makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
+      res[[dates[i]]] <- rMedRV(dat[starts[i]:ends[i],], makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
     }
     
     res <- setDT(transpose(res))[, DT := dates]
     setcolorder(res, "DT")
     if(ncol(res) == 2){
-      colnames(res) <- c("DT", "medRV")
+      colnames(res) <- c("DT", "rMedRV")
     } else {
       colnames(res) <- colnames(rData)
     }
@@ -395,13 +395,13 @@ medRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
   }
 }
 
-#' Modulated Realized Covariance (MRC): Return univariate or multivariate preaveraged estimator.  
+#' Modulated Realized Covariance (rMRC): Return univariate or multivariate preaveraged estimator.  
 #' 
 #' @description Function returns univariate or multivariate preaveraged estimator, as defined in Hautsch and Podolskij (2013). 
 #'
 #' @param pData a list. Each list-item contains an xts object with the intraday price data of a stock.
 #' @param pairwise boolean, should be TRUE when refresh times are based on pairs of assets. FALSE by default.
-#' @param makePsd boolean, in case it is TRUE, the positive definite version of MRC is returned. FALSE by default.
+#' @param makePsd boolean, in case it is TRUE, the positive definite version of rMRC is returned. FALSE by default.
 #' 
 #' @return an \eqn{d x d} matrix
 #' 
@@ -440,7 +440,7 @@ medRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #'   \deqn{
 #'     \psi_2= \frac{1}{12}
 #'   }
-#'   The multivariate counterpart is very similar. The estimator is called the Modulated Realized Covariance (MRC) and is defined as
+#'   The multivariate counterpart is very similar. The estimator is called the Modulated Realized Covariance (rMRC) and is defined as
 #'   \deqn{
 #'     \mbox{MRC}= \frac{N}{N-k_N+2}\frac{1}{\psi_2k_N}\sum_{i=0}^{N-k_N+1}\bar{\boldsymbol{r}}_{\tau_i}\cdot \bar{\boldsymbol{r}}'_{\tau_i} -\frac{\psi_1^{k_N}}{\theta^2\psi_2^{k_N}}\hat{\Psi}
 #' }
@@ -461,12 +461,12 @@ medRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #' ## Note that this ought to be tick-by-tick data and this example is only to show the usage!
 #' a <- list(as.xts(sampleOneMinuteData[as.Date(DT) == "2001-08-04", list(DT, MARKET)]), 
 #'           as.xts(sampleOneMinuteData[as.Date(DT) == "2001-08-04", list(DT, STOCK)]))
-#' MRC(a, pairwise = TRUE, makePsd = TRUE)
+#' rMRC(a, pairwise = TRUE, makePsd = TRUE)
 #' 
 #' }
 #' @keywords highfrequency preaveraging
 #' @export
-MRC <- function(pData, pairwise = FALSE, makePsd = FALSE) {
+rMRC <- function(pData, pairwise = FALSE, makePsd = FALSE) {
   
   if (!is.list(pData)) {
     n <- 1
@@ -855,7 +855,7 @@ rAVGCov <- function(rData, cor = FALSE, alignBy = "minutes", alignPeriod = 5, k 
 #' @param rData a zoo/xts object containing all returns in period t for one asset.
 #' @param rIndex a zoo/xts object containing return in period t for an index.
 #' @param RCOVestimator can be chosen among realized covariance estimators: rCov, rAVGCov, rBPCov, rHYCov, rKernelCov, rOWCov, rRTSCov, rThresholdCov and rTSCov. rCov by default.
-#' @param RVestimator can be chosen among realized variance estimators: RV, minRV and medRV. RV by default. In case of missing RVestimator, RCOVestimator function applying for rIndex will be used.
+#' @param RVestimator can be chosen among realized variance estimators: RV, rMinRV and rMedRV. RV by default. In case of missing RVestimator, RCOVestimator function applying for rIndex will be used.
 #' @param makeReturns boolean, should be TRUE when rData contains prices instead of returns. FALSE by  default.
 #' 
 #' @return numeric
@@ -883,7 +883,7 @@ rAVGCov <- function(rData, cor = FALSE, alignBy = "minutes", alignPeriod = 5, k 
 #' library("xts")
 #' a <- as.xts(sampleOneMinuteData[as.Date(DT) == "2001-08-04", list(DT, MARKET)])
 #' b <-  as.xts(sampleOneMinuteData[as.Date(DT) == "2001-08-04", list(DT, STOCK)])
-#' rBeta(a, b, RCOVestimator = "rBPCov", RVestimator = "minRV", makeReturns = TRUE)
+#' rBeta(a, b, RCOVestimator = "rBPCov", RVestimator = "rMinRV", makeReturns = TRUE)
 #' }
 #' 
 #' @keywords highfrequency rBeta
@@ -941,8 +941,8 @@ rBeta <- function(rData, rIndex, RCOVestimator = "rCov", RVestimator = "RV", mak
                rCov = rCov(rIndex ) ,
                RV = RV(rIndex),
                BV = RBPVar(rIndex),
-               minRV = minRV(rIndex ),
-               medRV = medRV(rIndex ),
+               rMinRV = rMinRV(rIndex ),
+               rMedRV = rMedRV(rIndex ),
                rAVGCov = rAVGCov(rIndex ) ,
                rBPCov = rBPCov(rIndex ) ,
                rHYCov = rHYCov(rIndex ) ,
@@ -2759,15 +2759,15 @@ rTSCov <- function (pData, cor = FALSE, K = 300, J = 1, K_cov = NULL, J_cov = NU
 #' This is done in order of liquidity, which means that the algorithm uses more data points than most other estimation techniques. 
 #' @param pData a list. Each list-item i contains an xts object with the intraday price data 
 #' of stock i for day t. The order of the data does not matter as it will be sorted according to the criterion specified in the \code{criterion} argument
-#' @param IVest integrated variance estimator, default is \code{"MRC"}. For a list of implemented estimators, use listCholCovEstimators().
-#' @param COVest covariance estimator, default is \code{"MRC"}. For a list of implemented estimators, use listCholCovEstimators().
+#' @param IVest integrated variance estimator, default is \code{"rMRC"}. For a list of implemented estimators, use listCholCovEstimators().
+#' @param COVest covariance estimator, default is \code{"rMRC"}. For a list of implemented estimators, use listCholCovEstimators().
 #' @param criterion criterion to use for sorting the data according to liquidity. Possible values are ["squared duration"|"duration"|"count"], defaults to \code{"squared duration"}.
 #' @param ... additional arguments to pass to IVest and COVest. See details.
 #' 
 #' @return a list containing the covariance matrix "CholCov", and the Cholesky decomposition "L" and "G" such that L * G * L' = CholCov
 #' 
 #' @details
-#' additional arguments for IVest and COVest should be passed in the ... argument. For the MRC estimator, which is the default, the theta and delta parameters can be set. These default to 1 and 0.1 respectively.
+#' additional arguments for IVest and COVest should be passed in the ... argument. For the rMRC estimator, which is the default, the theta and delta parameters can be set. These default to 1 and 0.1 respectively.
 #' 
 #' @references 
 #' Boudt, Laurent, Lunde, Quaedvlieg, Sauri(2017) Positive semidefinite integrated covariance estimation, factorizations and asynchronicity. Journal of Econometrics 196, 347-367
@@ -2776,7 +2776,7 @@ rTSCov <- function (pData, cor = FALSE, K = 300, J = 1, K_cov = NULL, J_cov = NU
 #' @importFrom xts xts
 #' @importFrom zoo coredata
 #' @export
-rCholCov <- function(pData, IVest = "MRC", COVest = "MRC", criterion = "squared duration", ...){
+rCholCov <- function(pData, IVest = "rMRC", COVest = "rMRC", criterion = "squared duration", ...){
   
   if(!is.list(pData)){
     stop("pData must be a list of atleast length one")
@@ -2851,7 +2851,7 @@ rCholCov <- function(pData, IVest = "MRC", COVest = "MRC", criterion = "squared 
           for (m in 1:(l-1)) {
             
             COV <- switch(COVest,
-                   MRC = cholCovMRC(as.matrix(coredata(cbind(returns[,l], f[,m]))), delta = delta, theta = theta),
+                   rMRC = cholCovrMRC(as.matrix(coredata(cbind(returns[,l], f[,m]))), delta = delta, theta = theta),
                    rCov = rCov(exp(cumsum(cbind(returns[,l], f[,m]))), alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = TRUE),
                    rAVGCov = rAVGCov(exp(cumsum(cbind(returns[,l], f[,m]))), alignBy = alignBy, alignPeriod = alignPeriod, k = k, makeReturns = TRUE),
                    rBPCov = rBPCov(exp(cumsum(cbind(returns[,l], f[,m]))), alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = TRUE),
@@ -2879,7 +2879,7 @@ rCholCov <- function(pData, IVest = "MRC", COVest = "MRC", criterion = "squared 
       
       # In this switch, we need to use xts on the data to get the aggregation to work
       G[d,d] <- switch(IVest, 
-                       MRC = cholCovMRC(as.matrix(coredata(f[,d])), delta = delta, theta = theta),
+                       rMRC = cholCovrMRC(as.matrix(coredata(f[,d])), delta = delta, theta = theta),
                        rCov =          rCov(xts(exp(cumsum(f[,d])), order.by = index(returns)), alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = TRUE),
                        rAVGCov =       rAVGCov(xts(exp(cumsum(f[,d])), order.by = index(returns)), alignBy = alignBy, alignPeriod = alignPeriod, k = k, makeReturns = TRUE),
                        rBPCov =        rBPCov(xts(exp(cumsum(f[,d])), order.by = index(returns)), alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = TRUE),
@@ -3066,7 +3066,7 @@ rSemiCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, mak
 #' @return This function returns a character vector containing the available estimators.
 #' @export
 listCholCovEstimators <- function(){
-  c("MRC",
+  c("rMRC",
     "rCov",
     "rAVGCov",
     "rBPCov",

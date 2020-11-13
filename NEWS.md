@@ -23,8 +23,8 @@ Changes in version 0.6.5
  - compatibility with lubridate 1.7.8
 
 Changes in version 0.6.4
- - bug fix in refreshTime (affected MRC for n > 2)
- - one additional test for MRC
+ - bug fix in refreshTime (affected rMRC for n > 2)
+ - one additional test for rMRC
  - updated realized library file until end of 2019
 
 Changes in version 0.6.3

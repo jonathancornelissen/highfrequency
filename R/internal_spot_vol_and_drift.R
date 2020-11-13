@@ -111,18 +111,18 @@ detPer <- function(mR, rData = NULL, options = list()) {
     mR <- as.numeric(mR)
     estimdailyvol <- switch(op$dailyvol,
                             bipower = rBPCov(mR),
-                            medrv = medRV(mR),
+                            medrv = rMedRV(mR),
                             rv = rCov(mR))
   } else {
     if (is.null(rData)) {
       estimdailyvol <- switch(op$dailyvol,
                               bipower = apply(mR, 1, "rBPCov"),
-                              medrv = apply(mR, 1, "medRV"),
+                              medrv = apply(mR, 1, "rMedRV"),
                               rv = apply(mR, 1, "rCov"))
     } else {
       estimdailyvol <- switch(op$dailyvol,
                               bipower = apply.daily(rData, rBPCov),
-                              medrv = apply.daily(rData, medRV),
+                              medrv = apply.daily(rData, rMedRV),
                               rv = apply.daily(rData, rCov))
       dates = time(estimdailyvol)
     }
@@ -145,7 +145,7 @@ detPer <- function(mR, rData = NULL, options = list()) {
                             nrow = cDays)
     estimdailyvol <- switch(op$dailyvol,
                             bipower = apply(mfilteredR, 1, "rBPCov"),
-                            medrv = apply(mfilteredR, 1, "medRV"),
+                            medrv = apply(mfilteredR, 1, "rMedRV"),
                             rv = apply(mfilteredR, 1, "rCov"))
     spot <- rep(sqrt(as.numeric(estimdailyvol) * (1/M)), each = M) *
       rep(estimperiodicvol, cDays)
@@ -464,7 +464,7 @@ piecewise <- function(mR, rData = NULL, options = list()) {
                        bipower = sqrt((1/(i - lastchange + 1)) *
                                         (rBPCov(vR[(lastchange + 1):i]))),
                        medrv = sqrt((1/(i - lastchange + 1)) *
-                                      (medRV(vR[(lastchange+1):i]))),
+                                      (rMedRV(vR[(lastchange+1):i]))),
                        rv = sqrt((1/(i - lastchange + 1)) *
                                    (rCov(vR[(lastchange + 1):i]))),
                        sd = sd(vR[(lastchange + 1):i]),
@@ -475,7 +475,7 @@ piecewise <- function(mR, rData = NULL, options = list()) {
       len <- to - from
       spot[i] <- switch(op$volest,
                         bipower = sqrt((1/len)*(rBPCov(vR[from:to]))),
-                        medrv = sqrt((1/len)*(medRV(vR[from:to]))),
+                        medrv = sqrt((1/len)*(rMedRV(vR[from:to]))),
                         rv = sqrt((1/len)*(rCov(vR[from:to]))),
                         sd = sd(vR[from:to]),
                         tau = robustbase::scaleTau2(vR[from:to]))
@@ -973,8 +973,8 @@ realizedMeasureSpotVol <- function(mR, rData, options = list()){
         sigma2hat[i, j] <- switch(op$RM,
                             bipower = RBPVar(mR[i,(j-lookBackPeriod+1):j]),
                             rv = RV(mR[i,(j-lookBackPeriod+1):j]),
-                            medrv = medRV(mR[i,(j-lookBackPeriod+1):j]),
-                            minrv = minRV(matrix(mR[i,(j-lookBackPeriod+1):j], ncol = 1))
+                            medrv = rMedRV(mR[i,(j-lookBackPeriod+1):j]),
+                            minrv = rMinRV(matrix(mR[i,(j-lookBackPeriod+1):j], ncol = 1))
           
         )
       }
@@ -988,8 +988,8 @@ realizedMeasureSpotVol <- function(mR, rData, options = list()){
         sigma2hat[i, j] <- switch(op$RM,
                                     bipower = RBPVar(mR[i,(j-lookBackPeriod+1):(j-1)]),
                                     rv = RV(mR[i,(j-lookBackPeriod+1):(j-1)]),
-                                    medrv = medRV(mR[i,(j-lookBackPeriod+1):(j-1)]),
-                                    minrv = minRV(matrix(mR[i,(j-lookBackPeriod+1):(j-1)], ncol = 1))
+                                    medrv = rMedRV(mR[i,(j-lookBackPeriod+1):(j-1)]),
+                                    minrv = rMinRV(matrix(mR[i,(j-lookBackPeriod+1):(j-1)], ncol = 1))
                                     
         )
       }

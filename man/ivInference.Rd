@@ -18,9 +18,9 @@ ivInference(
 \arguments{
 \item{rData}{zoo/xts object containing all returns in period t for one asset.}
 
-\item{IVestimator}{can be chosen among integrated variance estimators: RV, BV, minRV or medRV. RV by default.}
+\item{IVestimator}{can be chosen among integrated variance estimators: RV, BV, rMinRV or rMedRV. RV by default.}
 
-\item{IQestimator}{can be chosen among integrated quarticity estimators: rQuar, realized tri-power quarticity (TPQ), quad-power quarticity (QPQ), minRQ or medRQ. TPQ by default.}
+\item{IQestimator}{can be chosen among integrated quarticity estimators: rQuar, realized tri-power quarticity (TPQ), quad-power quarticity (QPQ), rMinRQ or rMedRQ. TPQ by default.}
 
 \item{confidence}{confidence level set by users. 0.95 by default.}
 
@@ -36,7 +36,7 @@ ivInference(
 list
 }
 \description{
-This function supplies information about standard error and confidence band of integrated variance (IV) estimators under Brownian semimartingales model such as: bipower variation, minRV, medRV. 
+This function supplies information about standard error and confidence band of integrated variance (IV) estimators under Brownian semimartingales model such as: bipower variation, rMinRV, rMedRV. 
 Depending on users' choices of estimator (integrated variance (IVestimator), integrated quarticity (IQestimator)) and confidence level, the function returns the result.(Barndorff (2002))
 Function returns three outcomes: 1.value of IV estimator 2.standard error of IV estimator and 3.confidence band of IV estimator. 
 
@@ -72,8 +72,8 @@ where \eqn{a} is the drift term, \eqn{\sigma} denotes the spot volatility proces
 \examples{
 \dontrun{
 library("xts") # This function only accepts xts data currently
-ivInf <- ivInference(as.xts(sampleTDataMicroseconds[, list(DT, PRICE)]), IVestimator= "minRV",
-                     IQestimator = "medRQ", confidence = 0.95, makeReturns = TRUE)
+ivInf <- ivInference(as.xts(sampleTDataMicroseconds[, list(DT, PRICE)]), IVestimator= "rMinRV",
+                     IQestimator = "rMedRQ", confidence = 0.95, makeReturns = TRUE)
 ivInf
 }
             

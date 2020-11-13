@@ -19,7 +19,7 @@ rBeta(
 
 \item{RCOVestimator}{can be chosen among realized covariance estimators: rCov, rAVGCov, rBPCov, rHYCov, rKernelCov, rOWCov, rRTSCov, rThresholdCov and rTSCov. rCov by default.}
 
-\item{RVestimator}{can be chosen among realized variance estimators: RV, minRV and medRV. RV by default. In case of missing RVestimator, RCOVestimator function applying for rIndex will be used.}
+\item{RVestimator}{can be chosen among realized variance estimators: RV, rMinRV and rMedRV. RV by default. In case of missing RVestimator, RCOVestimator function applying for rIndex will be used.}
 
 \item{makeReturns}{boolean, should be TRUE when rData contains prices instead of returns. FALSE by  default.}
 }
@@ -57,7 +57,7 @@ Note: It is worth to note that the function does not support to calculate for da
 library("xts")
 a <- as.xts(sampleOneMinuteData[as.Date(DT) == "2001-08-04", list(DT, MARKET)])
 b <-  as.xts(sampleOneMinuteData[as.Date(DT) == "2001-08-04", list(DT, STOCK)])
-rBeta(a, b, RCOVestimator = "rBPCov", RVestimator = "minRV", makeReturns = TRUE)
+rBeta(a, b, RCOVestimator = "rBPCov", RVestimator = "rMinRV", makeReturns = TRUE)
 }
 
 }

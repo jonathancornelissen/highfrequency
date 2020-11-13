@@ -1,5 +1,5 @@
-# User can choose integrated variance (IV) estimators RV, BV, minRV or medRV; 
-#and integrated quarticity (IQ) estimators: rQuar, TP, QP, minRQ or medRQ.
+# User can choose integrated variance (IV) estimators RV, BV, rMinRV or rMedRV; 
+#and integrated quarticity (IQ) estimators: rQuar, TP, QP, rMinRQ or rMedRQ.
 # Output: 1)value of IVestimator; 
 #2) standard error of IVestimator;
 #3) confidence band of IVestimator. 
@@ -10,8 +10,8 @@ hatIV <- function(rData, IVestimator, startV = NULL) {
   switch(IVestimator,
          RV = RV(rData),
          BV = RBPVar(rData),
-         minRV = minRV(rData),
-         medRV = medRV(rData),
+         rMinRV = rMinRV(rData),
+         rMedRV = rMedRV(rData),
          ROWvar = rOWCov(rData),
          CTBV = ctBV(rData, startV = startV))
 }
@@ -24,8 +24,8 @@ hatIQ <- function (rData, IQestimator) {
          rQuar = rQuar(rData),
          QP = rQPVar(rData),
          TP = rTPQuar(rData),
-         minRQ = minRQ(rData),
-         medRQ = medRQ(rData),
+         rMinRQ = rMinRQ(rData),
+         rMedRQ = rMedRQ(rData),
          CTTPV = ctTPV(rData))
 }
 
@@ -40,13 +40,13 @@ IV <- function(IVestimator, iq) {
          RV = sqrt(2 * iq), 
          BV = sqrt(2.61 * iq),
          TV = sqrt(3.06 * iq), 
-         minRV = sqrt(3.81 * iq), 
-         medRV = sqrt(2.96 * iq))
+         rMinRV = sqrt(3.81 * iq), 
+         rMedRV = sqrt(2.96 * iq))
 }
 
 #' Function returns the value, the standard error and the confidence band of the integrated variance (IV) estimator. 
 #' 
-#' @description This function supplies information about standard error and confidence band of integrated variance (IV) estimators under Brownian semimartingales model such as: bipower variation, minRV, medRV. 
+#' @description This function supplies information about standard error and confidence band of integrated variance (IV) estimators under Brownian semimartingales model such as: bipower variation, rMinRV, rMedRV. 
 #' Depending on users' choices of estimator (integrated variance (IVestimator), integrated quarticity (IQestimator)) and confidence level, the function returns the result.(Barndorff (2002))
 #' Function returns three outcomes: 1.value of IV estimator 2.standard error of IV estimator and 3.confidence band of IV estimator. 
 #' 
@@ -73,8 +73,8 @@ IV <- function(IVestimator, iq) {
 #' \eqn{\hat{IQ}} integrated quarticity estimator.
 #' 
 #' @param rData zoo/xts object containing all returns in period t for one asset.
-#' @param IVestimator can be chosen among integrated variance estimators: RV, BV, minRV or medRV. RV by default.
-#' @param IQestimator can be chosen among integrated quarticity estimators: rQuar, realized tri-power quarticity (TPQ), quad-power quarticity (QPQ), minRQ or medRQ. TPQ by default.
+#' @param IVestimator can be chosen among integrated variance estimators: RV, BV, rMinRV or rMedRV. RV by default.
+#' @param IQestimator can be chosen among integrated quarticity estimators: rQuar, realized tri-power quarticity (TPQ), quad-power quarticity (QPQ), rMinRQ or rMedRQ. TPQ by default.
 #' @param confidence confidence level set by users. 0.95 by default. 
 #' @param alignBy a string, align the tick data to "seconds"|"minutes"|"hours"
 #' @param alignPeriod an integer, align the tick data to this many [seconds|minutes|hours].
@@ -98,8 +98,8 @@ IV <- function(IVestimator, iq) {
 #' @examples 
 #' \dontrun{
 #' library("xts") # This function only accepts xts data currently
-#' ivInf <- ivInference(as.xts(sampleTDataMicroseconds[, list(DT, PRICE)]), IVestimator= "minRV",
-#'                      IQestimator = "medRQ", confidence = 0.95, makeReturns = TRUE)
+#' ivInf <- ivInference(as.xts(sampleTDataMicroseconds[, list(DT, PRICE)]), IVestimator= "rMinRV",
+#'                      IQestimator = "rMedRQ", confidence = 0.95, makeReturns = TRUE)
 #' ivInf
 #' }
 #'             
@@ -150,8 +150,8 @@ ivInference <- function(rData, IVestimator = "RV", IQestimator = "rQuar", confid
 tt <- function(IVestimator, ...) {
   switch(IVestimator,
          BV = pi^2/4+pi-3,
-         minRV = 3.81,
-         medRV = 2.96,
+         rMinRV = 3.81,
+         rMedRV = 2.96,
          CTBV = pi^2/4+pi-3,
          ROWVar = thetaROWVar(...))
 }

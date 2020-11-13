@@ -519,7 +519,7 @@ plot.HARmodel <- function(x, which = c(1L:3L, 5L), caption = list("Residuals vs 
 
 #' @importFrom stats var
 #' @export
-predict.HARmodel <- function(object, newdata = NULL, warnings = TRUE, ...) {
+predict.HARmodel <- function(object, newdata = NULL, warnings = TRUE, backtransform = FALSE, ...) {
   # If no new data is provided - just forecast on the last day of your estimation sample
   # If new data with colnames as in object$model$x is provided, i.e. right measures for that model, just use that data
   ##### These 4 lines are added to make adding new models (hopefully) easier
@@ -836,16 +836,22 @@ predict.HARmodel <- function(object, newdata = NULL, warnings = TRUE, ...) {
       return(as.numeric(as.matrix(cbind(1, x))  %*%  object$coefficients))
     }
     if (object$transform == "log") {
-      if (warnings) {
-        warning("Due to log-transform, forecast of RV is derived under assumption of log-normality.")
+      if(backtransform == "parametric"){
+        return(as.numeric(exp(as.matrix(cbind(1, x))  %*%  object$coefficients + 1/2 * var(object$residuals))))  
+      } else if(backtransform == "simple"){
+        return(exp(as.numeric(as.matrix(cbind(1, x))  %*%  object$coefficients)))
+      } else {
+        return(as.numeric(as.matrix(cbind(1, x))  %*%  object$coefficients))
       }
-      return(as.numeric(exp(as.matrix(cbind(1, x))  %*%  object$coefficients + 1/2 * var(object$residuals))))
     }
     if (object$transform == "sqrt") {
-      if (warnings) {
-        warning("Forecast for sqrt(RV) due to transform == \"sqrt\".")
+      if(backtransform == "simple"){
+        return(as.numeric(as.matrix(cbind(1, x))  %*%  object$coefficients)^2)  
+      } else if(backtransform == "parametrics"){
+        stop("parametric backtransform is not available for the sqrt transformation")
+      } else {
+        return(as.numeric(as.matrix(cbind(1, x))  %*%  object$coefficients)) 
       }
-      return(as.numeric(as.matrix(cbind(1, x))  %*%  object$coefficients))
     }
   }
 }

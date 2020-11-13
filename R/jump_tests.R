@@ -65,6 +65,7 @@ ABDJumptest <- function(RV, BPV, TQ) { # Compute jump detection stat mentioned i
 #' @param alignPeriod an integer, align the tick data to this many [seconds|minutes|hours].
 #' @param alphaMultiplier alpha multiplier
 #' @param makeReturns boolean, should be TRUE when rData contains prices instead of returns. FALSE by default.
+#' @param alpha numeric of length one with the significance level to use for the jump test(s). Defaults to 0.975.
 #' @param ... used internally
 #' 
 #' @return list or xts in case the input prices span more than one day.
@@ -96,7 +97,7 @@ ABDJumptest <- function(RV, BPV, TQ) { # Compute jump detection stat mentioned i
 #' @keywords highfrequency AJjumpTest
 #' @importFrom stats qnorm pnorm
 #' @export
-AJjumpTest <- function(pData, p = 4 , k = 2, alignBy = NULL, alignPeriod = NULL, alphaMultiplier = 4, makeReturns = FALSE, ...) {
+AJjumpTest <- function(pData, p = 4 , k = 2, alignBy = NULL, alignPeriod = NULL, alphaMultiplier = 4, makeReturns = FALSE, alpha = 0.975,...) {
   op <- list(...)
   flag <- TRUE
   if("flag" %in% names(op)){
@@ -184,7 +185,7 @@ AJjumpTest <- function(pData, p = 4 , k = 2, alignBy = NULL, alignPeriod = NULL,
 
   out <- {}
   out$ztest <- AJtest
-  out$critical.value <- qnorm(c(0.025,0.975))
+  out$critical.value <- qnorm(c(1- alpha, alpha))
   out$pvalue <- 2 * pnorm(-abs(AJtest))
   return(out)
 }
@@ -204,14 +205,14 @@ AJjumpTest <- function(pData, p = 4 , k = 2, alignBy = NULL, alignPeriod = NULL,
 #' \deqn{
 #' \mbox{BNSjumpTest}= \frac{RV - IVestimator}{\sqrt{(\theta-2)\frac{1}{N} {IQestimator}}}
 #' }
-#' in which, \eqn{IVestimator} can be: bipower variance (BV), minRV, medRV. 
-#' \eqn{IQestimator} can be: tripower quarticity (TP), quadpower quarticity (QP), minRQ, medRQ.
+#' in which, \eqn{IVestimator} can be: bipower variance (BV), rMinRV, rMedRV. 
+#' \eqn{IQestimator} can be: tripower quarticity (TP), quadpower quarticity (QP), rMinRQ, rMedRQ.
 #' 
 #' \eqn{\theta}: depends on IVestimator (Huang and Tauchen (2005)).
 #' 
 #' @param rData a zoo/xts object containing all returns in period t for one asset.
-#' @param IVestimator can be chosen among jump robust integrated variance estimators: BV, minRV, medRV and corrected threshold bipower variation (CTBV). If CTBV is chosen, an argument of \eqn{startV}, start point of auxiliary estimators in threshold estimation (Corsi et al. (2010) can be included. BV by default.
-#' @param IQestimator can be chosen among jump robust integrated quarticity estimators: TP, QP, minRQ and medRQ. TP by default.
+#' @param IVestimator can be chosen among jump robust integrated variance estimators: BV, rMinRV, rMedRV and corrected threshold bipower variation (CTBV). If CTBV is chosen, an argument of \eqn{startV}, start point of auxiliary estimators in threshold estimation (Corsi et al. (2010) can be included. BV by default.
+#' @param IQestimator can be chosen among jump robust integrated quarticity estimators: TP, QP, rMinRQ and rMedRQ. TP by default.
 #' @param type a method of BNS testing: can be linear or ratio. Linear by default.
 #' @param logTransform boolean, should be TRUE when QVestimator and IVestimator are in logarithm form. FALSE by default.
 #' @param max boolean, should be TRUE when max adjustment in SE. FALSE by default.
@@ -245,8 +246,8 @@ AJjumpTest <- function(pData, p = 4 , k = 2, alignBy = NULL, alignPeriod = NULL,
 #' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
 #' 
 #' @examples 
-#' bns <- BNSjumpTest(sampleTDataMicroseconds[, list(DT, PRICE)], IVestimator= "minRV",
-#'                    IQestimator = "medRQ", type= "linear", makeReturns = TRUE)
+#' bns <- BNSjumpTest(sampleTDataMicroseconds[, list(DT, PRICE)], IVestimator= "rMinRV",
+#'                    IQestimator = "rMedRQ", type= "linear", makeReturns = TRUE)
 #' bns
 #' 
 #' @keywords highfrequency BNSjumpTest
@@ -279,9 +280,14 @@ BNSjumpTest <- function (rData, IVestimator = "BV", IQestimator = "TP", type = "
     return(result)
   } else if (is.data.table(rData)){
     DATE <- .N <- DT <- NULL
-    if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+    if(!is.null(alignBy) && !is.null(alignPeriod) && makeReturns) {
       rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
     }
+    
+    if(!is.null(alignBy) && !is.null(alignPeriod) && !makeReturns) {
+      rData <- fastTickAgregation_DATA.TABLE_RETURNS(rData, on = alignBy, k = alignPeriod)
+    }
+    
     setkey(rData, "DT")
     dates <- rData[, list(end = .N), by = list(DATE = as.Date(DT))][, `:=`(end = cumsum(end), DATE = as.character(DATE))][, start := shift(end, fill = 0) + 1]
     res <- vector(mode = "list", length = nrow(dates))
@@ -298,8 +304,11 @@ BNSjumpTest <- function (rData, IVestimator = "BV", IQestimator = "TP", type = "
     return(res)
     
   } else {
-    if ((!is.null(alignBy)) && (!is.null(alignPeriod))) {
+    if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && makeReturns) {
       rData <- fastTickAgregation(rData, on = alignBy, k = alignPeriod)
+    }
+    if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && !makeReturns) {
+      rData <- fastTickAgregation_RETURNS(rData, on = alignBy, k = alignPeriod)
     }
     if (makeReturns) {
       rData <- makeReturns(rData)

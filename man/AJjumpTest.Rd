@@ -12,6 +12,7 @@ AJjumpTest(
   alignPeriod = NULL,
   alphaMultiplier = 4,
   makeReturns = FALSE,
+  alpha = 0.975,
   ...
 )
 }
@@ -29,6 +30,8 @@ AJjumpTest(
 \item{alphaMultiplier}{alpha multiplier}
 
 \item{makeReturns}{boolean, should be TRUE when rData contains prices instead of returns. FALSE by default.}
+
+\item{alpha}{numeric of length one with the significance level to use for the jump test(s). Defaults to 0.975.}
 
 \item{...}{used internally}
 }

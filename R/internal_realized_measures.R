@@ -76,7 +76,7 @@ ctBV <- function(rData, startV = NULL) {
   N <- length(rData)
 
   if (is.null(startV)) {
-    hatV <- medRV(rData)
+    hatV <- rMedRV(rData)
   } else {
     hatV <- startV
   }
@@ -103,7 +103,7 @@ ctTPV <- function (rData, startV = NULL){
   N <- length(rData);
 
   if (is.null(startV)) {
-    hatV <- medRV(rData)
+    hatV <- rMedRV(rData)
   } else {
     hatV <- startV
   }
@@ -528,7 +528,7 @@ RTSRV <- function(pData, startIV = NULL, noisevar = NULL, K = 300, J = 1, eta = 
   }
   if (is.null(startIV)) {
     sel <- seq(1, n, K)
-    RTSRV <- medRV(as.matrix(diff(logprices[sel])))
+    RTSRV <- rMedRV(as.matrix(diff(logprices[sel])))
   }
   iter <- 1
   while (iter <= 20) {
@@ -654,7 +654,7 @@ zgamma <- function (x, y, gamma_power) {
 
 
 #' @keywords internal
-cholCovMRC <- function(returns, delta = 0.1, theta = 1){
+cholCovrMRC <- function(returns, delta = 0.1, theta = 1){
   
   nObs <- nrow(returns) + 1 
   kn <- floor(theta * nObs ^(1/2 + delta))
