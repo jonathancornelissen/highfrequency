@@ -4,15 +4,15 @@
 \alias{makeOHLCV}
 \title{Make Open-High-Low-Close-Volume bars}
 \usage{
-makeOHLCV(pData, on = "minutes", k = 5, tz = NULL)
+makeOHLCV(pData, alignBy = "minutes", alignPeriod = 5, tz = NULL)
 }
 \arguments{
 \item{pData}{data.table or xts object to make the bars out of, containing the intraday price series of a stock for possibly multiple days.}
 
-\item{on}{character, indicating the time scale in which "k" is expressed. Possible values are: "secs", "seconds", "mins", "minutes", "hours".}
+\item{alignBy}{character, indicating the time scale in which "alignPeriod" is expressed. Possible values are: "secs", "seconds", "mins", "minutes", "hours".}
 
-\item{k}{positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate an
-object to the 5 minute frequency set k = 5 and on = "minutes".}
+\item{alignPeriod}{positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate an
+object to the 5 minute frequency set alignPeriod = 5 and alignBy = "minutes".}
 
 \item{tz}{time zone used, by default: tz = "GMT".}
 }
@@ -21,11 +21,11 @@ This function makes OHLC-V bars at arbitrary intevals. If the SIZE column is not
 }
 \examples{
 \dontrun{
-minuteBars <- makeOHLCV(sampleTDataEurope, on = "minutes", k = 1)
+minuteBars <- makeOHLCV(sampleTDataEurope, alignBy = "minutes", alignPeriod = 1)
 ## We can use the quantmod package's chartSeries function to plot the ohlcv data
 quantmod::chartSeries(minuteBars)
 
-minuteBars <- makeOHLCV(sampleTDataEurope[,], on = "minutes", k = 1)
+minuteBars <- makeOHLCV(sampleTDataEurope[,], alignBy = "minutes", alignPeriod = 1)
 ## Again we plot the series with chartSeries
 quantmod::chartSeries(minuteBars)
 
@@ -34,8 +34,8 @@ fiveMinuteBars <- makeOHLCV(sampleTDataMicroseconds)
 ## Again we plot the series with chartSeries
 quantmod::chartSeries(fiveMinuteBars)
 
-## We can use arbitrary k, here we choose pi
-bars <- makeOHLCV(sampleTDataEurope, on = "seconds", k = pi)
+## We can use arbitrary alignPeriod, here we choose pi
+bars <- makeOHLCV(sampleTDataEurope, alignBy = "seconds", alignPeriod = pi)
 ## Again we plot the series with chartSeries
 quantmod::chartSeries(bars)
 }

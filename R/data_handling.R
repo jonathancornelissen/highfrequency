@@ -9,9 +9,9 @@
 #' @param FUN function to apply over each interval. By default, previous tick aggregation is done. 
 #' Alternatively one can set e.g. FUN = "mean".
 #' In case weights are supplied, this argument is ignored and a weighted average is taken.
-#' @param on character, indicating the time scale in which "k" is expressed. Possible values are: "secs", "seconds", "mins", "minutes", "hours", "days", "weeks", "ticks".
-#' @param k positive integer, indicating the number of periods to aggregate over. For example, to aggregate an 
-#' xts object to the five-minute frequency set k = 5 and on = "minutes".
+#' @param alignBy character, indicating the time scale in which "alignPeriod" is expressed. Possible values are: "secs", "seconds", "mins", "minutes", "hours", "days", "weeks", "ticks".
+#' @param alignPeriod positive integer, indicating the number of periods to aggregate over. For example, to aggregate an 
+#' xts object to the five-minute frequency set alignPeriod = 5 and alignBy = "minutes".
 #' @param weights By default, no weighting scheme is used. 
 #' When you assign an xts object with wheights to this argument, a weighted mean is taken over each interval. 
 #' Of course, the weights should have the same timestamps as the supplied time series.
@@ -23,7 +23,7 @@
 #' E.g. for a weekly aggregation the new timestamp is the last day in that particular week (namely sunday).
 #' 
 #' In case of previous tick aggregation, 
-#' for on = "seconds"/"minutes"/"hours",
+#' for alignBy = "seconds"/"minutes"/"hours",
 #' the element of the returned series with e.g. timestamp 09:35:00 contains 
 #' the last observation up to that point, including the value at 09:35:00 itself.
 #' 
@@ -31,9 +31,9 @@
 #' tick aggregation it makes sense to fill these NA's by the function \code{na.locf}
 #' (last observation carried forward) from the zoo package.
 #' 
-#' In case on = "ticks", the sampling is done such the sampling starts on the first tick, and the last tick is always included
+#' In case alignBy = "ticks", the sampling is done such the sampling starts on the first tick, and the last tick is always included
 #' For example, if 14 observations are made on one day, and these are 1, 2, 3, ... 14.
-#' Then, with on = "ticks" and k = 3, the output will be 1, 4, 7, 10, 13, 14.
+#' Then, with alignBy = "ticks" and alignPeriod = 3, the output will be 1, 4, 7, 10, 13, 14.
 #' 
 #' @return An xts object containing the aggregated time series.
 #' 
@@ -46,12 +46,12 @@
 #' ts <- as.xts(sampleTDataMicroseconds[, list(DT, PRICE, SIZE)])
 #' 
 #' #Previous tick aggregation to the 5-minute sampling frequency:
-#' tsagg5min <- aggregateTS(ts, on = "minutes", k = 5)
+#' tsagg5min <- aggregateTS(ts, alignBy = "minutes", alignPeriod = 5)
 #' head(tsagg5min)
 #' #Previous tick aggregation to the 30-second sampling frequency:
-#' tsagg30sec <- aggregateTS(ts, on = "seconds", k = 30)
+#' tsagg30sec <- aggregateTS(ts, alignBy = "seconds", alignPeriod = 30)
 #' tail(tsagg30sec)
-#' tsagg3ticks <- aggregateTS(ts, on = "ticks", k = 3)
+#' tsagg3ticks <- aggregateTS(ts, alignBy = "ticks", alignPeriod = 3)
 #' }
 #' 
 #' 
@@ -59,12 +59,12 @@
 #' @importFrom stats start end
 #' @importFrom xts period.apply tzone	
 #' @export
-aggregateTS <- function (ts, FUN = "previoustick", on = "minutes", k = 1, weights = NULL, dropna = FALSE, tz = NULL) {
+aggregateTS <- function (ts, FUN = "previoustick", alignBy = "minutes", alignPeriod = 1, weights = NULL, dropna = FALSE, tz = NULL) {
   
-  makethispartbetter <- ((!is.null(weights))| on=="days"| on=="weeks" | (FUN!="previoustick") | dropna)
-  if(length(k) > 1){
-    k <- k[1]
-    warning("K must be of length one. Longer object provided. Using only first entry.")
+  makethispartbetter <- ((!is.null(weights))| alignBy=="days"| alignBy=="weeks" | (FUN!="previoustick") | dropna)
+  if(length(alignPeriod) > 1){
+    alignPeriod <- alignPeriod[1]
+    warning("alignPeriod must be of length one. Longer object provided. Using only first entry.")
   }
   
   if (FUN == "previoustick") {
@@ -77,12 +77,12 @@ aggregateTS <- function (ts, FUN = "previoustick", on = "minutes", k = 1, weight
     tz <- tzone(ts)
   }
   
-  if(on == "ticks"){ ## Special case for on = "ticks"
-    if(k < 1 | k%%1 != 0){
-      stop("When on is `ticks`, must be a positive integer valued numeric")
+  if(alignBy == "ticks"){ ## Special case for alignBy = "ticks"
+    if(alignPeriod < 1 | alignPeriod%%1 != 0){
+      stop("When alignBy is `ticks`, must be a positive integer valued numeric")
     }
-    idx <- seq(1, nrow(ts), by = k)
-    if(k %% nrow(ts) != 0){
+    idx <- seq(1, nrow(ts), by = alignPeriod)
+    if(alignPeriod %% nrow(ts) != 0){
       idx <- c(idx, nrow(ts))
     }
     ts <- ts[idx,]
@@ -92,7 +92,7 @@ aggregateTS <- function (ts, FUN = "previoustick", on = "minutes", k = 1, weight
   if (makethispartbetter)  {
     
     if (is.null(weights)) {
-      ep <- endpoints(ts, on, k)
+      ep <- endpoints(ts, alignBy, alignPeriod)
       if (dim(ts)[2] == 1) { 
         ts2 <- period.apply(ts, ep, FUN) 
       }
@@ -101,31 +101,30 @@ aggregateTS <- function (ts, FUN = "previoustick", on = "minutes", k = 1, weight
       }
     } else {
       tsb <- cbind(ts, weights)
-      ep  <- endpoints(tsb, on, k)
+      ep  <- endpoints(tsb, alignBy, alignPeriod)
       ts2 <- period.apply(tsb, ep, FUN = match.fun(weightedaverage))
     }
-    if (on == "minutes" | on == "mins" | on == "secs" | on == 
-        "seconds") {
-      if (on == "minutes" | on == "mins") {
-        secs = k * 60
+    if (alignBy == "minutes" | alignBy == "mins" | alignBy == "secs" | alignBy == "seconds") {
+      if (alignBy == "minutes" | alignBy == "mins") {
+        secs = alignPeriod * 60
       }
-      if (on == "secs" | on == "seconds") {
-        secs <- k
+      if (alignBy == "secs" | alignBy == "seconds") {
+        secs <- alignPeriod
       }
       a <- index(ts2) + (secs - as.numeric(index(ts2)) %% secs)
       ts3 <- xts(ts2, a, tzone = tz)
     }
-    if (on == "hours") {
+    if (alignBy == "hours") {
       secs = 3600
       a <- index(ts2) + (secs - as.numeric(index(ts2)) %% secs)
       ts3 <- xts(ts2, a, tzone = tz)
     }
-    if (on == "days") {
+    if (alignBy == "days") {
       secs = 24 * 3600
       a   <- index(ts2) + (secs - as.numeric(index(ts2)) %% secs) - (24 * 3600)
       ts3 <- xts(ts2, a, tzone = tz)
     }
-    if (on == "weeks") {
+    if (alignBy == "weeks") {
       secs = 24 * 3600 * 7
       a <- (index(ts2) + (secs - (index(ts2) + (3L * 86400L)) %% secs)) - 
         (24 * 3600)
@@ -133,17 +132,17 @@ aggregateTS <- function (ts, FUN = "previoustick", on = "minutes", k = 1, weight
     }
     
     if (!dropna) {
-      if (on != "weeks" & on != "days") {
-        if (on == "secs" | on == "seconds") {
+      if (alignBy != "weeks" & alignBy != "days") {
+        if (alignBy == "secs" | alignBy == "seconds") {
           tby <- "s"
         }
-        if (on == "mins" | on == "minutes") {
+        if (alignBy == "mins" | alignBy == "minutes") {
           tby <- "min"
         }
-        if (on == "hours") {
+        if (alignBy == "hours") {
           tby <- "h"
         }
-        by <- paste(k, tby, sep = " ")
+        by <- paste(alignPeriod, tby, sep = " ")
         allindex <- as.POSIXct(seq(start(ts3), end(ts3), by = by))
         xx <- xts(rep("1", length(allindex)), order.by = allindex)
         ts3 <- merge(ts3, xx)[, (1:dim(ts)[2])]
@@ -155,16 +154,17 @@ aggregateTS <- function (ts, FUN = "previoustick", on = "minutes", k = 1, weight
   }
   
   if(!makethispartbetter){
-    if (on == "secs" | on == "seconds") { 
-      secs <- k 
-      tby <- paste(k, "sec", sep = " ")
+    if (alignBy == "secs" | alignBy == "seconds") { 
+      secs <- alignPeriod 
+      tby <- paste(alignPeriod, "sec", sep = " ")
     }
-    if (on == "mins" | on == "minutes") { 
-      secs <- 60*k; tby = paste(60*k,"sec",sep=" ")
+    if (alignBy == "mins" | alignBy == "minutes") { 
+      secs <- 60*alignPeriod
+      tby = paste(60*alignPeriod,"sec",sep=" ")
     }
-    if (on == "hours") { 
-      secs <- 3600 * k 
-      tby <- paste(3600 * k, "sec", sep=" ")
+    if (alignBy == "hours") { 
+      secs <- 3600 * alignPeriod 
+      tby <- paste(3600 * alignPeriod, "sec", sep=" ")
     }
     
     FUN <- match.fun(FUN)
@@ -199,9 +199,9 @@ aggregateTS <- function (ts, FUN = "previoustick", on = "minutes", k = 1, weight
 #' of the result.
 #'
 #' @param pData data.table or xts object to be aggregated containing the intraday price series, possibly across multiple days.
-#' @param on character, indicating the time scale in which "k" is expressed. Possible values are: "milliseconds", "secs", "seconds", "mins", "minutes","hours", "ticks".
-#' @param k positive integer, indicating the number of periods to aggregate over; e.g. to aggregate a
-#' xts object to the 5 minute frequency set k = 5 and on = "minutes".
+#' @param alignBy character, indicating the time scale in which "alignPeriod" is expressed. Possible values are: "milliseconds", "secs", "seconds", "mins", "minutes","hours", "ticks".
+#' @param alignPeriod positive integer, indicating the number of periods to aggregate over; e.g. to aggregate a
+#' xts object to the 5 minute frequency set alignPeriod = 5 and alignBy = "minutes".
 #' @param marketOpen the market opening time, by default: marketOpen = "09:30:00".
 #' @param marketClose the market closing time, by default: marketClose = "16:00:00".
 #' @param fill indicates whether rows without trades should be added with the most recent value, FALSE by default.
@@ -210,13 +210,13 @@ aggregateTS <- function (ts, FUN = "previoustick", on = "minutes", k = 1, weight
 #' @details
 #' The timestamps of the new time series are the closing times and/or days of the intervals.
 #'
-#' In case of previous tick aggregation or on = "seconds"/"minutes"/"hours",
+#' In case of previous tick aggregation or alignBy = "seconds"/"minutes"/"hours",
 #' the element of the returned series with e.g. timestamp 09:35:00 contains
 #' the last observation up to that point, including the value at 09:35:00 itself.
 #'
-#' In case on = "ticks", the sampling is done such the sampling starts on the first tick, and the last tick is always included
+#' In case alignBy = "ticks", the sampling is done such the sampling starts on the first tick, and the last tick is always included
 #' For example, if 14 observations are made on one day, and these are 1, 2, 3, ... 14.
-#' Then, with on = "ticks" and k = 3, the output will be 1, 4, 7, 10, 13, 14.
+#' Then, with alignBy = "ticks" and alignPeriod = 3, the output will be 1, 4, 7, 10, 13, 14.
 #'
 #' @return A data.table or xts object containing the aggregated time series.
 #'
@@ -224,43 +224,41 @@ aggregateTS <- function (ts, FUN = "previoustick", on = "minutes", k = 1, weight
 #' @keywords data manipulation
 #' @examples
 #' # aggregate price data to the 30 second frequency
-#' aggregatePrice(sampleTDataMicroseconds, on = "secs", k = 30)
+#' aggregatePrice(sampleTDataMicroseconds, alignBy = "secs", alignPeriod = 30)
 #' # aggregate price data to the 30 second frequency including zero return price changes
-#' aggregatePrice(sampleTDataMicroseconds, on = "secs", k = 30)
+#' aggregatePrice(sampleTDataMicroseconds, alignBy = "secs", alignPeriod = 30)
 #'
 #' # aggregate price data to half a second frequency including zero return price changes
-#' aggregatePrice(sampleTDataMicroseconds, on = "milliseconds", k = 500, fill = TRUE)
+#' aggregatePrice(sampleTDataMicroseconds, alignBy = "milliseconds", alignPeriod = 500, fill = TRUE)
 #' @keywords internal
 #' @importFrom xts last tzone
 #' @importFrom data.table fifelse
 #' @export
-aggregatePrice <- function(pData, on = "minutes", k = 1, marketOpen = "09:30:00", marketClose = "16:00:00" , fill = FALSE, tz = NULL) {
+aggregatePrice <- function(pData, alignBy = "minutes", alignPeriod = 1, marketOpen = "09:30:00", marketClose = "16:00:00" , fill = FALSE, tz = NULL) {
   ## checking
   pData <- checkColumnNames(pData)
   .N <- .I <- N <- DATE <- DT <- FIRST_DT <- DT_ROUND <- LAST_DT <- SYMBOL <- PRICE <- NULL
 
-  on_true <- NULL
 
   if (!("PRICE" %in% colnames(pData))) {
     stop("data.table or xts needs column named PRICE.")
   }
-  if (on == "milliseconds") {
-    on_true <- "milliseconds"
-    on <- "secs"
-    k <- k / 1000
+  if (alignBy == "milliseconds") {
+    alignBy <- "secs"
+    alignPeriod <- alignPeriod / 1000
   }
-  if(on == "secs" | on == "seconds"){
-    scaleFactor <- k
+  if(alignBy == "secs" | alignBy == "seconds"){
+    scaleFactor <- alignPeriod
   }
-  if(on == "mins" | on == "minutes"){
-    scaleFactor <- k * 60
+  if(alignBy == "mins" | alignBy == "minutes"){
+    scaleFactor <- alignPeriod * 60
   }
-  if(on == "hours"){
-    scaleFactor <- k * 60 * 60
+  if(alignBy == "hours"){
+    scaleFactor <- alignPeriod * 60 * 60
   }
 
-  if(! (on %in% c("milliseconds", "secs", "seconds", "mins", "minutes", "hours", "ticks"))){
-    stop("on not valid value. Valid values are: \"milliseconds\", \"secs\", \"seconds\", \"mins\", \"minutes\", \"hours\", and \"ticks\".")
+  if(! (alignBy %in% c("milliseconds", "secs", "seconds", "mins", "minutes", "hours", "ticks"))){
+    stop("alignBy not valid value. Valid values are: \"milliseconds\", \"secs\", \"seconds\", \"mins\", \"minutes\", \"hours\", and \"ticks\".")
   }
 
   inputWasXts <- FALSE
@@ -335,15 +333,15 @@ aggregatePrice <- function(pData, on = "minutes", k = 1, marketOpen = "09:30:00"
 
   }
 
-  if(on == "ticks"){ ## Special case for on = "ticks"
-    if(k < 1 | k%%1 != 0){
-      stop("When on is `ticks`, must be a positive integer valued numeric")
+  if(alignBy == "ticks"){ ## Special case for alignBy = "ticks"
+    if(alignPeriod < 1 | alignPeriod%%1 != 0){
+      stop("When alignBy is `ticks`, must be a positive integer valued numeric")
     }
     if(length(unique(as.Date(pData[,DT]))) > 1){
-      stop("Multiday support for aggregatePrice with on = \"ticks\" is not implemented yet.")
+      stop("Multiday support for aggregatePrice with alignBy = \"ticks\" is not implemented yet.")
     }
-    idx <- seq(1, nrow(pData), by = k)
-    if(k %% nrow(pData) != 0){
+    idx <- seq(1, nrow(pData), by = alignPeriod)
+    if(alignPeriod %% nrow(pData) != 0){
       idx <- c(idx, nrow(pData))
     }
     pData <- pData[idx,]
@@ -397,10 +395,10 @@ aggregatePrice <- function(pData, on = "minutes", k = 1, marketOpen = "09:30:00"
 #' See \code{\link{sampleQDataMicroseconds}} for an example of the argument qData.
 #' 
 #' @param qData data.table or xts object to be aggregated, containing the intraday quote data of a stock for one day.
-#' @param on character, indicating the time scale in which "k" is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".
-#' xts object to the 5 minute frequency, set k=5 and on = "minutes".
-#' @param k positive integer, indicating the number of periods to aggregate over. E.g. to aggregate an
-#' object to the 5 minute frequency set k = 5 and on = "minutes".
+#' @param alignBy character, indicating the time scale in which "alignPeriod" is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".
+#' xts object to the 5 minute frequency, set alignPeriod=5 and alignBy = "minutes".
+#' @param alignPeriod positive integer, indicating the number of periods to aggregate over. E.g. to aggregate an
+#' object to the 5 minute frequency set alignPeriod = 5 and alignBy = "minutes".
 #' @param marketOpen the market opening time, by default: marketOpen = "09:30:00".
 #' @param marketClose the market closing time, by default: marketClose = "16:00:00".
 #' @param tz time zone used, by default: tz = "GMT".
@@ -422,27 +420,26 @@ aggregatePrice <- function(pData, on = "minutes", k = 1, marketOpen = "09:30:00"
 #' 
 #' @examples
 #' # aggregate quote data to the 30 second frequency
-#' qDataAggregated <- aggregateQuotes(sampleQDataMicroseconds, on = "seconds", k = 30)
+#' qDataAggregated <- aggregateQuotes(sampleQDataMicroseconds, alignBy = "seconds", alignPeriod = 30)
 #' qDataAggregated # Show the aggregated data
 #' @export
-aggregateQuotes <- function(qData, on = "minutes", k = 5, marketOpen = "09:30:00", marketClose = "16:00:00", tz = "GMT") {
+aggregateQuotes <- function(qData, alignBy = "minutes", alignPeriod = 5, marketOpen = "09:30:00", marketClose = "16:00:00", tz = "GMT") {
   .I <- .N <- N <- DATE <- BID <- OFR <- BIDSIZ <- OFRSIZ <- DT <- FIRST_DT <- DT_ROUND <-LAST_DT <- SYMBOL <- NULL
   
   qData <- checkColumnNames(qData)
   checkqData(qData)
-  if (on == "milliseconds") {
-    on_true <- "milliseconds"
-    on <- "secs"
-    k <- k / 1000
+  if (alignBy == "milliseconds") {
+    alignBy <- "secs"
+    alignPeriod <- alignPeriod / 1000
   }
-  if(on == "secs" | on == "seconds"){
-    scaleFactor <- k
+  if(alignBy == "secs" | alignBy == "seconds"){
+    scaleFactor <- alignPeriod
   }
-  if(on == "mins" | on == "minutes"){
-    scaleFactor <- k * 60
+  if(alignBy == "mins" | alignBy == "minutes"){
+    scaleFactor <- alignPeriod * 60
   }
-  if(on == "hours"){
-    scaleFactor <- k * 60 * 60
+  if(alignBy == "hours"){
+    scaleFactor <- alignPeriod * 60 * 60
   }
   inputWasXts <- FALSE
   if (!is.data.table(qData)) {
@@ -559,9 +556,9 @@ aggregateQuotes <- function(qData, on = "minutes", k = 5, marketOpen = "09:30:00
 #' and subsequent observations are the closing prices over the interval.
 #' 
 #' @param tData data.table or xts object to be aggregated, containing the intraday price series of a stock for possibly multiple days.
-#' @param on character, indicating the time scale in which "k" is expressed. Possible values are: "secs", "seconds", "mins", "minutes", "hours".
-#' @param k positive integer, indicating the number of periods to aggregate over. E.g. to aggregate an
-#' object to the 5 minute frequency set k = 5 and on = "minutes".
+#' @param alignBy character, indicating the time scale in which "alignPeriod" is expressed. Possible values are: "secs", "seconds", "mins", "minutes", "hours".
+#' @param alignPeriod positive integer, indicating the number of periods to aggregate over. E.g. to aggregate an
+#' object to the 5 minute frequency set alignPeriod = 5 and alignBy = "minutes".
 #' @param marketOpen the market opening time, by default: marketOpen = "09:30:00".
 #' @param marketClose the market closing time, by default: marketClose = "16:00:00".
 #' @param tz time zone used, by default: tz = "GMT".
@@ -575,7 +572,7 @@ aggregateQuotes <- function(qData, on = "minutes", k = 5, marketOpen = "09:30:00
 #' 
 #' The timestamps of the new time series are the closing times of the intervals. 
 #' 
-#' In case of previous tick aggregation or on = "seconds"/"minutes"/"hours",
+#' In case of previous tick aggregation or alignBy = "seconds"/"minutes"/"hours",
 #' the element of the returned series with e.g. timestamp 09:35:00 contains 
 #' the last observation up to that point, including the value at 09:35:00 itself.
 #' 
@@ -586,27 +583,27 @@ aggregateQuotes <- function(qData, on = "minutes", k = 5, marketOpen = "09:30:00
 #' 
 #' @examples 
 #' # aggregate trade data to 5 minute frequency
-#' tDataAggregated <- aggregateTrades(sampleTDataMicroseconds, on = "minutes", k = 5)
+#' tDataAggregated <- aggregateTrades(sampleTDataMicroseconds, alignBy = "minutes", alignPeriod = 5)
 #' tDataAggregated
 #' @export
-aggregateTrades <- function(tData, on = "minutes", k = 5, marketOpen = "09:30:00", marketClose = "16:00:00", tz = "GMT") {
+aggregateTrades <- function(tData, alignBy = "minutes", alignPeriod = 5, marketOpen = "09:30:00", marketClose = "16:00:00", tz = "GMT") {
   .I <- .N <- N <- DATE <- SIZE <- DT <- FIRST_DT <- DT_ROUND <- LAST_DT <- SYMBOL <- PRICE <- VWPRICE <- SIZETPRICE <- SIZESUM <- NULL
   tData <- checkColumnNames(tData)
   checktData(tData)
   
-  if (on == "milliseconds") {
+  if (alignBy == "milliseconds") {
     on_true <- "milliseconds"
-    on <- "secs"
-    k <- k / 1000
+    alignBy <- "secs"
+    alignPeriod <- alignPeriod / 1000
   }
-  if(on == "secs" | on == "seconds"){
-    scaleFactor <- k
+  if(alignBy == "secs" | alignBy == "seconds"){
+    scaleFactor <- alignPeriod
   }
-  if(on == "mins" | on == "minutes"){
-    scaleFactor <- k * 60
+  if(alignBy == "mins" | alignBy == "minutes"){
+    scaleFactor <- alignPeriod * 60
   }
-  if(on == "hours"){
-    scaleFactor <- k * 60 * 60
+  if(alignBy == "hours"){
+    scaleFactor <- alignPeriod * 60 * 60
   }
   
   inputWasXts <- FALSE
@@ -2576,17 +2573,17 @@ businessTimeAggregation <- function(pData, measure = "volume", obs = 390, bandwi
 #' 
 #' This function makes OHLC-V bars at arbitrary intevals. If the SIZE column is not present in the input, no volume column is created.
 #' @param pData data.table or xts object to make the bars out of, containing the intraday price series of a stock for possibly multiple days.
-#' @param on character, indicating the time scale in which "k" is expressed. Possible values are: "secs", "seconds", "mins", "minutes", "hours".
-#' @param k positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate an
-#' object to the 5 minute frequency set k = 5 and on = "minutes".
+#' @param alignBy character, indicating the time scale in which "alignPeriod" is expressed. Possible values are: "secs", "seconds", "mins", "minutes", "hours".
+#' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate an
+#' object to the 5 minute frequency set alignPeriod = 5 and alignBy = "minutes".
 #' @param tz time zone used, by default: tz = "GMT".
 #' @examples 
 #' \dontrun{
-#' minuteBars <- makeOHLCV(sampleTDataEurope, on = "minutes", k = 1)
+#' minuteBars <- makeOHLCV(sampleTDataEurope, alignBy = "minutes", alignPeriod = 1)
 #' ## We can use the quantmod package's chartSeries function to plot the ohlcv data
 #' quantmod::chartSeries(minuteBars)
 #' 
-#' minuteBars <- makeOHLCV(sampleTDataEurope[,], on = "minutes", k = 1)
+#' minuteBars <- makeOHLCV(sampleTDataEurope[,], alignBy = "minutes", alignPeriod = 1)
 #' ## Again we plot the series with chartSeries
 #' quantmod::chartSeries(minuteBars)
 #' 
@@ -2595,31 +2592,31 @@ businessTimeAggregation <- function(pData, measure = "volume", obs = 390, bandwi
 #' ## Again we plot the series with chartSeries
 #' quantmod::chartSeries(fiveMinuteBars)
 #' 
-#' ## We can use arbitrary k, here we choose pi
-#' bars <- makeOHLCV(sampleTDataEurope, on = "seconds", k = pi)
+#' ## We can use arbitrary alignPeriod, here we choose pi
+#' bars <- makeOHLCV(sampleTDataEurope, alignBy = "seconds", alignPeriod = pi)
 #' ## Again we plot the series with chartSeries
 #' quantmod::chartSeries(bars)
 #' }
 #' 
 #' @export
-makeOHLCV <- function(pData, on = "minutes", k = 5, tz = NULL){
+makeOHLCV <- function(pData, alignBy = "minutes", alignPeriod = 5, tz = NULL){
   .SD <-  DATE <- SIZE <- DT <-  PRICE <- NULL
   if (!is.xts(pData) & !is.data.table(pData)) {
     stop("The argument pData should be a data.table or xts object.")
   }
-  k <- k[1]
-  if (on == "milliseconds") {
-    on <- "secs"
-    k <- k / 1000
+  alignPeriod <- alignPeriod[1]
+  if (alignBy == "milliseconds") {
+    alignBy <- "secs"
+    alignPeriod <- alignPeriod / 1000
   }
-  if(on == "secs" | on == "seconds"){
-    scaleFactor <- k
+  if(alignBy == "secs" | alignBy == "seconds"){
+    scaleFactor <- alignPeriod
   }
-  if(on == "mins" | on == "minutes"){
-    scaleFactor <- k * 60
+  if(alignBy == "mins" | alignBy == "minutes"){
+    scaleFactor <- alignPeriod * 60
   }
-  if(on == "hours"){
-    scaleFactor <- k * 60 * 60
+  if(alignBy == "hours"){
+    scaleFactor <- alignPeriod * 60 * 60
   }
   
   inputWasXts <- FALSE

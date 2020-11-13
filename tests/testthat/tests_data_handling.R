@@ -28,7 +28,7 @@ test_that("quotesCleanup", {
 context("aggregatePrice")
 test_that("aggregatePrice", {
   expect_equal(
-    formatC(sum(head(aggregatePrice(sampleTDataMicroseconds[, list(DT, PRICE)], on = "secs", k = 30))$PRICE), digits = 10),
+    formatC(sum(head(aggregatePrice(sampleTDataMicroseconds[, list(DT, PRICE)], alignBy = "secs", alignPeriod = 30))$PRICE), digits = 10),
     "     950.73"
   )
 })
@@ -195,8 +195,8 @@ test_that("aggregateTS edge cases", {
   )
   
   expect_true(
-    max(index(aggregateTS(xts(1:23400, as.POSIXct(seq(34200, 57600, length.out = 23400), origin = '1970-01-01', on = "minutes", k = 1)))))<
-    max(index(aggregateTS(xts(1:23400, as.POSIXct(seq(34200, 57601, length.out = 23400), origin = '1970-01-01', on = "minutes", k = 1)))))
+    max(index(aggregateTS(xts(1:23400, as.POSIXct(seq(34200, 57600, length.out = 23400), origin = '1970-01-01', alignBy = "minutes", alignPeriod = 1)))))<
+    max(index(aggregateTS(xts(1:23400, as.POSIXct(seq(34200, 57601, length.out = 23400), origin = '1970-01-01', alignBy = "minutes", alignPeriod = 1)))))
     # The last one will have an extra minute in this case!
   )
 
@@ -207,13 +207,13 @@ context("aggregatePrice time zones")
 test_that("aggregatePrice time zones", {
   dat <- data.table(DT = as.POSIXct(c(34150, 34201, 34201, 34500, 34500 + 1e-6, 34799, 34799, 34801, 34803, 35099), origin = "1970-01-01", tz = "EST"), PRICE = 0:9)
   
-  output <- aggregatePrice(dat, on = "minutes", k = 5, marketOpen = "04:30:00", marketClose = "11:00:00", fill = FALSE)
+  output <- aggregatePrice(dat, alignBy = "minutes", alignPeriod = 5, marketOpen = "04:30:00", marketClose = "11:00:00", fill = FALSE)
   target <- data.table(DT = as.POSIXct(c(34200, 34500, 34800, 35100), origin = "1970-01-01", tz = "EST"), PRICE = c(1,3,6,9))
   expect_equal(output, target)
   
   dat <- as.xts(dat)
   
-  output <- aggregatePrice(dat, on = "minutes", k = 5, marketOpen = "04:30:00", marketClose = "11:00:00", fill = FALSE, tz = "EST")
+  output <- aggregatePrice(dat, alignBy = "minutes", alignPeriod = 5, marketOpen = "04:30:00", marketClose = "11:00:00", fill = FALSE, tz = "EST")
   target <- xts(c(1,3,6,9), as.POSIXct(c(34200, 34500, 34800, 35100), origin = "1970-01-01", tz = "EST")) 
   colnames(target) <- "PRICE"
   expect_equal(output, target)
@@ -221,7 +221,7 @@ test_that("aggregatePrice time zones", {
   dat <- data.table(DT = as.POSIXct(c(34150, 34201, 34201, 34500, 34500 + 1e-6, 34799, 34799, 34801, 34803, 35099) + 86400 * c(rep(1,10), rep(200,10)),
                                     origin =  as.POSIXct("1970-01-01", tz = "EST"), tz = "EST"), PRICE = rep(0:9, 2))
   
-  output <- aggregatePrice(dat, on = "minutes", k = 5, marketOpen = "09:30:00", marketClose = "16:00:00", fill = FALSE)
+  output <- aggregatePrice(dat, alignBy = "minutes", alignPeriod = 5, marketOpen = "09:30:00", marketClose = "16:00:00", fill = FALSE)
   target <- data.table(DT = as.POSIXct(c(34200, 34500, 34800, 35100) + 86400 * c(rep(1,4), rep(200,4)), origin = as.POSIXct("1970-01-01", tz = "EST"), tz = "EST"), PRICE = rep(c(1,3,6,9), 2))
   expect_equal(output, target)
   
@@ -233,7 +233,7 @@ test_that("aggregatePrice time zones", {
 context("aggregatePrice edge cases")
 test_that("aggregatePrice edge cases", {
   dat <- data.table(DT = as.POSIXct(c(34150, 34201, 34201, 34500, 34500 + 1e-9, 34799, 34799, 34801, 34803, 35099), origin = "1970-01-01", tz = "UTC"), PRICE = 0:9)
-  output <- aggregatePrice(dat, on = "minutes", k = 5, marketOpen = "09:30:00", marketClose = "16:00:00", fill = FALSE)
+  output <- aggregatePrice(dat, alignBy = "minutes", alignPeriod = 5, marketOpen = "09:30:00", marketClose = "16:00:00", fill = FALSE)
   target <- data.table(DT = as.POSIXct(c(34200, 34500, 34800, 35100), origin = "1970-01-01", tz = "UTC"), PRICE = c(1,3,6,9))
   expect_equal(output, target)
 })
@@ -242,15 +242,15 @@ test_that("aggregatePrice edge cases", {
 context("aggregatePrice milliseconds vs seconds")
 test_that("aggregatePrice milliseconds vs seconds", {
   dat <- data.table(DT = as.POSIXct(c(34150 ,34201, 34500, 34500 + 1e-9, 34799, 34801, 34803, 35099), origin = "1970-01-01", tz = "GMT"), PRICE = 0:7)
-  expect_equal(aggregatePrice(dat, on = "milliseconds", k = 5000, marketOpen = "09:30:00", marketClose = "16:00:00", fill = TRUE),
-               aggregatePrice(dat, on = "secs", k = 5, marketOpen = "09:30:00", marketClose = "16:00:00", fill = TRUE))
+  expect_equal(aggregatePrice(dat, alignBy = "milliseconds", alignPeriod = 5000, marketOpen = "09:30:00", marketClose = "16:00:00", fill = TRUE),
+               aggregatePrice(dat, alignBy = "secs", alignPeriod = 5, marketOpen = "09:30:00", marketClose = "16:00:00", fill = TRUE))
   
 })
 
 context("aggregatePrice filling correctly")
 test_that("aggregatePrice filling correctly", {
   dat <- data.table(DT = as.POSIXct(c(34150 ,34201, 34800, 45500, 45799, 50801, 50803, 57599.01, 57601), origin = "1970-01-01", tz = "GMT"), PRICE = 0:8)
-  output <- aggregatePrice(dat, on = "milliseconds", k = 1000, marketOpen = "09:30:00", marketClose = "16:00:00", fill = TRUE)
+  output <- aggregatePrice(dat, alignBy = "milliseconds", alignPeriod = 1000, marketOpen = "09:30:00", marketClose = "16:00:00", fill = TRUE)
   expect_equal(sum(output$PRICE == 0), 0) # This should be removed since it happens before the market opens
   expect_equal(sum(output$PRICE == 1), 60 * 10) # 1 is the prevaling price for 10 minutes (It is also the opening price!!!!!)
   expect_equal(sum(output$PRICE == 2), 2 * 60 * 60 + 58 * 60 + 20) # 2 is the prevailing price for 2 hours, 58 minutes and 20 seconds 
@@ -268,7 +268,7 @@ context("aggregateQuotes edge cases")
 test_that("aggregateQuotes edge cases", {
   dat <- data.table(DT = as.POSIXct(c(34150 ,34201, 34500, 34500 + 1e-9, 34799, 34801, 34803, 35099), origin = "1970-01-01", tz = "GMT"), 
                     SYMBOL = "XXX", BID = as.numeric(0:7), BIDSIZ = as.numeric(1), OFR = as.numeric(1:8), OFRSIZ = as.numeric(2))
-  output <- aggregateQuotes(dat, on = "minutes", k = 5, marketOpen = "09:30:00", marketClose = "16:00:00")
+  output <- aggregateQuotes(dat, alignBy = "minutes", alignPeriod = 5, marketOpen = "09:30:00", marketClose = "16:00:00")
   
   target <- data.table(DT = as.POSIXct(c(34200, 34500, 34800, 35100), origin = "1970-01-01", tz = "GMT"),
                        SYMBOL = "XXX", BID = c(1,2,4,7), BIDSIZ = c(1,1,2,3), OFR = c(1,2,4,7) + 1, OFRSIZ = c(1,1,2,3) * 2)
@@ -283,8 +283,8 @@ context("aggregateQuotes milliseconds vs seconds")
 test_that("aggregateQuotes milliseconds vs seconds", {
   dat <- data.table(DT = as.POSIXct(c(34150 ,34201, 34500, 34500 + 1e-12, 34799, 34801, 34803, 35099), origin = "1970-01-01", tz = "GMT"), 
                     SYMBOL = "XXX", BID = as.numeric(0:7), BIDSIZ = as.numeric(1), OFR = as.numeric(1:8), OFRSIZ = as.numeric(2))
-  expect_equal(aggregateQuotes(dat, on = "milliseconds", k = 5000, marketOpen = "09:30:00", marketClose = "16:00:00"),
-               aggregateQuotes(dat, on = "secs", k = 5, marketOpen = "09:30:00", marketClose = "16:00:00"))
+  expect_equal(aggregateQuotes(dat, alignBy = "milliseconds", alignPeriod = 5000, marketOpen = "09:30:00", marketClose = "16:00:00"),
+               aggregateQuotes(dat, alignBy = "secs", alignPeriod = 5, marketOpen = "09:30:00", marketClose = "16:00:00"))
   
 })
 

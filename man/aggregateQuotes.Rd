@@ -6,8 +6,8 @@
 \usage{
 aggregateQuotes(
   qData,
-  on = "minutes",
-  k = 5,
+  alignBy = "minutes",
+  alignPeriod = 5,
   marketOpen = "09:30:00",
   marketClose = "16:00:00",
   tz = "GMT"
@@ -16,11 +16,11 @@ aggregateQuotes(
 \arguments{
 \item{qData}{data.table or xts object to be aggregated, containing the intraday quote data of a stock for one day.}
 
-\item{on}{character, indicating the time scale in which "k" is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".
-xts object to the 5 minute frequency, set k=5 and on = "minutes".}
+\item{alignBy}{character, indicating the time scale in which "alignPeriod" is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".
+xts object to the 5 minute frequency, set alignPeriod=5 and alignBy = "minutes".}
 
-\item{k}{positive integer, indicating the number of periods to aggregate over. E.g. to aggregate an
-object to the 5 minute frequency set k = 5 and on = "minutes".}
+\item{alignPeriod}{positive integer, indicating the number of periods to aggregate over. E.g. to aggregate an
+object to the 5 minute frequency set alignPeriod = 5 and alignBy = "minutes".}
 
 \item{marketOpen}{the market opening time, by default: marketOpen = "09:30:00".}
 
@@ -48,7 +48,7 @@ Please note: Returned objects always contain the first observation (i.e. opening
 }
 \examples{
 # aggregate quote data to the 30 second frequency
-qDataAggregated <- aggregateQuotes(sampleQDataMicroseconds, on = "seconds", k = 30)
+qDataAggregated <- aggregateQuotes(sampleQDataMicroseconds, alignBy = "seconds", alignPeriod = 30)
 qDataAggregated # Show the aggregated data
 }
 \author{

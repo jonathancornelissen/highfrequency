@@ -1,19 +1,19 @@
 #' @importFrom zoo zoo na.locf `index<-`
 #' @importFrom stats start end
 #' @keywords internal
-fastTickAgregation <- function (ts, on = "minutes", k = 1, tz = "GMT") {
+fastTickAgregation <- function (ts, alignBy = "minutes", alignPeriod = 1, tz = "GMT") {
   
-  if (on == "secs" | on == "seconds") {
-    secs <- k
-    tby <- paste(k, "sec", sep = " ")
+  if (alignBy == "secs" | alignBy == "seconds") {
+    secs <- alignPeriod
+    tby <- paste(alignPeriod, "sec", sep = " ")
   } 
-  if (on == "mins" | on == "minutes") {
-    secs <- 60 * k
-    tby <- paste(60 * k, "sec", sep = " ")
+  if (alignBy == "mins" | alignBy == "minutes") {
+    secs <- 60 * alignPeriod
+    tby <- paste(60 * alignPeriod, "sec", sep = " ")
   } 
-  if (on == "hours"){
-    secs <- 3600 * k
-    tby <- paste(3600 * k, "sec", sep = " ")
+  if (alignBy == "hours"){
+    secs <- 3600 * alignPeriod
+    tby <- paste(3600 * alignPeriod, "sec", sep = " ")
   }
   g <- base::seq(start(ts), end(ts), by = tby)
   rawg <- as.numeric(as.POSIXct(g, tz = tz))
@@ -35,16 +35,16 @@ fastTickAgregation <- function (ts, on = "minutes", k = 1, tz = "GMT") {
 
 #' @importFrom data.table rbindlist setkey nafill set
 #' @keywords internal
-fastTickAgregation_DATA.TABLE <- function(dat, on = "minutes", k = 1, tz = "GMT"){
+fastTickAgregation_DATA.TABLE <- function(dat, alignBy = "minutes", alignPeriod = 1, tz = "GMT"){
   MAXDT <- .SD <- firstDT <- DT <- PRICE <- DATE <- NULL
-  if (on == "secs" | on == "seconds") {
-    secs <- k
+  if (alignBy == "secs" | alignBy == "seconds") {
+    secs <- alignPeriod
   } 
-  if (on == "mins" | on == "minutes") {
-    secs <- 60 * k
+  if (alignBy == "mins" | alignBy == "minutes") {
+    secs <- 60 * alignPeriod
   } 
-  if (on == "hours"){
-    secs <- 3600 * k
+  if (alignBy == "hours"){
+    secs <- 3600 * alignPeriod
   }
   #n
   timeZone <- attr(dat$DT, "tzone")
@@ -95,19 +95,19 @@ fastTickAgregation_DATA.TABLE <- function(dat, on = "minutes", k = 1, tz = "GMT"
 #' @importFrom zoo zoo na.locf `index<-`
 #' @importFrom stats start end
 #' @keywords internal
-fastTickAgregation_RETURNS <- function (ts, on = "minutes", k = 1, tz = "GMT") {
+fastTickAgregation_RETURNS <- function (ts, alignBy = "minutes", alignPeriod = 1, tz = "GMT") {
   
-  if (on == "secs" | on == "seconds") {
-    secs <- k
-    tby <- paste(k, "sec", sep = " ")
+  if (alignBy == "secs" | alignBy == "seconds") {
+    secs <- alignPeriod
+    tby <- paste(alignPeriod, "sec", sep = " ")
   } 
-  if (on == "mins" | on == "minutes") {
-    secs <- 60 * k
-    tby <- paste(60 * k, "sec", sep = " ")
+  if (alignBy == "mins" | alignBy == "minutes") {
+    secs <- 60 * alignPeriod
+    tby <- paste(60 * alignPeriod, "sec", sep = " ")
   } 
-  if (on == "hours"){
-    secs <- 3600 * k
-    tby <- paste(3600 * k, "sec", sep = " ")
+  if (alignBy == "hours"){
+    secs <- 3600 * alignPeriod
+    tby <- paste(3600 * alignPeriod, "sec", sep = " ")
   }
   g <- base::seq(start(ts), end(ts), by = tby)
   rawg <- as.numeric(as.POSIXct(g, tz = tz))
@@ -131,16 +131,16 @@ fastTickAgregation_RETURNS <- function (ts, on = "minutes", k = 1, tz = "GMT") {
 
 #' @importFrom data.table rbindlist setkey nafill set
 #' @keywords internal
-fastTickAgregation_DATA.TABLE_RETURNS <- function(dat, on = "minutes", k = 1, tz = "GMT"){
+fastTickAgregation_DATA.TABLE_RETURNS <- function(dat, alignBy = "minutes", alignPeriod = 1, tz = "GMT"){
   DT_ROUND <- FIRST_DT <- .SD <- FIRST_DT <- DT <- DATE <- NULL
-  if (on == "secs" | on == "seconds") {
-    secs <- k
+  if (alignBy == "secs" | alignBy == "seconds") {
+    secs <- alignPeriod
   } 
-  if (on == "mins" | on == "minutes") {
-    secs <- 60 * k
+  if (alignBy == "mins" | alignBy == "minutes") {
+    secs <- 60 * alignPeriod
   } 
-  if (on == "hours"){
-    secs <- 3600 * k
+  if (alignBy == "hours"){
+    secs <- 3600 * alignPeriod
   }
   #n
   timeZone <- attr(dat$DT, "tzone")

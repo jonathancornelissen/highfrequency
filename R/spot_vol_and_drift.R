@@ -5,9 +5,9 @@
 #' @param method Which method to be used to estimate the spot-drift. Currently, three methods are available, rolling mean and median as well as the kernel method of Christensen et al. 2018.
 #' The kernel is a left hand exponential kernel that will weigh newer observations more heavily than older observations.
 #' @param ... Additional arguments for the individual methods. See details
-#' @param on What time-frame should the estimator be applied? Accepted inputs are \code{"milliseconds"}, \code{"seconds"} and \code{"secs"} for seconds, \code{"minutes"} and \code{"mins"} for minutes, and \code{"hours"} for hours.
+#' @param alignBy What time-frame should the estimator be applied? Accepted inputs are \code{"milliseconds"}, \code{"seconds"} and \code{"secs"} for seconds, \code{"minutes"} and \code{"mins"} for minutes, and \code{"hours"} for hours.
 #' Standard is minutes
-#' @param k How often should the estimation take place? If \code{k} is 5 the estimation will be done every fifth unit of \code{on}.
+#' @param alignPeriod How often should the estimation take place? If \code{alignPeriod} is 5 the estimation will be done every fifth unit of \code{alignBy}.
 #' @param marketOpen Opening time of the market, standard is "09:30:00"
 #' @param marketClose Closing time of the market, standard is "16:00:00"
 #' @param tz Time zone, standard is "GMT"
@@ -26,15 +26,15 @@
 #'
 #' @examples
 #' # Example 1: Rolling mean and median estimators for 2 days
-#' meandrift <- spotDrift(data = sampleTDataMicroseconds, k = 1, tz = "EST")
+#' meandrift <- spotDrift(data = sampleTDataMicroseconds, alignPeriod = 1, tz = "EST")
 #' mediandrift <- spotDrift(data = sampleTDataMicroseconds, method = "driftMedian", 
-#'                          on = "seconds", k = 30, tz = "EST")
+#'                          alignBy = "seconds", alignPeriod = 30, tz = "EST")
 #' plot(meandrift)
 #' plot(mediandrift)
 #'\dontrun{
 #' # Example 2: Kernel based estimator for one day with data.table format
 #' price <- sampleTDataMicroseconds[as.Date(DT) == "2018-01-02", list(DT, PRICE)]
-#' kerneldrift <- spotDrift(price, method = "driftKernel", on = "minutes", k = 1)
+#' kerneldrift <- spotDrift(price, method = "driftKernel", alignBy = "minutes", alignPeriod = 1)
 #' plot(kerneldrift)
 #'}
 #'
@@ -44,7 +44,7 @@
 #' @importFrom data.table rbindlist
 #' @importFrom data.table setkeyv
 #' @export
-spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
+spotDrift <- function(data, method = "driftMean", ..., alignBy = "minutes", alignPeriod = 5,
                      marketOpen = "09:30:00", marketClose = "16:00:00", tz = "GMT") {
 
   PRICE = DATE = RETURN = DT = NULL
@@ -71,7 +71,7 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
       stop("Data.table needs DT column containing the time-stamps of the trades.") # added the timestamp comment for verbosity.
     }
   }
-  datad <- aggregatePrice(data, on = on, k = k , marketOpen = marketOpen,
+  datad <- aggregatePrice(data, alignBy = alignBy, alignPeriod = alignPeriod , marketOpen = marketOpen,
                           marketClose = marketClose, tz = tz, fill = TRUE)
   datad[, DATE := as.Date(DT)]
   setkeyv(datad, "DT")
@@ -101,16 +101,16 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
 #'
 #' @param data Can be one of two input types, \code{xts} or \code{data.table}. It is assumed that the input comprises prices in levels. Irregularly spaced
 #' observations are allowed. They will be aggregated to the level specified by
-#' parameters \code{on} and \code{k}.
+#' parameters \code{alignBy} and \code{alignPeriod}.
 #'
 #' @param method specifies which method will be used to estimate the spot
 #' volatility. Options include \code{"detPer"} and \code{"stochper"}.
 #' See 'Details'.
-#' @param on string indicating the time scale in which \code{k} is expressed.
+#' @param alignBy string indicating the time scale in which \code{alignPeriod} is expressed.
 #' Possible values are: \code{"secs", "seconds", "mins", "minutes", "hours"}.
-#' @param k positive integer, indicating the number of periods to aggregate
+#' @param alignPeriod positive integer, indicating the number of periods to aggregate
 #' over. E.g. to aggregate an \code{xts} object to the 5 minute frequency, set
-#' \code{k = 5} and \code{on = "minutes"}.
+#' \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
 #' @param marketOpen the market opening time. This should be in the time zone
 #' specified by \code{tz}. By default, \code{marketOpen = "09:30:00"}.
 #' @param marketClose the market closing time. This should be in the time zone
@@ -127,8 +127,8 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
 #' An \code{xts} or \code{matrix} object (depending on the input) containing
 #' spot volatility estimates \eqn{\sigma_{t,i}}, reported for each interval
 #' \eqn{i} between \code{marketOpen} and \code{marketClose} for every day
-#' \eqn{t} in \code{data}. The length of the intervals is specified by \code{k}
-#' and \code{on}. Methods that provide this output: All.
+#' \eqn{t} in \code{data}. The length of the intervals is specified by \code{alignPeriod}
+#' and \code{alignBy}. Methods that provide this output: All.
 #'
 #' \code{daily}
 #' An \code{xts} or \code{numeric} object (depending on the input) containing
@@ -463,7 +463,7 @@ spotDrift <- function(data, method = "driftMean", ..., on = "minutes", k = 5,
 #'
 #' Taylor, S. J. and X. Xu (1997). The incremental volatility information in one million foreign exchange quotations. Journal of Empirical Finance 4, 317-340.
 #' @export
-spotVol <- function(data, method = "detPer", ..., on = "minutes", k = 5,
+spotVol <- function(data, method = "detPer", ..., alignBy = "minutes", alignPeriod = 5,
                       marketOpen = "09:30:00", marketClose = "16:00:00",
                       tz = "GMT") {
   
@@ -493,7 +493,7 @@ spotVol <- function(data, method = "detPer", ..., on = "minutes", k = 5,
   }
   
   if( method != "PARM"){
-    datad <- aggregatePrice(data, on = on, k = k , marketOpen = marketOpen,
+    datad <- aggregatePrice(data, alignBy = alignBy, alignPeriod = alignPeriod , marketOpen = marketOpen,
                             marketClose = marketClose, tz = tz, fill = TRUE)
     datad[, DATE := as.Date(DT, tz = tzone(datad$DT))]
     setkeyv(datad, "DT")
@@ -503,12 +503,12 @@ spotVol <- function(data, method = "detPer", ..., on = "minutes", k = 5,
     mR <- matrix(unlist(lapply(datad, FUN = function(x) as.numeric(x$RETURN))), ncol = length(datad[[1]]$RETURN), byrow = TRUE)
     
     if (method == "kernel") {
-      if (on == "seconds" | on == "secs")
-        delta <- k
-      if (on == "minutes" | on == "mins")
-        delta <- k * 60
-      if (on == "hours")
-        delta <- k * 3600
+      if (alignBy == "seconds" | alignBy == "secs")
+        delta <- alignPeriod
+      if (alignBy == "minutes" | alignBy == "mins")
+        delta <- alignPeriod * 60
+      if (alignBy == "hours")
+        delta <- alignPeriod * 3600
     }
   }
   options <- list(...)

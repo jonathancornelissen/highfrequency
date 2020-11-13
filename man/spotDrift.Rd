@@ -8,8 +8,8 @@ spotDrift(
   data,
   method = "driftMean",
   ...,
-  on = "minutes",
-  k = 5,
+  alignBy = "minutes",
+  alignPeriod = 5,
   marketOpen = "09:30:00",
   marketClose = "16:00:00",
   tz = "GMT"
@@ -23,10 +23,10 @@ The kernel is a left hand exponential kernel that will weigh newer observations 
 
 \item{...}{Additional arguments for the individual methods. See details}
 
-\item{on}{What time-frame should the estimator be applied? Accepted inputs are \code{"milliseconds"}, \code{"seconds"} and \code{"secs"} for seconds, \code{"minutes"} and \code{"mins"} for minutes, and \code{"hours"} for hours.
+\item{alignBy}{What time-frame should the estimator be applied? Accepted inputs are \code{"milliseconds"}, \code{"seconds"} and \code{"secs"} for seconds, \code{"minutes"} and \code{"mins"} for minutes, and \code{"hours"} for hours.
 Standard is minutes}
 
-\item{k}{How often should the estimation take place? If \code{k} is 5 the estimation will be done every fifth unit of \code{on}.}
+\item{alignPeriod}{How often should the estimation take place? If \code{alignPeriod} is 5 the estimation will be done every fifth unit of \code{alignBy}.}
 
 \item{marketOpen}{Opening time of the market, standard is "09:30:00"}
 
@@ -48,15 +48,15 @@ These arguments default to 300 and 5 respectively.
 }
 \examples{
 # Example 1: Rolling mean and median estimators for 2 days
-meandrift <- spotDrift(data = sampleTDataMicroseconds, k = 1, tz = "EST")
+meandrift <- spotDrift(data = sampleTDataMicroseconds, alignPeriod = 1, tz = "EST")
 mediandrift <- spotDrift(data = sampleTDataMicroseconds, method = "driftMedian", 
-                         on = "seconds", k = 30, tz = "EST")
+                         alignBy = "seconds", alignPeriod = 30, tz = "EST")
 plot(meandrift)
 plot(mediandrift)
 \dontrun{
 # Example 2: Kernel based estimator for one day with data.table format
 price <- sampleTDataMicroseconds[as.Date(DT) == "2018-01-02", list(DT, PRICE)]
-kerneldrift <- spotDrift(price, method = "driftKernel", on = "minutes", k = 1)
+kerneldrift <- spotDrift(price, method = "driftKernel", alignBy = "minutes", alignPeriod = 1)
 plot(kerneldrift)
 }
 

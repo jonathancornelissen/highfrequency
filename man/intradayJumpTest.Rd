@@ -10,8 +10,8 @@ intradayJumpTest(
   driftEstimator = "none",
   alpha = 0.95,
   ...,
-  on = "minutes",
-  k = 5,
+  alignBy = "minutes",
+  alignPeriod = 5,
   marketOpen = "09:30:00",
   marketClose = "16:00:00",
   tz = "GMT"
@@ -28,12 +28,12 @@ intradayJumpTest(
 
 \item{...}{extra arguments passed on to \code{\link{spotVol}} for the volatility estimation, and to \code{\link{spotDrift}}.}
 
-\item{on}{string indicating the time scale in which \code{k} is expressed.
+\item{alignBy}{string indicating the time scale in which \code{alignPeriod} is expressed.
 Possible values are: \code{"secs", "seconds", "mins", "minutes", "hours"}.}
 
-\item{k}{positive integer, indicating the number of periods to aggregate
+\item{alignPeriod}{positive integer, indicating the number of periods to aggregate
 over. E.g. to aggregate an \code{xts} object to the 5 minute frequency, set
-\code{k = 5} and \code{on = "minutes"}.}
+\code{alignPeriod = 5} and \code{alignBy = "minutes"}.}
 
 \item{marketOpen}{the market opening time. This should be in the time zone
 specified by \code{tz}. By default, \code{marketOpen = "09:30:00"}.}
@@ -56,7 +56,7 @@ The tests are of the form \eqn{L(t) = (R(t) - mu(t))/sigma(t)}.
 LMtest <- intradayJumpTest(pData = sampleTDataMicroseconds[, list(DT, PRICE)], 
                            volEstimator = "RM", driftEstimator = "none",
                            RM = "bipower", lookBackPeriod = 20,
-                           on = "minutes", k = 5, marketOpen = "09:30:00", 
+                           alignBy = "minutes", alignPeriod = 5, marketOpen = "09:30:00", 
                            marketClose = "16:00:00")
 plot(LMtest)
 

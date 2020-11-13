@@ -8,8 +8,8 @@ spotVol(
   data,
   method = "detPer",
   ...,
-  on = "minutes",
-  k = 5,
+  alignBy = "minutes",
+  alignPeriod = 5,
   marketOpen = "09:30:00",
   marketClose = "16:00:00",
   tz = "GMT"
@@ -18,7 +18,7 @@ spotVol(
 \arguments{
 \item{data}{Can be one of two input types, \code{xts} or \code{data.table}. It is assumed that the input comprises prices in levels. Irregularly spaced
 observations are allowed. They will be aggregated to the level specified by
-parameters \code{on} and \code{k}.}
+parameters \code{alignBy} and \code{alignPeriod}.}
 
 \item{method}{specifies which method will be used to estimate the spot
 volatility. Options include \code{"detPer"} and \code{"stochper"}.
@@ -26,12 +26,12 @@ See 'Details'.}
 
 \item{...}{method-specific parameters (see 'Details').}
 
-\item{on}{string indicating the time scale in which \code{k} is expressed.
+\item{alignBy}{string indicating the time scale in which \code{alignPeriod} is expressed.
 Possible values are: \code{"secs", "seconds", "mins", "minutes", "hours"}.}
 
-\item{k}{positive integer, indicating the number of periods to aggregate
+\item{alignPeriod}{positive integer, indicating the number of periods to aggregate
 over. E.g. to aggregate an \code{xts} object to the 5 minute frequency, set
-\code{k = 5} and \code{on = "minutes"}.}
+\code{alignPeriod = 5} and \code{alignBy = "minutes"}.}
 
 \item{marketOpen}{the market opening time. This should be in the time zone
 specified by \code{tz}. By default, \code{marketOpen = "09:30:00"}.}
@@ -51,8 +51,8 @@ following outputs, depending on the method used:
 An \code{xts} or \code{matrix} object (depending on the input) containing
 spot volatility estimates \eqn{\sigma_{t,i}}, reported for each interval
 \eqn{i} between \code{marketOpen} and \code{marketClose} for every day
-\eqn{t} in \code{data}. The length of the intervals is specified by \code{k}
-and \code{on}. Methods that provide this output: All.
+\eqn{t} in \code{data}. The length of the intervals is specified by \code{alignPeriod}
+and \code{alignBy}. Methods that provide this output: All.
 
 \code{daily}
 An \code{xts} or \code{numeric} object (depending on the input) containing

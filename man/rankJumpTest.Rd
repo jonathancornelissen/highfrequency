@@ -14,8 +14,8 @@ rankJumpTest(
   BoxCox = 1,
   nBoot = 1000,
   dontTestAtBoundaries = TRUE,
-  on = "minutes",
-  k = 5,
+  alignBy = "minutes",
+  alignPeriod = 5,
   marketOpen = "09:30:00",
   marketClose = "16:00:00",
   tz = "GMT"
@@ -40,12 +40,12 @@ rankJumpTest(
 
 \item{dontTestAtBoundaries}{logical determining whether to exclude data across different days. Default is \code{TRUE}}
 
-\item{on}{string indicating the time scale in which \code{k} is expressed.
+\item{alignBy}{string indicating the time scale in which \code{alignPeriod} is expressed.
 Possible values are: \code{"secs", "seconds", "mins", "minutes", "hours"}.}
 
-\item{k}{positive integer, indicating the number of periods to aggregate
+\item{alignPeriod}{positive integer, indicating the number of periods to aggregate
 over. E.g. to aggregate an \code{xts} object to the 5 minute frequency, set
-\code{k = 5} and \code{on = "minutes"}.}
+\code{alignPeriod = 5} and \code{alignBy = "minutes"}.}
 
 \item{marketOpen}{the market opening time. This should be in the time zone
 specified by \code{tz}. By default, \code{marketOpen = "09:30:00"}.}

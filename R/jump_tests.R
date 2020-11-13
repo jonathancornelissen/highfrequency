@@ -138,9 +138,9 @@ AJjumpTest <- function(pData, p = 4 , k = 2, alignBy = NULL, alignPeriod = NULL,
     
   } else {
     if(is.data.table(pData)){
-      pData <- fastTickAgregation_DATA.TABLE(pData, on = "seconds", k = 1)
+      pData <- fastTickAgregation_DATA.TABLE(pData, alignBy = "seconds", alignPeriod = 1)
     } else {
-      pData <- fastTickAgregation(pData, on = "seconds", k = 1)
+      pData <- fastTickAgregation(pData, alignBy = "seconds", alignPeriod = 1)
     }
   }
 
@@ -281,11 +281,11 @@ BNSjumpTest <- function (rData, IVestimator = "BV", IQestimator = "TP", type = "
   } else if (is.data.table(rData)){
     DATE <- .N <- DT <- NULL
     if(!is.null(alignBy) && !is.null(alignPeriod) && makeReturns) {
-      rData <- fastTickAgregation_DATA.TABLE(rData, on = alignBy, k = alignPeriod)
+      rData <- fastTickAgregation_DATA.TABLE(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     
     if(!is.null(alignBy) && !is.null(alignPeriod) && !makeReturns) {
-      rData <- fastTickAgregation_DATA.TABLE_RETURNS(rData, on = alignBy, k = alignPeriod)
+      rData <- fastTickAgregation_DATA.TABLE_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     
     setkey(rData, "DT")
@@ -305,10 +305,10 @@ BNSjumpTest <- function (rData, IVestimator = "BV", IQestimator = "TP", type = "
     
   } else {
     if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && makeReturns) {
-      rData <- fastTickAgregation(rData, on = alignBy, k = alignPeriod)
+      rData <- fastTickAgregation(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && !makeReturns) {
-      rData <- fastTickAgregation_RETURNS(rData, on = alignBy, k = alignPeriod)
+      rData <- fastTickAgregation_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     if (makeReturns) {
       rData <- makeReturns(rData)
@@ -451,7 +451,7 @@ JOjumpTest <- function(pData, power = 4, alignBy = NULL, alignPeriod = NULL, alp
   } else if (is.data.table(pData)){
     DATE <- .N <- DT <- NULL
     if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
-      pData <- fastTickAgregation_DATA.TABLE(pData, on = alignBy, k = alignPeriod)
+      pData <- fastTickAgregation_DATA.TABLE(pData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     setkey(pData, "DT")
     dates <- pData[, list(end = .N), by = list(DATE = as.Date(DT))][, `:=`(end = cumsum(end), DATE = as.character(DATE))][, start := shift(end, fill = 0) + 1]
@@ -469,7 +469,7 @@ JOjumpTest <- function(pData, power = 4, alignBy = NULL, alignPeriod = NULL, alp
     
   } else {
     if ((!is.null(alignBy)) && (!is.null(alignPeriod))) {
-      pData <- fastTickAgregation(pData, on = alignBy, k = alignPeriod)
+      pData <- fastTickAgregation(pData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     
     R  <- as.zoo(simre(pData))
@@ -524,11 +524,11 @@ JOjumpTest <- function(pData, power = 4, alignBy = NULL, alignPeriod = NULL, alp
 #' @param driftEstimator character denoting which drift estimator to use for the tests. See \link{spotDrift}. Default = \code{"none"} denoting no drift estimation.
 #' @param alpha numeric of length one determining what confidence level to use when constructing the critical values.
 #' @param ... extra arguments passed on to \code{\link{spotVol}} for the volatility estimation, and to \code{\link{spotDrift}}.
-#' @param on string indicating the time scale in which \code{k} is expressed.
+#' @param alignBy string indicating the time scale in which \code{alignPeriod} is expressed.
 #' Possible values are: \code{"secs", "seconds", "mins", "minutes", "hours"}.
-#' @param k positive integer, indicating the number of periods to aggregate
+#' @param alignPeriod positive integer, indicating the number of periods to aggregate
 #' over. E.g. to aggregate an \code{xts} object to the 5 minute frequency, set
-#' \code{k = 5} and \code{on = "minutes"}.
+#' \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
 #' @param marketOpen the market opening time. This should be in the time zone
 #' specified by \code{tz}. By default, \code{marketOpen = "09:30:00"}.
 #' @param marketClose the market closing time. This should be in the time zone
@@ -544,7 +544,7 @@ JOjumpTest <- function(pData, power = 4, alignBy = NULL, alignPeriod = NULL, alp
 #' LMtest <- intradayJumpTest(pData = sampleTDataMicroseconds[, list(DT, PRICE)], 
 #'                            volEstimator = "RM", driftEstimator = "none",
 #'                            RM = "bipower", lookBackPeriod = 20,
-#'                            on = "minutes", k = 5, marketOpen = "09:30:00", 
+#'                            alignBy = "minutes", alignPeriod = 5, marketOpen = "09:30:00", 
 #'                            marketClose = "16:00:00")
 #' plot(LMtest)
 #' 
@@ -560,7 +560,7 @@ JOjumpTest <- function(pData, power = 4, alignBy = NULL, alignPeriod = NULL, alp
 #' @importFrom zoo index
 #' @export
 
-intradayJumpTest <- function(pData, volEstimator = "RM", driftEstimator = "none", alpha = 0.95, ..., on = "minutes", k = 5,
+intradayJumpTest <- function(pData, volEstimator = "RM", driftEstimator = "none", alpha = 0.95, ..., alignBy = "minutes", alignPeriod = 5,
                              marketOpen = "09:30:00", marketClose = "16:00:00", tz = "GMT"){
 
   PRICE = DATE = RETURN = DT = NULL
@@ -594,7 +594,7 @@ intradayJumpTest <- function(pData, volEstimator = "RM", driftEstimator = "none"
     isMultiDay <- TRUE
   } 
   
-  vol <- spotVol(pData, method = volEstimator, on = on, k = k, marketOpen = marketOpen, marketClose = marketClose, tz = tz, ...)
+  vol <- spotVol(pData, method = volEstimator, alignBy = alignBy, alignPeriod = alignPeriod, marketOpen = marketOpen, marketClose = marketClose, tz = tz, ...)
 
   if (volEstimator == "RM") {
     
@@ -611,7 +611,7 @@ intradayJumpTest <- function(pData, volEstimator = "RM", driftEstimator = "none"
 
   
   if (volEstimator != "PARM") {
-    prices <- aggregatePrice(pData, on = on, k = k , marketOpen = marketOpen,
+    prices <- aggregatePrice(pData, alignBy = alignBy, alignPeriod = alignPeriod , marketOpen = marketOpen,
                    marketClose = marketClose, tz = tz, fill = TRUE)
     setkeyv(prices, "DT")
     prices[, DATE := as.Date(DT, tz = tz)]
@@ -664,7 +664,7 @@ intradayJumpTest <- function(pData, volEstimator = "RM", driftEstimator = "none"
       drift <- 0
       warning("Drift estimation not currently supported together with pre-averaged realized measures. Setting drift to 0")
     } else {
-      drift <- as.numeric(unlist(spotDrift(pData, method = driftEstimator, on = on, k = k, marketOpen = marketOpen, marketClose = marketClose, tz = tz, ...)))
+      drift <- as.numeric(unlist(spotDrift(pData, method = driftEstimator, alignBy = alignBy, alignPeriod = alignPeriod, marketOpen = marketOpen, marketClose = marketClose, tz = tz, ...)))
     }
   } else {
     drift <- 0
@@ -719,7 +719,7 @@ intradayJumpTest <- function(pData, volEstimator = "RM", driftEstimator = "none"
   #         print("ask Onno, Kris, and Nabil about best action")
   #         temp <- NULL
   #         for (date in dates){
-  #           temp <- rbind(temp, aggregateTS(pData[date], on = "minutes", k = windowSize))
+  #           temp <- rbind(temp, aggregateTS(pData[date], alignBy = "minutes", k = windowSize))
   #         }
   #         tmp[["tests"]] <- cbind(temp, c(out$jumpIndices, rep(NA, nrow(temp) - length(out$jumpIndices)))) 
   #       }
@@ -859,11 +859,11 @@ plot.intradayJumpTest <- function(x, ...){
 #' @param BoxCox numeric of exponents for the Box-Cox transformation, default is \code{1}
 #' @param nBoot numeric denoting how many replications to be used for the bootstrap algorithm. Default is \code{1000}
 #' @param dontTestAtBoundaries logical determining whether to exclude data across different days. Default is \code{TRUE}
-#' @param on string indicating the time scale in which \code{k} is expressed.
+#' @param alignBy string indicating the time scale in which \code{alignPeriod} is expressed.
 #' Possible values are: \code{"secs", "seconds", "mins", "minutes", "hours"}.
-#' @param k positive integer, indicating the number of periods to aggregate
+#' @param alignPeriod positive integer, indicating the number of periods to aggregate
 #' over. E.g. to aggregate an \code{xts} object to the 5 minute frequency, set
-#' \code{k = 5} and \code{on = "minutes"}.
+#' \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
 #' @param marketOpen the market opening time. This should be in the time zone
 #' specified by \code{tz}. By default, \code{marketOpen = "09:30:00"}.
 #' @param marketClose the market closing time. This should be in the time zone
@@ -880,7 +880,7 @@ plot.intradayJumpTest <- function(x, ...){
 #' @importFrom zoo coredata
 #' @export
 rankJumpTest <- function(marketPrice, stockPrices, alpha = c(5,3), coarseFreq = 10, localWindow = 30, rank = 1, BoxCox = 1, nBoot = 1000, 
-                         dontTestAtBoundaries = TRUE, on = "minutes", k = 5,
+                         dontTestAtBoundaries = TRUE, alignBy = "minutes", alignPeriod = 5,
                          marketOpen = "09:30:00", marketClose = "16:00:00", tz = "GMT"){
   
   ## Preparation of data
@@ -915,7 +915,7 @@ rankJumpTest <- function(marketPrice, stockPrices, alpha = c(5,3), coarseFreq = 
     
   }
 
-  marketPrice <- aggregatePrice(marketPrice, on = on, k = k , marketOpen = marketOpen,
+  marketPrice <- aggregatePrice(marketPrice, alignBy = alignBy, alignPeriod = alignPeriod , marketOpen = marketOpen,
                           marketClose = marketClose, tz = tz, fill = TRUE)
   marketPrice[, DATE := as.Date(DT, tz = tzone(marketPrice$DT))]
   setkeyv(marketPrice, "DT")
@@ -926,7 +926,7 @@ rankJumpTest <- function(marketPrice, stockPrices, alpha = c(5,3), coarseFreq = 
   for (stock in 1:length(stockPrices)) {
     tmp <- setnames(as.data.table(stockPrices[[stock]]), old = "index", new = "DT", skip_absent = TRUE)
     colnames(tmp) <- c("DT", "PRICE")
-    tmp <- aggregatePrice(tmp, on = on, k = k , marketOpen = marketOpen,
+    tmp <- aggregatePrice(tmp, alignBy = alignBy, alignPeriod = alignPeriod , marketOpen = marketOpen,
                                  marketClose = marketClose, tz = tz, fill = TRUE)
     tmp[, DATE := as.Date(DT, tz = tzone(tmp$DT))]
     setkeyv(tmp, "DT")

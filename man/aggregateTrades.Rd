@@ -6,8 +6,8 @@
 \usage{
 aggregateTrades(
   tData,
-  on = "minutes",
-  k = 5,
+  alignBy = "minutes",
+  alignPeriod = 5,
   marketOpen = "09:30:00",
   marketClose = "16:00:00",
   tz = "GMT"
@@ -16,10 +16,10 @@ aggregateTrades(
 \arguments{
 \item{tData}{data.table or xts object to be aggregated, containing the intraday price series of a stock for possibly multiple days.}
 
-\item{on}{character, indicating the time scale in which "k" is expressed. Possible values are: "secs", "seconds", "mins", "minutes", "hours".}
+\item{alignBy}{character, indicating the time scale in which "alignPeriod" is expressed. Possible values are: "secs", "seconds", "mins", "minutes", "hours".}
 
-\item{k}{positive integer, indicating the number of periods to aggregate over. E.g. to aggregate an
-object to the 5 minute frequency set k = 5 and on = "minutes".}
+\item{alignPeriod}{positive integer, indicating the number of periods to aggregate over. E.g. to aggregate an
+object to the 5 minute frequency set alignPeriod = 5 and alignBy = "minutes".}
 
 \item{marketOpen}{the market opening time, by default: marketOpen = "09:30:00".}
 
@@ -45,13 +45,13 @@ The variable "VWPRICE" is the aggregated price weighted by volume.
 
 The timestamps of the new time series are the closing times of the intervals. 
 
-In case of previous tick aggregation or on = "seconds"/"minutes"/"hours",
+In case of previous tick aggregation or alignBy = "seconds"/"minutes"/"hours",
 the element of the returned series with e.g. timestamp 09:35:00 contains 
 the last observation up to that point, including the value at 09:35:00 itself.
 }
 \examples{
 # aggregate trade data to 5 minute frequency
-tDataAggregated <- aggregateTrades(sampleTDataMicroseconds, on = "minutes", k = 5)
+tDataAggregated <- aggregateTrades(sampleTDataMicroseconds, alignBy = "minutes", alignPeriod = 5)
 tDataAggregated
 }
 \author{
