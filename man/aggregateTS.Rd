@@ -65,6 +65,7 @@ Then, with alignBy = "ticks" and alignPeriod = 3, the output will be 1, 4, 7, 10
 \examples{
 #load sample price data
 \dontrun{
+library(xts)
 ts <- as.xts(sampleTDataMicroseconds[, list(DT, PRICE, SIZE)])
 
 #Previous tick aggregation to the 5-minute sampling frequency:
