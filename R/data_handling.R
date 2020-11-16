@@ -2668,3 +2668,75 @@ makeOHLCV <- function(pData, alignBy = "minutes", alignPeriod = 5, tz = NULL){
   }
 }
 
+
+
+
+
+#' Convert to format for realized measures
+#' 
+#' Convenience function to split data from one xts or data.table with atleast DT, SYMBOL, and PRICE columns to a format that can be used in the 
+#' r* functions for calculation of realized measures.
+#' 
+#' @param data An xts or a data.table object with atleast DT, SYMBOL, and PRICE columns. This data should already be cleaned.
+#' 
+#' @return An xts or a data.table object with columns DT and a column named after each unique entrance in the SYMBOL column of the input. 
+#' These columns contain the price of the associated symbol. 
+#' 
+#' @examples
+#' \dontrun{
+#' library(data.table)
+#' data1 <- copy(sampleTDataMicroseconds)[,  `:=`(PRICE = PRICE * runif(.N, min = 0.99, max = 1.01),
+#'                                                DT = DT + runif(.N, 0.01, 0.02))]
+#' data2 <- copy(sampleTDataMicroseconds)[, SYMBOL := 'XYZ']
+#' 
+#' dat <- rbind(data1, data2)
+#' setkey(dat, "DT")
+#' dat <- makeRMFormat(dat)
+#' 
+#' rCov(dat, alignBy = 'minutes', alignPeriod = 5, makeReturns = TRUE, cor = TRUE) 
+#' }
+#' 
+#' @importFrom data.table merge.data.table setkey
+#' @importFrom xts is.xts
+#' @export
+makeRMFormat <- function(data){
+  SYMBOL <- PRICE <- DT <- NULL
+  if(any(!(c("SYMBOL", "PRICE") %in% colnames(data)))){
+    stop(paste("Could not find column(s)", c("SYMBOL", "PRICE")[!(c("SYMBOL", "PRICE") %in% colnames(data))]), "these columns must be present")
+  }
+  inputWasXts <- FALSE
+  if (!is.data.table(data)) {
+    if (is.xts(data)) {
+      data <- as.data.table(data)
+      data <- setnames(data , old = "index", new = "DT")
+      inputWasXts <- TRUE
+    } else {
+      stop("Input has to be data.table or xts.")
+    }
+  } else {
+    if (!("DT" %in% colnames(data))) {
+      stop("Data.table neeeds DT column.")
+    }
+  }
+  splitted <- split(data[,list(DT, PRICE, SYMBOL)], by = 'SYMBOL')
+  
+  
+  collected <- Reduce(function(x,y) merge.data.table(x,y, by = "DT", all = TRUE), lapply(splitted, function(x){
+    name <- x[1, SYMBOL]
+    x <- x[, list(DT,PRICE)]
+    setnames(x, old = "PRICE", new = name)
+    return(x)
+  }))
+  
+  
+  if(inputWasXts){
+    collected <- as.xts(collected)
+    storage.mode(collected) <- 'numeric'
+    return(collected)
+  } else {
+    setkey(collected, "DT")
+    return(collected[])
+  }
+  
+}
+

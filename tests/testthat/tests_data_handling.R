@@ -368,3 +368,29 @@ test_that("refreshTime", {
                expected[, names(expected)[c(1, dur + 1)], with = FALSE])
   
 })
+
+
+library(data.table)
+
+context("makeRMFormat")
+test_that("makeRMFormat",{
+  set.seed(1)
+  PRICE <- DT <- .N <- NULL
+  data1 <- copy(sampleTDataMicroseconds)[,  `:=`(PRICE = PRICE * runif(.N, min = 0.99, max = 1.01),
+                                                 DT = DT + runif(.N, 0.01, 0.02))]
+  data2 <- copy(sampleTDataMicroseconds)[, SYMBOL := 'XYZ']
+  
+  dat <- rbind(data1, data2)
+  setkey(dat, "DT")
+  dat <- makeRMFormat(dat)
+  
+  res <- rCov(dat, alignBy = 'minutes', alignPeriod = 5, makeReturns = TRUE, cor = TRUE)
+  target <- list("2018-01-02" = matrix(c(1, 0.05400510115,
+                                         0.05400510115, 1), ncol = 2),
+                 "2018-01-03" = matrix(c(1, 0.171321754,
+                                         0.171321754, 1), ncol = 2)
+                 )
+  expect_equal(res, target)
+  
+  
+})

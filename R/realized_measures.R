@@ -610,7 +610,9 @@ rAVGCov <- function(rData, cor = FALSE, alignBy = "minutes", alignPeriod = 5, k 
 
     if(length(res[[1]]) == 1){ ## Univariate case
       res <- data.table(DT = names(res), rAVGCov = as.numeric(res))
-    } 
+    } else if(length(res) == 1){ ## Single day multivariate case
+      res <- res[[1]]
+    }
     
     return(res)
     
@@ -1051,7 +1053,9 @@ rBPCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeR
     
     if(ncol(rData) == 2){ ## Univariate case
       res <- data.table(DT = names(res), BPV = as.numeric(res))
-    } 
+    } else if(length(res) == 1){ ## Single day multivariate case
+      res <- res[[1]]
+    }
      
     
     return(res)
@@ -1199,7 +1203,9 @@ rCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeRet
     
     if(length(res[[1]]) == 1){ ## Univariate case
       res <- data.table(DT = names(res), RV = as.numeric(res))
-    } 
+    } else if(length(res) == 1){ ## Single day multivariate case
+      res <- res[[1]]
+    }
     
     return(res)
     
@@ -1423,7 +1429,9 @@ rKernelCov <- function(rData, cor = FALSE,  alignBy = "seconds", alignPeriod = 1
 
     if(ncol(rData) == 2){ ## Univariate case
       res <- data.table(DT = names(res), RK = as.numeric(res))
-    } 
+    } else if(length(res) == 1){ ## Single day multivariate case
+      res <- res[[1]]
+    }
     
     return(res)
     
@@ -2142,6 +2150,8 @@ rThresholdCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL
     
     if(length(res[[1]]) == 1){ ## Univariate case
       res <- data.table(DT = names(res), ThresholdCov = as.numeric(res))
+    } else if(length(res) == 1){ ## Single day multivariate case
+      res <- res[[1]]
     }
     
     return(res)
@@ -3548,4 +3558,8 @@ ReMeDIAsymptoticVariance <- function(pData, kn, lags, phi, i){
 #### #' 
 #### #' 
 #### #' 
-#### 
+
+
+
+
+
