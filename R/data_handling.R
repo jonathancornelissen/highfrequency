@@ -1567,11 +1567,15 @@ quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
       }
     }
     
+    nm <- colnames(qDataRaw)
+    
     nresult[1] <- dim(qDataRaw)[1] 
     qDataRaw <- qDataRaw[BID != 0 & OFR != 0]
     nresult[2] <- dim(qDataRaw)[1] 
-    qDataRaw <- qDataRaw[EX %in% exchanges]
-    nresult[3] <- dim(qDataRaw)[1] 
+    if("EX" %in% nm){
+      qDataRaw <- qDataRaw[EX %in% exchanges]
+    }
+    nresult[3] <- dim(qDataRaw)[1]
     qDataRaw[OFR > BID, `:=`(SPREAD = OFR - BID, DATE = as.Date(DT))][, SPREAD_MEDIAN := median(SPREAD), by = "DATE"]
     nresult[4] <- dim(qDataRaw)[1] 
     qDataRaw <- qDataRaw[SPREAD < (SPREAD_MEDIAN * maxi)][, -c("SPREAD","SPREAD_MEDIAN")]
@@ -1887,7 +1891,8 @@ rmOutliersQuotes <- function (qData, maxi = 10, window = 50, type = "advanced") 
 #' 
 #' @param tData an xts or data.table object containing the time series data, with 
 #' one column named "COND" indicating the Sale Condition.
-#' @param validConds a character vector containing valid sales conditions defaults to \code{c('', '@', 'E', '@E', 'F', 'FI', '@F', '@FI', 'I', '@I')}. See details.
+#' @param validConds a character vector containing valid sales conditions defaults to \cr
+#' \code{c('', '@', 'E', '@E', 'F', 'FI', '@F', '@FI', 'I', '@I')}. See \link{tradesCondition}.
 #' @keywords leaning
 #' @export
 salesCondition <- function(tData, validConds = c('', '@', 'E', '@E', 'F', 'FI', '@F', '@FI', 'I', '@I')) {
@@ -1901,7 +1906,8 @@ salesCondition <- function(tData, validConds = c('', '@', 'E', '@E', 'F', 'FI', 
 #' 
 #' @param tData an xts or data.table object containing the time series data, with 
 #' one column named "COND" indicating the Sale Condition.
-#' @param validConds a character vector containing valid sales conditions defaults to \code{c('', '@', 'E', '@E', 'F', 'FI', '@F', '@FI', 'I', '@I')}. See details.
+#' @param validConds a character vector containing valid sales conditions defaults to \cr
+#' \code{c('', '@', 'E', '@E', 'F', 'FI', '@F', '@FI', 'I', '@I')}. See details.
 #' 
 #' @details To get more information on the sales conditions, see the NYSE documentation. Section about Daily TAQ Trades File.
 #' The current version (as of May 2020) can be found online at \href{https://www.nyse.com/publicdocs/nyse/data/Daily_TAQ_Client_Spec_v3.3.pdf}{NYSE's webpage}
@@ -2061,7 +2067,7 @@ selectExchange <- function(data, exch = "N") {
 #' @export
 tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, tDataRaw = NULL, report = TRUE, selection = "median",
                           validConds = c('', '@', 'E', '@E', 'F', 'FI', '@F', '@FI', 'I', '@I'), saveAsXTS = TRUE, tz = "EST") {
-  SIZE <- SYMBOL <- PRICE <- EX <- COND <- DT <- DATE <- TIME_M <- NULL
+  CORR <- SIZE <- SYMBOL <- PRICE <- EX <- COND <- DT <- DATE <- TIME_M <- NULL
   
   if (is.null(tDataRaw)) {
     try(dir.create(dataDestination), silent = TRUE)
@@ -2099,6 +2105,7 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, 
     nresult <- c(initial_number = 0,
                  no_zero_trades = 0,
                  select_exchange = 0,
+                 remove_corr = 0,
                  remove_sales_condition = 0,
                  merge_same_timestamp = 0)
     
@@ -2126,15 +2133,29 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, 
         stop("Data.table neeeds DT column.")
       }
     }
-    nresult[1] <- dim(tDataRaw)[1] 
+    
+    nm <- colnames(tDataRaw)
+    
+    nresult[1] <- dim(tDataRaw)[1]
     tDataRaw <- tDataRaw[PRICE != 0]
-    nresult[2] <- dim(tDataRaw)[1] 
-    tDataRaw <- tDataRaw[EX %in% exchanges]
-    nresult[3] <- dim(tDataRaw)[1] 
-    tDataRaw <- tradesCondition(tDataRaw, validConds)
-    nresult[4] <- dim(tDataRaw)[1] 
+    nresult[2] <- dim(tDataRaw)[1]
+    
+    if("EX" %in% nm){
+      tDataRaw <- tDataRaw[EX %in% exchanges]
+    }
+    nresult[3] <- dim(tDataRaw)[1]
+    if("CORR" %in% nm){
+      tDataRaw <- tDataRaw[CORR == 0]
+    }
+    nresult[4] <- dim(tDataRaw)[1]
+    
+    if("COND" %in% nm){
+      tDataRaw <- tradesCondition(tDataRaw, validConds)
+    }
+    nresult[5] <- dim(tDataRaw)[1]
+    
     tDataRaw <- mergeTradesSameTimestamp(tDataRaw, selection = selection)
-    nresult[5] <- dim(tDataRaw)[1] 
+    nresult[6] <- dim(tDataRaw)[1]
     
     if (inputWasXts) {
       df_result <- xts(as.matrix(tDataRaw[, -c("DT")]), order.by = tDataRaw$DT)

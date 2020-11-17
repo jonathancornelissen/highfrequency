@@ -182,6 +182,7 @@ fastTickAgregation_DATA.TABLE_RETURNS <- function(dat, alignBy = "minutes", alig
 }
 
 #' @importFrom xts xtsAttributes
+#' @importFrom data.table copy
 #' @keywords internal
 checkColumnNames <- function(data) { 
   # FUNCTION sets column names according to RTAQ format using quantmod conventions, 
@@ -212,6 +213,7 @@ checkColumnNames <- function(data) {
   }
   
   if(is.data.table(data)){
+    data <- copy(data)
     # Change column names to previous RTAQ format! 
     # Adjust price col naming:  
     try(setnames(data, "Price", "PRICE", skip_absent = TRUE), silent = TRUE)
@@ -235,6 +237,7 @@ checkColumnNames <- function(data) {
     
     try(setnames(data, "TR_SCOND", "COND", skip_absent = TRUE), silent = TRUE)
     try(setnames(data, "CR", "CORR", skip_absent = TRUE), silent = TRUE)  
+    try(setnames(data, "TR_CORR", "CORR", skip_absent = TRUE), silent = TRUE)  
   }
   
   
