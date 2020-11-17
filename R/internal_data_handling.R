@@ -192,19 +192,17 @@ checkColumnNames <- function(data) {
   
   if(is.xts(data)){
     data <- set.AllColumns(data)
+    colnames(data) <-  toupper(colnames(data)) # Make sure we have upper case column names
     # Change column names to previous RTAQ format! 
-    # Adjust price col naming:  
-    try((colnames(data)[xtsAttributes(data)[['Price']]] = 'PRICE'), silent = TRUE)
-    # Adjust Bid col naming:    
-    try((colnames(data)[xtsAttributes(data)[['Bid']]] = 'BID'))  
     # Adjust Ask col naming:    
     try((colnames(data)[xtsAttributes(data)[['Ask']]] = 'OFR'))
     # Adjust SYMBOL col naming:    
     try((colnames(data)[xtsAttributes(data)[['SYM_ROOT']]] = 'SYMBOL'))
     # Adjust Ask size col naming:
-    try((colnames(data)[xtsAttributes(data)[['BidSize']]] = 'BIDSIZ'))
+    try((colnames(data)[xtsAttributes(data)[['BIDSIZE']]] = 'BIDSIZ'))
     # Adjust Bid size col naming:    
-    try((colnames(data)[xtsAttributes(data)[['AskSize']]] = 'OFRSIZ'))
+    try((colnames(data)[xtsAttributes(data)[['ASKSIZE']]] = 'OFRSIZ'))
+    try((colnames(data)[xtsAttributes(data)[['ASKSIZ']]] = 'OFRSIZ'))
     # Adjust correction column, if necessary:
     if (any(colnames(data) == "CR")) {
       colnames(data)[colnames(data) == "CR"] <- "CORR"
@@ -214,30 +212,27 @@ checkColumnNames <- function(data) {
   
   if(is.data.table(data)){
     data <- copy(data)
-    # Change column names to previous RTAQ format! 
-    # Adjust price col naming:  
-    try(setnames(data, "Price", "PRICE", skip_absent = TRUE), silent = TRUE)
     
-    # Adjust Bid col naming:    
-    try(setnames(data, "Bid", "BID", skip_absent = TRUE), silent = TRUE)
+    setnames(data, colnames(data), toupper(colnames(data))) # Make sure we have upper case column names
+    # Change column names to previous RTAQ format! 
+
     # Adjust Ask col naming:    
-    try(setnames(data, "Ask", "OFR", skip_absent = TRUE), silent = TRUE)
-    try(setnames(data, "ASK", "OFR", skip_absent = TRUE), silent = TRUE)
+    setnames(data, "ASK", "OFR", skip_absent = TRUE)
     # Adjust SYMBOL col naming:    
-    try(setnames(data, "SYM_ROOT", "SYMBOL", skip_absent = TRUE), silent = TRUE)
+    setnames(data, "SYM_ROOT", "SYMBOL", skip_absent = TRUE)
     
     # Adjust Ask size col naming:
-    try(setnames(data, "BidSize", "BIDSIZ", skip_absent = TRUE), silent = TRUE)
+    setnames(data, "BIDSIZE", "BIDSIZ", skip_absent = TRUE)
     
     # Adjust Bid size col naming:    
-    try(setnames(data, "AskSize", "OFRSIZ", skip_absent = TRUE), silent = TRUE)
+    setnames(data, "ASKSIZE", "OFRSIZ", skip_absent = TRUE)
     # Adjust Bid size col naming:    
-    try(setnames(data, "ASKSIZ", "OFRSIZ", skip_absent = TRUE), silent = TRUE)
+    setnames(data, "ASKSIZ", "OFRSIZ", skip_absent = TRUE)
     
+    setnames(data, "TR_SCOND", "COND", skip_absent = TRUE)
+    setnames(data, "CR", "CORR", skip_absent = TRUE)
+    setnames(data, "TR_CORR", "CORR", skip_absent = TRUE)
     
-    try(setnames(data, "TR_SCOND", "COND", skip_absent = TRUE), silent = TRUE)
-    try(setnames(data, "CR", "CORR", skip_absent = TRUE), silent = TRUE)  
-    try(setnames(data, "TR_CORR", "CORR", skip_absent = TRUE), silent = TRUE)  
   }
   
   

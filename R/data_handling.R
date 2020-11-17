@@ -273,7 +273,6 @@ aggregatePrice <- function(pData, alignBy = "minutes", alignPeriod = 1, marketOp
       stop("Input has to be data.table or xts.")
     }
   } else {
-    pData <- data.table::copy(pData) # copy
     if (!("DT" %in% colnames(pData))) {
       stop("Data.table neeeds DT column (date-time ).")
     }
@@ -456,7 +455,6 @@ aggregateQuotes <- function(qData, alignBy = "minutes", alignPeriod = 5, marketO
       stop("Input has to be data.table or xts.")
     }
   } else {
-    qData <- data.table::copy(qData) #Copy the data so we don't change it in the users environment
     if (!("DT" %in% colnames(qData))) {
       stop("Data.table neeeds DT column.")
     }
@@ -624,7 +622,6 @@ aggregateTrades <- function(tData, alignBy = "minutes", alignPeriod = 5, marketO
     if (!("DT" %in% colnames(tData))) {
       stop("Data.table neeeds DT column (date-time).")
     }
-    tData <- copy(tData)
   }
   
   timeZone <- attr(tData$DT, "tzone")
@@ -929,8 +926,7 @@ exchangeHoursOnly <- function(data, marketOpen = "09:30:00", marketClose = "16:0
   } else {
     tz <- timeZone
   }
-  data <- copy(data) # We need to copy the data so as to not change the user's data
-  setkey(data, DT) # The below code MAY fail with data with unordered DT column. Also setkey inceases speed of grouping
+  setkey(data, "DT") # The below code MAY fail with data with unordered DT column. Also setkey inceases speed of grouping
   data[, DATE := as.Date(floor(as.numeric(DT, tz = tz) / 86400), origin = "1970-01-01", tz = tz)]
   dates <- unique(data[,DATE])
   # data <- data[DT >= ymd_hms(paste(as.Date(data$DT), dayBegin), tz = tzone(data$DT))]
@@ -1136,7 +1132,7 @@ matchTradesQuotes <- function(tData, qData, lagQuotes = 2, BFM = FALSE, backward
   if(!BFM){ ## We DONT conduct a backwards- forwards matching search
     
     # qData <- copy(qData[c(TRUE, diff(BID)|diff(OFR))])[, DT := as.numeric(DT, tz = tz)]
-    qData <- copy(qData)[, DT := as.numeric(DT, tz = tz)]
+    qData[, DT := as.numeric(DT, tz = tz)]
     qData[, DATE := floor(DT / 86400)]
     qData[, FIRST_DT := min(DT), by = "DATE"]
     # Make the adjustments to the quote timestamps.
@@ -1157,9 +1153,9 @@ matchTradesQuotes <- function(tData, qData, lagQuotes = 2, BFM = FALSE, backward
     
   } else {
     
-    qData <- copy(qData)[, DT := as.numeric(DT, tz = tz)]
+    qData[, DT := as.numeric(DT, tz = tz)]
     qData[, DT := fifelse(DT == min(DT), DT, DT + lagQuotes), by = floor(DT / 86400)]
-    tData <- copy(tData)[, DT := as.numeric(DT, tz = tz)]
+    tData <- tData[, DT := as.numeric(DT, tz = tz)]
     out <- BFMalgorithm(tData, qData, backwardsWindow = backwardsWindow, forwardsWindow = forwardsWindow, plot = plot, tz = tz)
     
     return(out[])
@@ -2623,6 +2619,7 @@ businessTimeAggregation <- function(pData, measure = "volume", obs = 390, bandwi
 #' @export
 makeOHLCV <- function(pData, alignBy = "minutes", alignPeriod = 5, tz = NULL){
   .SD <-  DATE <- SIZE <- DT <-  PRICE <- NULL
+  pData <- checkColumnNames(pData)
   if (!is.xts(pData) & !is.data.table(pData)) {
     stop("The argument pData should be a data.table or xts object.")
   }
@@ -2658,7 +2655,7 @@ makeOHLCV <- function(pData, alignBy = "minutes", alignPeriod = 5, tz = NULL){
     if (!("DT" %in% colnames(pData))) {
       stop("Data.table neeeds DT column (date-time).")
     }
-    pData <- copy(pData)[, list(DT, PRICE, SIZE)]
+    pData <- pData[, list(DT, PRICE, SIZE)]
   }
   
   
