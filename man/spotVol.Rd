@@ -109,24 +109,18 @@ The following estimation methods can be specified in \code{method}:
 \strong{Deterministic periodicity method (\code{"detPer"})}
 
 Parameters:
-  \tabular{ll}{
-    \code{dailyvol} \tab A string specifying the estimation method for the daily
-    component \eqn{s_t}. Possible values are \code{"bipower", "rv", "medrv"}.
-    Default = \code{"bipower"}. \cr
-    \code{periodicvol} \tab A string specifying the estimation method for the
-    component of intraday volatility, that depends in a deterministic way on the
-    intraday time at which the return is observed. Possible values are
-    \code{"TML", "SD", "WSD", "OLS"}. See Boudt et al. (2011) for details.
-    Default = \code{"TML"}.\cr
-    \code{P1} \tab A positive integer corresponding to the number of cosinus
-    terms used in the flexible Fourier specification of the periodicity function,
-    see Andersen et al. (1997) for details. Default = 5. \cr
-   \code{P2} \tab Same as \code{P1}, but for the sinus terms. Default = 5.\cr
-   \code{dummies} \tab Boolean: in case it is \code{TRUE}, the parametric
-   estimator of periodic standard deviation specifies the periodicity function
-   as the sum of dummy variables corresponding to each intraday period. If it
-   is \code{FALSE}, the parametric estimator uses the flexible Fourier
-   specification. Default = \code{FALSE}.
+  \itemize{
+   \item{\code{dailyvol}} {A string specifying the estimation method for the daily component \eqn{s_t}.
+   Possible values are \code{"bipower", "rv", "medrv"}. Default = \code{"bipower"}.}
+    \item{\code{periodicvol}} { A string specifying the estimation method for the component of intraday volatility,
+    that depends in a deterministic way on the intraday time at which the return is observed.
+     Possible values are \code{"TML", "SD", "WSD", "OLS"}. See Boudt et al. (2011) for details. Default = \code{"TML"}.}
+    \item{\code{P1}}  {A positive integer corresponding to the number of cosine terms used in the flexible Fourier
+    specification of the periodicity function, see Andersen et al. (1997) for details. Default = 5.}
+   \item{\code{P2}}{  Same as \code{P1}, but for the sine terms. Default = 5.}
+   \item{\code{dummies}}{  Boolean: in case it is \code{TRUE}, the parametric estimator of periodic standard deviation
+   specifies the periodicity function as the sum of dummy variables corresponding to each intraday period.
+   If it is \code{FALSE}, the parametric estimator uses the flexible Fourier specification. Default = \code{FALSE}.}
 }
 Outputs (see 'Value' for a full description of each component):
 \itemize{
@@ -143,21 +137,17 @@ and Andersen and Bollerslev (1997). The jump robust versions by Boudt et al.
 
 \strong{Stochastic periodicity method (\code{"stochper"})}
 Parameters:
-\tabular{ll}{
-\code{P1} \tab A positive integer corresponding to the number of cosinus
-terms used in the flexible Fourier specification of the periodicity function.
-Default = 5. \cr
-\code{P2} \tab Same as \code{P1}, but for the sinus terms. Default = 5.\cr
-\code{init} \tab A named list of initial values to be used in the
-optimization routine (\code{"BFGS"} in \code{optim}). Default =
-\code{list(sigma = 0.03, sigma_mu = 0.005, sigma_h = 0.005, sigma_k = 0.05,
-phi = 0.2, rho = 0.98, mu = c(2, -0.5), delta_c = rep(0, max(1,P1)),
-delta_s = rep(0, max(1,P2)))}.
-See Beltratti & Morana (2001) for a definition
-of each parameter. \code{init} can contain any number of these parameters.
-For parameters not specified in \code{init}, the default initial value will
-be used.\cr
-\code{control} \tab A list of options to be passed down to \code{optim}.
+\itemize{
+\item{\code{P1}}{A positive integer corresponding to the number of cosine terms used in the flexible Fourier
+ specification of the periodicity function. Default = 5. }
+\item{\code{P2}}{Same as \code{P1}, but for the sine terms. Default = 5.}
+\item{\code{init}}{A named list of initial values to be used in the optimization routine (\code{"BFGS"} in \code{optim}).
+ Default = \code{list(sigma = 0.03, sigma_mu = 0.005, sigma_h = 0.005, sigma_k = 0.05,
+  phi = 0.2, rho = 0.98, mu = c(2, -0.5), delta_c = rep(0, max(1,P1)),
+delta_s = rep(0, max(1,P2)))}. 
+See Beltratti & Morana (2001) for a definition of each parameter. \code{init} can contain any number of these parameters.
+For parameters not specified in \code{init}, the default initial value will be used.}
+\item{\code{control}}{A list of options to be passed down to \code{optim}.}
 }
 Outputs (see 'Value' for a full description of each component):
 \itemize{
@@ -175,24 +165,24 @@ the spot volatility estimates, all parameter estimates are returned.
 \strong{Nonparametric filtering (\code{"kernel"})}
 
 Parameters:
-\tabular{ll}{
-\code{type} \tab String specifying the type of kernel to be used. Options
-include \code{"gaussian", "epanechnikov", "beta"}. Default = \code{"gaussian"}.\cr
-\code{h} \tab Scalar or vector specifying bandwidth(s) to be used in kernel.
+\itemize{
+\item{\code{type}}{String specifying the type of kernel to be used. Options
+include \code{"gaussian", "epanechnikov", "beta"}. Default = \code{"gaussian"}.}
+\item{\code{h}}{Scalar or vector specifying bandwidth(s) to be used in kernel.
 If \code{h} is a scalar, it will be assumed equal throughout the sample. If
 it is a vector, it should contain bandwidths for each day. If left empty,
-it will be estimated. Default = \code{NULL}. \cr
-\code{est} \tab String specifying the bandwidth estimation method. Possible
+it will be estimated. Default = \code{NULL}.}
+\item{\code{est}}{String specifying the bandwidth estimation method. Possible
 values include \code{"cv", "quarticity"}. Method \code{"cv"} equals
 cross-validation, which chooses the bandwidth that minimizes the Integrated
 Square Error. \code{"quarticity"} multiplies the simple plug-in estimator
 by a factor based on the daily quarticity of the returns. \code{est} is
 obsolete if \code{h} has already been specified by the user. Default =
-\code{"cv"}.\cr
-\code{lower} \tab Lower bound to be used in bandwidth optimization routine,
-when using cross-validation method. Default is \eqn{0.1n^{-0.2}}. \cr
-\code{upper} \tab Upper bound to be used in bandwidth optimization routine,
-when using cross-validation method. Default is \eqn{n^{-0.2}}. \cr
+\code{"cv"}.}
+\item{\code{lower}}{Lower bound to be used in bandwidth optimization routine,
+when using cross-validation method. Default is \eqn{0.1n^{-0.2}}.}
+\item{\code{upper}}{Upper bound to be used in bandwidth optimization routine,
+when using cross-validation method. Default is \eqn{n^{-0.2}}.}
 }
 
 Outputs (see 'Value' for a full description of each component):
@@ -228,25 +218,24 @@ estimates, all used values of the bandwidth \eqn{h} are returned.
 \strong{Piecewise constant volatility (\code{"piecewise"})}
 
 Parameters:
-\tabular{ll}{
-\code{type} \tab String specifying the type of test to be used. Options
-include \code{"MDa", "MDb", "DM"}. See Fried (2012) for details. Default =
-\code{"MDa"}.\cr
-\code{m} \tab Number of observations to include in reference window.
-Default = \code{40}. \cr
-\code{n} \tab Number of observations to include in test window.
-Default = \code{20}. \cr
-\code{alpha} \tab Significance level to be used in tests. Note that the test
+\itemize{
+\item{\code{type}}{String specifying the type of test to be used. Options
+include \code{"MDa", "MDb", "DM"}. See Fried (2012) for details. Default = \code{"MDa"}.}
+\item{\code{m}}{Number of observations to include in reference window.
+Default = \code{40}.}
+\item{\code{n}}{Number of observations to include in test window.
+Default = \code{20}.}
+\item{\code{alpha}}{Significance level to be used in tests. Note that the test
 will be executed many times (roughly equal to the total number of
 observations), so it is advised to use a small value for \code{alpha}, to
-avoid a lot of false positives. Default = \code{0.005}. \cr
-\code{volest} \tab String specifying the realized volatility estimator to be
+avoid a lot of false positives. Default = \code{0.005}.}
+\item{\code{volest}}{String specifying the realized volatility estimator to be
 used in local windows. Possible values are \code{"bipower", "rv", "medrv"}.
-Default = \code{"bipower"}. \cr
-\code{online} \tab Boolean indicating whether estimations at a certain point
+Default = \code{"bipower"}.}
+\item{\code{online}}{Boolean indicating whether estimations at a certain point
 \eqn{t} should be done online (using only information available at
 \eqn{t-1}), or ex post (using all observations between two change points).
-Default = \code{TRUE}.  \cr
+Default = \code{TRUE}.}
 }
 
 Outputs (see 'Value' for a full description of each component):
@@ -269,21 +258,21 @@ visualized.
 \strong{GARCH models with intraday seasonality  (\code{"garch"})}
 
 Parameters:
-\tabular{ll}{
-\code{model} \tab String specifying the type of test to be used. Options
+\itemize{
+\item{\code{model}}{String specifying the type of test to be used. Options
 include \code{"sGARCH", "eGARCH"}. See \code{ugarchspec} in the
-\code{rugarch} package. Default = \code{"eGARCH"}. \cr
-\code{garchorder} \tab Numeric value of length 2, containing the order of
-the GARCH model to be estimated. Default = \code{c(1,1)}. \cr
-\code{dist} \tab String specifying the distribution to be assumed on the
+\code{rugarch} package. Default = \code{"eGARCH"}.}
+\item{\code{garchorder}}{Numeric value of length 2, containing the order of
+the GARCH model to be estimated. Default = \code{c(1,1)}.}
+\item{\code{dist}}{String specifying the distribution to be assumed on the
 innovations. See \code{distribution.model} in \code{ugarchspec} for
-possible options. Default = \code{"norm"}. \cr
-\code{solver.control} \tab List containing solver options.
-See \code{ugarchfit} for possible values. Default = \code{list()}. \cr
-\code{P1} \tab A positive integer corresponding to the number of cosinus
+possible options. Default = \code{"norm"}.}
+\item{\code{solver.control}}{List containing solver options.
+See \code{ugarchfit} for possible values. Default = \code{list()}.}
+\item{\code{P1}}{A positive integer corresponding to the number of cosine
 terms used in the flexible Fourier specification of the periodicity function.
-Default = 5. \cr
-\code{P2} \tab Same as \code{P1}, but for the sinus terms. Default = 5.\cr
+Default = 5.}
+\item{\code{P2}}{Same as \code{P1}, but for the sinus terms. Default = 5.}
 }
 
 Outputs (see 'Value' for a full description of each component):
@@ -302,12 +291,14 @@ Along with the spot volatility estimates, this method will return the
 \strong{Realized Measures (\code{"RM"})}
 
 Parameters:
-\tabular{ll}{
-\code{RM} \tab String denoting which realized measure to use to estimate the local volatility. Possible values are: "bipower", "medrv", "minrv", "rv"
-Default = "bipower" \cr
-\code{lookBackPeriod} \tab positive integer denoting the amount of sub-sampled returns to use for the estimation of the local volatility. Default = 10. \cr
-\code{dontIncludeLast} \tab logical indicating whether to omit the last return in the calculation of the local volatility. This is done in e.g. Lee-Mykland (2008) to produce jump-robust estimates of spot volatility. 
-Setting this to TRUE will then use lookBackPeriod - 1 returns in the construction of the realized measures. Default = FALSE\cr
+\itemize{
+\item{\code{RM}}{String denoting which realized measure to use to estimate the local volatility. Possible values are: "bipower", "medrv", "minrv", "rv"
+Default = "bipower"}
+\item{\code{lookBackPeriod}}{positive integer denoting the amount of sub-sampled returns to use 
+for the estimation of the local volatility. Default = 10.}
+\item{\code{dontIncludeLast}}{logical indicating whether to omit the last return in the calculation of the local volatility.
+ This is done in e.g. Lee-Mykland (2008) to produce jump-robust estimates of spot volatility. 
+ Setting this to TRUE will then use lookBackPeriod - 1 returns in the construction of the realized measures. Default = FALSE}
 }
 
 Outputs (see 'Value' for a full description of each component):
@@ -323,10 +314,10 @@ This method returns the estimates of the spot volatility, a string containing th
 \strong{(Non-overlapping) Pre-Averaged Realized Measures (\code{"PARM"})}
 
 Parameters:
-\tabular{ll}{
-\code{RM} \tab String denoting which realized measure to use to estimate the local volatility. Possible values are: "bipower", "medrv", "minrv", "rv"
-Default = "BPV"\cr
-\code{lookBackPeriod} \tab positive integer denoting the amount of sub-sampled returns to use for the estimation of the local volatility. Default = 50.\cr
+\itemize{
+\item{\code{RM}}{String denoting which realized measure to use to estimate the local volatility.
+ Possible values are: "bipower", "medrv", "minrv", and "rv". Default = "BPV"}
+\item{\code{lookBackPeriod}}{positive integer denoting the amount of sub-sampled returns to use for the estimation of the local volatility. Default = 50.}
 }
 
 Outputs (see 'Value' for a full description of each component):

@@ -13,7 +13,8 @@ tradesCondition(
 \item{tData}{an xts or data.table object containing the time series data, with 
 one column named "COND" indicating the Sale Condition.}
 
-\item{validConds}{a character vector containing valid sales conditions defaults to \code{c('', '@', 'E', '@E', 'F', 'FI', '@F', '@FI', 'I', '@I')}. See details.}
+\item{validConds}{a character vector containing valid sales conditions defaults to \cr
+\code{c('', '@', 'E', '@E', 'F', 'FI', '@F', '@FI', 'I', '@I')}. See details.}
 }
 \value{
 xts or data.table object depending on input

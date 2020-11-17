@@ -18,12 +18,14 @@ spotDrift(
 \arguments{
 \item{data}{Can be one of two input types, \code{xts} or \code{data.table}. It is assumed that the input comprises prices in levels.}
 
-\item{method}{Which method to be used to estimate the spot-drift. Currently, three methods are available, rolling mean and median as well as the kernel method of Christensen et al. 2018.
+\item{method}{Which method to be used to estimate the spot-drift. Currently, three methods are available, 
+rolling mean and median as well as the kernel method of Christensen et al. 2018.
 The kernel is a left hand exponential kernel that will weigh newer observations more heavily than older observations.}
 
 \item{...}{Additional arguments for the individual methods. See details}
 
-\item{alignBy}{What time-frame should the estimator be applied? Accepted inputs are \code{"milliseconds"}, \code{"seconds"} and \code{"secs"} for seconds, \code{"minutes"} and \code{"mins"} for minutes, and \code{"hours"} for hours.
+\item{alignBy}{What time-frame should the estimator be applied? Accepted inputs are \code{"milliseconds"}, \code{"seconds"} and \code{"secs"} for seconds,
+ \code{"minutes"} and \code{"mins"} for minutes, and \code{"hours"} for hours.
 Standard is minutes}
 
 \item{alignPeriod}{How often should the estimation take place? If \code{alignPeriod} is 5 the estimation will be done every fifth unit of \code{alignBy}.}
@@ -43,7 +45,8 @@ Function used to estimate the spot drift of intraday (tick) stock prices/returns
 \details{
 The additional arguments for the mean and median methods are: \code{periods} for the rolling window length which is 5 by standard and
 \code{align} to allow for control of the alignment, should one wish to do so, the standard is \code{"right"}. 
-For the kernel mean estimator, the arguments \code{meanBandwidth} can be used to control the bandwidth of the drift estimator and the \code{preAverage} argument, which can be used to control the pre-averaging horizon. 
+For the kernel mean estimator, the arguments \code{meanBandwidth} can be used to control the bandwidth of the 
+drift estimator and the \code{preAverage} argument, which can be used to control the pre-averaging horizon. 
 These arguments default to 300 and 5 respectively.
 }
 \examples{
