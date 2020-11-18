@@ -20,7 +20,7 @@ context("quotesCleanup")
 test_that("quotesCleanup", {
   expect_equal(
     quotesCleanup(qDataRaw = sampleQDataRawMicroseconds, exchanges = "N")$report["remove_outliers"],
-    c(remove_outliers = 46566)
+    c(remove_outliers = 46564)
   )
 })
 
@@ -78,7 +78,7 @@ test_that("selectExchange and data cleaning functions", {
   
   expect_equal(
   dim(tradesCleanup(tDataRaw = sampleTDataRawMicroseconds, exchanges = "N", report = FALSE)),
-  c(6140, 12)
+  c(6140, 13)
   )
 })
 
@@ -108,28 +108,27 @@ test_that("tradesCleanup on-disk functionality", {
   DT <- SYMBOL <- NULL
   trades2 <- sampleTDataRawMicroseconds
   quotes2 <- sampleQDataRawMicroseconds
-  trades2[,DT := as.POSIXct(DT, tz = "EST")]
-  quotes2[,DT := as.POSIXct(DT, tz = "EST")]
-  setwd("/home/emil/tmp/")
+  trades2[, DT := as.POSIXct(DT, tz = "UTC")]
+  quotes2[, DT := as.POSIXct(DT, tz = "UTC")]
   
   rawDataSource <- paste0(LETTERS[sample(1:26, size = 10)], collapse = "")
   tradeDataSource <- paste0(LETTERS[sample(1:26, size = 10)], collapse = "")
   quoteDataSource <- paste0(LETTERS[sample(1:26, size = 10)], collapse = "")
   dataDestination <- paste0(LETTERS[sample(1:26, size = 10)], collapse = "")
   dir.create(rawDataSource)
-  fwrite(quotes2, paste0(rawDataSource, "/quotes2.csv"))
-  fwrite(trades2, paste0(rawDataSource, "/trades2.csv"))
-  tradesCleanup(dataSource = rawDataSource, dataDestination = tradeDataSource, exchanges = "N", saveAsXTS = FALSE, tz = "EST")
-  quotesCleanup(dataSource = rawDataSource, dataDestination = quoteDataSource, exchanges = "N", saveAsXTS = FALSE, type = "standard", tz = "EST")
+  saveRDS(quotes2, paste0(rawDataSource, "/quotes2.rds"))
+  saveRDS(trades2, paste0(rawDataSource, "/trades2.rds"))
+  
+  
+  tradesCleanup(dataSource = rawDataSource, dataDestination = tradeDataSource, exchanges = "N", saveAsXTS = FALSE, tz = "UTC")
+  quotesCleanup(dataSource = rawDataSource, dataDestination = quoteDataSource, exchanges = "N", saveAsXTS = FALSE, type = "standard", tz = "UTC")
   tradesCleanupUsingQuotes(tradeDataSource = tradeDataSource, quoteDataSource = quoteDataSource, dataDestination = dataDestination,
                            lagQuotes = 0)
   
-  onDiskDay1 <- readRDS(paste0(dataDestination, "/", "trades2.csv/2018-01-02tradescleanedbyquotes.rds"))
-  onDiskDay2 <- readRDS(paste0(dataDestination, "/", "trades2.csv/2018-01-03tradescleanedbyquotes.rds"))
+  onDiskDay1 <- readRDS(paste0(dataDestination, "/", "2018-01-02tradescleanedbyquotes.rds"))
+  onDiskDay2 <- readRDS(paste0(dataDestination, "/", "2018-01-03tradescleanedbyquotes.rds"))
   
 
-  ### CLEANUP!
-  setwd("/home/emil/tmp")  ## Emil Sjoerup's computer
   unlink(rawDataSource, recursive = TRUE, force = TRUE)
   unlink(tradeDataSource, recursive = TRUE, force = TRUE)
   unlink(quoteDataSource, recursive = TRUE, force = TRUE)
@@ -161,7 +160,7 @@ test_that("tradesCleanup on-disk functionality", {
   ## Test that they are equal to the shipped data
   cleanedMicroseconds <-  rbind(sampleTDataMicrosecondsDay1, sampleTDataMicrosecondsDay2)
   setkey(cleanedMicroseconds, SYMBOL, DT)
-  expect_equal(sampleTDataMicroseconds, cleanedMicroseconds) 
+  expect_equal(sampleTDataMicroseconds, cleanedMicroseconds)
   
 })
 

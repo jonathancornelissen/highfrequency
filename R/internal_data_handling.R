@@ -703,7 +703,7 @@ set.Trade <- function(x, error = TRUE) {
 
 #' This function is not exported, but the documentation is here to help users
 #' @keywords internal
-#' @importFrom data.table copy data.table setnafill
+#' @importFrom data.table copy data.table setnafill fifelse
 BFMalgorithm <- function(tData, qData, backwardsWindow, forwardsWindow, plot, tz){
   N <- .N <- MIDQUOTE <- SPREAD <- DT <- BID <- OFR <- PRICE <- NULL
   qData <- qData[, list(DT, BID, OFR)]

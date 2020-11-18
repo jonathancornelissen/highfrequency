@@ -10,7 +10,10 @@ tradesCleanupUsingQuotes(
   dataDestination = NULL,
   tData = NULL,
   qData = NULL,
-  lagQuotes = 2
+  lagQuotes = 2,
+  BFM = FALSE,
+  backwardsWindow = 3600,
+  forwardsWindow = 0.5
 )
 }
 \arguments{
@@ -26,7 +29,15 @@ from, to, dataSource and dataDestination will be ignored. (only advisable for sm
 \item{qData}{data.table or xts object containing (ONE day and for ONE stock only) cleaned quote data. This argument is NULL by default. Enabling it means the arguments
 from, to, dataSource, dataDestination will be ignored. (only advisable for small chunks of data)}
 
-\item{lagQuotes}{passed through to rmTradeOutliersUsingQuotes. \code{\link{rmTradeOutliersUsingQuotes}}}
+\item{lagQuotes}{passed through to \code{\link{rmTradeOutliersUsingQuotes}}. A numeric of length 1 that denotes how many seconds to lag the quotes. Default is 2 seconds. See Details.}
+
+\item{BFM}{passed through to \code{\link{rmTradeOutliersUsingQuotes}}. A logical determining whether to conduct 'Backwards - Forwards matching' of trades and quotes.
+The algorithm tries to match trades that fall outside the bid - ask and first tries to match a small window forwards and if this fails, it tries to match backwards in a bigger window.
+The small window is a tolerance for inaccuracies in the timestamps of bids and asks. The backwards window allow for matching of late reported trades. I.e. block trades.}
+
+\item{backwardsWindow}{passed through to \code{\link{rmTradeOutliersUsingQuotes}}. A numeric denoting the length of the backwards window. Default is 3600, corresponding to one hour.}
+
+\item{forwardsWindow}{passed through to \code{\link{rmTradeOutliersUsingQuotes}}. A numeric denoting the length of the forwards window. Default is 0.5, dorresponding to one half second.}
 }
 \value{
 For each day an xts object is saved into the folder of that date, containing the cleaned data.

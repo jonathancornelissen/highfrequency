@@ -14,9 +14,11 @@ quotesCleanup(
   maxi = 50,
   window = 50,
   type = "advanced",
+  marketOpen = "09:30:00",
+  marketClose = "16:00:00",
   rmoutliersmaxi = 10,
   printExchange = TRUE,
-  saveAsXTS = TRUE,
+  saveAsXTS = FALSE,
   tz = "EST"
 )
 }
@@ -56,12 +58,20 @@ from, to, dataSource and dataDestination will be ignored. (only advisable for sm
 
 \item{type}{argument to be passed on to the cleaning routine \code{\link{rmOutliersQuotes}}.}
 
+\item{marketOpen}{passed to \code{\link{exchangeHoursOnly}}. A character in the format of \"HH:MM:SS\",
+specifying the starting hour, minute and second of an exchange
+trading day.}
+
+\item{marketClose}{passed to \code{\link{exchangeHoursOnly}}. A character in the format of \"HH:MM:SS\",
+specifying the closing hour, minute and second of an exchange
+trading day.}
+
 \item{rmoutliersmaxi}{argument to be passed on to the cleaning routine \code{\link{rmOutliersQuotes}}.}
 
 \item{printExchange}{Argument passed to \code{\link{autoSelectExchangeQuotes}} indicates whether the chosen exchange is printed on the console, 
 default is TRUE. This is only used when \code{exchanges} is \code{"auto"}}
 
-\item{saveAsXTS}{indicates whether data should be saved in xts format instead of data.table when using on-disk functionality. TRUE by default.}
+\item{saveAsXTS}{indicates whether data should be saved in xts format instead of data.table when using on-disk functionality. FALSE by default.}
 
 \item{tz}{timezone to use}
 }

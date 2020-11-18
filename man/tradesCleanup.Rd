@@ -12,8 +12,10 @@ tradesCleanup(
   report = TRUE,
   selection = "median",
   validConds = c("", "@", "E", "@E", "F", "FI", "@F", "@FI", "I", "@I"),
+  marketOpen = "09:30:00",
+  marketClose = "16:00:00",
   printExchange = TRUE,
-  saveAsXTS = TRUE,
+  saveAsXTS = FALSE,
   tz = "EST"
 )
 }
@@ -49,10 +51,18 @@ from, to, dataSource and dataDestination will be ignored. (only advisable for sm
 
 \item{validConds}{character vector containing valid sales conditions. Passed through to \code{\link{tradesCondition}}.}
 
+\item{marketOpen}{passed to \code{\link{exchangeHoursOnly}}. A character in the format of \"HH:MM:SS\",
+specifying the starting hour, minute and second of an exchange
+trading day.}
+
+\item{marketClose}{passed to \code{\link{exchangeHoursOnly}}. A character in the format of \"HH:MM:SS\",
+specifying the closing hour, minute and second of an exchange
+trading day.}
+
 \item{printExchange}{Argument passed to \code{\link{autoSelectExchangeTrades}} indicates whether the chosen exchange is printed on the console, 
 default is TRUE. This is only used when \code{exchanges} is \code{"auto"}}
 
-\item{saveAsXTS}{indicates whether data should be saved in xts format instead of data.table when using on-disk functionality. TRUE by default.}
+\item{saveAsXTS}{indicates whether data should be saved in xts format instead of data.table when using on-disk functionality. FALSE by default.}
 
 \item{tz}{timezone to use}
 }

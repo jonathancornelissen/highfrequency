@@ -4,7 +4,7 @@
 \alias{rmOutliersQuotes}
 \title{Delete entries for which the mid-quote is outlying with respect to surrounding entries}
 \usage{
-rmOutliersQuotes(qData, maxi = 10, window = 50, type = "advanced")
+rmOutliersQuotes(qData, maxi = 10, window = 50, type = "advanced", tz = "EST")
 }
 \arguments{
 \item{qData}{a data.table or xts object at least containing the columns "BID" and "OFR".}
@@ -14,6 +14,8 @@ rmOutliersQuotes(qData, maxi = 10, window = 50, type = "advanced")
 \item{window}{an integer, indicating the time window for which the "outlyingness" is considered.}
 
 \item{type}{should be "standard" or "advanced" (see description).}
+
+\item{tz}{timezone to use}
 }
 \value{
 xts object or data.table depending on type of input

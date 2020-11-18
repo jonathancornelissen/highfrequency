@@ -11,7 +11,8 @@ rmTradeOutliersUsingQuotes(
   BFM = FALSE,
   backwardsWindow = 3600,
   forwardsWindow = 0.5,
-  plot = FALSE
+  plot = FALSE,
+  ...
 )
 }
 \arguments{
@@ -30,6 +31,8 @@ The small window is a tolerance for inaccuracies in the timestamps of bids and a
 \item{forwardsWindow}{a numeric denoting the length of the forwards window. Default is 0.5, dorresponding to one half second.}
 
 \item{plot}{a logical denoting whether to visualize the forwards, backwards, and unmatched trades in a plot.}
+
+\item{...}{used internally}
 }
 \value{
 xts or data.table object depending on input

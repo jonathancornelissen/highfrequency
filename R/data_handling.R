@@ -1064,6 +1064,7 @@ makeReturns <- function(ts) {
 #' @param backwardsWindow a numeric denoting the length of the backwards window. Default is 3600, corresponding to one hour.
 #' @param forwardsWindow a numeric denoting the length of the forwards window. Default is 0.5, dorresponding to one half second.
 #' @param plot a logical denoting whether to visualize the forwards, backwards, and unmatched trades in a plot.
+#' @param ... used internally
 #' @return data.table or xts-object containing the matched trade and quote data
 #' 
 #' @references  Vergote, O. (2005). How to match trades and quotes for NYSE stocks?
@@ -1080,7 +1081,7 @@ makeReturns <- function(ts) {
 #' tqData
 #' @importFrom xts tzone<- tzone
 #' @export
-matchTradesQuotes <- function(tData, qData, lagQuotes = 2, BFM = FALSE, backwardsWindow = 3600, forwardsWindow = 0.5, plot = FALSE) {
+matchTradesQuotes <- function(tData, qData, lagQuotes = 2, BFM = FALSE, backwardsWindow = 3600, forwardsWindow = 0.5, plot = FALSE, ...) {
   
   PRICE <- BID <- OFR <- DATE <- DT <- FIRST_DT <- SYMBOL <- NULL
   
@@ -1152,11 +1153,29 @@ matchTradesQuotes <- function(tData, qData, lagQuotes = 2, BFM = FALSE, backward
     }
     
   } else {
+    opt <- list(onlyTQ = FALSE)
+    options <- list(...)
+    opt[names(options)] <- options
+    onlyTQ <- opt$onlyTQ
     
-    qData[, DT := as.numeric(DT, tz = tz)]
-    qData[, DT := fifelse(DT == min(DT), DT, DT + lagQuotes), by = floor(DT / 86400)]
-    tData <- tData[, DT := as.numeric(DT, tz = tz)]
-    out <- BFMalgorithm(tData, qData, backwardsWindow = backwardsWindow, forwardsWindow = forwardsWindow, plot = plot, tz = tz)
+    
+    qData[, DT := as.numeric(DT, tz = tz)][, DATE := floor(DT / 86400)]
+    qData[, DT := fifelse(DT == min(DT), DT, DT + lagQuotes)]
+    tData[, DT := as.numeric(DT, tz = tz)][, DATE := floor(DT / 86400)]
+    out <- list()
+    i <- 1
+    for (date in unique(qData$DATE)) {
+      for (symbol in unique(qData$SYMBOL)) {
+        if(onlyTQ){
+          out[[i]] <- BFMalgorithm(tData[DATE == date & SYMBOL == symbol, ], qData[DATE == date & SYMBOL == symbol, ], backwardsWindow = backwardsWindow, forwardsWindow = forwardsWindow, plot = plot, tz = tz)$tqData
+        } else {
+          out[[i]] <- BFMalgorithm(tData[DATE == date & SYMBOL == symbol, ], qData[DATE == date & SYMBOL == symbol, ], backwardsWindow = backwardsWindow, forwardsWindow = forwardsWindow, plot = plot, tz = tz)
+        }
+        i <- i + 1
+      }
+    }
+    out <- rbindlist(out)
+    setkey(out, "DT")
     
     return(out[])
     
@@ -1461,9 +1480,15 @@ noZeroQuotes <- function(qData) {
 #' @param window argument to be passed on to the cleaning routine \code{\link{rmOutliersQuotes}}. 
 #' @param type argument to be passed on to the cleaning routine \code{\link{rmOutliersQuotes}}.
 #' @param rmoutliersmaxi argument to be passed on to the cleaning routine \code{\link{rmOutliersQuotes}}.
+#' @param marketOpen passed to \code{\link{exchangeHoursOnly}}. A character in the format of \"HH:MM:SS\",
+#' specifying the starting hour, minute and second of an exchange
+#' trading day.
+#' @param marketClose passed to \code{\link{exchangeHoursOnly}}. A character in the format of \"HH:MM:SS\",
+#' specifying the closing hour, minute and second of an exchange
+#' trading day.
 #' @param printExchange Argument passed to \code{\link{autoSelectExchangeQuotes}} indicates whether the chosen exchange is printed on the console, 
 #' default is TRUE. This is only used when \code{exchanges} is \code{"auto"}
-#' @param saveAsXTS indicates whether data should be saved in xts format instead of data.table when using on-disk functionality. TRUE by default.
+#' @param saveAsXTS indicates whether data should be saved in xts format instead of data.table when using on-disk functionality. FALSE by default.
 #' @param tz timezone to use
 #' @return The function converts every csv file in dataSource into multiple xts or data.table files.
 #' In dataDestination, there will be one folder for each symbol containing .rds files with cleaned data stored either in data.table or xts format.
@@ -1489,15 +1514,17 @@ noZeroQuotes <- function(qData) {
 #' #via "dataSource" and "dataDestination" arguments
 #' 
 #' @importFrom data.table fread
+#' @importFrom utils unzip
 #' @keywords cleaning
 #' @export
 quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges = "auto", qDataRaw = NULL, report = TRUE, 
-                          selection = "median", maxi = 50, window = 50, type = "advanced", rmoutliersmaxi = 10, printExchange = TRUE,
-                          saveAsXTS = TRUE, tz = "EST") {
+                          selection = "median", maxi = 50, window = 50, type = "advanced", marketOpen = "09:30:00", 
+                          marketClose = "16:00:00", rmoutliersmaxi = 10, printExchange = TRUE, saveAsXTS = FALSE, tz = "EST") {
   
   .SD <- BID <- OFR <- DT <- SPREAD <- SPREAD_MEDIAN <- EX <- DATE <- BIDSIZ <- OFRSIZ <- TIME_M <- SYMBOL <- NULL
   nresult <- c(initial_number = 0,
                no_zero_quotes = 0,
+               no_outside_exchange_hours = 0,
                select_exchange = 0,
                remove_negative_spread = 0,
                remove_large_spread = 0,
@@ -1505,19 +1532,43 @@ quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
                remove_outliers = 0)
   
   if (is.null(qDataRaw)) {
-    try(dir.create(dataDestination), silent = TRUE)
     
-    quotesfiles <- list.files(dataSource, recursive = TRUE)[grepl("quotes", list.files(dataSource, recursive = TRUE))]
+    quotesfiles <- list.files(dataSource, recursive = TRUE, full.names = TRUE)[grepl("quotes", list.files(dataSource, recursive = TRUE))]
     for (ii in quotesfiles) {
-      readdata <- try(fread(paste0(dataSource, "/", ii)), silent = TRUE)
+      extension <- strsplit(ii, "\\.")[[1]]
+      extension <- extension[length(extension)]
+      if(extension == "zip") {
+        tmp <- tempdir()
+        unzip(ii, exdir = tmp)
+        files <- list.files(tmp, full.names = TRUE, pattern = "csv")
+        if(length(files) >= 1){
+          readdata <- try(rbindlist(lapply(files, fread)), silent = TRUE)
+        }
+        # Try to Cleanup - we don't force it though!
+        unlink(tmp, recursive = TRUE)
+      } else if(extension %in% c("csv", "gz", "bz2")){
+        readdata <- try(fread(ii), silent = TRUE)
+      } else if(extension %in% c("rds")){
+        readdata <- try(readRDS(ii))
+      } else {
+        readdata <- try(fread(ii), silent = TRUE)
+      }
+      
+      if(inherits(readdata, "try-error")){
+        stop(paste("Error encountered while opening data, error message is:",readdata))
+      }
       if(colnames(readdata)[1] == "index"){ # The data was saved from an xts object
         readdata <- try(readdata[, DT := as.POSIXct(index, tz = tz, format = "%Y-%m-%dT%H:%M:%OS")])
       } else if ("DT" %in% colnames(readdata)){
         readdata <- try(readdata[, DT := as.POSIXct(DT, tz = tz, format = "%Y-%m-%dT%H:%M:%OS")])
       } else {
-        readdata <- try(readdata[, DT := as.POSIXct(substring(paste(as.character(DATE), TIME_M, sep = " "), 1, 20), tz = tz, format = "%Y%m%d %H:%M:%OS")], silent = TRUE)
+        readdata <- try(copy(readdata)[,`:=`(DT = as.POSIXct(paste(DATE, TIME_M), tz = "UTC", format = "%Y%m%d %H:%M:%OS"),
+                                      DATE = NULL, TIME_M = NULL, SYM_SUFFIX = NULL)], silent = TRUE)
       }
       
+      if(inherits(readdata, "try-error")){
+        stop(paste("Error encountered while creating a DT column, error message is:",readdata))
+      }
       qData <- try(quotesCleanup(qDataRaw = readdata,
                                  selection = selection,
                                  exchanges = exchanges,
@@ -1529,17 +1580,18 @@ quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
       qData <- qData[, DATE := as.Date(DT, tz = tz)]
       qData <- split(qData, by = "DATE")
       
-      try(dir.create(paste0(dataDestination, "/", strsplit(ii, "/")[[1]][1])), silent = TRUE)
+      try(dir.create(paste0(dataDestination, "/", strsplit(ii, "/")[[1]][1]), recursive = TRUE), silent = TRUE)
       for (jj in qData) {
         if (saveAsXTS) {
           df_result <- xts(as.matrix(jj[, -c("DT", "DATE")]), order.by = jj$DT)
         } else {
           df_result <- jj[, -c( "DATE")]
         }
-        saveRDS(df_result, paste0(dataDestination, "/", strsplit(ii, "/")[[1]][1], "/", unique(as.Date(jj$DT, tz = tz)), "quotes.rds"))
+        saveRDS(df_result, paste0(dataDestination, "/", strsplit(ii, "/")[[1]][1], "/", unique(as.Date(jj$DT, tz = tz)), ".rds"))
         # saveRDS(df_result, paste0(dataDestination, "/", strsplit(ii, "/")[[1]][1], "/", strsplit(strsplit(ii, "/")[[1]][2], ".zip")[1], ".rds"))
       }
     }
+    gc()
   }
   
   if (!is.null(qDataRaw)) {
@@ -1566,28 +1618,41 @@ quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
       }
     }
     
+    timeZone <- attr(qDataRaw$DT, "tzone")
+    if(timeZone == ""){
+      if(is.null(tz)){
+        tz <- "UTC"
+      }
+      if(!("POSIXct" %in% class(qDataRaw$DT))){
+        qDataRaw[, DT := as.POSIXct(format(DT, digits = 20, nsmall = 20), tz = tz)]
+      }
+    } else {
+      tz <- timeZone
+    }
     nm <- colnames(qDataRaw)
     
     nresult[1] <- dim(qDataRaw)[1] 
     qDataRaw <- qDataRaw[BID != 0 & OFR != 0]
     nresult[2] <- dim(qDataRaw)[1] 
+    qDataRaw <- exchangeHoursOnly(qDataRaw, marketOpen = marketOpen, marketClose = marketClose, tz = tz)
+    nresult[3] <- dim(qDataRaw)[1] 
     if("EX" %in% nm){
       if(exchanges != "auto"){
         qDataRaw <- qDataRaw[EX %in% exchanges]
       } else if (exchanges == "auto"){
-        qDataRaw <- qDataRaw[, autoSelectExchangeQuotes(.SD, printExchange = printExchange), .SDcols = nm,by = list(SYMBOL, DATE = as.Date(DT))][, nm, with = FALSE]
+        qDataRaw <- qDataRaw[, autoSelectExchangeQuotes(.SD, printExchange = printExchange), .SDcols = nm,by = list(SYMBOL, DATE = as.Date(DT, tz = tz))][, nm, with = FALSE]
       }
     }
-    nresult[3] <- dim(qDataRaw)[1]
-    qDataRaw[OFR > BID, `:=`(SPREAD = OFR - BID, DATE = as.Date(DT))][, SPREAD_MEDIAN := median(SPREAD), by = "DATE"]
-    nresult[4] <- dim(qDataRaw)[1] 
+    nresult[4] <- dim(qDataRaw)[1]
+    qDataRaw[OFR > BID, `:=`(SPREAD = OFR - BID, DATE = as.Date(DT, tz = tz))][, SPREAD_MEDIAN := median(SPREAD), by = "DATE"]
+    nresult[5] <- dim(qDataRaw)[1] 
     qDataRaw <- qDataRaw[SPREAD < (SPREAD_MEDIAN * maxi)][, -c("SPREAD","SPREAD_MEDIAN")]
-    nresult[5] <- dim(qDataRaw)[1]
-    qDataRaw <- mergeQuotesSameTimestamp(qData = qDataRaw, selection = selection)
     nresult[6] <- dim(qDataRaw)[1]
+    qDataRaw <- mergeQuotesSameTimestamp(qData = qDataRaw, selection = selection)
+    nresult[7] <- dim(qDataRaw)[1]
     
     qDataRaw <- rmOutliersQuotes(qDataRaw, window = window, type = type, maxi = rmoutliersmaxi)
-    nresult[7] <- dim(qDataRaw)[1]
+    nresult[8] <- dim(qDataRaw)[1]
     if (inputWasXts) {
       df_result <- xts(as.matrix(qDataRaw[, -c("DT",  "DATE")]), order.by = qDataRaw$DT)
     } else {
@@ -1694,6 +1759,7 @@ rmNegativeSpread <- function(qData) {
 #' @param backwardsWindow a numeric denoting the length of the backwards window. Default is 3600, corresponding to one hour.
 #' @param forwardsWindow a numeric denoting the length of the forwards window. Default is 0.5, dorresponding to one half second.
 #' @param plot a logical denoting whether to visualize the forwards, backwards, and unmatched trades in a plot.
+#' @param ... used internally
 #' @details Note: in order to work correctly, the input data of this function should be
 #' cleaned trade (tData) and quote (qData) data respectively.
 #' In older high frequency datasets the trades frequently lag the quotes. In newer datasets this tends to happen 
@@ -1708,7 +1774,7 @@ rmNegativeSpread <- function(qData) {
 #' @keywords cleaning
 #' @importFrom data.table setkey set
 #' @export
-rmTradeOutliersUsingQuotes <- function(tData, qData, lagQuotes = 2, BFM = FALSE, backwardsWindow = 3600, forwardsWindow = 0.5, plot = FALSE) {
+rmTradeOutliersUsingQuotes <- function(tData, qData, lagQuotes = 2, BFM = FALSE, backwardsWindow = 3600, forwardsWindow = 0.5, plot = FALSE, ...) {
   if(length(lagQuotes) != 1){
     lagQuotes <- lagQuotes[1]
   }
@@ -1755,7 +1821,7 @@ rmTradeOutliersUsingQuotes <- function(tData, qData, lagQuotes = 2, BFM = FALSE,
   
   
   
-  tqData <- matchTradesQuotes(tData, qData, lagQuotes = lagQuotes, BFM = BFM, backwardsWindow = backwardsWindow, forwardsWindow = forwardsWindow, plot = plot)
+  tqData <- matchTradesQuotes(tData, qData, lagQuotes = lagQuotes, BFM = BFM, backwardsWindow = backwardsWindow, forwardsWindow = forwardsWindow, plot = plot, ... = ...)
   
   if(!BFM){
     tData <- tqData[, SPREAD := OFR - BID][PRICE <= OFR + SPREAD & PRICE >= BID - SPREAD]
@@ -1803,7 +1869,7 @@ rmTradeOutliersUsingQuotes <- function(tData, qData, lagQuotes = 2, BFM = FALSE,
 #' @param maxi an integer, indicating the maximum number of median absolute deviations allowed.
 #' @param window an integer, indicating the time window for which the "outlyingness" is considered.
 #' @param type should be "standard" or "advanced" (see description).
-#' 
+#' @param tz timezone to use
 #' @details NOTE: This function works only correct if supplied input data consists of 1 day.
 #' 
 #' @return xts object or data.table depending on type of input
@@ -1820,7 +1886,7 @@ rmTradeOutliersUsingQuotes <- function(tData, qData, lagQuotes = 2, BFM = FALSE,
 #' @importFrom xts is.xts as.xts
 #' @importFrom RcppRoll roll_median
 #' @export
-rmOutliersQuotes <- function (qData, maxi = 10, window = 50, type = "advanced") {
+rmOutliersQuotes <- function (qData, maxi = 10, window = 50, type = "advanced", tz = "EST") {
   # NOTE: Median Absolute deviation chosen contrary to Barndorff-Nielsen et al.
   # Setting those variables equal NULL is for suppressing NOTES in devtools::check
   # References inside data.table-operations throw "no visible binding for global variable ..." error
@@ -1864,7 +1930,7 @@ rmOutliersQuotes <- function (qData, maxi = 10, window = 50, type = "advanced") 
   weights_med_follow  <- c(0 , rep(1, times = window))
   weights_med_trail    <- c(rep(1, times = window), 0)
   
-  qData <- qData[, `:=`(MIDQUOTE = (BID + OFR) / 2,  DATE = as.Date(DT))][, MADALL := mad(MIDQUOTE), by = list(DATE,SYMBOL)]
+  qData <- qData[, `:=`(MIDQUOTE = (BID + OFR) / 2,  DATE = as.Date(DT, tz = tz))][, MADALL := mad(MIDQUOTE), by = list(DATE,SYMBOL)]
   
   if (type == "standard") {
     qData <- qData[ , CRITERION := abs(MIDQUOTE - rollingMedianInclEnds(MIDQUOTE, window = window, weights = weights_med_center_excl)), by = list(DATE,SYMBOL)][
@@ -2037,9 +2103,15 @@ selectExchange <- function(data, exch = "N") {
 #' @param report boolean and TRUE by default. In case it is true the function returns (also) a vector indicating how many trades remained after each cleaning step.
 #' @param selection argument to be passed on to the cleaning routine \code{\link{mergeTradesSameTimestamp}}. The default is "median".
 #' @param validConds character vector containing valid sales conditions. Passed through to \code{\link{tradesCondition}}.
+#' @param marketOpen passed to \code{\link{exchangeHoursOnly}}. A character in the format of \"HH:MM:SS\",
+#' specifying the starting hour, minute and second of an exchange
+#' trading day.
+#' @param marketClose passed to \code{\link{exchangeHoursOnly}}. A character in the format of \"HH:MM:SS\",
+#' specifying the closing hour, minute and second of an exchange
+#' trading day.
 #' @param printExchange Argument passed to \code{\link{autoSelectExchangeTrades}} indicates whether the chosen exchange is printed on the console, 
 #' default is TRUE. This is only used when \code{exchanges} is \code{"auto"}
-#' @param saveAsXTS indicates whether data should be saved in xts format instead of data.table when using on-disk functionality. TRUE by default.
+#' @param saveAsXTS indicates whether data should be saved in xts format instead of data.table when using on-disk functionality. FALSE by default.
 #' @param tz timezone to use
 #' @return For each day an xts or data.table object is saved into the folder of that date, containing the cleaned data.
 #' This procedure is performed for each stock in "ticker".
@@ -2065,32 +2137,59 @@ selectExchange <- function(data, exch = "N") {
 #' 
 #' @author Jonathan Cornelissen and Kris Boudt
 #' @importFrom data.table fread
+#' @importFrom utils unzip
 #' @keywords cleaning
 #' @export
 tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges = "auto", tDataRaw = NULL, report = TRUE, selection = "median",
-                          validConds = c('', '@', 'E', '@E', 'F', 'FI', '@F', '@FI', 'I', '@I'), printExchange = TRUE, saveAsXTS = TRUE, tz = "EST") {
+                          validConds = c('', '@', 'E', '@E', 'F', 'FI', '@F', '@FI', 'I', '@I'), marketOpen = "09:30:00", 
+                          marketClose = "16:00:00", printExchange = TRUE, saveAsXTS = FALSE, tz = "EST") {
   .SD <- CORR <- SIZE <- SYMBOL <- PRICE <- EX <- COND <- DT <- DATE <- TIME_M <- NULL
   
   if (is.null(tDataRaw)) {
-    try(dir.create(dataDestination), silent = TRUE)
-    tradesfiles <- list.files(dataSource, recursive = TRUE)[grepl("trades", list.files(dataSource, recursive = TRUE))]
+
+    tradesfiles <- list.files(dataSource, recursive = TRUE, full.names = TRUE)[grepl("trades", list.files(dataSource, recursive = TRUE))]
     for (ii in tradesfiles) {
-      readdata <- try(fread(paste0(dataSource, "/", ii)), silent = TRUE)
+      extension <- strsplit(ii, "\\.")[[1]]
+      extension <- extension[length(extension)]
+      if(extension == "zip") {
+        tmp <- tempdir()
+        unzip(ii, exdir = tmp, )
+        files <- list.files(tmp, full.names = TRUE, pattern = "csv")
+        if(length(files) >= 1){
+          readdata <- try(rbindlist(lapply(files, fread, tz = tz)), silent = TRUE)
+        }
+        # Try to Cleanup - we don't force it though!
+        unlink(tmp, recursive = TRUE)
+      } else if(extension %in% c("csv", "gz", "bz2")){
+        readdata <- try(fread(ii, tz = tz), silent = TRUE)
+      } else if(extension %in% c("rds")){
+        readdata <- try(readRDS(ii))
+      } else {
+        readdata <- try(fread(ii, tz = tz), silent = TRUE)
+      }
+      if(inherits(readdata, "try-error")){
+        stop(paste("Error encountered while opening data, error message is:",readdata))
+      }
       if(colnames(readdata)[1] == "index"){ # The data was saved from an xts object
         readdata <- try(readdata[, DT := as.POSIXct(index, tz = tz, format = "%Y-%m-%dT%H:%M:%OS")])
       } else if ("DT" %in% colnames(readdata)){
         readdata <- try(readdata[, DT := as.POSIXct(DT, tz = tz, format = "%Y-%m-%dT%H:%M:%OS")])
       } else {
-        readdata <- try(readdata[, DT := as.POSIXct(substring(paste(as.character(DATE), TIME_M, sep = " "), 1, 20), tz = tz, format = "%Y%m%d %H:%M:%OS")], silent = TRUE)
+        readdata <- try(readdata[, `:=`(DT = as.POSIXct(paste(DATE, TIME_M), tz = "UTC", format = "%Y%m%d %H:%M:%OS"),
+                                      DATE = NULL, TIME_M = NULL, SYM_SUFFIX = NULL)], silent = TRUE)
       }
+      
+      if(inherits(readdata, "try-error")){
+        stop(paste("Error encountered while creating a DT column, error message is:",readdata))
+      }
+      
       tData <- try(tradesCleanup(tDataRaw = readdata,
                                  selection = selection,
                                  exchanges = exchanges,
                                  validConds = validConds, tz = tz))$tData
       tData <- tData[, DATE := as.Date(DT, tz = tz)]
       tData <- split(tData, by = "DATE")
-      
-      try(dir.create(paste0(dataDestination, "/", strsplit(ii, "/")[[1]][1])), silent = TRUE)
+      try(dir.create(paste0(dataDestination, "/", strsplit(ii, "/")[[1]][1]), recursive = TRUE), silent = TRUE)
       for (jj in tData) {
         if (saveAsXTS) {
           df_result <- xts(as.matrix(jj[, -c("DT", "DATE")]), order.by = jj$DT)
@@ -2104,8 +2203,13 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
   }
   
   if (!is.null(tDataRaw)) {
+    
+    
+    
+    
     nresult <- c(initial_number = 0,
                  no_zero_trades = 0,
+                 no_outside_exchange_hours = 0,
                  select_exchange = 0,
                  remove_corr = 0,
                  remove_sales_condition = 0,
@@ -2136,32 +2240,46 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
       }
     }
     
+    
+    timeZone <- attr(tDataRaw$DT, "tzone")
+    if(timeZone == ""){
+      if(is.null(tz)){
+        tz <- "UTC"
+      }
+      if(!("POSIXct" %in% class(tDataRaw$DT))){
+        tDataRaw[, DT := as.POSIXct(format(DT, digits = 20, nsmall = 20), tz = tz)]
+      }
+    } else {
+      tz <- timeZone
+    }
+    
     nm <- colnames(tDataRaw)
     
     nresult[1] <- dim(tDataRaw)[1]
     tDataRaw <- tDataRaw[PRICE != 0]
-    nresult[2] <- dim(tDataRaw)[1]
-    
+    nresult[2] <- dim(tDataRaw)[1] 
+    tDataRaw <- exchangeHoursOnly(tDataRaw, marketOpen = marketOpen, marketClose = marketClose, tz = tz)
+    nresult[3] <- dim(tDataRaw)[1]
     if("EX" %in% nm){
       if(exchanges != "auto"){
         tDataRaw <- tDataRaw[EX %in% exchanges]
       } else if (exchanges == "auto"){
-        tDataRaw <- tDataRaw[, autoSelectExchangeTrades(.SD, printExchange = printExchange), .SDcols = nm,by = list(SYMBOL, DATE = as.Date(DT))][, nm, with = FALSE]
+        tDataRaw <- tDataRaw[, autoSelectExchangeTrades(.SD, printExchange = printExchange), .SDcols = nm,by = list(SYMBOL, DATE = as.Date(DT, tz = tz))][, nm, with = FALSE]
       }
     }
-    nresult[3] <- dim(tDataRaw)[1]
+    nresult[4] <- dim(tDataRaw)[1]
     if("CORR" %in% nm){
       tDataRaw <- tDataRaw[CORR == 0]
     }
-    nresult[4] <- dim(tDataRaw)[1]
+    nresult[5] <- dim(tDataRaw)[1]
     
     if("COND" %in% nm){
       tDataRaw <- tradesCondition(tDataRaw, validConds)
     }
-    nresult[5] <- dim(tDataRaw)[1]
+    nresult[6] <- dim(tDataRaw)[1]
     
     tDataRaw <- mergeTradesSameTimestamp(tDataRaw, selection = selection)
-    nresult[6] <- dim(tDataRaw)[1]
+    nresult[7] <- dim(tDataRaw)[1]
     
     if (inputWasXts) {
       df_result <- xts(as.matrix(tDataRaw[, -c("DT")]), order.by = tDataRaw$DT)
@@ -2200,8 +2318,12 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
 #' from, to, dataSource and dataDestination will be ignored. (only advisable for small chunks of data)
 #' @param qData data.table or xts object containing (ONE day and for ONE stock only) cleaned quote data. This argument is NULL by default. Enabling it means the arguments
 #' from, to, dataSource, dataDestination will be ignored. (only advisable for small chunks of data)
-#' @param lagQuotes passed through to rmTradeOutliersUsingQuotes. \code{\link{rmTradeOutliersUsingQuotes}}
-#' 
+#' @param lagQuotes passed through to \code{\link{rmTradeOutliersUsingQuotes}}. A numeric of length 1 that denotes how many seconds to lag the quotes. Default is 2 seconds. See Details.
+#' @param BFM passed through to \code{\link{rmTradeOutliersUsingQuotes}}. A logical determining whether to conduct 'Backwards - Forwards matching' of trades and quotes.
+#' The algorithm tries to match trades that fall outside the bid - ask and first tries to match a small window forwards and if this fails, it tries to match backwards in a bigger window.
+#' The small window is a tolerance for inaccuracies in the timestamps of bids and asks. The backwards window allow for matching of late reported trades. I.e. block trades.
+#' @param backwardsWindow passed through to \code{\link{rmTradeOutliersUsingQuotes}}. A numeric denoting the length of the backwards window. Default is 3600, corresponding to one hour.
+#' @param forwardsWindow passed through to \code{\link{rmTradeOutliersUsingQuotes}}. A numeric denoting the length of the forwards window. Default is 0.5, dorresponding to one half second.
 #' @return For each day an xts object is saved into the folder of that date, containing the cleaned data.
 #' 
 #' @details 
@@ -2232,10 +2354,12 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
 #' #via the "tradeDataSource", "quoteDataSource", and "dataDestination" arguments
 #' @keywords cleaning
 #' @export
-tradesCleanupUsingQuotes <- function(tradeDataSource = NULL, quoteDataSource = NULL, dataDestination = NULL, tData = NULL, qData = NULL, lagQuotes = 2) {
+tradesCleanupUsingQuotes <- function(tradeDataSource = NULL, quoteDataSource = NULL, dataDestination = NULL, tData = NULL, qData = NULL, lagQuotes = 2,
+                                     BFM = FALSE, backwardsWindow = 3600, forwardsWindow = 0.5) {
   
-  if (is.null(dataDestination)) {
+  if (is.null(dataDestination) && !is.null(tradeDataSource)) {
     dataDestination <- tradeDataSource
+    dataDestination <- path.expand(dataDestination)
   }
   
   if ((!is.null(tData)) & (!is.null(qData))) {
@@ -2261,40 +2385,37 @@ tradesCleanupUsingQuotes <- function(tradeDataSource = NULL, quoteDataSource = N
     }
     
     if(!file.exists(dataDestination)){
-      dir.create(dataDestination)
+      dir.create(dataDestination, recursive  = TRUE)
     }
     
     ## Make regular expression to find the tradeDatasource in tradeFiles, so we can create a destination that follows same 
     ## naming conventions for the end files.
-    finalDestinations <- tradeFiles
-    finalDestinations <- sapply(finalDestinations , strsplit, split = .Platform$file.sep)
+
+    # 
+    # finalDestinations <- tradeFiles
+    # finalDestinations <- sapply(finalDestinations , strsplit, split = .Platform$file.sep)
+    # browser()
+    # for (i in 1:length(finalDestinations)) {
+    #   ## substitute in tradescleanedbyquotes right before the extension.
+    #   finalDestinations[[i]][length(finalDestinations[[i]])] <- 
+    #     sub("\\.", "tradescleanedbyquotes.", finalDestinations[[i]][length(finalDestinations[[i]])])
+    # }
     
-    for (i in 1:length(finalDestinations)) {
-      
-      ## We change the directory to the dataDestination directory
-      finalDestinations[[i]][grepl(tradeDataSource, finalDestinations[[i]],)] <- dataDestination
-      
-      ## substitute in tradescleanedbyquotes right before the extension.
-      finalDestinations[[i]][length(finalDestinations[[i]])] <- 
-        sub("\\.", "tradescleanedbyquotes.", finalDestinations[[i]][length(finalDestinations[[i]])])
-    }
-    
-    finalDestinations <- unlist(lapply(finalDestinations, paste0, collapse = .Platform$file.sep))
-    ## Check if the directories exist
-    if(any(!file.exists(dirname(finalDestinations)))){
-      sapply(dirname(finalDestinations), dir.create, showWarnings = FALSE)
-    }
+    # finalDestinations <- unlist(lapply(finalDestinations, paste0, collapse = .Platform$file.sep))
+    # ## Check if the directories exist
+    # if(any(!file.exists(dirname(finalDestinations)))){
+    #   sapply(dirname(finalDestinations), dir.create, showWarnings = FALSE)
+    # }
     
     for (i in 1:length(tradeFiles)) {
-      
       tradeFile <- tradeFiles[i]
       quoteFile <- quoteFiles[i]
       
       tData <- try(readRDS(tradeFile))
       qData <- try(readRDS(quoteFile))
-      saveRDS(rmTradeOutliersUsingQuotes(tData, qData, lagQuotes = lagQuotes), file = finalDestinations[i])
-      
-      
+      saveRDS(rmTradeOutliersUsingQuotes(tData, qData, lagQuotes = lagQuotes, BFM = BFM,
+                                         backwardsWindow = backwardsWindow, forwardsWindow = forwardsWindow, plot = FALSE, onlyTQ = TRUE), 
+              file = paste0(dataDestination, "/", gsub(".rds", "tradescleanedbyquotes.rds", basename(tradeFile))))
       
     }
     # for (tFile in tradeFiles) {
