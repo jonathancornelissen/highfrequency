@@ -7,11 +7,12 @@
 tradesCleanup(
   dataSource = NULL,
   dataDestination = NULL,
-  exchanges,
+  exchanges = "auto",
   tDataRaw = NULL,
   report = TRUE,
   selection = "median",
   validConds = c("", "@", "E", "@E", "F", "FI", "@F", "@FI", "I", "@I"),
+  printExchange = TRUE,
   saveAsXTS = TRUE,
   tz = "EST"
 )
@@ -37,7 +38,7 @@ The possible exchange symbols are:
 \item M: Chicago
 \item W: CBOE
 \item Z: BATS
-}}
+} The default value is \code{"auto"} which automatically selects the exchange for the stocks and days independently using the \code{\link{autoSelectExchangeTrades}}}
 
 \item{tDataRaw}{xts object containing (for ONE stock only) raw trade data. This argument is NULL by default. Enabling it means the arguments
 from, to, dataSource and dataDestination will be ignored. (only advisable for small chunks of data)}
@@ -47,6 +48,9 @@ from, to, dataSource and dataDestination will be ignored. (only advisable for sm
 \item{selection}{argument to be passed on to the cleaning routine \code{\link{mergeTradesSameTimestamp}}. The default is "median".}
 
 \item{validConds}{character vector containing valid sales conditions. Passed through to \code{\link{tradesCondition}}.}
+
+\item{printExchange}{Argument passed to \code{\link{autoSelectExchangeTrades}} indicates whether the chosen exchange is printed on the console, 
+default is TRUE. This is only used when \code{exchanges} is \code{"auto"}}
 
 \item{saveAsXTS}{indicates whether data should be saved in xts format instead of data.table when using on-disk functionality. TRUE by default.}
 

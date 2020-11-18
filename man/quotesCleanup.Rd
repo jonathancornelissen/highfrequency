@@ -7,7 +7,7 @@
 quotesCleanup(
   dataSource = NULL,
   dataDestination = NULL,
-  exchanges = NULL,
+  exchanges = "auto",
   qDataRaw = NULL,
   report = TRUE,
   selection = "median",
@@ -15,6 +15,7 @@ quotesCleanup(
   window = 50,
   type = "advanced",
   rmoutliersmaxi = 10,
+  printExchange = TRUE,
   saveAsXTS = TRUE,
   tz = "EST"
 )
@@ -40,7 +41,7 @@ The possible exchange symbols are:
 \item M: Chicago
 \item W: CBOE
 \item Z: BATS
-}}
+}. The default value is \code{"auto"} which automatically selects the exchange for the stocks and days independently using the \code{\link{autoSelectExchangeQuotes}}}
 
 \item{qDataRaw}{xts or data.table object containing (ONE stock only) raw quote data. This argument is NULL by default. Enabling it means the arguments
 from, to, dataSource and dataDestination will be ignored. (only advisable for small chunks of data)}
@@ -56,6 +57,9 @@ from, to, dataSource and dataDestination will be ignored. (only advisable for sm
 \item{type}{argument to be passed on to the cleaning routine \code{\link{rmOutliersQuotes}}.}
 
 \item{rmoutliersmaxi}{argument to be passed on to the cleaning routine \code{\link{rmOutliersQuotes}}.}
+
+\item{printExchange}{Argument passed to \code{\link{autoSelectExchangeQuotes}} indicates whether the chosen exchange is printed on the console, 
+default is TRUE. This is only used when \code{exchanges} is \code{"auto"}}
 
 \item{saveAsXTS}{indicates whether data should be saved in xts format instead of data.table when using on-disk functionality. TRUE by default.}
 

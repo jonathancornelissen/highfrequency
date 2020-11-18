@@ -1232,12 +1232,12 @@ mergeQuotesSameTimestamp <- function(qData, selection = "median") {
   }
   
   if (selection == "max.volume") {
-    qData <- qData[, MAXBID := max(BIDSIZ), by = list(DT, SYMBOL)][, MAXOFR := max(OFRSIZ), by = "DT"][
+    qData <- qData[, MAXBID := max(BIDSIZ), by = list(DT, SYMBOL)][, MAXOFR := max(OFRSIZ), by = list(DT, SYMBOL)][
       , BIDSIZ := fifelse(BIDSIZ == MAXBID, 1, 0)][
       , OFRSIZ := fifelse(OFRSIZ == MAXOFR, 1, 0)][
       , BID := BID * BIDSIZ][
       , OFR := OFR * OFRSIZ][
-      , BID := max(BID), by = "DT"][, OFR := max(OFR), by = list(DT, SYMBOL)][, -c("MAXBID", "MAXOFR", "BIDSIZ", "OFRSIZ")][
+      , BID := max(BID), by = list(DT,SYMBOL)][, OFR := max(OFR), by = list(DT, SYMBOL)][, -c("MAXBID", "MAXOFR", "BIDSIZ", "OFRSIZ")][
       , lapply(.SD, unique), by = list(DT, SYMBOL), .SDcols = c("BID", "OFR")]
   }
   if (selection == "weighted.average") {
@@ -1452,7 +1452,7 @@ noZeroQuotes <- function(qData) {
 #' \item M: Chicago
 #' \item W: CBOE
 #' \item Z: BATS
-#' }
+#' }. The default value is \code{"auto"} which automatically selects the exchange for the stocks and days independently using the \code{\link{autoSelectExchangeQuotes}}
 #' @param qDataRaw xts or data.table object containing (ONE stock only) raw quote data. This argument is NULL by default. Enabling it means the arguments
 #' from, to, dataSource and dataDestination will be ignored. (only advisable for small chunks of data)
 #' @param report boolean and TRUE by default. In case it is true the function returns (also) a vector indicating how many quotes remained after each cleaning step.
@@ -1461,6 +1461,8 @@ noZeroQuotes <- function(qData) {
 #' @param window argument to be passed on to the cleaning routine \code{\link{rmOutliersQuotes}}. 
 #' @param type argument to be passed on to the cleaning routine \code{\link{rmOutliersQuotes}}.
 #' @param rmoutliersmaxi argument to be passed on to the cleaning routine \code{\link{rmOutliersQuotes}}.
+#' @param printExchange Argument passed to \code{\link{autoSelectExchangeQuotes}} indicates whether the chosen exchange is printed on the console, 
+#' default is TRUE. This is only used when \code{exchanges} is \code{"auto"}
 #' @param saveAsXTS indicates whether data should be saved in xts format instead of data.table when using on-disk functionality. TRUE by default.
 #' @param tz timezone to use
 #' @return The function converts every csv file in dataSource into multiple xts or data.table files.
@@ -1489,10 +1491,11 @@ noZeroQuotes <- function(qData) {
 #' @importFrom data.table fread
 #' @keywords cleaning
 #' @export
-quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges = NULL, qDataRaw = NULL, report = TRUE, 
-                          selection = "median", maxi = 50, window = 50, type = "advanced", rmoutliersmaxi = 10, saveAsXTS = TRUE, tz = "EST") {
+quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges = "auto", qDataRaw = NULL, report = TRUE, 
+                          selection = "median", maxi = 50, window = 50, type = "advanced", rmoutliersmaxi = 10, printExchange = TRUE,
+                          saveAsXTS = TRUE, tz = "EST") {
   
-  BID <- OFR <- DT <- SPREAD <- SPREAD_MEDIAN <- EX <- DATE <- BIDSIZ <- OFRSIZ <- TIME_M <- SYMBOL <- NULL
+  .SD <- BID <- OFR <- DT <- SPREAD <- SPREAD_MEDIAN <- EX <- DATE <- BIDSIZ <- OFRSIZ <- TIME_M <- SYMBOL <- NULL
   nresult <- c(initial_number = 0,
                no_zero_quotes = 0,
                select_exchange = 0,
@@ -1569,7 +1572,11 @@ quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
     qDataRaw <- qDataRaw[BID != 0 & OFR != 0]
     nresult[2] <- dim(qDataRaw)[1] 
     if("EX" %in% nm){
-      qDataRaw <- qDataRaw[EX %in% exchanges]
+      if(exchanges != "auto"){
+        qDataRaw <- qDataRaw[EX %in% exchanges]
+      } else if (exchanges == "auto"){
+        qDataRaw <- qDataRaw[, autoSelectExchangeQuotes(.SD, printExchange = printExchange), .SDcols = nm,by = list(SYMBOL, DATE = as.Date(DT))][, nm, with = FALSE]
+      }
     }
     nresult[3] <- dim(qDataRaw)[1]
     qDataRaw[OFR > BID, `:=`(SPREAD = OFR - BID, DATE = as.Date(DT))][, SPREAD_MEDIAN := median(SPREAD), by = "DATE"]
@@ -1817,7 +1824,7 @@ rmOutliersQuotes <- function (qData, maxi = 10, window = 50, type = "advanced") 
   # NOTE: Median Absolute deviation chosen contrary to Barndorff-Nielsen et al.
   # Setting those variables equal NULL is for suppressing NOTES in devtools::check
   # References inside data.table-operations throw "no visible binding for global variable ..." error
-  BID <- OFR <- MIDQUOTE <- DATE <- DT <- MADALL <- CRITERION <- NULL
+  SYMBOL <- BID <- OFR <- MIDQUOTE <- DATE <- DT <- MADALL <- CRITERION <- NULL
   if ((window %% 2) != 0) {
     stop("Window size can't be odd.")
   }
@@ -1847,9 +1854,6 @@ rmOutliersQuotes <- function (qData, maxi = 10, window = 50, type = "advanced") 
     }
   }
   
-  if (length(unique(qData$SYMBOL)) > 1) {
-    stop("Please provide only one symbol at a time.") # This may actually not be needed!
-  }
   
   if (!(type %in% c("standard", "advanced"))) {
     stop("type has to be \"standard\" or \"advanced\".")
@@ -1860,10 +1864,10 @@ rmOutliersQuotes <- function (qData, maxi = 10, window = 50, type = "advanced") 
   weights_med_follow  <- c(0 , rep(1, times = window))
   weights_med_trail    <- c(rep(1, times = window), 0)
   
-  qData <- qData[, MIDQUOTE := (BID + OFR) / 2][, DATE := as.Date(DT)][, MADALL := mad(MIDQUOTE), by = "DATE"]
+  qData <- qData[, `:=`(MIDQUOTE = (BID + OFR) / 2,  DATE = as.Date(DT))][, MADALL := mad(MIDQUOTE), by = list(DATE,SYMBOL)]
   
   if (type == "standard") {
-    qData <- qData[ , CRITERION := abs(MIDQUOTE - rollingMedianInclEnds(MIDQUOTE, window = window, weights = weights_med_center_excl))][
+    qData <- qData[ , CRITERION := abs(MIDQUOTE - rollingMedianInclEnds(MIDQUOTE, window = window, weights = weights_med_center_excl)), by = list(DATE,SYMBOL)][
       CRITERION < maxi * MADALL]
     
   }
@@ -1871,7 +1875,7 @@ rmOutliersQuotes <- function (qData, maxi = 10, window = 50, type = "advanced") 
     qData <- qData[, CRITERION := pmin(abs(MIDQUOTE - rollingMedianInclEnds(MIDQUOTE, window = window, weights = weights_med_center_excl, direction = "center")),
                                        abs(MIDQUOTE - rollingMedianInclEnds(MIDQUOTE, window = window, weights = weights_med_trail, direction = "left")),
                                        abs(MIDQUOTE - rollingMedianInclEnds(MIDQUOTE, window = window, weights = weights_med_follow, direction = "right")),
-                                       na.rm = TRUE)][
+                                       na.rm = TRUE), by = list(DATE,SYMBOL)][
                                          CRITERION < maxi * MADALL]
   }
   if (inputWasXts) {
@@ -2026,13 +2030,15 @@ selectExchange <- function(data, exch = "N") {
 #' \item M: Chicago
 #' \item W: CBOE
 #' \item Z: BATS
-#' }
+#' } The default value is \code{"auto"} which automatically selects the exchange for the stocks and days independently using the \code{\link{autoSelectExchangeTrades}}
 #' 
 #' @param tDataRaw xts object containing (for ONE stock only) raw trade data. This argument is NULL by default. Enabling it means the arguments
 #' from, to, dataSource and dataDestination will be ignored. (only advisable for small chunks of data)
 #' @param report boolean and TRUE by default. In case it is true the function returns (also) a vector indicating how many trades remained after each cleaning step.
 #' @param selection argument to be passed on to the cleaning routine \code{\link{mergeTradesSameTimestamp}}. The default is "median".
 #' @param validConds character vector containing valid sales conditions. Passed through to \code{\link{tradesCondition}}.
+#' @param printExchange Argument passed to \code{\link{autoSelectExchangeTrades}} indicates whether the chosen exchange is printed on the console, 
+#' default is TRUE. This is only used when \code{exchanges} is \code{"auto"}
 #' @param saveAsXTS indicates whether data should be saved in xts format instead of data.table when using on-disk functionality. TRUE by default.
 #' @param tz timezone to use
 #' @return For each day an xts or data.table object is saved into the folder of that date, containing the cleaned data.
@@ -2061,9 +2067,9 @@ selectExchange <- function(data, exch = "N") {
 #' @importFrom data.table fread
 #' @keywords cleaning
 #' @export
-tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, tDataRaw = NULL, report = TRUE, selection = "median",
-                          validConds = c('', '@', 'E', '@E', 'F', 'FI', '@F', '@FI', 'I', '@I'), saveAsXTS = TRUE, tz = "EST") {
-  CORR <- SIZE <- SYMBOL <- PRICE <- EX <- COND <- DT <- DATE <- TIME_M <- NULL
+tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges = "auto", tDataRaw = NULL, report = TRUE, selection = "median",
+                          validConds = c('', '@', 'E', '@E', 'F', 'FI', '@F', '@FI', 'I', '@I'), printExchange = TRUE, saveAsXTS = TRUE, tz = "EST") {
+  .SD <- CORR <- SIZE <- SYMBOL <- PRICE <- EX <- COND <- DT <- DATE <- TIME_M <- NULL
   
   if (is.null(tDataRaw)) {
     try(dir.create(dataDestination), silent = TRUE)
@@ -2137,7 +2143,11 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges, 
     nresult[2] <- dim(tDataRaw)[1]
     
     if("EX" %in% nm){
-      tDataRaw <- tDataRaw[EX %in% exchanges]
+      if(exchanges != "auto"){
+        tDataRaw <- tDataRaw[EX %in% exchanges]
+      } else if (exchanges == "auto"){
+        tDataRaw <- tDataRaw[, autoSelectExchangeTrades(.SD, printExchange = printExchange), .SDcols = nm,by = list(SYMBOL, DATE = as.Date(DT))][, nm, with = FALSE]
+      }
     }
     nresult[3] <- dim(tDataRaw)[1]
     if("CORR" %in% nm){
