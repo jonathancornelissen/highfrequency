@@ -93,6 +93,12 @@ The following cleaning steps are performed sequentially:
 \code{\link{noZeroQuotes}}, \code{\link{selectExchange}}, rmLargeSpread,
 \code{\link{mergeQuotesSameTimestamp}}, \code{\link{rmOutliersQuotes}}.
 }
+\details{
+Using the on-disk functionality with .csv.zip files which is the standard from the WRDS database
+will write temporary files on your machine - we try to clean up after it, but cannot guarantee that 
+there won't be files that slip through the crack if the permission settings on your machine does not match 
+ours
+}
 \examples{
 # Consider you have raw quote data for 1 stock for 2 days
 head(sampleQDataRawMicroseconds)

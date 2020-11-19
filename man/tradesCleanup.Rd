@@ -90,6 +90,12 @@ Since the function \code{\link{rmTradeOutliersUsingQuotes}}
 also requires cleaned quote data as input, it is not incorporated here and
 there is a seperate wrapper called \code{\link{tradesCleanupUsingQuotes}}.
 }
+\details{
+Using the on-disk functionality with .csv.zip files which is the standard from the WRDS database
+will write temporary files on your machine in order to unzip the files - we try to clean up after it,
+but cannot guarantee that there won't be files that slip through the crack if the permission settings on your machine does not match 
+ours
+}
 \examples{
 # Consider you have raw trade data for 1 stock for 2 days 
 head(sampleTDataRawMicroseconds)

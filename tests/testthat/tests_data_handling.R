@@ -19,8 +19,8 @@ test_that("autoSelectExchangeTrades", {
 context("quotesCleanup")
 test_that("quotesCleanup", {
   expect_equal(
-    quotesCleanup(qDataRaw = sampleQDataRawMicroseconds, exchanges = "N")$report["remove_outliers"],
-    c(remove_outliers = 46564)
+    quotesCleanup(qDataRaw = sampleQDataRawMicroseconds, exchanges = "N")$report["removedFromSelectingExchange"],
+    c(removedFromSelectingExchange = 36109)
   )
 })
 

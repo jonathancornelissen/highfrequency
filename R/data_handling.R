@@ -1500,6 +1500,11 @@ noZeroQuotes <- function(qData) {
 #' Brownlees, C.T. and Gallo, G.M. (2006). Financial econometric analysis at ultra-high frequency: Data handling concerns. Computational Statistics & Data Analysis, 51, pages 2232-2245.
 #' Falkenberry, T.N. (2002). High frequency data filtering. Unpublished technical report.
 #' 
+#' @details 
+#' Using the on-disk functionality with .csv.zip files which is the standard from the WRDS database
+#' will write temporary files on your machine - we try to clean up after it, but cannot guarantee that 
+#' there won't be files that slip through the crack if the permission settings on your machine does not match 
+#' ours
 #' @author Jonathan Cornelissen, Kris Boudt and Onno Kleen.
 #' 
 #' @examples
@@ -1522,14 +1527,7 @@ quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
                           marketClose = "16:00:00", rmoutliersmaxi = 10, printExchange = TRUE, saveAsXTS = FALSE, tz = "EST") {
   
   .SD <- BID <- OFR <- DT <- SPREAD <- SPREAD_MEDIAN <- EX <- DATE <- BIDSIZ <- OFRSIZ <- TIME_M <- SYMBOL <- NULL
-  nresult <- c(initial_number = 0,
-               no_zero_quotes = 0,
-               no_outside_exchange_hours = 0,
-               select_exchange = 0,
-               remove_negative_spread = 0,
-               remove_large_spread = 0,
-               merge_same_timestamp = 0,
-               remove_outliers = 0)
+
   
   if (is.null(qDataRaw)) {
     
@@ -1629,13 +1627,24 @@ quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
     } else {
       tz <- timeZone
     }
+    
+    REPORT <- c(initialObservations = 0,
+                removedFromZeroQuotes = 0, 
+                removedOutsideExchangeHours = 0,
+                removedFromSelectingExchange = 0,
+                removedFromNegativeSpread = 0,
+                removedFromLargeSpread = 0,
+                removedFromMergeTimestamp = 0,
+                removedOutliers = 0,
+                finalObservations = 0)
+    
     nm <- colnames(qDataRaw)
     
-    nresult[1] <- dim(qDataRaw)[1] 
+    REPORT[1] <- dim(qDataRaw)[1] 
     qDataRaw <- qDataRaw[BID != 0 & OFR != 0]
-    nresult[2] <- dim(qDataRaw)[1] 
+    REPORT[2] <- dim(qDataRaw)[1] 
     qDataRaw <- exchangeHoursOnly(qDataRaw, marketOpen = marketOpen, marketClose = marketClose, tz = tz)
-    nresult[3] <- dim(qDataRaw)[1] 
+    REPORT[3] <- dim(qDataRaw)[1] 
     if("EX" %in% nm){
       if(exchanges != "auto"){
         qDataRaw <- qDataRaw[EX %in% exchanges]
@@ -1643,16 +1652,16 @@ quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
         qDataRaw <- qDataRaw[, autoSelectExchangeQuotes(.SD, printExchange = printExchange), .SDcols = nm,by = list(SYMBOL, DATE = as.Date(DT, tz = tz))][, nm, with = FALSE]
       }
     }
-    nresult[4] <- dim(qDataRaw)[1]
+    REPORT[4] <- dim(qDataRaw)[1]
     qDataRaw[OFR > BID, `:=`(SPREAD = OFR - BID, DATE = as.Date(DT, tz = tz))][, SPREAD_MEDIAN := median(SPREAD), by = "DATE"]
-    nresult[5] <- dim(qDataRaw)[1] 
+    REPORT[5] <- dim(qDataRaw)[1] 
     qDataRaw <- qDataRaw[SPREAD < (SPREAD_MEDIAN * maxi)][, -c("SPREAD","SPREAD_MEDIAN")]
-    nresult[6] <- dim(qDataRaw)[1]
+    REPORT[6] <- dim(qDataRaw)[1]
     qDataRaw <- mergeQuotesSameTimestamp(qData = qDataRaw, selection = selection)
-    nresult[7] <- dim(qDataRaw)[1]
+    REPORT[7] <- dim(qDataRaw)[1]
     
     qDataRaw <- rmOutliersQuotes(qDataRaw, window = window, type = type, maxi = rmoutliersmaxi)
-    nresult[8] <- dim(qDataRaw)[1]
+    REPORT[8] <- dim(qDataRaw)[1]
     if (inputWasXts) {
       df_result <- xts(as.matrix(qDataRaw[, -c("DT",  "DATE")]), order.by = qDataRaw$DT)
     } else {
@@ -1660,7 +1669,7 @@ quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
     }
     
     if (report) {
-      return(list(qData = df_result, report = nresult))
+      return(list(qData = df_result, report = c(REPORT[1], -diff(REPORT))))
     } else {
       return(df_result[])
     }
@@ -2120,6 +2129,12 @@ selectExchange <- function(data, exch = "N") {
 #' In case you supply the argument "rawtData", the on-disk functionality is ignored
 #' and the function returns a list with the cleaned trades as xts object (see examples).
 #' 
+#' @details 
+#' Using the on-disk functionality with .csv.zip files which is the standard from the WRDS database
+#' will write temporary files on your machine in order to unzip the files - we try to clean up after it,
+#' but cannot guarantee that there won't be files that slip through the crack if the permission settings on your machine does not match 
+#' ours
+#' 
 #' @examples 
 #' # Consider you have raw trade data for 1 stock for 2 days 
 #' head(sampleTDataRawMicroseconds)
@@ -2207,13 +2222,7 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
     
     
     
-    nresult <- c(initial_number = 0,
-                 no_zero_trades = 0,
-                 no_outside_exchange_hours = 0,
-                 select_exchange = 0,
-                 remove_corr = 0,
-                 remove_sales_condition = 0,
-                 merge_same_timestamp = 0)
+    
     
     tDataRaw <- checkColumnNames(tDataRaw)
     checktData(tDataRaw)
@@ -2253,13 +2262,21 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
       tz <- timeZone
     }
     
-    nm <- colnames(tDataRaw)
+    REPORT <- c(initialObservations = 0,
+                removedFromZeroTrades = 0,
+                removedOutsideExchangeHours = 0,
+                removedFromSelectingExchange = 0,
+                removedFromCorrections = 0,
+                removedFromSalesCondition = 0,
+                removedFromMergeTimestamp = 0,
+                finalObservations = 0)
     
-    nresult[1] <- dim(tDataRaw)[1]
+    nm <- colnames(tDataRaw)
+    REPORT[1] <- dim(tDataRaw)[1]
     tDataRaw <- tDataRaw[PRICE != 0]
-    nresult[2] <- dim(tDataRaw)[1] 
+    REPORT[2] <- dim(tDataRaw)[1] 
     tDataRaw <- exchangeHoursOnly(tDataRaw, marketOpen = marketOpen, marketClose = marketClose, tz = tz)
-    nresult[3] <- dim(tDataRaw)[1]
+    REPORT[3] <- dim(tDataRaw)[1]
     if("EX" %in% nm){
       if(exchanges != "auto"){
         tDataRaw <- tDataRaw[EX %in% exchanges]
@@ -2267,20 +2284,20 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
         tDataRaw <- tDataRaw[, autoSelectExchangeTrades(.SD, printExchange = printExchange), .SDcols = nm,by = list(SYMBOL, DATE = as.Date(DT, tz = tz))][, nm, with = FALSE]
       }
     }
-    nresult[4] <- dim(tDataRaw)[1]
+    REPORT[4] <- dim(tDataRaw)[1]
     if("CORR" %in% nm){
       tDataRaw <- tDataRaw[CORR == 0]
     }
-    nresult[5] <- dim(tDataRaw)[1]
+    REPORT[5] <- dim(tDataRaw)[1]
     
     if("COND" %in% nm){
       tDataRaw <- tradesCondition(tDataRaw, validConds)
     }
-    nresult[6] <- dim(tDataRaw)[1]
+    REPORT[6] <- dim(tDataRaw)[1]
     
     tDataRaw <- mergeTradesSameTimestamp(tDataRaw, selection = selection)
-    nresult[7] <- dim(tDataRaw)[1]
-    
+    REPORT[7] <- dim(tDataRaw)[1]
+    REPORT[8]
     if (inputWasXts) {
       df_result <- xts(as.matrix(tDataRaw[, -c("DT")]), order.by = tDataRaw$DT)
     } else {
@@ -2288,7 +2305,7 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
     }
     
     if (report) {
-      return(list(tData = df_result, report = nresult))
+      return(list(tData = df_result, report = c(REPORT[1], -diff(REPORT))))
     } else {
       return(df_result[])
     }
