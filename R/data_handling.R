@@ -2738,7 +2738,7 @@ businessTimeAggregation <- function(pData, measure = "volume", obs = 390, bandwi
 #' Make Open-High-Low-Close-Volume bars
 #' 
 #' This function makes OHLC-V bars at arbitrary intevals. If the SIZE column is not present in the input, no volume column is created.
-#' @param pData data.table or xts object to make the bars out of, containing the intraday price series of a stock for possibly multiple days.
+#' @param pData data.table or xts object to make the bars out of, containing the intraday price series of possibly multiple stocks for possibly multiple days.
 #' @param alignBy character, indicating the time scale in which "alignPeriod" is expressed. Possible values are: "secs", "seconds", "mins", "minutes", "hours".
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate an
 #' object to the 5 minute frequency set alignPeriod = 5 and alignBy = "minutes".
@@ -2766,7 +2766,7 @@ businessTimeAggregation <- function(pData, measure = "volume", obs = 390, bandwi
 #' 
 #' @export
 makeOHLCV <- function(pData, alignBy = "minutes", alignPeriod = 5, tz = NULL){
-  .SD <-  DATE <- SIZE <- DT <-  PRICE <- NULL
+  SYMBOL <- .SD <-  DATE <- SIZE <- DT <-  PRICE <- NULL
   pData <- checkColumnNames(pData)
   if (!is.xts(pData) & !is.data.table(pData)) {
     stop("The argument pData should be a data.table or xts object.")
@@ -2800,10 +2800,10 @@ makeOHLCV <- function(pData, alignBy = "minutes", alignPeriod = 5, tz = NULL){
       stop("Input has to be data.table or xts.")
     }
   } else {
-    if (!("DT" %in% colnames(pData))) {
-      stop("Data.table neeeds DT column (date-time).")
+    if (any(!(c("DT","SYMBOL") %in% colnames(pData)))) {
+      stop("Data.table neeeds DT (date-time) and SYMBOL columns.")
     }
-    pData <- pData[, list(DT, PRICE, SIZE)]
+    pData <- pData[, list(DT, PRICE, SIZE, SYMBOL)]
   }
   
   
@@ -2817,14 +2817,16 @@ makeOHLCV <- function(pData, alignBy = "minutes", alignPeriod = 5, tz = NULL){
     tz <- timeZone
   }
   
-  setkey(pData, DT)
-  pData <- pData[, lapply(.SD, nafill, type = "locf"), .SDcols = colnames(pData), by = list(DATE = as.Date(DT, tz = tz))]
-  pData <- pData[, lapply(.SD, nafill, type = "nocb"), by = DATE]
+  setkey(pData, SYMBOL, DT)
+  nm <- colnames(pData)
+  nm <- nm[nm != "SYMBOL"]
+  pData <- pData[, lapply(.SD, nafill, type = "locf"), .SDcols = nm, by = list(SYMBOL = SYMBOL, DATE = as.Date(DT, tz = tz))]
+  pData <- pData[, lapply(.SD, nafill, type = "nocb"), .SDcols = nm, by = list(SYMBOL = SYMBOL, DATE = DATE)]
   pData[, DT := DT + (scaleFactor - as.numeric(DT, tz = tz) %% scaleFactor)]
   if(!("SIZE" %in% colnames(pData))){
-    pData <- pData[, list(OPEN = first(PRICE), HIGH = max(PRICE), LOW = min(PRICE), CLOSE = last(PRICE)), by = DT]
+    pData <- pData[, list(OPEN = first(PRICE), HIGH = max(PRICE), LOW = min(PRICE), CLOSE = last(PRICE)), by = list(SYMBOL, DT)]
   } else{
-    pData <- pData[, list(OPEN = first(PRICE), HIGH = max(PRICE), LOW = min(PRICE), CLOSE = last(PRICE), VOLUME = sum(SIZE)), by = DT]
+    pData <- pData[, list(OPEN = first(PRICE), HIGH = max(PRICE), LOW = min(PRICE), CLOSE = last(PRICE), VOLUME = sum(SIZE)), by = list(DT,SYMBOL)]
   }
  
   if (inputWasXts) {
