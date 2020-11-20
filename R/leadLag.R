@@ -67,7 +67,6 @@ leadLag <- function(price1 = NULL, price2 = NULL, lags = NULL, resolution = "sec
     timestampsY <- as.numeric(price2[, DT]) * timestampsCorrectionFactor
     x <- as.numeric(price1[, PRICE])
     y <- as.numeric(price2[, PRICE])
-  
   } else { # Here we have XTS input
     # Make sure we have correct xts inputs
     if(!is.xts(price1) | !is.xts(price2) | isMultiXts(price1)| isMultiXts(price2)){
@@ -76,8 +75,14 @@ leadLag <- function(price1 = NULL, price2 = NULL, lags = NULL, resolution = "sec
     } 
     timestampsX <- as.numeric(index(price1)) * timestampsCorrectionFactor
     timestampsY <- as.numeric(index(price2)) * timestampsCorrectionFactor
-    x <- as.numeric(price1)
-    y <- as.numeric(price2)
+    
+    if(ncol(price1) > 1){
+      x <- as.numeric(price1[, "PRICE"])
+      y <- as.numeric(price2[, "PRICE"])
+    } else {
+      x <- as.numeric(price1)
+      y <- as.numeric(price2)
+    }
   }
   
   

@@ -1,14 +1,14 @@
-#' LLTC Data
-#'
-#' @description Tick data for LLTC 2011/07/01, cleaned with \code{tradesCleanup}.
-#'
-#' @examples
-#' data(lltc)
-#' plot(lltc)
-#'
-#' @format xts object
-#' @keywords datasets
-"lltc"
+# #' LLTC Data
+# #'
+# #' @description Tick data for LLTC 2011/07/01, cleaned with \code{tradesCleanup}.
+# #'
+# #' @examples
+# #' data(lltc)
+# #' plot(lltc)
+# #'
+# #' @format xts object
+# #' @keywords datasets
+# "lltc"
 
 # #' The realized library from the Oxford-Man Institute of Quantitative Finance
 # #' 
@@ -223,19 +223,19 @@
 #' @keywords datasets
 "sampleTDataRawMicroseconds"
 
-#' Starbucks Data
-#' 
-#' @description Tick data for Starbucks 2011/07/01, cleaned with \code{tradesCleanup}.
-#' 
-#' @docType data
-#' 
-#' @examples
-#' data(sbux)
-#' plot(sbux) 
-#' 
-#' @format xts object
-#' @keywords datasets
-"sbux"
+# #' Starbucks Data
+# #' 
+# #' @description Tick data for Starbucks 2011/07/01, cleaned with \code{tradesCleanup}.
+# #' 
+# #' @docType data
+# #' 
+# #' @examples
+# #' data(sbux)
+# #' plot(sbux) 
+# #' 
+# #' @format xts object
+# #' @keywords datasets
+# "sbux"
 
 # #' SP500 Realized Measures calculated with 5 minute sampling
 # #' 
