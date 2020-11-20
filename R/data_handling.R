@@ -1505,6 +1505,9 @@ noZeroQuotes <- function(qData) {
 #' will write temporary files on your machine - we try to clean up after it, but cannot guarantee that 
 #' there won't be files that slip through the crack if the permission settings on your machine does not match 
 #' ours
+#' 
+#' If the input data.table does not contain a DT column but it does contain DATE and TIME_M columns, we create the DT column by REFERENCE, altering the data.table that may be in the user's environment!
+#' 
 #' @author Jonathan Cornelissen, Kris Boudt and Onno Kleen.
 #' 
 #' @examples
@@ -1593,6 +1596,13 @@ quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
   }
   
   if (!is.null(qDataRaw)) {
+    
+    nm <- colnames(qDataRaw)
+    if(!"DT" %in% nm && c("DATE", "TIME_M") %in% nm){
+      qDataRaw[, `:=`(DT = as.POSIXct(paste(DATE, TIME_M), tz = "UTC", format = "%Y%m%d %H:%M:%OS"),
+                      DATE = NULL, TIME_M = NULL, SYM_SUFFIX = NULL)]
+    }
+    
     
     qDataRaw <- checkColumnNames(qDataRaw)
     checkqData(qDataRaw)
@@ -2135,6 +2145,7 @@ selectExchange <- function(data, exch = "N") {
 #' but cannot guarantee that there won't be files that slip through the crack if the permission settings on your machine does not match 
 #' ours
 #' 
+#' If the input data.table does not contain a DT column but it does contain DATE and TIME_M columns, we create the DT column by REFERENCE, altering the data.table that may be in the user's environment!
 #' @examples 
 #' # Consider you have raw trade data for 1 stock for 2 days 
 #' head(sampleTDataRaw)
@@ -2219,8 +2230,11 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
   
   if (!is.null(tDataRaw)) {
     
-    
-    
+    nm <- colnames(tDataRaw)
+    if(!"DT" %in% nm && c("DATE", "TIME_M") %in% nm){
+      tDataRaw[, `:=`(DT = as.POSIXct(paste(DATE, TIME_M), tz = "UTC", format = "%Y%m%d %H:%M:%OS"),
+                      DATE = NULL, TIME_M = NULL, SYM_SUFFIX = NULL)]
+    }
     
     
     
