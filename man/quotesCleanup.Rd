@@ -101,9 +101,9 @@ ours
 }
 \examples{
 # Consider you have raw quote data for 1 stock for 2 days
-head(sampleQDataRawMicroseconds)
-dim(sampleQDataRawMicroseconds)
-qDataAfterCleaning <- quotesCleanup(qDataRaw = sampleQDataRawMicroseconds, exchanges = "N")
+head(sampleQDataRaw)
+dim(sampleQDataRaw)
+qDataAfterCleaning <- quotesCleanup(qDataRaw = sampleQDataRaw, exchanges = "N")
 qDataAfterCleaning$report
 dim(qDataAfterCleaning$qData)
 

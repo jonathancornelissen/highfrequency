@@ -91,7 +91,7 @@ ABDJumptest <- function(RV, BPV, TQ) { # Compute jump detection stat mentioned i
 #' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
 #'
 #' @examples
-#' jt <- AJjumpTest(sampleTDataMicroseconds[, list(DT, PRICE)], p = 2, k = 3, 
+#' jt <- AJjumpTest(sampleTData[, list(DT, PRICE)], p = 2, k = 3, 
 #'                  alignBy = "seconds", alignPeriod = 5, makeReturns = TRUE)
 #' 
 #' @keywords highfrequency AJjumpTest
@@ -246,7 +246,7 @@ AJjumpTest <- function(pData, p = 4 , k = 2, alignBy = NULL, alignPeriod = NULL,
 #' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
 #' 
 #' @examples 
-#' bns <- BNSjumpTest(sampleTDataMicroseconds[, list(DT, PRICE)], IVestimator= "rMinRV",
+#' bns <- BNSjumpTest(sampleTData[, list(DT, PRICE)], IVestimator= "rMinRV",
 #'                    IQestimator = "rMedRQ", type= "linear", makeReturns = TRUE)
 #' bns
 #' 
@@ -425,7 +425,7 @@ BNSjumpTest <- function (rData, IVestimator = "BV", IQestimator = "TP", type = "
 #' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
 #' 
 #' @examples
-#' joDT <- JOjumpTest(sampleTDataMicroseconds[, list(DT, PRICE)])
+#' joDT <- JOjumpTest(sampleTData[, list(DT, PRICE)])
 #' @keywords highfrequency JOjumpTest
 #' @importFrom stats qnorm
 #' @importFrom stats pnorm
@@ -541,7 +541,7 @@ JOjumpTest <- function(pData, power = 4, alignBy = NULL, alignPeriod = NULL, alp
 #' @examples 
 #' \dontrun{
 #' # We can easily make a Lee-Mykland jump test.
-#' LMtest <- intradayJumpTest(pData = sampleTDataMicroseconds[, list(DT, PRICE)], 
+#' LMtest <- intradayJumpTest(pData = sampleTData[, list(DT, PRICE)], 
 #'                            volEstimator = "RM", driftEstimator = "none",
 #'                            RM = "bipower", lookBackPeriod = 20,
 #'                            alignBy = "minutes", alignPeriod = 5, marketOpen = "09:30:00", 
@@ -549,7 +549,7 @@ JOjumpTest <- function(pData, power = 4, alignBy = NULL, alignPeriod = NULL, alp
 #' plot(LMtest)
 #' 
 #' # We can just as easily use the pre-averaged version from the "Fact or Friction" paper
-#' FoFtest <- intradayJumpTest(pData = sampleTDataMicroseconds[, list(DT, PRICE)], 
+#' FoFtest <- intradayJumpTest(pData = sampleTData[, list(DT, PRICE)], 
 #'                             volEstimator = "PARM", driftEstimator = "none",
 #'                             RM = "bipower", lookBackPeriod = 20, theta = 1.2,
 #'                             marketOpen = "09:30:00", marketClose = "16:00:00")

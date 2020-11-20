@@ -20,9 +20,9 @@ r* functions for calculation of realized measures.
 \examples{
 \dontrun{
 library(data.table)
-data1 <- copy(sampleTDataMicroseconds)[,  `:=`(PRICE = PRICE * runif(.N, min = 0.99, max = 1.01),
+data1 <- copy(sampleTData)[,  `:=`(PRICE = PRICE * runif(.N, min = 0.99, max = 1.01),
                                                DT = DT + runif(.N, 0.01, 0.02))]
-data2 <- copy(sampleTDataMicroseconds)[, SYMBOL := 'XYZ']
+data2 <- copy(sampleTData)[, SYMBOL := 'XYZ']
 
 dat <- rbind(data1, data2)
 setkey(dat, "DT")

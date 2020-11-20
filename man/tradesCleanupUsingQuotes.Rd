@@ -57,10 +57,10 @@ When using the on-disk functionality and tradeDataSource and quoteDataSource are
 }
 \examples{
 # Consider you have raw trade data for 1 stock for 2 days 
-tDataAfterFirstCleaning <- tradesCleanup(tDataRaw = sampleTDataRawMicroseconds, 
+tDataAfterFirstCleaning <- tradesCleanup(tDataRaw = sampleTDataRaw, 
                                           exchanges = "N", report = FALSE)
 # 
-qData <- quotesCleanup(qDataRaw = sampleQDataRawMicroseconds, 
+qData <- quotesCleanup(qDataRaw = sampleQDataRaw, 
                        exchanges = "N", report = FALSE)
 dim(tDataAfterFirstCleaning)
 tDataAfterFinalCleaning <- 

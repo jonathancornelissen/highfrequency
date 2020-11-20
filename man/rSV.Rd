@@ -36,7 +36,7 @@ Then, the rSV is given by
 }
 }
 \examples{
-sv <- rSV(sampleTDataMicroseconds[, list(DT, PRICE)], alignBy = "minutes", 
+sv <- rSV(sampleTData[, list(DT, PRICE)], alignBy = "minutes", 
           alignPeriod = 5, makeReturns = TRUE)
 sv
 }

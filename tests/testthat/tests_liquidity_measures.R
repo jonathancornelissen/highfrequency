@@ -4,7 +4,7 @@ library(xts)
 
 context("matchTradesQuotes & getTradeDirection quotes")
 test_that("matchTradesQuotes & getTradeDirection quotes", {
-  tqData <- matchTradesQuotes(sampleTDataMicroseconds, sampleQDataMicroseconds, lagQuotes = 2)
+  tqData <- matchTradesQuotes(sampleTData, sampleQData, lagQuotes = 2)
   directions <- getTradeDirection(tqData)
   sum(directions)
 expect_equal(
@@ -15,8 +15,8 @@ expect_equal(
 context("getLiquidityMeasures")
 test_that("testing getLiquidityMeasures",{
   
-  tqData <- tradesCleanupUsingQuotes(tData = tradesCleanup(tDataRaw = sampleTDataRawMicroseconds, report = FALSE, exchanges = "N"), 
-                                     qData = quotesCleanup(qDataRaw = sampleQDataRawMicroseconds, report = FALSE, exchanges = "N"), lagQuotes = 0)
+  tqData <- tradesCleanupUsingQuotes(tData = tradesCleanup(tDataRaw = sampleTDataRaw, report = FALSE, exchanges = "N"), 
+                                     qData = quotesCleanup(qDataRaw = sampleQDataRaw, report = FALSE, exchanges = "N"), lagQuotes = 0)
   liquidityMeasures <- getLiquidityMeasures(tqData)
   liquidityMeasures <- liquidityMeasures[, -(1:ncol(tqData))]
   

@@ -47,14 +47,24 @@ The different types of kernels can be found using \code{\link{listAvailableKerne
 }
 \examples{
 # Univariate:
-rvKernel <- rKernelCov(rData = sampleTDataMicroseconds[, list(DT, PRICE)], alignBy = "minutes",
+rvKernel <- rKernelCov(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes",
                        alignPeriod = 5, makeReturns = TRUE)
 rvKernel
 
 # Multivariate:
-rcKernel <- rKernelCov(rData = cbind(lltc, sbux, fill = 0), alignBy = "minutes",
-                       alignPeriod = 5, makeReturns = FALSE)
+\dontrun{
+library(xts)
+set.seed(123)
+start <- strptime("1970-01-01", format = "\%Y-\%m-\%d", tz = "UTC")
+timestamps <- start + seq(34200, 57600, length.out = 23401)
+
+dat <- cbind(rnorm(23401) * sqrt(1/23401), rnorm(23401) * sqrt(1/23401))
+
+dat <- exp(cumsum(xts(dat, timestamps)))
+rcKernel <- rKernelCov(rData = dat, alignBy = "minutes",
+                       alignPeriod = 5, makeReturns = TRUE)
 rcKernel
+}
 }
 \references{
 Ole E. Barndorff-Nielsen, Peter Reinhard Hansen, Asger Lunde, and Neil Shephard (2008). Designing Realized Kernels to Measure the ex post Variation of Equity Prices in the Presence of Noise. \emph{Econometrica}, 76, pp. 1481-1536.

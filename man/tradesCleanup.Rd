@@ -98,9 +98,9 @@ ours
 }
 \examples{
 # Consider you have raw trade data for 1 stock for 2 days 
-head(sampleTDataRawMicroseconds)
-dim(sampleTDataRawMicroseconds)
-tDataAfterFirstCleaning <- tradesCleanup(tDataRaw = sampleTDataRawMicroseconds, 
+head(sampleTDataRaw)
+dim(sampleTDataRaw)
+tDataAfterFirstCleaning <- tradesCleanup(tDataRaw = sampleTDataRaw, 
                                          exchanges = list("N"))
 tDataAfterFirstCleaning$report
 dim(tDataAfterFirstCleaning$tData)

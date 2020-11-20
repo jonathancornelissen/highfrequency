@@ -22,13 +22,13 @@ We start by loading the highfrequency package and printing the head of one examp
 
 ```{r}
 library(highfrequency)
-head(sampleTDataRawMicroseconds)
+head(sampleTDataRaw)
 ```
 
 A quick look via summary into the data let's us see that there are trades listed in the data set out of the bounds of the regular trading hours that are 9:30 to 16:00 on regular work days.
 
 ```{r eval = TRUE}
-summary(sampleTDataRawMicroseconds[, c("DT", "SIZE", "PRICE")])
+summary(sampleTDataRaw[, c("DT", "SIZE", "PRICE")])
 ```
 
 Next, we will use one of three main cleaning functions called tradesCleanup. It implements the steps laid out in the seminal paper of Barndorff-Nielsen et al. (2009). It processes the given data by
@@ -39,7 +39,7 @@ Next, we will use one of three main cleaning functions called tradesCleanup. It 
 - summarizing trades that have the same time stamp. The default is to take the median price and summed-up volume of the different trades.
 
 ```{r eval = TRUE}
-tDataCleaned <- tradesCleanup(tDataRaw = sampleTDataRawMicroseconds, exchange = "N")
+tDataCleaned <- tradesCleanup(tDataRaw = sampleTDataRaw, exchange = "N")
 ```
 
 When using tradesCleanup, the return value is a list of two. It contains a report about the number of observations after each cleaning step and the cleaned data itself.
@@ -65,7 +65,7 @@ The highfrequency function also brings a similarly-named function for cleaning q
 - removing quotes that may be seen to be outliers.
 
 ```{r eval = TRUE}
-qDataCleaned <- quotesCleanup(qDataRaw = sampleQDataRawMicroseconds, exchange = "N")
+qDataCleaned <- quotesCleanup(qDataRaw = sampleQDataRaw, exchange = "N")
 ```
 
 quotesCleanup also provides a list with two elements, a report and the cleaned data.

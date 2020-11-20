@@ -44,7 +44,7 @@ Function matches the trades and quotes and returns an xts-object containing both
 }
 \examples{
 # multi-day input allowed
-tqData <- matchTradesQuotes(sampleTDataMicroseconds, sampleQDataMicroseconds)
+tqData <- matchTradesQuotes(sampleTData, sampleQData)
 # Show output
 tqData
 }

@@ -30,7 +30,7 @@ minuteBars <- makeOHLCV(sampleTDataEurope[,], alignBy = "minutes", alignPeriod =
 quantmod::chartSeries(minuteBars)
 
 ## We can also handle data across multiple days.
-fiveMinuteBars <- makeOHLCV(sampleTDataMicroseconds)
+fiveMinuteBars <- makeOHLCV(sampleTData)
 ## Again we plot the series with chartSeries
 quantmod::chartSeries(fiveMinuteBars)
 

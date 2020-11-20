@@ -37,7 +37,7 @@ exchange with the highest value for the variable "SIZE",
 i.e. the highest trade volume.
 }
 \examples{
-autoSelectExchangeTrades(sampleTDataRawMicroseconds)
+autoSelectExchangeTrades(sampleTDataRaw)
 
 }
 \author{

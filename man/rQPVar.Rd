@@ -31,7 +31,7 @@ Function returns the realized quad-power variation, defined in Andersen et al. (
  }
 }
 \examples{
-qpv <- rQPVar(rData= sampleTDataMicroseconds[, list(DT, PRICE)], alignBy= "minutes", 
+qpv <- rQPVar(rData= sampleTData[, list(DT, PRICE)], alignBy= "minutes", 
               alignPeriod =5, makeReturns= TRUE)
 qpv
 

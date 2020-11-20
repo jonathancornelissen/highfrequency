@@ -72,7 +72,7 @@ where \eqn{a} is the drift term, \eqn{\sigma} denotes the spot volatility proces
 \examples{
 \dontrun{
 library("xts") # This function only accepts xts data currently
-ivInf <- ivInference(as.xts(sampleTDataMicroseconds[, list(DT, PRICE)]), IVestimator= "rMinRV",
+ivInf <- ivInference(as.xts(sampleTData[, list(DT, PRICE)]), IVestimator= "rMinRV",
                      IQestimator = "rMedRQ", confidence = 0.95, makeReturns = TRUE)
 ivInf
 }

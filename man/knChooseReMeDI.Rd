@@ -44,13 +44,13 @@ function to choose the tuning parameter, kn in ReMeDI estimation
 This is the algorithm B.2 in the appendix of the Li and Linton (2019) working paper
 }
 \examples{
-optimalKn <- knChooseReMeDI(sampleTDataMicroseconds[as.Date(DT) == "2018-01-02",],
+optimalKn <- knChooseReMeDI(sampleTData[as.Date(DT) == "2018-01-02",],
                             knMax = 10, tol = 0.05, size = 3,
                             lower = 2, upper = 5, plot = TRUE)
 optimalKn
 \dontrun{
 # We can also have a much larger search-space
-optimalKn <- knChooseReMeDI(sampleTDataMicroseconds[as.Date(DT) == "2018-01-02",],
+optimalKn <- knChooseReMeDI(sampleTData[as.Date(DT) == "2018-01-02",],
                             knMax = 50, tol = 0.05,
                             size = 3, lower = 2, upper = 5, plot = TRUE)
 optimalKn

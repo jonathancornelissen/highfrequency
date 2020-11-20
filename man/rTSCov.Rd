@@ -88,9 +88,21 @@ matrix. This function replaces the negative eigenvalues with zeroes.
 \examples{
 # Robust Realized two timescales Variance/Covariance
 # Multivariate:
-rcovts <- rTSCov(pData = list(cumsum(lltc) + 100, cumsum(sbux) + 100))
+\dontrun{
+library(xts)
+set.seed(123)
+start <- strptime("1970-01-01", format = "\%Y-\%m-\%d", tz = "UTC")
+timestamps <- start + seq(34200, 57600, length.out = 23401)
+
+dat <- cbind(rnorm(23401) * sqrt(1/23401), rnorm(23401) * sqrt(1/23401))
+
+dat <- exp(cumsum(xts(dat, timestamps)))
+price1 <- dat[,1]
+price2 <- dat[,2]
+rcovts <- rTSCov(pData = list(price1, price2))
 # Note: List of prices as input
 rcovts 
+}
 
 }
 \references{

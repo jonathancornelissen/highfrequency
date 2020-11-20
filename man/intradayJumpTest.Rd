@@ -53,7 +53,7 @@ The tests are of the form \eqn{L(t) = (R(t) - mu(t))/sigma(t)}.
 \examples{
 \dontrun{
 # We can easily make a Lee-Mykland jump test.
-LMtest <- intradayJumpTest(pData = sampleTDataMicroseconds[, list(DT, PRICE)], 
+LMtest <- intradayJumpTest(pData = sampleTData[, list(DT, PRICE)], 
                            volEstimator = "RM", driftEstimator = "none",
                            RM = "bipower", lookBackPeriod = 20,
                            alignBy = "minutes", alignPeriod = 5, marketOpen = "09:30:00", 
@@ -61,7 +61,7 @@ LMtest <- intradayJumpTest(pData = sampleTDataMicroseconds[, list(DT, PRICE)],
 plot(LMtest)
 
 # We can just as easily use the pre-averaged version from the "Fact or Friction" paper
-FoFtest <- intradayJumpTest(pData = sampleTDataMicroseconds[, list(DT, PRICE)], 
+FoFtest <- intradayJumpTest(pData = sampleTData[, list(DT, PRICE)], 
                             volEstimator = "PARM", driftEstimator = "none",
                             RM = "bipower", lookBackPeriod = 20, theta = 1.2,
                             marketOpen = "09:30:00", marketClose = "16:00:00")

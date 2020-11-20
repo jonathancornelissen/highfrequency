@@ -50,7 +50,7 @@ Function returns the rMPV, defined in Andersen et al. (2012).
   and \eqn{m} > \eqn{p/2}.
 }
 \examples{
-mpv <- rMPV(sampleTDataMicroseconds[, list(DT, PRICE)], m = 2, p = 3, alignBy = "minutes", 
+mpv <- rMPV(sampleTData[, list(DT, PRICE)], m = 2, p = 3, alignBy = "minutes", 
             alignPeriod = 5, makeReturns = TRUE)
 mpv
 }
