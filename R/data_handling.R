@@ -1547,7 +1547,7 @@ quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
         }
         # Try to Cleanup - we don't force it though!
         unlink(tmp, recursive = TRUE)
-      } else if(extension %in% c("csv", "gz", "bz2")){
+      } else if(extension %in% c("csv", "gz", "gzip", "bz2")){
         readdata <- try(fread(ii), silent = TRUE)
       } else if(extension %in% c("rds")){
         readdata <- try(readRDS(ii))
@@ -2186,7 +2186,7 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
         }
         # Try to Cleanup - we don't force it though!
         unlink(tmp, recursive = TRUE)
-      } else if(extension %in% c("csv", "gz", "bz2")){
+      } else if(extension %in% c("csv", "gz", "gzip", "bz2")){
         readdata <- try(fread(ii, tz = tz), silent = TRUE)
       } else if(extension %in% c("rds")){
         readdata <- try(readRDS(ii))
