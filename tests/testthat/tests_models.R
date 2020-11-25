@@ -36,20 +36,21 @@ test_that("HARModel",{
   info <- summary(model)
   expect_equal(info$call, "RV1 = beta0  +  beta1 * RV1 +  beta2 * RV5 +  beta3 * RV22")
   ## Testing with BPQ's data 
-  expect_equal(model$coefficients, c("(Intercept)" = 1.0657152785,"RV1" = 0.5542609958,"RV5" = 0.2194697795, "RV22" = 0.1041612492))
+  expect_equal(model$coefficients, c("(Intercept)" = 1.160000921e-05 ,"RV1" = 2.953165771e-01,"RV5" = 2.813334173e-01, "RV22" = 1.471632893e-01 ))
   
   model <- HARmodel(as.xts(SPYRM[, list(DT, RV5, RQ5)]), type = "HARQ")
-  expect_equal(model$coefficients, c("(Intercept)" = 0.43766717, "RV1" = 0.72960614, "RV5" = 0.15875296, "RV22" = 0.06894572, "RQ1" = -0.17082535))
+  expect_equal(model$coefficients, c("(Intercept)" = 3.285615865e-06, "RV1" = 9.754440119e-01, "RV5" = 7.909932136e-03, "RV22" = 2.366579823e-02, "RQ1" = -3.881445184e-01 ))
                 
   model <- HARmodel(as.xts(SPYRM[, list(DT, RV5, RQ5)]), type = "HARQ", periodsQ = c(1,5,22))
   expect_equal(model$coefficients,  
-               c("(Intercept)" = -0.14999372, "RV1" = 0.70939522, "RV5" = 0.20844754, "RV22" = 0.11054066, 
-                 "RQ1" = -0.15272757, "RQ5" = -0.06202333, "RQ22" = -0.13730876))
-  expect_equal(summary(model)$r.squared, 0.59853454)
+               c("(Intercept)" = -6.413188e-07, "RV1" = 9.163777832e-01, "RV5" = 1.609612721e-01, "RV22" = 6.218964e-02, 
+                 "RQ1" = -3.581803794e-01 , "RQ5" = -1.695874367e-01  , "RQ22" = -2.373133e-01))
+  expect_equal(summary(model)$r.squared, 0.3205499342)
   
   model <- HARmodel(as.xts(SPYRM[, list(DT, RV5, BPV5, RQ5)]), type = "HARQJ", periodsJ = c(1))
   expect_equal(model$coefficients,
-               c("(Intercept)" = 0.47391062, "RV1" = 0.73820120, "RV5" = 0.15866817, "RV22" = 0.07063117, "J1" = -0.31028495, "RQ1" = -0.17198537)
+               c("(Intercept)" = 3.278421768e-06, "RV1" = 9.738665838e-01, "RV5" = 7.578418611e-03, "RV22" = 2.352647045e-02 , 
+                 "J1" = 2.665076387e-02, "RQ1" = -3.874289127e-01 )
                )
   
   model <- HARmodel(as.xts(SPYRM[, list(DT, RV5)]), periods = c(1,5,22), externalRegressor = xts(1:nrow(SPYRM), order.by = SPYRM$DT), periodsExternal = c(1))
@@ -79,6 +80,6 @@ test_that("HEAVYmodel",{
   output <- HEAVYmodel(data = as.matrix(data,ncol=2), compConst = FALSE, backCast = backCast)
   expect_identical(
       formatC(sum(output$estparams), digits = 7),
-    "1.485103"
+    "1.935699"
   )
 })
