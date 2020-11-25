@@ -103,6 +103,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// calcRecVarEq
+NumericVector calcRecVarEq(NumericVector par, NumericVector rm);
+RcppExport SEXP _highfrequency_calcRecVarEq(SEXP parSEXP, SEXP rmSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type par(parSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type rm(rmSEXP);
+    rcpp_result_gen = Rcpp::wrap(calcRecVarEq(par, rm));
+    return rcpp_result_gen;
+END_RCPP
+}
 // heavy_parameter_transformR_
 List heavy_parameter_transformR_(NumericVector parameters, int K, IntegerVector p, IntegerVector q, NumericVector O, NumericVector A, NumericVector B, IntegerVector pMax1, IntegerVector qMax1);
 RcppExport SEXP _highfrequency_heavy_parameter_transformR_(SEXP parametersSEXP, SEXP KSEXP, SEXP pSEXP, SEXP qSEXP, SEXP OSEXP, SEXP ASEXP, SEXP BSEXP, SEXP pMax1SEXP, SEXP qMax1SEXP) {
@@ -422,6 +434,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_highfrequency_DriftBurstLoopC", (DL_FUNC) &_highfrequency_DriftBurstLoopC, 8},
     {"_highfrequency_DriftBurstLoopCPAR", (DL_FUNC) &_highfrequency_DriftBurstLoopCPAR, 9},
     {"_highfrequency_har_agg", (DL_FUNC) &_highfrequency_har_agg, 3},
+    {"_highfrequency_calcRecVarEq", (DL_FUNC) &_highfrequency_calcRecVarEq, 2},
     {"_highfrequency_heavy_parameter_transformR_", (DL_FUNC) &_highfrequency_heavy_parameter_transformR_, 9},
     {"_highfrequency_heavy_parameter_transform_RetrackR_", (DL_FUNC) &_highfrequency_heavy_parameter_transform_RetrackR_, 10},
     {"_highfrequency_heavy_likelihoodR_", (DL_FUNC) &_highfrequency_heavy_likelihoodR_, 14},

@@ -29,6 +29,10 @@ har_agg <- function(RM, periods, iNperiods) {
     .Call(`_highfrequency_har_agg`, RM, periods, iNperiods)
 }
 
+calcRecVarEq <- function(par, rm) {
+    .Call(`_highfrequency_calcRecVarEq`, par, rm)
+}
+
 heavy_parameter_transformR_ <- function(parameters, K, p, q, O, A, B, pMax1, qMax1) {
     .Call(`_highfrequency_heavy_parameter_transformR_`, parameters, K, p, q, O, A, B, pMax1, qMax1)
 }
