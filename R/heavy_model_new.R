@@ -1,14 +1,5 @@
 
-#' keywords internal
-#' calcRecVarEq <- function(par, rm) {
-#'   h <- rep(1, times = length(rm))
-#'   h[1] <- mean(rm)
-#'   for (ii in c(2:length(rm))) {
-#'     h[ii] <- par[1] + par[2] * rm[ii-1] + par[3] * h[ii-1]
-#'   }
-#'   h
-#' }
-
+# 
 # blub <-
 #   SPYRM %>%
 #   tibble::as_tibble() %>%
@@ -31,29 +22,47 @@
 #' HEAVY Model estimation
 #' @description This function calculates the High frEquency bAsed VolatilitY (HEAVY) model proposed in Shephard and Sheppard (2010). 
 #'
-#' @param ret (Log)-returns 
-#' @param rm realized measure of intraday stock price variation
-#' @param startingValues alternative starting values 
+#' @param ret a vector of demeaned returns 
+#' @param rm a vector of realized stock market variation
+#' @param startingValues a vector of alternative starting values: first three arguments for variance equation and last three arguments for measurement equation.
 #' 
 #' @references Shephard, N. and K. Sheppard (2010). Realising the future: Forecasting with high frequency based volatility (HEAVY) models. Journal of Applied Econometrics 25, 197--231.
-#' @importFrom numDeriv jacobian
+#' @importFrom numDeriv jacobian hessian
+#' @author Onno Kleen
+#' 
+#' @examples 
+#' 
+#' # Calculate annualized returns in percentages
+#' logReturns <- 100 * makeReturns(log(SPYRM$CLOSE))
+#' 
+#' # Returns are assumed to be demeaned
+#' logReturns <- logReturns - mean(logReturns)
+#' 
+#' # Due to return calculation, the first observation is missing
+#' estimatedHEAVY <- HEAVYmodelNew(logReturns[-1], SPYRM$RV5[-1]^2 / 252)
+#' 
+#' # Calculate iterative multi-step-ahead forecasts
+#' predict(estimatedHEAVY, stepsAhead = 12)
 #' @export
 HEAVYmodelNew <- function(ret, rm, startingValues = NULL) {
   
-  if (abs(mean(ret)) > 0.000000001) {
+  ret <- as.numeric(ret)
+  rm <- as.numeric(rm)
+  
+  if (abs(mean(ret)) > 0.00001) {
     warning("Returns are assumed to be demeaned but mean(ret) is unequal zero. Please check your data.")
   }
   
-  heavyLLH <- function(par, rmEq = FALSE) {
+  heavyLLH <- function(par, RMEq = FALSE) {
     condVar <- calcRecVarEq(par, rm)
-    if (rmEq == TRUE) {
+    if (RMEq) {
       if (sum(condVar < 0) > 0 | par[1] < 0 | par[2] < 0 | par[3] < 0 | par[2] + par[3] >= 1) {
         NA
       } else {
         - 1 / 2 * (log(condVar) + rm / condVar)
       }
     } else {
-      if (sum(condVar < 0) > 0 | (par[1] < 0) | (par[2] < 0) | par[3] < 0 | par[2] > 1) {
+      if (sum(condVar < 0) > 0 | par[1] < 0 | (par[2] < 0) | par[3] < 0 | par[3] >= 1) {
         NA
       } else {
         - 1 / 2 * (log(condVar) + ret^2 / condVar)
@@ -61,22 +70,27 @@ HEAVYmodelNew <- function(ret, rm, startingValues = NULL) {
     }
   }
   
-  if (!is.null(startingValues)) {
-    startingValues <- c(0.04, 0.2, 0.6) 
+  if (is.null(startingValues)) {
+    startingValuesVar <- c(var(ret) * (1 - 0.3 - 0.5), 0.3, 0.5) 
+    startingValuesRM <- c(mean(rm) * (1 - 0.6 - 0.3), 0.6, 0.3)
+    # startingValuesRM <- c(0.04, 0.6, 0.3) 
+  } else {
+    startingValuesVar <-startingValues[1:3]
+    startingValuesRM <-startingValues[4:6]
   }
   
   # Try BFGS first, otherwise Nelder-Mead
-  parVarEq <- try({optim(startingValues, function(x) -sum(heavyLLH(x)), method = "BFGS")}, 
+  parVarEq <- try({optim(startingValuesVar, function(x) -sum(heavyLLH(x)), method = "BFGS")}, 
                   silent = TRUE)
   
-  parRMEq <- try({optim(startingValues, function(x) -sum(heavyLLH(x, rmEq = TRUE)), method = "BFGS")},
+  parRMEq <- try({optim(startingValuesRM, function(x) -sum(heavyLLH(x, RMEq = TRUE)), method = "BFGS")},
                  silent = TRUE)
   
   if (class(parVarEq) == "try-error") {
-    parVarEq <- optim(startingValues, function(x) -sum(heavyLLH(x)))
+    parVarEq <- optim(startingValuesVar, function(x) -sum(heavyLLH(x)))
   }
   if (class(parRMEq) == "try-error") {
-    parRMEq <- optim(startingValues, function(x) -sum(heavyLLH(x, rmEq = TRUE)))
+    parRMEq <- optim(startingValuesRM, function(x) -sum(heavyLLH(x, RMEq = TRUE)))
   }
   
   
@@ -84,31 +98,31 @@ HEAVYmodelNew <- function(ret, rm, startingValues = NULL) {
   RMCondVariances <- calcRecVarEq(parRMEq$par, rm)
   
   modelEstimates <- c(parVarEq$par, parRMEq$par)
-  names(modelEstimates) <- c("varOmega", "varAlpha", "varBeta",
-                             "rmOmega", "rmAlpha", "rmBeta")
+  names(modelEstimates) <- c("omegaVar", "alphaVar", "betaVar",
+                             "omegaRM", "alphaRM", "betaRM")
   
   invHessianVarEq <- try({
-    solve(-suppressWarnings(numDeriv::hessian(x = parVarEq$par, func = function (theta) {
+    solve(-suppressWarnings(hessian(x = parVarEq$par, func = function (theta) {
       -sum(heavyLLH(theta))
     })))
   }, silent = TRUE)
   invHessianRMEq <- try({
-    solve(-suppressWarnings(numDeriv::hessian(x = parRMEq$par, func = function (theta) {
-      -sum(heavyLLH(theta, rmEq = TRUE))
+    solve(-suppressWarnings(hessian(x = parRMEq$par, func = function (theta) {
+      -sum(heavyLLH(theta, RMEq = TRUE))
     })))
   }, silent = TRUE)
   
   if (class(invHessianVarEq)[1] == "try-error") {
     warning("Inverting the Hessian matrix failed. No robust standard errors calculated for variance equation.")
-   robStdErrVarEq <- NA
+   robStdErrVarEq <- rep(NA, times = 3)
   } else {
-   robStdErrVarEq <- sqrt(diag(invHessianVarEq %*% crossprod(numDeriv::jacobian(func = function(theta) -sum(heavyLLH(theta)), x = parVarEq$par)) %*% invHessianVarEq))
+   robStdErrVarEq <- sqrt(diag(invHessianVarEq %*% crossprod(jacobian(function(theta) -sum(heavyLLH(theta)), parVarEq$par)) %*% invHessianVarEq))
   }
   if (class(invHessianRMEq)[1] == "try-error") {
     warning("Inverting the Hessian matrix failed. No robust standard errors calculated for RM equation.")
-    robStdErrRMEq <- NA
+    robStdErrRMEq <- rep(NA, times = 3)
   } else {
-    robStdErrRMEq <- sqrt(diag(invHessianRMEq %*% crossprod(numDeriv::jacobian(func = function(theta) -sum(heavyLLH(theta, rmEq = TRUE)), x = parRMEq$par)) %*% invHessianRMEq))
+    robStdErrRMEq <- sqrt(diag(invHessianRMEq %*% crossprod(jacobian(function(theta) -sum(heavyLLH(theta, RMEq = TRUE)), parRMEq$par)) %*% invHessianRMEq))
   }
   
   model <- list()
@@ -125,40 +139,46 @@ HEAVYmodelNew <- function(ret, rm, startingValues = NULL) {
   model
 }
 
+#' Iterative multi-step-ahead forecasting for HEAVY models
+#' 
+#' @param object an object of class HEAVYmodel
+#' @param stepsAhead the number of days iterative forecasts are calculated for (default 10)
+#' @param ... further arguments passed to or from other methods
 #' @export
-predict.HEAVYmodel <- function(object, warnings = TRUE, stepsAhead = 10, ...) {
+predict.HEAVYmodel <- function(object, stepsAhead = 10, ...) {
   
-  parRMEq$par <- object$coefficients[1:3]
-  parVarEq$par <- object$coefficients[4:6]
+  parRMEq <- object$coefficients[1:3]
+  parVarEq <- object$coefficients[4:6]
   
-  B_j <- function(j) {
+  Bj <- function(j) {
     if (j == 0) {
       matrix(c(1, 0, 0, 1), nrow = 2)
     } else {
-      nu <- parRMEq$par[2] + parRMEq$par[3]
-      rbind(c(parVarEq$par[2]^j, 
-              parVarEq$par[1] * sum(sapply(c(1:(j)), function(l) nu^(j - l) * parVarEq$par[2]^(l-1)))),
+      nu <- parRMEq[2] + parRMEq[3]
+      rbind(c(parVarEq[2]^j, 
+              parVarEq[1] * sum(sapply(c(1:(j)), function(l) nu^(j - l) * parVarEq[2]^(l-1)))),
             c(0, nu^j))
     }
   }
   
-  forecastsHEAVY <- function(steps.ahead) {
+  forecastsHEAVY <- function(stepsAhead) {
     
-    oneStep <- c(parVarEq$par[1] + parVarEq$par[2] * last(object$data$rm) + parVarEq$par[3] * last(object$varCondVariances),
-                  parRMEq$par[1] + parRMEq$par[2] * last(object$data$rm) + parRMEq$par[3] * last(object$RMCondVariances))
-    if (steps.ahead == 1) {
+    oneStep <- c(parVarEq[1] + parVarEq[2] * last(object$data$rm) + parVarEq[3] * last(object$varCondVariances),
+                  parRMEq[1] + parRMEq[2] * last(object$data$rm) + parRMEq[3] * last(object$RMCondVariances))
+    if (stepsAhead == 1) {
       oneStep
     } else {
-      sum_B <- 
-        Reduce('+', lapply(c(0:(steps.ahead - 2)), function(s) B_j(s))) %*% 
-        c(parVarEq$par[1], parRMEq$par[2]) + 
-        B_j(steps.ahead - 1) %*% 
+      sumB <- 
+        Reduce('+', lapply(c(0:(stepsAhead - 2)), function(s) Bj(s))) %*% 
+        c(parVarEq[1], parRMEq[2]) + 
+        Bj(stepsAhead - 1) %*% 
         oneStep
-      sum_B
+      sumB
     }
   } 
   
   fcts <- sapply(c(1:stepsAhead), function(x) forecastsHEAVY(x)[1])
+  names(fcts) <- c(1:stepsAhead)
   fcts
 }
 
@@ -180,106 +200,3 @@ summary.HEAVYmodel <- function(object, ...) {
   ans
 }
 
-
-
-
-# fit_heavy_model <- function(ret, rm) {
-#   
-#   h_var_eq <- function(rm, omega, alpha, beta) {
-#     h <- rep(1, times = length(rm))
-#     h[1] <- mean(rm)
-#     for (ii in c(2:length(rm))) {
-#       h[ii] <- omega + alpha * rm[ii-1] + beta * h[ii-1]
-#     }
-#     h
-#   }
-#   
-#   rm_eq <- function(rm, omega.rm, alpha.rm, beta.rm) { 
-#     mu <- rep(1, times = length(rm))
-#     mu[1] <- mean(rm)
-#     for (ii in c(2:length(rm))) {
-#       mu[ii] <- omega.rm + alpha.rm * rm[ii-1] + beta.rm * mu[ii-1]
-#     }
-#     mu
-#   }
-#   
-#   heavy_llh_var_eq_optim <- function(par) {
-#     h_llh <- h_var_eq(rm = rm,
-#                       omega = par["omega_var"],
-#                       alpha = par["alpha_var"],
-#                       beta = par["beta_var"])
-#     if (sum(h_llh < 0) > 0 | (par["alpha_var"] < 0) | (par["omega_var"] < 0) | par["beta_var"] < 0 | par["beta_var"] > 1) {
-#       NA
-#     } else {
-#       - 1 / 2 * (log(h_llh) + ret^2 / h_llh)
-#     }
-#   }
-#   heavy_llh_rm_eq_optim <- function(par) {
-#     rm_llh <- rm_eq(rm = rm,
-#                     omega.rm = par["omega_rm"],
-#                     alpha.rm = par["alpha_rm"],
-#                     beta.rm = par["beta_rm"])
-#     
-#     if (sum(rm_llh < 0) > 0 | (par["alpha_rm"] < 0) | par["beta_rm"] < 0 | par["omega_rm"] < 0 | par["alpha_rm"] + par["beta_rm"] >= 1) {
-#       NA
-#     } else {
-#       - 1 / 2 * (log(rm_llh) + rm / rm_llh)
-#     }
-#   }
-#   
-#   parVarEq <- try({optim(par = c("omega_var" = 0.04, "alpha_var" = 0.2, "beta_var" = 0.6), fn = function(x) -sum(heavy_llh_var_eq_optim(x)), method = "BFGS")})
-#   parRMEq <- try({optim(par = c("omega_rm" = 0.02, "alpha_rm" = 0.2, "beta_rm" = 0.6), fn = function(x) -sum(heavy_llh_rm_eq_optim(x)), method = "BFGS")})
-#   
-#   if (class(parVarEq) == "try-error") {
-#     parVarEq <- optim(par = c("omega_var" = 0.04, "alpha_var" = 0.2, "beta_var" = 0.6), fn = function(x) -sum(heavy_llh_var_eq_optim(x)))
-#   }
-#   if (class(parRMEq) == "try-error") {
-#     parRMEq <- optim(par = c("omega_rm" = 0.02, "alpha_rm" = 0.2, "beta_rm" = 0.6), fn = function(x) -sum(heavy_llh_rm_eq_optim(x)))
-#   }
-#   
-#   
-#   B_j <- function(j) {
-#     if (j == 0) {
-#       matrix(c(1, 0, 0, 1), nrow = 2)
-#     } else {
-#       nu <- parRMEq$par["alpha_rm"] + parRMEq$par["beta_rm"]
-#       rbind(c(parVarEq$par["beta_var"]^j, 
-#               parVarEq$par["alpha_var"] * sum(sapply(c(1:(j)), function(l) nu^(j - l) * parVarEq$par["beta_var"]^(l-1)))),
-#             c(0, nu^j))
-#     }
-#   }
-#   
-#   last_h <-
-#     last(h_var_eq(rm = rm,
-#                   omega = parVarEq$par["omega_var"],
-#                   alpha = parVarEq$par["alpha_var"],
-#                   beta = parVarEq$par["beta_var"]))
-#   last_mu <-
-#     last(rm_eq(rm = rm,
-#                omega.rm = parRMEq$par["omega_rm"],
-#                alpha.rm = parRMEq$par["alpha_rm"],
-#                beta.rm = parRMEq$par["beta_rm"]))
-#   
-#   forecasts_heavy<- function(step.ahead) {
-#     
-#     one_step <- c(parVarEq$par["omega_var"] + parVarEq$par["alpha_var"] * last(rm) + parVarEq$par["beta_var"] * last_h,
-#                   parRMEq$par["omega_rm"] + parRMEq$par["alpha_rm"] * last(rm) + parRMEq$par["beta_rm"] * last_mu)
-#     if (step.ahead == 1) {
-#       one_step
-#     } else {
-#       sum_B <- 
-#         Reduce('+', lapply(c(0:(step.ahead - 2)), function(s) B_j(s))) %*% 
-#         c(parVarEq$par["omega_var"], parRMEq$par["omega_rm"]) + 
-#         B_j(step.ahead - 1) %*% 
-#         one_step
-#       sum_B
-#     }
-#   } 
-#   
-#   fcts <- sapply(c(1:66), function(x) forecasts_heavy(x)[1])
-#   
-#   list(par_var = parVarEq$par,
-#        par_rm = parRMEq$par,
-#        forecasts = fcts)
-#   
-# }

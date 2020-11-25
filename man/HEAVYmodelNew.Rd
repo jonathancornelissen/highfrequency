@@ -2,29 +2,37 @@
 % Please edit documentation in R/heavy_model_new.R
 \name{HEAVYmodelNew}
 \alias{HEAVYmodelNew}
-\title{keywords internal
-calcRecVarEq <- function(par, rm) {
-  h <- rep(1, times = length(rm))
-  h[1] <- mean(rm)
-  for (ii in c(2:length(rm))) {
-    h[ii] <- par[1] + par[2] * rm[ii-1] + par[3] * h[ii-1]
-  }
-  h
-}
-HEAVY Model estimation}
+\title{HEAVY Model estimation}
 \usage{
 HEAVYmodelNew(ret, rm, startingValues = NULL)
 }
 \arguments{
-\item{ret}{(Log)-returns}
+\item{ret}{a vector of demeaned returns}
 
-\item{rm}{realized measure of intraday stock price variation}
+\item{rm}{a vector of realized stock market variation}
 
-\item{startingValues}{alternative starting values}
+\item{startingValues}{a vector of alternative starting values: first three arguments for variance equation and last three arguments for measurement equation.}
 }
 \description{
 This function calculates the High frEquency bAsed VolatilitY (HEAVY) model proposed in Shephard and Sheppard (2010).
 }
+\examples{
+
+# Calculate annualized returns in percentages
+logReturns <- 100 * makeReturns(log(SPYRM$CLOSE))
+
+# Returns are assumed to be demeaned
+logReturns <- logReturns - mean(logReturns)
+
+# Due to return calculation, the first observation is missing
+estimatedHEAVY <- HEAVYmodelNew(logReturns[-1], SPYRM$RV5[-1]^2 / 252)
+
+# Calculate iterative multi-step-ahead forecasts
+predict(estimatedHEAVY, stepsAhead = 12)
+}
 \references{
 Shephard, N. and K. Sheppard (2010). Realising the future: Forecasting with high frequency based volatility (HEAVY) models. Journal of Applied Econometrics 25, 197--231.
+}
+\author{
+Onno Kleen
 }
