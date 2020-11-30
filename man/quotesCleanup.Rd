@@ -98,12 +98,14 @@ Using the on-disk functionality with .csv.zip files which is the standard from t
 will write temporary files on your machine - we try to clean up after it, but cannot guarantee that 
 there won't be files that slip through the crack if the permission settings on your machine does not match 
 ours
+
+If the input data.table does not contain a DT column but it does contain DATE and TIME_M columns, we create the DT column by REFERENCE, altering the data.table that may be in the user's environment!
 }
 \examples{
 # Consider you have raw quote data for 1 stock for 2 days
-head(sampleQDataRawMicroseconds)
-dim(sampleQDataRawMicroseconds)
-qDataAfterCleaning <- quotesCleanup(qDataRaw = sampleQDataRawMicroseconds, exchanges = "N")
+head(sampleQDataRaw)
+dim(sampleQDataRaw)
+qDataAfterCleaning <- quotesCleanup(qDataRaw = sampleQDataRaw, exchanges = "N")
 qDataAfterCleaning$report
 dim(qDataAfterCleaning$qData)
 

@@ -57,7 +57,7 @@ In the case that cor is TRUE, the mixed matrix will be an \eqn{N x N} matrix fil
 # at 5 minutes.
 
 # Univariate: 
-rSV = rSemiCov(rData = sampleTDataMicroseconds[, list(DT, PRICE)], alignBy = "minutes", 
+rSV = rSemiCov(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes", 
                    alignPeriod = 5, makeReturns = TRUE)
 rSV
 \dontrun{

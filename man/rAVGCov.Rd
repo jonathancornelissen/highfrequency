@@ -39,19 +39,31 @@ Realized Covariance using average subsample.
 # 5 subgrids (5 minutes).
 
 # Univariate
-rvSub <- rAVGCov(rData = sampleTDataMicroseconds[, list(DT, PRICE)], alignBy = "minutes",
+rvSub <- rAVGCov(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes",
                  alignPeriod = 5, makeReturns = TRUE) 
 rvSub
 
 # Multivariate:
-rcovSub <- rAVGCov(rData = cbind(lltc, sbux, fill = 0), alignBy = "minutes", 
-                   alignPeriod = 5, makeReturns = FALSE)
+\dontrun{
+library(xts)
+set.seed(123)
+start <- strptime("1970-01-01", format = "\%Y-\%m-\%d", tz = "UTC")
+timestamps <- start + seq(34200, 57600, length.out = 23401)
+
+dat <- cbind(rnorm(23401) * sqrt(1/23401), rnorm(23401) * sqrt(1/23401))
+
+dat <- exp(cumsum(xts(dat, timestamps)))
+price1 <- dat[,1]
+price2 <- dat[,2]
+rcovSub <- rAVGCov(rData = cbind(price1, price2), alignBy = "minutes", 
+                   alignPeriod = 5, makeReturns = TRUE)
 rcovSub
 
 # Multivariate with a 30 second fast aggregation and a 2.5 minute slow aggregation.
-rcovSub <- rAVGCov(rData = cbind(lltc, sbux, fill = 0), 
-                   alignBy = "minutes", alignPeriod = 2.5, k = 0.5, makeReturns = FALSE)
+rcovSub <- rAVGCov(rData = cbind(price1, price2), 
+                   alignBy = "minutes", alignPeriod = 2.5, k = 0.5, makeReturns = TRUE)
 rcovSub
+}
 }
 \references{
 L. Zhang, P.A Mykland, and Y. Ait-Sahalia. A tale of two time scales: Determining integrated volatility with noisy high-frequency data. \emph{Journal of the American Statistical Association}, 2005.

@@ -4,12 +4,12 @@ library(data.table)
 context("autoSelectExchangeTrades")
 test_that("autoSelectExchangeTrades", {
   expect_equal(
-    unique(autoSelectExchangeTrades(sampleTDataRawMicroseconds, printExchange = FALSE)$EX),
+    unique(autoSelectExchangeTrades(sampleTDataRaw, printExchange = FALSE)$EX),
     "D"
   )
   
   expect_equal(
-    unique(autoSelectExchangeQuotes(sampleQDataRawMicroseconds, printExchange = FALSE)$EX),
+    unique(autoSelectExchangeQuotes(sampleQDataRaw, printExchange = FALSE)$EX),
     "N"
   )
 
@@ -19,7 +19,7 @@ test_that("autoSelectExchangeTrades", {
 context("quotesCleanup")
 test_that("quotesCleanup", {
   expect_equal(
-    quotesCleanup(qDataRaw = sampleQDataRawMicroseconds, exchanges = "N")$report["removedFromSelectingExchange"],
+    quotesCleanup(qDataRaw = sampleQDataRaw, exchanges = "N")$report["removedFromSelectingExchange"],
     c(removedFromSelectingExchange = 36109)
   )
 })
@@ -28,7 +28,7 @@ test_that("quotesCleanup", {
 context("aggregatePrice")
 test_that("aggregatePrice", {
   expect_equal(
-    formatC(sum(head(aggregatePrice(sampleTDataMicroseconds[, list(DT, PRICE)], alignBy = "secs", alignPeriod = 30))$PRICE), digits = 10),
+    formatC(sum(head(aggregatePrice(sampleTData[, list(DT, PRICE)], alignBy = "secs", alignPeriod = 30))$PRICE), digits = 10),
     "     950.73"
   )
 })
@@ -36,48 +36,48 @@ test_that("aggregatePrice", {
 context("selectExchange and data cleaning functions")
 test_that("selectExchange and data cleaning functions", {
   expect_equal(
-    unique(selectExchange(sampleQDataRawMicroseconds, c("N", "P"))$EX),
+    unique(selectExchange(sampleQDataRaw, c("N", "P"))$EX),
     c("P", "N")
   )
   
   expect_equal(
-    dim(rmOutliersQuotes(selectExchange(sampleQDataRawMicroseconds, "N"))),
-    dim(rmOutliersQuotes(selectExchange(sampleQDataRawMicroseconds, "N"), type = "standard"))
+    dim(rmOutliersQuotes(selectExchange(sampleQDataRaw, "N"))),
+    dim(rmOutliersQuotes(selectExchange(sampleQDataRaw, "N"), type = "standard"))
   )
   
   expect_equal(
-    dim(rmTradeOutliersUsingQuotes(selectExchange(sampleTDataRawMicroseconds, "P"), selectExchange(sampleQDataRawMicroseconds, "N"))),
+    dim(rmTradeOutliersUsingQuotes(selectExchange(sampleTDataRaw, "P"), selectExchange(sampleQDataRaw, "N"))),
     c(5502, 22)
   )
   
   expect_equal(
-    dim(rmLargeSpread(selectExchange(sampleQDataRawMicroseconds, "N"))),
+    dim(rmLargeSpread(selectExchange(sampleQDataRaw, "N"))),
     c(94422, 13)
   )
   
   expect_equal(
-    dim(mergeQuotesSameTimestamp(selectExchange(sampleQDataRawMicroseconds, "N"), selection = "max.volume")),
+    dim(mergeQuotesSameTimestamp(selectExchange(sampleQDataRaw, "N"), selection = "max.volume")),
     c(46566, 13)
   )
   
   expect_equal(
-    dim(mergeQuotesSameTimestamp(selectExchange(sampleQDataRawMicroseconds, "N"), selection = "weighted.average")),
+    dim(mergeQuotesSameTimestamp(selectExchange(sampleQDataRaw, "N"), selection = "weighted.average")),
     c(46566, 13)
   )
   
   expect_equal(
-    dim(noZeroQuotes(selectExchange(sampleQDataRawMicroseconds, "N"))),
+    dim(noZeroQuotes(selectExchange(sampleQDataRaw, "N"))),
     c(94422, 13)
   )
   
   
   expect_equal(
-  dim(tradesCleanupUsingQuotes(tData = sampleTDataRawMicroseconds, qData = sampleQDataMicroseconds)),
+  dim(tradesCleanupUsingQuotes(tData = sampleTDataRaw, qData = sampleQData)),
   c(72035, 23)
   )
   
   expect_equal(
-  dim(tradesCleanup(tDataRaw = sampleTDataRawMicroseconds, exchanges = "N", report = FALSE)),
+  dim(tradesCleanup(tDataRaw = sampleTDataRaw, exchanges = "N", report = FALSE)),
   c(6140, 13)
   )
 })
@@ -86,15 +86,15 @@ context("tradesCleanup")
 
 test_that("tradesCleanup gives same data as the shipped data", {
   
-  cleanedMicroseconds <-
+  cleaned <-
     tradesCleanupUsingQuotes(
-      tData = tradesCleanup(tDataRaw = sampleTDataRawMicroseconds, exchanges = "N", report = FALSE),
-      qData = quotesCleanup(qDataRaw = sampleQDataRawMicroseconds, exchanges = "N", type = "standard", report = FALSE),
+      tData = tradesCleanup(tDataRaw = sampleTDataRaw, exchanges = "N", report = FALSE),
+      qData = quotesCleanup(qDataRaw = sampleQDataRaw, exchanges = "N", type = "standard", report = FALSE),
       lagQuotes = 0
     )[, c("DT", "SYMBOL", "PRICE", "SIZE")]
   
-  setkey(cleanedMicroseconds, SYMBOL, DT)
-  expect_equal(cleanedMicroseconds, sampleTDataMicroseconds)
+  setkey(cleaned, SYMBOL, DT)
+  expect_equal(cleaned, sampleTData)
   
   
 })
@@ -106,8 +106,8 @@ test_that("tradesCleanup on-disk functionality", {
   }
   library(data.table)
   DT <- SYMBOL <- NULL
-  trades2 <- sampleTDataRawMicroseconds
-  quotes2 <- sampleQDataRawMicroseconds
+  trades2 <- sampleTDataRaw
+  quotes2 <- sampleQDataRaw
   trades2[, DT := as.POSIXct(DT, tz = "UTC")]
   quotes2[, DT := as.POSIXct(DT, tz = "UTC")]
   
@@ -134,18 +134,18 @@ test_that("tradesCleanup on-disk functionality", {
   unlink(quoteDataSource, recursive = TRUE, force = TRUE)
   unlink(dataDestination, recursive = TRUE, force = TRUE)
   
-  sampleTDataMicrosecondsDay1 <-
+  sampleTDataDay1 <-
     tradesCleanupUsingQuotes(
-      tData = tradesCleanup(tDataRaw = sampleTDataRawMicroseconds[as.Date(DT) == "2018-01-02"], exchanges = "N", report = FALSE),
-      qData = quotesCleanup(qDataRaw = sampleQDataRawMicroseconds[as.Date(DT) == "2018-01-02"], exchanges = "N", type = "advanced", report = FALSE),
+      tData = tradesCleanup(tDataRaw = sampleTDataRaw[as.Date(DT) == "2018-01-02"], exchanges = "N", report = FALSE),
+      qData = quotesCleanup(qDataRaw = sampleQDataRaw[as.Date(DT) == "2018-01-02"], exchanges = "N", type = "advanced", report = FALSE),
       lagQuotes = 0
     )[, c("DT", "SYMBOL", "PRICE", "SIZE")]
   
   
-  sampleTDataMicrosecondsDay2 <-
+  sampleTDataDay2 <-
     tradesCleanupUsingQuotes(
-      tData = tradesCleanup(tDataRaw = sampleTDataRawMicroseconds[as.Date(DT) == "2018-01-03"], exchanges = "N", report = FALSE),
-      qData = quotesCleanup(qDataRaw = sampleQDataRawMicroseconds[as.Date(DT) == "2018-01-03"], exchanges = "N", type = "standard", report = FALSE),
+      tData = tradesCleanup(tDataRaw = sampleTDataRaw[as.Date(DT) == "2018-01-03"], exchanges = "N", report = FALSE),
+      qData = quotesCleanup(qDataRaw = sampleQDataRaw[as.Date(DT) == "2018-01-03"], exchanges = "N", type = "standard", report = FALSE),
       lagQuotes = 0
     )[, c("DT", "SYMBOL", "PRICE", "SIZE")]
   
@@ -155,12 +155,12 @@ test_that("tradesCleanup on-disk functionality", {
   onDiskDay2 <- onDiskDay2[as.Date(DT, tz = "EST") == "2018-01-03",c("DT", "SYMBOL", "PRICE", "SIZE")][, DT := DT - 18000]
   setkey(onDiskDay1, SYMBOL, DT)
   setkey(onDiskDay2, SYMBOL, DT)
-  expect_equal(onDiskDay1[,-"DT"], sampleTDataMicrosecondsDay1[,-"DT"])
-  expect_equal(onDiskDay2[,-"DT"], sampleTDataMicrosecondsDay2[,-"DT"])
+  expect_equal(onDiskDay1[,-"DT"], sampleTDataDay1[,-"DT"])
+  expect_equal(onDiskDay2[,-"DT"], sampleTDataDay2[,-"DT"])
   ## Test that they are equal to the shipped data
-  cleanedMicroseconds <-  rbind(sampleTDataMicrosecondsDay1, sampleTDataMicrosecondsDay2)
-  setkey(cleanedMicroseconds, SYMBOL, DT)
-  expect_equal(sampleTDataMicroseconds, cleanedMicroseconds)
+  cleaned <-  rbind(sampleTDataDay1, sampleTDataDay2)
+  setkey(cleaned, SYMBOL, DT)
+  expect_equal(sampleTData, cleaned)
   
 })
 
@@ -292,7 +292,7 @@ test_that("aggregateQuotes milliseconds vs seconds", {
 context("business time aggregation")
 test_that("business time aggregation",{
   skip_if_not(capabilities('long.double'), 'Skip tests when long double is not available')
-  pData <- sampleTDataMicroseconds
+  pData <- sampleTData
   agged1 <- businessTimeAggregation(pData, measure = "intensity", obs = 390, bandwidth = 0.075)
   expect_equal(nrow(agged1$pData), 780) # We return the correct number of observations
   
@@ -375,9 +375,9 @@ context("makeRMFormat")
 test_that("makeRMFormat",{
   set.seed(1)
   PRICE <- DT <- .N <- NULL
-  data1 <- copy(sampleTDataMicroseconds)[,  `:=`(PRICE = PRICE * runif(.N, min = 0.99, max = 1.01),
+  data1 <- copy(sampleTData)[,  `:=`(PRICE = PRICE * runif(.N, min = 0.99, max = 1.01),
                                                  DT = DT + runif(.N, 0.01, 0.02))]
-  data2 <- copy(sampleTDataMicroseconds)[, SYMBOL := 'XYZ']
+  data2 <- copy(sampleTData)[, SYMBOL := 'XYZ']
   
   dat <- rbind(data1, data2)
   setkey(dat, "DT")

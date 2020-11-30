@@ -46,8 +46,18 @@ as suggested in Jacod and Todorov (2009).
 \examples{
 # Realized threshold  Variance/Covariance: 
 # Multivariate:
-rcThreshold <- rThresholdCov(cbind(lltc, sbux), alignBy = "minutes", alignPeriod = 1) 
+\dontrun{
+library("xts")
+set.seed(123)
+start <- strptime("1970-01-01", format = "\%Y-\%m-\%d", tz = "UTC")
+timestamps <- start + seq(34200, 57600, length.out = 23401)
+
+dat <- cbind(rnorm(23401) * sqrt(1/23401), rnorm(23401) * sqrt(1/23401))
+
+dat <- exp(cumsum(xts(dat, timestamps)))
+rcThreshold <- rThresholdCov(dat, alignBy = "minutes", alignPeriod = 1, makeReturns = TRUE)
 rcThreshold  
+}
 
 }
 \references{

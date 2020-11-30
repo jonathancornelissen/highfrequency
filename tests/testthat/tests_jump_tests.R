@@ -4,7 +4,7 @@ library(xts)
 context("AJjumpTest unit test")
 test_that("AJjumpTest unit test",{
   expect_equal(
-    as.numeric(AJjumpTest(as.xts(sampleTDataMicroseconds[,list(DT, PRICE)]), p = 2, k = 3, alignBy = "seconds", alignPeriod = 5, makeReturns = TRUE)[,1]),
+    as.numeric(AJjumpTest(as.xts(sampleTData[,list(DT, PRICE)]), p = 2, k = 3, alignBy = "seconds", alignPeriod = 5, makeReturns = TRUE)[,1]),
     c(-1.1620534373, -0.1330522019)
   )
 })
@@ -29,7 +29,7 @@ test_that("JO jump test unit test",{
 context("BNSjumpTest")
 test_that("BNSjumpTest", {
   expect_equal(
-    as.numeric(BNSjumpTest(as.xts(sampleTDataMicroseconds[, list(DT, PRICE)]), IVestimator= "rMinRV", IQestimator = "rMedRQ", type= "linear", makeReturns = TRUE)[, "p.value"]),
+    as.numeric(BNSjumpTest(as.xts(sampleTData[, list(DT, PRICE)]), IVestimator= "rMinRV", IQestimator = "rMedRQ", type= "linear", makeReturns = TRUE)[, "p.value"]),
     c(1.794624516e-02, 2.913249385e-05)
   )
 })
@@ -38,7 +38,7 @@ context("intradayJumpTest")
 test_that("LM test",{
   ## Extract the prices and set the time-zone to the local time-zone
   library(xts)
-  dat <- sampleTDataMicroseconds[as.Date(DT) == "2018-01-02", list(DT, PRICE)]
+  dat <- sampleTData[as.Date(DT) == "2018-01-02", list(DT, PRICE)]
   
   jumpTest <- intradayJumpTest(pData = dat, volEstimator = "RM", driftEstimator = "none", alpha = 0.95, RM = "bipower", 
                                lookBackPeriod = 10, dontIncludeLast = TRUE, on = "minutes", k = 5,
@@ -57,7 +57,7 @@ test_that("LM test",{
 })
 
 test_that("FoF test",{
-  dat <- sampleTDataMicroseconds[, list(DT, PRICE)]
+  dat <- sampleTData[, list(DT, PRICE)]
   FoFtest <- intradayJumpTest(pData = dat, volEstimator = "PARM", driftEstimator = "none", alpha = 0.95, RM = "bipower", 
                               theta = 1, lookBackPeriod = 50, marketOpen = "9:30:00", marketClose = "16:00:00", tz = "GMT")
   

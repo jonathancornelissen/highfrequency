@@ -31,7 +31,7 @@ Function returns the rMedRQ, defined in Andersen et al. (2012).
   }
 }
 \examples{
-rq <- rMedRQ(rData = sampleTDataMicroseconds[, list(DT, PRICE)], alignBy = "minutes", 
+rq <- rMedRQ(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes", 
             alignPeriod = 5, makeReturns = TRUE)
 rq
 }

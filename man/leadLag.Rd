@@ -46,7 +46,18 @@ The lead-lag-ratio (LLR) can be used to see if one asset leads the other. If LLR
 }
 \examples{
 \dontrun{
-ll <- leadLag(100 + cumsum(sbux), 100 + cumsum(lltc), lags = seq(-50,50))
+# Toy example to show the usage
+library(xts)
+set.seed(123)
+start <- strptime("1970-01-01", format = "\%Y-\%m-\%d", tz = "UTC")
+timestamps <- start + seq(34200, 57600, length.out = 23401)
+
+dat <- cbind(rnorm(23401) * sqrt(1/23401), rnorm(23401) * sqrt(1/23401))
+
+dat <- exp(cumsum(xts(dat, timestamps)))
+price1 <- dat[,1]
+price2 <- dat[,2]
+ll <- leadLag(price1, price2, seq(-10,10), normalize = FALSE)
 plot(ll)
 }
 

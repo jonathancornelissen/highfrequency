@@ -7,7 +7,7 @@
 makeOHLCV(pData, alignBy = "minutes", alignPeriod = 5, tz = NULL)
 }
 \arguments{
-\item{pData}{data.table or xts object to make the bars out of, containing the intraday price series of a stock for possibly multiple days.}
+\item{pData}{data.table or xts object to make the bars out of, containing the intraday price series of possibly multiple stocks for possibly multiple days.}
 
 \item{alignBy}{character, indicating the time scale in which "alignPeriod" is expressed. Possible values are: "secs", "seconds", "mins", "minutes", "hours".}
 
@@ -30,7 +30,7 @@ minuteBars <- makeOHLCV(sampleTDataEurope[,], alignBy = "minutes", alignPeriod =
 quantmod::chartSeries(minuteBars)
 
 ## We can also handle data across multiple days.
-fiveMinuteBars <- makeOHLCV(sampleTDataMicroseconds)
+fiveMinuteBars <- makeOHLCV(sampleTData)
 ## Again we plot the series with chartSeries
 quantmod::chartSeries(fiveMinuteBars)
 

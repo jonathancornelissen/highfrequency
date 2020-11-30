@@ -41,7 +41,7 @@ can lead to more precise volatility forecasts,
 as shown in Andersen et al. (2007) and Corsi et al. (2010).
 }
 \examples{
-medrv <- rMedRV(rData = sampleTDataMicroseconds[, list(DT, PRICE)], alignBy = "minutes", 
+medrv <- rMedRV(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes", 
                alignPeriod = 5, makeReturns = TRUE)
 medrv 
 }

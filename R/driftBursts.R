@@ -30,7 +30,7 @@
 #' 
 #' @examples 
 #' ## Usage with data.table object
-#' dat <- sampleTDataMicroseconds[as.Date(DT) == "2018-01-02"]
+#' dat <- sampleTData[as.Date(DT) == "2018-01-02"]
 #' ## Testing every 60 seconds after 09:45:00
 #' DBH1 <- driftBursts(dat, testTimes = seq(35100, 57600, 60), preAverage = 2, ACLag = -1L,
 #'                     meanBandwidth = 300L, varianceBandwidth = 900L)
@@ -39,21 +39,21 @@
 #' plot(DBH1, pData = dat)
 #' ## Usage with xts object (1 column)
 #' library("xts")
-#' dat <- xts(sampleTDataMicroseconds[as.Date(DT) == "2018-01-03"]$PRICE, 
-#'            order.by = sampleTDataMicroseconds[as.Date(DT) == "2018-01-03"]$DT)
+#' dat <- xts(sampleTData[as.Date(DT) == "2018-01-03"]$PRICE, 
+#'            order.by = sampleTData[as.Date(DT) == "2018-01-03"]$DT)
 #' ## Testing every 60 seconds after 09:45:00
 #' DBH2 <- driftBursts(dat, testTimes = seq(35100, 57600, 60), preAverage = 2, ACLag = -1L,
 #'                     meanBandwidth = 300L, varianceBandwidth = 900L)
 #' plot(DBH2, pData = dat)
 #' 
 #' \dontrun{ ## This block takes some time
-#' dat <- 10 + cumsum(lltc)
-#' index(dat) <- index(dat) - 6 * 3600
-#' ## Testing every 60 seconds after 09:45:00
-#' system.time({DBH4 <- driftBursts(dat, testTimes = seq(35100, 57600, 60), preAverage = 2, 
+#' dat <- xts(sampleTDataEurope$PRICE, 
+#'            order.by = sampleTDataEurope$DT)
+#' ## Testing every 60 seconds after 09:00:00
+#' system.time({DBH4 <- driftBursts(dat, testTimes = seq(32400 + 900, 63000, 60), preAverage = 2, 
 #'              ACLag = -1L, meanBandwidth = 300L, varianceBandwidth = 900L)})
 #' # On my machine with an i5-8250U, the following is 2-3 times faster
-#' system.time({DBH4 <- driftBursts(dat, testTimes = seq(35100, 57600, 60), preAverage = 2, 
+#' system.time({DBH4 <- driftBursts(dat, testTimes = seq(32400 + 900, 63000, 60), preAverage = 2, 
 #'                                  ACLag = -1L, meanBandwidth = 300L, varianceBandwidth = 900L,
 #'                                  parallelize = TRUE, nCores = 8)})
 #' plot(DBH4, pData = dat)

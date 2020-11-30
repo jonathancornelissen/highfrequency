@@ -31,7 +31,7 @@ Then, the rMinRQ is given by
 }
 }
 \examples{
-rq <- rMinRQ(rData = sampleTDataMicroseconds[, list(DT, PRICE)], alignBy = "minutes", 
+rq <- rMinRQ(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes", 
             alignPeriod = 5, makeReturns = TRUE)
 rq
 }

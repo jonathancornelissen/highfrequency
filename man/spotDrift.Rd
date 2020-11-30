@@ -51,14 +51,14 @@ These arguments default to 300 and 5 respectively.
 }
 \examples{
 # Example 1: Rolling mean and median estimators for 2 days
-meandrift <- spotDrift(data = sampleTDataMicroseconds, alignPeriod = 1, tz = "EST")
-mediandrift <- spotDrift(data = sampleTDataMicroseconds, method = "driftMedian", 
+meandrift <- spotDrift(data = sampleTData, alignPeriod = 1, tz = "EST")
+mediandrift <- spotDrift(data = sampleTData, method = "driftMedian", 
                          alignBy = "seconds", alignPeriod = 30, tz = "EST")
 plot(meandrift)
 plot(mediandrift)
 \dontrun{
 # Example 2: Kernel based estimator for one day with data.table format
-price <- sampleTDataMicroseconds[as.Date(DT) == "2018-01-02", list(DT, PRICE)]
+price <- sampleTData[as.Date(DT) == "2018-01-02", list(DT, PRICE)]
 kerneldrift <- spotDrift(price, method = "driftKernel", alignBy = "minutes", alignPeriod = 1)
 plot(kerneldrift)
 }

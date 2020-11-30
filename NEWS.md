@@ -1,3 +1,17 @@
+eChanges in version 0.8.0
+ - Various bugfixes and performance improvements
+ - Added lowercase r in front of realized measures that did not have it, so it can easily be found in IDEs e.g. with highfrequency::
+ - Added drift burst code
+ - Added Backwards - Forwards matching algorithm to cleaning step. Thanks to Kim Christensen for providing his Matlab code.
+ - removed various datasets, outdated TAQ format,  simulated 5 minute prices, returns, and prices with jumps
+ - Added European sample data, anonymized one-minute data with anonymous stock and market data, as well as home-grown dataset with realized measures
+ - on and k in data handling is now alignBy and alignPeriod respectively. This means that the realized measures and data handling functions have similar notation
+ - Improved UX in data cleaning functions by having more clear report on the trades when prompted and adding defaults that follow the standard in the literature
+ - Added data.table support to (most) realized measures
+ - Added functions makeRMFormat and makeOHLCV to convert data from a long format to a format that can be used for realized measures, and to make arbitrary period bars.
+ - HARmodel has less 'RV' in the types - much easier to type and read, also it now supports an external regressor and has robust standard errors reported in the summary.
+ - add asymptotic variance estimator for ReMeDI estimation - thanks to Merrick Li for contributing his Matlab code
+ 
 Changes in version 0.7.0
  - New naming convention.
  - Bugfix in BNSjumpTest, JOjumpTest, AJjumpTest. These functions behaved in an unexpected and inconsistent manner when the input spanned more than one day

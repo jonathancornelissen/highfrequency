@@ -31,7 +31,7 @@ Function returns the rTPQuar, defined in Andersen et al. (2012).
  }
 }
 \examples{
-tpv <- rTPQuar(rData = sampleTDataMicroseconds[, list(DT, PRICE)], alignBy = "minutes", 
+tpv <- rTPQuar(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes", 
               alignPeriod = 5, makeReturns = TRUE)
 tpv
 

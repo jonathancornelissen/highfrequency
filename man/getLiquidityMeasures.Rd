@@ -231,8 +231,8 @@ The respective liquidity measures are defined as follows:
  }
 }
 \examples{
-tqData <- matchTradesQuotes(sampleTDataMicroseconds[as.Date(DT) == "2018-01-02"], 
-                            sampleQDataMicroseconds[as.Date(DT) == "2018-01-02"])
+tqData <- matchTradesQuotes(sampleTData[as.Date(DT) == "2018-01-02"], 
+                            sampleQData[as.Date(DT) == "2018-01-02"])
 res <- getLiquidityMeasures(tqData)
 res
 }

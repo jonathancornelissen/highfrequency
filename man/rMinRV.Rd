@@ -31,7 +31,7 @@ Then, the rMinRV is given by
 }
 }
 \examples{
-minrv <- rMinRV(rData = sampleTDataMicroseconds[, list(DT, PRICE)], alignBy = "minutes",
+minrv <- rMinRV(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes",
                alignPeriod = 5, makeReturns = TRUE)
 minrv 
 

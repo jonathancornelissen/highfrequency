@@ -51,12 +51,12 @@ Then, with alignBy = "ticks" and alignPeriod = 3, the output will be 1, 4, 7, 10
 }
 \examples{
 # aggregate price data to the 30 second frequency
-aggregatePrice(sampleTDataMicroseconds, alignBy = "secs", alignPeriod = 30)
+aggregatePrice(sampleTData, alignBy = "secs", alignPeriod = 30)
 # aggregate price data to the 30 second frequency including zero return price changes
-aggregatePrice(sampleTDataMicroseconds, alignBy = "secs", alignPeriod = 30)
+aggregatePrice(sampleTData, alignBy = "secs", alignPeriod = 30)
 
 # aggregate price data to half a second frequency including zero return price changes
-aggregatePrice(sampleTDataMicroseconds, alignBy = "milliseconds", alignPeriod = 500, fill = TRUE)
+aggregatePrice(sampleTData, alignBy = "milliseconds", alignPeriod = 500, fill = TRUE)
 }
 \author{
 Jonathan Cornelissen, Kris Boudt and Onno Kleen.

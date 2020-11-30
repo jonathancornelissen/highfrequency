@@ -33,7 +33,7 @@ Then, the rKurt is given by
  in which \eqn{RV_t:} realized variance
 }
 \examples{
-rk <- rKurt(sampleTDataMicroseconds[, list(DT, PRICE)], alignBy = "minutes", 
+rk <- rKurt(sampleTData[, list(DT, PRICE)], alignBy = "minutes", 
             alignPeriod = 5, makeReturns = TRUE)
 rk
 }

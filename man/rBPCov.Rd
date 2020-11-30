@@ -54,7 +54,7 @@ Function returns the Realized BiPower Covariance (rBPCov),
 # at 5 minutes.
  
 # Univariate: 
-rbpv <- rBPCov(rData = sampleTDataMicroseconds[, list(DT, PRICE)], alignBy ="minutes", 
+rbpv <- rBPCov(rData = sampleTData[, list(DT, PRICE)], alignBy ="minutes", 
                alignPeriod = 5, makeReturns = TRUE) 
 # Multivariate: 
 rbpc <- rBPCov(rData = sampleOneMinuteData, makeReturns = TRUE, makePsd = TRUE)

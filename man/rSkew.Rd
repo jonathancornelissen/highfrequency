@@ -34,7 +34,7 @@ in which
 \eqn{RV_{t}:} realized variance
 }
 \examples{
-rs <- rSkew(sampleTDataMicroseconds[, list(DT, PRICE)],alignBy ="minutes", alignPeriod =5,
+rs <- rSkew(sampleTData[, list(DT, PRICE)],alignBy ="minutes", alignPeriod =5,
             makeReturns = TRUE)
 rs
 }

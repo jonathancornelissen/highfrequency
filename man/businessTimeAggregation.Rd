@@ -32,7 +32,7 @@ Time series aggregation based on `business time` statistics. Instead of equidist
 For example when sampling based on volume, business time aggregation will result in a time series that has an equal amount of volume between each observation (if possible).
 }
 \examples{
-pData <- sampleTDataMicroseconds[,list(DT, PRICE, SIZE)]
+pData <- sampleTData[,list(DT, PRICE, SIZE)]
 # Aggregate based on the trade intensity measure. Getting 390 observations.
 agged <- businessTimeAggregation(pData, measure = "intensity", obs = 390, bandwidth = 0.075)
 # Plot the trade intensity measure

@@ -41,7 +41,7 @@ Then, the rCov is given by
 # Realized Variance/Covariance for prices aligned at 5 minutes.
 
 # Univariate: 
-rv = rCov(rData = sampleTDataMicroseconds[, list(DT, PRICE)], alignBy = "minutes", 
+rv = rCov(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes", 
           alignPeriod = 5, makeReturns = TRUE)
 rv
 

@@ -44,7 +44,7 @@
 #' #load sample price data
 #' \dontrun{
 #' library(xts)
-#' ts <- as.xts(sampleTDataMicroseconds[, list(DT, PRICE, SIZE)])
+#' ts <- as.xts(sampleTData[, list(DT, PRICE, SIZE)])
 #' 
 #' #Previous tick aggregation to the 5-minute sampling frequency:
 #' tsagg5min <- aggregateTS(ts, alignBy = "minutes", alignPeriod = 5)
@@ -225,12 +225,12 @@ aggregateTS <- function (ts, FUN = "previoustick", alignBy = "minutes", alignPer
 #' @keywords data manipulation
 #' @examples
 #' # aggregate price data to the 30 second frequency
-#' aggregatePrice(sampleTDataMicroseconds, alignBy = "secs", alignPeriod = 30)
+#' aggregatePrice(sampleTData, alignBy = "secs", alignPeriod = 30)
 #' # aggregate price data to the 30 second frequency including zero return price changes
-#' aggregatePrice(sampleTDataMicroseconds, alignBy = "secs", alignPeriod = 30)
+#' aggregatePrice(sampleTData, alignBy = "secs", alignPeriod = 30)
 #'
 #' # aggregate price data to half a second frequency including zero return price changes
-#' aggregatePrice(sampleTDataMicroseconds, alignBy = "milliseconds", alignPeriod = 500, fill = TRUE)
+#' aggregatePrice(sampleTData, alignBy = "milliseconds", alignPeriod = 500, fill = TRUE)
 #' @keywords internal
 #' @importFrom xts last tzone
 #' @importFrom data.table fifelse
@@ -392,7 +392,7 @@ aggregatePrice <- function(pData, alignBy = "minutes", alignPeriod = 1, marketOp
 #' Aggregate a data.table or xts object containing quote data
 #' 
 #' @description Function returns a data.table or xts object containing the aggregated quote data with columns "SYMBOL", "EX", "BID","BIDSIZ","OFR","OFRSIZ". 
-#' See \code{\link{sampleQDataMicroseconds}} for an example of the argument qData.
+#' See \code{\link{sampleQData}} for an example of the argument qData.
 #' 
 #' @param qData data.table or xts object to be aggregated, containing the intraday quote data of a stock for one day.
 #' @param alignBy character, indicating the time scale in which "alignPeriod" is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".
@@ -420,7 +420,7 @@ aggregatePrice <- function(pData, alignBy = "minutes", alignPeriod = 1, marketOp
 #' 
 #' @examples
 #' # aggregate quote data to the 30 second frequency
-#' qDataAggregated <- aggregateQuotes(sampleQDataMicroseconds, alignBy = "seconds", alignPeriod = 30)
+#' qDataAggregated <- aggregateQuotes(sampleQData, alignBy = "seconds", alignPeriod = 30)
 #' qDataAggregated # Show the aggregated data
 #' @export
 aggregateQuotes <- function(qData, alignBy = "minutes", alignPeriod = 5, marketOpen = "09:30:00", marketClose = "16:00:00", tz = "GMT") {
@@ -582,7 +582,7 @@ aggregateQuotes <- function(qData, alignBy = "minutes", alignPeriod = 5, marketO
 #' 
 #' @examples 
 #' # aggregate trade data to 5 minute frequency
-#' tDataAggregated <- aggregateTrades(sampleTDataMicroseconds, alignBy = "minutes", alignPeriod = 5)
+#' tDataAggregated <- aggregateTrades(sampleTData, alignBy = "minutes", alignPeriod = 5)
 #' tDataAggregated
 #' @export
 aggregateTrades <- function(tData, alignBy = "minutes", alignPeriod = 5, marketOpen = "09:30:00", marketClose = "16:00:00", tz = "GMT") {
@@ -734,7 +734,7 @@ aggregateTrades <- function(tData, alignBy = "minutes", alignPeriod = 5, marketO
 #' }
 #' @return data.table or xts object depending on input
 #' 
-#' @examples autoSelectExchangeTrades(sampleTDataRawMicroseconds)
+#' @examples autoSelectExchangeTrades(sampleTDataRaw)
 #' 
 #' @author Jonathan Cornelissen, Kris Boudt and Onno Kleen
 #' 
@@ -817,7 +817,7 @@ autoSelectExchangeTrades <- function(tData, printExchange = TRUE) {
 #' @return data.table or xts object depending on input
 #' 
 #' @examples 
-#' autoSelectExchangeQuotes(sampleQDataRawMicroseconds)
+#' autoSelectExchangeQuotes(sampleQDataRaw)
 #'
 #' @author Jonathan Cornelissen, Kris Boudt and Onno Kleen
 #' 
@@ -895,7 +895,7 @@ autoSelectExchangeQuotes <- function(qData, printExchange = TRUE) {
 #' @references Brownlees, C.T. and Gallo, G.M. (2006). Financial econometric analysis at ultra-high frequency: Data handling concerns. Computational Statistics & Data Analysis, 51, pages 2232-2245.
 #' @author Jonathan Cornelissen, Kris Boudt and Onno Kleen.
 #' @examples 
-#' exchangeHoursOnly(sampleTDataRawMicroseconds)
+#' exchangeHoursOnly(sampleTDataRaw)
 #' @keywords cleaning
 #' @importFrom xts tzone
 #' @export
@@ -1076,7 +1076,7 @@ makeReturns <- function(ts) {
 #' 
 #' @examples 
 #' # multi-day input allowed
-#' tqData <- matchTradesQuotes(sampleTDataMicroseconds, sampleQDataMicroseconds)
+#' tqData <- matchTradesQuotes(sampleTData, sampleQData)
 #' # Show output
 #' tqData
 #' @importFrom xts tzone<- tzone
@@ -1239,7 +1239,7 @@ mergeQuotesSameTimestamp <- function(qData, selection = "median") {
       stop("Data.table neeeds DT column (date-time).")
     }
   }
-  # qData <- sampleQDataRawMicroseconds
+  # qData <- sampleQDataRaw
   # qData <- checkColumnNames(qData)
   # keep summed size columns
   keepCols <- colnames(qData)[!(colnames(qData) %in% c("DT", "SYMBOL","BID", "OFR","BIDSIZ", "OFRSIZ"))]
@@ -1505,13 +1505,16 @@ noZeroQuotes <- function(qData) {
 #' will write temporary files on your machine - we try to clean up after it, but cannot guarantee that 
 #' there won't be files that slip through the crack if the permission settings on your machine does not match 
 #' ours
+#' 
+#' If the input data.table does not contain a DT column but it does contain DATE and TIME_M columns, we create the DT column by REFERENCE, altering the data.table that may be in the user's environment!
+#' 
 #' @author Jonathan Cornelissen, Kris Boudt and Onno Kleen.
 #' 
 #' @examples
 #' # Consider you have raw quote data for 1 stock for 2 days
-#' head(sampleQDataRawMicroseconds)
-#' dim(sampleQDataRawMicroseconds)
-#' qDataAfterCleaning <- quotesCleanup(qDataRaw = sampleQDataRawMicroseconds, exchanges = "N")
+#' head(sampleQDataRaw)
+#' dim(sampleQDataRaw)
+#' qDataAfterCleaning <- quotesCleanup(qDataRaw = sampleQDataRaw, exchanges = "N")
 #' qDataAfterCleaning$report
 #' dim(qDataAfterCleaning$qData)
 #' 
@@ -1544,7 +1547,7 @@ quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
         }
         # Try to Cleanup - we don't force it though!
         unlink(tmp, recursive = TRUE)
-      } else if(extension %in% c("csv", "gz", "bz2")){
+      } else if(extension %in% c("csv", "gz", "gzip", "bz2")){
         readdata <- try(fread(ii), silent = TRUE)
       } else if(extension %in% c("rds")){
         readdata <- try(readRDS(ii))
@@ -1593,6 +1596,13 @@ quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
   }
   
   if (!is.null(qDataRaw)) {
+    
+    nm <- colnames(qDataRaw)
+    if(!"DT" %in% nm && c("DATE", "TIME_M") %in% nm){
+      qDataRaw[, `:=`(DT = as.POSIXct(paste(DATE, TIME_M), tz = "UTC", format = "%Y%m%d %H:%M:%OS"),
+                      DATE = NULL, TIME_M = NULL, SYM_SUFFIX = NULL)]
+    }
+    
     
     qDataRaw <- checkColumnNames(qDataRaw)
     checkqData(qDataRaw)
@@ -1725,7 +1735,7 @@ rmLargeSpread <- function(qData, maxi = 50) {
 #' @author Jonathan Cornelissen, Kris Boudt and Onno Kleen
 #' 
 #' @examples 
-#' rmNegativeSpread(sampleQDataRawMicroseconds)
+#' rmNegativeSpread(sampleQDataRaw)
 #' 
 #' @keywords cleaning
 #' @export
@@ -2135,11 +2145,12 @@ selectExchange <- function(data, exch = "N") {
 #' but cannot guarantee that there won't be files that slip through the crack if the permission settings on your machine does not match 
 #' ours
 #' 
+#' If the input data.table does not contain a DT column but it does contain DATE and TIME_M columns, we create the DT column by REFERENCE, altering the data.table that may be in the user's environment!
 #' @examples 
 #' # Consider you have raw trade data for 1 stock for 2 days 
-#' head(sampleTDataRawMicroseconds)
-#' dim(sampleTDataRawMicroseconds)
-#' tDataAfterFirstCleaning <- tradesCleanup(tDataRaw = sampleTDataRawMicroseconds, 
+#' head(sampleTDataRaw)
+#' dim(sampleTDataRaw)
+#' tDataAfterFirstCleaning <- tradesCleanup(tDataRaw = sampleTDataRaw, 
 #'                                          exchanges = list("N"))
 #' tDataAfterFirstCleaning$report
 #' dim(tDataAfterFirstCleaning$tData)
@@ -2175,7 +2186,7 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
         }
         # Try to Cleanup - we don't force it though!
         unlink(tmp, recursive = TRUE)
-      } else if(extension %in% c("csv", "gz", "bz2")){
+      } else if(extension %in% c("csv", "gz", "gzip", "bz2")){
         readdata <- try(fread(ii, tz = tz), silent = TRUE)
       } else if(extension %in% c("rds")){
         readdata <- try(readRDS(ii))
@@ -2219,8 +2230,11 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
   
   if (!is.null(tDataRaw)) {
     
-    
-    
+    nm <- colnames(tDataRaw)
+    if(!"DT" %in% nm && c("DATE", "TIME_M") %in% nm){
+      tDataRaw[, `:=`(DT = as.POSIXct(paste(DATE, TIME_M), tz = "UTC", format = "%Y%m%d %H:%M:%OS"),
+                      DATE = NULL, TIME_M = NULL, SYM_SUFFIX = NULL)]
+    }
     
     
     
@@ -2357,10 +2371,10 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
 #' 
 #' @examples 
 #' # Consider you have raw trade data for 1 stock for 2 days 
-#' tDataAfterFirstCleaning <- tradesCleanup(tDataRaw = sampleTDataRawMicroseconds, 
+#' tDataAfterFirstCleaning <- tradesCleanup(tDataRaw = sampleTDataRaw, 
 #'                                           exchanges = "N", report = FALSE)
 #' # 
-#' qData <- quotesCleanup(qDataRaw = sampleQDataRawMicroseconds, 
+#' qData <- quotesCleanup(qDataRaw = sampleQDataRaw, 
 #'                        exchanges = "N", report = FALSE)
 #' dim(tDataAfterFirstCleaning)
 #' tDataAfterFinalCleaning <- 
@@ -2622,7 +2636,7 @@ refreshTime <- function (pData, sort = FALSE, criterion = "squared duration") {
 #' @return A list containing "pData" which is the aggregated data and a list containing the intensity process, split up day by day.
 #' 
 #' @examples
-#' pData <- sampleTDataMicroseconds[,list(DT, PRICE, SIZE)]
+#' pData <- sampleTData[,list(DT, PRICE, SIZE)]
 #' # Aggregate based on the trade intensity measure. Getting 390 observations.
 #' agged <- businessTimeAggregation(pData, measure = "intensity", obs = 390, bandwidth = 0.075)
 #' # Plot the trade intensity measure
@@ -2738,7 +2752,7 @@ businessTimeAggregation <- function(pData, measure = "volume", obs = 390, bandwi
 #' Make Open-High-Low-Close-Volume bars
 #' 
 #' This function makes OHLC-V bars at arbitrary intevals. If the SIZE column is not present in the input, no volume column is created.
-#' @param pData data.table or xts object to make the bars out of, containing the intraday price series of a stock for possibly multiple days.
+#' @param pData data.table or xts object to make the bars out of, containing the intraday price series of possibly multiple stocks for possibly multiple days.
 #' @param alignBy character, indicating the time scale in which "alignPeriod" is expressed. Possible values are: "secs", "seconds", "mins", "minutes", "hours".
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate an
 #' object to the 5 minute frequency set alignPeriod = 5 and alignBy = "minutes".
@@ -2754,7 +2768,7 @@ businessTimeAggregation <- function(pData, measure = "volume", obs = 390, bandwi
 #' quantmod::chartSeries(minuteBars)
 #' 
 #' ## We can also handle data across multiple days.
-#' fiveMinuteBars <- makeOHLCV(sampleTDataMicroseconds)
+#' fiveMinuteBars <- makeOHLCV(sampleTData)
 #' ## Again we plot the series with chartSeries
 #' quantmod::chartSeries(fiveMinuteBars)
 #' 
@@ -2766,7 +2780,7 @@ businessTimeAggregation <- function(pData, measure = "volume", obs = 390, bandwi
 #' 
 #' @export
 makeOHLCV <- function(pData, alignBy = "minutes", alignPeriod = 5, tz = NULL){
-  .SD <-  DATE <- SIZE <- DT <-  PRICE <- NULL
+  SYMBOL <- .SD <-  DATE <- SIZE <- DT <-  PRICE <- NULL
   pData <- checkColumnNames(pData)
   if (!is.xts(pData) & !is.data.table(pData)) {
     stop("The argument pData should be a data.table or xts object.")
@@ -2800,10 +2814,10 @@ makeOHLCV <- function(pData, alignBy = "minutes", alignPeriod = 5, tz = NULL){
       stop("Input has to be data.table or xts.")
     }
   } else {
-    if (!("DT" %in% colnames(pData))) {
-      stop("Data.table neeeds DT column (date-time).")
+    if (any(!(c("DT","SYMBOL") %in% colnames(pData)))) {
+      stop("Data.table neeeds DT (date-time) and SYMBOL columns.")
     }
-    pData <- pData[, list(DT, PRICE, SIZE)]
+    pData <- pData[, list(DT, PRICE, SIZE, SYMBOL)]
   }
   
   
@@ -2817,14 +2831,16 @@ makeOHLCV <- function(pData, alignBy = "minutes", alignPeriod = 5, tz = NULL){
     tz <- timeZone
   }
   
-  setkey(pData, DT)
-  pData <- pData[, lapply(.SD, nafill, type = "locf"), .SDcols = colnames(pData), by = list(DATE = as.Date(DT, tz = tz))]
-  pData <- pData[, lapply(.SD, nafill, type = "nocb"), by = DATE]
+  setkey(pData, SYMBOL, DT)
+  nm <- colnames(pData)
+  nm <- nm[nm != "SYMBOL"]
+  pData <- pData[, lapply(.SD, nafill, type = "locf"), .SDcols = nm, by = list(SYMBOL = SYMBOL, DATE = as.Date(DT, tz = tz))]
+  pData <- pData[, lapply(.SD, nafill, type = "nocb"), .SDcols = nm, by = list(SYMBOL = SYMBOL, DATE = DATE)]
   pData[, DT := DT + (scaleFactor - as.numeric(DT, tz = tz) %% scaleFactor)]
   if(!("SIZE" %in% colnames(pData))){
-    pData <- pData[, list(OPEN = first(PRICE), HIGH = max(PRICE), LOW = min(PRICE), CLOSE = last(PRICE)), by = DT]
+    pData <- pData[, list(OPEN = first(PRICE), HIGH = max(PRICE), LOW = min(PRICE), CLOSE = last(PRICE)), by = list(SYMBOL, DT)]
   } else{
-    pData <- pData[, list(OPEN = first(PRICE), HIGH = max(PRICE), LOW = min(PRICE), CLOSE = last(PRICE), VOLUME = sum(SIZE)), by = DT]
+    pData <- pData[, list(OPEN = first(PRICE), HIGH = max(PRICE), LOW = min(PRICE), CLOSE = last(PRICE), VOLUME = sum(SIZE)), by = list(DT,SYMBOL)]
   }
  
   if (inputWasXts) {
@@ -2851,9 +2867,9 @@ makeOHLCV <- function(pData, alignBy = "minutes", alignPeriod = 5, tz = NULL){
 #' @examples
 #' \dontrun{
 #' library(data.table)
-#' data1 <- copy(sampleTDataMicroseconds)[,  `:=`(PRICE = PRICE * runif(.N, min = 0.99, max = 1.01),
+#' data1 <- copy(sampleTData)[,  `:=`(PRICE = PRICE * runif(.N, min = 0.99, max = 1.01),
 #'                                                DT = DT + runif(.N, 0.01, 0.02))]
-#' data2 <- copy(sampleTDataMicroseconds)[, SYMBOL := 'XYZ']
+#' data2 <- copy(sampleTData)[, SYMBOL := 'XYZ']
 #' 
 #' dat <- rbind(data1, data2)
 #' setkey(dat, "DT")

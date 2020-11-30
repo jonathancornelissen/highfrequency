@@ -4,14 +4,14 @@ library(testthat)
 
 context("spotDrift")
 test_that("spotDrift",{
-  price <- sampleTDataMicroseconds[as.Date(DT) == "2018-01-03", list(DT, PRICE)]
+  price <- sampleTData[as.Date(DT) == "2018-01-03", list(DT, PRICE)]
   kerneldrift <- spotDrift(as.xts(price), method = "driftKernel", alignBy = "minutes", alignPeriod = 1)
   expect_equal(
     sum(kerneldrift$mu),
     0.2335009566
   )
   
-  dat <- data.table::copy(sampleTDataMicroseconds)
+  dat <- data.table::copy(sampleTData)
   dat[, SYMBOL := NULL]
   meandrift <- spotDrift(data = dat, alignPeriod = 1, tz = "EST")
   expect_identical(formatC(meandrift$mu[1:10], digits = 5),
@@ -19,11 +19,11 @@ test_that("spotDrift",{
   )
   
   expect_identical(
-    {dat <- data.table::copy(sampleTDataMicroseconds)
+    {dat <- data.table::copy(sampleTData)
     dat[, SYMBOL := NULL]
     meandrift1 <- spotDrift(data = dat, alignPeriod = 10, alignBy =  "seconds", tz = "EST")
     formatC(meandrift1$mu[11:40], digits = 5)},
-    {dat <- data.table::copy(sampleTDataMicroseconds)
+    {dat <- data.table::copy(sampleTData)
     dat[, SYMBOL := NULL]
     meandrift2 <- spotDrift(data = dat, alignPeriod = 10000, alignBy =  "milliseconds", tz = "EST")
     formatC(meandrift2$mu[11:40], digits = 5)}

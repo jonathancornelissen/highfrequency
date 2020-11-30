@@ -1,14 +1,14 @@
-#' LLTC Data
-#'
-#' @description Tick data for LLTC 2011/07/01, cleaned with \code{tradesCleanup}.
-#'
-#' @examples
-#' data(lltc)
-#' plot(lltc)
-#'
-#' @format xts object
-#' @keywords datasets
-"lltc"
+# #' LLTC Data
+# #'
+# #' @description Tick data for LLTC 2011/07/01, cleaned with \code{tradesCleanup}.
+# #'
+# #' @examples
+# #' data(lltc)
+# #' plot(lltc)
+# #'
+# #' @format xts object
+# #' @keywords datasets
+# "lltc"
 
 # #' The realized library from the Oxford-Man Institute of Quantitative Finance
 # #' 
@@ -118,17 +118,17 @@
 
 #' Sample of cleaned quotes for stock XXX for 2 days measured in microseconds
 #' 
-#' @description A data.table object containing the quotes for the imaginary stock XXX for 2 days. This is the cleaned version of the data sample \code{\link{sampleQDataRawMicroseconds}}, using \code{quotesCleanup}.
+#' @description A data.table object containing the quotes for the imaginary stock XXX for 2 days. This is the cleaned version of the data sample \code{\link{sampleQDataRaw}}, using \code{quotesCleanup}.
 #' 
 #' @format data.table object
 #' @examples 
 #' \dontrun{
-#' # The code to create the sampleQDataMicroseconds dataset from raw data is
-#' sampleQDataMicroseconds <- quotesCleanup(qDataRaw = sampleQDataRawMicroseconds,
+#' # The code to create the sampleQData dataset from raw data is
+#' sampleQData <- quotesCleanup(qDataRaw = sampleQDataRaw,
 #'                                          exchanges = "N", type = "standard", report = FALSE)
 #' }
 #' @keywords datasets
-"sampleQDataMicroseconds"
+"sampleQData"
 
 #' Sample of raw quotes for stock XXX for 2 days measured in microseconds
 #' @description  An data.table object containing the raw quotes for stock XXX for 2 days, in the typical NYSE TAQ database format.
@@ -136,7 +136,7 @@
 #' @format data.table object
 #' 
 #' @keywords datasets
-"sampleQDataRawMicroseconds"
+"sampleQDataRaw"
 
 # #' Sample returns data
 # #' 
@@ -177,21 +177,21 @@
 #' Sample of cleaned trades for stock XXX for 2 days
 #' 
 #' @description A data.table object containing the trades for the imaginary stock XXX for 2 days, in the typical NYSE TAQ database format.
-#' This is the cleaned version of the data sample \code{\link{sampleTDataRawMicroseconds}}, using \code{tradesCleanup}.
+#' This is the cleaned version of the data sample \code{\link{sampleTDataRaw}}, using \code{tradesCleanup}.
 #' 
 #' @docType data
 #' @examples 
 #' \dontrun{
-#' # The code to create the sampleTDataMicroseconds dataset from raw data is
-#' sampleQDataMicroseconds <- quotesCleanup(qDataRaw = sampleQDataRawMicroseconds,
+#' # The code to create the sampleTData dataset from raw data is
+#' sampleQData <- quotesCleanup(qDataRaw = sampleQDataRaw,
 #'                                          exchanges = "N", type = "standard", report = FALSE)
 #' 
-#' tradesAfterFirstCleaning <- tradesCleanup(tDataRaw = sampleTDataRawMicroseconds, 
+#' tradesAfterFirstCleaning <- tradesCleanup(tDataRaw = sampleTDataRaw, 
 #'                                           exchanges = "N", report = FALSE)
 #' 
-#' sampleTDataMicroseconds <- tradesCleanupUsingQuotes(
+#' sampleTData <- tradesCleanupUsingQuotes(
 #'   tData = tradesAfterFirstCleaning,
-#'   qData = sampleQDataMicroseconds,
+#'   qData = sampleQData,
 #'   lagQuotes = 0)[, c("DT", "SYMBOL", "PRICE", "SIZE")]
 #' # Only some columns are included. These are the ones that were historically included.
 #' }
@@ -199,7 +199,7 @@
 #' @format A data.table object.
 #' 
 #' @keywords datasets
-"sampleTDataMicroseconds"
+"sampleTData"
 
 # #' Sample of raw trades for stock XXX for 1 day
 # #' 
@@ -221,21 +221,21 @@
 #' @format A data.table object.
 #' 
 #' @keywords datasets
-"sampleTDataRawMicroseconds"
+"sampleTDataRaw"
 
-#' Starbucks Data
-#' 
-#' @description Tick data for Starbucks 2011/07/01, cleaned with \code{tradesCleanup}.
-#' 
-#' @docType data
-#' 
-#' @examples
-#' data(sbux)
-#' plot(sbux) 
-#' 
-#' @format xts object
-#' @keywords datasets
-"sbux"
+# #' Starbucks Data
+# #' 
+# #' @description Tick data for Starbucks 2011/07/01, cleaned with \code{tradesCleanup}.
+# #' 
+# #' @docType data
+# #' 
+# #' @examples
+# #' data(sbux)
+# #' plot(sbux) 
+# #' 
+# #' @format xts object
+# #' @keywords datasets
+# "sbux"
 
 # #' SP500 Realized Measures calculated with 5 minute sampling
 # #' 
@@ -266,8 +266,8 @@
 "sampleTDataEurope"
 
 #' SPY realized measures
-#' @description Realized measures for the SPY ETF calculated at 1 and 5 minute sampling
-#' @note The CLOSE column is NOT the official close price, but simply the last recorded price of the day. Thus this may be slightly different from other datasets
+#' @description Realized measures for the SPY ETF calculated at 1 and 5 minute sampling. 
+#' @note The CLOSE column is NOT the official close price, but simply the last recorded price of the day. Thus this may be slightly different from other sources
 #' @format A \code{data.table} object
 #' @keywords datasets
 "SPYRM"
