@@ -39,7 +39,7 @@
 #' logReturns <- logReturns - mean(logReturns)
 #' 
 #' # Due to return calculation, the first observation is missing
-#' estimatedHEAVY <- HEAVYmodelNew(logReturns[-1], SPYRM$RV5[-1]^2 / 252)
+#' estimatedHEAVY <- HEAVYmodelNew(logReturns[-1], SPYRM$RK5[-1]^2 / 252)
 #' 
 #' # Calculate iterative multi-step-ahead forecasts
 #' predict(estimatedHEAVY, stepsAhead = 12)
@@ -169,9 +169,9 @@ predict.HEAVYmodel <- function(object, stepsAhead = 10, ...) {
       oneStep
     } else {
       sumB <- 
-        Reduce('+', lapply(c(0:(stepsAhead - 2)), function(s) Bj(s))) %*% 
-        c(parVarEq[1], parRMEq[2]) + 
-        Bj(stepsAhead - 1) %*% 
+        Reduce('+', lapply(c(0:(stepsAhead - 1)), function(s) Bj(s))) %*% 
+        c(parVarEq[1], parRMEq[1]) + 
+        Bj(stepsAhead) %*% 
         oneStep
       sumB
     }
