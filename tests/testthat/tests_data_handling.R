@@ -393,3 +393,18 @@ test_that("makeRMFormat",{
   
   
 })
+
+context("aggregateTrades, aggregatePrice, and aggregateQuotes multisymbol multiday")
+test_that("aggregateTrades, aggregatePrice, and aggregateQuotes multisymbol multiday",{
+  
+  datTrades <- merge.data.table(sampleTData, copy(sampleTData)[, SYMBOL := "ABC"][], by = c(colnames(sampleTData)), all = TRUE)
+  datQuotes <- merge.data.table(sampleQData, copy(sampleQData)[, SYMBOL := "ABC"][], by = colnames(sampleQData), all = TRUE)
+  
+  aggTrades <- aggregateTrades(datTrades)
+  expect_true(all(split(aggTrades, by = "SYMBOL")[[2]] == aggregateTrades(sampleTData)))
+  aggQuotes <- aggregateQuotes(datQuotes)
+  expect_true(all(split(aggQuotes, by = "SYMBOL")[[2]] == aggregateQuotes(sampleQData), na.rm = TRUE)) # remove NA because we return all the columns
+  
+  aggQuotes2 <- aggregatePrice(datQuotes)
+  all(split(aggQuotes2, by = "SYMBOL")[[2]] == aggregatePrice(sampleQData), na.rm = TRUE)
+  

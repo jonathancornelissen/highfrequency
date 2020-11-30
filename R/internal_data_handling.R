@@ -47,8 +47,8 @@ fastTickAgregation_DATA.TABLE <- function(dat, alignBy = "minutes", alignPeriod 
     secs <- 3600 * alignPeriod
   }
   #n
-  timeZone <- attr(dat$DT, "tzone")
-  if(is.null(timeZone) | timeZone == ""){
+  timeZone <- format(dat$DT[1], format = "%Z")
+  if(is.null(timeZone) || timeZone == ""){
     if(is.null(tz)){
       tz <- "UTC"
     }
@@ -61,8 +61,6 @@ fastTickAgregation_DATA.TABLE <- function(dat, alignBy = "minutes", alignPeriod 
   dat <- dat[, lapply(.SD, nafill, type = "nocb"), by = DATE]
   g <- dat[, list(DT = seq(first(DT), last(DT), by = secs, tz = tz), MAXDT = max(DT)), by = DATE]
   g$DT <- g$DT + (secs - as.numeric(g$DT, tz = tz) %% secs)
-  # g$DT <- as.POSIXct(as.numeric(g$DT, tz = tz) + (secs - as.numeric(g$DT, tz = tz) %% secs), origin = as.POSIXct("1970-01-01", tz = tz), tz = tz)
-  # dropDATE <- ifelse("DATE" %in% colnames(dat), "i.DATE", character(0))
   out <- dat[g, roll = TRUE, on = "DT"][DT < MAXDT + secs]
   
   prependingCheck <- cbind(out[, list(firstDT = first(DT)), by = DATE],
@@ -118,7 +116,8 @@ fastTickAgregation_RETURNS <- function (ts, alignBy = "minutes", alignPeriod = 1
   
   firstObs <- ts[1,]
   firstObs[] <- 0 ## We should have 0 return! We use [] to not just overwrite it as a numeric with 0
-  ts <- period.apply(ts, INDEX = merge.data.table(data.table(DT = index(ts), 1:nrow(ts)), data.table(DT = newg), by = "DT")$V2, FUN = colSums, na.rm = TRUE)
+  ts <- period.apply(ts, INDEX = merge.data.table(data.table(DT = index(ts), 1:nrow(ts)), data.table(DT = newg), by = "DT")$V2, 
+                     FUN = colSums, na.rm = TRUE)
   ts <- na.locf(ts)
   if(index(ts[1]) > index(firstObs)){
     index(firstObs) <- index(ts[1]) - secs
@@ -143,8 +142,8 @@ fastTickAgregation_DATA.TABLE_RETURNS <- function(dat, alignBy = "minutes", alig
     secs <- 3600 * alignPeriod
   }
   #n
-  timeZone <- attr(dat$DT, "tzone")
-  if(is.null(timeZone) | timeZone == ""){
+  timeZone <- format(dat$DT[1], format = "%Z")
+  if(is.null(timeZone) || timeZone == ""){
     if(is.null(tz)){
       tz <- "UTC"
     }
@@ -168,7 +167,6 @@ fastTickAgregation_DATA.TABLE_RETURNS <- function(dat, alignBy = "minutes", alig
   return(dat[])
   
 }
-
 
 
 
@@ -249,7 +247,7 @@ checktData <- function(tData) {
     stop("The argument tData should have a column containing the PRICE. Could not find that column.")
   }
   if (!any(colnames(tData) == "SYMBOL")) {
-    stop("The argument tData should have a column containing SYMBOL. Could not find that column.")
+    warning("The argument tData should have a column containing SYMBOL. Could not find that column.")
   }
   
   if (is.data.table(tData)) {
@@ -273,7 +271,7 @@ checkqData <- function(qData) {
     stop("The argument qData should have a column containing the ASK / OFR. Could not find that column.")
   }
   if (!any(colnames(qData) == "SYMBOL")) {
-    stop("The argument qData should have a column containing SYMBOL. Could not find that column.")
+    warning("The argument qData should have a column containing SYMBOL. Could not find that column.")
   }
   if (is.data.table(qData)) {
     if (typeof(qData$BID) != "double") {
@@ -289,6 +287,7 @@ checkqData <- function(qData) {
 # 1. Rolling centered median (excluding the observation under consideration)
 # 2. Rolling median of the following "window" observations
 # 3. Rolling median of the previous "window" observations
+#' @importFrom RcppRoll roll_median
 #' @keywords internal
 rollingMedianInclEnds <- function(x, weights, window, direction = "center") {
   
@@ -401,9 +400,6 @@ BFMalgorithm <- function(tData, qData, backwardsWindow, forwardsWindow, plot, tz
     plot(tqData$DT, tqData$PRICE, xaxs = 'i', pch = 20, ylim = yLim, col = fifelse(!(1:nrow(tqData) %in% remaining),
                                                                                    1 + 1:nrow(tqData) %in% idxOutliers + 1:nrow(tqData) %in% idxOutliers2,
                                                                                    0))
-    # axis(1, at = seq.POSIXt(as.POSIXct(range(tqData$DT), origin = as.POSIXct("1970-01-01", tz = "GMT"), tz = "GMT")[1], as.POSIXct(range(tqData$DT), origin = as.POSIXct("1970-01-01", tz = "GMT"), tz = "GMT")[2], length.out = 3, tz = "GMT"),
-    #      labels = format(seq.POSIXt(as.POSIXct(range(tqData$DT), origin = as.POSIXct("1970-01-01", tz = "GMT"), tz = "GMT")[1], as.POSIXct(range(tqData$DT), origin =as.POSIXct("1970-01-01", tz = "GMT"))[2], length.out = 3, tz = "GMT"),
-    #      format = "%H:%M"))
     lines(tqData$DT, tqData$OFR, type = "l", col = "blue", ylim = yLim)
     lines(tqData$DT, tqData$BID, type = "l", col = "green", ylim = yLim)
     points(tqData[remaining, DT], tqData[remaining, PRICE], pch = 4, col = "red")
