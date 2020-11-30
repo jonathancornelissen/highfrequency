@@ -960,56 +960,56 @@ exchangeHoursOnly <- function(data, marketOpen = "09:30:00", marketClose = "16:0
 
 
 
-#' Get price column(s) from a timeseries
-#' @description Will attempt to locate price column(s) from a time series with rational defaults.
-#' 
-#' @param x A data object with columns containing data to be extracted
-#' @param symbol text string containing the symbol to extract
-#' @param prefer preference for any particular type of price, see Details
-#' 
-#' @details  May be subset by symbol and preference.
-#'  \code{prefer} Preference will be for any commonly used financial time series price description,
-#'  e.g. 'trade', 'close', 'bid', 'ask' with specific tests and matching for types and column names
-#'  currently supported in R, but a default grep match will be performed if one of the supported types doesn't match.
-#'
-#' The functionality was taken from the quantmod-package
-getPrice <- function (x, symbol = NULL, prefer = NULL) {
-  # first subset on symbol, if present
-  if (!is.null(symbol)) {
-    loc <- grep(symbol, colnames(x))
-    if (!identical(loc, integer(0))) {
-      x <- x[, loc]
-    } else {
-      stop(paste("Subscript out of bounds: no column name containing ",symbol,"."))
-    }
-  }
-  if (is.null(prefer)) {
-    # default to trying Price, then Trade, then Close
-    if(has.Price(x)) prefer = 'price'
-    else if(has.Trade(x)) prefer = 'trade'
-    else if(has.Cl(x))    prefer = 'close'
-    else stop("Subscript out of bounds, no price was discernible from the data.")
-  }else {
-    loc <- NULL
-    switch(prefer,
-           Op =, open =, Open = { loc <- has.Op(x,which=TRUE) },
-           Hi =, high =, High = { loc <- has.Hi(x,which=TRUE) },
-           Lo =, low =, Low = { loc <- has.Lo(x,which=TRUE) },
-           Cl =, close =, Close = { loc <- has.Cl(x,which=TRUE) },
-           Bid =, bid = { loc <- has.Bid(x,which=TRUE) },
-           Ask =, ask =, Offer =, offer = { loc <- has.Ask(x,which=TRUE) },
-           Mid =, mid =, Midpoint =, midpoint = { loc <- has.Mid(x,which=TRUE) },
-           Trade =, trade = { loc <- has.Trade(x,which=TRUE) },
-           Price =, price = { loc <- has.Price(x,which=TRUE) },
-           {loc <- grep(prefer,colnames(x))}
-    )
-    if (!identical(loc, integer(0))) {
-      return(x[, loc])
-    } else {
-      stop("Subscript out of bounds, no price was discernible from the data.")
-    }
-  }
-}
+# #' Get price column(s) from a timeseries
+# #' @description Will attempt to locate price column(s) from a time series with rational defaults.
+# #' 
+# #' @param x A data object with columns containing data to be extracted
+# #' @param symbol text string containing the symbol to extract
+# #' @param prefer preference for any particular type of price, see Details
+# #' 
+# #' @details  May be subset by symbol and preference.
+# #'  \code{prefer} Preference will be for any commonly used financial time series price description,
+# #'  e.g. 'trade', 'close', 'bid', 'ask' with specific tests and matching for types and column names
+# #'  currently supported in R, but a default grep match will be performed if one of the supported types doesn't match.
+# #'
+# #' The functionality was taken from the quantmod-package
+# getPrice <- function (x, symbol = NULL, prefer = NULL) {
+#   # first subset on symbol, if present
+#   if (!is.null(symbol)) {
+#     loc <- grep(symbol, colnames(x))
+#     if (!identical(loc, integer(0))) {
+#       x <- x[, loc]
+#     } else {
+#       stop(paste("Subscript out of bounds: no column name containing ",symbol,"."))
+#     }
+#   }
+#   if (is.null(prefer)) {
+#     # default to trying Price, then Trade, then Close
+#     if(has.Price(x)) prefer = 'price'
+#     else if(has.Trade(x)) prefer = 'trade'
+#     else if(has.Cl(x))    prefer = 'close'
+#     else stop("Subscript out of bounds, no price was discernible from the data.")
+#   }else {
+#     loc <- NULL
+#     switch(prefer,
+#            Op =, open =, Open = { loc <- has.Op(x,which=TRUE) },
+#            Hi =, high =, High = { loc <- has.Hi(x,which=TRUE) },
+#            Lo =, low =, Low = { loc <- has.Lo(x,which=TRUE) },
+#            Cl =, close =, Close = { loc <- has.Cl(x,which=TRUE) },
+#            Bid =, bid = { loc <- has.Bid(x,which=TRUE) },
+#            Ask =, ask =, Offer =, offer = { loc <- has.Ask(x,which=TRUE) },
+#            Mid =, mid =, Midpoint =, midpoint = { loc <- has.Mid(x,which=TRUE) },
+#            Trade =, trade = { loc <- has.Trade(x,which=TRUE) },
+#            Price =, price = { loc <- has.Price(x,which=TRUE) },
+#            {loc <- grep(prefer,colnames(x))}
+#     )
+#     if (!identical(loc, integer(0))) {
+#       return(x[, loc])
+#     } else {
+#       stop("Subscript out of bounds, no price was discernible from the data.")
+#     }
+#   }
+# }
 
 #' Compute log returns
 #' @description Function returns an xts object with the log returns as xts object.
