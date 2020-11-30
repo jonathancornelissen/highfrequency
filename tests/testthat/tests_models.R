@@ -58,8 +58,6 @@ test_that("HARModel",{
   model <- HARmodel(as.xts(SPYRM[1:1000 , list(DT, RV5)]))
   expect_equal(predict(model), sum(coefficients(model) * tail(cbind(1, model$model[,-1]),1)))
   
-  
-  
 })
 
 context("HEAVYmodel")
@@ -68,10 +66,10 @@ test_that("HEAVYmodel",{
   returns <-  makeReturns(SPYRM$CLOSE)
   bv      <-  SPYRM$BPV5
   returns <- returns[!is.na(bv)]
-  bv <- bv[!is.na(bv)] # Remove NA's
+  bv <- bv[!is.na(bv)] # Remove NAs
   output <- HEAVYmodel(ret = returns - mean(returns), rm = bv)
   expect_identical(
     formatC(sum(output$coefficients), digits = 6),
-    "2.29154"
+    "2.61353"
   )
 })
