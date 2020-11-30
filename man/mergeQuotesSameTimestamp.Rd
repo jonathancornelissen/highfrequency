@@ -30,6 +30,6 @@ Function replaces multiple quote entries that have the same time stamp
 by a single one and returns an xts object with unique time stamps only.
 }
 \author{
-Jonathan Cornelissen and Kris Boudt
+Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
 }
 \keyword{cleaning}

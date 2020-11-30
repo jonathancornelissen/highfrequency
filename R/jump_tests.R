@@ -58,13 +58,14 @@ ABDJumptest <- function(RV, BPV, TQ) { # Compute jump detection stat mentioned i
 #'  
 #'  \eqn{U, V}: independent standard normal random variables; \eqn{h=1/N}; \eqn{p, k, \alpha, w}: parameters. 
 #'  
-#' @param pData a zoo/xts object containing all prices in period t for one asset.
+#' @param pData either an \code{xts} or a \code{data.table} containing the prices of a single asset, possibly over multiple days.
 #' @param p can be chosen among 2 or 3 or 4. The author suggests 4. 4 by default.
 #' @param k can be chosen among 2 or 3 or 4. The author suggests 2. 2 by default.
-#' @param alignBy a string, align the tick data to "seconds"|"minutes"|"hours"
-#' @param alignPeriod an integer, align the tick data to this many [seconds|minutes|hours].
+#' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".
+#' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
+#' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate an
+#' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
 #' @param alphaMultiplier alpha multiplier
-#' @param makeReturns boolean, should be TRUE when rData contains prices instead of returns. FALSE by default.
 #' @param alpha numeric of length one with the significance level to use for the jump test(s). Defaults to 0.975.
 #' @param ... used internally
 #' 
@@ -88,7 +89,7 @@ ABDJumptest <- function(RV, BPV, TQ) { # Compute jump detection stat mentioned i
 #' 
 #' Theodosiou, M., & Zikes, F. (2009). A comprehensive comparison of alternative tests for jumps in asset prices. Unpublished manuscript, Graduate School of Business, Imperial College London.
 #' 
-#' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
+#' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 #'
 #' @examples
 #' jt <- AJjumpTest(sampleTData[, list(DT, PRICE)], p = 2, k = 3, 
@@ -97,7 +98,7 @@ ABDJumptest <- function(RV, BPV, TQ) { # Compute jump detection stat mentioned i
 #' @keywords highfrequency AJjumpTest
 #' @importFrom stats qnorm pnorm
 #' @export
-AJjumpTest <- function(pData, p = 4 , k = 2, alignBy = NULL, alignPeriod = NULL, alphaMultiplier = 4, makeReturns = FALSE, alpha = 0.975,...) {
+AJjumpTest <- function(pData, p = 4 , k = 2, alignBy = NULL, alignPeriod = NULL, alphaMultiplier = 4, alpha = 0.975,...) {
   op <- list(...)
   flag <- TRUE
   if("flag" %in% names(op)){
@@ -109,7 +110,7 @@ AJjumpTest <- function(pData, p = 4 , k = 2, alignBy = NULL, alignPeriod = NULL,
     result <- 
       apply.daily(pData, 
                   function(x){
-                    tmp <- AJjumpTest(x, p = p, k = k, alignBy = alignBy, alignPeriod = alignPeriod, alphaMultiplier = alphaMultiplier, makeReturns = makeReturns, ...)
+                    tmp <- AJjumpTest(x, p = p, k = k, alignBy = alignBy, alignPeriod = alignPeriod, alphaMultiplier = alphaMultiplier, ...)
                     return(cbind(tmp[[1]], tmp[[2]][1], tmp[[2]][2], tmp[[3]]))
                     })
     colnames(result) <- c("ztest", "lower", "upper", "p-value")
@@ -131,7 +132,7 @@ AJjumpTest <- function(pData, p = 4 , k = 2, alignBy = NULL, alignPeriod = NULL,
     dates <- dates$DATE
     for (i in 1:length(dates)) {
       res[[dates[i]]] <- AJjumpTest(pData[starts[i]:ends[i], ], p = p, k = k, alignBy = alignBy, alignPeriod = alignPeriod,
-                                    alphaMultiplier = alphaMultiplier, makeReturns = makeReturns, flag = FALSE)
+                                    alphaMultiplier = alphaMultiplier, flag = FALSE)
     }
     
     return(res)
@@ -147,11 +148,11 @@ AJjumpTest <- function(pData, p = 4 , k = 2, alignBy = NULL, alignPeriod = NULL,
   p <- as.numeric(p)
   k <- as.numeric(k)
   if(is.data.table(pData)){
-    alpha <- alphaMultiplier * sqrt(rCov(pData, alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = makeReturns)$RV)
+    alpha <- alphaMultiplier * sqrt(rCov(pData, alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = TRUE)$RV)
     pData <- as.matrix(pData[, !"DT"])
     
   } else {
-    alpha <- alphaMultiplier * sqrt(rCov(pData, alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = makeReturns))
+    alpha <- alphaMultiplier * sqrt(rCov(pData, alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = TRUE))
   }
   N <- length(pData)-1
   w <- 0.47
@@ -210,15 +211,17 @@ AJjumpTest <- function(pData, p = 4 , k = 2, alignBy = NULL, alignPeriod = NULL,
 #' 
 #' \eqn{\theta}: depends on IVestimator (Huang and Tauchen (2005)).
 #' 
-#' @param rData a zoo/xts object containing all returns in period t for one asset.
+#' @param rData either an \code{xts} or a \code{data.table} containing the log-returns or prices of a single asset, possibly over multiple days-
 #' @param IVestimator can be chosen among jump robust integrated variance estimators: BV, rMinRV, rMedRV and corrected threshold bipower variation (CTBV). If CTBV is chosen, an argument of \eqn{startV}, start point of auxiliary estimators in threshold estimation (Corsi et al. (2010) can be included. BV by default.
 #' @param IQestimator can be chosen among jump robust integrated quarticity estimators: TP, QP, rMinRQ and rMedRQ. TP by default.
 #' @param type a method of BNS testing: can be linear or ratio. Linear by default.
 #' @param logTransform boolean, should be TRUE when QVestimator and IVestimator are in logarithm form. FALSE by default.
 #' @param max boolean, should be TRUE when max adjustment in SE. FALSE by default.
-#' @param alignBy a string, align the tick data to "seconds"|"minutes"|"hours".
-#' @param alignPeriod an integer, align the tick data to this many [seconds|minutes|hours].
-#' @param makeReturns boolean, should be TRUE when rData contains prices instead of returns. FALSE by default.
+#' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".
+#' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
+#' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate an
+#' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
+#' @param makeReturns boolean, should be TRUE when pData contains prices. FALSE by default.
 #' @param alpha numeric of length one with the significance level to use for the jump test(s). Defaults to 0.975.
 #' 
 #' @return list or xts in case the input prices span more than one day.
@@ -233,7 +236,8 @@ AJjumpTest <- function(pData, p = 4 , k = 2, alignBy = NULL, alignPeriod = NULL,
 #' }
 #' where \eqn{k_j} are nonzero random variables. The counting process can be either finite or infinite for finite or infinite activity jumps.
 #' 
-#' Since the realized volatility converges to the sum of integrated variance and jump variation, while the robust IVestimator converges to the integrated variance,  it follows that the difference between #' \eqn{RV_{t,N}} and the IVestimator captures the jump part only, and this observation underlines the BNS test for jumps. (Theodosiou& Zikes(2009))
+#' Since the realized volatility converges to the sum of integrated variance and jump variation, while the robust IVestimator converges to the integrated variance, 
+#' it follows that the difference between  \eqn{RV_{t,N}} and the IVestimator captures the jump part only, and this observation underlines the BNS test for jumps. (Theodosiou& Zikes(2009))
 #' 
 #' @references Barndorff-Nielsen, O. E., & Shephard, N. (2006). Econometrics of testing for jumps in financial economics using bipower variation. Journal of financial Econometrics, 4(1), 1-30. 
 #' 
@@ -243,7 +247,7 @@ AJjumpTest <- function(pData, p = 4 , k = 2, alignBy = NULL, alignPeriod = NULL,
 #' 
 #' Theodosiou, M., & Zikes, F. (2009). A comprehensive comparison of alternative tests for jumps in asset prices. Unpublished manuscript, Graduate School of Business, Imperial College London.
 #' 
-#' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
+#' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 #' 
 #' @examples 
 #' bns <- BNSjumpTest(sampleTData[, list(DT, PRICE)], IVestimator= "rMinRV",
@@ -395,8 +399,10 @@ BNSjumpTest <- function (rData, IVestimator = "BV", IQestimator = "TP", type = "
 #'  
 #' @param pData a zoo/xts object containing all prices in period t for one asset.
 #' @param power can be chosen among 4 or 6. 4 by default.
-#' @param alignBy a string, align the tick data to "seconds"|"minutes"|"hours". Defaults to NULL, denoting testing by using tick by tick returns
-#' @param alignPeriod an integer, align the tick data to this many [seconds|minutes|hours]. Defaults to NULL, denoting testing by using tick by tick returns or if the returns are already aligned as 
+#' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".
+#' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
+#' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate an
+#' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
 #' @param alpha numeric of length one with the significance level to use for the jump test(s). Defaults to 0.975.
 #' @param ... additional arguments. (Currently unused)
 #'
@@ -422,7 +428,7 @@ BNSjumpTest <- function (rData, IVestimator = "BV", IQestimator = "TP", type = "
 #' 
 #' Theodosiou, M., & Zikes, F. (2009). A comprehensive comparison of alternative tests for jumps in asset prices. Unpublished manuscript, Graduate School of Business, Imperial College London.
 #' 
-#' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
+#' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 #' 
 #' @examples
 #' joDT <- JOjumpTest(sampleTData[, list(DT, PRICE)])
@@ -533,8 +539,8 @@ JOjumpTest <- function(pData, power = 4, alignBy = NULL, alignPeriod = NULL, alp
 #' specified by \code{tz}. By default, \code{marketOpen = "09:30:00"}.
 #' @param marketClose the market closing time. This should be in the time zone
 #' specified by \code{tz}. By default, \code{marketClose = "16:00:00"}.
-#' @param tz string specifying the time zone to which the times in \code{data}
-#' and/or \code{marketOpen}/ \code{marketClose} belong. Default = \code{"GMT"}.
+#' @param tz fallback time zone used in case we we are unable to identify the timezone of the data, by default: \code{tz = NULL}. We attempt to extract the timezone from the DT column (or index) of the data, which may fail. 
+#' In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}
 #' 
 #' The null hypothesis of the tests in this function is that there are no jumps in the price series
 #' 
@@ -556,7 +562,7 @@ JOjumpTest <- function(pData, power = 4, alignBy = NULL, alignPeriod = NULL, alp
 #' plot(FoFtest)
 #' 
 #' }
-#' 
+#' @author Emil Sjoerup
 #' @importFrom zoo index
 #' @export
 
@@ -875,7 +881,7 @@ plot.intradayJumpTest <- function(x, ...){
 #' @return A list containing "criticalValues" which are the bootstrapped critcal values, "testStatistic" the test statistic of the jump test, "dimensions" which are the dimensions of the jump matrix
 #'  "marketJumpDetections" the jumps detected in the market prices, "stockJumpDetections" the co-jumps detected in the individual stock prices, and "jumpIndices" which are the indices of the detected jumps.
 #' 
-#' 
+#' @author Emil Sjoerup
 #' @importFrom stats na.omit quantile runif
 #' @importFrom zoo coredata
 #' @export

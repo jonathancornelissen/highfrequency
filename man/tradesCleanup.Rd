@@ -16,7 +16,7 @@ tradesCleanup(
   marketClose = "16:00:00",
   printExchange = TRUE,
   saveAsXTS = FALSE,
-  tz = "EST"
+  tz = NULL
 )
 }
 \arguments{
@@ -64,7 +64,10 @@ default is TRUE. This is only used when \code{exchanges} is \code{"auto"}}
 
 \item{saveAsXTS}{indicates whether data should be saved in xts format instead of data.table when using on-disk functionality. FALSE by default.}
 
-\item{tz}{timezone to use}
+\item{tz}{fallback time zone used in case we we are unable to identify the timezone of the data, by default: \code{tz = NULL}. 
+With the non-disk functionality, we attempt to extract the timezone from the DT column (or index) of the data, which may fail. 
+In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}. 
+In the on-disk functionality, if tz is not specified, the timezone used will be the system default.}
 }
 \value{
 For each day an xts or data.table object is saved into the folder of that date, containing the cleaned data.
@@ -116,6 +119,6 @@ Barndorff-Nielsen, O. E., P. R. Hansen, A. Lunde, and N. Shephard (2009). Realiz
 Brownlees, C.T. and Gallo, G.M. (2006). Financial econometric analysis at ultra-high frequency: Data handling concerns. Computational Statistics & Data Analysis, 51, pp. 2232-2245.
 }
 \author{
-Jonathan Cornelissen and Kris Boudt
+Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
 }
 \keyword{cleaning}

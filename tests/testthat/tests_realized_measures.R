@@ -45,7 +45,6 @@ test_that("rMedRV", {
   
   expect_equal(matrix(as.matrix(rMedRV(sampleOneMinuteData, makeReturns = TRUE)[,-1]), ncol = 2),
                matrix(rMedRV(as.xts(sampleOneMinuteData), makeReturns = TRUE), ncol = 2))
-  
 
 })
 ##### rMedRQ ##### 
@@ -272,7 +271,10 @@ test_that("rKernelCov", {
   
   expect_equal(lapply(rKernelCov(returnDat), sum), list("1970-01-01" = 2.941858941, "1970-01-02" = 3.009886185, "1970-01-03" = 3.009261885))
   expect_equal(lapply(rKernelCov(returnDat), sum), lapply(rKernelCov(dat, makeReturns = TRUE), sum))
+  
   expect_equal(rKernelCov(returnDat),  rKernelCov(returnDatDT))
+  expect_equal(rKernelCov(returnDatDT), rKernelCov(datDT, makeReturns = TRUE))
+  
   expect_equal(rKernelCov(dat, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE),
                rKernelCov(datDT, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE))
   
@@ -334,8 +336,6 @@ test_that("rThresholdCov", {
   
   
   expect_equal(rThresholdCov(as.xts(sampleOneMinuteData), makeReturns = TRUE),  rThresholdCov(sampleOneMinuteData, makeReturns = TRUE))
-  
-  
   
   
 })

@@ -5,8 +5,8 @@
 #' @param pData Either a data.table or an xts object. If pData is a data.table, columns DT and PRICE must be present, containing timestamps of the trades and the price of the 
 #' trades (in levels) respectively. If pData is an xts object and the number of columns is greater than one, PRICE must be present.
 #' @param testTimes A \code{numeric} containing the times at which to calculate the tests. The standard of \code{seq(34260, 57600, 60)} 
-#' denotes calculating the test-statistic once per minute, i.e. 390 times for a typical 6.5 hour trading day from 9:31:00 to 16:00:00. See details. Default is seq(34260, 57600, 60.
-#' @param preAverage An \code{integer} denoting the length of pre-averaging window for the log-prices. Default is 5
+#' denotes calculating the test-statistic once per minute, i.e. 390 times for a typical 6.5 hour trading day from 9:31:00 to 16:00:00. See details.
+#' @param preAverage A positive \code{integer} denoting the length of pre-averaging window for the log-prices. Default is 5
 #' @param ACLag A positive \code{integer} greater than 1 denoting how many lags are to be used for the HAC estimator of the variance - the default
 #' of \code{-1} denotes using an automatic lag selection algorithm for each iteration. Default is -1L
 #' @param meanBandwidth An \code{integer} denoting the bandwidth for the left-sided exponential kernel for the mean. Default is 300L
@@ -18,15 +18,13 @@
 #' @details 
 #' If the \code{testTimes} vector contains instructions to test before the first trade, or more than 15 minutes after the last trade, these entries will be deleted, as not doing so may cause crashes.
 #' The test statistic is unstable before \code{max(meanBandwidth , varianceBandwidth)} seconds has passed.
-#' If \code{timestamps} is provided and \code{logPrices} is an \code{xts} object, the indices of logPrices will be used regardless.
-#' Note that using an \code{xts} logPrices argument is slower than using a \code{numeric} due to the creation of the timestamps from the index of the input. 
-#' When using \code{xts} objects, be careful to use the correct time zones. For example, if I as a dane use the \code{"America/New_York"} time zone for my \code{xts} objects, I have to add 14400 to my testing times.
-#' Same correction will have to be made to the \code{startTime} and \code{endTime} arguments in the plotting methods.
 #' The lags from the Newey-West algorithm is increased by \code{2 * (preAveage-1)} due to the pre-averaging we know at least this many lags should be corrected for.
 #' The maximum of 20 lags is also increased by this factor for the same reason.
 #' @return An object of class \code{DBH} and \code{list} containing the series of the drift burst hypothesis test-statistic as well as the estimated spot drift and variance series. 
 #' The list also contains some information such as the variance and mean bandwidths along with the pre-averaging setting and the amount of observations. 
 #' Additionally, the list will contain information on whether testing happened for all \code{testTimes} entries.
+#' Objects of class \code{DBH} has the methods \code{\link{print}}, \code{\link{plot}}, and \code{\link{getCriticalValues}} which prints, plots, and
+#' retrieves critical values for the test described in appendix B 
 #' 
 #' @examples 
 #' ## Usage with data.table object
@@ -52,7 +50,7 @@
 #' ## Testing every 60 seconds after 09:00:00
 #' system.time({DBH4 <- driftBursts(dat, testTimes = seq(32400 + 900, 63000, 60), preAverage = 2, 
 #'              ACLag = -1L, meanBandwidth = 300L, varianceBandwidth = 900L)})
-#' # On my machine with an i5-8250U, the following is 2-3 times faster
+#'
 #' system.time({DBH4 <- driftBursts(dat, testTimes = seq(32400 + 900, 63000, 60), preAverage = 2, 
 #'                                  ACLag = -1L, meanBandwidth = 300L, varianceBandwidth = 900L,
 #'                                  parallelize = TRUE, nCores = 8)})
@@ -115,7 +113,7 @@ driftBursts <- function(pData, testTimes = seq(34260, 57600, 60),
   } else if (is.xts(pData)){ ##xts case
     tz         <- tzone(pData)
     timestamps <- index(pData)
-    timestamps <- as.numeric(timestamps, tz = tz) - as.numeric(as.POSIXct(paste0(as.Date(timestamps[1], tz = tz)) , format = "%Y-%m-%d", tz = tz), tz = tz)
+    timestamps <- as.numeric(timestamps, tz = tz) - as.numeric(as.POSIXct(paste0(as.Date(timestamps[1], tz = tz)), format = "%Y-%m-%d", tz = tz), tz = tz)
     vIndex     <- as.POSIXct((.indexDate(pData[1,]) * 86400) + testTimes, origin = "1970-01-01", tz = tz)
     if(ncol(pData) == 1){
       logPrices <- log(as.numeric(pData))
@@ -414,7 +412,7 @@ print.DBH = function(x, ...){
 
 
 #' Get critical value for the drift burst hypothesis t-statistic
-#' @description Method for DBH objects to calculate the critical value for the presence of a 
+#' @description Method for DBH objects to calculate the critical value for the presence of a burst of drift.
 #' @param x object of class \code{DBH}
 #' @param alpha numeric denoting the confidence level for the critical value
 #' 

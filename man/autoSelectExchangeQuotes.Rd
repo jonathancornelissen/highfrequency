@@ -41,6 +41,6 @@ autoSelectExchangeQuotes(sampleQDataRaw)
 
 }
 \author{
-Jonathan Cornelissen, Kris Boudt and Onno Kleen
+Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
 }
 \keyword{cleaning}

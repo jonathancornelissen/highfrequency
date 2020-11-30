@@ -30,6 +30,6 @@ The current version (as of May 2020) can be found online at \href{https://www.ny
 Some CSV readers and the WRDS API parses empty strings as NA's. We transform \code{NA} values in COND to \code{""}.
 }
 \author{
-Jonathan Cornelissen and Kris Boudt
+Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
 }
 \keyword{cleaning}

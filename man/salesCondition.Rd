@@ -19,4 +19,4 @@ one column named "COND" indicating the Sale Condition.}
 \description{
 Function deletes entries with abnormal trades condition
 }
-\keyword{leaning}
+\keyword{cleaning}

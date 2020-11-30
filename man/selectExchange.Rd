@@ -34,6 +34,6 @@ xts or data.table object depending on input
 Function returns an xts object containing the data of only 1 stock exchange.
 }
 \author{
-Jonathan Cornelissen and Kris Boudt
+Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
 }
 \keyword{cleaning}

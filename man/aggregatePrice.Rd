@@ -17,37 +17,39 @@ aggregatePrice(
 \arguments{
 \item{pData}{data.table or xts object to be aggregated containing the intraday price series, possibly across multiple days.}
 
-\item{alignBy}{character, indicating the time scale in which "alignPeriod" is expressed. Possible values are: "milliseconds", "secs", "seconds", "mins", "minutes","hours", "ticks".}
+\item{alignBy}{character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours", and "ticks".
+To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".}
 
-\item{alignPeriod}{positive integer, indicating the number of periods to aggregate over; e.g. to aggregate a
-xts object to the 5 minute frequency set alignPeriod = 5 and alignBy = "minutes".}
+\item{alignPeriod}{positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate an
+To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".}
 
-\item{marketOpen}{the market opening time, by default: marketOpen = "09:30:00".}
+\item{marketOpen}{the market opening time, by default: \code{marketOpen = "09:30:00"}.}
 
-\item{marketClose}{the market closing time, by default: marketClose = "16:00:00".}
+\item{marketClose}{the market closing time, by default: \code{marketClose = "16:00:00"}.}
 
 \item{fill}{indicates whether rows without trades should be added with the most recent value, FALSE by default.}
 
-\item{tz}{time zone used, by default: tz = timezone of DT column/index of xts.}
+\item{tz}{fallback time zone used in case we we are unable to identify the timezone of the data, by default: \code{tz = NULL}. We attempt to extract the timezone from the DT column (or index) of the data, which may fail. 
+In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}}
 }
 \value{
 A data.table or xts object containing the aggregated time series.
 }
 \description{
-Function returns new time series as xts object where first observation is always the opening price
-and subsequent observations are the closing prices over the interval with as endpoint the timestamp
-of the result.
+Function to aggregate high frequency data by last tick aggregation to an arbitrary periodicity based on wall clocks.
+Alternatively the aggregation can be done by number of ticks. In case we DON'T do tick-based aggregation, 
+this function accepts arbitrary number of symbols over a arbitrary number of days. Although the function has the word Price in the name,
+the function is general and works on arbitrary time series, either \code{xts} or \code{data.table} objects the latter requires a \code{DT}
+column containing POSIXct timestamps.
 }
 \details{
-The timestamps of the new time series are the closing times and/or days of the intervals.
-
-In case of previous tick aggregation or alignBy = "seconds"/"minutes"/"hours",
-the element of the returned series with e.g. timestamp 09:35:00 contains
+The timestamps of the new time series are the closing times and/or days of the intervals. 
+The element of the returned series with e.g. timestamp 09:35:00 contains
 the last observation up to that point, including the value at 09:35:00 itself.
 
-In case alignBy = "ticks", the sampling is done such the sampling starts on the first tick, and the last tick is always included
+In case \code{alignBy = "ticks"}, the sampling is done such the sampling starts on the first tick, and the last tick is always included.
 For example, if 14 observations are made on one day, and these are 1, 2, 3, ... 14.
-Then, with alignBy = "ticks" and alignPeriod = 3, the output will be 1, 4, 7, 10, 13, 14.
+Then, with \code{alignBy = "ticks"} and \code{alignPeriod = 3}, the output will be 1, 4, 7, 10, 13, 14.
 }
 \examples{
 # aggregate price data to the 30 second frequency
@@ -59,8 +61,7 @@ aggregatePrice(sampleTData, alignBy = "secs", alignPeriod = 30)
 aggregatePrice(sampleTData, alignBy = "milliseconds", alignPeriod = 500, fill = TRUE)
 }
 \author{
-Jonathan Cornelissen, Kris Boudt and Onno Kleen.
+Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
 }
 \keyword{data}
-\keyword{internal}
 \keyword{manipulation}

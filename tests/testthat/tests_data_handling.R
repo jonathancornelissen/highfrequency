@@ -28,7 +28,7 @@ test_that("quotesCleanup", {
 context("aggregatePrice")
 test_that("aggregatePrice", {
   expect_equal(
-    formatC(sum(head(aggregatePrice(sampleTData[, list(DT, PRICE)], alignBy = "secs", alignPeriod = 30))$PRICE), digits = 10),
+    formatC(sum(head(aggregatePrice(sampleTData[, ], alignBy = "secs", alignPeriod = 30))$PRICE), digits = 10),
     "     950.73"
   )
 })
@@ -356,7 +356,7 @@ test_that("refreshTime", {
   
   RT <- refreshTime(list("a" = aDT, "b" = bDT, "c" = cDT))
   
-  expected <- data.table(DT =start + c(1,3,6,9,14), 
+  expected <- data.table(DT = start + c(1,3,6,9,14), 
                          matrix(c(1,1,1, 2,2,3, 4,3,4, 5,6,6, 6,8,8), ncol = 3, byrow = TRUE, dimnames = list(NULL, c("a", "b", "c"))))
   
   expect_equal(RT, expected)
@@ -408,3 +408,4 @@ test_that("aggregateTrades, aggregatePrice, and aggregateQuotes multisymbol mult
   aggQuotes2 <- aggregatePrice(datQuotes)
   all(split(aggQuotes2, by = "SYMBOL")[[2]] == aggregatePrice(sampleQData), na.rm = TRUE)
   
+})

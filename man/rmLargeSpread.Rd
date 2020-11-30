@@ -4,13 +4,17 @@
 \alias{rmLargeSpread}
 \title{Delete entries for which the spread is more than "maxi" times the median spread}
 \usage{
-rmLargeSpread(qData, maxi = 50)
+rmLargeSpread(qData, maxi = 50, tz = NULL)
 }
 \arguments{
 \item{qData}{an xts or data.table object at least containing the columns "BID" and "OFR".}
 
 \item{maxi}{an integer. By default maxi = "50", which means that entries are deleted 
 if the spread is more than 50 times the median spread on that day.}
+
+\item{tz}{fallback time zone used in case we we are unable to identify the timezone of the data, by default: \code{tz = NULL}. With the non-disk functionality, we attempt to extract the timezone from the DT column (or index) of the data, which may fail. 
+In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}. 
+In the on-disk functionality, if tz is not specified, the timezone used will be the system default.}
 }
 \value{
 xts or data.table object depending on input.
@@ -20,6 +24,6 @@ Function deletes entries for which the spread is more than "maxi" times the medi
 spread on that day.
 }
 \author{
-Jonathan Cornelissen and Kris Boudt
+Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
 }
 \keyword{cleaning}

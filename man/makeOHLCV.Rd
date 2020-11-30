@@ -14,7 +14,8 @@ makeOHLCV(pData, alignBy = "minutes", alignPeriod = 5, tz = NULL)
 \item{alignPeriod}{positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate an
 object to the 5 minute frequency set alignPeriod = 5 and alignBy = "minutes".}
 
-\item{tz}{time zone used, by default: tz = "GMT".}
+\item{tz}{fallback time zone used in case we we are unable to identify the timezone of the data, by default: \code{tz = NULL}. With the non-disk functionality, we attempt to extract the timezone from the DT column (or index) of the data, which may fail. 
+In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}.}
 }
 \description{
 This function makes OHLC-V bars at arbitrary intevals. If the SIZE column is not present in the input, no volume column is created.
@@ -39,5 +40,7 @@ bars <- makeOHLCV(sampleTDataEurope, alignBy = "seconds", alignPeriod = pi)
 ## Again we plot the series with chartSeries
 quantmod::chartSeries(bars)
 }
-
+}
+\author{
+Emil Sjoerup
 }

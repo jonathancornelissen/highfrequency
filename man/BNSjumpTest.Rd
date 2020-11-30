@@ -18,7 +18,7 @@ BNSjumpTest(
 )
 }
 \arguments{
-\item{rData}{a zoo/xts object containing all returns in period t for one asset.}
+\item{rData}{either an \code{xts} or a \code{data.table} containing the log-returns or prices of a single asset, possibly over multiple days-}
 
 \item{IVestimator}{can be chosen among jump robust integrated variance estimators: BV, rMinRV, rMedRV and corrected threshold bipower variation (CTBV). If CTBV is chosen, an argument of \eqn{startV}, start point of auxiliary estimators in threshold estimation (Corsi et al. (2010) can be included. BV by default.}
 
@@ -30,11 +30,13 @@ BNSjumpTest(
 
 \item{max}{boolean, should be TRUE when max adjustment in SE. FALSE by default.}
 
-\item{alignBy}{a string, align the tick data to "seconds"|"minutes"|"hours".}
+\item{alignBy}{character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".
+To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".}
 
-\item{alignPeriod}{an integer, align the tick data to this many [seconds|minutes|hours].}
+\item{alignPeriod}{positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate an
+To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".}
 
-\item{makeReturns}{boolean, should be TRUE when rData contains prices instead of returns. FALSE by default.}
+\item{makeReturns}{boolean, should be TRUE when pData contains prices. FALSE by default.}
 
 \item{alpha}{numeric of length one with the significance level to use for the jump test(s). Defaults to 0.975.}
 }
@@ -71,7 +73,8 @@ where \eqn{a} is the drift term, \eqn{\sigma} denotes the spot volatility proces
 }
 where \eqn{k_j} are nonzero random variables. The counting process can be either finite or infinite for finite or infinite activity jumps.
 
-Since the realized volatility converges to the sum of integrated variance and jump variation, while the robust IVestimator converges to the integrated variance,  it follows that the difference between #' \eqn{RV_{t,N}} and the IVestimator captures the jump part only, and this observation underlines the BNS test for jumps. (Theodosiou& Zikes(2009))
+Since the realized volatility converges to the sum of integrated variance and jump variation, while the robust IVestimator converges to the integrated variance, 
+it follows that the difference between  \eqn{RV_{t,N}} and the IVestimator captures the jump part only, and this observation underlines the BNS test for jumps. (Theodosiou& Zikes(2009))
 }
 \examples{
 bns <- BNSjumpTest(sampleTData[, list(DT, PRICE)], IVestimator= "rMinRV",
@@ -89,7 +92,7 @@ Huang, X., & Tauchen, G. (2005). The relative contribution of jumps to total pri
 Theodosiou, M., & Zikes, F. (2009). A comprehensive comparison of alternative tests for jumps in asset prices. Unpublished manuscript, Graduate School of Business, Imperial College London.
 }
 \author{
-Giang Nguyen, Jonathan Cornelissen and Kris Boudt
+Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 }
 \keyword{BNSjumpTest}
 \keyword{highfrequency}

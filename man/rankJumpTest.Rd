@@ -64,3 +64,6 @@ A list containing "criticalValues" which are the bootstrapped critcal values, "t
 \description{
 Rank jump test
 }
+\author{
+Emil Sjoerup
+}

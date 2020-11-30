@@ -52,6 +52,6 @@ Vergote, O. (2005). How to match trades and quotes for NYSE stocks?
 K.U.Leuven working paper.
 }
 \author{
-Jonathan Cornelissen, Kris Boudt and Onno Kleen
+Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
 }
 \keyword{cleaning}

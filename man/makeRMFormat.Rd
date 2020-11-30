@@ -30,5 +30,7 @@ dat <- makeRMFormat(dat)
 
 rCov(dat, alignBy = 'minutes', alignPeriod = 5, makeReturns = TRUE, cor = TRUE) 
 }
-
+}
+\author{
+Emil Sjoerup
 }

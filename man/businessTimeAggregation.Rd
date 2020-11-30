@@ -9,6 +9,7 @@ businessTimeAggregation(
   measure = "volume",
   obs = 390,
   bandwidth = 0.075,
+  tz = NULL,
   ...
 )
 }
@@ -21,6 +22,9 @@ volatility, and volume, respectively. Default is "volume"}
 \item{obs}{integer valued numeric of length 1 denoting how many observations is wanted after the aggregation procedure.}
 
 \item{bandwidth}{numeric of length one, denoting which bandwidth parameter to use in the trade intensity process estimation of Oomen (2005.)}
+
+\item{tz}{fallback time zone used in case we we are unable to identify the timezone of the data, by default: \code{tz = NULL}. We attempt to extract the timezone from the DT column (or index) of the data, which may fail. 
+In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}}
 
 \item{...}{extra arguments passed on to \code{\link{spotVol}} when measure is "vol"}
 }

@@ -14,5 +14,5 @@ getCriticalValues(x, alpha = 0.95)
 The critical value is that of the test described in appendix B in Christensen Oomen Reno}
 }
 \description{
-Method for DBH objects to calculate the critical value for the presence of a
+Method for DBH objects to calculate the critical value for the presence of a burst of drift.
 }

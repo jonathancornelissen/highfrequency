@@ -18,9 +18,11 @@ JOjumpTest(
 
 \item{power}{can be chosen among 4 or 6. 4 by default.}
 
-\item{alignBy}{a string, align the tick data to "seconds"|"minutes"|"hours". Defaults to NULL, denoting testing by using tick by tick returns}
+\item{alignBy}{character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".
+To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".}
 
-\item{alignPeriod}{an integer, align the tick data to this many [seconds|minutes|hours]. Defaults to NULL, denoting testing by using tick by tick returns or if the returns are already aligned as}
+\item{alignPeriod}{positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate an
+To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".}
 
 \item{alpha}{numeric of length one with the significance level to use for the jump test(s). Defaults to 0.975.}
 
@@ -86,7 +88,7 @@ Jiang, J.G. and Oomen R.C.A (2008). Testing for jumps when asset prices are obse
 Theodosiou, M., & Zikes, F. (2009). A comprehensive comparison of alternative tests for jumps in asset prices. Unpublished manuscript, Graduate School of Business, Imperial College London.
 }
 \author{
-Giang Nguyen, Jonathan Cornelissen and Kris Boudt
+Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 }
 \keyword{JOjumpTest}
 \keyword{highfrequency}
