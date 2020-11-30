@@ -1,4 +1,3 @@
-library(xts)
 library(testthat)
 rets <- as.xts(sampleOneMinuteData)[, 1]
 
@@ -63,9 +62,6 @@ test_that("HARModel",{
   
 })
 
-
-
-
 context("HEAVYmodel")
 test_that("HEAVYmodel",{
   
@@ -73,13 +69,9 @@ test_that("HEAVYmodel",{
   bv      <-  SPYRM$BPV5
   returns <- returns[!is.na(bv)]
   bv <- bv[!is.na(bv)] # Remove NA's
-  data <- cbind( returns^2, bv) # Make data matrix with returns and realized measures
-  backCast <- matrix(c(var(returns), mean(bv)), ncol = 1)
-  
-  #For traditional (default) version:
-  output <- HEAVYmodel(data = as.matrix(data,ncol=2), compConst = FALSE, backCast = backCast)
+  output <- HEAVYmodel(ret = returns - mean(returns), rm = bv)
   expect_identical(
-    formatC(sum(output$estparams), digits = 7),
-    "1.935699"
+    formatC(sum(output$coefficients), digits = 6),
+    "2.29154"
   )
 })
