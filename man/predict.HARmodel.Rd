@@ -19,7 +19,7 @@ Predict method for objects of type \code{HARmodel}
 \itemize{
 \item{\code{newdata}}{ new data to use for forecasting}
 \item{\code{warnings}}{ A logical denoting whether to display warnings, detault is \code{TRUE}}
-\item{\code{warnings}}{ A string. If the model is estimated with transformation this parameter can be set to transform the prediction back into variance
+\item{\code{backtransform}}{ A string. If the model is estimated with transformation this parameter can be set to transform the prediction back into variance
 The possible values are \code{"simple"} which means inverse of transformation, i.e. \code{exp} when log-transformation is applied. If using log transformation,
 the option \code{"parametric"} can also be used to transform back. The parametric method adds a correction  denoting whether to display warnings, detault is \code{TRUE}}
 }

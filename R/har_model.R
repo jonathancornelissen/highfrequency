@@ -533,13 +533,21 @@ plot.HARmodel <- function(x, ...){
 #' \itemize{
 #' \item{\code{newdata}}{ new data to use for forecasting}
 #' \item{\code{warnings}}{ A logical denoting whether to display warnings, detault is \code{TRUE}}
-#' \item{\code{warnings}}{ A string. If the model is estimated with transformation this parameter can be set to transform the prediction back into variance
+#' \item{\code{backtransform}}{ A string. If the model is estimated with transformation this parameter can be set to transform the prediction back into variance
 #' The possible values are \code{"simple"} which means inverse of transformation, i.e. \code{exp} when log-transformation is applied. If using log transformation,
 #' the option \code{"parametric"} can also be used to transform back. The parametric method adds a correction  denoting whether to display warnings, detault is \code{TRUE}}
 #' }
 #' @importFrom stats var
 #' @export
 predict.HARmodel <- function(object, ... ){
+  options <- list(...)
+  #### List of standard options
+  opt <- list(newdata = NULL, warnings = TRUE, backtransform = NULL)
+  #### Override standard options where user passed new options
+  opt[names(options)] <- options
+  newdata <- opt$newdata
+  warnings <- opt$warnings
+  backtransform <- opt$backtransform
   # If no new data is provided - just forecast on the last day of your estimation sample
   # If new data with colnames as in object$model$x is provided, i.e. right measures for that model, just use that data
   ##### These 4 lines are added to make adding new models (hopefully) easier
