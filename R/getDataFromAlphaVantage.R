@@ -51,7 +51,7 @@ getAlphaVantageData <- function(symbols = NULL, interval = "5min", outputType = 
   
   
   # Check if we have more than one symbol
-  isMultiSymbols <- ifelse(length(symbols) > 1, TRUE, FALSE)
+  isMultiSymbols <- length(symbols) > 1
   
   # We have more than one symbol
   if (isMultiSymbols) {
