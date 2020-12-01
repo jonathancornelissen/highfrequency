@@ -3355,7 +3355,7 @@ ReMeDI <- function(pData, kn = 1, lags = 1, knEqual = FALSE,
 #'
 #' @author Emil Sjoerup
 #' @importFrom stats plot.ts
-#' @references A ReMeDI for Microstructure Noise
+#' @references Li and Linton (2019) (Working paper): "A ReMeDI for microstructure noise."
 #' @return integer containing the optimal kn
 #' @export
 knChooseReMeDI <- function(pData, knEqual = FALSE,
