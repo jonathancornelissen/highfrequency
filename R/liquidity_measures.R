@@ -2,14 +2,13 @@
 #' 
 #' Function returns an xts or data.table object containing 23 liquidity measures. Please see details below.
 #'
-#' Note that this assumes a regular time grid. The Lee + Ready measure
-#' uses two lags for the Tick Rule.
+#' Note that this assumes a regular time grid. 
 #'
 #' @param tqData A \code{data.table} or xts object as in the \pkg{highfrequency} merged
 #' trades and quotes data (that is included).
 #' @param win A windows length for the forward-prices used for \sQuote{realized}
 #' spread
-#' @param type Legacy option. Default is to return all liquidity measures.
+#' @param type Deprecated. Setting this parameter does nothing, except produce a warning not to do so.
 #' @return A modified (enlarged) \code{xts} or \code{data.table} with the new measures.
 #' 
 #' @details NOTE: xts or data.table should only contain one day of observations
@@ -224,7 +223,9 @@
 #' @importFrom data.table shift
 #' @export
 getLiquidityMeasures <- function(tqData, win = 300, type = NULL) {
-  
+  if(!is.null(type)){
+    warning("type is deprecated and setting is does nothing")
+  }
   BID <- PRICE <- OFR  <- SIZE <- OFRSIZ <- BIDSIZ <- NULL
   ## All these are assigned to NULL
   midpoints <- direction <- effectiveSpread <- realizedSpread <- valueTrade <- signedValueTrade <- 
@@ -301,11 +302,7 @@ getLiquidityMeasures <- function(tqData, win = 300, type = NULL) {
   tqData[, signedTradeSize := direction * SIZE]
   
   if (wasXts) {
-    if (is.null(type)) {
-      return(xts(as.matrix(tqData[, -c("DT")]), order.by = tqData$DT))
-    } else {
-      return(xts(as.matrix(tqData[, -c("DT")]), order.by = tqData$DT)[, type])
-    }
+    return(xts(as.matrix(tqData[, -c("DT")]), order.by = tqData$DT))
   } else {
     return(tqData[])
   }
@@ -325,7 +322,7 @@ getLiquidityMeasures <- function(tqData, win = 300, type = NULL) {
 #' 
 #' @references  Lee, C. M. C. and M. J. Ready (1991). Inferring trade direction from intraday data. Journal of Finance 46, 733-746.
 #' 
-#' @author Jonathan Cornelissen, Kris Boudt and Onno Kleen. Special thanks to Dirk Eddelbuettel.
+#' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup. Special thanks to Dirk Eddelbuettel.
 #' 
 #' @examples 
 #' # generate matched trades and quote data set
@@ -366,7 +363,7 @@ getTradeDirection <- function(tqData) {
   midpoints <- (bid + offer)/2
   price <- tqData[, PRICE]
 
-  equal <- price == midpoints
+  # equal <- price == midpoints
   rets <- diff(price)
   buys <- nafill(c(TRUE, fifelse(test = rets > 0, yes = TRUE, no = fifelse(test = rets < 0, FALSE, NA))) * 2 -1, "locf")
   buys <- fifelse(price < midpoints, -1, fifelse(price > midpoints, 1, buys))
