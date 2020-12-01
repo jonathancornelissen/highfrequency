@@ -63,8 +63,8 @@ ABDJumptest <- function(RV, BPV, TQ) { # Compute jump detection stat mentioned i
 #' @param k can be chosen among 2 or 3 or 4. The author suggests 2. 2 by default.
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".
 #' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
-#' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate an
-#' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
+#' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
+#' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
 #' @param alphaMultiplier alpha multiplier
 #' @param alpha numeric of length one with the significance level to use for the jump test(s). Defaults to 0.975.
 #' @param ... used internally
@@ -219,8 +219,8 @@ AJjumpTest <- function(pData, p = 4 , k = 2, alignBy = NULL, alignPeriod = NULL,
 #' @param max boolean, should be TRUE when max adjustment in SE. FALSE by default.
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".
 #' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
-#' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate an
-#' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
+#' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
+#' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
 #' @param makeReturns boolean, should be TRUE when pData contains prices. FALSE by default.
 #' @param alpha numeric of length one with the significance level to use for the jump test(s). Defaults to 0.975.
 #' 
@@ -401,8 +401,8 @@ BNSjumpTest <- function (rData, IVestimator = "BV", IQestimator = "TP", type = "
 #' @param power can be chosen among 4 or 6. 4 by default.
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".
 #' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
-#' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate an
-#' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
+#' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
+#' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
 #' @param alpha numeric of length one with the significance level to use for the jump test(s). Defaults to 0.975.
 #' @param ... additional arguments. (Currently unused)
 #'
@@ -532,8 +532,8 @@ JOjumpTest <- function(pData, power = 4, alignBy = NULL, alignPeriod = NULL, alp
 #' @param ... extra arguments passed on to \code{\link{spotVol}} for the volatility estimation, and to \code{\link{spotDrift}}.
 #' @param alignBy string indicating the time scale in which \code{alignPeriod} is expressed.
 #' Possible values are: \code{"secs", "seconds", "mins", "minutes", "hours"}.
-#' @param alignPeriod positive integer, indicating the number of periods to aggregate
-#' over. E.g. to aggregate an \code{xts} object to the 5 minute frequency, set
+#' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
+#' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
 #' \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
 #' @param marketOpen the market opening time. This should be in the time zone
 #' specified by \code{tz}. By default, \code{marketOpen = "09:30:00"}.
@@ -867,8 +867,8 @@ plot.intradayJumpTest <- function(x, ...){
 #' @param dontTestAtBoundaries logical determining whether to exclude data across different days. Default is \code{TRUE}
 #' @param alignBy string indicating the time scale in which \code{alignPeriod} is expressed.
 #' Possible values are: \code{"secs", "seconds", "mins", "minutes", "hours"}.
-#' @param alignPeriod positive integer, indicating the number of periods to aggregate
-#' over. E.g. to aggregate an \code{xts} object to the 5 minute frequency, set
+#' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
+#' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
 #' \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
 #' @param marketOpen the market opening time. This should be in the time zone
 #' specified by \code{tz}. By default, \code{marketOpen = "09:30:00"}.
