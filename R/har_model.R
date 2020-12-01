@@ -527,15 +527,19 @@ plot.HARmodel <- function(x, ...){
 
 #' Predict method for objects of type \code{HARmodel}
 #' @param object an object of class \code{HARmodel}
-#' @param newdata new data to use for forecasting
-#' @param warnings logical denoting whether to display warnings
-#' @param backtransfrom if the model is estimated with transformation this parameter can be set to transform the prediction back into variance
+#' @param ... extra argumetns. See details
+#' @details
+#' #' The print method has the following optional parameters:
+#' \itemize{
+#' \item{\code{newdata}}{ new data to use for forecasting}
+#' \item{\code{warnings}}{ A logical denoting whether to display warnings, detault is \code{TRUE}}
+#' \item{\code{warnings}}{ A string. If the model is estimated with transformation this parameter can be set to transform the prediction back into variance
 #' The possible values are \code{"simple"} which means inverse of transformation, i.e. \code{exp} when log-transformation is applied. If using log transformation,
-#' the option \code{"parametric"} can also be used to transform back. The parametric method adds a correction 
-#' 
+#' the option \code{"parametric"} can also be used to transform back. The parametric method adds a correction  denoting whether to display warnings, detault is \code{TRUE}}
+#' }
 #' @importFrom stats var
 #' @export
-predict.HARmodel <- function(object, newdata = NULL, warnings = TRUE, backtransform = FALSE, ...) {
+predict.HARmodel <- function(object, ... ){
   # If no new data is provided - just forecast on the last day of your estimation sample
   # If new data with colnames as in object$model$x is provided, i.e. right measures for that model, just use that data
   ##### These 4 lines are added to make adding new models (hopefully) easier
@@ -879,10 +883,19 @@ predict.HARmodel <- function(object, newdata = NULL, warnings = TRUE, backtransf
   }
 }
 
+
+#' Printing method for \code{HARmodel} objects
+#' @param x object of type \code{HARmodel}
+#' @param ... extra options
+#' @details The printing method has the extra option \code{digits} which can be used to set the number of digits for printing
 #' @importFrom stats coef
 #' @importFrom sandwich NeweyWest
 #' @export
-print.HARmodel <- function(x, digits = max(3, getOption("digits") - 3), ...){
+print.HARmodel <- function(x, ...){
+  options <- list(...)
+  opt <- list(digits = max(3, getOption("digits") - 3))
+  opt[names(options)] <- options
+  digits <- opt$digits
   formula <- getHarmodelformula(x); modeldescription = formula[[1]]; betas = formula[[2]];
 
   cat("\nModel:\n", paste(modeldescription, sep = "\n", collapse = "\n"),
@@ -911,12 +924,12 @@ print.HARmodel <- function(x, digits = max(3, getOption("digits") - 3), ...){
 
 #' Summary for \code{HARmodel} objects
 #' @param object An object of class \code{HARmodel}
-#' 
+#' @param ... unused - do not set.
 #' @return A modified \code{summary.lm}
 #' @importFrom stats summary.lm pt
 #' @importFrom sandwich NeweyWest
 #' @export
-summary.HARmodel <- function(object){
+summary.HARmodel <- function(object, ...){
   dd <- summary.lm(object)
   dd$coefficients[,"Std. Error"] <- sqrt(diag(NeweyWest(object, lag = 22)))
   dd$coefficients[,"t value"] <- dd$coefficients[,"Estimate"] / dd$coefficients[,"Std. Error"]

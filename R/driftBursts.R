@@ -445,7 +445,7 @@ print.DBH = function(x, ...){
 #' @param alpha numeric denoting the confidence level for the critical value. Possible values are \code{c(0.9 0.95 0.99 0.995 0.999 0.9999)}
 #' 
 #' @author Emil Sjoerup
-#' 
+#' @aliases getCriticalValues.DBH
 #' @export
 getCriticalValues <- function(x, alpha = 0.95){
   UseMethod('getCriticalValues', x)

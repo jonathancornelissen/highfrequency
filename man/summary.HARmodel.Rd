@@ -4,10 +4,12 @@
 \alias{summary.HARmodel}
 \title{Summary for \code{HARmodel} objects}
 \usage{
-\method{summary}{HARmodel}(object)
+\method{summary}{HARmodel}(object, ...)
 }
 \arguments{
 \item{object}{An object of class \code{HARmodel}}
+
+\item{...}{unused - do not set.}
 }
 \value{
 A modified \code{summary.lm}

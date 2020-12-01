@@ -2,6 +2,7 @@
 % Please edit documentation in R/driftBursts.R
 \name{getCriticalValues}
 \alias{getCriticalValues}
+\alias{getCriticalValues.DBH}
 \title{Get critical value for the drift burst hypothesis t-statistic}
 \usage{
 getCriticalValues(x, alpha = 0.95)
