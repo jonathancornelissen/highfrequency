@@ -71,6 +71,6 @@ L. Zhang, P.A Mykland, and Y. Ait-Sahalia. A tale of two time scales: Determinin
 Michiel de Pooter, Martin Martens, and Dick van Dijk. Predicting the daily covariance matrix for S\&P100 stocks using intraday data - but which frequency to use? \emph{Econometric Reviews}, 2008.
 }
 \author{
-Scott Payseur
+Scott Payseur, Onno Kleen, and Emil Sjoerup
 }
 \keyword{volatility}

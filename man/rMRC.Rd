@@ -79,7 +79,7 @@ rMRC(a, pairwise = TRUE, makePsd = TRUE)
 Hautsch, N., & Podolskij, M. (2013). Preaveraging-Based Estimation of Quadratic Variation in the Presence of Noise and Jumps: Theory, Implementation, and Empirical Evidence. Journal of Business & Economic Statistics, 31(2), 165-183.
 }
 \author{
-Giang Nguyen, Jonathan Cornelissen and Kris Boudt
+Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 }
 \keyword{highfrequency}
 \keyword{preaveraging}

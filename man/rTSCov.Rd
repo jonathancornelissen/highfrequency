@@ -111,6 +111,6 @@ Zhang, L., P. A. Mykland, and Y. Ait-Sahalia (2005). A tale of two time scales: 
 Zhang, L. (2011). Estimating covariation: Epps effect, microstructure noise. Journal of Econometrics 160, 33-47.
 }
 \author{
-Jonathan Cornelissen and Kris Boudt
+Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 }
 \keyword{volatility}

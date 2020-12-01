@@ -68,6 +68,6 @@ Jacod, J. and V. Todorov (2009). Testing for common arrival of jumps in discrete
 Mancini, C. and F. Gobbi (2009). Identifying the covariation between the diffusion parts and the co-jumps given discrete observations. Mimeo.
 }
 \author{
-Jonathan Cornelissen and Kris Boudt
+Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 }
 \keyword{volatility}

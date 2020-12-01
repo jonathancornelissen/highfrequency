@@ -53,6 +53,6 @@ Andersen, T.G., T. Bollerslev, and F. Diebold (2007). Roughing it up: including 
 Corsi, F., D. Pirino, and R. Reno (2010). Threshold Bipower Variation and the Impact of Jumps on Volatility Forecasting. Journal of Econometrics 159 (2), 276-288.
 }
 \author{
-Jonathan Cornelissen and Kris Boudt
+Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup´
 }
 \keyword{volatility}

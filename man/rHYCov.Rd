@@ -36,7 +36,7 @@ Calculates the Hayashi-Yoshida Covariance estimator
 T. Hayashi and N. Yoshida. On covariance estimation of non-synchronously observed diffusion processes. \emph{Bernoulli}, 11, 359-379, 2005.
 }
 \author{
-Scott Payseur
+Scott Payseur and Emil Sjoerup
 
 # Average Hayashi-Yoshida Covariance estimator is calculated on five-minute returns
 

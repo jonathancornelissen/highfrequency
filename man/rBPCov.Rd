@@ -67,6 +67,6 @@ jumps in multivariate price processes using bipower covariation. Discussion
 paper, Nuffield College, Oxford University.
 }
 \author{
-Jonathan Cornelissen and Kris Boudt
+Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 }
 \keyword{volatility}
