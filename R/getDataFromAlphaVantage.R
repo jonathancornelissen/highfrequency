@@ -8,7 +8,7 @@
 #' @param apiKey string with the api key provided by Alpha Vantage. 
 #' @param doSleep logical when the length of symbols > 5 the function will sleep for 12 seconds by default. 
 #' 
-#' @details #' The doSleep argument is set to true as default because Alpha Vantage has a limit of five calls per minute. 
+#' @details The \code{doSleep} argument is set to true as default because Alpha Vantage has a limit of five calls per minute. 
 #' The function does not try to extract when the last API call was made which means that if
 #' you made successive calls to get 3 symbols in rapid succession, the function may not retrieve all the data.
 #' 
@@ -65,10 +65,10 @@ getAlphaVantageData <- function(symbols = NULL, interval = "5min", outputType = 
       
       if (outputType == "DT") { #Here the user wants a data.table out. Thus we set the class DT and we change the names.
         singleSymbol <- as.data.table(singleSymbol)
-        setnames(singleSymbol, colnames(singleSymbol), new = c("DT", "Open", "High", "Low" , "Close", "Volume"))
+        setnames(singleSymbol, colnames(singleSymbol), new = c("DT", "OPEN", "HIGH", "LOW", "CLOSE", "SIZE"))
       } else{
         # Change the names to OHLC-V 
-        colnames(singleSymbol) <-  c("Open", "High", "Low", "Close", "Volume")
+        colnames(singleSymbol) <-  c("OPEN", "HIGH", "LOW", "CLOSE", "SIZE")
       }
       data[[symbol]] <- singleSymbol
       
@@ -85,10 +85,10 @@ getAlphaVantageData <- function(symbols = NULL, interval = "5min", outputType = 
                          api.key = apiKey, auto.assign = FALSE, output.size = "full")  
     if (outputType == "DT") { #Here the user wants a data table out. Thus we set the class DT and we change the names.
       data <- as.data.table(data)
-      setnames(data, colnames(data), new = c("DT", "Open", "High", "Low" , "Close", "Volume"))
+      setnames(data, colnames(data), new = c("DT", "OPEN", "HIGH", "LOW", "CLOSE", "SIZE"))
     } else {
       # Change the names to OHLC-V
-      colnames(data) <- c("Open", "High", "Low", "Close", "Volume")
+      colnames(data) <- c("OPEN", "HIGH", "LOW", "CLOSE", "SIZE")
     }
   }
   
