@@ -44,7 +44,7 @@ If this argument is not provided, sequential evaluation will be used even though
 An object of class \code{DBH} and \code{list} containing the series of the drift burst hypothesis test-statistic as well as the estimated spot drift and variance series. 
 The list also contains some information such as the variance and mean bandwidths along with the pre-averaging setting and the amount of observations. 
 Additionally, the list will contain information on whether testing happened for all \code{testTimes} entries.
-Objects of class \code{DBH} has the methods \code{\link{print}}, \code{\link{plot}}, and \code{\link{getCriticalValues}} which prints, plots, and
+Objects of class \code{DBH} has the methods \code{\link{print.DBH}}, \code{\link{plot.DBH}}, and \code{\link{getCriticalValues.DBH}} which prints, plots, and
 retrieves critical values for the test described in appendix B
 }
 \description{

@@ -23,7 +23,7 @@
 #' @return An object of class \code{DBH} and \code{list} containing the series of the drift burst hypothesis test-statistic as well as the estimated spot drift and variance series. 
 #' The list also contains some information such as the variance and mean bandwidths along with the pre-averaging setting and the amount of observations. 
 #' Additionally, the list will contain information on whether testing happened for all \code{testTimes} entries.
-#' Objects of class \code{DBH} has the methods \code{\link{print}}, \code{\link{plot}}, and \code{\link{getCriticalValues}} which prints, plots, and
+#' Objects of class \code{DBH} has the methods \code{\link{print.DBH}}, \code{\link{plot.DBH}}, and \code{\link{getCriticalValues.DBH}} which prints, plots, and
 #' retrieves critical values for the test described in appendix B 
 #' 
 #' @examples 
@@ -224,7 +224,26 @@ driftBursts <- function(pData, testTimes = seq(34260, 57600, 60),
   return(lDriftBursts)
 }
 
-
+#' Plotting method for \code{DBH} objects
+#' 
+#' The plotting method has the following optional parameters:
+#' \itemize{
+#' \item{\code{pData}}{ A data.table or an xts object, containing the prices and timestamps of the data used to calculate the test statistic.
+#' If specified, and \code{which = "tStat"}, the price will be shown on the right y-axis along with the test statistic}
+#' \item{\code{which}}{ A string denoting which of four plots to make. \code{"tStat"} denotes plotting the test statistic. \code{"sigma"} denotes plotting the
+#' estimated volatility process. \code{"mu"} denotes plotting the estimated drift process. If \code{which = c("sigma", "mu")} or \code{which = c("mu", "sigma")},
+#' both the drift and volatility processes are plotted. CaPiTAlizAtIOn doesn't matter}
+#' }
+#' @examples
+#' ## Testing every 60 seconds after 09:15:00
+#' DBH <- driftBursts(sampleTDataEurope, testTimes = seq(32400 + 900, 63000, 60), preAverage = 2, 
+#'                     ACLag = -1L, meanBandwidth = 300L, varianceBandwidth = 900L)
+#' plot(DBH)
+#' plot(DBH, pData = sampleTDataEurope)
+#' plot(DBH, which = "sigma")
+#' plot(DBH, which = "mu")
+#' plot(DBH, which = c("sigma", "mu"))
+#' @author Emil Sjoerup
 #' @importFrom graphics axis axis.POSIXct legend mtext
 #' @importFrom grDevices rgb
 #' @export
@@ -244,11 +263,9 @@ plot.DBH <- function(x, ...){
   which      <- tolower(opt$which)
   startTime  <- opt$startTime
   endTime    <- opt$endTime
-  main       <- opt$main
   tz         <- opt$tz
   leg.x      <- opt$leg.x
   leg.y      <- opt$leg.y
-  nDays      <- opt$nDays
   timestamps <- opt$timestamps
   tstat      <- x$tStat
   sigma      <- x$sigma
@@ -305,17 +322,6 @@ plot.DBH <- function(x, ...){
     sigma <- as.numeric(sigma)
     mu    <- as.numeric(mu)
   } 
-  # if(testTimes[1] == startTime){
-  #   testTimes <- testTimes[-1]
-  #   sigma     <- sigma[-1]
-  #   mu        <- mu[-1]
-  #   tstat     <- tstat[-1]
-  # }
-  # if(min(testTimes) < startTime | max(testTimes) > endTime){
-  #   cat('\nTesting was tried before sessionStart or after sessionEnd, thus some of the tests may be cut off from the plot.
-  #       \nIf the plot looks weird, consider changing sessionStart and sessionEnd.
-  #       \nThese should reflect the start of trading and the end of trading respectively')
-  # }
   xtext <- as.POSIXct(testTimes, tz = tz, origin = as.POSIXct("1970-01-01", tz = tz))
   if(is.null(prices)) {
     xlim  <- c(startTime, endTime)
@@ -372,6 +378,23 @@ plot.DBH <- function(x, ...){
   par(startpar)
 }
 
+#' Printing method for \code{DBH} objects
+#' 
+#' The print method has the following optional parameters:
+#' \itemize{
+#' \item{\code{criticalValue}}{ A numeric denoting a custom critical value of the test.}
+#' \item{\code{alpha}}{ A numeric denoting the confidence level of the test. The alpha value is passed on to \code{\link{getCriticalValues}}.
+#' The default value is 0.95}
+#' }
+#' 
+#' @examples
+#' DBH <- driftBursts(sampleTDataEurope, testTimes = seq(32400 + 900, 63000, 60), preAverage = 2, 
+#'                     ACLag = -1L, meanBandwidth = 300L, varianceBandwidth = 900L)
+#' print(DBH)
+#' print(DBH, criticalValue = 1) # This value doesn't make sense - don't actually use it!
+#' print(DBH, alpha = 0.95) # 5% confidence level - this is the standard
+#' print(DBH, alpha = 0.99) # 1% confidence level
+#' @author Emil Sjoerup
 #' @export
 print.DBH = function(x, ...){
   usePolynomialInterpolation <- TRUE
@@ -413,10 +436,12 @@ print.DBH = function(x, ...){
 
 #' Get critical value for the drift burst hypothesis t-statistic
 #' @description Method for DBH objects to calculate the critical value for the presence of a burst of drift.
-#' @param x object of class \code{DBH}
-#' @param alpha numeric denoting the confidence level for the critical value
-#' 
 #' The critical value is that of the test described in appendix B in Christensen Oomen Reno
+#' @param x object of class \code{DBH}
+#' @param alpha numeric denoting the confidence level for the critical value. Possible values are \code{c(0.9 0.95 0.99 0.995 0.999 0.9999)}
+#' 
+#' 
+#' @author Emil Sjoerup
 #' 
 #' @export
 getCriticalValues <- function(x, alpha = 0.95){
