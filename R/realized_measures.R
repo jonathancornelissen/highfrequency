@@ -40,9 +40,9 @@ listAvailableKernels <- function() {
 #'   }
 #' @param rData an xts or data.table object containing returns or prices, possibly for multiple assets over multiple days
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".
-#' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
+#' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
-#' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
+#' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
 #' @param makeReturns boolean, should be TRUE when rData contains prices instead of returns. FALSE by  default.
 #' 
 #' @return In case the input is an xts object with data from one day, a numeric of same length as the number of assets. 
@@ -133,9 +133,9 @@ rMedRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
 #' }
 #' @param rData an xts or data.table object containing returns or prices, possibly for multiple assets over multiple days
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".
-#' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
+#' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
-#' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
+#' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
 #' @param makeReturns boolean, should be TRUE when rData contains prices instead of returns. FALSE by  default.
 #' 
 #' @return In case the input is an xts object with data from one day, a numeric of same length as the number of assets. 
@@ -214,9 +214,9 @@ rMinRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
 #' 
 #' @param rData an xts or data.table object containing returns or prices, possibly for multiple assets over multiple days
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".
-#' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
+#' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
-#' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
+#' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
 #' @param makeReturns boolean, should be TRUE when rData contains prices instead of returns. FALSE by default.
 #' 
 #' @return In case the input is an xts object with data from one day, a numeric of same length as the number of assets. 
@@ -308,9 +308,9 @@ rMinRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
 #'  
 #' @param rData an xts or data.table object containing returns or prices, possibly for multiple assets over multiple days
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".
-#' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
+#' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
-#' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
+#' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
 #' @param makeReturns boolean, should be TRUE when rData contains prices instead of returns. FALSE by   default.
 #'  
 #' @details
@@ -548,9 +548,9 @@ rMRC <- function(pData, pairwise = FALSE, makePsd = FALSE) {
 #' return series over period \eqn{t}, with \eqn{M} observations during \eqn{t}.
 #' @param cor boolean, in case it is TRUE, the correlation is returned. FALSE by default.
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".
-#' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
+#' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
-#' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
+#' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
 #' @param k numeric denoting which horizon to use for the subsambles. This can be a fraction as long as k is a divisor of alignPeriod default is \code{1}
 #' @param makeReturns Prices are passed make them into log returns
 #' 
@@ -1008,9 +1008,9 @@ rBeta <- function(rData, rIndex, RCOVestimator = "rCov", RVestimator = "RV", mak
 #' @param rData an xts or data.table object containing returns or prices, possibly for multiple assets over multiple days
 #' @param cor boolean, in case it is TRUE, the correlation is returned. FALSE by default.
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".
-#' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
+#' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
-#' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
+#' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
 #' @param makeReturns boolean, should be TRUE when rData contains prices instead of returns. FALSE by default.
 #' @param makePsd boolean, in case it is TRUE, the positive definite version of rBPCov is returned. FALSE by default.
 #'
@@ -1162,9 +1162,9 @@ rBPCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeR
 #' @param rData an xts or data.table object containing returns or prices, possibly for multiple assets over multiple days
 #' @param cor boolean, in case it is TRUE, the correlation is returned. FALSE by default.
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".
-#' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
+#' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
-#' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
+#' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
 #' @param makeReturns boolean, should be TRUE when rData contains prices instead of returns. FALSE by default.
 #' 
 #' @return in case the input is and contains data from one day, an N by N matrix is returned. If the data is a univariate xts object with multiple days, an xts is returned. 
@@ -1276,9 +1276,9 @@ rCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeRet
 #' @param cor boolean, in case it is TRUE, the correlation is returned. FALSE by default.
 #' @param period Sampling period 
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".
-#' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
+#' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
-#' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
+#' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
 #' @param makeReturns Prices are passed make them into log returns
 #' @param makePsd boolean, in case it is TRUE, the positive definite version of rHYCov is returned. FALSE by default.
 #' 
@@ -1380,9 +1380,9 @@ rHYCov <- function(rData, cor = FALSE, period = 1, alignBy = "seconds", alignPer
 #' @param rData an xts or data.table object containing returns or prices, possibly for multiple assets over multiple days
 #' @param cor boolean, in case it is TRUE, the correlation is returned. FALSE by default.
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".
-#' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
+#' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
-#' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
+#' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
 #' @param makeReturns Convert to Returns
 #' @param kernelType Kernel name (or number)
 #' @param kernelParam Kernel parameter (usually lags)
@@ -1554,9 +1554,9 @@ rKernelCov <- function(rData, cor = FALSE,  alignBy = "seconds", alignPeriod = 1
 #'   
 #' @param rData an xts or data.table object containing returns or prices, possibly for multiple assets over multiple days
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".
-#' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
+#' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
-#' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
+#' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
 #' @param makeReturns boolean, should be TRUE when rData contains prices instead of returns. FALSE by   default.
 #'
 #' @return In case the input is an xts object with data from one day, a numeric of same length as the number of assets. 
@@ -1662,9 +1662,9 @@ rKurt <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #' @param m the window size of return blocks. 2 by default.
 #' @param p the power of the variation. 2 by default.
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".
-#' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
+#' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
-#' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
+#' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
 #' @param makeReturns boolean, should be TRUE when rData contains prices instead of returns. FALSE by  default.
 #'
 #' @return numeric
@@ -1770,9 +1770,9 @@ rMPV <- function(rData, m = 2, p = 2, alignBy = NULL, alignPeriod = NULL, makeRe
 #' return series over period \eqn{t}, with \eqn{M} observations during \eqn{t}.
 #' @param cor boolean, in case it is TRUE, the correlation is returned. FALSE by default.
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".
-#' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
+#' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
-#' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
+#' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
 #' @param makeReturns boolean, should be TRUE when rData contains prices instead of returns. FALSE by default.
 #' @param seasadjR a \eqn{(M x N)} matrix/zoo/xts object containing 
 #' the seasonaly adjusted returns. This is an optional argument.
@@ -1932,9 +1932,9 @@ rOWCov <- function (rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, make
 #' 
 #' @param rData an xts or data.table object containing returns or prices, possibly for multiple assets over multiple days
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".
-#' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
+#' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
-#' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
+#' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
 #' @param makeReturns boolean, should be TRUE when rData contains prices instead of returns. FALSE by   default.
 #' 
 #' @return In case the input is an xts object with data from one day, a numeric of same length as the number of assets. 
@@ -2028,9 +2028,9 @@ rSkew <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #' }
 #' @param rData an xts or data.table object containing returns or prices, possibly for multiple assets over multiple days
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".
-#' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
+#' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
-#' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
+#' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
 #' @param makeReturns boolean, should be TRUE when rData contains prices instead of returns. FALSE by   default.
 #' @param ... used internally, any input is ignored.
 #' @return list with to arguments. The realized positive and negative semivariance.
@@ -2135,9 +2135,9 @@ rSV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, 
 #' @param rData an xts or data.table object containing returns or prices, possibly for multiple assets over multiple days
 #' @param cor boolean, in case it is TRUE, the correlation is returned. FALSE by default.
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".
-#' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
+#' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
-#' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
+#' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
 #' @param makeReturns boolean, should be TRUE when rData contains prices instead of returns. FALSE by default.
 #' 
 #' @return in case the input is and contains data from one day, an N by N matrix is returned. If the data is a univariate xts object with multiple days, an xts is returned. 
@@ -2459,9 +2459,9 @@ RV <- function(rData) {
 #'  
 #' @param rData an xts or data.table object containing returns or prices, possibly for multiple assets over multiple days
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".
-#' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
+#' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
-#' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
+#' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
 #' @param makeReturns boolean, should be TRUE when rData contains prices instead of returns. FALSE by   default.
 #'  
 #' @return In case the input is an xts object with data from one day, a numeric of same length as the number of assets. 
@@ -2544,9 +2544,9 @@ rTPQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FAL
 #'
 #' @param rData an xts or data.table object containing returns or prices, possibly for multiple assets over multiple days
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".
-#' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
+#' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
-#' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
+#' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
 #' @param makeReturns boolean, should be TRUE when rData contains prices instead of returns. FALSE by default.
 #'
 #' @return In case the input is an xts object with data from one day, a numeric of same length as the number of assets. 
@@ -2626,9 +2626,9 @@ rQPVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
 #'  
 #' @param rData an xts or data.table object containing returns or prices, possibly for multiple assets over multiple days
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".
-#' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
+#' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
-#' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
+#' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
 #' @param makeReturns boolean, should be TRUE when rData contains prices instead of returns. FALSE by default.
 #' 
 #' @return In case the input is an xts object with data from one day, a numeric of same length as the number of assets. 
@@ -3036,9 +3036,9 @@ rCholCov <- function(pData, IVest = "rMRC", COVest = "rMRC", criterion = "square
 #' @param rData an xts or data.table object containing returns or prices, possibly for multiple assets over multiple days
 #' @param cor logical, in case it is TRUE, the correlation is returned. FALSE by default.
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".
-#' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
+#' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
-#' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
+#' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
 #' @param makeReturns logical, should be TRUE when rData contains prices instead of returns. FALSE by default.
 #' 
 #' @return In case the data consists of one day a list of four \eqn{N x N} matrices are returned. These matrices are the mixed, positive, negative and concordant

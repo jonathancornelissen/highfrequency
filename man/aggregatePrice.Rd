@@ -18,10 +18,10 @@ aggregatePrice(
 \item{pData}{data.table or xts object to be aggregated containing the intraday price series, possibly across multiple days.}
 
 \item{alignBy}{character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours", and "ticks".
-To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".}
+To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.}
 
 \item{alignPeriod}{positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
-based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".}
+based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.}
 
 \item{marketOpen}{the market opening time, by default: \code{marketOpen = "09:30:00"}.}
 

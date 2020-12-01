@@ -24,7 +24,7 @@ In case weights are supplied, this argument is ignored and a weighted average is
 \item{alignBy}{character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: "secs", "seconds", "mins", "minutes", "hours", "days", "weeks", "ticks".}
 
 \item{alignPeriod}{positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
-based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".}
+based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.}
 
 \item{weights}{By default, no weighting scheme is used. 
 When you assign an xts object with weights to this argument, a weighted mean is taken over each interval. 
