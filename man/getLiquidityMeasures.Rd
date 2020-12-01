@@ -6,8 +6,7 @@
 
 Function returns an xts or data.table object containing 23 liquidity measures. Please see details below.
 
-Note that this assumes a regular time grid. The Lee + Ready measure
-uses two lags for the Tick Rule.}
+Note that this assumes a regular time grid.}
 \usage{
 getLiquidityMeasures(tqData, win = 300, type = NULL)
 }
@@ -18,7 +17,7 @@ trades and quotes data (that is included).}
 \item{win}{A windows length for the forward-prices used for \sQuote{realized}
 spread}
 
-\item{type}{Legacy option. Default is to return all liquidity measures.}
+\item{type}{Deprecated. Setting this parameter does nothing, except produce a warning not to do so.}
 }
 \value{
 A modified (enlarged) \code{xts} or \code{data.table} with the new measures.
@@ -28,8 +27,7 @@ Compute Liquidity Measure
 
 Function returns an xts or data.table object containing 23 liquidity measures. Please see details below.
 
-Note that this assumes a regular time grid. The Lee + Ready measure
-uses two lags for the Tick Rule.
+Note that this assumes a regular time grid.
 }
 \details{
 NOTE: xts or data.table should only contain one day of observations

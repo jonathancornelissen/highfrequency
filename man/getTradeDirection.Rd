@@ -32,6 +32,6 @@ head(directions)
 Lee, C. M. C. and M. J. Ready (1991). Inferring trade direction from intraday data. Journal of Finance 46, 733-746.
 }
 \author{
-Jonathan Cornelissen, Kris Boudt and Onno Kleen. Special thanks to Dirk Eddelbuettel.
+Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup. Special thanks to Dirk Eddelbuettel.
 }
 \keyword{liquidity}
