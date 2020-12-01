@@ -6,7 +6,15 @@
 \usage{
 \method{print}{DBH}(x, ...)
 }
+\arguments{
+\item{x}{an object of class \code{DBH}}
+
+\item{...}{optional arguments, see details}
+}
 \description{
+Printing method for \code{DBH} objects
+}
+\details{
 The print method has the following optional parameters:
 \itemize{
 \item{\code{criticalValue}}{ A numeric denoting a custom critical value of the test.}

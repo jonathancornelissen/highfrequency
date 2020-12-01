@@ -225,8 +225,10 @@ driftBursts <- function(pData, testTimes = seq(34260, 57600, 60),
 }
 
 #' Plotting method for \code{DBH} objects
+#' @param x an object of class \code{DBH}
+#' @param ... optional arguments, see details
 #' 
-#' The plotting method has the following optional parameters:
+#' @details The plotting method has the following optional parameters:
 #' \itemize{
 #' \item{\code{pData}}{ A data.table or an xts object, containing the prices and timestamps of the data used to calculate the test statistic.
 #' If specified, and \code{which = "tStat"}, the price will be shown on the right y-axis along with the test statistic}
@@ -379,7 +381,9 @@ plot.DBH <- function(x, ...){
 }
 
 #' Printing method for \code{DBH} objects
-#' 
+#' @param x an object of class \code{DBH}
+#' @param ... optional arguments, see details
+#' @details 
 #' The print method has the following optional parameters:
 #' \itemize{
 #' \item{\code{criticalValue}}{ A numeric denoting a custom critical value of the test.}
@@ -439,7 +443,6 @@ print.DBH = function(x, ...){
 #' The critical value is that of the test described in appendix B in Christensen Oomen Reno
 #' @param x object of class \code{DBH}
 #' @param alpha numeric denoting the confidence level for the critical value. Possible values are \code{c(0.9 0.95 0.99 0.995 0.999 0.9999)}
-#' 
 #' 
 #' @author Emil Sjoerup
 #' 

@@ -6,7 +6,15 @@
 \usage{
 \method{plot}{DBH}(x, ...)
 }
+\arguments{
+\item{x}{an object of class \code{DBH}}
+
+\item{...}{optional arguments, see details}
+}
 \description{
+Plotting method for \code{DBH} objects
+}
+\details{
 The plotting method has the following optional parameters:
 \itemize{
 \item{\code{pData}}{ A data.table or an xts object, containing the prices and timestamps of the data used to calculate the test statistic.
