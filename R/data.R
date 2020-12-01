@@ -46,17 +46,6 @@
 #' @keywords datasets
 "sampleTData"
 
-# #' Sample of raw trades for stock XXX for 1 day
-# #' 
-# #' @description An imaginary xts object containing the raw trades for stock XXX for 1 day, in the typical NYSE TAQ database format.
-# #' 
-# #' @docType data
-# #' 
-# #' @format A large \code{xts} object.
-# #' 
-# #' @keywords datasets
-# "sampleTDataRaw"
-
 #' Sample of raw trades for stock XXX for 2 days
 #' 
 #' @description An imaginary data.table object containing the raw trades for stock XXX for 2 days, in the typical NYSE TAQ database format.
@@ -83,7 +72,7 @@
 
 #' SPY realized measures
 #' @description Realized measures for the SPY ETF calculated at 1 and 5 minute sampling. 
-#' @note The CLOSE column is NOT the official close price, but simply the last recorded price of the day. Thus this may be slightly different from other sources
+#' @note The CLOSE column is NOT the official close price, but simply the last recorded price of the day. Thus, this may be slightly different from other sources.
 #' @format A \code{data.table} object
 #' @keywords datasets
 "SPYRM"
