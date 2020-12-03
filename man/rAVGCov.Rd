@@ -14,24 +14,23 @@ rAVGCov(
 )
 }
 \arguments{
-\item{rData}{an xts or data.table object containing returns or prices, possibly for multiple assets over multiple days
-return series over period \eqn{t}, with \eqn{M} observations during \eqn{t}.}
+\item{rData}{an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days}
 
-\item{cor}{boolean, in case it is TRUE, the correlation is returned. FALSE by default.}
+\item{cor}{boolean, in case it is \code{TRUE}, and the input data is multivariate, the correlation is returned instead of the covariance matrix. \code{FALSE} by default.}
 
-\item{alignBy}{character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".
+\item{alignBy}{character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
 To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.}
 
 \item{alignPeriod}{positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
 based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.}
 
-\item{k}{numeric denoting which horizon to use for the subsambles. This can be a fraction as long as k is a divisor of alignPeriod default is \code{1}}
+\item{k}{numeric denoting which horizon to use for the subsambles. This can be a fraction as long as k is a divisor of \code{alignPeriod} default is \code{1}}
 
-\item{makeReturns}{Prices are passed make them into log returns}
+\item{makeReturns}{boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.}
 }
 \value{
-in case the input is and contains data from one day, an N by N matrix is returned. If the data is a univariate xts object with multiple days, an xts is returned. 
-If the data is multivariate and contains multiple days (xts or data.table), the function returns a list containing N by N matrices. Each item in the list has a name which corresponds to the date for the matrix.
+in case the input is and contains data from one day, an N by N matrix is returned. If the data is a univariate \code{xts} object with multiple days, an \code{xts} is returned. 
+If the data is multivariate and contains multiple days (\code{xts} or \code{data.table}), the function returns a list containing N by N matrices. Each item in the list has a name which corresponds to the date for the matrix.
 }
 \description{
 Realized Covariance using average subsample.

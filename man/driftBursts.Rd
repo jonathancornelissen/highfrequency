@@ -18,8 +18,8 @@ driftBursts(
 )
 }
 \arguments{
-\item{pData}{Either a data.table or an xts object. If pData is a data.table, columns DT and PRICE must be present, containing timestamps of the trades and the price of the 
-trades (in levels) respectively. If pData is an xts object and the number of columns is greater than one, PRICE must be present.}
+\item{pData}{Either a \code{data.table} or an \code{xts} object. If pData is a data.table, columns DT and PRICE must be present, containing timestamps of the trades and the price of the 
+trades (in levels) respectively. If pData is an \code{xts} object and the number of columns is greater than one, PRICE must be present.}
 
 \item{testTimes}{A \code{numeric} containing the times at which to calculate the tests. The standard of \code{seq(34260, 57600, 60)} 
 denotes calculating the test-statistic once per minute, i.e. 390 times for a typical 6.5 hour trading day from 9:31:00 to 16:00:00. See details.}

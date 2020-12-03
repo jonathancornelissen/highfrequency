@@ -7,12 +7,12 @@
 makePsd(S, method = "covariance")
 }
 \arguments{
-\item{S}{matrix.}
+\item{S}{a non-PSD matrix.}
 
 \item{method}{character, indicating whether the negative eigenvalues of the correlation or covariance should be replaced by zero. Possible values are "covariance" and "correlation".}
 }
 \value{
-An xts object containing the aggregated trade data.
+A matrix containing the positive semi definite matrix.
 }
 \description{
 Function returns the positive semidinite projection of a symmetric matrix using the eigenvalue method.
@@ -34,7 +34,7 @@ Fan, J., Y. Li, and K. Yu (2010). Vast volatility matrix estimation using high f
 Rousseeuw, P. and G. Molenberghs (1993). Transformation of non positive semidefinite correlation matrices. Communications in Statistics - Theory and Methods 22, 965-984.
 }
 \author{
-Jonathan Cornelissen and Kris Boudt
+Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 }
 \keyword{data}
 \keyword{manipulation}

@@ -7,10 +7,10 @@
 noZeroPrices(tData)
 }
 \arguments{
-\item{tData}{an xts or data.table object at least containing a column "PRICE".}
+\item{tData}{an \code{xts} or \code{data.table} object at least containing a column \code{PRICE}.}
 }
 \value{
-an xts or data.table object depending on input
+an \code{xts} or \code{data.table} object depending on input
 }
 \description{
 Function deletes the observations where the price is zero.

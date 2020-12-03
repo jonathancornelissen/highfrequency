@@ -17,10 +17,10 @@ rTSCov(
 )
 }
 \arguments{
-\item{pData}{a list. Each list-item i contains an xts object with the intraday price data 
+\item{pData}{a list. Each list-item i contains an \code{xts} object with the intraday price data 
 of stock i for day t.}
 
-\item{cor}{boolean, in case it is TRUE, the correlation is returned. FALSE by default.}
+\item{cor}{boolean, in case it is \code{TRUE}, and the input data is multivariate, the correlation is returned instead of the covariance matrix. \code{FALSE} by default.}
 
 \item{K}{positive integer, slow time scale returns are computed on prices that are K steps apart.}
 
@@ -34,11 +34,11 @@ of stock i for day t.}
 
 \item{J_var}{vector of positive integers, for the diagonal variance elements the fast time scale returns are computed on prices that are J steps apart.}
 
-\item{makePsd}{boolean, in case it is TRUE, the positive definite version of rTSCov is returned. FALSE by default.}
+\item{makePsd}{boolean, in case it is \code{TRUE}, the positive definite version of rTSCov is returned. \code{FALSE} by default.}
 }
 \value{
-in case the input is and contains data from one day, an N by N matrix is returned. If the data is a univariate xts object with multiple days, an xts is returned. 
-If the data is multivariate and contains multiple days (xts or data.table), the function returns a list containing N by N matrices. Each item in the list has a name which corresponds to the date for the matrix.
+in case the input is and contains data from one day, an N by N matrix is returned. If the data is a univariate \code{xts} object with multiple days, an \code{xts} is returned. 
+If the data is multivariate and contains multiple days (\code{xts} or \code{data.table}), the function returns a list containing N by N matrices. Each item in the list has a name which corresponds to the date for the matrix.
 }
 \description{
 Function returns the two time scale covariance matrix proposed in Zhang et al (2005) and Zhang (2010).

@@ -17,13 +17,13 @@ knChooseReMeDI(
 )
 }
 \arguments{
-\item{pData}{xts or data.table containing the log-prices of the asset.}
+\item{pData}{\code{xts} or \code{data.table} containing the log-prices of the asset.}
 
-\item{knEqual}{Use an altered version of the ReMeDI estimator, where we instead use equal kn, instead of kn and 2*kn for the windows. See Figure 1 of paper in reference section.}
+\item{knEqual}{Use an altered version of the ReMeDI estimator, where we instead use equal \code{kn}, instead of \code{kn} and \code{2*kn} for the windows. See Figure 1 of paper in reference section.}
 
-\item{knMax}{max value of kn to be considered}
+\item{knMax}{max value of \code{kn} to be considered}
 
-\item{tol}{tolerance for the minimizing value. If tol is high, the algorithm will choose a lower optimal value.}
+\item{tol}{tolerance for the minimizing value. If \code{tol} is high, the algorithm will choose a lower optimal value.}
 
 \item{size}{size of the local window}
 

@@ -15,10 +15,10 @@ leadLag(
 )
 }
 \arguments{
-\item{price1}{xts or data.table containing prices in levels, in case of data.table,
+\item{price1}{\code{xts} or \code{data.table} containing prices in levels, in case of data.table,
 use a column DT to denote the date-time in POSIXct format, and a column PRICE to denote the price}
 
-\item{price2}{xts or data.table containing prices in levels, in case of data.table,
+\item{price2}{\code{xts} or \code{data.table} containing prices in levels, in case of data.table,
 use a column DT to denote the date-time in POSIXct format, and a column PRICE to denote the price}
 
 \item{lags}{a numeric denoting which lags (in units of \code{resolution}) should be tested as leading or lagging}

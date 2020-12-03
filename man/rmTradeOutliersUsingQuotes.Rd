@@ -16,9 +16,9 @@ rmTradeOutliersUsingQuotes(
 )
 }
 \arguments{
-\item{tData}{a data.table or xts object containing the time series data, with at least the column "PRICE", containing the transaction price.}
+\item{tData}{a \code{data.table} or \code{xts} object containing the time series data, with at least the column "PRICE", containing the transaction price.}
 
-\item{qData}{a data.table or xts object containing the time series data with at least the columns "BID" and "OFR", containing the bid and ask prices.}
+\item{qData}{a \code{data.table} or \code{xts} object containing the time series data with at least the columns "BID" and "OFR", containing the bid and ask prices.}
 
 \item{lagQuotes}{a numeric of length 1 that denotes how many seconds to lag the quotes. Default is 2 seconds. See Details.}
 
@@ -35,7 +35,7 @@ The small window is a tolerance for inaccuracies in the timestamps of bids and a
 \item{...}{used internally}
 }
 \value{
-xts or data.table object depending on input
+\code{xts} or \code{data.table} object depending on input
 }
 \description{
 Function deletes entries with prices that are above the ask plus the bid-ask spread.

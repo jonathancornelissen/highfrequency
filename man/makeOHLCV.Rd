@@ -7,7 +7,7 @@
 makeOHLCV(pData, alignBy = "minutes", alignPeriod = 5, tz = NULL)
 }
 \arguments{
-\item{pData}{data.table or xts object to make the bars out of, containing the intraday price series of possibly multiple stocks for possibly multiple days.}
+\item{pData}{\code{data.table} or \code{xts} object to make the bars out of, containing the intraday price series of possibly multiple stocks for possibly multiple days.}
 
 \item{alignBy}{character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours", and "ticks".
 To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.}

@@ -7,7 +7,7 @@
 RV(rData)
 }
 \arguments{
-\item{rData}{a zoo/xts object containing all returns in period t for one asset.}
+\item{rData}{a \code{xts} object containing all returns in period t for one asset.}
 }
 \value{
 numeric

@@ -14,7 +14,7 @@ businessTimeAggregation(
 )
 }
 \arguments{
-\item{pData}{xts or data.table containing data to aggregate.}
+\item{pData}{\code{xts} or \code{data.table} containing data to aggregate.}
 
 \item{measure}{character denoting which measure to use. Valid options are "intensity", "vol", and "volume", denoting the trade intensity process of Oomen (2005),
 volatility, and volume, respectively. Default is "volume"}

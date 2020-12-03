@@ -10,7 +10,7 @@ salesCondition(
 )
 }
 \arguments{
-\item{tData}{an xts or data.table object containing the time series data, with 
+\item{tData}{an \code{xts} or \code{data.table} object containing the time series data, with 
 one column named "COND" indicating the Sale Condition.}
 
 \item{validConds}{a character vector containing valid sales conditions defaults to \cr

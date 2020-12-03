@@ -23,12 +23,14 @@ The default value is 0.95}
 }
 }
 \examples{
+\dontrun{
 DBH <- driftBursts(sampleTDataEurope, testTimes = seq(32400 + 900, 63000, 60), preAverage = 2, 
-                    ACLag = -1L, meanBandwidth = 300L, varianceBandwidth = 900L)
+                   ACLag = -1L, meanBandwidth = 300L, varianceBandwidth = 900L)
 print(DBH)
 print(DBH, criticalValue = 1) # This value doesn't make sense - don't actually use it!
 print(DBH, alpha = 0.95) # 5\% confidence level - this is the standard
 print(DBH, alpha = 0.99) # 1\% confidence level
+}
 }
 \author{
 Emil Sjoerup

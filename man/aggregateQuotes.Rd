@@ -2,7 +2,7 @@
 % Please edit documentation in R/data_handling.R
 \name{aggregateQuotes}
 \alias{aggregateQuotes}
-\title{Aggregate a data.table or xts object containing quote data}
+\title{Aggregate a \code{data.table} or \code{xts} object containing quote data}
 \usage{
 aggregateQuotes(
   qData,
@@ -14,7 +14,7 @@ aggregateQuotes(
 )
 }
 \arguments{
-\item{qData}{data.table or xts object to be aggregated, containing the intraday quote data of a stock for one day.}
+\item{qData}{\code{data.table} or \code{xts} object to be aggregated, containing the intraday quote data of a stock for one day.}
 
 \item{alignBy}{character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours", and "ticks".
 To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.}
@@ -30,10 +30,10 @@ based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to
 In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}}
 }
 \value{
-A data.table or an xts object containing the aggregated quote data.
+A \code{data.table} or an \code{xts} object containing the aggregated quote data.
 }
 \description{
-Function returns a data.table or xts object containing the aggregated quote data with columns "SYMBOL", "EX", "BID","BIDSIZ","OFR","OFRSIZ". 
+Function returns a \code{data.table} or \code{xts} object containing the aggregated quote data with columns "SYMBOL", "EX", "BID","BIDSIZ","OFR","OFRSIZ". 
 See \code{\link{sampleQData}} for an example of the argument qData. This function accepts arbitrary number of symbols over an aribtrary number of days.
 }
 \details{

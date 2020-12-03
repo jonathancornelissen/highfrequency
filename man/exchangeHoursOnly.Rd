@@ -2,7 +2,7 @@
 % Please edit documentation in R/data_handling.R
 \name{exchangeHoursOnly}
 \alias{exchangeHoursOnly}
-\title{Extract data from an xts object for the Exchange Hours Only}
+\title{Extract data from an \code{xts} object for the Exchange Hours Only}
 \usage{
 exchangeHoursOnly(
   data,
@@ -12,7 +12,7 @@ exchangeHoursOnly(
 )
 }
 \arguments{
-\item{data}{a data.table or xts object containing the time series data. 
+\item{data}{a \code{data.table} or \code{xts} object containing the time series data. 
 Multiple days of input are allowed.}
 
 \item{marketOpen}{character in the format of \code{"HH:MM:SS"},
@@ -25,7 +25,7 @@ specifying the closing time of the exchange(s).}
 In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}}
 }
 \value{
-xts or data.table object depending on input
+\code{xts} or \code{data.table} object depending on input
 }
 \description{
 The function returns data within exchange trading hours,

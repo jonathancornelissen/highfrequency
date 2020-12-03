@@ -28,7 +28,7 @@ quotesCleanup(
 \item{dataDestination}{character indicating the folder in which the cleaned data is stored.}
 
 \item{exchanges}{vector of stock exchange symbols for all data in dataSource, 
-e.g. exchanges = c("T","N") retrieves all stock market data from both NYSE and NASDAQ.
+e.g. \code{exchanges = c("T","N")} retrieves all stock market data from both NYSE and NASDAQ.
 The possible exchange symbols are:
 \itemize{
 \item A: AMEX
@@ -45,63 +45,61 @@ The possible exchange symbols are:
 \item Z: BATS
 }. The default value is \code{"auto"} which automatically selects the exchange for the stocks and days independently using the \code{\link{autoSelectExchangeQuotes}}}
 
-\item{qDataRaw}{xts or data.table object containing (ONE stock only) raw quote data. This argument is NULL by default. Enabling it means the arguments
-from, to, dataSource and dataDestination will be ignored. (only advisable for small chunks of data)}
+\item{qDataRaw}{\code{xts} or \code{data.table} object containing raw quote data, possibly for multiple symbols over multiple days. This argument is \code{NULL} by default. 
+Enabling it means the arguments \code{dataSource} and \code{dataDestination} will be ignored. (only advisable for small chunks of data)}
 
-\item{report}{boolean and TRUE by default. In case it is true the function returns (also) a vector indicating how many quotes remained after each cleaning step.}
+\item{report}{boolean and \code{TRUE} by default. In case it is true and we don't use the on-disk functionalit, the function returns (also) a vector indicating how many quotes were deleted by each cleaning step.}
 
-\item{selection}{argument to be passed on to the cleaning routine \code{\link{mergeQuotesSameTimestamp}}. The default is "median".}
+\item{selection}{argument to be passed on to the cleaning routine \code{\link{mergeQuotesSameTimestamp}}. The default is \code{"median"}.}
 
-\item{maxi}{spreads which are greater than median(spreads of day) times maxi are excluded.}
+\item{maxi}{spreads which are greater than median spreads of the day times \code{maxi} are excluded.}
 
 \item{window}{argument to be passed on to the cleaning routine \code{\link{rmOutliersQuotes}}.}
 
 \item{type}{argument to be passed on to the cleaning routine \code{\link{rmOutliersQuotes}}.}
 
-\item{marketOpen}{passed to \code{\link{exchangeHoursOnly}}. A character in the format of \"HH:MM:SS\",
-specifying the starting hour, minute and second of an exchange
-trading day.}
+\item{marketOpen}{passed to \code{\link{exchangeHoursOnly}}. A character in the format of \code{"HH:MM:SS"},
+specifying the starting hour, minute and second of an exchange.}
 
-\item{marketClose}{passed to \code{\link{exchangeHoursOnly}}. A character in the format of \"HH:MM:SS\",
-specifying the closing hour, minute and second of an exchange
-trading day.}
+\item{marketClose}{passed to \code{\link{exchangeHoursOnly}}. A character in the format of \code{"HH:MM:SS"},
+specifying the closing hour, minute and second of an exchange.}
 
 \item{rmoutliersmaxi}{argument to be passed on to the cleaning routine \code{\link{rmOutliersQuotes}}.}
 
 \item{printExchange}{Argument passed to \code{\link{autoSelectExchangeQuotes}} indicates whether the chosen exchange is printed on the console, 
-default is TRUE. This is only used when \code{exchanges} is \code{"auto"}}
+default is \code{TRUE}. This is only used when \code{exchanges} is \code{"auto"}}
 
-\item{saveAsXTS}{indicates whether data should be saved in xts format instead of data.table when using on-disk functionality. FALSE by default.}
+\item{saveAsXTS}{indicates whether data should be saved in \code{xts} format instead of \code{data.table} when using on-disk functionality. \code{FALSE} by default, which means we save as \code{data.table}.}
 
 \item{tz}{fallback time zone used in case we we are unable to identify the timezone of the data, by default: \code{tz = NULL}. With the non-disk functionality, we attempt to extract the timezone from the DT column (or index) of the data, which may fail. 
 In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}. 
-In the on-disk functionality, if tz is not specified, the timezone used will be the system default.}
+In the on-disk functionality, if \code{tz} is not specified, the timezone used will be the system default.}
 }
 \value{
-The function converts every csv file in dataSource into multiple xts or data.table files.
-In dataDestination, there will be one folder for each symbol containing .rds files with cleaned data stored either in data.table or xts format.
+The function converts every (compressed) csv (or rds) file in \code{dataSource} into multiple \code{xts} or \code{data.table} files.
+In \code{dataDestination}, there will be one folder for each symbol containing .rds files with cleaned data stored either in \code{data.table} or \code{xts} format.
 
-In case you supply the argument "qDataRaw", the on-disk functionality is ignored
-and the function returns a list with the cleaned quotes as an xts or data.table object depending on input (see examples).
+In case you supply the argument \code{qDataRaw}, the on-disk functionality is ignored
+and the function returns a list with the cleaned quotes as an \code{xts} or \code{data.table} object depending on input (see examples).
 }
 \description{
-This is a wrapper function for cleaning the quote data in the entire folder dataSource. 
-The result is saved in the folder dataDestination. 
+This is a wrapper function for cleaning the quote data in the entire folder \code{dataSource}. 
+The result is saved in the folder \code{dataDestination}. 
 
-In case you supply the argument "qDataRaw", the on-disk functionality is ignored
-and the function returns the cleaned quotes as xts or data.table object (see examples).
+In case you supply the argument \code{qDataRaw}, the on-disk functionality is ignored
+and the function returns the cleaned quotes as \code{xts} or \code{data.table} object (see examples).
 
-The following cleaning steps are performed sequentially:
-\code{\link{noZeroQuotes}}, \code{\link{selectExchange}}, rmLargeSpread,
+The following cleaning functions are performed sequentially:
+\code{\link{noZeroQuotes}}, \code{\link{exchangeHoursOnly}}, \code{\link{selectExchange}}, \code{\link{rmNegativeSpread}}, \code{\link{rmLargeSpread}}
 \code{\link{mergeQuotesSameTimestamp}}, \code{\link{rmOutliersQuotes}}.
 }
 \details{
 Using the on-disk functionality with .csv.zip files which is the standard from the WRDS database
 will write temporary files on your machine - we try to clean up after it, but cannot guarantee that 
 there won't be files that slip through the crack if the permission settings on your machine does not match 
-ours
+ours.
 
-If the input data.table does not contain a DT column but it does contain DATE and TIME_M columns, we create the DT column by REFERENCE, altering the data.table that may be in the user's environment!
+If the input \code{data.table} does not contain a \code{DT} column but it does contain \code{DATE} and \code{TIME_M} columns, we create the \code{DT} column by REFERENCE, altering the \code{data.table} that may be in the user's environment!
 }
 \examples{
 # Consider you have raw quote data for 1 stock for 2 days

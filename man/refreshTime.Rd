@@ -7,14 +7,14 @@
 refreshTime(pData, sort = FALSE, criterion = "squared duration")
 }
 \arguments{
-\item{pData}{a list. Each list-item contains an xts or a data.table object (with first column DT (datetime)) containing the original time series (one day only and typically a price series).}
+\item{pData}{a list. Each list-item contains an \code{xts} or a \code{data.table} object (with first column DT (datetime)) containing the original time series (one day only and typically a price series).}
 
 \item{sort}{logical determining whether to sort the index based on a criterion (will only sort descending (i.e. most liquid first)). Default is FALSE}
 
 \item{criterion}{character determining which criterion used. Currently supports "squared duration" and "duration". Default is "squared duration".}
 }
 \value{
-An xts or data.table object containing the synchronized time series - depending on the input.
+An \code{xts} or \code{data.table} object containing the synchronized time series - depending on the input.
 }
 \description{
 This function implements the refresh time synchronization scheme proposed by Harris et al. (1995). 

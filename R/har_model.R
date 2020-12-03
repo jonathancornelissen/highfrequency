@@ -57,7 +57,7 @@ harInsanityFilter <- function(fittedValues, lower, upper, replacement) {
 #' for Realized volatility discussed in Andersen et al. (2007) and Corsi (2009).
 #' This model is mainly used to forecast the next day's volatility based on the high-frequency returns of the past. Consult the vignette for more information.
 #'
-#' @param data  an xts object containing either: intra-day (log-)returns or realized measures already computed from such returns. 
+#' @param data  an \code{xts} object containing either: intra-day (log-)returns or realized measures already computed from such returns. 
 #' In case more than one realized measure is needed, the object should have the as many columns as realized measures needed. 
 #' The first column should always be the realized variance proxy. In case type is either "HARQJ" or "CHARQ" the order should be "RV", "BPV", "RQ", or the relevant proxies.
 #' @param periods a vector of integers indicating over how days the realized measures in the model should be aggregated. By default  periods = c(1,5,22), which corresponds to one day, one week and one month respectively. This default is in line with Andersen et al. (2007).
@@ -76,7 +76,7 @@ harInsanityFilter <- function(fittedValues, lower, upper, replacement) {
 #' @param h an integer indicating the number over how many days the dependent variable should be aggregated.
 #' By default, h=1, i.e. no aggregation takes place, you just model the daily realized volatility.
 #' @param transform optionally a string referring to a function that transforms both the dependent and explanatory variables in the model. By default transform=NULL, so no transformation is done. Typical other choices in this context would be "log" or "sqrt".
-#' @param externalRegressor an xts object of same number of rows as \code{data}, and one column. This is used as an external regressor. Default is NULL
+#' @param externalRegressor an \code{xts} object of same number of rows as \code{data}, and one column. This is used as an external regressor. Default is NULL
 #' @param periodsExternal a vector of integers indicating over how days \code{externalRegressor} should be aggregated.
 #' @param ... extra arguments for jump test.
 #'
@@ -527,7 +527,7 @@ plot.HARmodel <- function(x, ...){
 
 #' Predict method for objects of type \code{HARmodel}
 #' @param object an object of class \code{HARmodel}
-#' @param ... extra argumetns. See details
+#' @param ... extra arguments. See details
 #' @details
 #' #' The print method has the following optional parameters:
 #' \itemize{
@@ -535,7 +535,7 @@ plot.HARmodel <- function(x, ...){
 #' \item{\code{warnings}}{ A logical denoting whether to display warnings, detault is \code{TRUE}}
 #' \item{\code{backtransform}}{ A string. If the model is estimated with transformation this parameter can be set to transform the prediction back into variance
 #' The possible values are \code{"simple"} which means inverse of transformation, i.e. \code{exp} when log-transformation is applied. If using log transformation,
-#' the option \code{"parametric"} can also be used to transform back. The parametric method adds a correction  denoting whether to display warnings, detault is \code{TRUE}}
+#' the option \code{"parametric"} can also be used to transform back. The parametric method adds a correction that stems from using the log-transformation }
 #' }
 #' @importFrom stats var
 #' @export

@@ -4,14 +4,14 @@
 \alias{getLiquidityMeasures}
 \title{Compute Liquidity Measure
 
-Function returns an xts or data.table object containing 23 liquidity measures. Please see details below.
+Function returns an \code{xts} or \code{data.table} object containing 23 liquidity measures. Please see details below.
 
 Note that this assumes a regular time grid.}
 \usage{
 getLiquidityMeasures(tqData, win = 300, type = NULL)
 }
 \arguments{
-\item{tqData}{A \code{data.table} or xts object as in the \pkg{highfrequency} merged
+\item{tqData}{A \code{data.table} or \code{xts} object as in the \pkg{highfrequency} merged
 trades and quotes data (that is included).}
 
 \item{win}{A windows length for the forward-prices used for \sQuote{realized}
@@ -25,12 +25,12 @@ A modified (enlarged) \code{xts} or \code{data.table} with the new measures.
 \description{
 Compute Liquidity Measure
 
-Function returns an xts or data.table object containing 23 liquidity measures. Please see details below.
+Function returns an \code{xts} or \code{data.table} object containing 23 liquidity measures. Please see details below.
 
 Note that this assumes a regular time grid.
 }
 \details{
-NOTE: xts or data.table should only contain one day of observations
+NOTE: \code{xts} or \code{data.table} should only contain one day of observations
 
 The respective liquidity measures are defined as follows:
   \itemize{

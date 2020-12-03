@@ -7,24 +7,25 @@
 mergeTradesSameTimestamp(tData, selection = "median")
 }
 \arguments{
-\item{tData}{an xts object containing the time series data, with 
-one column named "PRICE" indicating the transaction price 
-and one column "SIZE" indicating the number of shares traded.}
+\item{tData}{an \code{xts} object containing the time series data, with 
+one column named \code{PRICE} indicating the transaction price 
+and one column \code{SIZE} indicating the number of shares traded.}
 
 \item{selection}{indicates how the price for a certain time stamp
 should be calculated in case of multiple observation for a certain time
-stamp. By default, selection = "median", and the median price is taken. Alternatively:
+stamp. By default, \code{selection = "median"}, and the median price is taken. Alternatively:
 \itemize{
-\item selection = "max.volume": use the price of the transaction with
+\item \code{selection = "max.volume"}: use the price of the transaction with
 largest volume.
-\item selection = "weighted.average": take the weighted average of all prices.
+\item \code{selection = "weighted.average"}: take the weighted average of all prices.
 }}
 }
 \value{
-data.table or xts object depending on input
+\code{data.table} or \code{xts} object depending on input
 }
 \description{
-Function replaces multiple transactions that have the same time stamp by a single one and returns an xts or data.table object with unique time stamps only.
+Merge trade entries that have the same time stamp to a single one and returns an \code{xts} or a \code{data.table} object
+ with unique time stamps only.
 }
 \note{
 previously this function returned the mean of the size of the merged trades (pre version 0.7 and when not using max.volume as the criterion), now it returns the sum.

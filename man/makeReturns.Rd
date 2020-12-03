@@ -7,14 +7,14 @@
 makeReturns(ts)
 }
 \arguments{
-\item{ts}{xts object}
+\item{ts}{a possibly multivariate matrix-like object containing prices in levels. If \code{ts} is an \code{xts} object, we return an \code{xts} object. Other types will result in a \code{matrix}}
 }
 \value{
-an xts object containing the log returns.
+Depending on input, either a \code{matrix} or an \code{xts} object containing the log returns.
 }
 \description{
-Function returns an xts object with the log returns as xts object.
-
+Convenience function to calculate log-returns, also used extensively internally.
+Accepts \code{xts} and \code{matrix}-like objects. If you use this with a \code{data.table} object, remember to not pass the \code{DT} column.
 \deqn{
 \mbox{log return}_t =  (\log(\mbox{PRICE}_{t})-\log(\mbox{PRICE}_{t-1})).
 }

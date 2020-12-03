@@ -15,7 +15,7 @@ aggregatePrice(
 )
 }
 \arguments{
-\item{pData}{data.table or xts object to be aggregated containing the intraday price series, possibly across multiple days.}
+\item{pData}{\code{data.table} or \code{xts} object to be aggregated containing the intraday price series, possibly across multiple days.}
 
 \item{alignBy}{character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours", and "ticks".
 To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.}
@@ -33,7 +33,7 @@ based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to
 In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}}
 }
 \value{
-A data.table or xts object containing the aggregated time series.
+A \code{data.table} or \code{xts} object containing the aggregated time series.
 }
 \description{
 Function to aggregate high frequency data by last tick aggregation to an arbitrary periodicity based on wall clocks.

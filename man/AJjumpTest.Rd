@@ -35,7 +35,7 @@ based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to
 \item{...}{used internally}
 }
 \value{
-list or xts in case the input prices span more than one day.
+list or \code{xts}in case the input prices span more than one day.
 }
 \description{
 This test examines the presence of jumps in highfrequency price series. It is based on the theory of Ait-Sahalia and Jacod (2009) (AJ). It consists in comparing the multipower variation of equispaced returns computed at a fast time scale (\eqn{h}), \eqn{r_{t,i}} (\eqn{i=1, \ldots,N}) and those computed at the slower time scale (\eqn{kh}), \eqn{y_{t,i}}(\eqn{i=1, \ldots ,\mbox{N/k}}).

@@ -7,7 +7,7 @@
 getTradeDirection(tqData)
 }
 \arguments{
-\item{tqData}{data.table or xts object, containing joined trades and quotes (e.g. using \code{\link{matchTradesQuotes}})}
+\item{tqData}{\code{data.table} or \code{xts} object, containing joined trades and quotes (e.g. using \code{\link{matchTradesQuotes}})}
 }
 \value{
 A vector which has values 1 or (-1) if the inferred trade direction

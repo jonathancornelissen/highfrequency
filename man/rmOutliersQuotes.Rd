@@ -7,7 +7,7 @@
 rmOutliersQuotes(qData, maxi = 10, window = 50, type = "advanced", tz = NULL)
 }
 \arguments{
-\item{qData}{a data.table or xts object at least containing the columns "BID" and "OFR".}
+\item{qData}{a \code{data.table} or \code{xts} object at least containing the columns "BID" and "OFR".}
 
 \item{maxi}{an integer, indicating the maximum number of median absolute deviations allowed.}
 
@@ -19,7 +19,7 @@ rmOutliersQuotes(qData, maxi = 10, window = 50, type = "advanced", tz = NULL)
 In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}.}
 }
 \value{
-xts object or data.table depending on type of input
+\code{xts} object or \code{data.table} depending on type of input
 }
 \description{
 If type = "standard": Function deletes entries for which the mid-quote deviated by more than "maxi"

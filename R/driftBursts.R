@@ -2,8 +2,8 @@
 #'   Drift Bursts
 #' @description Calculates the Test-Statistic for the Drift Burst Hypothesis
 #'  
-#' @param pData Either a data.table or an xts object. If pData is a data.table, columns DT and PRICE must be present, containing timestamps of the trades and the price of the 
-#' trades (in levels) respectively. If pData is an xts object and the number of columns is greater than one, PRICE must be present.
+#' @param pData Either a \code{data.table} or an \code{xts} object. If pData is a data.table, columns DT and PRICE must be present, containing timestamps of the trades and the price of the 
+#' trades (in levels) respectively. If pData is an \code{xts} object and the number of columns is greater than one, PRICE must be present.
 #' @param testTimes A \code{numeric} containing the times at which to calculate the tests. The standard of \code{seq(34260, 57600, 60)} 
 #' denotes calculating the test-statistic once per minute, i.e. 390 times for a typical 6.5 hour trading day from 9:31:00 to 16:00:00. See details.
 #' @param preAverage A positive \code{integer} denoting the length of pre-averaging window for the log-prices. Default is 5
@@ -230,7 +230,7 @@ driftBursts <- function(pData, testTimes = seq(34260, 57600, 60),
 #' 
 #' @details The plotting method has the following optional parameters:
 #' \itemize{
-#' \item{\code{pData}}{ A data.table or an xts object, containing the prices and timestamps of the data used to calculate the test statistic.
+#' \item{\code{pData}}{ A \code{data.table} or an \code{xts} object, containing the prices and timestamps of the data used to calculate the test statistic.
 #' If specified, and \code{which = "tStat"}, the price will be shown on the right y-axis along with the test statistic}
 #' \item{\code{which}}{ A string denoting which of four plots to make. \code{"tStat"} denotes plotting the test statistic. \code{"sigma"} denotes plotting the
 #' estimated volatility process. \code{"mu"} denotes plotting the estimated drift process. If \code{which = c("sigma", "mu")} or \code{which = c("mu", "sigma")},
@@ -392,12 +392,14 @@ plot.DBH <- function(x, ...){
 #' }
 #' 
 #' @examples
+#' \dontrun{
 #' DBH <- driftBursts(sampleTDataEurope, testTimes = seq(32400 + 900, 63000, 60), preAverage = 2, 
-#'                     ACLag = -1L, meanBandwidth = 300L, varianceBandwidth = 900L)
+#'                    ACLag = -1L, meanBandwidth = 300L, varianceBandwidth = 900L)
 #' print(DBH)
 #' print(DBH, criticalValue = 1) # This value doesn't make sense - don't actually use it!
 #' print(DBH, alpha = 0.95) # 5% confidence level - this is the standard
 #' print(DBH, alpha = 0.99) # 1% confidence level
+#' }
 #' @author Emil Sjoerup
 #' @export
 print.DBH = function(x, ...){

@@ -9,7 +9,7 @@
 \arguments{
 \item{object}{an object of class \code{HARmodel}}
 
-\item{...}{extra argumetns. See details}
+\item{...}{extra arguments. See details}
 }
 \description{
 Predict method for objects of type \code{HARmodel}
@@ -21,6 +21,6 @@ Predict method for objects of type \code{HARmodel}
 \item{\code{warnings}}{ A logical denoting whether to display warnings, detault is \code{TRUE}}
 \item{\code{backtransform}}{ A string. If the model is estimated with transformation this parameter can be set to transform the prediction back into variance
 The possible values are \code{"simple"} which means inverse of transformation, i.e. \code{exp} when log-transformation is applied. If using log transformation,
-the option \code{"parametric"} can also be used to transform back. The parametric method adds a correction  denoting whether to display warnings, detault is \code{TRUE}}
+the option \code{"parametric"} can also be used to transform back. The parametric method adds a correction that stems from using the log-transformation }
 }
 }

@@ -69,7 +69,7 @@ ABDJumptest <- function(RV, BPV, TQ) { # Compute jump detection stat mentioned i
 #' @param alpha numeric of length one with the significance level to use for the jump test(s). Defaults to 0.975.
 #' @param ... used internally
 #' 
-#' @return list or xts in case the input prices span more than one day.
+#' @return list or \code{xts}in case the input prices span more than one day.
 #' 
 #' @details 
 #'  The theoretical framework underlying jump test is that the logarithmic price process \eqn{X_t} belongs to the class of Brownian semimartingales, which can be written as:
@@ -224,7 +224,7 @@ AJjumpTest <- function(pData, p = 4 , k = 2, alignBy = NULL, alignPeriod = NULL,
 #' @param makeReturns boolean, should be TRUE when pData contains prices. FALSE by default.
 #' @param alpha numeric of length one with the significance level to use for the jump test(s). Defaults to 0.975.
 #' 
-#' @return list or xts in case the input prices span more than one day.
+#' @return list or \code{xts}in case the input prices span more than one day.
 #' 
 #' @details The theoretical framework underlying jump test is that the logarithmic price process \eqn{X_t} belongs to the class of Brownian semimartingales, which can be written as:
 #' \deqn{
@@ -525,7 +525,7 @@ JOjumpTest <- function(pData, power = 4, alignBy = NULL, alignPeriod = NULL, alp
 #' This function can be used to  test for jumps in intraday price paths.
 #' The tests are of the form \eqn{L(t) = (R(t) - mu(t))/sigma(t)}. 
 #' 
-#' @param pData xts or data.table of the price data in levels. This data can (and should in some cases) be tick-level data. The data can span more than one day.
+#' @param pData \code{xts}or data.table of the price data in levels. This data can (and should in some cases) be tick-level data. The data can span more than one day.
 #' @param volEstimator character denoting which volatility estimator to use for the tests. See \link{spotVol}. Default = \code{"RM"} denoting realized measures.
 #' @param driftEstimator character denoting which drift estimator to use for the tests. See \link{spotDrift}. Default = \code{"none"} denoting no drift estimation.
 #' @param alpha numeric of length one determining what confidence level to use when constructing the critical values.
@@ -856,8 +856,8 @@ plot.intradayJumpTest <- function(x, ...){
 
 #' Rank jump test
 #' 
-#' @param marketPrice data.table or xts containing the market prices in levels
-#' @param stockPrices list containing the individual stock prices in either data.table or xts format. The format should be the the same as \code{marketPrice}
+#' @param marketPrice data.table or \code{xts}containing the market prices in levels
+#' @param stockPrices list containing the individual stock prices in either data.table or \code{xts}format. The format should be the the same as \code{marketPrice}
 #' @param alpha signicance level (in standard deviations) to use for the jump detections. Default is \code{c(5,3)} for 5 and 3 in the market and stocks respectively.
 #' @param localWindow numeric denoting the local window for the bootstrap algorithm. Default is \code{30}
 #' @param coarseFreq numeric denoting the coarse sampling frequency. Default is \code{10}
@@ -876,12 +876,13 @@ plot.intradayJumpTest <- function(x, ...){
 #' specified by \code{tz}. By default, \code{marketClose = "16:00:00"}.
 #' @param tz string specifying the time zone to which the times in \code{data}
 #' and/or \code{marketOpen}/ \code{marketClose} belong. Default = \code{"GMT"}.
-#' This parameter will also help determine the testing times as the test is done on non-overlapping pre-averaged returns.
 #' 
-#' @return A list containing "criticalValues" which are the bootstrapped critcal values, "testStatistic" the test statistic of the jump test, "dimensions" which are the dimensions of the jump matrix
-#'  "marketJumpDetections" the jumps detected in the market prices, "stockJumpDetections" the co-jumps detected in the individual stock prices, and "jumpIndices" which are the indices of the detected jumps.
+#' @return A list containing \code{criticalValues} which are the bootstrapped critcal values, \code{testStatistic} the test statistic of the jump test, \code{dimensions} which are the dimensions of the jump matrix
+#'  \code{marketJumpDetections} the jumps detected in the market prices, \code{stockJumpDetections} the co-jumps detected in the individual stock prices, and \code{jumpIndices} which are the indices of the detected jumps.
 #' 
-#' @author Emil Sjoerup
+#' @references Li et al. (2019). Rank Tests at Jump Events, Journal of Business & Economic Statistics, 37(2), 312- 321.
+#' 
+#' @author Emil Sjoerup, based on Matlab code by Li et al.
 #' @importFrom stats na.omit quantile runif
 #' @importFrom zoo coredata
 #' @export

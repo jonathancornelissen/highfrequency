@@ -14,23 +14,23 @@ rBPCov(
 )
 }
 \arguments{
-\item{rData}{an xts or data.table object containing returns or prices, possibly for multiple assets over multiple days}
+\item{rData}{an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days}
 
-\item{cor}{boolean, in case it is TRUE, the correlation is returned. FALSE by default.}
+\item{cor}{boolean, in case it is \code{TRUE}, and the input data is multivariate, the correlation is returned instead of the covariance matrix. \code{FALSE} by default.}
 
-\item{alignBy}{character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".
+\item{alignBy}{character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
 To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.}
 
 \item{alignPeriod}{positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
 based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.}
 
-\item{makeReturns}{boolean, should be TRUE when rData contains prices instead of returns. FALSE by default.}
+\item{makeReturns}{boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.}
 
-\item{makePsd}{boolean, in case it is TRUE, the positive definite version of rBPCov is returned. FALSE by default.}
+\item{makePsd}{boolean, in case it is \code{TRUE}, the positive definite version of rBPCov is returned. \code{FALSE} by default.}
 }
 \value{
-in case the input is and contains data from one day, an N by N matrix is returned. If the data is a univariate xts object with multiple days, an xts is returned. 
-If the data is multivariate and contains multiple days (xts or data.table), the function returns a list containing N by N matrices. Each item in the list has a name which corresponds to the date for the matrix.
+in case the input is and contains data from one day, an N by N matrix is returned. If the data is a univariate \code{xts} object with multiple days, an \code{xts} is returned. 
+If the data is multivariate and contains multiple days (\code{xts} or \code{data.table}), the function returns a list containing N by N matrices. Each item in the list has a name which corresponds to the date for the matrix.
 }
 \description{
 Function returns the Realized BiPower Covariance (rBPCov), 

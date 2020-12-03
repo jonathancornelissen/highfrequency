@@ -15,7 +15,7 @@ aggregateTS(
 )
 }
 \arguments{
-\item{ts}{xts object to aggregate.}
+\item{ts}{\code{xts} object to aggregate.}
 
 \item{FUN}{function to apply over each interval. By default, previous tick aggregation is done. 
 Alternatively one can set e.g. FUN = "mean".
@@ -27,7 +27,7 @@ In case weights are supplied, this argument is ignored and a weighted average is
 based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.}
 
 \item{weights}{By default, no weighting scheme is used. 
-When you assign an xts object with weights to this argument, a weighted mean is taken over each interval. 
+When you assign an \code{xts} object with weights to this argument, a weighted mean is taken over each interval. 
 Of course, the weights should have the same timestamps as the supplied time series.}
 
 \item{dropna}{boolean, which determines whether empty intervals should be dropped.
@@ -37,10 +37,10 @@ for previous tick aggregation, by setting FUN = "previoustick" (default).}
 \item{tz}{character denoting which timezone the output should be in. Defaults to NULL}
 }
 \value{
-An xts object containing the aggregated time series.
+An \code{xts} object containing the aggregated time series.
 }
 \description{
-Function returns aggregated time series as xts object. 
+Function returns aggregated time series as \code{xts} object. 
 It can handle irregularly spaced timeseries and returns a regularly spaced one.
 Use univariate timeseries as input for this function, and check out \code{\link{aggregateTrades}}
 and \code{\link{aggregateQuotes}} to aggregate Trade or Quote data objects.

@@ -14,6 +14,6 @@ SPYRM
 Realized measures for the SPY ETF calculated at 1 and 5 minute sampling.
 }
 \note{
-The CLOSE column is NOT the official close price, but simply the last recorded price of the day. Thus this may be slightly different from other sources
+The CLOSE column is NOT the official close price, but simply the last recorded price of the day. Thus, this may be slightly different from other sources.
 }
 \keyword{datasets}
