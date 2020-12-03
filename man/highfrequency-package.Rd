@@ -6,7 +6,7 @@
 \alias{highfrequency-package}
 \title{highfrequency: Tools for Highfrequency Data Analysis}
 \description{
-The highfrequency package provides numerous tools for analyzing financial (highfrequency) data. It has five main goals:
+The \pkg{highfrequency} package provides numerous tools for analyzing high frequency financial data. It has five main goals:
 
 \itemize{ 
 \item Provide functionality to manage, clean and match highfrequency trades and quotes data, 
@@ -16,7 +16,7 @@ The highfrequency package provides numerous tools for analyzing financial (highf
 \item investigate microstructure noise and intraday periodicity.
 }
 
-To learn more about highfrequency, start with the vignettes:
+To learn more about \pkg{highfrequency}, start with the vignettes:
 `browseVignettes(package = "highfrequency")`
 }
 \seealso{

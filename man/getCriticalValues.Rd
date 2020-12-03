@@ -9,10 +9,12 @@ getCriticalValues(x, alpha = 0.95)
 \arguments{
 \item{x}{object of class \code{DBH}}
 
-\item{alpha}{numeric denoting the confidence level for the critical value
-
-The critical value is that of the test described in appendix B in Christensen Oomen Reno}
+\item{alpha}{numeric denoting the confidence level for the critical value. Possible values are \code{c(0.9 0.95 0.99 0.995 0.999 0.9999)}}
 }
 \description{
-Method for DBH objects to calculate the critical value for the presence of a
+Method for DBH objects to calculate the critical value for the presence of a burst of drift.
+The critical value is that of the test described in appendix B in Christensen Oomen Reno
+}
+\author{
+Emil Sjoerup
 }

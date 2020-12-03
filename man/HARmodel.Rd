@@ -61,7 +61,8 @@ By default, h=1, i.e. no aggregation takes place, you just model the daily reali
 \item{...}{extra arguments for jump test.}
 }
 \value{
-The function outputs an object of class \code{HARmodel} and \code{\link{lm}} (so \code{HARmodel} is  a subclass of \code{\link{lm}}).
+The function outputs an object of class \code{HARmodel} and \code{\link{lm}} (so \code{HARmodel} is  a subclass of \code{\link{lm}}). Objects
+of class \code{HARmodel} has the following methods \code{\link{plot.HARmodel}}, \code{\link{predict.HARmodel}}, \code{\link{print.HARmodel}}, and \code{\link{summary.HARmodel}}.
 }
 \description{
 Function returns the estimates for the Heterogeneous Autoregressive model
@@ -133,6 +134,6 @@ Corsi, F. and Reno R. (2012). Discrete-time volatility forecasting with persiste
 Bollerslev, T., Patton, A., Quaedvlieg, R. 2016,  Exploiting the errors: A simple approach for improved volatility forecasting, Journal of Econometrics, vol.192, issue 1, 1-18.
 }
 \author{
-Jonathan Cornelissen and Kris Boudt
+Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
 }
 \keyword{forecasting}

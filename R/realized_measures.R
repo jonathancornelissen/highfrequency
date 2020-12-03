@@ -29,7 +29,7 @@ listAvailableKernels <- function() {
 }
 
 #' An estimator of integrated quarticity from applying the median operator on blocks of three returns.
-#' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
+#' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 #' @description Function returns the rMedRQ, defined in Andersen et al. (2012).
 #'   
 #'   Assume there is \eqn{N} equispaced returns in period \eqn{t}. Let \eqn{r_{t,i}} be a return (with \eqn{i=1, \ldots,N}) in period \eqn{t}.
@@ -120,7 +120,7 @@ rMedRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
 }
 
 #' An estimator of integrated quarticity from applying the minimum operator on blocks of two returns.
-#' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
+#' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 #' @description Function returns the rMinRQ, defined in Andersen et al. (2012).
 #' 
 #' Assume there is \eqn{N} equispaced returns in period \eqn{t}. Let \eqn{r_{t,i}} be a return (with \eqn{i=1, \ldots,N}) in period \eqn{t}.
@@ -220,7 +220,7 @@ rMinRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
 #' @references 
 #' Andersen, T. G., D. Dobrev, and E. Schaumburg (2012). Jump-robust volatility estimation using nearest neighbor truncation. Journal of Econometrics, 169 (1), 75-93.
 #' 
-#' @author Jonathan Cornelissen and Kris Boudt
+#' @author Jonathan Cornelissen, Kris Boudt, Emil Sjoerup
 #' 
 #' @examples
 #' minrv <- rMinRV(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes",
@@ -325,7 +325,7 @@ rMinRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
 #' 
 #' Corsi, F., D. Pirino, and R. Reno (2010). Threshold Bipower Variation and the Impact of Jumps on Volatility Forecasting. Journal of Econometrics 159 (2), 276-288.
 #' 
-#' @author Jonathan Cornelissen and Kris Boudt
+#' @author Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup´
 #' 
 #' @examples 
 #' medrv <- rMedRV(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes", 
@@ -453,7 +453,7 @@ rMedRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
 #' 
 #' @references Hautsch, N., & Podolskij, M. (2013). Preaveraging-Based Estimation of Quadratic Variation in the Presence of Noise and Jumps: Theory, Implementation, and Empirical Evidence. Journal of Business & Economic Statistics, 31(2), 165-183.
 #' 
-#' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
+#' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 #' 
 #' @examples 
 #' \dontrun{
@@ -552,7 +552,7 @@ rMRC <- function(pData, pairwise = FALSE, makePsd = FALSE) {
 #' 
 #' Michiel de Pooter, Martin Martens, and Dick van Dijk. Predicting the daily covariance matrix for S\&P100 stocks using intraday data - but which frequency to use? \emph{Econometric Reviews}, 2008.
 #' 
-#' @author Scott Payseur
+#' @author Scott Payseur, Onno Kleen, and Emil Sjoerup
 #' 
 #' @examples 
 #' # Average subsampled realized variance/covariance aligned at one minute returns at 
@@ -890,7 +890,7 @@ rAVGCov <- function(rData, cor = FALSE, alignBy = "minutes", alignPeriod = 5, k 
 #' Barndorff-Nielsen, O. E., & Shephard, N. (2004). Econometric analysis of realized covariation: High frequency based covariance, regression, and correlation in 
 #' #' financial economics. Econometrica, 72(3), 885-925.
 #' 
-#' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
+#' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
 #' 
 #' @examples 
 #' \dontrun{
@@ -1010,7 +1010,7 @@ rBeta <- function(rData, rIndex, RCOVestimator = "rCov", RVestimator = "RV", mak
 #' jumps in multivariate price processes using bipower covariation. Discussion
 #' paper, Nuffield College, Oxford University.
 #' 
-#' @author Jonathan Cornelissen and Kris Boudt
+#' @author Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 #' 
 #' @examples 
 #' # Realized Bipower Variance/Covariance for a price series aligned   
@@ -1156,7 +1156,7 @@ rBPCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeR
 #' @return in case the input is and contains data from one day, an N by N matrix is returned. If the data is a univariate xts object with multiple days, an xts is returned. 
 #' If the data is multivariate and contains multiple days (xts or data.table), the function returns a list containing N by N matrices. Each item in the list has a name which corresponds to the date for the matrix.
 #' 
-#' @author Jonathan Cornelissen and Kris Boudt
+#' @author Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 #' 
 #' @examples 
 #' # Realized Variance/Covariance for prices aligned at 5 minutes.
@@ -1268,7 +1268,7 @@ rCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeRet
 #' 
 #' @references T. Hayashi and N. Yoshida. On covariance estimation of non-synchronously observed diffusion processes. \emph{Bernoulli}, 11, 359-379, 2005.
 #' 
-#' @author Scott Payseur
+#' @author Scott Payseur and Emil Sjoerup
 #' 
 #' # Average Hayashi-Yoshida Covariance estimator is calculated on five-minute returns
 #' 
@@ -1382,7 +1382,7 @@ rHYCov <- function(rData, cor = FALSE, period = 1, alignBy = "seconds", alignPer
 #'
 #' P. Hansen and A. Lunde. Realized variance and market microstructure noise. \emph{Journal of Business and Economic Statistics}, 24:127-218, 2006.
 #'
-#' @author Scott Payseur and Onno Kleen
+#' @author Scott Payseur, Onno Kleen, and Emil Sjoerup
 #'
 #' @examples
 #' # Univariate:
@@ -1545,7 +1545,7 @@ rKernelCov <- function(rData, cor = FALSE,  alignBy = "seconds", alignPeriod = 1
 #'
 #' @references Amaya, D., Christoffersen, P., Jacobs, K. and Vasquez, A. (2011). Do realized skewness and kurtosis predict the cross-section of equity returns?. CREATES research paper. p. 3-7.
 #'
-#' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
+#' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
 #' 
 #' @examples 
 #' rk <- rKurt(sampleTData[, list(DT, PRICE)], alignBy = "minutes", 
@@ -1649,7 +1649,7 @@ rKurt <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #' 
 #' @references Andersen, T. G., D. Dobrev, and E. Schaumburg (2012). Jump-robust volatility estimation using nearest neighbor truncation. Journal of Econometrics, 169(1), 75- 93.
 #'
-#' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
+#' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 #' 
 #' @examples
 #' mpv <- rMPV(sampleTData[, list(DT, PRICE)], m = 2, p = 3, alignBy = "minutes", 
@@ -1780,7 +1780,7 @@ rMPV <- function(rData, m = 2, p = 2, alignBy = NULL, alignPeriod = NULL, makeRe
 #' 
 #' @references Boudt, K., C. Croux, and S. Laurent (2008). Outlyingness weighted covariation. Mimeo.
 #' 
-#' @author Jonathan Cornelissen and Kris Boudt
+#' @author Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 #' 
 #' @examples 
 #' \dontrun{
@@ -1917,7 +1917,7 @@ rOWCov <- function (rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, make
 #' 
 #' @references  Amaya, D., Christoffersen, P., Jacobs, K. and Vasquez, A. (2011). Do realized skewness and kurtosis predict the cross-section of equity returns?. CREATES research paper. p. 3-7.
 #'
-#' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
+#' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 #' 
 #' @examples 
 #' rs <- rSkew(sampleTData[, list(DT, PRICE)],alignBy ="minutes", alignPeriod =5,
@@ -2011,7 +2011,7 @@ rSkew <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #'           alignPeriod = 5, makeReturns = TRUE)
 #' sv
 #' @references Barndorff-Nielsen, O.E., Kinnebrock, S. and Shephard N. (2008). Measuring downside risk - realized semivariance. CREATES research paper. p. 3-5.
-#' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
+#' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 #' @keywords  highfrequency rSV
 #' @export
 rSV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, ...) {
@@ -2120,7 +2120,7 @@ rSV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, 
 #' 
 #' Mancini, C. and F. Gobbi (2009). Identifying the covariation between the diffusion parts and the co-jumps given discrete observations. Mimeo.
 #' 
-#' @author Jonathan Cornelissen and Kris Boudt
+#' @author Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 #' 
 #' @examples # Realized threshold  Variance/Covariance: 
 #' # Multivariate:
@@ -2298,7 +2298,7 @@ rThresholdCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL
 #' 
 #' Zhang, L., P. A. Mykland, and Y. Ait-Sahalia (2005). A tale of two time scales: Determining integrated volatility with noisy high-frequency data. Journal of the American Statistical Association 100, 1394-1411.
 #' 
-#' @author Jonathan Cornelissen and Kris Boudt
+#' @author Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 #' @examples
 #' \dontrun{
 #' library(xts)
@@ -2438,7 +2438,7 @@ RV <- function(rData) {
 #' 
 #' @references Andersen, T. G., D. Dobrev, and E. Schaumburg (2012). Jump-robust volatility estimation using nearest neighbor truncation. Journal of Econometrics, 169(1), 75- 93.
 #'  
-#' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
+#' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 #'  
 #' @examples 
 #' tpv <- rTPQuar(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes", 
@@ -2520,7 +2520,7 @@ rTPQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FAL
 #' If the input data is a data.table object, the function returns a data.table with the same column names as the input data, containing the date and the realized measures
 #' 
 #' @references Andersen, T. G., D. Dobrev, and E. Schaumburg (2012). Jump-robust volatility estimation using nearest neighbor truncation. Journal of Econometrics, 169(1), 75- 93.
-#' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
+#' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 #' 
 #' @examples 
 #' qpv <- rQPVar(rData= sampleTData[, list(DT, PRICE)], alignBy= "minutes", 
@@ -2599,7 +2599,7 @@ rQPVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
 #' If the input data spans multiple days and is in xts format, an xts will be returned. 
 #' If the input data is a data.table object, the function returns a data.table with the same column names as the input data, containing the date and the realized measures
 #'
-#' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
+#' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 #' @references  Andersen, T. G., D. Dobrev, and E. Schaumburg (2012). Jump-robust volatility estimation using nearest neighbor truncation. Journal of Econometrics, 169(1), 75- 93.
 #' @examples 
 #' rq <- rQuar(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes", 
@@ -2720,7 +2720,7 @@ rQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #' Zhang, L., P. A. Mykland, and Y. Ait-Sahalia (2005). A tale of two time scales: Determining integrated volatility with noisy high-frequency data. Journal of the American Statistical Association 100, 1394-1411.
 #' Zhang, L. (2011). Estimating covariation: Epps effect, microstructure noise. Journal of Econometrics 160, 33-47.
 #' 
-#' @author Jonathan Cornelissen and Kris Boudt
+#' @author Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 #' @examples 
 #' # Robust Realized two timescales Variance/Covariance
 #' # Multivariate:
@@ -3355,7 +3355,7 @@ ReMeDI <- function(pData, kn = 1, lags = 1, knEqual = FALSE,
 #'
 #' @author Emil Sjoerup
 #' @importFrom stats plot.ts
-#' @references A ReMeDI for Microstructure Noise
+#' @references Li and Linton (2019) (Working paper): "A ReMeDI for microstructure noise."
 #' @return integer containing the optimal kn
 #' @export
 knChooseReMeDI <- function(pData, knEqual = FALSE,

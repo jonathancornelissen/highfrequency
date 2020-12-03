@@ -74,6 +74,6 @@ B. Zhou. High-frequency data and volatility in foreign-exchange rates. \emph{Jou
 P. Hansen and A. Lunde. Realized variance and market microstructure noise. \emph{Journal of Business and Economic Statistics}, 24:127-218, 2006.
 }
 \author{
-Scott Payseur and Onno Kleen
+Scott Payseur, Onno Kleen, and Emil Sjoerup
 }
 \keyword{volatility}

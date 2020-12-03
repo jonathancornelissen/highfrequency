@@ -4,7 +4,7 @@
 \alias{rmOutliersQuotes}
 \title{Delete entries for which the mid-quote is outlying with respect to surrounding entries}
 \usage{
-rmOutliersQuotes(qData, maxi = 10, window = 50, type = "advanced", tz = "EST")
+rmOutliersQuotes(qData, maxi = 10, window = 50, type = "advanced", tz = NULL)
 }
 \arguments{
 \item{qData}{a data.table or xts object at least containing the columns "BID" and "OFR".}
@@ -15,7 +15,8 @@ rmOutliersQuotes(qData, maxi = 10, window = 50, type = "advanced", tz = "EST")
 
 \item{type}{should be "standard" or "advanced" (see description).}
 
-\item{tz}{timezone to use}
+\item{tz}{fallback time zone used in case we we are unable to identify the timezone of the data, by default: \code{tz = NULL}. With the non-disk functionality, we attempt to extract the timezone from the DT column (or index) of the data, which may fail. 
+In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}.}
 }
 \value{
 xts object or data.table depending on type of input

@@ -44,7 +44,7 @@ sv
 Barndorff-Nielsen, O.E., Kinnebrock, S. and Shephard N. (2008). Measuring downside risk - realized semivariance. CREATES research paper. p. 3-5.
 }
 \author{
-Giang Nguyen, Jonathan Cornelissen and Kris Boudt
+Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 }
 \keyword{highfrequency}
 \keyword{rSV}

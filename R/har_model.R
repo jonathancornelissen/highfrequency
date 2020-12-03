@@ -80,14 +80,14 @@ harInsanityFilter <- function(fittedValues, lower, upper, replacement) {
 #' @param periodsExternal a vector of integers indicating over how days \code{externalRegressor} should be aggregated.
 #' @param ... extra arguments for jump test.
 #'
-#' @return The function outputs an object of class \code{HARmodel} and \code{\link{lm}} (so \code{HARmodel} is  a subclass of \code{\link{lm}}).
+#' @return The function outputs an object of class \code{HARmodel} and \code{\link{lm}} (so \code{HARmodel} is  a subclass of \code{\link{lm}}). Objects
+#' of class \code{HARmodel} has the following methods \code{\link{plot.HARmodel}}, \code{\link{predict.HARmodel}}, \code{\link{print.HARmodel}}, and \code{\link{summary.HARmodel}}.
 #'
 #' @references Andersen, T. G., T. Bollerslev, and F. Diebold (2007). Roughing it up: including jump components in the measurement, modelling and forecasting of return volatility. The Review of Economics and Statistics 89, 701-720.
 #' Corsi, F. (2009). A simple approximate long memory model of realized volatility. Journal of Financial Econometrics 7, 174-196.
 #' Corsi, F. and Reno R. (2012). Discrete-time volatility forecasting with persistent leverage effect and the link with continuous-time volatility modeling. Journal of Business and Economic Statistics, forthcoming.
 #' Bollerslev, T., Patton, A., Quaedvlieg, R. 2016,  Exploiting the errors: A simple approach for improved volatility forecasting, Journal of Econometrics, vol.192, issue 1, 1-18.
 #'
-#' @author Jonathan Cornelissen and Kris Boudt
 #' @keywords forecasting
 #'
 #' @examples
@@ -147,6 +147,7 @@ harInsanityFilter <- function(fittedValues, lower, upper, replacement) {
 #' # plot(x)
 #' predict(x)
 #'
+#' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
 #' @import RcppArmadillo
 #' @export
 HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), periodsQ = c(1),
@@ -478,27 +479,34 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
   return (model)
 }
 
+#' Plotting method for HARModel objects
+#' @param x an object of class \code{HARmodel}
+#' @param ... extra arguments, see details
+#' @details The plotting method has the following optional parameter:
+#' \itemize{
+#' \item{\code{legend.loc}}{ A string denoting the location of the legend passed on to \code{addLegend} of the \pkg{xts} package}
+#' }
+#' 
 #' @importFrom grDevices dev.interactive
 #' @importFrom graphics plot panel.smooth points par
 #' @importFrom stats residuals
 #' @importFrom xts addLegend
 #' @export
-plot.HARmodel <- function(x, which = c(1L:3L, 5L), caption = list("Residuals vs Fitted",
-                                                                  "Normal Q-Q", "Scale-Location", "Cook's distance", "Residuals vs Leverage",
-                                                                  expression("Cook's dist vs Leverage  " * h[ii]/(1 - h[ii]))),
-                          panel = if (add.smooth) panel.smooth else points, sub.caption = NULL,
-                          main = "", ask = prod(par("mfcol")) < length(which) && dev.interactive(), legend.loc = "topleft",
-                          ..., id.n = 3, labels.id = names(residuals(x)), cex.id = 0.75,
-                          qqline = TRUE, cook.levels = c(0.5, 1), add.smooth = getOption("add.smooth"),
-                          label.pos = c(4, 2), cex.caption = 1){
-  observed <- x$model$y
-  fitted   <- x$fitted.values
-  dates    <- x$dates
-  dates    <- as.POSIXct(dates)
-  observed <- xts(observed, order.by=dates)
-  fitted   <- xts(fitted, order.by=dates)
-  type     <- x$type
-
+plot.HARmodel <- function(x, ...){
+  options <- list(...)
+  #### List of standard options
+  opt <- list(legend.loc = "topleft")
+  #### Override standard options where user passed new options
+  opt[names(options)] <- options
+  
+  observed   <- x$model$y
+  fitted     <- x$fitted.values
+  dates      <- x$dates
+  dates      <- as.POSIXct(dates)
+  observed   <- xts(observed, order.by=dates)
+  fitted     <- xts(fitted, order.by=dates)
+  type       <- x$type
+  legend.loc <- opt$legend.loc
   g_range <- range(fitted,observed)
   g_range[1] <- 0.95 * g_range[1]
   g_range[2] <- 1.05 * g_range[2]
@@ -517,6 +525,14 @@ plot.HARmodel <- function(x, which = c(1L:3L, 5L), caption = list("Residuals vs 
             col = c("blue", "red"))
 }
 
+#' Predict method for objects of type \code{HARmodel}
+#' @param object an object of class \code{HARmodel}
+#' @param newdata new data to use for forecasting
+#' @param warnings logical denoting whether to display warnings
+#' @param backtransfrom if the model is estimated with transformation this parameter can be set to transform the prediction back into variance
+#' The possible values are \code{"simple"} which means inverse of transformation, i.e. \code{exp} when log-transformation is applied. If using log transformation,
+#' the option \code{"parametric"} can also be used to transform back. The parametric method adds a correction 
+#' 
 #' @importFrom stats var
 #' @export
 predict.HARmodel <- function(object, newdata = NULL, warnings = TRUE, backtransform = FALSE, ...) {
@@ -531,20 +547,27 @@ predict.HARmodel <- function(object, newdata = NULL, warnings = TRUE, backtransf
   inputType <- object$inputType
 
   if (is.null(newdata)) {
-    if (is.null(object$transform) ) {
+    
+    if (is.null(object$transform)) {
       return(as.numeric(as.numeric(c(1, xts::last(object$model[,-1])))  %*%  object$coefficients))
     }
     if (object$transform == "log") {
-      if (warnings) {
-        warning("Due to log-transform, forecast of RV is derived under assumption of log-normality.")
+      if(backtransform == "parametric"){
+        return(as.numeric(exp(as.numeric(c(1, xts::last(object$model[,-1])))  %*%  object$coefficients + 1/2 * var(object$residuals))))
+      } else if(backtransform == "simple"){
+        return(exp(as.numeric(as.numeric(c(1, xts::last(object$model[,-1])))  %*%  object$coefficients)))
+      } else {
+        return(as.numeric(as.numeric(c(1, xts::last(object$model[,-1])))  %*%  object$coefficients))
       }
-      return(as.numeric(exp(as.numeric(c(1, xts::last(object$model[,-1])))  %*%  object$coefficients + 1/2 * var(object$residuals))))
     }
     if (object$transform == "sqrt") {
-      if (warnings) {
-        warning("Forecast for sqrt(RV) due to transform == \"sqrt\".")
+      if(backtransform == "simple"){
+        return(as.numeric(as.numeric(c(1, xts::last(object$model[,-1])))  %*%  object$coefficients)^2)  
+      } else if(backtransform == "parametric"){
+        stop("parametric backtransform is not available for the sqrt transformation")
+      } else {
+        return(as.numeric(as.numeric(c(1, xts::last(object$model[,-1])))  %*%  object$coefficients)) 
       }
-      return(as.numeric(as.numeric(c(1, xts::last(object$model[,-1])))  %*%  object$coefficients))
     }
   }
 
@@ -847,7 +870,7 @@ predict.HARmodel <- function(object, newdata = NULL, warnings = TRUE, backtransf
     if (object$transform == "sqrt") {
       if(backtransform == "simple"){
         return(as.numeric(as.matrix(cbind(1, x))  %*%  object$coefficients)^2)  
-      } else if(backtransform == "parametrics"){
+      } else if(backtransform == "parametric"){
         stop("parametric backtransform is not available for the sqrt transformation")
       } else {
         return(as.numeric(as.matrix(cbind(1, x))  %*%  object$coefficients)) 
@@ -886,10 +909,14 @@ print.HARmodel <- function(x, digits = max(3, getOption("digits") - 3), ...){
   invisible(x)
 }
 
+#' Summary for \code{HARmodel} objects
+#' @param object An object of class \code{HARmodel}
+#' 
+#' @return A modified \code{summary.lm}
 #' @importFrom stats summary.lm pt
 #' @importFrom sandwich NeweyWest
 #' @export
-summary.HARmodel <- function(object, correlation = FALSE, symbolic.cor = FALSE, ...){
+summary.HARmodel <- function(object){
   dd <- summary.lm(object)
   dd$coefficients[,"Std. Error"] <- sqrt(diag(NeweyWest(object, lag = 22)))
   dd$coefficients[,"t value"] <- dd$coefficients[,"Estimate"] / dd$coefficients[,"Std. Error"]

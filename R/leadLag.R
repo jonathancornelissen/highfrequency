@@ -14,7 +14,7 @@
 #' @param nCores integer valued numeric denoting how many cores to use for the lead-lag estimation procedure in case parallelize is TRUE. 
 #' Default is NA, which does not parallelize the code.
 #' 
-#' @return An list with class "leadLag" which containing 'contrasts', 'lead-lag-ratio', and 'lags', denoting the estimated values for each lag calculated,
+#' @return A list with class "leadLag" which containing 'contrasts', 'lead-lag-ratio', and 'lags', denoting the estimated values for each lag calculated,
 #' the lead-lag-ratio, and the tested lags respectively.
 #' 
 #' @details The lead-lag-ratio (LLR) can be used to see if one asset leads the other. If LLR < 1, then price1 MAY be leading price2 and vice versa if LLR > 1.

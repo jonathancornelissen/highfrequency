@@ -41,8 +41,8 @@ specified by \code{tz}. By default, \code{marketOpen = "09:30:00"}.}
 \item{marketClose}{the market closing time. This should be in the time zone
 specified by \code{tz}. By default, \code{marketClose = "16:00:00"}.}
 
-\item{tz}{string specifying the time zone to which the times in \code{data}
-and/or \code{marketOpen}/ \code{marketClose} belong. Default = \code{"GMT"}.
+\item{tz}{fallback time zone used in case we we are unable to identify the timezone of the data, by default: \code{tz = NULL}. We attempt to extract the timezone from the DT column (or index) of the data, which may fail. 
+In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}
 
 The null hypothesis of the tests in this function is that there are no jumps in the price series}
 }
@@ -68,5 +68,7 @@ FoFtest <- intradayJumpTest(pData = sampleTData[, list(DT, PRICE)],
 plot(FoFtest)
 
 }
-
+}
+\author{
+Emil Sjoerup
 }

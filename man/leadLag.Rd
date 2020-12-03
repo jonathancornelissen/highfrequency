@@ -35,7 +35,7 @@ This does not change the value of the lead-lag-ratio.}
 Default is NA, which does not parallelize the code.}
 }
 \value{
-An list with class "leadLag" which containing 'contrasts', 'lead-lag-ratio', and 'lags', denoting the estimated values for each lag calculated,
+A list with class "leadLag" which containing 'contrasts', 'lead-lag-ratio', and 'lags', denoting the estimated values for each lag calculated,
 the lead-lag-ratio, and the tested lags respectively.
 }
 \description{

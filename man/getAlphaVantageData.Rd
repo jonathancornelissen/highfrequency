@@ -31,7 +31,7 @@ data.table objects will be put into a list.
 Function to retrieve high frequency data from Alpha Vantage - wrapper around quantMods' getSymbols.av function
 }
 \details{
-#' The doSleep argument is set to true as default because Alpha Vantage has a limit of five calls per minute. 
+The \code{doSleep} argument is set to true as default because Alpha Vantage has a limit of five calls per minute. 
 The function does not try to extract when the last API call was made which means that if
 you made successive calls to get 3 symbols in rapid succession, the function may not retrieve all the data.
 }

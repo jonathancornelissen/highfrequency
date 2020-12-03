@@ -100,6 +100,6 @@ rowc
 Boudt, K., C. Croux, and S. Laurent (2008). Outlyingness weighted covariation. Mimeo.
 }
 \author{
-Jonathan Cornelissen and Kris Boudt
+Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 }
 \keyword{volatility}

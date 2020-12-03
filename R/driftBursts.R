@@ -5,8 +5,8 @@
 #' @param pData Either a data.table or an xts object. If pData is a data.table, columns DT and PRICE must be present, containing timestamps of the trades and the price of the 
 #' trades (in levels) respectively. If pData is an xts object and the number of columns is greater than one, PRICE must be present.
 #' @param testTimes A \code{numeric} containing the times at which to calculate the tests. The standard of \code{seq(34260, 57600, 60)} 
-#' denotes calculating the test-statistic once per minute, i.e. 390 times for a typical 6.5 hour trading day from 9:31:00 to 16:00:00. See details. Default is seq(34260, 57600, 60.
-#' @param preAverage An \code{integer} denoting the length of pre-averaging window for the log-prices. Default is 5
+#' denotes calculating the test-statistic once per minute, i.e. 390 times for a typical 6.5 hour trading day from 9:31:00 to 16:00:00. See details.
+#' @param preAverage A positive \code{integer} denoting the length of pre-averaging window for the log-prices. Default is 5
 #' @param ACLag A positive \code{integer} greater than 1 denoting how many lags are to be used for the HAC estimator of the variance - the default
 #' of \code{-1} denotes using an automatic lag selection algorithm for each iteration. Default is -1L
 #' @param meanBandwidth An \code{integer} denoting the bandwidth for the left-sided exponential kernel for the mean. Default is 300L
@@ -18,15 +18,13 @@
 #' @details 
 #' If the \code{testTimes} vector contains instructions to test before the first trade, or more than 15 minutes after the last trade, these entries will be deleted, as not doing so may cause crashes.
 #' The test statistic is unstable before \code{max(meanBandwidth , varianceBandwidth)} seconds has passed.
-#' If \code{timestamps} is provided and \code{logPrices} is an \code{xts} object, the indices of logPrices will be used regardless.
-#' Note that using an \code{xts} logPrices argument is slower than using a \code{numeric} due to the creation of the timestamps from the index of the input. 
-#' When using \code{xts} objects, be careful to use the correct time zones. For example, if I as a dane use the \code{"America/New_York"} time zone for my \code{xts} objects, I have to add 14400 to my testing times.
-#' Same correction will have to be made to the \code{startTime} and \code{endTime} arguments in the plotting methods.
 #' The lags from the Newey-West algorithm is increased by \code{2 * (preAveage-1)} due to the pre-averaging we know at least this many lags should be corrected for.
 #' The maximum of 20 lags is also increased by this factor for the same reason.
 #' @return An object of class \code{DBH} and \code{list} containing the series of the drift burst hypothesis test-statistic as well as the estimated spot drift and variance series. 
 #' The list also contains some information such as the variance and mean bandwidths along with the pre-averaging setting and the amount of observations. 
 #' Additionally, the list will contain information on whether testing happened for all \code{testTimes} entries.
+#' Objects of class \code{DBH} has the methods \code{\link{print.DBH}}, \code{\link{plot.DBH}}, and \code{\link{getCriticalValues.DBH}} which prints, plots, and
+#' retrieves critical values for the test described in appendix B 
 #' 
 #' @examples 
 #' ## Usage with data.table object
@@ -52,7 +50,7 @@
 #' ## Testing every 60 seconds after 09:00:00
 #' system.time({DBH4 <- driftBursts(dat, testTimes = seq(32400 + 900, 63000, 60), preAverage = 2, 
 #'              ACLag = -1L, meanBandwidth = 300L, varianceBandwidth = 900L)})
-#' # On my machine with an i5-8250U, the following is 2-3 times faster
+#'
 #' system.time({DBH4 <- driftBursts(dat, testTimes = seq(32400 + 900, 63000, 60), preAverage = 2, 
 #'                                  ACLag = -1L, meanBandwidth = 300L, varianceBandwidth = 900L,
 #'                                  parallelize = TRUE, nCores = 8)})
@@ -115,7 +113,7 @@ driftBursts <- function(pData, testTimes = seq(34260, 57600, 60),
   } else if (is.xts(pData)){ ##xts case
     tz         <- tzone(pData)
     timestamps <- index(pData)
-    timestamps <- as.numeric(timestamps, tz = tz) - as.numeric(as.POSIXct(paste0(as.Date(timestamps[1], tz = tz)) , format = "%Y-%m-%d", tz = tz), tz = tz)
+    timestamps <- as.numeric(timestamps, tz = tz) - as.numeric(as.POSIXct(paste0(as.Date(timestamps[1], tz = tz)), format = "%Y-%m-%d", tz = tz), tz = tz)
     vIndex     <- as.POSIXct((.indexDate(pData[1,]) * 86400) + testTimes, origin = "1970-01-01", tz = tz)
     if(ncol(pData) == 1){
       logPrices <- log(as.numeric(pData))
@@ -226,7 +224,28 @@ driftBursts <- function(pData, testTimes = seq(34260, 57600, 60),
   return(lDriftBursts)
 }
 
-
+#' Plotting method for \code{DBH} objects
+#' @param x an object of class \code{DBH}
+#' @param ... optional arguments, see details
+#' 
+#' @details The plotting method has the following optional parameters:
+#' \itemize{
+#' \item{\code{pData}}{ A data.table or an xts object, containing the prices and timestamps of the data used to calculate the test statistic.
+#' If specified, and \code{which = "tStat"}, the price will be shown on the right y-axis along with the test statistic}
+#' \item{\code{which}}{ A string denoting which of four plots to make. \code{"tStat"} denotes plotting the test statistic. \code{"sigma"} denotes plotting the
+#' estimated volatility process. \code{"mu"} denotes plotting the estimated drift process. If \code{which = c("sigma", "mu")} or \code{which = c("mu", "sigma")},
+#' both the drift and volatility processes are plotted. CaPiTAlizAtIOn doesn't matter}
+#' }
+#' @examples
+#' ## Testing every 60 seconds after 09:15:00
+#' DBH <- driftBursts(sampleTDataEurope, testTimes = seq(32400 + 900, 63000, 60), preAverage = 2, 
+#'                     ACLag = -1L, meanBandwidth = 300L, varianceBandwidth = 900L)
+#' plot(DBH)
+#' plot(DBH, pData = sampleTDataEurope)
+#' plot(DBH, which = "sigma")
+#' plot(DBH, which = "mu")
+#' plot(DBH, which = c("sigma", "mu"))
+#' @author Emil Sjoerup
 #' @importFrom graphics axis axis.POSIXct legend mtext
 #' @importFrom grDevices rgb
 #' @export
@@ -246,11 +265,9 @@ plot.DBH <- function(x, ...){
   which      <- tolower(opt$which)
   startTime  <- opt$startTime
   endTime    <- opt$endTime
-  main       <- opt$main
   tz         <- opt$tz
   leg.x      <- opt$leg.x
   leg.y      <- opt$leg.y
-  nDays      <- opt$nDays
   timestamps <- opt$timestamps
   tstat      <- x$tStat
   sigma      <- x$sigma
@@ -307,17 +324,6 @@ plot.DBH <- function(x, ...){
     sigma <- as.numeric(sigma)
     mu    <- as.numeric(mu)
   } 
-  # if(testTimes[1] == startTime){
-  #   testTimes <- testTimes[-1]
-  #   sigma     <- sigma[-1]
-  #   mu        <- mu[-1]
-  #   tstat     <- tstat[-1]
-  # }
-  # if(min(testTimes) < startTime | max(testTimes) > endTime){
-  #   cat('\nTesting was tried before sessionStart or after sessionEnd, thus some of the tests may be cut off from the plot.
-  #       \nIf the plot looks weird, consider changing sessionStart and sessionEnd.
-  #       \nThese should reflect the start of trading and the end of trading respectively')
-  # }
   xtext <- as.POSIXct(testTimes, tz = tz, origin = as.POSIXct("1970-01-01", tz = tz))
   if(is.null(prices)) {
     xlim  <- c(startTime, endTime)
@@ -374,6 +380,25 @@ plot.DBH <- function(x, ...){
   par(startpar)
 }
 
+#' Printing method for \code{DBH} objects
+#' @param x an object of class \code{DBH}
+#' @param ... optional arguments, see details
+#' @details 
+#' The print method has the following optional parameters:
+#' \itemize{
+#' \item{\code{criticalValue}}{ A numeric denoting a custom critical value of the test.}
+#' \item{\code{alpha}}{ A numeric denoting the confidence level of the test. The alpha value is passed on to \code{\link{getCriticalValues}}.
+#' The default value is 0.95}
+#' }
+#' 
+#' @examples
+#' DBH <- driftBursts(sampleTDataEurope, testTimes = seq(32400 + 900, 63000, 60), preAverage = 2, 
+#'                     ACLag = -1L, meanBandwidth = 300L, varianceBandwidth = 900L)
+#' print(DBH)
+#' print(DBH, criticalValue = 1) # This value doesn't make sense - don't actually use it!
+#' print(DBH, alpha = 0.95) # 5% confidence level - this is the standard
+#' print(DBH, alpha = 0.99) # 1% confidence level
+#' @author Emil Sjoerup
 #' @export
 print.DBH = function(x, ...){
   usePolynomialInterpolation <- TRUE
@@ -414,11 +439,12 @@ print.DBH = function(x, ...){
 
 
 #' Get critical value for the drift burst hypothesis t-statistic
-#' @description Method for DBH objects to calculate the critical value for the presence of a 
-#' @param x object of class \code{DBH}
-#' @param alpha numeric denoting the confidence level for the critical value
-#' 
+#' @description Method for DBH objects to calculate the critical value for the presence of a burst of drift.
 #' The critical value is that of the test described in appendix B in Christensen Oomen Reno
+#' @param x object of class \code{DBH}
+#' @param alpha numeric denoting the confidence level for the critical value. Possible values are \code{c(0.9 0.95 0.99 0.995 0.999 0.9999)}
+#' 
+#' @author Emil Sjoerup
 #' 
 #' @export
 getCriticalValues <- function(x, alpha = 0.95){

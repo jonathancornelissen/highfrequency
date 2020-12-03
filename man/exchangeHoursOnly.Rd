@@ -15,22 +15,21 @@ exchangeHoursOnly(
 \item{data}{a data.table or xts object containing the time series data. 
 Multiple days of input are allowed.}
 
-\item{marketOpen}{character in the format of \"HH:MM:SS\",
-specifying the starting hour, minute and second of an exchange
-trading day.}
+\item{marketOpen}{character in the format of \code{"HH:MM:SS"},
+specifying the opening time of the exchange(s).}
 
-\item{marketClose}{character in the format of \"HH:MM:SS\",
-specifying the closing hour, minute and second of an exchange
-trading day.}
+\item{marketClose}{character in the format of \code{"HH:MM:SS"},
+specifying the closing time of the exchange(s).}
 
-\item{tz}{time zone used, by default: tz = "GMT".}
+\item{tz}{fallback time zone used in case we we are unable to identify the timezone of the data, by default: \code{tz = NULL}. We attempt to extract the timezone from the DT column of the data, which may fail. 
+In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}}
 }
 \value{
 xts or data.table object depending on input
 }
 \description{
-The function returns data within exchange trading hours
-"dayBegin" and "dayEnd". By default, dayBegin and dayEnd
+The function returns data within exchange trading hours,
+"marketOpen" and "marketClose". By default, \code{marketOpen} and \code{marketClose}
 are set to "09:30:00" and "16:00:00" respectively (see Brownlees and Gallo (2006) for more information on good choices for these arguments).
 }
 \examples{
@@ -40,6 +39,6 @@ exchangeHoursOnly(sampleTDataRaw)
 Brownlees, C.T. and Gallo, G.M. (2006). Financial econometric analysis at ultra-high frequency: Data handling concerns. Computational Statistics & Data Analysis, 51, pages 2232-2245.
 }
 \author{
-Jonathan Cornelissen, Kris Boudt and Onno Kleen.
+Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
 }
 \keyword{cleaning}

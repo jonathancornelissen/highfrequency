@@ -50,6 +50,6 @@ rc = rCov(rData = sampleOneMinuteData, makeReturns=TRUE)
 rc
 }
 \author{
-Jonathan Cornelissen and Kris Boudt
+Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 }
 \keyword{volatility}

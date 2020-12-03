@@ -23,5 +23,5 @@ Function returns an xts object with the log returns as xts object.
 Note: the first (row of) observation(s) is set to zero.
 }
 \author{
-Jonathan Cornelissen and Kris Boudt
+Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 }

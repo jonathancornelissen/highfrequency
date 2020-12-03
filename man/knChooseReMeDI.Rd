@@ -58,7 +58,7 @@ optimalKn
 
 }
 \references{
-A ReMeDI for Microstructure Noise
+Li and Linton (2019) (Working paper): "A ReMeDI for microstructure noise."
 }
 \author{
 Emil Sjoerup

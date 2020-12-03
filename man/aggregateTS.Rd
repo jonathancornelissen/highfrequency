@@ -21,20 +21,20 @@ aggregateTS(
 Alternatively one can set e.g. FUN = "mean".
 In case weights are supplied, this argument is ignored and a weighted average is taken.}
 
-\item{alignBy}{character, indicating the time scale in which "alignPeriod" is expressed. Possible values are: "secs", "seconds", "mins", "minutes", "hours", "days", "weeks", "ticks".}
+\item{alignBy}{character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: "secs", "seconds", "mins", "minutes", "hours", "days", "weeks", "ticks".}
 
 \item{alignPeriod}{positive integer, indicating the number of periods to aggregate over. For example, to aggregate an 
-xts object to the five-minute frequency set alignPeriod = 5 and alignBy = "minutes".}
+xts object to the five-minute frequency set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.}
 
 \item{weights}{By default, no weighting scheme is used. 
-When you assign an xts object with wheights to this argument, a weighted mean is taken over each interval. 
+When you assign an xts object with weights to this argument, a weighted mean is taken over each interval. 
 Of course, the weights should have the same timestamps as the supplied time series.}
 
 \item{dropna}{boolean, which determines whether empty intervals should be dropped.
 By default, an NA is returned in case an interval is empty, except when the user opts
 for previous tick aggregation, by setting FUN = "previoustick" (default).}
 
-\item{tz}{character denoting which timezone the output should be in. Defaults to "GMT"}
+\item{tz}{character denoting which timezone the output should be in. Defaults to NULL}
 }
 \value{
 An xts object containing the aggregated time series.
@@ -56,11 +56,11 @@ the last observation up to that point, including the value at 09:35:00 itself.
 
 Please note: In case an interval is empty, by default an NA is returned.. In case e.g. previous 
 tick aggregation it makes sense to fill these NA's by the function \code{na.locf}
-(last observation carried forward) from the zoo package.
+(last observation carried forward) from the \pkg{zoo} package.
 
-In case alignBy = "ticks", the sampling is done such the sampling starts on the first tick, and the last tick is always included
+In case \code{alignBy = "ticks"}, the sampling is done such the sampling starts on the first tick, and the last tick is always included.
 For example, if 14 observations are made on one day, and these are 1, 2, 3, ... 14.
-Then, with alignBy = "ticks" and alignPeriod = 3, the output will be 1, 4, 7, 10, 13, 14.
+Then, with \code{alignBy = "ticks"} and \code{alignPeriod = 3}, the output will be 1, 4, 7, 10, 13, 14.
 }
 \examples{
 #load sample price data
@@ -80,7 +80,7 @@ tsagg3ticks <- aggregateTS(ts, alignBy = "ticks", alignPeriod = 3)
 
 }
 \author{
-Jonathan Cornelissen and Kris Boudt
+Jonathan Cornelissen, Kris Boudt and Emil Sjoerup
 }
 \keyword{data}
 \keyword{manipulation}

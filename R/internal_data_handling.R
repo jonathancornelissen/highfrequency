@@ -47,8 +47,8 @@ fastTickAgregation_DATA.TABLE <- function(dat, alignBy = "minutes", alignPeriod 
     secs <- 3600 * alignPeriod
   }
   #n
-  timeZone <- attr(dat$DT, "tzone")
-  if(is.null(timeZone) | timeZone == ""){
+  timeZone <- format(dat$DT[1], format = "%Z")
+  if(is.null(timeZone) || timeZone == ""){
     if(is.null(tz)){
       tz <- "UTC"
     }
@@ -61,8 +61,6 @@ fastTickAgregation_DATA.TABLE <- function(dat, alignBy = "minutes", alignPeriod 
   dat <- dat[, lapply(.SD, nafill, type = "nocb"), by = DATE]
   g <- dat[, list(DT = seq(first(DT), last(DT), by = secs, tz = tz), MAXDT = max(DT)), by = DATE]
   g$DT <- g$DT + (secs - as.numeric(g$DT, tz = tz) %% secs)
-  # g$DT <- as.POSIXct(as.numeric(g$DT, tz = tz) + (secs - as.numeric(g$DT, tz = tz) %% secs), origin = as.POSIXct("1970-01-01", tz = tz), tz = tz)
-  # dropDATE <- ifelse("DATE" %in% colnames(dat), "i.DATE", character(0))
   out <- dat[g, roll = TRUE, on = "DT"][DT < MAXDT + secs]
   
   prependingCheck <- cbind(out[, list(firstDT = first(DT)), by = DATE],
@@ -118,7 +116,8 @@ fastTickAgregation_RETURNS <- function (ts, alignBy = "minutes", alignPeriod = 1
   
   firstObs <- ts[1,]
   firstObs[] <- 0 ## We should have 0 return! We use [] to not just overwrite it as a numeric with 0
-  ts <- period.apply(ts, INDEX = merge.data.table(data.table(DT = index(ts), 1:nrow(ts)), data.table(DT = newg), by = "DT")$V2, FUN = colSums, na.rm = TRUE)
+  ts <- period.apply(ts, INDEX = merge.data.table(data.table(DT = index(ts), 1:nrow(ts)), data.table(DT = newg), by = "DT")$V2, 
+                     FUN = colSums, na.rm = TRUE)
   ts <- na.locf(ts)
   if(index(ts[1]) > index(firstObs)){
     index(firstObs) <- index(ts[1]) - secs
@@ -143,8 +142,8 @@ fastTickAgregation_DATA.TABLE_RETURNS <- function(dat, alignBy = "minutes", alig
     secs <- 3600 * alignPeriod
   }
   #n
-  timeZone <- attr(dat$DT, "tzone")
-  if(is.null(timeZone) | timeZone == ""){
+  timeZone <- format(dat$DT[1], format = "%Z")
+  if(is.null(timeZone) || timeZone == ""){
     if(is.null(tz)){
       tz <- "UTC"
     }
@@ -171,7 +170,6 @@ fastTickAgregation_DATA.TABLE_RETURNS <- function(dat, alignBy = "minutes", alig
 
 
 
-
 # # Necessary for check-package not throwing errors
 # #' @keywords internal
 # ..keepCols <- NULL
@@ -191,7 +189,6 @@ checkColumnNames <- function(data) {
   
   
   if(is.xts(data)){
-    data <- set.AllColumns(data)
     colnames(data) <-  toupper(colnames(data)) # Make sure we have upper case column names
     # Change column names to previous RTAQ format! 
     # Adjust Ask col naming:    
@@ -239,247 +236,6 @@ checkColumnNames <- function(data) {
   return(data)
 } 
 
-#' @keywords internal
-is.BBO <- function (x) {
-  if (all(has.Bid(x), has.Ask(x))) {
-    TRUE
-  } else {
-    FALSE
-  }
-}
-
-#' @keywords internal
-is.TBBO <- function (x) {
-  if (all(has.Trade(x), hasQty(x), has.Bid(x), has.Ask(x))) {
-    TRUE
-  }
-  else FALSE
-}
-
-#' @keywords internal
-is.BAM <- function(x) {
-  if (all(has.Bid(x), has.Ask(x), has.Mid(x))) {
-    TRUE
-  }
-  else FALSE
-}
-
-#' @keywords internal
-is.BATM <- function(x) {
-  if (all(has.Bid(x), has.Ask(x), has.Trade(x), has.Mid(x))) {
-    TRUE
-  }
-  else FALSE
-}
-
-#' @keywords internal
-has.Bid <- function(x, which = FALSE) {
-  colAttr <- attr(x, "Bid")
-  if(!is.null(colAttr))
-    return(if(which) colAttr else TRUE)
-  #first try with "price" for data that has both bid.size and bid.price
-  loc <- grep("bid.*price", colnames(x), ignore.case=TRUE)
-  if (identical(loc, integer(0))) #If no column named bid.price
-    loc <- grep("bid", colnames(x), ignore.case=TRUE) #look for bid
-  if (!identical(loc, integer(0))) {
-    return(if(which) loc else TRUE)
-  } else FALSE
-}
-
-#' @keywords internal
-has.BidSize <- function(x, which = FALSE) {
-  colAttr <- attr(x, "BidSize")
-  if(!is.null(colAttr))
-    return(if(which) colAttr else TRUE)
-  
-  loc <- grep("bid.*(size|qty|quantity)", colnames(x), ignore.case=TRUE)
-  if (!identical(loc, integer(0))) {
-    return(if(which) loc else TRUE)
-  }
-  loc <- grep("(bidsize|bidsiz)", colnames(x), ignore.case=TRUE)
-  if (!identical(loc, integer(0))) {
-    return(if(which) loc else TRUE)
-  }
-  else FALSE
-}
-
-#' @keywords internal
-has.Ask <- function(x, which = FALSE) {
-  colAttr <- attr(x, "Ask") #case sensitive; doesn't work for SYMBOL.Ask :-(
-  if(!is.null(colAttr))
-    return(if(which) colAttr else TRUE)
-  #first try with "price" for data that has both ask.size and ask.price
-  loc <- grep("(ask|offer).*price", colnames(x), ignore.case=TRUE)
-  if (identical(loc, integer(0))) #if that failed, try to find just "ask|offer"
-    loc <- grep("(ask|offer|ofr)", colnames(x), ignore.case=TRUE)
-  if (!identical(loc, integer(0))) {
-    return(if(which) loc else TRUE)
-  } else FALSE
-}
-
-#' @keywords internal
-has.AskSize <- function(x, which = FALSE) {
-  colAttr <- attr(x, "AskSize")
-  if(!is.null(colAttr))
-    return(if(which) colAttr else TRUE)
-  
-  loc <- grep("(ask|offer).*(size|qty|quantity)", colnames(x), ignore.case=TRUE)
-  if (!identical(loc, integer(0))) {
-    return(if(which) loc else TRUE)
-  }
-  loc <- grep("(ofrsize|ofrsiz|offersize|offersiz|asksiz)", colnames(x), ignore.case=TRUE)
-  if (!identical(loc, integer(0))) {
-    return(if(which) loc else TRUE)
-  }
-  else FALSE
-}
-
-#' @keywords internal
-has.Price <- function(x, which = FALSE) {
-  colAttr <- attr(x, "Price")
-  if(!is.null(colAttr))
-    return(if(which) colAttr else TRUE)
-  
-  locBidAsk <- c(has.Bid(x, which=TRUE),has.Ask(x, which=TRUE))
-  loc <- grep("price", colnames(x), ignore.case=TRUE)
-  loc <- loc[!(loc %in% locBidAsk)]
-  if (!identical(loc, integer(0))) {
-    return(if(which) loc else TRUE)
-  } else FALSE
-}
-
-#' @keywords internal
-has.Trade <- function(x, which = FALSE) {
-  colAttr <- attr(x, "Trade")
-  if(!is.null(colAttr)) {
-    return(if(which) colAttr else TRUE)
-  }
-  loc <- grep("trade", colnames(x), ignore.case=TRUE)
-  if (!identical(loc, integer(0))) {
-    return(if(which) loc else TRUE)
-  } else FALSE
-}
-
-#' @keywords internal
-has.Mid <- function(x, which=FALSE) {
-  colAttr <- attr(x, "Mid")
-  if(!is.null(colAttr))
-    return(if(which) colAttr else TRUE)
-  
-  loc <- grep("Mid", colnames(x), ignore.case = TRUE)
-  if (!identical(loc, integer(0)))
-    return(ifelse(which, loc, TRUE))
-  ifelse(which, loc, FALSE)
-}
-
-#' @keywords internal
-has.Chg <- function(x, which=FALSE) {
-  colAttr <- attr(x, "Chg")
-  if(!is.null(colAttr))
-    return(if(which) colAttr else TRUE)
-  loc <- grep("(chg|change)", colnames(x), ignore.case=TRUE)
-  if (!identical(loc, integer(0)))
-    return(ifelse(which, loc, TRUE))
-  ifelse(which, loc, FALSE)
-}
-
-#' @keywords internal
-has.Cl <- function (x, which = FALSE){
-  colAttr <- attr(x, "Cl")
-  if (!is.null(colAttr))
-    return(if (which) colAttr else TRUE)
-  loc <- grep("Close", colnames(x), ignore.case = TRUE)
-  if (!identical(loc, integer(0))) {
-    return(if (which) loc else TRUE)
-  }
-  else FALSE
-}
-
-#' @keywords internal
-has.Ad<-function (x, which = FALSE){
-  colAttr <- attr(x, "Ad")
-  if (!is.null(colAttr))
-    return(if (which) colAttr else TRUE)
-  loc <- grep("Adjusted", colnames(x), ignore.case = TRUE)
-  if (!identical(loc, integer(0))) {
-    return(if (which) loc else TRUE)
-  }
-  else FALSE
-}
-
-#' @keywords internal
-has.Hi <- function (x, which = FALSE) {
-  colAttr <- attr(x, "Hi")
-  if (!is.null(colAttr))
-    return(if (which) colAttr else TRUE)
-  loc <- grep("High", colnames(x), ignore.case = TRUE)
-  if (!identical(loc, integer(0))) {
-    return(if (which) loc else TRUE)
-  }
-  else FALSE
-}
-
-#' @keywords internal
-has.Lo <- function (x, which = FALSE) {
-  colAttr <- attr(x, "Lo")
-  if (!is.null(colAttr))
-    return(if (which) colAttr else TRUE)
-  loc <- grep("Low", colnames(x), ignore.case = TRUE)
-  if (!identical(loc, integer(0))) {
-    return(if (which) loc else TRUE)
-  }
-  else FALSE
-}
-
-#' @keywords internal
-has.Op<-function (x, which = FALSE) {
-  colAttr <- attr(x, "Op")
-  if (!is.null(colAttr)) {
-    return(if (which) colAttr else TRUE)
-  }
-  loc <- grep("Open", colnames(x), ignore.case = TRUE)
-  if (!identical(loc, integer(0))) {
-    return(if (which) loc else TRUE)
-  }
-  else FALSE
-}
-
-#' @keywords internal
-has.Vo<-function (x, which = FALSE){
-  colAttr <- attr(x, "Vo")
-  if (!is.null(colAttr)) {
-    return(if (which) colAttr else TRUE)
-  }
-  loc <- grep("Volume", colnames(x), ignore.case = TRUE)
-  if (!identical(loc, integer(0))) {
-    return(if (which) loc else TRUE)
-  }
-  else FALSE
-}
-
-#' Check for Trade, Bid, and Ask/Offer (BBO/TBBO), Quantity, and Price data
-#' @description A set of functions to check for appropriate TBBO/BBO and price column
-#' names within a data object, as well as the availability and
-#' position of those columns.
-#' 
-#' @param x data object
-#' @param which display position of match
-#' 
-#' @export
-hasQty <- function(x, which = FALSE) {
-  colAttr <- attr(x, "Qty")
-  if(!is.null(colAttr)) {
-    return(if (which) colAttr else TRUE)
-  }
-  
-  locBidAsk <- c(has.Bid(x, which = TRUE), has.Ask(x, which = TRUE))
-  loc <- grep("qty", colnames(x), ignore.case=TRUE)
-  loc <- loc[!(loc %in% locBidAsk)]
-  if (!identical(loc, integer(0))) {
-    return(if(which) loc else TRUE)
-  } else FALSE
-}
-
 #' @importFrom data.table is.data.table
 #' @importFrom xts is.xts
 #' @keywords internal
@@ -491,7 +247,7 @@ checktData <- function(tData) {
     stop("The argument tData should have a column containing the PRICE. Could not find that column.")
   }
   if (!any(colnames(tData) == "SYMBOL")) {
-    stop("The argument tData should have a column containing SYMBOL. Could not find that column.")
+    warning("The argument tData should have a column containing SYMBOL. Could not find that column.")
   }
   
   if (is.data.table(tData)) {
@@ -515,7 +271,7 @@ checkqData <- function(qData) {
     stop("The argument qData should have a column containing the ASK / OFR. Could not find that column.")
   }
   if (!any(colnames(qData) == "SYMBOL")) {
-    stop("The argument qData should have a column containing SYMBOL. Could not find that column.")
+    warning("The argument qData should have a column containing SYMBOL. Could not find that column.")
   }
   if (is.data.table(qData)) {
     if (typeof(qData$BID) != "double") {
@@ -531,6 +287,7 @@ checkqData <- function(qData) {
 # 1. Rolling centered median (excluding the observation under consideration)
 # 2. Rolling median of the following "window" observations
 # 3. Rolling median of the previous "window" observations
+#' @importFrom RcppRoll roll_median
 #' @keywords internal
 rollingMedianInclEnds <- function(x, weights, window, direction = "center") {
   
@@ -567,141 +324,7 @@ rollingMedianInclEnds <- function(x, weights, window, direction = "center") {
   median_vec
 }
 
-# Column setting functions
-#' @keywords internal
-set.AllColumns <- function(x) {
-  cols <- c("Op","Hi","Lo","Cl","Vo","Ad","Price","Trade","Qty",
-            "Bid","BidSize","Ask", "AskSize", "Mid", "Chg")
-  for(col in cols) {
-    try(x <- do.call(paste("set", col, sep = "."), list(x)), silent = TRUE)
-  }
-  return(x)
-}
 
-#' @keywords internal
-set.Chg <- function(x, error = TRUE) {
-  if (has.Chg(x))
-    attr(x,"Chg") <- has.Chg(x, which = TRUE)
-  return(x)
-}
-
-#' @keywords internal
-set.Mid <- function(x, error = TRUE) {
-  if(has.Mid(x))
-    attr(x,"Mid") <- has.Mid(x, which=TRUE)
-  return(x)
-}
-
-#' @keywords internal
-set.Ad <- function(x, error = TRUE) {
-  if(has.Ad(x))
-    attr(x,"Ad") <- has.Ad(x, which=TRUE)
-  return(x)
-}
-
-#' @keywords internal
-set.Bid <- function(x, error=TRUE) {
-  if(has.Bid(x))
-    attr(x,"Bid") <- has.Bid(x, which=TRUE)
-  return(x)
-}
-
-#' @keywords internal
-set.BidSize <- function(x, error=TRUE) {
-  if(has.BidSize(x))
-    attr(x,"BidSize") <- has.BidSize(x, which=TRUE)
-  return(x)
-}
-
-#' @keywords internal
-set.Hi <- function(x, error=TRUE) {
-  if(has.Hi(x))
-    attr(x,"Hi") <- has.Hi(x, which=TRUE)
-  return(x)
-}
-
-#' @keywords internal
-set.Lo <- function(x, error=TRUE) {
-  if(has.Lo(x))
-    attr(x,"Lo") <- has.Lo(x, which=TRUE)
-  return(x)
-}
-
-#' @keywords internal
-set.Op <- function(x, error=TRUE) {
-  if(has.Op(x))
-    attr(x,"Op") <- has.Op(x, which=TRUE)
-  return(x)
-}
-
-#' @keywords internal
-set.Qty <- function(x, error=TRUE) {
-  if(hasQty(x))
-    attr(x,"Qty") <- hasQty(x, which=TRUE)
-  return(x)
-}
-
-#' @keywords internal
-set.Vo <- function(x, error=TRUE) {
-  if(has.Vo(x))
-    attr(x,"Vo") <- has.Vo(x, which=TRUE)
-  return(x)
-}
-
-#' @keywords internal
-set.Ask <- function(x, error=TRUE) {
-  if(has.Ask(x))
-    attr(x,"Ask") <- has.Ask(x, which=TRUE)
-  return(x)
-}
-
-#' @keywords internal
-set.AskSize <- function(x, error=TRUE) {
-  if(has.AskSize(x))
-    attr(x,"AskSize") <- has.AskSize(x, which=TRUE)
-  return(x)
-}
-
-#' @keywords internal
-set.Cl <- function(x, error = TRUE) {
-  if(has.Cl(x))
-    attr(x,"Cl") <- has.Cl(x, which=TRUE)
-  return(x)
-}
-
-#' @keywords internal
-set.Price <- function(x, error = TRUE) {
-  if(has.Price(x))
-    attr(x,"Price") <- has.Price(x, which = TRUE)
-  return(x)
-}
-
-#' @keywords internal
-set.Trade <- function(x, error = TRUE) {
-  if(has.Trade(x))
-    attr(x,"Trade") <- has.Trade(x, which = TRUE)
-  return(x)
-}
-
-
-## #' @keywords internal
-## #' @importFrom data.table fread
-## readDataset <- function(path){
-##   extension <- regexpr("*.[a-z]{0,}$", path) # Extract the extension of the file.
-##   extension <- substr(path, start = extension[[1]], stop = extension[[1]] + attr(extension, "match.length"))
-##   
-##   if(extension == ".rds"){
-##     return(try(readRDS(path)))
-##   } else if( extension == ".csv"){
-##     return(try(fread(path)))
-##   }else {
-##      stop("Extension not recognized")
-##    }
-##   
-## }
-
-
-#' This function is not exported, but the documentation is here to help users
 #' @keywords internal
 #' @importFrom data.table copy data.table setnafill fifelse
 BFMalgorithm <- function(tData, qData, backwardsWindow, forwardsWindow, plot, tz){
@@ -777,9 +400,6 @@ BFMalgorithm <- function(tData, qData, backwardsWindow, forwardsWindow, plot, tz
     plot(tqData$DT, tqData$PRICE, xaxs = 'i', pch = 20, ylim = yLim, col = fifelse(!(1:nrow(tqData) %in% remaining),
                                                                                    1 + 1:nrow(tqData) %in% idxOutliers + 1:nrow(tqData) %in% idxOutliers2,
                                                                                    0))
-    # axis(1, at = seq.POSIXt(as.POSIXct(range(tqData$DT), origin = as.POSIXct("1970-01-01", tz = "GMT"), tz = "GMT")[1], as.POSIXct(range(tqData$DT), origin = as.POSIXct("1970-01-01", tz = "GMT"), tz = "GMT")[2], length.out = 3, tz = "GMT"),
-    #      labels = format(seq.POSIXt(as.POSIXct(range(tqData$DT), origin = as.POSIXct("1970-01-01", tz = "GMT"), tz = "GMT")[1], as.POSIXct(range(tqData$DT), origin =as.POSIXct("1970-01-01", tz = "GMT"))[2], length.out = 3, tz = "GMT"),
-    #      format = "%H:%M"))
     lines(tqData$DT, tqData$OFR, type = "l", col = "blue", ylim = yLim)
     lines(tqData$DT, tqData$BID, type = "l", col = "green", ylim = yLim)
     points(tqData[remaining, DT], tqData[remaining, PRICE], pch = 4, col = "red")

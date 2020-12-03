@@ -9,16 +9,16 @@
 #' @param FUN function to apply over each interval. By default, previous tick aggregation is done. 
 #' Alternatively one can set e.g. FUN = "mean".
 #' In case weights are supplied, this argument is ignored and a weighted average is taken.
-#' @param alignBy character, indicating the time scale in which "alignPeriod" is expressed. Possible values are: "secs", "seconds", "mins", "minutes", "hours", "days", "weeks", "ticks".
+#' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: "secs", "seconds", "mins", "minutes", "hours", "days", "weeks", "ticks".
 #' @param alignPeriod positive integer, indicating the number of periods to aggregate over. For example, to aggregate an 
-#' xts object to the five-minute frequency set alignPeriod = 5 and alignBy = "minutes".
+#' xts object to the five-minute frequency set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
 #' @param weights By default, no weighting scheme is used. 
-#' When you assign an xts object with wheights to this argument, a weighted mean is taken over each interval. 
+#' When you assign an xts object with weights to this argument, a weighted mean is taken over each interval. 
 #' Of course, the weights should have the same timestamps as the supplied time series.
 #' @param dropna boolean, which determines whether empty intervals should be dropped.
 #' By default, an NA is returned in case an interval is empty, except when the user opts
 #' for previous tick aggregation, by setting FUN = "previoustick" (default).
-#' @param tz character denoting which timezone the output should be in. Defaults to "GMT"
+#' @param tz character denoting which timezone the output should be in. Defaults to NULL
 #' @details The timestamps of the new time series are the closing times and/or days of the intervals. 
 #' E.g. for a weekly aggregation the new timestamp is the last day in that particular week (namely sunday).
 #' 
@@ -29,15 +29,15 @@
 #' 
 #' Please note: In case an interval is empty, by default an NA is returned.. In case e.g. previous 
 #' tick aggregation it makes sense to fill these NA's by the function \code{na.locf}
-#' (last observation carried forward) from the zoo package.
+#' (last observation carried forward) from the \pkg{zoo} package.
 #' 
-#' In case alignBy = "ticks", the sampling is done such the sampling starts on the first tick, and the last tick is always included
+#' In case \code{alignBy = "ticks"}, the sampling is done such the sampling starts on the first tick, and the last tick is always included.
 #' For example, if 14 observations are made on one day, and these are 1, 2, 3, ... 14.
-#' Then, with alignBy = "ticks" and alignPeriod = 3, the output will be 1, 4, 7, 10, 13, 14.
+#' Then, with \code{alignBy = "ticks"} and \code{alignPeriod = 3}, the output will be 1, 4, 7, 10, 13, 14.
 #' 
 #' @return An xts object containing the aggregated time series.
 #' 
-#' @author Jonathan Cornelissen and Kris Boudt
+#' @author Jonathan Cornelissen, Kris Boudt and Emil Sjoerup
 #' @keywords data manipulation
 #' 
 #' @examples 
@@ -195,33 +195,34 @@ aggregateTS <- function (ts, FUN = "previoustick", alignBy = "minutes", alignPer
 
 
 #' Aggregate a time series but keep first and last observation
-#' @description Function returns new time series as xts object where first observation is always the opening price
-#' and subsequent observations are the closing prices over the interval with as endpoint the timestamp
-#' of the result.
-#'
+#' @description Function to aggregate high frequency data by last tick aggregation to an arbitrary periodicity based on wall clocks.
+#' Alternatively the aggregation can be done by number of ticks. In case we DON'T do tick-based aggregation, 
+#' this function accepts arbitrary number of symbols over a arbitrary number of days. Although the function has the word Price in the name,
+#' the function is general and works on arbitrary time series, either \code{xts} or \code{data.table} objects the latter requires a \code{DT}
+#' column containing POSIXct timestamps.
+#' 
 #' @param pData data.table or xts object to be aggregated containing the intraday price series, possibly across multiple days.
-#' @param alignBy character, indicating the time scale in which "alignPeriod" is expressed. Possible values are: "milliseconds", "secs", "seconds", "mins", "minutes","hours", "ticks".
-#' @param alignPeriod positive integer, indicating the number of periods to aggregate over; e.g. to aggregate a
-#' xts object to the 5 minute frequency set alignPeriod = 5 and alignBy = "minutes".
-#' @param marketOpen the market opening time, by default: marketOpen = "09:30:00".
-#' @param marketClose the market closing time, by default: marketClose = "16:00:00".
+#' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours", and "ticks".
+#' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
+#' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate an
+#' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
+#' @param marketOpen the market opening time, by default: \code{marketOpen = "09:30:00"}.
+#' @param marketClose the market closing time, by default: \code{marketClose = "16:00:00"}.
 #' @param fill indicates whether rows without trades should be added with the most recent value, FALSE by default.
-#' @param tz time zone used, by default: tz = timezone of DT column/index of xts.
-#'
+#' @param tz fallback time zone used in case we we are unable to identify the timezone of the data, by default: \code{tz = NULL}. We attempt to extract the timezone from the DT column (or index) of the data, which may fail. 
+#' In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}
 #' @details
-#' The timestamps of the new time series are the closing times and/or days of the intervals.
-#'
-#' In case of previous tick aggregation or alignBy = "seconds"/"minutes"/"hours",
-#' the element of the returned series with e.g. timestamp 09:35:00 contains
+#' The timestamps of the new time series are the closing times and/or days of the intervals. 
+#' The element of the returned series with e.g. timestamp 09:35:00 contains
 #' the last observation up to that point, including the value at 09:35:00 itself.
 #'
-#' In case alignBy = "ticks", the sampling is done such the sampling starts on the first tick, and the last tick is always included
+#' In case \code{alignBy = "ticks"}, the sampling is done such the sampling starts on the first tick, and the last tick is always included.
 #' For example, if 14 observations are made on one day, and these are 1, 2, 3, ... 14.
-#' Then, with alignBy = "ticks" and alignPeriod = 3, the output will be 1, 4, 7, 10, 13, 14.
+#' Then, with \code{alignBy = "ticks"} and \code{alignPeriod = 3}, the output will be 1, 4, 7, 10, 13, 14.
 #'
 #' @return A data.table or xts object containing the aggregated time series.
 #'
-#' @author Jonathan Cornelissen, Kris Boudt and Onno Kleen.
+#' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
 #' @keywords data manipulation
 #' @examples
 #' # aggregate price data to the 30 second frequency
@@ -231,19 +232,16 @@ aggregateTS <- function (ts, FUN = "previoustick", alignBy = "minutes", alignPer
 #'
 #' # aggregate price data to half a second frequency including zero return price changes
 #' aggregatePrice(sampleTData, alignBy = "milliseconds", alignPeriod = 500, fill = TRUE)
-#' @keywords internal
 #' @importFrom xts last tzone
 #' @importFrom data.table fifelse
 #' @export
 aggregatePrice <- function(pData, alignBy = "minutes", alignPeriod = 1, marketOpen = "09:30:00", marketClose = "16:00:00" , fill = FALSE, tz = NULL) {
   ## checking
+  nm <- colnames(pData)
   pData <- checkColumnNames(pData)
   .N <- .I <- N <- DATE <- DT <- FIRST_DT <- DT_ROUND <- LAST_DT <- SYMBOL <- PRICE <- NULL
 
 
-  if (!("PRICE" %in% colnames(pData))) {
-    stop("data.table or xts needs column named PRICE.")
-  }
   if (alignBy == "milliseconds") {
     alignBy <- "secs"
     alignPeriod <- alignPeriod / 1000
@@ -265,10 +263,10 @@ aggregatePrice <- function(pData, alignBy = "minutes", alignPeriod = 1, marketOp
   inputWasXts <- FALSE
   if (!is.data.table(pData)) {
     if (is.xts(pData)) {
+      nm <- c("DT", nm)
+      pData <- as.data.table(pData)
+      pData <- setnames(pData , old = "index", new = "DT")
       inputWasXts <- TRUE
-      pData <- setnames(as.data.table(pData)[, PRICE := as.numeric(as.character(PRICE))],
-                        old = "index", new = "DT")
-      
     } else {
       stop("Input has to be data.table or xts.")
     }
@@ -276,12 +274,15 @@ aggregatePrice <- function(pData, alignBy = "minutes", alignPeriod = 1, marketOp
     if (!("DT" %in% colnames(pData))) {
       stop("Data.table neeeds DT column (date-time ).")
     }
-    if (!("PRICE" %in% colnames(pData))) {
-      stop("Data.table neeeds PRICE column.")
-    }
+
   }
-  timeZone <- attr(pData$DT, "tzone")
-  if(timeZone == ""){
+  
+  if (!("SYMBOL" %in% nm)) {
+    pData[, SYMBOL := "UKNOWN"]
+  }
+  
+  timeZone <- format(pData$DT[1], format = "%Z")
+  if(is.null(timeZone) || timeZone == ""){
     if(is.null(tz)){
       tz <- "UTC"
     }
@@ -349,20 +350,20 @@ aggregatePrice <- function(pData, alignBy = "minutes", alignPeriod = 1, marketOp
   }
 
   # Find the first observation per day.
-  pData[, FIRST_DT := min(DT), by = "DATE"]
+  pData[, FIRST_DT := min(DT), by = list(SYMBOL, DATE)]
   # Use Dirks answer here: https://stackoverflow.com/a/42498175 to round the timestamps to the latest scaleFactor
   pData[, DT_ROUND := fifelse(DT == FIRST_DT,
                              floor(DT/scaleFactor) * scaleFactor,
                              ceiling(DT/scaleFactor) * scaleFactor)]
 
-  pData[, LAST_DT := max(DT), by = "DT_ROUND"]
+  pData[, LAST_DT := max(DT), by = list(SYMBOL, DT_ROUND)]
 
   # Create the first observation each day.
-  pData_open <- pData[pData[DT == FIRST_DT, .I[1], DATE]$V1, c("DT", "PRICE")]
+  pData_open <- pData[pData[DT == FIRST_DT, .I[1], by = list(SYMBOL, DATE)]$V1, ]
   pData_open[, DT := floor(DT/86400) * 86400 + marketOpenNumeric %% 86400]
 
   # Take the last observation of each group of LAST_DT
-  pData <- pData[pData[DT == LAST_DT, .I[.N], LAST_DT]$V1][, DT := DT_ROUND][, c("DT", "PRICE")] ## Make sure we only take the last observation
+  pData <- pData[pData[DT == LAST_DT, .I[.N], by = list(SYMBOL, DT_ROUND)]$V1][, DT := DT_ROUND] ## Make sure we only take the last observation
 
   # due to rounding there may be an observation that is refered to the opening time
   pData <- pData[!(DT %in% pData_open$DT)]
@@ -377,8 +378,8 @@ aggregatePrice <- function(pData, alignBy = "minutes", alignPeriod = 1, marketOp
     # Merge the construct the NA.LOCF filled in data.
     pData <- unique(pData[dt_full_index, roll = TRUE, on = "DT"])
   }
-
   pData[, DT := as.POSIXct(DT, origin = as.POSIXct("1970-01-01", tz = "UTC"), tz = tz)]
+  pData <- pData[, nm, with = FALSE]
   if (inputWasXts) {
     return(xts(as.matrix(pData[, -c("DT")]), order.by = pData$DT, tzone = tz))
   } else {
@@ -392,18 +393,17 @@ aggregatePrice <- function(pData, alignBy = "minutes", alignPeriod = 1, marketOp
 #' Aggregate a data.table or xts object containing quote data
 #' 
 #' @description Function returns a data.table or xts object containing the aggregated quote data with columns "SYMBOL", "EX", "BID","BIDSIZ","OFR","OFRSIZ". 
-#' See \code{\link{sampleQData}} for an example of the argument qData.
+#' See \code{\link{sampleQData}} for an example of the argument qData. This function accepts arbitrary number of symbols over an aribtrary number of days.
 #' 
 #' @param qData data.table or xts object to be aggregated, containing the intraday quote data of a stock for one day.
 #' @param alignBy character, indicating the time scale in which "alignPeriod" is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".
-#' xts object to the 5 minute frequency, set alignPeriod=5 and alignBy = "minutes".
-#' @param alignPeriod positive integer, indicating the number of periods to aggregate over. E.g. to aggregate an
-#' object to the 5 minute frequency set alignPeriod = 5 and alignBy = "minutes".
-#' @param marketOpen the market opening time, by default: marketOpen = "09:30:00".
-#' @param marketClose the market closing time, by default: marketClose = "16:00:00".
-#' @param tz time zone used, by default: tz = "GMT".
-#' 
-#' @return a data.table or xts object containing the aggregated time series.
+#' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
+#' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate an
+#' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
+#' @param marketOpen the market opening time, by default: \code{marketOpen = "09:30:00"}.
+#' @param marketClose the market closing time, by default: \code{marketClose = "16:00:00"}.
+#' @param tz fallback time zone used in case we we are unable to identify the timezone of the data, by default: \code{tz = NULL}. We attempt to extract the timezone from the DT column (or index) of the data, which may fail. 
+#' In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}
 #' 
 #' @details The output "BID" and "OFR" columns are constructed using previous tick aggregation.
 #' 
@@ -415,7 +415,7 @@ aggregatePrice <- function(pData, alignBy = "minutes", alignPeriod = 1, marketOp
 #' 
 #' @return A data.table or an xts object containing the aggregated quote data.
 #' 
-#' @author Jonathan Cornelissen, Kris Boudt and Onno Kleen
+#' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
 #' @keywords data manipulation
 #' 
 #' @examples
@@ -425,7 +425,7 @@ aggregatePrice <- function(pData, alignBy = "minutes", alignPeriod = 1, marketOp
 #' @export
 aggregateQuotes <- function(qData, alignBy = "minutes", alignPeriod = 5, marketOpen = "09:30:00", marketClose = "16:00:00", tz = "GMT") {
   .I <- .N <- N <- DATE <- BID <- OFR <- BIDSIZ <- OFRSIZ <- DT <- FIRST_DT <- DT_ROUND <-LAST_DT <- SYMBOL <- NULL
-  
+  nm <- colnames(qData)
   qData <- checkColumnNames(qData)
   checkqData(qData)
   if (alignBy == "milliseconds") {
@@ -444,6 +444,7 @@ aggregateQuotes <- function(qData, alignBy = "minutes", alignPeriod = 5, marketO
   inputWasXts <- FALSE
   if (!is.data.table(qData)) {
     if (is.xts(qData)) {
+      nm <- c("DT", nm)
       qData <- as.data.table(qData)
       qData <- setnames(qData , old = "index", new = "DT")
       for (col in names(qData)[-1]) {
@@ -459,15 +460,14 @@ aggregateQuotes <- function(qData, alignBy = "minutes", alignPeriod = 5, marketO
       stop("Data.table neeeds DT column.")
     }
   }
-  
-  if ("SYMBOL" %in% colnames(qData)) {
-    if (length(unique(qData$SYMBOL)) > 1) {
-      stop("Please provide only one symbol at a time.")
-    }
+
+  if (!("SYMBOL" %in% nm)) {
+    qData[, SYMBOL := "UKNOWN"]
   }
   
-  timeZone <- attr(qData$DT, "tzone")
-  if(timeZone == ""){
+  
+  timeZone <- format(qData$DT[1], format = "%Z")
+  if(is.null(timeZone) || timeZone == ""){
     if(is.null(tz)){
       tz <- "UTC"
     }
@@ -523,16 +523,16 @@ aggregateQuotes <- function(qData, alignBy = "minutes", alignPeriod = 5, marketO
                              floor(DT/scaleFactor) * scaleFactor,
                              ceiling(DT/scaleFactor) * scaleFactor)]
   
-  qData[, LAST_DT := max(DT), by = "DT_ROUND"]
-  qData[, OFRSIZ := sum(OFRSIZ), by = "DT_ROUND"]
-  qData[, BIDSIZ := sum(BIDSIZ), by = "DT_ROUND"]
+  qData[, LAST_DT := max(DT), by = list(SYMBOL, DT_ROUND)]
+  qData[, OFRSIZ := sum(OFRSIZ), by = list(SYMBOL, DT_ROUND)]
+  qData[, BIDSIZ := sum(BIDSIZ), by = list(SYMBOL, DT_ROUND)]
   
   # Create the first observation each day.
-  qData_open <- qData[qData[DT == FIRST_DT, .I[1], DATE]$V1, c("DT", "SYMBOL", "BID", "BIDSIZ", "OFR", "OFRSIZ")]
+  qData_open <- qData[qData[DT == FIRST_DT, .I[1], list(SYMBOL, DATE)]$V1, ]
   qData_open[, DT := floor(DT/86400) * 86400 + marketOpenNumeric %% 86400]
   
   # Take the last observation of each group of LAST_DT 
-  qData <- qData[qData[DT == LAST_DT, .I[.N], LAST_DT]$V1][, DT := DT_ROUND][, c("DT", "SYMBOL", "BID", "BIDSIZ", "OFR", "OFRSIZ")] ## Make sure we only take the last observation
+  qData <- qData[qData[DT == LAST_DT, .I[.N], by = list(SYMBOL, LAST_DT)]$V1][, DT := DT_ROUND] ## Make sure we only take the last observation
   
   # due to rounding there may be an observation that is refered to the opening time
   qData <- qData[!(DT %in% qData_open$DT)]
@@ -540,7 +540,7 @@ aggregateQuotes <- function(qData, alignBy = "minutes", alignPeriod = 5, marketO
   qData <- merge(qData, qData_open, all = TRUE)
   
   qData[, DT := as.POSIXct(DT, origin = as.POSIXct("1970-01-01", tz = "UTC"), tz = tz)]
-  
+  qData <- qData[, nm, with = FALSE]
   
   if (inputWasXts) {
     return(xts(as.matrix(qData[, -c("DT")]), order.by = qData$DT, tzone = tz))
@@ -552,15 +552,17 @@ aggregateQuotes <- function(qData, alignBy = "minutes", alignPeriod = 5, marketO
 #' Aggregate a data.table or xts object containing trades data
 #' 
 #' @description Function returns new time series as a data.table or xts object where first observation is always the opening price
-#' and subsequent observations are the closing prices over the interval.
+#' and subsequent observations are the closing prices over the interval. This function accepts arbitrary number of symbols over an aribtrary number of days.
 #' 
 #' @param tData data.table or xts object to be aggregated, containing the intraday price series of a stock for possibly multiple days.
-#' @param alignBy character, indicating the time scale in which "alignPeriod" is expressed. Possible values are: "secs", "seconds", "mins", "minutes", "hours".
-#' @param alignPeriod positive integer, indicating the number of periods to aggregate over. E.g. to aggregate an
-#' object to the 5 minute frequency set alignPeriod = 5 and alignBy = "minutes".
-#' @param marketOpen the market opening time, by default: marketOpen = "09:30:00".
-#' @param marketClose the market closing time, by default: marketClose = "16:00:00".
-#' @param tz time zone used, by default: tz = "GMT".
+#' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".
+#' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
+#' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate an
+#' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
+#' @param marketOpen the market opening time, by default: \code{marketOpen = "09:30:00"}.
+#' @param marketClose the market closing time, by default: \code{marketClose = "16:00:00"}.
+#' @param tz fallback time zone used in case we we are unable to identify the timezone of the data, by default: \code{tz = NULL}. We attempt to extract the timezone from the DT column (or index) of the data, which may fail. 
+#' In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}
 #' @details The timestamps of the new time series are the closing times and/or days of the intervals. 
 #' 
 #' The output "PRICE" column is constructed using previous tick aggregation.
@@ -577,7 +579,7 @@ aggregateQuotes <- function(qData, alignBy = "minutes", alignPeriod = 5, marketO
 #' 
 #' @return A data.table or xts object containing the aggregated time series.
 #' 
-#' @author Jonathan Cornelissen, Kris Boudt and Onno Kleen.
+#' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
 #' @keywords data manipulation
 #' 
 #' @examples 
@@ -587,6 +589,16 @@ aggregateQuotes <- function(qData, alignBy = "minutes", alignPeriod = 5, marketO
 #' @export
 aggregateTrades <- function(tData, alignBy = "minutes", alignPeriod = 5, marketOpen = "09:30:00", marketClose = "16:00:00", tz = "GMT") {
   .I <- .N <- N <- DATE <- SIZE <- DT <- FIRST_DT <- DT_ROUND <- LAST_DT <- SYMBOL <- PRICE <- VWPRICE <- SIZETPRICE <- SIZESUM <- NULL
+  nm <- colnames(tData)
+  if(alignPeriod <= 0){
+    if(alignPeriod == 0){
+      stop("alignPeriod is set to 0, this does not make sense")
+    } else {
+      warning("alignPeriod set to a negative number, using the absolute value")
+      alignPeriod <- abs(alignPeriod)
+    }
+  }
+  
   tData <- checkColumnNames(tData)
   checktData(tData)
   
@@ -608,6 +620,7 @@ aggregateTrades <- function(tData, alignBy = "minutes", alignPeriod = 5, marketO
   inputWasXts <- FALSE
   if (!is.data.table(tData)) {
     if (is.xts(tData)) {
+      nm <- c("DT", nm)
       tData <- as.data.table(tData)
       tData <- setnames(tData , old = "index", new = "DT")
       for (col in names(tData)[-1]) {
@@ -623,9 +636,12 @@ aggregateTrades <- function(tData, alignBy = "minutes", alignPeriod = 5, marketO
       stop("Data.table neeeds DT column (date-time).")
     }
   }
+  if (!("SYMBOL" %in% nm)) {
+    tData[, SYMBOL := "UKNOWN"]
+  }
   
-  timeZone <- attr(tData$DT, "tzone")
-  if(timeZone == ""){
+  timeZone <- format(tData$DT[1], format = "%Z")
+  if(is.null(timeZone) || timeZone == ""){
     if(is.null(tz)){
       tz <- "UTC"
     }
@@ -679,18 +695,18 @@ aggregateTrades <- function(tData, alignBy = "minutes", alignPeriod = 5, marketO
   tData[, DT_ROUND := fifelse(DT == FIRST_DT,
                              floor(DT/scaleFactor) * scaleFactor,
                              ceiling(DT/scaleFactor) * scaleFactor)]
-  tData[, LAST_DT := max(DT), by = "DT_ROUND"]
+  tData[, LAST_DT := max(DT), by = list(SYMBOL, DT_ROUND)]
   tData[, SIZETPRICE := SIZE * PRICE]
-  tData[, SIZESUM := sum(SIZE), by = "DT_ROUND"]
-  tData[, VWPRICE := sum(SIZETPRICE/SIZESUM), by = "DT_ROUND"]
-  tData[, SIZE := SIZESUM]
+  tData[, SIZESUM := sum(SIZE), by = list(SYMBOL, DT_ROUND)]
+  tData[, VWPRICE := sum(SIZETPRICE/SIZESUM), by = list(SYMBOL, DT_ROUND)]
+  tData[, SIZE := SIZESUM, by = list(SYMBOL)]
   
   # Create the first observation each day.
-  tData_open <- tData[tData[DT == FIRST_DT, .I[1], DATE]$V1, c("DT", "SYMBOL", "PRICE", "SIZE", "VWPRICE")]
+  tData_open <- tData[tData[DT == FIRST_DT, .I[1], by = list(SYMBOL, DATE)]$V1, c("DT", "SYMBOL", "PRICE", "SIZE", "VWPRICE")]
   tData_open[, DT := floor(DT/86400) * 86400 + marketOpenNumeric %% 86400]
   
   # Take the last observation of each group of LAST_DT 
-  tData <- tData[tData[DT == LAST_DT, .I[.N], LAST_DT]$V1][, DT := DT_ROUND][, c("DT", "SYMBOL", "PRICE", "SIZE", "VWPRICE")] ## Make sure we only take the last observation
+  tData <- tData[tData[DT == LAST_DT, .I[.N], by = list(SYMBOL, LAST_DT)]$V1][, DT := DT_ROUND][, c("DT", "SYMBOL", "PRICE", "SIZE", "VWPRICE")] ## Make sure we only take the last observation
   
   # due to rounding there may be an observation that is refered to the opening time
   tData <- tData[!(DT %in% tData_open$DT)]
@@ -698,7 +714,7 @@ aggregateTrades <- function(tData, alignBy = "minutes", alignPeriod = 5, marketO
   tData <- merge(tData, tData_open, all = TRUE)
   
   tData[, DT := as.POSIXct(DT, origin = as.POSIXct("1970-01-01", tz = "UTC"), tz = tz)]
-  
+  tData <- tData[, nm, with = FALSE]
   
   
   if (inputWasXts) {
@@ -736,7 +752,7 @@ aggregateTrades <- function(tData, alignBy = "minutes", alignPeriod = 5, marketO
 #' 
 #' @examples autoSelectExchangeTrades(sampleTDataRaw)
 #' 
-#' @author Jonathan Cornelissen, Kris Boudt and Onno Kleen
+#' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
 #' 
 #' @keywords cleaning
 #' @export
@@ -819,7 +835,7 @@ autoSelectExchangeTrades <- function(tData, printExchange = TRUE) {
 #' @examples 
 #' autoSelectExchangeQuotes(sampleQDataRaw)
 #'
-#' @author Jonathan Cornelissen, Kris Boudt and Onno Kleen
+#' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
 #' 
 #' @keywords cleaning
 #' @export
@@ -876,24 +892,23 @@ autoSelectExchangeQuotes <- function(qData, printExchange = TRUE) {
 
 #' Extract data from an xts object for the Exchange Hours Only
 #' 
-#' @description The function returns data within exchange trading hours
-#' "dayBegin" and "dayEnd". By default, dayBegin and dayEnd
+#' @description The function returns data within exchange trading hours,
+#' "marketOpen" and "marketClose". By default, \code{marketOpen} and \code{marketClose}
 #' are set to "09:30:00" and "16:00:00" respectively (see Brownlees and Gallo (2006) for more information on good choices for these arguments).
 #' 
 #' @param data a data.table or xts object containing the time series data. 
 #' Multiple days of input are allowed.
-#' @param marketOpen character in the format of \"HH:MM:SS\",
-#' specifying the starting hour, minute and second of an exchange
-#' trading day.
-#' @param marketClose character in the format of \"HH:MM:SS\",
-#' specifying the closing hour, minute and second of an exchange
-#' trading day.
-#' @param tz time zone used, by default: tz = "GMT".
+#' @param marketOpen character in the format of \code{"HH:MM:SS"},
+#' specifying the opening time of the exchange(s).
+#' @param marketClose character in the format of \code{"HH:MM:SS"},
+#' specifying the closing time of the exchange(s).
+#' @param tz fallback time zone used in case we we are unable to identify the timezone of the data, by default: \code{tz = NULL}. We attempt to extract the timezone from the DT column of the data, which may fail. 
+#' In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}
 #' 
 #' @return xts or data.table object depending on input
 #'
 #' @references Brownlees, C.T. and Gallo, G.M. (2006). Financial econometric analysis at ultra-high frequency: Data handling concerns. Computational Statistics & Data Analysis, 51, pages 2232-2245.
-#' @author Jonathan Cornelissen, Kris Boudt and Onno Kleen.
+#' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
 #' @examples 
 #' exchangeHoursOnly(sampleTDataRaw)
 #' @keywords cleaning
@@ -917,8 +932,8 @@ exchangeHoursOnly <- function(data, marketOpen = "09:30:00", marketClose = "16:0
     }
   }
   
-  timeZone <- attr(data$DT, "tzone")
-  if(timeZone == ""){
+  timeZone <- format(data$DT[1], format = "%Z")
+  if(is.null(timeZone) || timeZone == ""){
     if(is.null(tz)){
       tz <- "UTC"
     }
@@ -960,56 +975,56 @@ exchangeHoursOnly <- function(data, marketOpen = "09:30:00", marketClose = "16:0
 
 
 
-#' Get price column(s) from a timeseries
-#' @description Will attempt to locate price column(s) from a time series with rational defaults.
-#' 
-#' @param x A data object with columns containing data to be extracted
-#' @param symbol text string containing the symbol to extract
-#' @param prefer preference for any particular type of price, see Details
-#' 
-#' @details  May be subset by symbol and preference.
-#'  \code{prefer} Preference will be for any commonly used financial time series price description,
-#'  e.g. 'trade', 'close', 'bid', 'ask' with specific tests and matching for types and column names
-#'  currently supported in R, but a default grep match will be performed if one of the supported types doesn't match.
-#'
-#' The functionality was taken from the quantmod-package
-getPrice <- function (x, symbol = NULL, prefer = NULL) {
-  # first subset on symbol, if present
-  if (!is.null(symbol)) {
-    loc <- grep(symbol, colnames(x))
-    if (!identical(loc, integer(0))) {
-      x <- x[, loc]
-    } else {
-      stop(paste("Subscript out of bounds: no column name containing ",symbol,"."))
-    }
-  }
-  if (is.null(prefer)) {
-    # default to trying Price, then Trade, then Close
-    if(has.Price(x)) prefer = 'price'
-    else if(has.Trade(x)) prefer = 'trade'
-    else if(has.Cl(x))    prefer = 'close'
-    else stop("Subscript out of bounds, no price was discernible from the data.")
-  }else {
-    loc <- NULL
-    switch(prefer,
-           Op =, open =, Open = { loc <- has.Op(x,which=TRUE) },
-           Hi =, high =, High = { loc <- has.Hi(x,which=TRUE) },
-           Lo =, low =, Low = { loc <- has.Lo(x,which=TRUE) },
-           Cl =, close =, Close = { loc <- has.Cl(x,which=TRUE) },
-           Bid =, bid = { loc <- has.Bid(x,which=TRUE) },
-           Ask =, ask =, Offer =, offer = { loc <- has.Ask(x,which=TRUE) },
-           Mid =, mid =, Midpoint =, midpoint = { loc <- has.Mid(x,which=TRUE) },
-           Trade =, trade = { loc <- has.Trade(x,which=TRUE) },
-           Price =, price = { loc <- has.Price(x,which=TRUE) },
-           {loc <- grep(prefer,colnames(x))}
-    )
-    if (!identical(loc, integer(0))) {
-      return(x[, loc])
-    } else {
-      stop("Subscript out of bounds, no price was discernible from the data.")
-    }
-  }
-}
+# #' Get price column(s) from a timeseries
+# #' @description Will attempt to locate price column(s) from a time series with rational defaults.
+# #' 
+# #' @param x A data object with columns containing data to be extracted
+# #' @param symbol text string containing the symbol to extract
+# #' @param prefer preference for any particular type of price, see Details
+# #' 
+# #' @details  May be subset by symbol and preference.
+# #'  \code{prefer} Preference will be for any commonly used financial time series price description,
+# #'  e.g. 'trade', 'close', 'bid', 'ask' with specific tests and matching for types and column names
+# #'  currently supported in R, but a default grep match will be performed if one of the supported types doesn't match.
+# #'
+# #' The functionality was taken from the quantmod-package
+# getPrice <- function (x, symbol = NULL, prefer = NULL) {
+#   # first subset on symbol, if present
+#   if (!is.null(symbol)) {
+#     loc <- grep(symbol, colnames(x))
+#     if (!identical(loc, integer(0))) {
+#       x <- x[, loc]
+#     } else {
+#       stop(paste("Subscript out of bounds: no column name containing ",symbol,"."))
+#     }
+#   }
+#   if (is.null(prefer)) {
+#     # default to trying Price, then Trade, then Close
+#     if(has.Price(x)) prefer = 'price'
+#     else if(has.Trade(x)) prefer = 'trade'
+#     else if(has.Cl(x))    prefer = 'close'
+#     else stop("Subscript out of bounds, no price was discernible from the data.")
+#   }else {
+#     loc <- NULL
+#     switch(prefer,
+#            Op =, open =, Open = { loc <- has.Op(x,which=TRUE) },
+#            Hi =, high =, High = { loc <- has.Hi(x,which=TRUE) },
+#            Lo =, low =, Low = { loc <- has.Lo(x,which=TRUE) },
+#            Cl =, close =, Close = { loc <- has.Cl(x,which=TRUE) },
+#            Bid =, bid = { loc <- has.Bid(x,which=TRUE) },
+#            Ask =, ask =, Offer =, offer = { loc <- has.Ask(x,which=TRUE) },
+#            Mid =, mid =, Midpoint =, midpoint = { loc <- has.Mid(x,which=TRUE) },
+#            Trade =, trade = { loc <- has.Trade(x,which=TRUE) },
+#            Price =, price = { loc <- has.Price(x,which=TRUE) },
+#            {loc <- grep(prefer,colnames(x))}
+#     )
+#     if (!identical(loc, integer(0))) {
+#       return(x[, loc])
+#     } else {
+#       stop("Subscript out of bounds, no price was discernible from the data.")
+#     }
+#   }
+# }
 
 #' Compute log returns
 #' @description Function returns an xts object with the log returns as xts object.
@@ -1024,7 +1039,7 @@ getPrice <- function (x, symbol = NULL, prefer = NULL) {
 #' 
 #' @details Note: the first (row of) observation(s) is set to zero.
 #' 
-#' @author Jonathan Cornelissen and Kris Boudt
+#' @author Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 #' @importFrom xts xts 
 #' @importFrom zoo index
 #' @export
@@ -1070,7 +1085,7 @@ makeReturns <- function(ts) {
 #' @references  Vergote, O. (2005). How to match trades and quotes for NYSE stocks?
 #' K.U.Leuven working paper.
 #' 
-#' @author Jonathan Cornelissen, Kris Boudt and Onno Kleen
+#' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
 #' 
 #' @keywords data manipulation
 #' 
@@ -1123,10 +1138,10 @@ matchTradesQuotes <- function(tData, qData, lagQuotes = 2, BFM = FALSE, backward
     }
   }
   
-  if(tzone(tData$DT) != tzone(qData$DT)){
+  if(format(qData$DT[1], format = "%Z") != format(tData$DT[1], format = "%Z")){
     stop("timezone of the trade data is not the same as the timezone of the quote data")
   }
-  tz <- tzone(tData$DT)
+  tz <- format(tData$DT[1], format = "%Z")
   
   setnames(qData, old = "EX", new = "QUOTEEX", skip_absent = TRUE)
   
@@ -1207,7 +1222,7 @@ matchTradesQuotes <- function(tData, qData, lagQuotes = 2, BFM = FALSE, backward
 #' 
 #' @return xts or data.table object depending on input
 #' 
-#' @author Jonathan Cornelissen and Kris Boudt
+#' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
 #' @keywords cleaning 
 #' @export
 mergeQuotesSameTimestamp <- function(qData, selection = "median") {
@@ -1296,7 +1311,7 @@ mergeQuotesSameTimestamp <- function(qData, selection = "median") {
 #' @note previously this function returned the mean of the size of the merged trades (pre version 0.7 and when not using max.volume as the criterion), now it returns the sum.
 #' @return data.table or xts object depending on input
 #' 
-#' @author Jonathan Cornelissen and Kris Boudt
+#' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
 #' @keywords cleaning
 #' @export
 mergeTradesSameTimestamp <- function(tData, selection = "median") {
@@ -1489,7 +1504,9 @@ noZeroQuotes <- function(qData) {
 #' @param printExchange Argument passed to \code{\link{autoSelectExchangeQuotes}} indicates whether the chosen exchange is printed on the console, 
 #' default is TRUE. This is only used when \code{exchanges} is \code{"auto"}
 #' @param saveAsXTS indicates whether data should be saved in xts format instead of data.table when using on-disk functionality. FALSE by default.
-#' @param tz timezone to use
+#' @param tz fallback time zone used in case we we are unable to identify the timezone of the data, by default: \code{tz = NULL}. With the non-disk functionality, we attempt to extract the timezone from the DT column (or index) of the data, which may fail. 
+#' In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}. 
+#' In the on-disk functionality, if tz is not specified, the timezone used will be the system default.
 #' @return The function converts every csv file in dataSource into multiple xts or data.table files.
 #' In dataDestination, there will be one folder for each symbol containing .rds files with cleaned data stored either in data.table or xts format.
 #' 
@@ -1508,7 +1525,7 @@ noZeroQuotes <- function(qData) {
 #' 
 #' If the input data.table does not contain a DT column but it does contain DATE and TIME_M columns, we create the DT column by REFERENCE, altering the data.table that may be in the user's environment!
 #' 
-#' @author Jonathan Cornelissen, Kris Boudt and Onno Kleen.
+#' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
 #' 
 #' @examples
 #' # Consider you have raw quote data for 1 stock for 2 days
@@ -1527,7 +1544,7 @@ noZeroQuotes <- function(qData) {
 #' @export
 quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges = "auto", qDataRaw = NULL, report = TRUE, 
                           selection = "median", maxi = 50, window = 50, type = "advanced", marketOpen = "09:30:00", 
-                          marketClose = "16:00:00", rmoutliersmaxi = 10, printExchange = TRUE, saveAsXTS = FALSE, tz = "EST") {
+                          marketClose = "16:00:00", rmoutliersmaxi = 10, printExchange = TRUE, saveAsXTS = FALSE, tz = NULL) {
   
   .SD <- BID <- OFR <- DT <- SPREAD <- SPREAD_MEDIAN <- EX <- DATE <- BIDSIZ <- OFRSIZ <- TIME_M <- SYMBOL <- NULL
 
@@ -1558,6 +1575,7 @@ quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
       if(inherits(readdata, "try-error")){
         stop(paste("Error encountered while opening data, error message is:",readdata))
       }
+      
       if(colnames(readdata)[1] == "index"){ # The data was saved from an xts object
         readdata <- try(readdata[, DT := as.POSIXct(index, tz = tz, format = "%Y-%m-%dT%H:%M:%OS")])
       } else if ("DT" %in% colnames(readdata)){
@@ -1626,8 +1644,8 @@ quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
       }
     }
     
-    timeZone <- attr(qDataRaw$DT, "tzone")
-    if(timeZone == ""){
+    timeZone <- format(qDataRaw$DT[1], format = "%Z")
+    if(is.null(timeZone) || timeZone == ""){
       if(is.null(tz)){
         tz <- "UTC"
       }
@@ -1670,7 +1688,7 @@ quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
     qDataRaw <- mergeQuotesSameTimestamp(qData = qDataRaw, selection = selection)
     REPORT[7] <- dim(qDataRaw)[1]
     
-    qDataRaw <- rmOutliersQuotes(qDataRaw, window = window, type = type, maxi = rmoutliersmaxi)
+    qDataRaw <- rmOutliersQuotes(qDataRaw, window = window, type = type, maxi = rmoutliersmaxi, tz = tz)
     REPORT[8] <- dim(qDataRaw)[1]
     if (inputWasXts) {
       df_result <- xts(as.matrix(qDataRaw[, -c("DT",  "DATE")]), order.by = qDataRaw$DT)
@@ -1694,13 +1712,16 @@ quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
 #' @param qData an xts or data.table object at least containing the columns "BID" and "OFR".
 #' @param maxi an integer. By default maxi = "50", which means that entries are deleted 
 #' if the spread is more than 50 times the median spread on that day.
+#' @param tz fallback time zone used in case we we are unable to identify the timezone of the data, by default: \code{tz = NULL}. With the non-disk functionality, we attempt to extract the timezone from the DT column (or index) of the data, which may fail. 
+#' In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}. 
+#' In the on-disk functionality, if tz is not specified, the timezone used will be the system default.
 #' 
 #' @return xts or data.table object depending on input.
 #' 
-#' @author Jonathan Cornelissen and Kris Boudt
+#' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
 #' @keywords cleaning
 #' @export
-rmLargeSpread <- function(qData, maxi = 50) {
+rmLargeSpread <- function(qData, maxi = 50, tz = NULL) {
   BID <- OFR <- DATE <- DT <- SPREAD <- SPREAD_MEDIAN <- NULL
   qData <- checkColumnNames(qData)
   checkqData(qData)
@@ -1714,7 +1735,21 @@ rmLargeSpread <- function(qData, maxi = 50) {
     }
   } 
   
-  qData <- qData[, DATE := as.Date(DT)][
+  timeZone <- format(qData$DT[1], format = "%Z")
+  if(is.null(timeZone) || timeZone == ""){
+    if(is.null(tz)){
+      tz <- "UTC"
+    }
+    if(!("POSIXct" %in% class(qData$DT))){
+      qData[, DT := as.POSIXct(format(DT, digits = 20, nsmall = 20), tz = tz)]
+    }
+  } else {
+    tz <- timeZone
+  }
+  
+  
+  
+  qData <- qData[, DATE := as.Date(DT, tz = tz)][
     , SPREAD := OFR - BID][
     , SPREAD_MEDIAN := median(SPREAD), by = "DATE"][SPREAD < (SPREAD_MEDIAN * maxi)]
   
@@ -1789,7 +1824,7 @@ rmNegativeSpread <- function(qData) {
 #' @references  Vergote, O. (2005). How to match trades and quotes for NYSE stocks?
 #' K.U.Leuven working paper.
 #' 
-#' @author Jonathan Cornelissen, Kris Boudt and Onno Kleen
+#' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
 #' @keywords cleaning
 #' @importFrom data.table setkey set
 #' @export
@@ -1888,7 +1923,8 @@ rmTradeOutliersUsingQuotes <- function(tData, qData, lagQuotes = 2, BFM = FALSE,
 #' @param maxi an integer, indicating the maximum number of median absolute deviations allowed.
 #' @param window an integer, indicating the time window for which the "outlyingness" is considered.
 #' @param type should be "standard" or "advanced" (see description).
-#' @param tz timezone to use
+#' @param tz fallback time zone used in case we we are unable to identify the timezone of the data, by default: \code{tz = NULL}. With the non-disk functionality, we attempt to extract the timezone from the DT column (or index) of the data, which may fail. 
+#' In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}. 
 #' @details NOTE: This function works only correct if supplied input data consists of 1 day.
 #' 
 #' @return xts object or data.table depending on type of input
@@ -1903,9 +1939,8 @@ rmTradeOutliersUsingQuotes <- function(tData, qData, lagQuotes = 2, BFM = FALSE,
 #' @importFrom stats mad median
 #' @importFrom data.table as.data.table is.data.table setnames
 #' @importFrom xts is.xts as.xts
-#' @importFrom RcppRoll roll_median
 #' @export
-rmOutliersQuotes <- function (qData, maxi = 10, window = 50, type = "advanced", tz = "EST") {
+rmOutliersQuotes <- function (qData, maxi = 10, window = 50, type = "advanced", tz = NULL) {
   # NOTE: Median Absolute deviation chosen contrary to Barndorff-Nielsen et al.
   # Setting those variables equal NULL is for suppressing NOTES in devtools::check
   # References inside data.table-operations throw "no visible binding for global variable ..." error
@@ -1938,6 +1973,19 @@ rmOutliersQuotes <- function (qData, maxi = 10, window = 50, type = "advanced", 
       stop("Data.table neeeds DT column.")
     }
   }
+  
+  timeZone <- format(qData$DT[1], format = "%Z")
+  if(is.null(timeZone) || timeZone == ""){
+    if(is.null(tz)){
+      tz <- "UTC"
+    }
+    if(!("POSIXct" %in% class(qData$DT))){
+      qData[, DT := as.POSIXct(format(DT, digits = 20, nsmall = 20), tz = tz)]
+    }
+  } else {
+    tz <- timeZone
+  }
+  
   
   
   if (!(type %in% c("standard", "advanced"))) {
@@ -1978,7 +2026,7 @@ rmOutliersQuotes <- function (qData, maxi = 10, window = 50, type = "advanced", 
 #' one column named "COND" indicating the Sale Condition.
 #' @param validConds a character vector containing valid sales conditions defaults to \cr
 #' \code{c('', '@', 'E', '@E', 'F', 'FI', '@F', '@FI', 'I', '@I')}. See \link{tradesCondition}.
-#' @keywords leaning
+#' @keywords cleaning
 #' @export
 salesCondition <- function(tData, validConds = c('', '@', 'E', '@E', 'F', 'FI', '@F', '@FI', 'I', '@I')) {
   .Deprecated("tradesCondition")
@@ -1999,7 +2047,7 @@ salesCondition <- function(tData, validConds = c('', '@', 'E', '@E', 'F', 'FI', 
 #' @note Some CSV readers and the WRDS API parses empty strings as NA's. We transform \code{NA} values in COND to \code{""}.
 #' @return xts or data.table object depending on input
 #' 
-#' @author Jonathan Cornelissen and Kris Boudt
+#' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
 #' 
 #' @keywords cleaning
 #' @export
@@ -2057,7 +2105,7 @@ tradesCondition <- function(tData, validConds = c('', '@', 'E', '@E', 'F', 'FI',
 #' }
 #' @return xts or data.table object depending on input
 #' 
-#' @author Jonathan Cornelissen and Kris Boudt
+#' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
 #' @keywords cleaning
 #' @export
 selectExchange <- function(data, exch = "N") { 
@@ -2131,7 +2179,10 @@ selectExchange <- function(data, exch = "N") {
 #' @param printExchange Argument passed to \code{\link{autoSelectExchangeTrades}} indicates whether the chosen exchange is printed on the console, 
 #' default is TRUE. This is only used when \code{exchanges} is \code{"auto"}
 #' @param saveAsXTS indicates whether data should be saved in xts format instead of data.table when using on-disk functionality. FALSE by default.
-#' @param tz timezone to use
+#' @param tz fallback time zone used in case we we are unable to identify the timezone of the data, by default: \code{tz = NULL}. 
+#' With the non-disk functionality, we attempt to extract the timezone from the DT column (or index) of the data, which may fail. 
+#' In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}. 
+#' In the on-disk functionality, if tz is not specified, the timezone used will be the system default.
 #' @return For each day an xts or data.table object is saved into the folder of that date, containing the cleaned data.
 #' This procedure is performed for each stock in "ticker".
 #' The function returns a vector indicating how many trades remained after each cleaning step.
@@ -2161,14 +2212,14 @@ selectExchange <- function(data, exch = "N") {
 #' 
 #' Brownlees, C.T. and Gallo, G.M. (2006). Financial econometric analysis at ultra-high frequency: Data handling concerns. Computational Statistics & Data Analysis, 51, pp. 2232-2245.
 #' 
-#' @author Jonathan Cornelissen and Kris Boudt
+#' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
 #' @importFrom data.table fread
 #' @importFrom utils unzip
 #' @keywords cleaning
 #' @export
 tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges = "auto", tDataRaw = NULL, report = TRUE, selection = "median",
                           validConds = c('', '@', 'E', '@E', 'F', 'FI', '@F', '@FI', 'I', '@I'), marketOpen = "09:30:00", 
-                          marketClose = "16:00:00", printExchange = TRUE, saveAsXTS = FALSE, tz = "EST") {
+                          marketClose = "16:00:00", printExchange = TRUE, saveAsXTS = FALSE, tz = NULL) {
   .SD <- CORR <- SIZE <- SYMBOL <- PRICE <- EX <- COND <- DT <- DATE <- TIME_M <- NULL
   
   if (is.null(tDataRaw)) {
@@ -2264,8 +2315,8 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
     }
     
     
-    timeZone <- attr(tDataRaw$DT, "tzone")
-    if(timeZone == ""){
+    timeZone <- format(tDataRaw$DT[1], format = "%Z")
+    if(is.null(timeZone) || timeZone == ""){
       if(is.null(tz)){
         tz <- "UTC"
       }
@@ -2367,7 +2418,7 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
 #' 
 #' Brownlees, C.T. and Gallo, G.M. (2006). Financial econometric analysis at ultra-high frequency: Data handling concerns. Computational Statistics & Data Analysis, 51, pages 2232-2245.
 #' 
-#' @author Jonathan Cornelissen, Kris Boudt and Onno Kleen.
+#' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
 #' 
 #' @examples 
 #' # Consider you have raw trade data for 1 stock for 2 days 
@@ -2494,7 +2545,7 @@ tradesCleanupUsingQuotes <- function(tradeDataSource = NULL, quoteDataSource = N
 #' # Calculate the synchronized timeseries:
 #' refreshTime(list(a,b))
 #' 
-#' @author Jonathan Cornelissen and Kris Boudt
+#' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
 #' @keywords data manipulation
 #' @importFrom xts xts tzone
 #' @importFrom data.table merge.data.table
@@ -2566,10 +2617,8 @@ refreshTime <- function (pData, sort = FALSE, criterion = "squared duration") {
     return(temp)
   } else {
     DT <- NULL
-    
-    timeZone <- attr(pData[[1]]$DT, "tzone")
-    
-    if(timeZone == ""){
+    timeZone <- format(pData[[1]]$DT[1], format = "%Z")
+    if(is.null(timeZone) || timeZone == ""){
       tz <- "UTC"
     } else {
       tz <- timeZone
@@ -2631,6 +2680,8 @@ refreshTime <- function (pData, sort = FALSE, criterion = "squared duration") {
 #' volatility, and volume, respectively. Default is "volume"
 #' @param obs integer valued numeric of length 1 denoting how many observations is wanted after the aggregation procedure.
 #' @param bandwidth numeric of length one, denoting which bandwidth parameter to use in the trade intensity process estimation of Oomen (2005.)
+#' @param tz fallback time zone used in case we we are unable to identify the timezone of the data, by default: \code{tz = NULL}. We attempt to extract the timezone from the DT column (or index) of the data, which may fail. 
+#' In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}
 #' @param ... extra arguments passed on to \code{\link{spotVol}} when measure is "vol"
 #' 
 #' @return A list containing "pData" which is the aggregated data and a list containing the intensity process, split up day by day.
@@ -2658,7 +2709,7 @@ refreshTime <- function (pData, sort = FALSE, criterion = "squared duration") {
 #' @importFrom data.table copy as.xts.data.table
 #' @author Emil Sjoerup
 #' @export
-businessTimeAggregation <- function(pData, measure = "volume", obs = 390, bandwidth = 0.075, ...){
+businessTimeAggregation <- function(pData, measure = "volume", obs = 390, bandwidth = 0.075, tz = NULL, ...){
   aggregated <- SIZE <- PRICE <- DT <- intensityProcess <- NULL
   if(length(measure) > 1){
     measures <- measure[1]
@@ -2683,14 +2734,26 @@ businessTimeAggregation <- function(pData, measure = "volume", obs = 390, bandwi
     }
   }
   
+  timeZone <- format(pData$DT[1], format = "%Z")
+  if(is.null(timeZone) || timeZone == ""){
+    if(is.null(tz)){
+      tz <- "UTC"
+    }
+    if(!("POSIXct" %in% class(pData$DT))){
+      pData[, DT := as.POSIXct(format(DT, digits = 20, nsmall = 20), tz = tz)]
+    }
+  } else {
+    tz <- timeZone
+  }
   
-  dates <- as.character(unique(as.Date(pData[,DT])))
+  
+  dates <- as.character(unique(as.Date(pData[,DT], tz = tz)))
   pDataBackcup <- copy(pData)
   ITP <- list() # Container for trade intensity process.
   for (date in dates) {
-    pData <- pDataBackcup[as.Date(DT) == date,]
+    pData <- pDataBackcup[as.Date(DT, tz = tz) == date,]
     if(measure == "intensity"){
-      time <- as.numeric(pData[, DT])
+      time <- as.numeric(pData[, DT], tz = tz)
       bandwidth = bandwidth[1]
       
       
@@ -2756,7 +2819,8 @@ businessTimeAggregation <- function(pData, measure = "volume", obs = 390, bandwi
 #' @param alignBy character, indicating the time scale in which "alignPeriod" is expressed. Possible values are: "secs", "seconds", "mins", "minutes", "hours".
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate an
 #' object to the 5 minute frequency set alignPeriod = 5 and alignBy = "minutes".
-#' @param tz time zone used, by default: tz = "GMT".
+#' @param tz fallback time zone used in case we we are unable to identify the timezone of the data, by default: \code{tz = NULL}. With the non-disk functionality, we attempt to extract the timezone from the DT column (or index) of the data, which may fail. 
+#' In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}. 
 #' @examples 
 #' \dontrun{
 #' minuteBars <- makeOHLCV(sampleTDataEurope, alignBy = "minutes", alignPeriod = 1)
@@ -2777,7 +2841,7 @@ businessTimeAggregation <- function(pData, measure = "volume", obs = 390, bandwi
 #' ## Again we plot the series with chartSeries
 #' quantmod::chartSeries(bars)
 #' }
-#' 
+#' @author Emil Sjoerup
 #' @export
 makeOHLCV <- function(pData, alignBy = "minutes", alignPeriod = 5, tz = NULL){
   SYMBOL <- .SD <-  DATE <- SIZE <- DT <-  PRICE <- NULL
@@ -2821,8 +2885,8 @@ makeOHLCV <- function(pData, alignBy = "minutes", alignPeriod = 5, tz = NULL){
   }
   
   
-  timeZone <- attr(pData$DT, "tzone")
-  if(timeZone == ""){
+  timeZone <- format(pData$DT[1], format = "%Z")
+  if(is.null(timeZone) || timeZone == ""){
     if(is.null(tz)){
       tz <- "UTC"
     }
@@ -2877,7 +2941,7 @@ makeOHLCV <- function(pData, alignBy = "minutes", alignPeriod = 5, tz = NULL){
 #' 
 #' rCov(dat, alignBy = 'minutes', alignPeriod = 5, makeReturns = TRUE, cor = TRUE) 
 #' }
-#' 
+#' @author Emil Sjoerup
 #' @importFrom data.table merge.data.table setkey
 #' @importFrom xts is.xts
 #' @export

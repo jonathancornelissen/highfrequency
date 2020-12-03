@@ -21,7 +21,8 @@ test_that("DBH sim test", {
   randomTZ  <-  sample(OlsonNames(), 1)
   dat <- data.table(DT = as.POSIXct(timestamps, tz = randomTZ, origin = as.POSIXct("1970-01-01", tz = randomTZ)), PRICE = exp(p))
   DBH <- driftBursts(dat, testtimes, preAverage = 1, ACLag = -1, meanBandwidth = meanBandwidth, varianceBandwidth = 5*meanBandwidth, parallelize = FALSE)
-  
+  DBH2 <- driftBursts(as.xts(dat), testtimes, preAverage = 1, ACLag = -1, meanBandwidth = meanBandwidth, varianceBandwidth = 5*meanBandwidth, parallelize = FALSE)
+  expect_equal(as.numeric(DBH$tStat), as.numeric(DBH2$tStat))
   expect_equal(mean(DBH$tStat), 0.34463614)
   expect_equal(mean(DBH$sigma), 2.054827e-05)
   expect_equal(mean(DBH$mu), 8.359077e-05)
