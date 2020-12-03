@@ -32,7 +32,7 @@ Of course, the weights should have the same timestamps as the supplied time seri
 
 \item{dropna}{boolean, which determines whether empty intervals should be dropped.
 By default, an NA is returned in case an interval is empty, except when the user opts
-for previous tick aggregation, by setting FUN = "previoustick" (default).}
+for previous tick aggregation, by setting \code{FUN = "previoustick"} (default).}
 
 \item{tz}{character denoting which timezone the output should be in. Defaults to NULL}
 }
@@ -50,7 +50,7 @@ The timestamps of the new time series are the closing times and/or days of the i
 E.g. for a weekly aggregation the new timestamp is the last day in that particular week (namely sunday).
 
 In case of previous tick aggregation, 
-for alignBy = "seconds"/"minutes"/"hours",
+for \code{alignBy} is either \code{"seconds"} \code{"minutes"}, or \code{"hours"},
 the element of the returned series with e.g. timestamp 09:35:00 contains 
 the last observation up to that point, including the value at 09:35:00 itself.
 
