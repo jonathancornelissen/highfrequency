@@ -2,7 +2,7 @@
 % Please edit documentation in R/data_handling.R
 \name{aggregateTrades}
 \alias{aggregateTrades}
-\title{Aggregate a \code{data.table} or \code{xts} object containing trades data}
+\title{Aggregate a \code{data.table} or \code{xts} object containing trades data´}
 \usage{
 aggregateTrades(
   tData,
@@ -33,8 +33,8 @@ In case of failure we use \code{tz} if specified, and if it is not specified, we
 A \code{data.table} or \code{xts} object containing the aggregated time series.
 }
 \description{
-Function returns new time series as a \code{data.table} or \code{xts} object where first observation is always the opening price
-and subsequent observations are the closing prices over the interval. This function accepts arbitrary number of symbols over an aribtrary number of days.
+Aggregate tick-by-tick trade data and return a time series as a \code{data.table} or \code{xts} object where first observation is always the opening price
+and subsequent observations are the closing prices over the interval. This function accepts arbitrary number of symbols over an arbitrary number of days.
 }
 \details{
 The timestamps of the new time series are the closing times and/or days of the intervals. 

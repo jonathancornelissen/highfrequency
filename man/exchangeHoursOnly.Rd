@@ -28,9 +28,8 @@ In case of failure we use \code{tz} if specified, and if it is not specified, we
 \code{xts} or \code{data.table} object depending on input
 }
 \description{
-The function returns data within exchange trading hours,
-"marketOpen" and "marketClose". By default, \code{marketOpen} and \code{marketClose}
-are set to "09:30:00" and "16:00:00" respectively (see Brownlees and Gallo (2006) for more information on good choices for these arguments).
+Filter raw trade data such and return only data between market close and market open. 
+By default, \code{marketOpen} and \code{marketClose} are set to "09:30:00" and "16:00:00" respectively (see Brownlees and Gallo (2006) for more information on good choices for these arguments).
 }
 \examples{
 exchangeHoursOnly(sampleTDataRaw)

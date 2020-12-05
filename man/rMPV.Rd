@@ -32,7 +32,7 @@ based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to
 numeric
 }
 \description{
-Function returns the rMPV, defined in Andersen et al. (2012).
+Calculate the rMPV, defined in Andersen et al. (2012).
   
   Assume there is \eqn{N} equispaced returns in period \eqn{t}. Let \eqn{r_{t,i}} be a return (with \eqn{i=1, \ldots,N}) in period \eqn{t}.
   

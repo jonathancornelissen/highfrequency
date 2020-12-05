@@ -32,8 +32,7 @@ The possible exchanges are:
 \code{data.table} or \code{xts} object depending on input
 }
 \description{
-Function returns an \code{xts} object containing only observations 
-of the exchange with highest
+Filters raw quote data and return only data that stems from the exchange with the highest
 value for the sum of "BIDSIZ" and "OFRSIZ", i.e. the highest quote volume.
 }
 \examples{

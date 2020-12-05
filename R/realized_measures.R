@@ -30,7 +30,7 @@ listAvailableKernels <- function() {
 
 #' An estimator of integrated quarticity from applying the median operator on blocks of three returns.
 #' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
-#' @description Function returns the rMedRQ, defined in Andersen et al. (2012).
+#' @description Calculate the rMedRQ, defined in Andersen et al. (2012).
 #'   
 #'   Assume there is \eqn{N} equispaced returns in period \eqn{t}. Let \eqn{r_{t,i}} be a return (with \eqn{i=1, \ldots,N}) in period \eqn{t}.
 #'   
@@ -123,7 +123,7 @@ rMedRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
 
 #' An estimator of integrated quarticity from applying the minimum operator on blocks of two returns.
 #' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
-#' @description Function returns the rMinRQ, defined in Andersen et al. (2012).
+#' @description Calculate the rMinRQ, defined in Andersen et al. (2012).
 #' 
 #' Assume there is \eqn{N} equispaced returns in period \eqn{t}. Let \eqn{r_{t,i}} be a return (with \eqn{i=1, \ldots,N}) in period \eqn{t}.
 #' 
@@ -202,7 +202,7 @@ rMinRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
 
 #' rMinRV
 #' 
-#' @description Function returns the rMinRV, defined in Andersen et al. (2009).
+#' @description Calculate the rMinRV, defined in Andersen et al. (2009).
 #' 
 #' Let \eqn{r_{t,i}} be a return (with \eqn{i=1,\ldots,M}) in period \eqn{t}.
 #' 
@@ -296,7 +296,7 @@ rMinRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
 #' rMedRV
 #' 
 #' @description 
-#' Function returns the rMedRV, defined in Andersen et al. (2009).
+#' Calculate the rMedRV, defined in Andersen et al. (2009).
 #' 
 #' Let \eqn{r_{t,i}} be a return (with \eqn{i=1,\ldots,M}) in period \eqn{t}.
 #' 
@@ -332,7 +332,7 @@ rMinRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
 #' 
 #' Corsi, F., D. Pirino, and R. Reno (2010). Threshold Bipower Variation and the Impact of Jumps on Volatility Forecasting. Journal of Econometrics 159 (2), 276-288.
 #' 
-#' @author Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup´
+#' @author Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 #' 
 #' @examples 
 #' medrv <- rMedRV(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes", 
@@ -404,13 +404,13 @@ rMedRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
 
 #' Modulated Realized Covariance (rMRC): Return univariate or multivariate preaveraged estimator.  
 #' 
-#' @description Function returns univariate or multivariate preaveraged estimator, as defined in Hautsch and Podolskij (2013). 
+#' @description Calculate univariate or multivariate preaveraged estimator, as defined in Hautsch and Podolskij (2013). 
 #'
 #' @param pData a list. Each list-item contains an \code{xts} object with the intraday price data of a stock.
 #' @param pairwise boolean, should be TRUE when refresh times are based on pairs of assets. FALSE by default.
 #' @param makePsd boolean, in case it is \code{TRUE}, the positive definite version of rMRC is returned. \code{FALSE} by default.
 #' 
-#' @return an \eqn{d x d} matrix
+#' @return A \eqn{d x d} covariance matrix
 #' 
 #' @details 
 #'   In practice, market microstructure noise leads to a departure from the pure semimartingale model. We consider the process \eqn{Y} in period \eqn{\tau}: 
@@ -888,7 +888,7 @@ rBeta <- function(rData, rIndex, RCOVestimator = "rCov", RVestimator = "RV", mak
 
 #' Realized BiPower Covariance
 #' 
-#' Function returns the Realized BiPower Covariance (rBPCov), 
+#' @description Calculate the Realized BiPower Covariance (rBPCov), 
 #'  defined in Barndorff-Nielsen and Shephard (2004).
 #'  
 #'  Let \eqn{r_{t,i}} be an intraday \eqn{N x 1} return vector and \eqn{i=1,...,M} 
@@ -1441,7 +1441,7 @@ rKernelCov <- function(rData, cor = FALSE,  alignBy = "seconds", alignPeriod = 1
 
 #' Realized kurtosis of highfrequency return series. 
 #' 
-#' Function returns Realized kurtosis, defined in Amaya et al. (2011).
+#' Calculate the Realized kurtosis, defined in Amaya et al. (2011).
 #' 
 #' Assume there is \eqn{N} equispaced returns in period \eqn{t}. Let \eqn{r_{t,i}} be a return (with \eqn{i=1, \ldots,N}) in period \eqn{t}.
 #' 
@@ -1538,7 +1538,7 @@ rKurt <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 
 #' Realized multipower variation (MPV), an estimator of integrated power variation. 
 #' 
-#' @description Function returns the rMPV, defined in Andersen et al. (2012).
+#' @description Calculate the rMPV, defined in Andersen et al. (2012).
 #'   
 #'   Assume there is \eqn{N} equispaced returns in period \eqn{t}. Let \eqn{r_{t,i}} be a return (with \eqn{i=1, \ldots,N}) in period \eqn{t}.
 #'   
@@ -1644,11 +1644,11 @@ rMPV <- function(rData, m = 2, p = 2, alignBy = NULL, alignPeriod = NULL, makeRe
     }
     
   }
-}  
+}
 
 #' Realized Outlyingness Weighted Covariance
 #' 
-#' @description Function returns the Realized Outlyingness Weighted Covariance, defined in Boudt et al. (2008).
+#' @description Calculate the Realized Outlyingness Weighted Covariance, defined in Boudt et al. (2008).
 #' 
 #' Let \eqn{r_{t,i}}, for \eqn{i=1,...,M} be a sample
 #' of \eqn{M} high-frequency \eqn{(N x 1)} return vectors and \eqn{d_{t,i}}
@@ -1684,8 +1684,8 @@ rMPV <- function(rData, m = 2, p = 2, alignBy = NULL, alignPeriod = NULL, makeRe
 #' the subsets over which the determinant is minimized. 
 #' Allowed values are between 0.5 and 1 and 
 #'the default is 0.75. See Boudt et al. (2008) or the \code{covMcd} function in the
-#'robustbase package.
-#' @param alpha is a parameter between 0 en 0.5, 
+#'\pkg{\link[robustbase:covMcd]{robustbase}} package.
+#' @param alpha is a parameter between 0 and 0.5, 
 #'that determines the rejection threshold value 
 #'(see Boudt et al. (2008) for details).
 #' 
@@ -1694,7 +1694,7 @@ rMPV <- function(rData, m = 2, p = 2, alignBy = NULL, alignPeriod = NULL, makeRe
 #' @details 
 #' Advantages of the rOWCov compared to the \code{\link{rBPCov}} include a higher statistical efficiency, positive semidefiniteness and affine equivariance.
 #' However, the rOWCov suffers from a curse of dimensionality.
-#' Indeed, the rOWCov gives a zero weight to a return vector
+#' The rOWCov gives a zero weight to a return vector
 #' if at least one of the components is affected by a jump.
 #' In the case of independent jump occurrences, the average proportion of observations
 #' with at least one component being affected by jumps increases fast with the dimension
@@ -1817,7 +1817,7 @@ rOWCov <- function (rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, make
 
 #' Realized skewness of highfrequency return series.
 #'
-#' @description Function returns Realized skewness, defined in Amaya et al. (2011).
+#' @description Calculate the Realized skewness, defined in Amaya et al. (2011).
 #' 
 #' Assume there is \eqn{N} equispaced returns in period \eqn{t}. Let \eqn{r_{t,i}} be a return (with \eqn{i=1, \ldots,N}) in period \eqn{t}.
 #' 
@@ -1912,7 +1912,7 @@ rSkew <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 }
 
 #' Realized semivariance of highfrequency return series. 
-#' @description Function returns realized semivariances, defined in Barndorff-Nielsen et al. (2008).
+#' @description Calculate the realized semivariances, defined in Barndorff-Nielsen et al. (2008).
 #' 
 #' Function returns two outcomes: 1.Downside realized semivariance and 2.Upside realized semivariance.
 #' 
@@ -1932,7 +1932,7 @@ rSkew <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
 #' @param makeReturns boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.
 #' @param ... used internally, any input is ignored.
-#' @return list with to arguments. The realized positive and negative semivariance.
+#' @return list with two entries, the realized positive and negative semivariances
 #' @examples 
 #' sv <- rSV(sampleTData[, list(DT, PRICE)], alignBy = "minutes", 
 #'           alignPeriod = 5, makeReturns = TRUE)
@@ -2016,7 +2016,7 @@ rSV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, 
 
 #' Threshold Covariance
 #' @description 
-#' Function returns the treshold covariance matrix proposed in Gobbi and Mancini (2009).
+#' Calculate the treshold covariance matrix proposed in Gobbi and Mancini (2009).
 #' Unlike the \code{\link{rOWCov}}, the rThresholdCov uses univariate jump detection rules to truncate the effect of jumps on the covariance
 #' estimate. As such, it remains feasible in high dimensions, but it is less robust to small cojumps. 
 #' 
@@ -2153,7 +2153,7 @@ rThresholdCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL
 
 #' Robust two time scale covariance estimation
 #' 
-#' @description Function returns the robust two time scale covariance matrix proposed in Boudt and Zhang (2010). 
+#' @description Calculate the robust two time scale covariance matrix proposed in Boudt and Zhang (2010). 
 #' Unlike the \code{\link{rOWCov}}, but similarly to the \code{\link{rThresholdCov}}, the rRTSCov uses  univariate jump detection rules 
 #' to truncate the effect of jumps on the covariance 
 #' estimate. By the use of two time scales, this covariance estimate 
@@ -2347,7 +2347,7 @@ RV <- function(rData) {
 
 #' Realized tri-power quarticity for a highfrequency return series.
 #' 
-#' @description Function returns the rTPQuar, defined in Andersen et al. (2012).
+#' @description Calculate the rTPQuar, defined in Andersen et al. (2012).
 #'  
 #'  Assume there is \eqn{N} equispaced returns in period \eqn{t}. Let \eqn{r_{t,i}} be a return (with \eqn{i=1, \ldots,N}) in period \eqn{t}.
 #'  
@@ -2424,13 +2424,13 @@ rTPQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FAL
     q <- abs(as.matrix(rData))
     q <- rollApplyProdWrapper(q, 3)
     N <- nrow(q)+2
-    rTPVar <- N * (N/(N - 2)) * ((gamma(0.5)/(2^(2/3)*gamma( 7/6 ) ))^3) * colSums(q^(4/3))
+    rTPVar <- N * (N/(N - 2)) * ((gamma(0.5)/(2^(2/3)*gamma(7/6) ))^3) * colSums(q^(4/3))
     return(rTPVar)
   }
 }
 
 #' Realized quad-power variation of highfrequency return series. 
-#' @description Function returns the realized quad-power variation, defined in Andersen et al. (2012).
+#' @description Calculate the realized quad-power variation, defined in Andersen et al. (2012).
 #'  
 #'  Assume there is \eqn{N} equispaced returns in period \eqn{t}. Let \eqn{r_{t,i}} be a return (with \eqn{i=1, \ldots,N}) in period \eqn{t}.
 #'  
@@ -2512,7 +2512,7 @@ rQPVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
 }
 
 #' Realized quarticity of highfrequency return series. 
-#' @description  Function returns the rQuar, defined in Andersen et al. (2012).
+#' @description  Calculate the rQuar, defined in Andersen et al. (2012).
 #'
 #' Assume there is \eqn{N} equispaced returns in period \eqn{t}. Let \eqn{r_{t,i}} be a return (with \eqn{i=1, \ldots,N}) in period \eqn{t}.
 #'  
@@ -2591,7 +2591,7 @@ rQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 
 #' Two time scale covariance estimation 
 #' 
-#' @description Function returns the two time scale covariance matrix proposed in Zhang et al (2005) and Zhang (2010).
+#' @description Calculate the two time scale covariance matrix proposed in Zhang et al (2005) and Zhang (2010).
 #' By the use of two time scales, this covariance estimate 
 #' is robust to microstructure noise and non-synchronic trading.
 #' 
@@ -2909,7 +2909,7 @@ rCholCov <- function(pData, IVest = "rMRC", COVest = "rMRC", criterion = "square
 
 #' Realized Semicovariance
 #' 
-#' @description Function returns the Realized Semicovariances (rSemiCov).
+#' @description Calculate the Realized Semicovariances (rSemiCov).
 #' Let \eqn{r_{t,i}} be an intraday \eqn{M x N} return matrix and \eqn{i=1,...,M}
 #' the number of intraday returns. Then, let p = max(r_{t,i},0) and n = min(r_{t,i}).
 #' 
@@ -2939,12 +2939,11 @@ rCholCov <- function(pData, IVest = "rMRC", COVest = "rMRC", criterion = "square
 #' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
 #' @param makeReturns boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.
 #' 
-#' @return In case the data consists of one day a list of four \eqn{N x N} matrices are returned. These matrices are the mixed, positive, negative and concordant
+#' @return In case the data consists of one day a list of five \eqn{N x N} matrices are returned. These matrices are named \code{mixed}, \code{positive}, \code{negative}, \code{concordant}, and \code{rCov}.
+#' The latter matrix corresponds to the realized covariance estimator and is thus named like the function \code{\link{rCov}}.
 #' In case the data spans more than one day, the list for each day will be put into another list named according to the date of the estimates.
 #' 
 #' @details In the case that cor is TRUE, the mixed matrix will be an \eqn{N x N} matrix filled with NA as mapping the mixed covariance matrix into correlation space is impossible due to the 0-diagonal.
-#' 
-#' @author Emil Sjoerup
 #' 
 #' @examples 
 #' # Realized semi-variance/semi-covariance for prices aligned   
@@ -2955,6 +2954,7 @@ rCholCov <- function(pData, IVest = "rMRC", COVest = "rMRC", criterion = "square
 #'                    alignPeriod = 5, makeReturns = TRUE)
 #' rSV
 #' \dontrun{
+#' library("xts")
 #' # Multivariate multi day:
 #' rSC <- rSemiCov(sampleOneMinuteData, makeReturns = TRUE) # rSC is a list of lists
 #' # We extract the covariance between stock 1 and stock 2 for all three covariances.
@@ -3053,10 +3053,10 @@ rSemiCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, mak
       sdmatrix <- sqrt(diag(diag(rCovEst)))
       rCorEst <- solve(sdmatrix) %*% rCovEst %*% solve(sdmatrix)  
       
-      return(list("mixed" = mixCor, "negative" = negCor,  "positive" = posCor, "concordant" = concordantCor))
+      return(list("mixed" = mixCor, "negative" = negCor,  "positive" = posCor, "concordant" = concordantCor, "rCov" = rCorEst))
     }
     
-    return(list("mixed" = mixCov, "negative" = negCov,  "positive" = posCov, "concordant" = concordantCov))
+    return(list("mixed" = mixCov, "negative" = negCov,  "positive" = posCov, "concordant" = concordantCov, "rCov" = rCovEst ))
     
   }
   

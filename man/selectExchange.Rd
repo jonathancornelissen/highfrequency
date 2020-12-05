@@ -31,7 +31,7 @@ By default the NYSE is chosen (exch = "N"). Other exchange symbols are:
 \code{xts} or \code{data.table} object depending on input
 }
 \description{
-Function returns an \code{xts} object containing the data of only 1 stock exchange.
+Filter raw trade data to only contain specified exchanges
 }
 \author{
 Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup

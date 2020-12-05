@@ -33,7 +33,7 @@ in case the input is and contains data from one day, an N by N matrix is returne
 If the data is multivariate and contains multiple days (\code{xts} or \code{data.table}), the function returns a list containing N by N matrices. Each item in the list has a name which corresponds to the date for the matrix.
 }
 \description{
-Function returns the Realized BiPower Covariance (rBPCov), 
+Calculate the Realized BiPower Covariance (rBPCov), 
  defined in Barndorff-Nielsen and Shephard (2004).
  
  Let \eqn{r_{t,i}} be an intraday \eqn{N x 1} return vector and \eqn{i=1,...,M} 

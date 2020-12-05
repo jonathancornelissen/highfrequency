@@ -49,7 +49,7 @@ of stock i for day t.}
 an \eqn{N x N} matrix
 }
 \description{
-Function returns the robust two time scale covariance matrix proposed in Boudt and Zhang (2010). 
+Calculate the robust two time scale covariance matrix proposed in Boudt and Zhang (2010). 
 Unlike the \code{\link{rOWCov}}, but similarly to the \code{\link{rThresholdCov}}, the rRTSCov uses  univariate jump detection rules 
 to truncate the effect of jumps on the covariance 
 estimate. By the use of two time scales, this covariance estimate 

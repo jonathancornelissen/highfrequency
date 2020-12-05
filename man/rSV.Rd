@@ -20,10 +20,10 @@ based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to
 \item{...}{used internally, any input is ignored.}
 }
 \value{
-list with to arguments. The realized positive and negative semivariance.
+list with two entries, the realized positive and negative semivariances
 }
 \description{
-Function returns realized semivariances, defined in Barndorff-Nielsen et al. (2008).
+Calculate the realized semivariances, defined in Barndorff-Nielsen et al. (2008).
 
 Function returns two outcomes: 1.Downside realized semivariance and 2.Upside realized semivariance.
 

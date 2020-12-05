@@ -1,6 +1,6 @@
 #' Aggregate a time series
 #' 
-#' @description Function returns aggregated time series as \code{xts} object. 
+#' @description Aggregate a time series as \code{xts} object. 
 #' It can handle irregularly spaced timeseries and returns a regularly spaced one.
 #' Use univariate timeseries as input for this function, and check out \code{\link{aggregateTrades}}
 #' and \code{\link{aggregateQuotes}} to aggregate Trade or Quote data objects.
@@ -392,7 +392,7 @@ aggregatePrice <- function(pData, alignBy = "minutes", alignPeriod = 1, marketOp
 
 #' Aggregate a \code{data.table} or \code{xts} object containing quote data
 #' 
-#' @description Function returns a \code{data.table} or \code{xts} object containing the aggregated quote data with columns "SYMBOL", "EX", "BID","BIDSIZ","OFR","OFRSIZ". 
+#' @description Aggregate tick-by-tick quote data and return a \code{data.table} or \code{xts} object containing the aggregated quote data.
 #' See \code{\link{sampleQData}} for an example of the argument qData. This function accepts arbitrary number of symbols over an aribtrary number of days.
 #' 
 #' @param qData \code{data.table} or \code{xts} object to be aggregated, containing the intraday quote data of a stock for one day.
@@ -549,10 +549,10 @@ aggregateQuotes <- function(qData, alignBy = "minutes", alignPeriod = 5, marketO
   }
 }
 
-#' Aggregate a \code{data.table} or \code{xts} object containing trades data
+#' Aggregate a \code{data.table} or \code{xts} object containing trades data´
 #' 
-#' @description Function returns new time series as a \code{data.table} or \code{xts} object where first observation is always the opening price
-#' and subsequent observations are the closing prices over the interval. This function accepts arbitrary number of symbols over an aribtrary number of days.
+#' @description Aggregate tick-by-tick trade data and return a time series as a \code{data.table} or \code{xts} object where first observation is always the opening price
+#' and subsequent observations are the closing prices over the interval. This function accepts arbitrary number of symbols over an arbitrary number of days.
 #' 
 #' @param tData \code{data.table} or \code{xts} object to be aggregated, containing the intraday price series of a stock for possibly multiple days.
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".
@@ -726,9 +726,8 @@ aggregateTrades <- function(tData, alignBy = "minutes", alignPeriod = 5, marketO
 
 #' Retain only data from the stock exchange with the highest trading volume
 #' 
-#' @description Function returns a \code{data.table} or \code{xts} object containing only observations of the 
-#' exchange with the highest value for the variable "SIZE", 
-#' i.e. the highest trade volume.
+#' @description Filters raw trade data and return only data that stems from the exchange with the highest
+#'  value for the variable "SIZE", i.e. the highest trade volume.
 #' @param tData an \code{xts} object with at least a column "EX", 
 #' indicating the exchange symbol and "SIZE", 
 #' indicating the trade volume. 
@@ -806,8 +805,7 @@ autoSelectExchangeTrades <- function(tData, printExchange = TRUE) {
 
 #' Retain only data from the stock exchange with the highest volume
 #' 
-#' @description Function returns an \code{xts} object containing only observations 
-#' of the exchange with highest
+#' @description Filters raw quote data and return only data that stems from the exchange with the highest
 #' value for the sum of "BIDSIZ" and "OFRSIZ", i.e. the highest quote volume.
 #' 
 #' @param qData a \code{data.table} or \code{xts} object with at least a column "EX", indicating the exchange symbol 
@@ -892,9 +890,8 @@ autoSelectExchangeQuotes <- function(qData, printExchange = TRUE) {
 
 #' Extract data from an \code{xts} object for the Exchange Hours Only
 #' 
-#' @description The function returns data within exchange trading hours,
-#' "marketOpen" and "marketClose". By default, \code{marketOpen} and \code{marketClose}
-#' are set to "09:30:00" and "16:00:00" respectively (see Brownlees and Gallo (2006) for more information on good choices for these arguments).
+#' @description Filter raw trade data such and return only data between market close and market open. 
+#' By default, \code{marketOpen} and \code{marketClose} are set to "09:30:00" and "16:00:00" respectively (see Brownlees and Gallo (2006) for more information on good choices for these arguments).
 #' 
 #' @param data a \code{data.table} or \code{xts} object containing the time series data. 
 #' Multiple days of input are allowed.
@@ -1929,7 +1926,6 @@ rmTradeOutliersUsingQuotes <- function(tData, qData, lagQuotes = 2, BFM = FALSE,
 #' @param type should be "standard" or "advanced" (see description).
 #' @param tz fallback time zone used in case we we are unable to identify the timezone of the data, by default: \code{tz = NULL}. With the non-disk functionality, we attempt to extract the timezone from the DT column (or index) of the data, which may fail. 
 #' In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}. 
-#' @details NOTE: This function works only correct if supplied input data consists of 1 day.
 #' 
 #' @return \code{xts} object or \code{data.table} depending on type of input
 #' 
@@ -2024,12 +2020,10 @@ rmOutliersQuotes <- function (qData, maxi = 10, window = 50, type = "advanced", 
 
 #' \link{salesCondition} is deprecated. Use \link{tradesCondition} instead.
 #' 
-#' @description Function deletes entries with abnormal trades condition
+#' @description \link{salesCondition} is deprecated. Use \link{tradesCondition} instead.
 #' 
-#' @param tData an \code{xts} or \code{data.table} object containing the time series data, with 
-#' one column named "COND" indicating the Sale Condition.
-#' @param validConds a character vector containing valid sales conditions defaults to \cr
-#' \code{c('', '@', 'E', '@E', 'F', 'FI', '@F', '@FI', 'I', '@I')}. See \link{tradesCondition}.
+#' @param tData \link{salesCondition} is deprecated. Use \link{tradesCondition} instead.
+#' @param validConds \link{salesCondition} is deprecated. Use \link{tradesCondition} instead.
 #' @keywords cleaning
 #' @export
 salesCondition <- function(tData, validConds = c('', '@', 'E', '@E', 'F', 'FI', '@F', '@FI', 'I', '@I')) {
@@ -2039,10 +2033,10 @@ salesCondition <- function(tData, validConds = c('', '@', 'E', '@E', 'F', 'FI', 
 
 #' Delete entries with abnormal trades condition.
 #' 
-#' @description Function deletes entries with abnormal trades condition
+#' @description Delete entries with abnormal trades condition
 #' 
 #' @param tData an \code{xts} or \code{data.table} object containing the time series data, with 
-#' one column named "COND" indicating the Sale Condition.
+#' one column named \code{"COND"} indicating the Sale Condition.
 #' @param validConds a character vector containing valid sales conditions defaults to \cr
 #' \code{c('', '@', 'E', '@E', 'F', 'FI', '@F', '@FI', 'I', '@I')}. See details.
 #' 
@@ -2087,7 +2081,7 @@ tradesCondition <- function(tData, validConds = c('', '@', 'E', '@E', 'F', 'FI',
 }
 
 #' Retain only data from a single stock exchange
-#' @description Function returns an \code{xts} object containing the data of only 1 stock exchange.
+#' @description Filter raw trade data to only contain specified exchanges
 #' 
 #' @param data an \code{xts} or \code{data.table} object containing the time series data. 
 #' The object should have a column "EX", indicating the exchange by its symbol.
@@ -2137,7 +2131,7 @@ selectExchange <- function(data, exch = "N") {
 #' @description This is a wrapper function for cleaning the trade data of all stock data inside the folder dataSource. 
 #' The result is saved in the folder dataDestination. 
 #' 
-#' In case you supply the argument "rawtData", the on-disk functionality is ignored. The function returns a vector
+#' In case you supply the argument \code{rawtData}, the on-disk functionality is ignored. The function returns a vector
 #' indicating how many trades were removed at each cleaning step in this case.
 #' and the function returns an \code{xts} or \code{data.table} object.
 #' 
@@ -2151,8 +2145,8 @@ selectExchange <- function(data, exch = "N") {
 #' 
 #' @param dataSource character indicating the folder in which the original data is stored.
 #' @param dataDestination character indicating the folder in which the cleaned data is stored.
-#' @param exchanges vector of stock exchange symbols for all data in dataSource, 
-#' e.g. exchanges = c("T","N") retrieves all stock market data from both NYSE and NASDAQ.
+#' @param exchanges vector of stock exchange symbols for all data in \code{dataSource}, 
+#' e.g. \code{exchanges = c("T","N")} retrieves all stock market data from both NYSE and NASDAQ.
 #' The possible exchange symbols are:
 #' \itemize{
 #' \item A: AMEX
@@ -2169,17 +2163,15 @@ selectExchange <- function(data, exch = "N") {
 #' \item Z: BATS
 #' } The default value is \code{"auto"} which automatically selects the exchange for the stocks and days independently using the \code{\link{autoSelectExchangeTrades}}
 #' 
-#' @param tDataRaw \code{xts} object containing (for ONE stock only) raw trade data. This argument is NULL by default. Enabling it means the arguments
+#' @param tDataRaw \code{xts} object containing raw trade data. This argument is NULL by default. Enabling it means the arguments
 #' from, to, dataSource and dataDestination will be ignored. (only advisable for small chunks of data)
 #' @param report boolean and TRUE by default. In case it is true the function returns (also) a vector indicating how many trades remained after each cleaning step.
 #' @param selection argument to be passed on to the cleaning routine \code{\link{mergeTradesSameTimestamp}}. The default is "median".
 #' @param validConds character vector containing valid sales conditions. Passed through to \code{\link{tradesCondition}}.
-#' @param marketOpen passed to \code{\link{exchangeHoursOnly}}. A character in the format of \"HH:MM:SS\",
-#' specifying the starting hour, minute and second of an exchange
-#' trading day.
-#' @param marketClose passed to \code{\link{exchangeHoursOnly}}. A character in the format of \"HH:MM:SS\",
-#' specifying the closing hour, minute and second of an exchange
-#' trading day.
+#' @param marketOpen character in the format of \code{"HH:MM:SS"},
+#' specifying the opening time of the exchange(s).
+#' @param marketClose character in the format of \code{"HH:MM:SS"},
+#' specifying the closing time of the exchange(s).
 #' @param printExchange Argument passed to \code{\link{autoSelectExchangeTrades}} indicates whether the chosen exchange is printed on the console, 
 #' default is TRUE. This is only used when \code{exchanges} is \code{"auto"}
 #' @param saveAsXTS indicates whether data should be saved in \code{xts} format instead of \code{data.table} when using on-disk functionality. FALSE by default.
@@ -2234,7 +2226,7 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
       extension <- extension[length(extension)]
       if(extension == "zip") {
         tmp <- tempdir()
-        unzip(ii, exdir = tmp, )
+        unzip(ii, exdir = tmp)
         files <- list.files(tmp, full.names = TRUE, pattern = "csv")
         if(length(files) >= 1){
           readdata <- try(rbindlist(lapply(files, fread, tz = tz)), silent = TRUE)
@@ -2400,9 +2392,9 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
 #' @param tradeDataSource character indicating the folder in which the original trade data is stored.
 #' @param quoteDataSource character indicating the folder in which the original quote data is stored.
 #' @param dataDestination character indicating the folder in which the cleaned data is stored, folder of dataSource by default.
-#' @param tData \code{data.table} or \code{xts} object containing (ONE day and for ONE stock only) trade data cleaned by \code{\link{tradesCleanup}}. This argument is NULL by default. Enabling it, means the arguments
+#' @param tData \code{data.table} or \code{xts} object containing trade data cleaned by \code{\link{tradesCleanup}}. This argument is NULL by default. Enabling it, means the arguments
 #' from, to, dataSource and dataDestination will be ignored. (only advisable for small chunks of data)
-#' @param qData \code{data.table} or \code{xts} object containing (ONE day and for ONE stock only) cleaned quote data. This argument is NULL by default. Enabling it means the arguments
+#' @param qData \code{data.table} or \code{xts} object containing cleaned quote data. This argument is NULL by default. Enabling it means the arguments
 #' from, to, dataSource, dataDestination will be ignored. (only advisable for small chunks of data)
 #' @param lagQuotes numeric, number of seconds the quotes are registered faster than
 #' the trades (should be round and positive). Default is 0. For older datasets, i.e. before 2010, it may be a good idea to set this to e.g. 2. See Vergote (2005)
@@ -2410,11 +2402,12 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
 #' The algorithm tries to match trades that fall outside the bid - ask and first tries to match a small window forwards and if this fails, it tries to match backwards in a bigger window.
 #' The small window is a tolerance for inaccuracies in the timestamps of bids and asks. The backwards window allow for matching of late reported trades. I.e. block trades.
 #' @param backwardsWindow a numeric denoting the length of the backwards window used when \code{BFM = TRUE}. Default is 3600, corresponding to one hour.
-#' @param forwardsWindow a numeric denoting the length of the forwards window used when \code{BFM = TRUE}. Default is 0.5, dorresponding to one half second.
+#' @param forwardsWindow a numeric denoting the length of the forwards window used when \code{BFM = TRUE}. Default is 0.5, corresponding to one half second.
+#' @param plot a logical denoting whether to visualize the forwards, backwards, and unmatched trades in a plot. Passed on to \code{\link{rmTradeOutliersUsingQuotes}}
 #' @return For each day an \code{xts} object is saved into the folder of that date, containing the cleaned data.
 #' 
 #' @details 
-#' In case you supply the arguments "tData" and "qData", the on-disk functionality is ignored
+#' In case you supply the arguments \code{tData} and \code{qData}, the on-disk functionality is ignored
 #' and the function returns cleaned trades as a \code{data.table} or \code{xts} object (see examples).
 #' 
 #' When using the on-disk functionality and tradeDataSource and quoteDataSource are the same, the quote files are all files in the folder that contains 'quote', and the rest are treated as containing trade data.
@@ -2442,7 +2435,7 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
 #' @keywords cleaning
 #' @export
 tradesCleanupUsingQuotes <- function(tradeDataSource = NULL, quoteDataSource = NULL, dataDestination = NULL, tData = NULL, qData = NULL, lagQuotes = 2,
-                                     BFM = FALSE, backwardsWindow = 3600, forwardsWindow = 0.5) {
+                                     BFM = FALSE, backwardsWindow = 3600, forwardsWindow = 0.5, plot = FALSE) {
   
   if (is.null(dataDestination) && !is.null(tradeDataSource)) {
     dataDestination <- tradeDataSource
@@ -2454,7 +2447,7 @@ tradesCleanupUsingQuotes <- function(tradeDataSource = NULL, quoteDataSource = N
     qData <- checkColumnNames(qData)
     
     #1 cleaning procedure that needs cleaned trades and quotes
-    tData <- rmTradeOutliersUsingQuotes(tData, qData, lagQuotes = lagQuotes)
+    tData <- rmTradeOutliersUsingQuotes(tData, qData, lagQuotes = lagQuotes, BFM = BFM, backwardsWindow = backwardsWindow, forwardsWindow = forwardsWindow, plot = plot, onlyTQ = TRUE)
     return(tData)
   } else {
     

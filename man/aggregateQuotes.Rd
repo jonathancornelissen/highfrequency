@@ -33,7 +33,7 @@ In case of failure we use \code{tz} if specified, and if it is not specified, we
 A \code{data.table} or an \code{xts} object containing the aggregated quote data.
 }
 \description{
-Function returns a \code{data.table} or \code{xts} object containing the aggregated quote data with columns "SYMBOL", "EX", "BID","BIDSIZ","OFR","OFRSIZ". 
+Aggregate tick-by-tick quote data and return a \code{data.table} or \code{xts} object containing the aggregated quote data.
 See \code{\link{sampleQData}} for an example of the argument qData. This function accepts arbitrary number of symbols over an aribtrary number of days.
 }
 \details{

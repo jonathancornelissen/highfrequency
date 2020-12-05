@@ -13,7 +13,8 @@ tradesCleanupUsingQuotes(
   lagQuotes = 2,
   BFM = FALSE,
   backwardsWindow = 3600,
-  forwardsWindow = 0.5
+  forwardsWindow = 0.5,
+  plot = FALSE
 )
 }
 \arguments{
@@ -23,10 +24,10 @@ tradesCleanupUsingQuotes(
 
 \item{dataDestination}{character indicating the folder in which the cleaned data is stored, folder of dataSource by default.}
 
-\item{tData}{\code{data.table} or \code{xts} object containing (ONE day and for ONE stock only) trade data cleaned by \code{\link{tradesCleanup}}. This argument is NULL by default. Enabling it, means the arguments
+\item{tData}{\code{data.table} or \code{xts} object containing trade data cleaned by \code{\link{tradesCleanup}}. This argument is NULL by default. Enabling it, means the arguments
 from, to, dataSource and dataDestination will be ignored. (only advisable for small chunks of data)}
 
-\item{qData}{\code{data.table} or \code{xts} object containing (ONE day and for ONE stock only) cleaned quote data. This argument is NULL by default. Enabling it means the arguments
+\item{qData}{\code{data.table} or \code{xts} object containing cleaned quote data. This argument is NULL by default. Enabling it means the arguments
 from, to, dataSource, dataDestination will be ignored. (only advisable for small chunks of data)}
 
 \item{lagQuotes}{numeric, number of seconds the quotes are registered faster than
@@ -38,7 +39,9 @@ The small window is a tolerance for inaccuracies in the timestamps of bids and a
 
 \item{backwardsWindow}{a numeric denoting the length of the backwards window used when \code{BFM = TRUE}. Default is 3600, corresponding to one hour.}
 
-\item{forwardsWindow}{a numeric denoting the length of the forwards window used when \code{BFM = TRUE}. Default is 0.5, dorresponding to one half second.}
+\item{forwardsWindow}{a numeric denoting the length of the forwards window used when \code{BFM = TRUE}. Default is 0.5, corresponding to one half second.}
+
+\item{plot}{a logical denoting whether to visualize the forwards, backwards, and unmatched trades in a plot. Passed on to \code{\link{rmTradeOutliersUsingQuotes}}}
 }
 \value{
 For each day an \code{xts} object is saved into the folder of that date, containing the cleaned data.
@@ -51,7 +54,7 @@ is trade and quote data cleaned by respectively e.g. \code{\link{tradesCleanup}}
 and \code{\link{quotesCleanup}}.
 }
 \details{
-In case you supply the arguments "tData" and "qData", the on-disk functionality is ignored
+In case you supply the arguments \code{tData} and \code{qData}, the on-disk functionality is ignored
 and the function returns cleaned trades as a \code{data.table} or \code{xts} object (see examples).
 
 When using the on-disk functionality and tradeDataSource and quoteDataSource are the same, the quote files are all files in the folder that contains 'quote', and the rest are treated as containing trade data.

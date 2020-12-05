@@ -23,7 +23,7 @@ If the input data spans multiple days and is in \code{xts} format, an \code{xts}
 If the input data is a \code{data.table} object, the function returns a \code{data.table} with the same column names as the input data, containing the date and the realized measures
 }
 \description{
-Function returns the rMinRQ, defined in Andersen et al. (2012).
+Calculate the rMinRQ, defined in Andersen et al. (2012).
 
 Assume there is \eqn{N} equispaced returns in period \eqn{t}. Let \eqn{r_{t,i}} be a return (with \eqn{i=1, \ldots,N}) in period \eqn{t}.
 

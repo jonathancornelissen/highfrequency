@@ -44,13 +44,12 @@
 #' @importFrom stats filter time
 #' @importFrom utils tail
 #' @importFrom xts xtsible merge.xts
-#' @importFrom data.table rbindlist
-#' @importFrom data.table setkeyv
+#' @importFrom data.table setkeyv rbindlist
 #' @export
 spotDrift <- function(data, method = "driftMean", ..., alignBy = "minutes", alignPeriod = 5,
                      marketOpen = "09:30:00", marketClose = "16:00:00", tz = NULL) {
 
-  PRICE = DATE = RETURN = DT = NULL
+  PRICE <- DATE <- RETURN <- NULL
 
   if (!("PRICE" %in% colnames(data))) {
     if (dim(data)[2] == 1) {

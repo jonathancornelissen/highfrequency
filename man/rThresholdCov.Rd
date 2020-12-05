@@ -30,7 +30,7 @@ in case the input is and contains data from one day, an N by N matrix is returne
 If the data is multivariate and contains multiple days (\code{xts} or \code{data.table}), the function returns a list containing N by N matrices. Each item in the list has a name which corresponds to the date for the matrix.
 }
 \description{
-Function returns the treshold covariance matrix proposed in Gobbi and Mancini (2009).
+Calculate the treshold covariance matrix proposed in Gobbi and Mancini (2009).
 Unlike the \code{\link{rOWCov}}, the rThresholdCov uses univariate jump detection rules to truncate the effect of jumps on the covariance
 estimate. As such, it remains feasible in high dimensions, but it is less robust to small cojumps. 
 

@@ -43,9 +43,9 @@ By default a zero-one weight function (wFunction = "HR") is used.}
 the subsets over which the determinant is minimized. 
 Allowed values are between 0.5 and 1 and 
 the default is 0.75. See Boudt et al. (2008) or the \code{covMcd} function in the
-robustbase package.}
+\pkg{\link[robustbase:covMcd]{robustbase}} package.}
 
-\item{alpha}{is a parameter between 0 en 0.5, 
+\item{alpha}{is a parameter between 0 and 0.5, 
 that determines the rejection threshold value 
 (see Boudt et al. (2008) for details).}
 }
@@ -53,7 +53,7 @@ that determines the rejection threshold value
 an \eqn{N x N} matrix
 }
 \description{
-Function returns the Realized Outlyingness Weighted Covariance, defined in Boudt et al. (2008).
+Calculate the Realized Outlyingness Weighted Covariance, defined in Boudt et al. (2008).
 
 Let \eqn{r_{t,i}}, for \eqn{i=1,...,M} be a sample
 of \eqn{M} high-frequency \eqn{(N x 1)} return vectors and \eqn{d_{t,i}}
@@ -73,7 +73,7 @@ under the Brownian Semimartingale with Finite Activity Jumps model.
 \details{
 Advantages of the rOWCov compared to the \code{\link{rBPCov}} include a higher statistical efficiency, positive semidefiniteness and affine equivariance.
 However, the rOWCov suffers from a curse of dimensionality.
-Indeed, the rOWCov gives a zero weight to a return vector
+The rOWCov gives a zero weight to a return vector
 if at least one of the components is affected by a jump.
 In the case of independent jump occurrences, the average proportion of observations
 with at least one component being affected by jumps increases fast with the dimension

@@ -41,7 +41,7 @@ in case the input is and contains data from one day, an N by N matrix is returne
 If the data is multivariate and contains multiple days (\code{xts} or \code{data.table}), the function returns a list containing N by N matrices. Each item in the list has a name which corresponds to the date for the matrix.
 }
 \description{
-Function returns the two time scale covariance matrix proposed in Zhang et al (2005) and Zhang (2010).
+Calculate the two time scale covariance matrix proposed in Zhang et al (2005) and Zhang (2010).
 By the use of two time scales, this covariance estimate 
 is robust to microstructure noise and non-synchronic trading.
 }

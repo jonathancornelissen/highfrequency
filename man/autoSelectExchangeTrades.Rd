@@ -32,9 +32,8 @@ The possible exchanges are:
 \code{data.table} or \code{xts} object depending on input
 }
 \description{
-Function returns a \code{data.table} or \code{xts} object containing only observations of the 
-exchange with the highest value for the variable "SIZE", 
-i.e. the highest trade volume.
+Filters raw trade data and return only data that stems from the exchange with the highest
+ value for the variable "SIZE", i.e. the highest trade volume.
 }
 \examples{
 autoSelectExchangeTrades(sampleTDataRaw)

@@ -24,8 +24,8 @@ tradesCleanup(
 
 \item{dataDestination}{character indicating the folder in which the cleaned data is stored.}
 
-\item{exchanges}{vector of stock exchange symbols for all data in dataSource, 
-e.g. exchanges = c("T","N") retrieves all stock market data from both NYSE and NASDAQ.
+\item{exchanges}{vector of stock exchange symbols for all data in \code{dataSource}, 
+e.g. \code{exchanges = c("T","N")} retrieves all stock market data from both NYSE and NASDAQ.
 The possible exchange symbols are:
 \itemize{
 \item A: AMEX
@@ -42,7 +42,7 @@ The possible exchange symbols are:
 \item Z: BATS
 } The default value is \code{"auto"} which automatically selects the exchange for the stocks and days independently using the \code{\link{autoSelectExchangeTrades}}}
 
-\item{tDataRaw}{\code{xts} object containing (for ONE stock only) raw trade data. This argument is NULL by default. Enabling it means the arguments
+\item{tDataRaw}{\code{xts} object containing raw trade data. This argument is NULL by default. Enabling it means the arguments
 from, to, dataSource and dataDestination will be ignored. (only advisable for small chunks of data)}
 
 \item{report}{boolean and TRUE by default. In case it is true the function returns (also) a vector indicating how many trades remained after each cleaning step.}
@@ -51,13 +51,11 @@ from, to, dataSource and dataDestination will be ignored. (only advisable for sm
 
 \item{validConds}{character vector containing valid sales conditions. Passed through to \code{\link{tradesCondition}}.}
 
-\item{marketOpen}{passed to \code{\link{exchangeHoursOnly}}. A character in the format of \"HH:MM:SS\",
-specifying the starting hour, minute and second of an exchange
-trading day.}
+\item{marketOpen}{character in the format of \code{"HH:MM:SS"},
+specifying the opening time of the exchange(s).}
 
-\item{marketClose}{passed to \code{\link{exchangeHoursOnly}}. A character in the format of \"HH:MM:SS\",
-specifying the closing hour, minute and second of an exchange
-trading day.}
+\item{marketClose}{character in the format of \code{"HH:MM:SS"},
+specifying the closing time of the exchange(s).}
 
 \item{printExchange}{Argument passed to \code{\link{autoSelectExchangeTrades}} indicates whether the chosen exchange is printed on the console, 
 default is TRUE. This is only used when \code{exchanges} is \code{"auto"}}
@@ -81,7 +79,7 @@ and the function returns a list with the cleaned trades as \code{xts} object (se
 This is a wrapper function for cleaning the trade data of all stock data inside the folder dataSource. 
 The result is saved in the folder dataDestination. 
 
-In case you supply the argument "rawtData", the on-disk functionality is ignored. The function returns a vector
+In case you supply the argument \code{rawtData}, the on-disk functionality is ignored. The function returns a vector
 indicating how many trades were removed at each cleaning step in this case.
 and the function returns an \code{xts} or \code{data.table} object.
 

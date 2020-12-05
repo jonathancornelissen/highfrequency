@@ -11,7 +11,7 @@ tradesCondition(
 }
 \arguments{
 \item{tData}{an \code{xts} or \code{data.table} object containing the time series data, with 
-one column named "COND" indicating the Sale Condition.}
+one column named \code{"COND"} indicating the Sale Condition.}
 
 \item{validConds}{a character vector containing valid sales conditions defaults to \cr
 \code{c('', '@', 'E', '@E', 'F', 'FI', '@F', '@FI', 'I', '@I')}. See details.}
@@ -20,7 +20,7 @@ one column named "COND" indicating the Sale Condition.}
 \code{xts} or \code{data.table} object depending on input
 }
 \description{
-Function deletes entries with abnormal trades condition
+Delete entries with abnormal trades condition
 }
 \details{
 To get more information on the sales conditions, see the NYSE documentation. Section about Daily TAQ Trades File.

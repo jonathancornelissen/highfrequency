@@ -40,7 +40,7 @@ for previous tick aggregation, by setting \code{FUN = "previoustick"} (default).
 An \code{xts} object containing the aggregated time series.
 }
 \description{
-Function returns aggregated time series as \code{xts} object. 
+Aggregate a time series as \code{xts} object. 
 It can handle irregularly spaced timeseries and returns a regularly spaced one.
 Use univariate timeseries as input for this function, and check out \code{\link{aggregateTrades}}
 and \code{\link{aggregateQuotes}} to aggregate Trade or Quote data objects.

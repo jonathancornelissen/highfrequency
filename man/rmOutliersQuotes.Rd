@@ -44,9 +44,6 @@ Note that the median absolute deviation is taken over the entire
 day. In case it is zero (which can happen if mid-quotes don't change much), 
 the median absolute deviation is taken over a subsample without constant mid-quotes.
 }
-\details{
-NOTE: This function works only correct if supplied input data consists of 1 day.
-}
 \references{
 Barndorff-Nielsen, O. E., P. R. Hansen, A. Lunde, and N. Shephard (2009). Realized kernels in practice: Trades and quotes. Econometrics Journal 12, C1-C32.
 
