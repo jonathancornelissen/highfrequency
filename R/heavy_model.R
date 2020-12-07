@@ -25,13 +25,13 @@
 #' @examples 
 #' 
 #' # Calculate annualized returns in percentages
-#' logReturns <- 100 * makeReturns(log(SPYRM$CLOSE))
+#' logReturns <- 100 * makeReturns(SPYRM$CLOSE)[-1]
 #' 
 #' # Returns are assumed to be demeaned
 #' logReturns <- logReturns - mean(logReturns)
 #' 
 #' # Due to return calculation, the first observation is missing
-#' estimatedHEAVY <- HEAVYmodel(logReturns[-1], SPYRM$RK5[-1]^2 / 252)
+#' estimatedHEAVY <- HEAVYmodel(logReturns, SPYRM$RK5[-1] * 10000)
 #' 
 #' # Calculate iterative multi-step-ahead forecasts
 #' predict(estimatedHEAVY, stepsAhead = 12)
@@ -41,23 +41,26 @@ HEAVYmodel <- function(ret, rm, startingValues = NULL) {
   ret <- as.numeric(ret)
   rm <- as.numeric(rm)
   
-  if (abs(mean(ret)) > 0.00001) {
+  if (abs(mean(ret)) > 0.001) {
     warning("Returns are assumed to be demeaned but mean(ret) is unequal zero. Please check your data.")
   }
   
   heavyLLH <- function(par, RMEq = FALSE) {
+    # if (RMEq) {
+    #   browser()
+    # }
     condVar <- calcRecVarEq(par, rm)
     if (RMEq) {
       if (sum(condVar < 0) > 0 | par[1] < 0 | par[2] < 0 | par[3] < 0 | par[2] + par[3] >= 1) {
         NA
       } else {
-        - 1 / 2 * (log(condVar) + rm / condVar)
+        -1/2 * log(2 * pi) - 1 / 2 * (log(condVar) + rm / condVar)
       }
     } else {
       if (sum(condVar < 0) > 0 | par[1] < 0 | (par[2] < 0) | par[3] < 0 | par[3] >= 1) {
         NA
       } else {
-        - 1 / 2 * (log(condVar) + ret^2 / condVar)
+        -1/2 * log(2 * pi) - 1 / 2 * (log(condVar) + ret^2 / condVar)
       }
     }
   }
@@ -71,20 +74,21 @@ HEAVYmodel <- function(ret, rm, startingValues = NULL) {
     startingValuesRM <-startingValues[4:6]
   }
   
+  control_neg <- list(fnscale = -1)
+  
   # Try BFGS first, otherwise Nelder-Mead
-  parVarEq <- try({optim(startingValuesVar, function(x) -sum(heavyLLH(x)), method = "BFGS")}, 
+  parVarEq <- try({optim(startingValuesVar, function(x) sum(heavyLLH(x)), method = "BFGS", control = control_neg)}, 
                   silent = TRUE)
   
-  parRMEq <- try({optim(startingValuesRM, function(x) -sum(heavyLLH(x, RMEq = TRUE)), method = "BFGS", 
-                        control = list(reltol = 1e-12))},
+  parRMEq <- try({optim(startingValuesRM, function(x) sum(heavyLLH(x, RMEq = TRUE)), method = "BFGS", control = control_neg)},
                  silent = TRUE)
   
   if (class(parVarEq) == "try-error") {
-    parVarEq <- optim(startingValuesVar, function(x) -sum(heavyLLH(x)))
+    parVarEq <- optim(startingValuesVar, function(x) sum(heavyLLH(x)), control = control_neg)
   }
   
   if (class(parRMEq) == "try-error") {
-    parRMEq <- optim(startingValuesRM, function(x) -sum(heavyLLH(x, RMEq = TRUE)))
+    parRMEq <- optim(startingValuesRM, function(x) sum(heavyLLH(x, RMEq = TRUE)), control = control_neg)
   }
   
   varCondVariances <- calcRecVarEq(parVarEq$par, rm)
@@ -94,15 +98,23 @@ HEAVYmodel <- function(ret, rm, startingValues = NULL) {
   names(modelEstimates) <- c("omegaVar", "alphaVar", "betaVar",
                              "omegaRM", "alphaRM", "betaRM")
   
+  # numDeriv::grad(func = function (theta) {
+  #   sum(heavyLLH(theta, RMEq = TRUE))
+  # }, x = parRMEq$par)
+  # 
+  # numDeriv::grad(func = function (theta) {
+  #   sum(heavyLLH(theta, RMEq = FALSE))
+  # }, x = parVarEq$par)
+
   invHessianVarEq <- try({
     solve(-suppressWarnings(hessian(x = parVarEq$par, func = function (theta) {
-      -sum(heavyLLH(theta))
+      sum(heavyLLH(theta))
     }, method.args=list(d = 0.0001, r = 6))))
   }, silent = TRUE)
   invHessianRMEq <- try({
     solve(-suppressWarnings(hessian(x = parRMEq$par, func = function (theta) {
-      -sum(heavyLLH(theta, RMEq = TRUE))
-    }, method.args=list(d = 0.00005, r = 6))))
+      sum(heavyLLH(theta, RMEq = TRUE))
+    }, method.args=list(d = 0.0001, r = 6))))
   }, silent = TRUE)
   
   if (class(invHessianVarEq)[1] == "try-error") {
@@ -111,7 +123,7 @@ HEAVYmodel <- function(ret, rm, startingValues = NULL) {
   } else {
    robStdErrVarEq <- 
      sqrt(diag(invHessianVarEq %*% 
-                 crossprod(jacobian(function(theta) -sum(heavyLLH(theta)), parVarEq$par)) %*% 
+                 crossprod(jacobian(function(theta) sum(heavyLLH(theta)), parVarEq$par)) %*% 
                  invHessianVarEq))
   }
   if (class(invHessianRMEq)[1] == "try-error") {
@@ -120,7 +132,7 @@ HEAVYmodel <- function(ret, rm, startingValues = NULL) {
   } else {
     robStdErrRMEq <-
       sqrt(diag(invHessianRMEq %*% 
-                  crossprod(jacobian(function(theta) -sum(heavyLLH(theta, RMEq = TRUE)), parRMEq$par)) %*% 
+                  crossprod(jacobian(function(theta) sum(heavyLLH(theta, RMEq = TRUE)), parRMEq$par)) %*% 
                   invHessianRMEq))
   }
   
@@ -187,7 +199,7 @@ print.HEAVYmodel <- function(x, digits = max(3, getOption("digits") - 3), ...) {
   print(summary(x)$coefficients)
   cat(" \n")
   cat(paste0("The log-likelihoods are: \n",
-             "Variance equation:", sprintf("%.3f", x$llh[1]), "\n", 
+             "Variance equation: ", sprintf("%.3f", x$llh[1]), "\n", 
              "RM equation:", sprintf("%.3f", x$llh[2])))
 }
 
