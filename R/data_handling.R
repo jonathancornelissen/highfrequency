@@ -237,7 +237,7 @@ aggregateTS <- function (ts, FUN = "previoustick", alignBy = "minutes", alignPer
 #' @export
 aggregatePrice <- function(pData, alignBy = "minutes", alignPeriod = 1, marketOpen = "09:30:00", marketClose = "16:00:00" , fill = FALSE, tz = NULL) {
   ## checking
-  nm <- colnames(pData)
+  nm <- toupper(colnames(pData))
   pData <- checkColumnNames(pData)
   .N <- .I <- N <- DATE <- DT <- FIRST_DT <- DT_ROUND <- LAST_DT <- SYMBOL <- PRICE <- NULL
 
@@ -425,7 +425,14 @@ aggregatePrice <- function(pData, alignBy = "minutes", alignPeriod = 1, marketOp
 #' @export
 aggregateQuotes <- function(qData, alignBy = "minutes", alignPeriod = 5, marketOpen = "09:30:00", marketClose = "16:00:00", tz = "GMT") {
   .I <- .N <- N <- DATE <- BID <- OFR <- BIDSIZ <- OFRSIZ <- DT <- FIRST_DT <- DT_ROUND <-LAST_DT <- SYMBOL <- NULL
-  nm <- colnames(qData)
+  nm <- toupper(colnames(qData))
+  if (!("SYMBOL" %in% nm)) {
+    if(is.data.table(qData)){
+      qData[, SYMBOL := "UKNOWN"]
+    } else {
+      qData <- cbind(qData, SYMBOL = 'UNKNOWN')
+    }
+  }
   qData <- checkColumnNames(qData)
   checkqData(qData)
   if (alignBy == "milliseconds") {
@@ -461,9 +468,6 @@ aggregateQuotes <- function(qData, alignBy = "minutes", alignPeriod = 5, marketO
     }
   }
 
-  if (!("SYMBOL" %in% nm)) {
-    qData[, SYMBOL := "UKNOWN"]
-  }
   
   
   timeZone <- format(qData$DT[1], format = "%Z")
@@ -589,16 +593,15 @@ aggregateQuotes <- function(qData, alignBy = "minutes", alignPeriod = 5, marketO
 #' @export
 aggregateTrades <- function(tData, alignBy = "minutes", alignPeriod = 5, marketOpen = "09:30:00", marketClose = "16:00:00", tz = "GMT") {
   .I <- .N <- N <- DATE <- SIZE <- DT <- FIRST_DT <- DT_ROUND <- LAST_DT <- SYMBOL <- PRICE <- VWPRICE <- SIZETPRICE <- SIZESUM <- NULL
-  nm <- colnames(tData)
-  if(alignPeriod <= 0){
-    if(alignPeriod == 0){
-      stop("alignPeriod is set to 0, this does not make sense")
+  nm <- toupper(colnames(tData))
+  if (!("SYMBOL" %in% nm)) {
+    if(is.data.table(tData)){
+      tData[, SYMBOL := "UKNOWN"]
     } else {
-      warning("alignPeriod set to a negative number, using the absolute value")
-      alignPeriod <- abs(alignPeriod)
+      tData <- cbind(tData, SYMBOL = 'UNKNOWN')
     }
   }
-  
+
   tData <- checkColumnNames(tData)
   checktData(tData)
   
@@ -635,9 +638,6 @@ aggregateTrades <- function(tData, alignBy = "minutes", alignPeriod = 5, marketO
     if (!("DT" %in% colnames(tData))) {
       stop("Data.table neeeds DT column (date-time).")
     }
-  }
-  if (!("SYMBOL" %in% nm)) {
-    tData[, SYMBOL := "UKNOWN"]
   }
   
   timeZone <- format(tData$DT[1], format = "%Z")
@@ -943,9 +943,16 @@ exchangeHoursOnly <- function(data, marketOpen = "09:30:00", marketClose = "16:0
   dates <- unique(data[,DATE])
   # data <- data[DT >= ymd_hms(paste(as.Date(data$DT), dayBegin), tz = tzone(data$DT))]
   # data <- data[DT <= ymd_hms(paste(as.Date(data$DT), dayEnd), tz = tzone(data$DT))]
+  # 
+  # days <- 0
+  # if(grepl('+', marketClose)){
+  #   re <- regexpr('[+][[:digit:]]+', marketClose)
+  #   days <- substr(marketClose, re[1], re[1] + attr(re, 'match.length'))
+  #   days <- as.numeric(days)
+  # }
   marketOpenNumeric <- as.numeric(as.POSIXct(paste(dates, marketOpen), format = "%Y-%m-%d %H:%M:%OS", tz = tz), tz = tz)
   marketCloseNumeric <- as.numeric(as.POSIXct(paste(dates, marketClose), format = "%Y-%m-%d %H:%M:%OS", tz = tz), tz =tz)
-  
+  # marketCloseNumeric <- marketCloseNumeric + days * 86400 # 60 * 60 * 24
   obsPerDay <- data[, .N, by = DATE][,N]
   
   ## Here we make sure that we can correctly handle times that happen before midnight in the corrected timestamps from the flag if statements
@@ -1616,7 +1623,7 @@ quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
   
   if (!is.null(qDataRaw)) {
     
-    nm <- colnames(qDataRaw)
+    nm <- toupper(colnames(qDataRaw))
     if(!"DT" %in% nm && c("DATE", "TIME_M") %in% nm){
       qDataRaw[, `:=`(DT = as.POSIXct(paste(DATE, TIME_M), tz = "UTC", format = "%Y%m%d %H:%M:%OS"),
                       DATE = NULL, TIME_M = NULL, SYM_SUFFIX = NULL)]
@@ -1667,7 +1674,7 @@ quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
                 removedOutliers = 0,
                 finalObservations = 0)
     
-    nm <- colnames(qDataRaw)
+    nm <- toupper(colnames(qDataRaw))
     
     REPORT[1] <- dim(qDataRaw)[1] 
     qDataRaw <- qDataRaw[BID != 0 & OFR != 0]
@@ -2277,7 +2284,7 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
   
   if (!is.null(tDataRaw)) {
     
-    nm <- colnames(tDataRaw)
+    nm <- toupper(colnames(tDataRaw))
     if(!"DT" %in% nm && c("DATE", "TIME_M") %in% nm){
       tDataRaw[, `:=`(DT = as.POSIXct(paste(DATE, TIME_M), tz = "UTC", format = "%Y%m%d %H:%M:%OS"),
                       DATE = NULL, TIME_M = NULL, SYM_SUFFIX = NULL)]
@@ -2332,7 +2339,7 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
                 removedFromMergeTimestamp = 0,
                 finalObservations = 0)
     
-    nm <- colnames(tDataRaw)
+    nm <- toupper(colnames(tDataRaw))
     REPORT[1] <- dim(tDataRaw)[1]
     tDataRaw <- tDataRaw[PRICE != 0]
     REPORT[2] <- dim(tDataRaw)[1] 
@@ -2895,7 +2902,7 @@ makeOHLCV <- function(pData, alignBy = "minutes", alignPeriod = 5, tz = NULL){
   }
   
   setkey(pData, SYMBOL, DT)
-  nm <- colnames(pData)
+  nm <- toupper(colnames(pData))
   nm <- nm[nm != "SYMBOL"]
   pData <- pData[, lapply(.SD, nafill, type = "locf"), .SDcols = nm, by = list(SYMBOL = SYMBOL, DATE = as.Date(DT, tz = tz))]
   pData <- pData[, lapply(.SD, nafill, type = "nocb"), .SDcols = nm, by = list(SYMBOL = SYMBOL, DATE = DATE)]
