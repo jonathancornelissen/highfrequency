@@ -90,7 +90,7 @@ In case you supply the argument \code{qDataRaw}, the on-disk functionality is ig
 and the function returns the cleaned quotes as \code{xts} or \code{data.table} object (see examples).
 
 The following cleaning functions are performed sequentially:
-\code{\link{noZeroQuotes}}, \code{\link{exchangeHoursOnly}}, \code{\link{selectExchange}}, \code{\link{rmNegativeSpread}}, \code{\link{rmLargeSpread}}
+\code{\link{noZeroQuotes}}, \code{\link{exchangeHoursOnly}}, \code{\link{autoSelectExchangeQuotes}} or \code{\link{selectExchange}}, \code{\link{rmNegativeSpread}}, \code{\link{rmLargeSpread}}
 \code{\link{mergeQuotesSameTimestamp}}, \code{\link{rmOutliersQuotes}}.
 }
 \details{

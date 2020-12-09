@@ -84,7 +84,7 @@ indicating how many trades were removed at each cleaning step in this case.
 and the function returns an \code{xts} or \code{data.table} object.
 
 The following cleaning functions are performed sequentially:
-\code{\link{noZeroPrices}}, \code{\link{selectExchange}}, \code{\link{tradesCondition}},
+\code{\link{noZeroPrices}}, \code{\link{autoSelectExchangeTrades}} or \code{\link{selectExchange}}, \code{\link{tradesCondition}}, and
 \code{\link{mergeTradesSameTimestamp}}.
 
 Since the function \code{\link{rmTradeOutliersUsingQuotes}}

@@ -1476,7 +1476,7 @@ noZeroQuotes <- function(qData) {
 #' and the function returns the cleaned quotes as \code{xts} or \code{data.table} object (see examples).
 #' 
 #' The following cleaning functions are performed sequentially:
-#' \code{\link{noZeroQuotes}}, \code{\link{exchangeHoursOnly}}, \code{\link{selectExchange}}, \code{\link{rmNegativeSpread}}, \code{\link{rmLargeSpread}}
+#' \code{\link{noZeroQuotes}}, \code{\link{exchangeHoursOnly}}, \code{\link{autoSelectExchangeQuotes}} or \code{\link{selectExchange}}, \code{\link{rmNegativeSpread}}, \code{\link{rmLargeSpread}}
 #' \code{\link{mergeQuotesSameTimestamp}}, \code{\link{rmOutliersQuotes}}.
 #' @param dataSource character indicating the folder in which the original data is stored.
 #' @param dataDestination character indicating the folder in which the cleaned data is stored.
@@ -2143,7 +2143,7 @@ selectExchange <- function(data, exch = "N") {
 #' and the function returns an \code{xts} or \code{data.table} object.
 #' 
 #' The following cleaning functions are performed sequentially:
-#' \code{\link{noZeroPrices}}, \code{\link{selectExchange}}, \code{\link{tradesCondition}},
+#' \code{\link{noZeroPrices}}, \code{\link{autoSelectExchangeTrades}} or \code{\link{selectExchange}}, \code{\link{tradesCondition}}, and
 #' \code{\link{mergeTradesSameTimestamp}}.
 #' 
 #' Since the function \code{\link{rmTradeOutliersUsingQuotes}}
