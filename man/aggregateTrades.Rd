@@ -2,7 +2,7 @@
 % Please edit documentation in R/data_handling.R
 \name{aggregateTrades}
 \alias{aggregateTrades}
-\title{Aggregate a data.table or xts object containing trades data}
+\title{Aggregate a \code{data.table} or \code{xts} object containing trades data´}
 \usage{
 aggregateTrades(
   tData,
@@ -14,13 +14,13 @@ aggregateTrades(
 )
 }
 \arguments{
-\item{tData}{data.table or xts object to be aggregated, containing the intraday price series of a stock for possibly multiple days.}
+\item{tData}{\code{data.table} or \code{xts} object to be aggregated, containing the intraday price series of a stock for possibly multiple days.}
 
 \item{alignBy}{character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".
-To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".}
+To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.}
 
-\item{alignPeriod}{positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate an
-To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".}
+\item{alignPeriod}{positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
+based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.}
 
 \item{marketOpen}{the market opening time, by default: \code{marketOpen = "09:30:00"}.}
 
@@ -30,11 +30,11 @@ To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \cod
 In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}}
 }
 \value{
-A data.table or xts object containing the aggregated time series.
+A \code{data.table} or \code{xts} object containing the aggregated time series.
 }
 \description{
-Function returns new time series as a data.table or xts object where first observation is always the opening price
-and subsequent observations are the closing prices over the interval. This function accepts arbitrary number of symbols over an aribtrary number of days.
+Aggregate tick-by-tick trade data and return a time series as a \code{data.table} or \code{xts} object where first observation is always the opening price
+and subsequent observations are the closing prices over the interval. This function accepts arbitrary number of symbols over an arbitrary number of days.
 }
 \details{
 The timestamps of the new time series are the closing times and/or days of the intervals. 

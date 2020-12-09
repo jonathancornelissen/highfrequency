@@ -7,7 +7,7 @@
 matchTradesQuotes(
   tData,
   qData,
-  lagQuotes = 2,
+  lagQuotes = 0,
   BFM = FALSE,
   backwardsWindow = 3600,
   forwardsWindow = 0.5,
@@ -16,31 +16,32 @@ matchTradesQuotes(
 )
 }
 \arguments{
-\item{tData}{data.table or xts-object containing the trade data (multiple days possible).}
+\item{tData}{\code{data.table} or xts-object containing the trade data possibly with multiple symbols and over multiple days possible}
 
-\item{qData}{data.table or xts-object containing the quote data (multiple days possible).}
+\item{qData}{\code{data.table} or xts-object containing the quote data possibly with multiple symbols and over multiple days possible}
 
 \item{lagQuotes}{numeric, number of seconds the quotes are registered faster than
-the trades (should be round and positive). Based on the research of
-Vergote (2005), we set 2 seconds as the default.}
+the trades (should be round and positive). Default is 0. For older datasets, i.e. before 2010, it may be a good idea to set this to e.g. 2. See Vergote (2005)}
 
 \item{BFM}{a logical determining whether to conduct 'Backwards - Forwards matching' of trades and quotes.
 The algorithm tries to match trades that fall outside the bid - ask and first tries to match a small window forwards and if this fails, it tries to match backwards in a bigger window.
 The small window is a tolerance for inaccuracies in the timestamps of bids and asks. The backwards window allow for matching of late reported trades. I.e. block trades.}
 
-\item{backwardsWindow}{a numeric denoting the length of the backwards window. Default is 3600, corresponding to one hour.}
+\item{backwardsWindow}{a numeric denoting the length of the backwards window used when \code{BFM = TRUE}. Default is 3600, corresponding to one hour.}
 
-\item{forwardsWindow}{a numeric denoting the length of the forwards window. Default is 0.5, dorresponding to one half second.}
+\item{forwardsWindow}{a numeric denoting the length of the forwards window used when \code{BFM = TRUE}. Default is 0.5, dorresponding to one half second.}
 
 \item{plot}{a logical denoting whether to visualize the forwards, backwards, and unmatched trades in a plot.}
 
-\item{...}{used internally}
+\item{...}{used internally. Don't set this parameter}
 }
 \value{
-data.table or xts-object containing the matched trade and quote data
+Depending on the input data type, we return either a \code{data.table} or an \code{xts} object containing the matched trade and quote data.
+When using the BFM algorithm, a report of the matched and unmatched trades are also returned. (This is omitted when we call this function from the \code{\link{tradesCleanupUsingQuotes}} function)
 }
 \description{
-Function matches the trades and quotes and returns an xts-object containing both.
+Match the trades and quotes of the input data. All trades are retained and the latest bids and offers are retained,
+ while 'old' quotes are discarded.
 }
 \examples{
 # multi-day input allowed

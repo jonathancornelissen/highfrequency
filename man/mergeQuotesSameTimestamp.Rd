@@ -7,10 +7,10 @@
 mergeQuotesSameTimestamp(qData, selection = "median")
 }
 \arguments{
-\item{qData}{an xts object or data.table containing the time series data, with 
-at least two columns named "BID" and "OFR" indicating the bid and ask price 
-and two columns "BIDSIZ", "OFRSIZ" indicating the number of round lots available at these 
-prices. For data.table an additional column "DT" is necessary that stores the date/time information.}
+\item{qData}{an \code{xts} object or \code{data.table} containing the time series data, with 
+at least two columns named \code{BID} and \code{OFR} indicating the bid and ask price 
+as well as two columns \code{BIDSIZ}, \code{OFRSIZ} indicating the number of round lots available at these 
+prices. For \code{data.table} an additional column \code{DT} is necessary that stores the date/time information.}
 
 \item{selection}{indicates how the bid and ask price for a certain time stamp
 should be calculated in case of multiple observation for a certain time
@@ -23,11 +23,11 @@ weighted by "BIDSIZ" ("OFRSIZ").
 }}
 }
 \value{
-xts or data.table object depending on input
+Depending on the input data type, we return either a \code{data.table} or an \code{xts} object containing the quote data which has been cleaned.
 }
 \description{
-Function replaces multiple quote entries that have the same time stamp 
-by a single one and returns an xts object with unique time stamps only.
+Merge quote entries that have the same time stamp to a single one and returns an \code{xts} or a \code{data.table} object
+ with unique time stamps only.
 }
 \author{
 Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup

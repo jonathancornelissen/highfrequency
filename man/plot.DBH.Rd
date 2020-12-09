@@ -17,7 +17,7 @@ Plotting method for \code{DBH} objects
 \details{
 The plotting method has the following optional parameters:
 \itemize{
-\item{\code{pData}}{ A data.table or an xts object, containing the prices and timestamps of the data used to calculate the test statistic.
+\item{\code{pData}}{ A \code{data.table} or an \code{xts} object, containing the prices and timestamps of the data used to calculate the test statistic.
 If specified, and \code{which = "tStat"}, the price will be shown on the right y-axis along with the test statistic}
 \item{\code{which}}{ A string denoting which of four plots to make. \code{"tStat"} denotes plotting the test statistic. \code{"sigma"} denotes plotting the
 estimated volatility process. \code{"mu"} denotes plotting the estimated drift process. If \code{which = c("sigma", "mu")} or \code{which = c("mu", "sigma")},

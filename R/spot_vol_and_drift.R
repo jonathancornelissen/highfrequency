@@ -12,9 +12,9 @@
 #' @param alignPeriod How often should the estimation take place? If \code{alignPeriod} is 5 the estimation will be done every fifth unit of \code{alignBy}.
 #' @param marketOpen Opening time of the market, standard is "09:30:00"
 #' @param marketClose Closing time of the market, standard is "16:00:00"
-#' @param tz Time zone, standard is "GMT"
-#'
-#' @return An object of class "spotDrift" containing at least the estimated spot drift process. Input on what this class should contain and methods for it is welcome.
+#' @param tz fallback time zone used in case we we are unable to identify the timezone of the data, by default: \code{tz = NULL}. We attempt to extract the timezone from the DT column (or index) of the data, which may fail. 
+#' In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}
+#' @return An object of class \code{"spotDrift"} containing at least the estimated spot drift process. Input on what this class should contain and methods for it is welcome.
 #'
 #' @details The additional arguments for the mean and median methods are: \code{periods} for the rolling window length which is 5 by standard and
 #' \code{align} to allow for control of the alignment, should one wish to do so, the standard is \code{"right"}. 
@@ -44,13 +44,12 @@
 #' @importFrom stats filter time
 #' @importFrom utils tail
 #' @importFrom xts xtsible merge.xts
-#' @importFrom data.table rbindlist
-#' @importFrom data.table setkeyv
+#' @importFrom data.table setkeyv rbindlist
 #' @export
 spotDrift <- function(data, method = "driftMean", ..., alignBy = "minutes", alignPeriod = 5,
-                     marketOpen = "09:30:00", marketClose = "16:00:00", tz = "GMT") {
+                     marketOpen = "09:30:00", marketClose = "16:00:00", tz = NULL) {
 
-  PRICE = DATE = RETURN = DT = NULL
+  PRICE <- DATE <- RETURN <- NULL
 
   if (!("PRICE" %in% colnames(data))) {
     if (dim(data)[2] == 1) {
@@ -74,9 +73,8 @@ spotDrift <- function(data, method = "driftMean", ..., alignBy = "minutes", alig
       stop("Data.table needs DT column containing the time-stamps of the trades.") # added the timestamp comment for verbosity.
     }
   }
-  datad <- aggregatePrice(data, alignBy = alignBy, alignPeriod = alignPeriod , marketOpen = marketOpen,
-                          marketClose = marketClose, tz = tz, fill = TRUE)
-  datad[, DATE := as.Date(DT)]
+  datad <- aggregatePrice(data[, DATE := ""], alignBy = alignBy, alignPeriod = alignPeriod , marketOpen = marketOpen,
+                          marketClose = marketClose, tz = tz, fill = TRUE) # The allocation of date let's aggregatePrice return the date so we don't have to calculate it multiple times.
   setkeyv(datad, "DT")
   datad <- datad[, RETURN := log(PRICE) - shift(log(PRICE), type = "lag"), by = "DATE"][!is.na(RETURN)]
   datad <- split(datad, by = "DATE")
@@ -118,8 +116,8 @@ spotDrift <- function(data, method = "driftMean", ..., alignBy = "minutes", alig
 #' specified by \code{tz}. By default, \code{marketOpen = "09:30:00"}.
 #' @param marketClose the market closing time. This should be in the time zone
 #' specified by \code{tz}. By default, \code{marketClose = "16:00:00"}.
-#' @param tz string specifying the time zone to which the times in \code{data}
-#' and/or \code{marketOpen}/ \code{marketClose} belong. Default = \code{"GMT"}.
+#' @param tz fallback time zone used in case we we are unable to identify the timezone of the data, by default: \code{tz = NULL}. We attempt to extract the timezone from the DT column (or index) of the data, which may fail. 
+#' In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}
 #' @param ... method-specific parameters (see 'Details').
 #'
 #' @return A \code{spotVol} object, which is a list containing one or more of the
@@ -487,9 +485,9 @@ spotVol <- function(data, method = "detPer", ..., alignBy = "minutes", alignPeri
   }
   
   if( method != "PARM"){
-    datad <- aggregatePrice(data, alignBy = alignBy, alignPeriod = alignPeriod , marketOpen = marketOpen,
-                            marketClose = marketClose, tz = tz, fill = TRUE)
-    datad[, DATE := as.Date(DT, tz = tzone(datad$DT))]
+    
+    datad <- aggregatePrice(data[, DATE := ""], alignBy = alignBy, alignPeriod = alignPeriod , marketOpen = marketOpen,
+                            marketClose = marketClose, tz = tz, fill = TRUE) # The allocation of date let's aggregatePrice return the date so we don't have to calculate it multiple times.
     setkeyv(datad, "DT")
     datad <- datad[, RETURN := log(PRICE) - shift(log(PRICE), type = "lag"), by = "DATE"][!is.na(RETURN)]
     rData <- xts(datad$RETURN, order.by = datad$DT)

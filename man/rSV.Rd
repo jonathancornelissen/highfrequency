@@ -7,21 +7,23 @@
 rSV(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, ...)
 }
 \arguments{
-\item{rData}{an xts or data.table object containing returns or prices, possibly for multiple assets over multiple days}
+\item{rData}{an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days}
 
-\item{alignBy}{a string, align the tick data to "seconds"|"minutes"|"hours".}
+\item{alignBy}{character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
+To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.}
 
-\item{alignPeriod}{an integer, align the tick data to this many [seconds|minutes|hours].}
+\item{alignPeriod}{positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
+based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.}
 
-\item{makeReturns}{boolean, should be TRUE when rData contains prices instead of returns. FALSE by   default.}
+\item{makeReturns}{boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.}
 
 \item{...}{used internally, any input is ignored.}
 }
 \value{
-list with to arguments. The realized positive and negative semivariance.
+list with two entries, the realized positive and negative semivariances
 }
 \description{
-Function returns realized semivariances, defined in Barndorff-Nielsen et al. (2008).
+Calculate the realized semivariances, defined in Barndorff-Nielsen et al. (2008).
 
 Function returns two outcomes: 1.Downside realized semivariance and 2.Upside realized semivariance.
 

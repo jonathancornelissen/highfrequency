@@ -4,7 +4,7 @@
 #' 
 #' @param symbols character vector with the symbols to import.
 #' @param interval the sampling interval of the data retrieved. Should be one of one of "1min", "5min", "15min", "30min", or "60min"
-#' @param outputType string either "xts" or "DT" to denote the type of output wanted. "xts" will yield an xts object, "DT" will yield a data.table object.
+#' @param outputType string either \code{"xts"} or \code{"DT"} to denote the type of output wanted. \code{"xts"} will yield an xts object, \code{"DT"} will yield a data.table object.
 #' @param apiKey string with the api key provided by Alpha Vantage. 
 #' @param doSleep logical when the length of symbols > 5 the function will sleep for 12 seconds by default. 
 #' 
@@ -12,8 +12,8 @@
 #' The function does not try to extract when the last API call was made which means that if
 #' you made successive calls to get 3 symbols in rapid succession, the function may not retrieve all the data.
 #' 
-#' @return An object of type xts or data.table in case the length of symbols is 1. If the length of symbols > 1 the xts and 
-#' data.table objects will be put into a list.
+#' @return An object of type \code{xts} or \code{data.table} in case the length of symbols is 1. If the length of symbols > 1 the \code{xts} and 
+#' \code{data.table} objects will be put into a list.
 #' 
 #' @author Emil Sjoerup (wrapper only) Paul Teetor (for quantMod's getSymbols.av)
 #' 

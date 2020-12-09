@@ -13,22 +13,25 @@ rSemiCov(
 )
 }
 \arguments{
-\item{rData}{an xts or data.table object containing returns or prices, possibly for multiple assets over multiple days}
+\item{rData}{an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days}
 
-\item{cor}{logical, in case it is TRUE, the correlation is returned. FALSE by default.}
+\item{cor}{boolean, in case it is \code{TRUE}, and the input data is multivariate, the correlation is returned instead of the covariance matrix. \code{FALSE} by default.}
 
-\item{alignBy}{a string, align the tick data to "seconds"|"minutes"|"hours".}
+\item{alignBy}{character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
+To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.}
 
-\item{alignPeriod}{an integer, align the tick data to this many [seconds|minutes|hours].}
+\item{alignPeriod}{positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
+based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.}
 
-\item{makeReturns}{logical, should be TRUE when rData contains prices instead of returns. FALSE by default.}
+\item{makeReturns}{boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.}
 }
 \value{
-In case the data consists of one day a list of four \eqn{N x N} matrices are returned. These matrices are the mixed, positive, negative and concordant
+In case the data consists of one day a list of five \eqn{N x N} matrices are returned. These matrices are named \code{mixed}, \code{positive}, \code{negative}, \code{concordant}, and \code{rCov}.
+The latter matrix corresponds to the realized covariance estimator and is thus named like the function \code{\link{rCov}}.
 In case the data spans more than one day, the list for each day will be put into another list named according to the date of the estimates.
 }
 \description{
-Function returns the Realized Semicovariances (rSemiCov).
+Calculate the Realized Semicovariances (rSemiCov).
 Let \eqn{r_{t,i}} be an intraday \eqn{M x N} return matrix and \eqn{i=1,...,M}
 the number of intraday returns. Then, let p = max(r_{t,i},0) and n = min(r_{t,i}).
 
@@ -61,6 +64,7 @@ rSV = rSemiCov(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes",
                    alignPeriod = 5, makeReturns = TRUE)
 rSV
 \dontrun{
+library("xts")
 # Multivariate multi day:
 rSC <- rSemiCov(sampleOneMinuteData, makeReturns = TRUE) # rSC is a list of lists
 # We extract the covariance between stock 1 and stock 2 for all three covariances.
@@ -75,8 +79,6 @@ addLegend(lty = 1) # Add legend so we can distinguish the series.
 }
 }
 \author{
-Emil Sjoerup
-
 Emil Sjoerup
 }
 \keyword{volatility}

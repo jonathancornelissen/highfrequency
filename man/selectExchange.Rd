@@ -7,7 +7,7 @@
 selectExchange(data, exch = "N")
 }
 \arguments{
-\item{data}{an xts or data.table object containing the time series data. 
+\item{data}{an \code{xts} or \code{data.table} object containing the time series data. 
 The object should have a column "EX", indicating the exchange by its symbol.}
 
 \item{exch}{The (vector of) symbol(s) of the stock exchange(s) that should be selected.
@@ -28,10 +28,10 @@ By default the NYSE is chosen (exch = "N"). Other exchange symbols are:
 }}
 }
 \value{
-xts or data.table object depending on input
+\code{xts} or \code{data.table} object depending on input
 }
 \description{
-Function returns an xts object containing the data of only 1 stock exchange.
+Filter raw trade data to only contain specified exchanges
 }
 \author{
 Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup

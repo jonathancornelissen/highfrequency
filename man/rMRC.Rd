@@ -7,17 +7,17 @@
 rMRC(pData, pairwise = FALSE, makePsd = FALSE)
 }
 \arguments{
-\item{pData}{a list. Each list-item contains an xts object with the intraday price data of a stock.}
+\item{pData}{a list. Each list-item contains an \code{xts} object with the intraday price data of a stock.}
 
 \item{pairwise}{boolean, should be TRUE when refresh times are based on pairs of assets. FALSE by default.}
 
-\item{makePsd}{boolean, in case it is TRUE, the positive definite version of rMRC is returned. FALSE by default.}
+\item{makePsd}{boolean, in case it is \code{TRUE}, the positive definite version of rMRC is returned. \code{FALSE} by default.}
 }
 \value{
-an \eqn{d x d} matrix
+A \eqn{d x d} covariance matrix
 }
 \description{
-Function returns univariate or multivariate preaveraged estimator, as defined in Hautsch and Podolskij (2013).
+Calculate univariate or multivariate preaveraged estimator, as defined in Hautsch and Podolskij (2013).
 }
 \details{
 In practice, market microstructure noise leads to a departure from the pure semimartingale model. We consider the process \eqn{Y} in period \eqn{\tau}: 

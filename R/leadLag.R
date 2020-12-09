@@ -1,9 +1,9 @@
 #' Lead-Lag estimation
 #' @description Function that estimates whether one series leads (or lags) another.
 #' 
-#' @param price1 xts or data.table containing prices in levels, in case of data.table,
+#' @param price1 \code{xts} or \code{data.table} containing prices in levels, in case of data.table,
 #'  use a column DT to denote the date-time in POSIXct format, and a column PRICE to denote the price
-#' @param price2 xts or data.table containing prices in levels, in case of data.table,
+#' @param price2 \code{xts} or \code{data.table} containing prices in levels, in case of data.table,
 #'  use a column DT to denote the date-time in POSIXct format, and a column PRICE to denote the price
 #' @param lags a numeric denoting which lags (in units of \code{resolution}) should be tested as leading or lagging
 #' @param resolution the resolution at which the lags is measured. 

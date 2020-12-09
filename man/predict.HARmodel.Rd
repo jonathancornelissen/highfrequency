@@ -4,19 +4,23 @@
 \alias{predict.HARmodel}
 \title{Predict method for objects of type \code{HARmodel}}
 \usage{
-\method{predict}{HARmodel}(object, newdata = NULL, warnings = TRUE, backtransform = FALSE, ...)
+\method{predict}{HARmodel}(object, ...)
 }
 \arguments{
 \item{object}{an object of class \code{HARmodel}}
 
-\item{newdata}{new data to use for forecasting}
-
-\item{warnings}{logical denoting whether to display warnings}
-
-\item{backtransfrom}{if the model is estimated with transformation this parameter can be set to transform the prediction back into variance
-The possible values are \code{"simple"} which means inverse of transformation, i.e. \code{exp} when log-transformation is applied. If using log transformation,
-the option \code{"parametric"} can also be used to transform back. The parametric method adds a correction}
+\item{...}{extra arguments. See details}
 }
 \description{
 Predict method for objects of type \code{HARmodel}
+}
+\details{
+#' The print method has the following optional parameters:
+\itemize{
+\item{\code{newdata}}{ new data to use for forecasting}
+\item{\code{warnings}}{ A logical denoting whether to display warnings, detault is \code{TRUE}}
+\item{\code{backtransform}}{ A string. If the model is estimated with transformation this parameter can be set to transform the prediction back into variance
+The possible values are \code{"simple"} which means inverse of transformation, i.e. \code{exp} when log-transformation is applied. If using log transformation,
+the option \code{"parametric"} can also be used to transform back. The parametric method adds a correction that stems from using the log-transformation }
+}
 }

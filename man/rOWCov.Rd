@@ -17,18 +17,20 @@ rOWCov(
 )
 }
 \arguments{
-\item{rData}{a \eqn{(M x N)} matrix/zoo/xts object containing the \eqn{N}
+\item{rData}{a \eqn{(M x N)} \code{xts} object containing the \eqn{N}
 return series over period \eqn{t}, with \eqn{M} observations during \eqn{t}.}
 
-\item{cor}{boolean, in case it is TRUE, the correlation is returned. FALSE by default.}
+\item{cor}{boolean, in case it is \code{TRUE}, and the input data is multivariate, the correlation is returned instead of the covariance matrix. \code{FALSE} by default.}
 
-\item{alignBy}{a string, align the tick data to "seconds"|"minutes"|"hours".}
+\item{alignBy}{character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
+To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.}
 
-\item{alignPeriod}{an integer, align the tick data to this many [seconds|minutes|hours].}
+\item{alignPeriod}{positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
+based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.}
 
-\item{makeReturns}{boolean, should be TRUE when rData contains prices instead of returns. FALSE by default.}
+\item{makeReturns}{boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.}
 
-\item{seasadjR}{a \eqn{(M x N)} matrix/zoo/xts object containing 
+\item{seasadjR}{a \eqn{(M x N)} \code{xts} object containing 
 the seasonaly adjusted returns. This is an optional argument.}
 
 \item{wFunction}{determines whether 
@@ -41,9 +43,9 @@ By default a zero-one weight function (wFunction = "HR") is used.}
 the subsets over which the determinant is minimized. 
 Allowed values are between 0.5 and 1 and 
 the default is 0.75. See Boudt et al. (2008) or the \code{covMcd} function in the
-robustbase package.}
+\pkg{\link[robustbase:covMcd]{robustbase}} package.}
 
-\item{alpha}{is a parameter between 0 en 0.5, 
+\item{alpha}{is a parameter between 0 and 0.5, 
 that determines the rejection threshold value 
 (see Boudt et al. (2008) for details).}
 }
@@ -51,7 +53,7 @@ that determines the rejection threshold value
 an \eqn{N x N} matrix
 }
 \description{
-Function returns the Realized Outlyingness Weighted Covariance, defined in Boudt et al. (2008).
+Calculate the Realized Outlyingness Weighted Covariance, defined in Boudt et al. (2008).
 
 Let \eqn{r_{t,i}}, for \eqn{i=1,...,M} be a sample
 of \eqn{M} high-frequency \eqn{(N x 1)} return vectors and \eqn{d_{t,i}}
@@ -71,7 +73,7 @@ under the Brownian Semimartingale with Finite Activity Jumps model.
 \details{
 Advantages of the rOWCov compared to the \code{\link{rBPCov}} include a higher statistical efficiency, positive semidefiniteness and affine equivariance.
 However, the rOWCov suffers from a curse of dimensionality.
-Indeed, the rOWCov gives a zero weight to a return vector
+The rOWCov gives a zero weight to a return vector
 if at least one of the components is affected by a jump.
 In the case of independent jump occurrences, the average proportion of observations
 with at least one component being affected by jumps increases fast with the dimension

@@ -11,7 +11,7 @@ data.table object
 sampleQData
 }
 \description{
-A data.table object containing the quotes for the imaginary stock XXX for 2 days. This is the cleaned version of the data sample \code{\link{sampleQDataRaw}}, using \code{quotesCleanup}.
+A \code{data.table} object containing the quotes for the imaginary stock XXX for 2 days. This is the cleaned version of the data sample \code{\link{sampleQDataRaw}}, using \code{quotesCleanup}.
 }
 \examples{
 \dontrun{

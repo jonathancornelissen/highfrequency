@@ -7,21 +7,23 @@
 rTPQuar(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE)
 }
 \arguments{
-\item{rData}{an xts or data.table object containing returns or prices, possibly for multiple assets over multiple days}
+\item{rData}{an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days}
 
-\item{alignBy}{a string, align the tick data to "seconds"|"minutes"|"hours".}
+\item{alignBy}{character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
+To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.}
 
-\item{alignPeriod}{an integer, align the tick data to this many [seconds|minutes|hours].}
+\item{alignPeriod}{positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
+based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.}
 
-\item{makeReturns}{boolean, should be TRUE when rData contains prices instead of returns. FALSE by   default.}
+\item{makeReturns}{boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.}
 }
 \value{
-In case the input is an xts object with data from one day, a numeric of same length as the number of assets. 
-If the input data spans multiple days and is in xts format, an xts will be returned. 
-If the input data is a data.table object, the function returns a data.table with the same column names as the input data, containing the date and the realized measures
+In case the input is an \code{xts} object with data from one day, a numeric of same length as the number of assets. 
+If the input data spans multiple days and is in \code{xts} format, an \code{xts} will be returned. 
+If the input data is a \code{data.table} object, the function returns a \code{data.table} with the same column names as the input data, containing the date and the realized measures
 }
 \description{
-Function returns the rTPQuar, defined in Andersen et al. (2012).
+Calculate the rTPQuar, defined in Andersen et al. (2012).
  
  Assume there is \eqn{N} equispaced returns in period \eqn{t}. Let \eqn{r_{t,i}} be a return (with \eqn{i=1, \ldots,N}) in period \eqn{t}.
  

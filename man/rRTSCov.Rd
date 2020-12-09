@@ -20,10 +20,10 @@ rRTSCov(
 )
 }
 \arguments{
-\item{pData}{a list. Each list-item i contains an xts object with the intraday price data 
+\item{pData}{a list. Each list-item i contains an \code{xts} object with the intraday price data 
 of stock i for day t.}
 
-\item{cor}{boolean, in case it is TRUE, the correlation is returned. FALSE by default.}
+\item{cor}{boolean, in case it is \code{TRUE}, and the input data is multivariate, the correlation is returned instead of the covariance matrix. \code{FALSE} by default.}
 
 \item{startIV}{vector containing the first step estimates of the integrated variance of the assets, needed in the truncation. Is NULL by default.}
 
@@ -43,13 +43,13 @@ of stock i for day t.}
 
 \item{eta}{positive real number, squared standardized high-frequency returns that exceed eta are detected as jumps.}
 
-\item{makePsd}{boolean, in case it is TRUE, the positive definite version of rRTSCov is returned. FALSE by default.}
+\item{makePsd}{boolean, in case it is \code{TRUE}, the positive definite version of rRTSCov is returned. \code{FALSE} by default.}
 }
 \value{
 an \eqn{N x N} matrix
 }
 \description{
-Function returns the robust two time scale covariance matrix proposed in Boudt and Zhang (2010). 
+Calculate the robust two time scale covariance matrix proposed in Boudt and Zhang (2010). 
 Unlike the \code{\link{rOWCov}}, but similarly to the \code{\link{rThresholdCov}}, the rRTSCov uses  univariate jump detection rules 
 to truncate the effect of jumps on the covariance 
 estimate. By the use of two time scales, this covariance estimate 

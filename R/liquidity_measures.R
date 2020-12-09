@@ -1,17 +1,17 @@
 #' @title Compute Liquidity Measure
 #' 
-#' Function returns an xts or data.table object containing 23 liquidity measures. Please see details below.
+#' Function returns an \code{xts} or \code{data.table} object containing 23 liquidity measures. Please see details below.
 #'
 #' Note that this assumes a regular time grid. 
 #'
-#' @param tqData A \code{data.table} or xts object as in the \pkg{highfrequency} merged
+#' @param tqData A \code{data.table} or \code{xts} object as in the \pkg{highfrequency} merged
 #' trades and quotes data (that is included).
 #' @param win A windows length for the forward-prices used for \sQuote{realized}
 #' spread
 #' @param type Deprecated. Setting this parameter does nothing, except produce a warning not to do so.
 #' @return A modified (enlarged) \code{xts} or \code{data.table} with the new measures.
 #' 
-#' @details NOTE: xts or data.table should only contain one day of observations
+#' @details NOTE: \code{xts} or \code{data.table} should only contain one day of observations
 #' 
 #' The respective liquidity measures are defined as follows:
 #'   \itemize{
@@ -313,7 +313,7 @@ getLiquidityMeasures <- function(tqData, win = 300, type = NULL) {
 #' @description Function returns a vector with the inferred trade direction which is 
 #' determined using the Lee and Ready algorithm (Lee and Ready, 1991). 
 #' 
-#' @param tqData data.table or xts object, containing joined trades and quotes (e.g. using \code{\link{matchTradesQuotes}})
+#' @param tqData \code{data.table} or \code{xts} object, containing joined trades and quotes (e.g. using \code{\link{matchTradesQuotes}})
 #' 
 #' @details NOTE: By convention the first observation is always marked as a buy.
 #' 

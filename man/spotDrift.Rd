@@ -12,7 +12,7 @@ spotDrift(
   alignPeriod = 5,
   marketOpen = "09:30:00",
   marketClose = "16:00:00",
-  tz = "GMT"
+  tz = NULL
 )
 }
 \arguments{
@@ -34,10 +34,11 @@ Standard is minutes}
 
 \item{marketClose}{Closing time of the market, standard is "16:00:00"}
 
-\item{tz}{Time zone, standard is "GMT"}
+\item{tz}{fallback time zone used in case we we are unable to identify the timezone of the data, by default: \code{tz = NULL}. We attempt to extract the timezone from the DT column (or index) of the data, which may fail. 
+In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}}
 }
 \value{
-An object of class "spotDrift" containing at least the estimated spot drift process. Input on what this class should contain and methods for it is welcome.
+An object of class \code{"spotDrift"} containing at least the estimated spot drift process. Input on what this class should contain and methods for it is welcome.
 }
 \description{
 Function used to estimate the spot drift of intraday (tick) stock prices/returns

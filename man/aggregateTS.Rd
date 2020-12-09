@@ -15,7 +15,7 @@ aggregateTS(
 )
 }
 \arguments{
-\item{ts}{xts object to aggregate.}
+\item{ts}{\code{xts} object to aggregate.}
 
 \item{FUN}{function to apply over each interval. By default, previous tick aggregation is done. 
 Alternatively one can set e.g. FUN = "mean".
@@ -23,24 +23,24 @@ In case weights are supplied, this argument is ignored and a weighted average is
 
 \item{alignBy}{character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: "secs", "seconds", "mins", "minutes", "hours", "days", "weeks", "ticks".}
 
-\item{alignPeriod}{positive integer, indicating the number of periods to aggregate over. For example, to aggregate an 
-xts object to the five-minute frequency set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.}
+\item{alignPeriod}{positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
+based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.}
 
 \item{weights}{By default, no weighting scheme is used. 
-When you assign an xts object with weights to this argument, a weighted mean is taken over each interval. 
+When you assign an \code{xts} object with weights to this argument, a weighted mean is taken over each interval. 
 Of course, the weights should have the same timestamps as the supplied time series.}
 
 \item{dropna}{boolean, which determines whether empty intervals should be dropped.
 By default, an NA is returned in case an interval is empty, except when the user opts
-for previous tick aggregation, by setting FUN = "previoustick" (default).}
+for previous tick aggregation, by setting \code{FUN = "previoustick"} (default).}
 
 \item{tz}{character denoting which timezone the output should be in. Defaults to NULL}
 }
 \value{
-An xts object containing the aggregated time series.
+An \code{xts} object containing the aggregated time series.
 }
 \description{
-Function returns aggregated time series as xts object. 
+Aggregate a time series as \code{xts} object. 
 It can handle irregularly spaced timeseries and returns a regularly spaced one.
 Use univariate timeseries as input for this function, and check out \code{\link{aggregateTrades}}
 and \code{\link{aggregateQuotes}} to aggregate Trade or Quote data objects.
@@ -50,7 +50,7 @@ The timestamps of the new time series are the closing times and/or days of the i
 E.g. for a weekly aggregation the new timestamp is the last day in that particular week (namely sunday).
 
 In case of previous tick aggregation, 
-for alignBy = "seconds"/"minutes"/"hours",
+for \code{alignBy} is either \code{"seconds"} \code{"minutes"}, or \code{"hours"},
 the element of the returned series with e.g. timestamp 09:35:00 contains 
 the last observation up to that point, including the value at 09:35:00 itself.
 

@@ -18,7 +18,7 @@ intradayJumpTest(
 )
 }
 \arguments{
-\item{pData}{xts or data.table of the price data in levels. This data can (and should in some cases) be tick-level data. The data can span more than one day.}
+\item{pData}{\code{xts}or data.table of the price data in levels. This data can (and should in some cases) be tick-level data. The data can span more than one day.}
 
 \item{volEstimator}{character denoting which volatility estimator to use for the tests. See \link{spotVol}. Default = \code{"RM"} denoting realized measures.}
 
@@ -31,8 +31,8 @@ intradayJumpTest(
 \item{alignBy}{string indicating the time scale in which \code{alignPeriod} is expressed.
 Possible values are: \code{"secs", "seconds", "mins", "minutes", "hours"}.}
 
-\item{alignPeriod}{positive integer, indicating the number of periods to aggregate
-over. E.g. to aggregate an \code{xts} object to the 5 minute frequency, set
+\item{alignPeriod}{positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
+based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
 \code{alignPeriod = 5} and \code{alignBy = "minutes"}.}
 
 \item{marketOpen}{the market opening time. This should be in the time zone

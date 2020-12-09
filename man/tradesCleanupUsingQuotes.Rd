@@ -13,7 +13,8 @@ tradesCleanupUsingQuotes(
   lagQuotes = 2,
   BFM = FALSE,
   backwardsWindow = 3600,
-  forwardsWindow = 0.5
+  forwardsWindow = 0.5,
+  plot = FALSE
 )
 }
 \arguments{
@@ -23,24 +24,27 @@ tradesCleanupUsingQuotes(
 
 \item{dataDestination}{character indicating the folder in which the cleaned data is stored, folder of dataSource by default.}
 
-\item{tData}{data.table or xts object containing (ONE day and for ONE stock only) trade data cleaned by \code{\link{tradesCleanup}}. This argument is NULL by default. Enabling it, means the arguments
+\item{tData}{\code{data.table} or \code{xts} object containing trade data cleaned by \code{\link{tradesCleanup}}. This argument is NULL by default. Enabling it, means the arguments
 from, to, dataSource and dataDestination will be ignored. (only advisable for small chunks of data)}
 
-\item{qData}{data.table or xts object containing (ONE day and for ONE stock only) cleaned quote data. This argument is NULL by default. Enabling it means the arguments
+\item{qData}{\code{data.table} or \code{xts} object containing cleaned quote data. This argument is NULL by default. Enabling it means the arguments
 from, to, dataSource, dataDestination will be ignored. (only advisable for small chunks of data)}
 
-\item{lagQuotes}{passed through to \code{\link{rmTradeOutliersUsingQuotes}}. A numeric of length 1 that denotes how many seconds to lag the quotes. Default is 2 seconds. See Details.}
+\item{lagQuotes}{numeric, number of seconds the quotes are registered faster than
+the trades (should be round and positive). Default is 0. For older datasets, i.e. before 2010, it may be a good idea to set this to e.g. 2. See Vergote (2005)}
 
-\item{BFM}{passed through to \code{\link{rmTradeOutliersUsingQuotes}}. A logical determining whether to conduct 'Backwards - Forwards matching' of trades and quotes.
+\item{BFM}{a logical determining whether to conduct 'Backwards - Forwards matching' of trades and quotes.
 The algorithm tries to match trades that fall outside the bid - ask and first tries to match a small window forwards and if this fails, it tries to match backwards in a bigger window.
 The small window is a tolerance for inaccuracies in the timestamps of bids and asks. The backwards window allow for matching of late reported trades. I.e. block trades.}
 
-\item{backwardsWindow}{passed through to \code{\link{rmTradeOutliersUsingQuotes}}. A numeric denoting the length of the backwards window. Default is 3600, corresponding to one hour.}
+\item{backwardsWindow}{a numeric denoting the length of the backwards window used when \code{BFM = TRUE}. Default is 3600, corresponding to one hour.}
 
-\item{forwardsWindow}{passed through to \code{\link{rmTradeOutliersUsingQuotes}}. A numeric denoting the length of the forwards window. Default is 0.5, dorresponding to one half second.}
+\item{forwardsWindow}{a numeric denoting the length of the forwards window used when \code{BFM = TRUE}. Default is 0.5, corresponding to one half second.}
+
+\item{plot}{a logical denoting whether to visualize the forwards, backwards, and unmatched trades in a plot. Passed on to \code{\link{rmTradeOutliersUsingQuotes}}}
 }
 \value{
-For each day an xts object is saved into the folder of that date, containing the cleaned data.
+For each day an \code{xts} object is saved into the folder of that date, containing the cleaned data.
 }
 \description{
 Function performs cleaning procedure \code{\link{rmTradeOutliersUsingQuotes}} 
@@ -50,8 +54,8 @@ is trade and quote data cleaned by respectively e.g. \code{\link{tradesCleanup}}
 and \code{\link{quotesCleanup}}.
 }
 \details{
-In case you supply the arguments "tData" and "qData", the on-disk functionality is ignored
-and the function returns cleaned trades as a data.table or xts object (see examples).
+In case you supply the arguments \code{tData} and \code{qData}, the on-disk functionality is ignored
+and the function returns cleaned trades as a \code{data.table} or \code{xts} object (see examples).
 
 When using the on-disk functionality and tradeDataSource and quoteDataSource are the same, the quote files are all files in the folder that contains 'quote', and the rest are treated as containing trade data.
 }

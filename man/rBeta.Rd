@@ -13,15 +13,15 @@ rBeta(
 )
 }
 \arguments{
-\item{rData}{a zoo/xts object containing all returns in period t for one asset.}
+\item{rData}{a \code{xts} object containing all returns in period t for one asset.}
 
-\item{rIndex}{a zoo/xts object containing return in period t for an index.}
+\item{rIndex}{a \code{xts} object containing return in period t for an index.}
 
-\item{RCOVestimator}{can be chosen among realized covariance estimators: rCov, rAVGCov, rBPCov, rHYCov, rKernelCov, rOWCov, rRTSCov, rThresholdCov and rTSCov. rCov by default.}
+\item{RCOVestimator}{can be chosen among realized covariance estimators: \code{"rCov"}, \code{"rAVGCov"}, \code{"rBPCov"}, \code{"rHYCov"}, \code{"rKernelCov"}, \code{"rOWCov"}, \code{"rRTSCov"}, \code{"rThresholdCov"} and \code{"rTSCov"} \code{"rCov"} by default.}
 
-\item{RVestimator}{can be chosen among realized variance estimators: RV, rMinRV and rMedRV. RV by default. In case of missing RVestimator, RCOVestimator function applying for rIndex will be used.}
+\item{RVestimator}{can be chosen among realized variance estimators: \code{"RV"}, \code{"rMinRV"} and \code{"rMedRV"}. \code{"RV"} by default. In case of missing \code{RVestimator}, \code{RCOVestimator} function applying for \code{rIndex} will be used.}
 
-\item{makeReturns}{boolean, should be TRUE when rData contains prices instead of returns. FALSE by  default.}
+\item{makeReturns}{boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.}
 }
 \value{
 numeric

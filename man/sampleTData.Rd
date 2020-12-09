@@ -11,7 +11,7 @@ A data.table object.
 sampleTData
 }
 \description{
-A data.table object containing the trades for the imaginary stock XXX for 2 days, in the typical NYSE TAQ database format.
+A \code{data.table} object containing the trades for the imaginary stock XXX for 2 days, in the typical NYSE TAQ database format.
 This is the cleaned version of the data sample \code{\link{sampleTDataRaw}}, using \code{tradesCleanup}.
 }
 \examples{

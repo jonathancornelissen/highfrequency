@@ -7,10 +7,10 @@
 noZeroQuotes(qData)
 }
 \arguments{
-\item{qData}{an xts or data.table object at least containing the columns "BID" and "OFR".}
+\item{qData}{an \code{xts} or \code{data.table} object at least containing the columns \code{BID} and \code{OFR}.}
 }
 \value{
-xts object or data.table depending on type of input
+\code{xts} object or \code{data.table} depending on type of input
 }
 \description{
 Function deletes the observations where the bid or ask is zero.

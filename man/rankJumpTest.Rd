@@ -22,9 +22,9 @@ rankJumpTest(
 )
 }
 \arguments{
-\item{marketPrice}{data.table or xts containing the market prices in levels}
+\item{marketPrice}{data.table or \code{xts}containing the market prices in levels}
 
-\item{stockPrices}{list containing the individual stock prices in either data.table or xts format. The format should be the the same as \code{marketPrice}}
+\item{stockPrices}{list containing the individual stock prices in either data.table or \code{xts}format. The format should be the the same as \code{marketPrice}}
 
 \item{alpha}{signicance level (in standard deviations) to use for the jump detections. Default is \code{c(5,3)} for 5 and 3 in the market and stocks respectively.}
 
@@ -43,8 +43,8 @@ rankJumpTest(
 \item{alignBy}{string indicating the time scale in which \code{alignPeriod} is expressed.
 Possible values are: \code{"secs", "seconds", "mins", "minutes", "hours"}.}
 
-\item{alignPeriod}{positive integer, indicating the number of periods to aggregate
-over. E.g. to aggregate an \code{xts} object to the 5 minute frequency, set
+\item{alignPeriod}{positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
+based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
 \code{alignPeriod = 5} and \code{alignBy = "minutes"}.}
 
 \item{marketOpen}{the market opening time. This should be in the time zone
@@ -54,16 +54,18 @@ specified by \code{tz}. By default, \code{marketOpen = "09:30:00"}.}
 specified by \code{tz}. By default, \code{marketClose = "16:00:00"}.}
 
 \item{tz}{string specifying the time zone to which the times in \code{data}
-and/or \code{marketOpen}/ \code{marketClose} belong. Default = \code{"GMT"}.
-This parameter will also help determine the testing times as the test is done on non-overlapping pre-averaged returns.}
+and/or \code{marketOpen}/ \code{marketClose} belong. Default = \code{"GMT"}.}
 }
 \value{
-A list containing "criticalValues" which are the bootstrapped critcal values, "testStatistic" the test statistic of the jump test, "dimensions" which are the dimensions of the jump matrix
- "marketJumpDetections" the jumps detected in the market prices, "stockJumpDetections" the co-jumps detected in the individual stock prices, and "jumpIndices" which are the indices of the detected jumps.
+A list containing \code{criticalValues} which are the bootstrapped critcal values, \code{testStatistic} the test statistic of the jump test, \code{dimensions} which are the dimensions of the jump matrix
+ \code{marketJumpDetections} the jumps detected in the market prices, \code{stockJumpDetections} the co-jumps detected in the individual stock prices, and \code{jumpIndices} which are the indices of the detected jumps.
 }
 \description{
 Rank jump test
 }
+\references{
+Li et al. (2019). Rank Tests at Jump Events, Journal of Business & Economic Statistics, 37(2), 312- 321.
+}
 \author{
-Emil Sjoerup
+Emil Sjoerup, based on Matlab code by Li et al.
 }

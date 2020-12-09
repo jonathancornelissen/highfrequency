@@ -2,12 +2,12 @@
 % Please edit documentation in R/data_handling.R
 \name{rmLargeSpread}
 \alias{rmLargeSpread}
-\title{Delete entries for which the spread is more than "maxi" times the median spread}
+\title{Delete entries for which the spread is more than \code{maxi} times the median spread}
 \usage{
 rmLargeSpread(qData, maxi = 50, tz = NULL)
 }
 \arguments{
-\item{qData}{an xts or data.table object at least containing the columns "BID" and "OFR".}
+\item{qData}{an \code{xts} or \code{data.table} object at least containing the columns "BID" and "OFR".}
 
 \item{maxi}{an integer. By default maxi = "50", which means that entries are deleted 
 if the spread is more than 50 times the median spread on that day.}
@@ -17,7 +17,7 @@ In case of failure we use \code{tz} if specified, and if it is not specified, we
 In the on-disk functionality, if tz is not specified, the timezone used will be the system default.}
 }
 \value{
-xts or data.table object depending on input.
+\code{xts} or \code{data.table} object depending on input.
 }
 \description{
 Function deletes entries for which the spread is more than "maxi" times the median

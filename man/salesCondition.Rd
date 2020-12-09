@@ -10,13 +10,11 @@ salesCondition(
 )
 }
 \arguments{
-\item{tData}{an xts or data.table object containing the time series data, with 
-one column named "COND" indicating the Sale Condition.}
+\item{tData}{\link{salesCondition} is deprecated. Use \link{tradesCondition} instead.}
 
-\item{validConds}{a character vector containing valid sales conditions defaults to \cr
-\code{c('', '@', 'E', '@E', 'F', 'FI', '@F', '@FI', 'I', '@I')}. See \link{tradesCondition}.}
+\item{validConds}{\link{salesCondition} is deprecated. Use \link{tradesCondition} instead.}
 }
 \description{
-Function deletes entries with abnormal trades condition
+\link{salesCondition} is deprecated. Use \link{tradesCondition} instead.
 }
 \keyword{cleaning}

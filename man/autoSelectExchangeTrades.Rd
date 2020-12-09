@@ -7,7 +7,7 @@
 autoSelectExchangeTrades(tData, printExchange = TRUE)
 }
 \arguments{
-\item{tData}{an xts object with at least a column "EX", 
+\item{tData}{an \code{xts} object with at least a column "EX", 
 indicating the exchange symbol and "SIZE", 
 indicating the trade volume.}
 
@@ -29,12 +29,11 @@ The possible exchanges are:
 }}
 }
 \value{
-data.table or xts object depending on input
+\code{data.table} or \code{xts} object depending on input
 }
 \description{
-Function returns a data.table or xts object containing only observations of the 
-exchange with the highest value for the variable "SIZE", 
-i.e. the highest trade volume.
+Filters raw trade data and return only data that stems from the exchange with the highest
+ value for the variable "SIZE", i.e. the highest trade volume.
 }
 \examples{
 autoSelectExchangeTrades(sampleTDataRaw)

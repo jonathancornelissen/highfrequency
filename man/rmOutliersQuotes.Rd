@@ -7,7 +7,7 @@
 rmOutliersQuotes(qData, maxi = 10, window = 50, type = "advanced", tz = NULL)
 }
 \arguments{
-\item{qData}{a data.table or xts object at least containing the columns "BID" and "OFR".}
+\item{qData}{a \code{data.table} or \code{xts} object at least containing the columns "BID" and "OFR".}
 
 \item{maxi}{an integer, indicating the maximum number of median absolute deviations allowed.}
 
@@ -19,7 +19,7 @@ rmOutliersQuotes(qData, maxi = 10, window = 50, type = "advanced", tz = NULL)
 In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}.}
 }
 \value{
-xts object or data.table depending on type of input
+\code{xts} object or \code{data.table} depending on type of input
 }
 \description{
 If type = "standard": Function deletes entries for which the mid-quote deviated by more than "maxi"
@@ -43,9 +43,6 @@ for removing outliers.
 Note that the median absolute deviation is taken over the entire
 day. In case it is zero (which can happen if mid-quotes don't change much), 
 the median absolute deviation is taken over a subsample without constant mid-quotes.
-}
-\details{
-NOTE: This function works only correct if supplied input data consists of 1 day.
 }
 \references{
 Barndorff-Nielsen, O. E., P. R. Hansen, A. Lunde, and N. Shephard (2009). Realized kernels in practice: Trades and quotes. Econometrics Journal 12, C1-C32.

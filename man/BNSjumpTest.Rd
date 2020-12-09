@@ -33,15 +33,15 @@ BNSjumpTest(
 \item{alignBy}{character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".
 To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".}
 
-\item{alignPeriod}{positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate an
-To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".}
+\item{alignPeriod}{positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
+based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".}
 
 \item{makeReturns}{boolean, should be TRUE when pData contains prices. FALSE by default.}
 
 \item{alpha}{numeric of length one with the significance level to use for the jump test(s). Defaults to 0.975.}
 }
 \value{
-list or xts in case the input prices span more than one day.
+list or \code{xts}in case the input prices span more than one day.
 }
 \description{
 This test examines the presence of jumps in highfrequency price series. It is based on theory of Barndorff- Nielsen and Shephard (BNS). The null hypothesis is no jumps. 
