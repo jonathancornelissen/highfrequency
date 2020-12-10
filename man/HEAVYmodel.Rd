@@ -31,13 +31,13 @@ This function calculates the High frEquency bAsed VolatilitY (HEAVY) model propo
 \examples{
 
 # Calculate annualized returns in percentages
-logReturns <- 100 * makeReturns(log(SPYRM$CLOSE))
+logReturns <- 100 * makeReturns(SPYRM$CLOSE)[-1]
 
 # Returns are assumed to be demeaned
 logReturns <- logReturns - mean(logReturns)
 
 # Due to return calculation, the first observation is missing
-estimatedHEAVY <- HEAVYmodel(logReturns[-1], SPYRM$RK5[-1]^2 / 252)
+estimatedHEAVY <- HEAVYmodel(logReturns, SPYRM$RK5[-1] * 10000)
 
 # Calculate iterative multi-step-ahead forecasts
 predict(estimatedHEAVY, stepsAhead = 12)
