@@ -60,7 +60,7 @@ The highfrequency function also brings a similarly-named function for cleaning q
 
 - removing quotes with zero price,
 - selecting a single exchange,
-- removing entries that have extraordinarly large spreads
+- removing entries that have extraordinarily large spreads
 - merging quotes that happen on the same time and
 - removing quotes that may be seen to be outliers.
 

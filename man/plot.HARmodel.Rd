@@ -2,7 +2,7 @@
 % Please edit documentation in R/har_model.R
 \name{plot.HARmodel}
 \alias{plot.HARmodel}
-\title{Plotting method for HARModel objects}
+\title{Plotting method for HARmodel objects}
 \usage{
 \method{plot}{HARmodel}(x, ...)
 }
@@ -12,7 +12,7 @@
 \item{...}{extra arguments, see details}
 }
 \description{
-Plotting method for HARModel objects
+Plotting method for HARmodel objects
 }
 \details{
 The plotting method has the following optional parameter:

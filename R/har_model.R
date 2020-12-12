@@ -479,7 +479,7 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
   return (model)
 }
 
-#' Plotting method for HARModel objects
+#' Plotting method for HARmodel objects
 #' @param x an object of class \code{HARmodel}
 #' @param ... extra arguments, see details
 #' @details The plotting method has the following optional parameter:
