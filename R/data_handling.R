@@ -669,7 +669,7 @@ aggregateTrades <- function(tData, alignBy = "minutes", alignPeriod = 5, marketO
       marketOpenNumeric <- rep(marketOpenNumeric, length(obsPerDay))[1:length(obsPerDay)]
       marketCloseNumeric <- rep(marketCloseNumeric, length(obsPerDay))[1:length(obsPerDay)]
     } else {
-      stop("unknown error occured in aggregateQuotes")
+      stop("unknown error occured in aggregateTrades")
     }
     
   }
@@ -685,7 +685,7 @@ aggregateTrades <- function(tData, alignBy = "minutes", alignPeriod = 5, marketO
       marketOpenNumeric <- rep(marketOpenNumeric, length(obsPerDay))[1:length(obsPerDay)]
       marketCloseNumeric <- rep(marketCloseNumeric, length(obsPerDay))[1:length(obsPerDay)]
     } else {
-      stop("unknown error occured in aggregateQuotes")
+      stop("unknown error occured in aggregateTrades")
     }
   }
   
@@ -702,11 +702,11 @@ aggregateTrades <- function(tData, alignBy = "minutes", alignPeriod = 5, marketO
   tData[, SIZE := SIZESUM, by = list(SYMBOL)]
   
   # Create the first observation each day.
-  tData_open <- tData[tData[DT == FIRST_DT, .I[1], by = list(SYMBOL, DATE)]$V1, c("DT", "SYMBOL", "PRICE", "SIZE", "VWPRICE")]
+  tData_open <- tData[tData[DT == FIRST_DT, .I[1], by = list(SYMBOL, DATE)]$V1, ]
   tData_open[, DT := floor(DT/86400) * 86400 + marketOpenNumeric %% 86400]
   
   # Take the last observation of each group of LAST_DT 
-  tData <- tData[tData[DT == LAST_DT, .I[.N], by = list(SYMBOL, LAST_DT)]$V1][, DT := DT_ROUND][, c("DT", "SYMBOL", "PRICE", "SIZE", "VWPRICE")] ## Make sure we only take the last observation
+  tData <- tData[tData[DT == LAST_DT, .I[.N], by = list(SYMBOL, LAST_DT)]$V1][, DT := DT_ROUND] ## Make sure we only take the last observation
   
   # due to rounding there may be an observation that is refered to the opening time
   tData <- tData[!(DT %in% tData_open$DT)]
