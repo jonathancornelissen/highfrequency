@@ -41,15 +41,15 @@
 #' @keywords data manipulation
 #' 
 #' @examples 
-#' #load sample price data
+#' # Load sample price data
 #' \dontrun{
 #' library(xts)
 #' ts <- as.xts(sampleTData[, list(DT, PRICE, SIZE)])
 #' 
-#' #Previous tick aggregation to the 5-minute sampling frequency:
+#' # Previous tick aggregation to the 5-minute sampling frequency:
 #' tsagg5min <- aggregateTS(ts, alignBy = "minutes", alignPeriod = 5)
 #' head(tsagg5min)
-#' #Previous tick aggregation to the 30-second sampling frequency:
+#' # Previous tick aggregation to the 30-second sampling frequency:
 #' tsagg30sec <- aggregateTS(ts, alignBy = "seconds", alignPeriod = 30)
 #' tail(tsagg30sec)
 #' tsagg3ticks <- aggregateTS(ts, alignBy = "ticks", alignPeriod = 3)
@@ -225,12 +225,12 @@ aggregateTS <- function (ts, FUN = "previoustick", alignBy = "minutes", alignPer
 #' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
 #' @keywords data manipulation
 #' @examples
-#' # aggregate price data to the 30 second frequency
+#' # Aggregate price data to the 30 second frequency
 #' aggregatePrice(sampleTData, alignBy = "secs", alignPeriod = 30)
-#' # aggregate price data to the 30 second frequency including zero return price changes
+#' # Aggregate price data to the 30 second frequency including zero return price changes
 #' aggregatePrice(sampleTData, alignBy = "secs", alignPeriod = 30)
 #'
-#' # aggregate price data to half a second frequency including zero return price changes
+#' # Aggregate price data to half a second frequency including zero return price changes
 #' aggregatePrice(sampleTData, alignBy = "milliseconds", alignPeriod = 500, fill = TRUE)
 #' @importFrom xts last tzone
 #' @importFrom data.table fifelse
@@ -419,7 +419,7 @@ aggregatePrice <- function(pData, alignBy = "minutes", alignPeriod = 1, marketOp
 #' @keywords data manipulation
 #' 
 #' @examples
-#' # aggregate quote data to the 30 second frequency
+#' # Aggregate quote data to the 30 second frequency
 #' qDataAggregated <- aggregateQuotes(sampleQData, alignBy = "seconds", alignPeriod = 30)
 #' qDataAggregated # Show the aggregated data
 #' @export
@@ -587,7 +587,7 @@ aggregateQuotes <- function(qData, alignBy = "minutes", alignPeriod = 5, marketO
 #' @keywords data manipulation
 #' 
 #' @examples 
-#' # aggregate trade data to 5 minute frequency
+#' # Aggregate trade data to 5 minute frequency
 #' tDataAggregated <- aggregateTrades(sampleTData, alignBy = "minutes", alignPeriod = 5)
 #' tDataAggregated
 #' @export
@@ -1097,7 +1097,7 @@ makeReturns <- function(ts) {
 #' @keywords data manipulation
 #' 
 #' @examples 
-#' # multi-day input allowed
+#' # Multi-day input allowed
 #' tqData <- matchTradesQuotes(sampleTData, sampleQData)
 #' # Show output
 #' tqData
@@ -1545,7 +1545,7 @@ noZeroQuotes <- function(qData) {
 #' dim(qDataAfterCleaning$qData)
 #' 
 #' # In case you have more data it is advised to use the on-disk functionality
-#' #via "dataSource" and "dataDestination" arguments
+#' # via "dataSource" and "dataDestination" arguments
 #' 
 #' @importFrom data.table fread
 #' @importFrom utils unzip
@@ -2209,8 +2209,8 @@ selectExchange <- function(data, exch = "N") {
 #'                                          exchanges = list("N"))
 #' tDataAfterFirstCleaning$report
 #' dim(tDataAfterFirstCleaning$tData)
-#' #In case you have more data it is advised to use the on-disk functionality
-#' #via "dataSource" and "dataDestination" arguments
+#' # In case you have more data it is advised to use the on-disk functionality
+#' # via "dataSource" and "dataDestination" arguments
 #' 
 #' @references Barndorff-Nielsen, O. E., P. R. Hansen, A. Lunde, and N. Shephard (2009). Realized kernels in practice: Trades and quotes. Econometrics Journal 12, C1-C32.
 #' 
@@ -2430,7 +2430,6 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
 #' # Consider you have raw trade data for 1 stock for 2 days 
 #' tDataAfterFirstCleaning <- tradesCleanup(tDataRaw = sampleTDataRaw, 
 #'                                           exchanges = "N", report = FALSE)
-#' # 
 #' qData <- quotesCleanup(qDataRaw = sampleQDataRaw, 
 #'                        exchanges = "N", report = FALSE)
 #' dim(tDataAfterFirstCleaning)
@@ -2438,8 +2437,8 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
 #'   tradesCleanupUsingQuotes(qData = qData[as.Date(DT) == "2018-01-02"],
 #'                            tData = tDataAfterFirstCleaning[as.Date(DT) == "2018-01-02"])
 #' dim(tDataAfterFinalCleaning)
-#' #In case you have more data it is advised to use the on-disk functionality
-#' #via the "tradeDataSource", "quoteDataSource", and "dataDestination" arguments
+#' # In case you have more data it is advised to use the on-disk functionality
+#' # via the "tradeDataSource", "quoteDataSource", and "dataDestination" arguments
 #' @keywords cleaning
 #' @export
 tradesCleanupUsingQuotes <- function(tradeDataSource = NULL, quoteDataSource = NULL, dataDestination = NULL, tData = NULL, qData = NULL, lagQuotes = 2,
@@ -2831,21 +2830,21 @@ businessTimeAggregation <- function(pData, measure = "volume", obs = 390, bandwi
 #' @examples 
 #' \dontrun{
 #' minuteBars <- makeOHLCV(sampleTDataEurope, alignBy = "minutes", alignPeriod = 1)
-#' ## We can use the quantmod package's chartSeries function to plot the ohlcv data
+#' # We can use the quantmod package's chartSeries function to plot the ohlcv data
 #' quantmod::chartSeries(minuteBars)
 #' 
 #' minuteBars <- makeOHLCV(sampleTDataEurope[,], alignBy = "minutes", alignPeriod = 1)
-#' ## Again we plot the series with chartSeries
+#' # Again we plot the series with chartSeries
 #' quantmod::chartSeries(minuteBars)
 #' 
-#' ## We can also handle data across multiple days.
+#' # We can also handle data across multiple days.
 #' fiveMinuteBars <- makeOHLCV(sampleTData)
-#' ## Again we plot the series with chartSeries
+#' # Again we plot the series with chartSeries
 #' quantmod::chartSeries(fiveMinuteBars)
 #' 
-#' ## We can use arbitrary alignPeriod, here we choose pi
+#' # We can use arbitrary alignPeriod, here we choose pi
 #' bars <- makeOHLCV(sampleTDataEurope, alignBy = "seconds", alignPeriod = pi)
-#' ## Again we plot the series with chartSeries
+#' # Again we plot the series with chartSeries
 #' quantmod::chartSeries(bars)
 #' }
 #' @author Emil Sjoerup

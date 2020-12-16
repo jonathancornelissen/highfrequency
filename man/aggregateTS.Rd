@@ -63,15 +63,15 @@ For example, if 14 observations are made on one day, and these are 1, 2, 3, ... 
 Then, with \code{alignBy = "ticks"} and \code{alignPeriod = 3}, the output will be 1, 4, 7, 10, 13, 14.
 }
 \examples{
-#load sample price data
+# Load sample price data
 \dontrun{
 library(xts)
 ts <- as.xts(sampleTData[, list(DT, PRICE, SIZE)])
 
-#Previous tick aggregation to the 5-minute sampling frequency:
+# Previous tick aggregation to the 5-minute sampling frequency:
 tsagg5min <- aggregateTS(ts, alignBy = "minutes", alignPeriod = 5)
 head(tsagg5min)
-#Previous tick aggregation to the 30-second sampling frequency:
+# Previous tick aggregation to the 30-second sampling frequency:
 tsagg30sec <- aggregateTS(ts, alignBy = "seconds", alignPeriod = 30)
 tail(tsagg30sec)
 tsagg3ticks <- aggregateTS(ts, alignBy = "ticks", alignPeriod = 3)

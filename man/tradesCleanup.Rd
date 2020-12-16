@@ -107,8 +107,8 @@ tDataAfterFirstCleaning <- tradesCleanup(tDataRaw = sampleTDataRaw,
                                          exchanges = list("N"))
 tDataAfterFirstCleaning$report
 dim(tDataAfterFirstCleaning$tData)
-#In case you have more data it is advised to use the on-disk functionality
-#via "dataSource" and "dataDestination" arguments
+# In case you have more data it is advised to use the on-disk functionality
+# via "dataSource" and "dataDestination" arguments
 
 }
 \references{

@@ -96,7 +96,7 @@ harInsanityFilter <- function(fittedValues, lower, upper, replacement) {
 #' @keywords forecasting
 #'
 #' @examples
-#' ##### Example 1: HAR #####
+#' # Example 1: HAR
 #' # Forecasting daily Realized volatility for the S&P 500 using the basic HARmodel: HAR
 #' library(xts)
 #' RVSPY <- as.xts(SPYRM$RV5, order.by = SPYRM$DT)
@@ -110,7 +110,7 @@ harInsanityFilter <- function(fittedValues, lower, upper, replacement) {
 #' predict(x)
 #'
 #'
-#' ##### Example 2: HARQ #####
+#' # Example 2: HARQ
 #' # Get the highfrequency returns
 #' dat <- as.xts(sampleOneMinuteData[, makeReturns(STOCK), by = list(DATE = as.Date(DT))])
 #' x <- HARmodel(dat, periods = c(1,5,10), periodsJ = c(1,5,10),
@@ -122,7 +122,7 @@ harInsanityFilter <- function(fittedValues, lower, upper, replacement) {
 #' # plot(x)
 #' # predict(x)
 #' 
-#' ##### Example 3: HARQJ with already computed realized measures #####
+#' # Example 3: HARQJ with already computed realized measures
 #' dat <- SPYRM[, list(DT, RV5, BPV5, RQ5)]
 #' x <- HARmodel(as.xts(dat), periods = c(1,5,22), periodsJ = c(1),
 #'               periodsQ = c(1), type = "HARQJ")
@@ -132,7 +132,7 @@ harInsanityFilter <- function(fittedValues, lower, upper, replacement) {
 #' # plot(x)
 #' predict(x)
 #'
-#' ##### Example 4: CHAR with already computed realized measures #####
+#' # Example 4: CHAR with already computed realized measures
 #' dat <- SPYRM[, list(DT, RV5, BPV5)]
 #'
 #' x <- HARmodel(as.xts(dat), periods = c(1, 5, 22), type = "CHAR")
@@ -142,7 +142,7 @@ harInsanityFilter <- function(fittedValues, lower, upper, replacement) {
 #' # plot(x)
 #' predict(x)
 #'
-#' ##### Example 5: CHARQ with already computed realized measures #####
+#' # Example 5: CHARQ with already computed realized measures
 #' dat <- SPYRM[, list(DT, RV5, BPV5, RQ5)]
 #' 
 #' x <- HARmodel(as.xts(dat), periods = c(1,5,22), periodsQ = c(1), type = "CHARQ")
@@ -534,7 +534,7 @@ plot.HARmodel <- function(x, ...){
 #' @param object an object of class \code{HARmodel}
 #' @param ... extra arguments. See details
 #' @details
-#' #' The print method has the following optional parameters:
+#' The print method has the following optional parameters:
 #' \itemize{
 #' \item{\code{newdata}}{ new data to use for forecasting}
 #' \item{\code{warnings}}{ A logical denoting whether to display warnings, detault is \code{TRUE}}

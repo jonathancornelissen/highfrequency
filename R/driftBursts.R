@@ -28,27 +28,28 @@
 #' retrieves critical values for the test described in appendix B 
 #' 
 #' @examples 
-#' ## Usage with data.table object
+#' # Usage with data.table object
 #' dat <- sampleTData[as.Date(DT) == "2018-01-02"]
-#' ## Testing every 60 seconds after 09:45:00
+#' # Testing every 60 seconds after 09:45:00
 #' DBH1 <- driftBursts(dat, testTimes = seq(35100, 57600, 60), preAverage = 2, ACLag = -1L,
 #'                     meanBandwidth = 300L, varianceBandwidth = 900L)
 #' print(DBH1)
 #' 
 #' plot(DBH1, pData = dat)
-#' ## Usage with xts object (1 column)
+#' # Usage with xts object (1 column)
 #' library("xts")
 #' dat <- xts(sampleTData[as.Date(DT) == "2018-01-03"]$PRICE, 
 #'            order.by = sampleTData[as.Date(DT) == "2018-01-03"]$DT)
-#' ## Testing every 60 seconds after 09:45:00
+#' # Testing every 60 seconds after 09:45:00
 #' DBH2 <- driftBursts(dat, testTimes = seq(35100, 57600, 60), preAverage = 2, ACLag = -1L,
 #'                     meanBandwidth = 300L, varianceBandwidth = 900L)
 #' plot(DBH2, pData = dat)
 #' 
-#' \dontrun{ ## This block takes some time
+#' \dontrun{ 
+#' # This block takes some time
 #' dat <- xts(sampleTDataEurope$PRICE, 
 #'            order.by = sampleTDataEurope$DT)
-#' ## Testing every 60 seconds after 09:00:00
+#' # Testing every 60 seconds after 09:00:00
 #' system.time({DBH4 <- driftBursts(dat, testTimes = seq(32400 + 900, 63000, 60), preAverage = 2, 
 #'              ACLag = -1L, meanBandwidth = 300L, varianceBandwidth = 900L)})
 #'
@@ -243,7 +244,7 @@ driftBursts <- function(pData, testTimes = seq(34260, 57600, 60),
 #' both the drift and volatility processes are plotted. CaPiTAlizAtIOn doesn't matter}
 #' }
 #' @examples
-#' ## Testing every 60 seconds after 09:15:00
+#' # Testing every 60 seconds after 09:15:00
 #' DBH <- driftBursts(sampleTDataEurope, testTimes = seq(32400 + 900, 63000, 60), preAverage = 2, 
 #'                     ACLag = -1L, meanBandwidth = 300L, varianceBandwidth = 900L)
 #' plot(DBH)

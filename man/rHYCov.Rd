@@ -34,15 +34,16 @@ based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to
 \description{
 Calculates the Hayashi-Yoshida Covariance estimator
 }
+\examples{
+# Average Hayashi-Yoshida Covariance estimator is calculated on five-minute returns
+realized_cov <- rHYCov(rData = cbind(lltc, sbux, fill = 0), period = 5, alignBy = "minutes", 
+                       alignPeriod = 5, makeReturns = FALSE)
+
+}
 \references{
 T. Hayashi and N. Yoshida. On covariance estimation of non-synchronously observed diffusion processes. \emph{Bernoulli}, 11, 359-379, 2005.
 }
 \author{
 Scott Payseur and Emil Sjoerup
-
-# Average Hayashi-Yoshida Covariance estimator is calculated on five-minute returns
-#Multivariate:
-realized_cov <- rHYCov(rData = cbind(lltc, sbux, fill = 0), period = 5, alignBy = "minutes", 
-                       alignPeriod = 5, makeReturns = FALSE)
 }
 \keyword{volatility}

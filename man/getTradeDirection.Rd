@@ -21,7 +21,7 @@ determined using the Lee and Ready algorithm (Lee and Ready, 1991).
 NOTE: By convention the first observation is always marked as a buy.
 }
 \examples{
-# generate matched trades and quote data set
+# Generate matched trades and quote data set
 tqData <- matchTradesQuotes(sampleTData[as.Date(DT) == "2018-01-02"], 
                             sampleQData[as.Date(DT) == "2018-01-02"])
 directions <- getTradeDirection(tqData)

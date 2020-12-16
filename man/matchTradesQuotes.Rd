@@ -44,7 +44,7 @@ Match the trades and quotes of the input data. All trades are retained and the l
  while 'old' quotes are discarded.
 }
 \examples{
-# multi-day input allowed
+# Multi-day input allowed
 tqData <- matchTradesQuotes(sampleTData, sampleQData)
 # Show output
 tqData

@@ -44,8 +44,8 @@ rvSub <- rAVGCov(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes",
                  alignPeriod = 5, makeReturns = TRUE) 
 rvSub
 
-# Multivariate:
 \dontrun{
+# Multivariate:
 library(xts)
 set.seed(123)
 start <- strptime("1970-01-01", format = "\%Y-\%m-\%d", tz = "UTC")

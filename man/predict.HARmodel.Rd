@@ -15,7 +15,7 @@
 Predict method for objects of type \code{HARmodel}
 }
 \details{
-#' The print method has the following optional parameters:
+The print method has the following optional parameters:
 \itemize{
 \item{\code{newdata}}{ new data to use for forecasting}
 \item{\code{warnings}}{ A logical denoting whether to display warnings, detault is \code{TRUE}}

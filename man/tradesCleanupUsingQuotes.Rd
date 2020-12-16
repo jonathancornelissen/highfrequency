@@ -63,7 +63,6 @@ When using the on-disk functionality and tradeDataSource and quoteDataSource are
 # Consider you have raw trade data for 1 stock for 2 days 
 tDataAfterFirstCleaning <- tradesCleanup(tDataRaw = sampleTDataRaw, 
                                           exchanges = "N", report = FALSE)
-# 
 qData <- quotesCleanup(qDataRaw = sampleQDataRaw, 
                        exchanges = "N", report = FALSE)
 dim(tDataAfterFirstCleaning)
@@ -71,8 +70,8 @@ tDataAfterFinalCleaning <-
   tradesCleanupUsingQuotes(qData = qData[as.Date(DT) == "2018-01-02"],
                            tData = tDataAfterFirstCleaning[as.Date(DT) == "2018-01-02"])
 dim(tDataAfterFinalCleaning)
-#In case you have more data it is advised to use the on-disk functionality
-#via the "tradeDataSource", "quoteDataSource", and "dataDestination" arguments
+# In case you have more data it is advised to use the on-disk functionality
+# via the "tradeDataSource", "quoteDataSource", and "dataDestination" arguments
 }
 \references{
 Barndorff-Nielsen, O. E., P. R. Hansen, A. Lunde, and N. Shephard (2009). Realized kernels in practice: Trades and quotes. Econometrics Journal 12, C1-C32.

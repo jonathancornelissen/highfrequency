@@ -24,21 +24,21 @@ This function makes OHLC-V bars at arbitrary intervals. If the SIZE column is no
 \examples{
 \dontrun{
 minuteBars <- makeOHLCV(sampleTDataEurope, alignBy = "minutes", alignPeriod = 1)
-## We can use the quantmod package's chartSeries function to plot the ohlcv data
+# We can use the quantmod package's chartSeries function to plot the ohlcv data
 quantmod::chartSeries(minuteBars)
 
 minuteBars <- makeOHLCV(sampleTDataEurope[,], alignBy = "minutes", alignPeriod = 1)
-## Again we plot the series with chartSeries
+# Again we plot the series with chartSeries
 quantmod::chartSeries(minuteBars)
 
-## We can also handle data across multiple days.
+# We can also handle data across multiple days.
 fiveMinuteBars <- makeOHLCV(sampleTData)
-## Again we plot the series with chartSeries
+# Again we plot the series with chartSeries
 quantmod::chartSeries(fiveMinuteBars)
 
-## We can use arbitrary alignPeriod, here we choose pi
+# We can use arbitrary alignPeriod, here we choose pi
 bars <- makeOHLCV(sampleTDataEurope, alignBy = "seconds", alignPeriod = pi)
-## Again we plot the series with chartSeries
+# Again we plot the series with chartSeries
 quantmod::chartSeries(bars)
 }
 }

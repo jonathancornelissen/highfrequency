@@ -46,7 +46,7 @@ The timestamps of the new time series are the closing times of the intervals.
 Please note: Returned objects always contain the first observation (i.e. opening quotes,...).
 }
 \examples{
-# aggregate quote data to the 30 second frequency
+# Aggregate quote data to the 30 second frequency
 qDataAggregated <- aggregateQuotes(sampleQData, alignBy = "seconds", alignPeriod = 30)
 qDataAggregated # Show the aggregated data
 }

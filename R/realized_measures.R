@@ -571,8 +571,8 @@ rMRC <- function(pData, pairwise = FALSE, makePsd = FALSE) {
 #'                  alignPeriod = 5, makeReturns = TRUE) 
 #' rvSub
 #' 
-#' # Multivariate:
 #' \dontrun{
+#' # Multivariate:
 #' library(xts)
 #' set.seed(123)
 #' start <- strptime("1970-01-01", format = "%Y-%m-%d", tz = "UTC")
@@ -1184,9 +1184,8 @@ rCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeRet
 #' @references T. Hayashi and N. Yoshida. On covariance estimation of non-synchronously observed diffusion processes. \emph{Bernoulli}, 11, 359-379, 2005.
 #' 
 #' @author Scott Payseur and Emil Sjoerup
-#' 
+#' @examples
 #' # Average Hayashi-Yoshida Covariance estimator is calculated on five-minute returns
-#' #Multivariate:
 #' realized_cov <- rHYCov(rData = cbind(lltc, sbux, fill = 0), period = 5, alignBy = "minutes", 
 #'                        alignPeriod = 5, makeReturns = FALSE)
 #' 

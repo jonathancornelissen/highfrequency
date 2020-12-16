@@ -408,7 +408,7 @@ spotDrift <- function(data, method = "driftMean", alignBy = "minutes", alignPeri
 #'              delta_c = c(0.25, -0.05, -0.2, 0.13, 0.02),
 #'              delta_s = c(-1.2, 0.11, 0.26, -0.03, 0.08))
 #'
-#' # next method will take around 110 iterations
+#' # Next method will take around 110 iterations
 #' vol1 <- spotVol(sampleOneMinuteData[, list(DT, PRICE = MARKET)], method = "stochper", init = init)
 #' plot(as.numeric(vol1$spot[1:780]), type="l")
 #' legend("topright", c("detPer", "stochper"), col = c("black", "red"), lty=1)}
