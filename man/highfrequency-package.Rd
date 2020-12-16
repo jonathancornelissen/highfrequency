@@ -6,21 +6,17 @@
 \alias{highfrequency-package}
 \title{highfrequency: Tools for Highfrequency Data Analysis}
 \description{
-The \pkg{highfrequency} package provides numerous tools for analyzing high frequency financial data. It has five main goals:
-
-\itemize{ 
-\item Provide functionality to manage, clean and match highfrequency trades and quotes data, 
-\item calculate various liquidity measures, 
-\item estimate and forecast volatility, 
-\item detect price jumps and 
-\item investigate microstructure noise and intraday periodicity.
+The \pkg{highfrequency} package provides numerous tools for analyzing high frequency financial data, including functionality to:
+\itemize{
+\item Clean, handle, and manage high frequency trades and quotes data.
+\item Calculate liquidity measures
+\item Calculate (multivariate) realized measures of the distribution of high frequency returns
+\item Forecast measures of realized variance
+\item Detect jumps in prices
+\item Analyze market mircrostructure noise
+\item Estimate spot volatility and drift as well as analyse intraday periodicity of spot volatility
+\item - and more!
 }
-
-
-
-
-
-
 
 To learn more about \pkg{highfrequency}, start with the vignettes:
 `browseVignettes(package = "highfrequency")`
