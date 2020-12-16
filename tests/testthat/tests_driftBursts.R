@@ -19,6 +19,7 @@ test_that("DBH sim test", {
   r <- rnorm(iT, mean = 0.02, sd = 1) * sqrt(1/iT)
   p <- c(0,cumsum(r))
   randomTZ  <-  sample(OlsonNames(), 1)
+  randomTZ <- "UTC"
   dat <- data.table(DT = as.POSIXct(timestamps, tz = randomTZ, origin = as.POSIXct("1970-01-01", tz = randomTZ)), PRICE = exp(p))
   DBH <- driftBursts(dat, testtimes, preAverage = 1, ACLag = -1, meanBandwidth = meanBandwidth, varianceBandwidth = 5*meanBandwidth, parallelize = FALSE)
   DBH2 <- driftBursts(as.xts(dat), testtimes, preAverage = 1, ACLag = -1, meanBandwidth = meanBandwidth, varianceBandwidth = 5*meanBandwidth, parallelize = FALSE)
