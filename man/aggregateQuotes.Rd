@@ -34,7 +34,7 @@ A \code{data.table} or an \code{xts} object containing the aggregated quote data
 }
 \description{
 Aggregate tick-by-tick quote data and return a \code{data.table} or \code{xts} object containing the aggregated quote data.
-See \code{\link{sampleQData}} for an example of the argument qData. This function accepts arbitrary number of symbols over an aribtrary number of days.
+See \code{\link{sampleQData}} for an example of the argument qData. This function accepts arbitrary number of symbols over an arbitrary number of days.
 }
 \details{
 The output "BID" and "OFR" columns are constructed using previous tick aggregation.

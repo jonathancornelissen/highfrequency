@@ -424,7 +424,7 @@ rMedRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
 #'   It is intuitive that under mean zero i.i.d. microstructure noise some form of smoothing of the observed log-price should tend to diminish the impact of the noise. 
 #'   Effectively, we are going to approximate a continuous function by an average of observations of Y in a neighborhood, the noise being averaged away. 
 #'   
-#'   Assume there is \eqn{N} equispaced returns in period \eqn{\tau} of a list (after refeshing data). Let \eqn{r_{\tau_i}} be a return (with \eqn{i=1, \ldots,N}) of an asset in period \eqn{\tau}. Assume there is \eqn{d} assets. 
+#'   Assume there is \eqn{N} equispaced returns in period \eqn{\tau} of a list (after refreshing data). Let \eqn{r_{\tau_i}} be a return (with \eqn{i=1, \ldots,N}) of an asset in period \eqn{\tau}. Assume there is \eqn{d} assets. 
 #'   
 #'   In order to define the univariate pre-averaging estimator, we first define the pre-averaged returns as
 #'   \deqn{
@@ -799,7 +799,7 @@ rAVGCov <- function(rData, cor = FALSE, alignBy = "minutes", alignPeriod = 5, k 
 #' 
 #' @references 
 #' Barndorff-Nielsen, O. E., & Shephard, N. (2004). Econometric analysis of realized covariation: High frequency based covariance, regression, and correlation in 
-#' #' financial economics. Econometrica, 72(3), 885-925.
+#' financial economics. Econometrica, 72(3), 885-925.
 #' 
 #' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
 #' 
@@ -1186,12 +1186,9 @@ rCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeRet
 #' @author Scott Payseur and Emil Sjoerup
 #' 
 #' # Average Hayashi-Yoshida Covariance estimator is calculated on five-minute returns
-#' 
-#' # Multivariate:
-#' # realized_cov <- rHYCov(rData = cbind(lltc, sbux, fill = 0), period = 5, alignBy = "minutes", 
-#' #                        alignPeriod = 5, makeReturns = FALSE)
-#' # realized_cov 
-#' Note: for the diagonal elements the rCov is used.
+#' #Multivariate:
+#' realized_cov <- rHYCov(rData = cbind(lltc, sbux, fill = 0), period = 5, alignBy = "minutes", 
+#'                        alignPeriod = 5, makeReturns = FALSE)
 #' 
 #' @keywords volatility
 #' @export
@@ -1674,7 +1671,7 @@ rMPV <- function(rData, m = 2, p = 2, alignBy = NULL, alignPeriod = NULL, makeRe
 #' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
 #' @param makeReturns boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.
 #' @param seasadjR a \eqn{(M x N)} \code{xts} object containing 
-#' the seasonaly adjusted returns. This is an optional argument.
+#' the seasonally adjusted returns. This is an optional argument.
 #' @param wFunction determines whether 
 #' a zero-one weight function (one if no jump is detected based on \eqn{d_{t,i}} and 0 otherwise)
 #' or 
@@ -2016,7 +2013,7 @@ rSV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, 
 
 #' Threshold Covariance
 #' @description 
-#' Calculate the treshold covariance matrix proposed in Gobbi and Mancini (2009).
+#' Calculate the threshold covariance matrix proposed in Gobbi and Mancini (2009).
 #' Unlike the \code{\link{rOWCov}}, the rThresholdCov uses univariate jump detection rules to truncate the effect of jumps on the covariance
 #' estimate. As such, it remains feasible in high dimensions, but it is less robust to small cojumps. 
 #' 
@@ -2026,9 +2023,9 @@ rSV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, 
 #' Then, the \eqn{k,q}-th element of the threshold covariance matrix is defined as
 #' 
 #' \deqn{
-#' \mbox{tresholdcov}[k,q]_{t} = \sum_{i=1}^{M} r_{(k)t,i} 1_{\{r_{(k)t,i}^2 \leq TR_{M}\}}  \ \ r_{(q)t,i} 1_{\{r_{(q)t,i}^2 \leq TR_{M}\}},
+#' \mbox{thresholdcov}[k,q]_{t} = \sum_{i=1}^{M} r_{(k)t,i} 1_{\{r_{(k)t,i}^2 \leq TR_{M}\}}  \ \ r_{(q)t,i} 1_{\{r_{(q)t,i}^2 \leq TR_{M}\}},
 #' }
-#' with the treshold value \eqn{TR_{M}} set to \eqn{9 \Delta^{-1}} times the daily realized bi-power variation of asset \eqn{k}, 
+#' with the threshold value \eqn{TR_{M}} set to \eqn{9 \Delta^{-1}} times the daily realized bi-power variation of asset \eqn{k}, 
 #' as suggested in Jacod and Todorov (2009).
 #' 
 #' @param rData an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days
@@ -2133,8 +2130,8 @@ rThresholdCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL
     n <- dim(rData)[1]				                  # number of observations
     delta <- 1 / n
     rbpvars <- apply(rData, 2,FUN = RBPVar)		      # bipower variation per stock
-    tresholds <- 3 * sqrt(rbpvars) * (delta^(0.49))	  # treshold per stock
-    tresmatrix <- matrix(rep(tresholds, n), ncol = length(tresholds), nrow = n, byrow = TRUE)
+    thresholds <- 3 * sqrt(rbpvars) * (delta^(0.49))	  # treshold per stock
+    tresmatrix <- matrix(rep(thresholds, n), ncol = length(thresholds), nrow = n, byrow = TRUE)
     condition <- abs(rData) > tresmatrix
     rData[condition] <- 0
     covariance <- rCov(rData)
@@ -2223,7 +2220,7 @@ rThresholdCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL
 #' @references 
 #' Boudt K. and Zhang, J. 2010. Jump robust two time scale covariance estimation and realized volatility budgets. Mimeo.
 #' 
-#' Harris, F., T. McInish, G. Shoesmith, and R. Wood (1995). Cointegration, error correction, and price discovery on informartionally linked security markets. Journal of Financial and Quantitative Analysis 30, 563-581.
+#' Harris, F., T. McInish, G. Shoesmith, and R. Wood (1995). Cointegration, error correction, and price discovery on informationally linked security markets. Journal of Financial and Quantitative Analysis 30, 563-581.
 #' 
 #' Zhang, L., P. A. Mykland, and Y. Ait-Sahalia (2005). A tale of two time scales: Determining integrated volatility with noisy high-frequency data. Journal of the American Statistical Association 100, 1394-1411.
 #' 
@@ -3092,7 +3089,7 @@ listCholCovEstimators <- function(){
 #' 
 #' @references Li and Linton (2019) (Working paper): "A ReMeDI for microstructure noise."
 #' @keywords microstructure noise autocovariance autocorrelation
-#'
+#' @note We Thank Merrick Li for contributing his Matlab code for this estimator.
 #' @examples
 #' remed <- ReMeDI(sampleTData[as.Date(DT) == "2018-01-02", ], kn = 2, lags = 1:8)
 #' # We can also use the algorithm for choosing the kn to 
@@ -3101,7 +3098,6 @@ listCholCovEstimators <- function(){
 #'                             lower = 2, upper = 5, plot = TRUE)
 #' optimalKn 
 #' remed <- ReMeDI(sampleTData[as.Date(DT) == "2018-01-02", ], kn = optimalKn, lags = 1:8)
-
 #' @author Emil Sjoerup
 #' @export
 ReMeDI <- function(pData, kn = 1, lags = 1, knEqual = FALSE,
@@ -3273,7 +3269,7 @@ ReMeDI <- function(pData, kn = 1, lags = 1, knEqual = FALSE,
 #' @param upper upper boundary for the method if it fails to find an optimal value. If this is the case, the best kn between lower and upper is returned
 #' @param plot logical whether to plot the errors.
 #' @details This is the algorithm B.2 in the appendix of the Li and Linton (2019) working paper
-#'
+#' @note We Thank Merrick Li for contributing his Matlab code for this estimator.
 #' @examples
 #' optimalKn <- knChooseReMeDI(sampleTData[as.Date(DT) == "2018-01-02",],
 #'                             knMax = 10, tol = 0.05, size = 3,
@@ -3330,7 +3326,7 @@ knChooseReMeDI <- function(pData, knEqual = FALSE,
 #' @param phi tuning parameter phi
 #' @param i tuning parameter i
 #' 
-#' @return a list with compontents ReMeDI and asympVar
+#' @return a list with components ReMeDI and asympVar
 #' @export
 ReMeDIAsymptoticVariance <- function(pData, kn, lags, phi, i){
   PRICE <- DT <- NULL

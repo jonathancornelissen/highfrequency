@@ -31,7 +31,7 @@ based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to
 \item{makeReturns}{boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.}
 
 \item{seasadjR}{a \eqn{(M x N)} \code{xts} object containing 
-the seasonaly adjusted returns. This is an optional argument.}
+the seasonally adjusted returns. This is an optional argument.}
 
 \item{wFunction}{determines whether 
 a zero-one weight function (one if no jump is detected based on \eqn{d_{t,i}} and 0 otherwise)

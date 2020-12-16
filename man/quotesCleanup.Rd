@@ -48,7 +48,7 @@ The possible exchange symbols are:
 \item{qDataRaw}{\code{xts} or \code{data.table} object containing raw quote data, possibly for multiple symbols over multiple days. This argument is \code{NULL} by default. 
 Enabling it means the arguments \code{dataSource} and \code{dataDestination} will be ignored. (only advisable for small chunks of data)}
 
-\item{report}{boolean and \code{TRUE} by default. In case it is true and we don't use the on-disk functionalit, the function returns (also) a vector indicating how many quotes were deleted by each cleaning step.}
+\item{report}{boolean and \code{TRUE} by default. In case it is true and we don't use the on-disk functionality, the function returns (also) a vector indicating how many quotes were deleted by each cleaning step.}
 
 \item{selection}{argument to be passed on to the cleaning routine \code{\link{mergeQuotesSameTimestamp}}. The default is \code{"median"}.}
 

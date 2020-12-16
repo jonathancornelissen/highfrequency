@@ -5,7 +5,6 @@
 #' @param method Which method to be used to estimate the spot-drift. Currently, three methods are available, 
 #' rolling mean and median as well as the kernel method of Christensen et al. 2018.
 #' The kernel is a left hand exponential kernel that will weigh newer observations more heavily than older observations.
-#' @param ... Additional arguments for the individual methods. See details
 #' @param alignBy What time-frame should the estimator be applied? Accepted inputs are \code{"milliseconds"}, \code{"seconds"} and \code{"secs"} for seconds,
 #'  \code{"minutes"} and \code{"mins"} for minutes, and \code{"hours"} for hours.
 #' Standard is minutes
@@ -14,6 +13,7 @@
 #' @param marketClose Closing time of the market, standard is "16:00:00"
 #' @param tz fallback time zone used in case we we are unable to identify the timezone of the data, by default: \code{tz = NULL}. We attempt to extract the timezone from the DT column (or index) of the data, which may fail. 
 #' In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}
+#' @param ... Additional arguments for the individual methods. See details
 #' @return An object of class \code{"spotDrift"} containing at least the estimated spot drift process. Input on what this class should contain and methods for it is welcome.
 #'
 #' @details The additional arguments for the mean and median methods are: \code{periods} for the rolling window length which is 5 by standard and
@@ -46,8 +46,8 @@
 #' @importFrom xts xtsible merge.xts
 #' @importFrom data.table setkeyv rbindlist
 #' @export
-spotDrift <- function(data, method = "driftMean", ..., alignBy = "minutes", alignPeriod = 5,
-                     marketOpen = "09:30:00", marketClose = "16:00:00", tz = NULL) {
+spotDrift <- function(data, method = "driftMean", alignBy = "minutes", alignPeriod = 5,
+                     marketOpen = "09:30:00", marketClose = "16:00:00", tz = NULL, ...) {
 
   PRICE <- DATE <- RETURN <- NULL
 
@@ -455,9 +455,9 @@ spotDrift <- function(data, method = "driftMean", ..., alignBy = "minutes", alig
 #'
 #' Taylor, S. J. and X. Xu (1997). The incremental volatility information in one million foreign exchange quotations. Journal of Empirical Finance 4, 317-340.
 #' @export
-spotVol <- function(data, method = "detPer", ..., alignBy = "minutes", alignPeriod = 5,
+spotVol <- function(data, method = "detPer", alignBy = "minutes", alignPeriod = 5,
                       marketOpen = "09:30:00", marketClose = "16:00:00",
-                      tz = "GMT") {
+                      tz = "GMT", ...) {
   
   PRICE = DATE = RETURN = DT = NULL
   

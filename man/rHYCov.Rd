@@ -41,11 +41,8 @@ T. Hayashi and N. Yoshida. On covariance estimation of non-synchronously observe
 Scott Payseur and Emil Sjoerup
 
 # Average Hayashi-Yoshida Covariance estimator is calculated on five-minute returns
-
-# Multivariate:
-# realized_cov <- rHYCov(rData = cbind(lltc, sbux, fill = 0), period = 5, alignBy = "minutes", 
-#                        alignPeriod = 5, makeReturns = FALSE)
-# realized_cov 
-Note: for the diagonal elements the rCov is used.
+#Multivariate:
+realized_cov <- rHYCov(rData = cbind(lltc, sbux, fill = 0), period = 5, alignBy = "minutes", 
+                       alignPeriod = 5, makeReturns = FALSE)
 }
 \keyword{volatility}

@@ -31,7 +31,7 @@ In practice, market microstructure noise leads to a departure from the pure semi
   It is intuitive that under mean zero i.i.d. microstructure noise some form of smoothing of the observed log-price should tend to diminish the impact of the noise. 
   Effectively, we are going to approximate a continuous function by an average of observations of Y in a neighborhood, the noise being averaged away. 
   
-  Assume there is \eqn{N} equispaced returns in period \eqn{\tau} of a list (after refeshing data). Let \eqn{r_{\tau_i}} be a return (with \eqn{i=1, \ldots,N}) of an asset in period \eqn{\tau}. Assume there is \eqn{d} assets. 
+  Assume there is \eqn{N} equispaced returns in period \eqn{\tau} of a list (after refreshing data). Let \eqn{r_{\tau_i}} be a return (with \eqn{i=1, \ldots,N}) of an asset in period \eqn{\tau}. Assume there is \eqn{d} assets. 
   
   In order to define the univariate pre-averaging estimator, we first define the pre-averaged returns as
   \deqn{

@@ -83,10 +83,15 @@ harInsanityFilter <- function(fittedValues, lower, upper, replacement) {
 #' @return The function outputs an object of class \code{HARmodel} and \code{\link{lm}} (so \code{HARmodel} is  a subclass of \code{\link{lm}}). Objects
 #' of class \code{HARmodel} has the following methods \code{\link{plot.HARmodel}}, \code{\link{predict.HARmodel}}, \code{\link{print.HARmodel}}, and \code{\link{summary.HARmodel}}.
 #'
-#' @references Andersen, T. G., T. Bollerslev, and F. Diebold (2007). Roughing it up: including jump components in the measurement, modelling and forecasting of return volatility. The Review of Economics and Statistics 89, 701-720.
+#' @references 
+#' Andersen, T. G., T. Bollerslev, and F. Diebold (2007). Roughing it up: including jump components in the measurement, modelling and forecasting of return volatility. The Review of Economics and Statistics 89, 701-720.
+#' 
 #' Corsi, F. (2009). A simple approximate long memory model of realized volatility. Journal of Financial Econometrics 7, 174-196.
+#' 
 #' Corsi, F. and Reno R. (2012). Discrete-time volatility forecasting with persistent leverage effect and the link with continuous-time volatility modeling. Journal of Business and Economic Statistics, forthcoming.
-#' Bollerslev, T., Patton, A., Quaedvlieg, R. 2016,  Exploiting the errors: A simple approach for improved volatility forecasting, Journal of Econometrics, vol.192, issue 1, 1-18.
+#' 
+#' Bollerslev, T., Patton, A., Quaedvlieg, R. 2016,  Exploiting the errors: A simple approach for improved volatility forecasting, Journal of Econometrics, 192, issue 1, 1-18.
+#' 
 #'
 #' @keywords forecasting
 #'
@@ -94,9 +99,9 @@ harInsanityFilter <- function(fittedValues, lower, upper, replacement) {
 #' ##### Example 1: HAR #####
 #' # Forecasting daily Realized volatility for the S&P 500 using the basic HARmodel: HAR
 #' library(xts)
-#' RV_SPY <- as.xts(SPYRM$RV5, order.by = SPYRM$DT)
+#' RVSPY <- as.xts(SPYRM$RV5, order.by = SPYRM$DT)
 #'
-#' x <- HARmodel(data = RV_SPY , periods = c(1,5,22), RVest = c("rCov"),
+#' x <- HARmodel(data = RVSPY , periods = c(1,5,22), RVest = c("rCov"),
 #'               type = "HAR", h = 1, transform = NULL, inputType = "RM")
 #' class(x)
 #' x
@@ -111,17 +116,17 @@ harInsanityFilter <- function(fittedValues, lower, upper, replacement) {
 #' x <- HARmodel(dat, periods = c(1,5,10), periodsJ = c(1,5,10),
 #'             periodsQ = c(1), RVest = c("rCov", "rQuar"),
 #'               type="HARQ", inputType = "returns")
-#' ## Estimate the HAR model of type HARQ
+#' # Estimate the HAR model of type HARQ
 #' class(x)
 #' x
 #' # plot(x)
-#' #predict(x)
+#' # predict(x)
 #' 
 #' ##### Example 3: HARQJ with already computed realized measures #####
 #' dat <- SPYRM[, list(DT, RV5, BPV5, RQ5)]
 #' x <- HARmodel(as.xts(dat), periods = c(1,5,22), periodsJ = c(1),
 #'               periodsQ = c(1), type = "HARQJ")
-#' ## Estimate the HAR model of type HARQJ
+#' # Estimate the HAR model of type HARQJ
 #' class(x)
 #' x
 #' # plot(x)

@@ -16,6 +16,12 @@ The \pkg{highfrequency} package provides numerous tools for analyzing high frequ
 \item investigate microstructure noise and intraday periodicity.
 }
 
+
+
+
+
+
+
 To learn more about \pkg{highfrequency}, start with the vignettes:
 `browseVignettes(package = "highfrequency")`
 }
@@ -27,11 +33,11 @@ Useful links:
 
 }
 \author{
-Kris Boudt, Jonathan Cornelissen, Scott Payseur
+Kris Boudt, Jonathan Cornelissen, Onno Kleen, Scott Payseur, Emil Sjoerup
 
 Maintainer: Kris Boudt <Kris.Boudt@ugent.be>
 
-Contributors: Giang Nguyen, Onno Kleen, Emil Sjoerup
+Contributors: Giang Nguyen
 
-Thanks: We would like to thank Brian Peterson, Chris Blakely, Eric Zivot and Maarten Schermer. We are also grateful to Dirk Eddelbuettel for his extraordinary support as a mentor during the Google Summer of Code 2019.
+Thanks: We would like to thank Brian Peterson, Chris Blakely, Dirk Eddelbuettel, Maarten Schermer, and Eric Zivot
 }

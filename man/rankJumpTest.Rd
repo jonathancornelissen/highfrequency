@@ -26,7 +26,7 @@ rankJumpTest(
 
 \item{stockPrices}{list containing the individual stock prices in either data.table or \code{xts}format. The format should be the the same as \code{marketPrice}}
 
-\item{alpha}{signicance level (in standard deviations) to use for the jump detections. Default is \code{c(5,3)} for 5 and 3 in the market and stocks respectively.}
+\item{alpha}{significance level (in standard deviations) to use for the jump detections. Default is \code{c(5,3)} for 5 and 3 in the market and stocks respectively.}
 
 \item{coarseFreq}{numeric denoting the coarse sampling frequency. Default is \code{10}}
 
@@ -57,7 +57,7 @@ specified by \code{tz}. By default, \code{marketClose = "16:00:00"}.}
 and/or \code{marketOpen}/ \code{marketClose} belong. Default = \code{"GMT"}.}
 }
 \value{
-A list containing \code{criticalValues} which are the bootstrapped critcal values, \code{testStatistic} the test statistic of the jump test, \code{dimensions} which are the dimensions of the jump matrix
+A list containing \code{criticalValues} which are the bootstrapped critical values, \code{testStatistic} the test statistic of the jump test, \code{dimensions} which are the dimensions of the jump matrix
  \code{marketJumpDetections} the jumps detected in the market prices, \code{stockJumpDetections} the co-jumps detected in the individual stock prices, and \code{jumpIndices} which are the indices of the detected jumps.
 }
 \description{

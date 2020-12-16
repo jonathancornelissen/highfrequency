@@ -43,6 +43,9 @@ function to choose the tuning parameter, kn in ReMeDI estimation
 \details{
 This is the algorithm B.2 in the appendix of the Li and Linton (2019) working paper
 }
+\note{
+We Thank Merrick Li for contributing his Matlab code for this estimator.
+}
 \examples{
 optimalKn <- knChooseReMeDI(sampleTData[as.Date(DT) == "2018-01-02",],
                             knMax = 10, tol = 0.05, size = 3,

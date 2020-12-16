@@ -9,12 +9,12 @@ intradayJumpTest(
   volEstimator = "RM",
   driftEstimator = "none",
   alpha = 0.95,
-  ...,
   alignBy = "minutes",
   alignPeriod = 5,
   marketOpen = "09:30:00",
   marketClose = "16:00:00",
-  tz = "GMT"
+  tz = "GMT",
+  ...
 )
 }
 \arguments{
@@ -25,8 +25,6 @@ intradayJumpTest(
 \item{driftEstimator}{character denoting which drift estimator to use for the tests. See \link{spotDrift}. Default = \code{"none"} denoting no drift estimation.}
 
 \item{alpha}{numeric of length one determining what confidence level to use when constructing the critical values.}
-
-\item{...}{extra arguments passed on to \code{\link{spotVol}} for the volatility estimation, and to \code{\link{spotDrift}}.}
 
 \item{alignBy}{string indicating the time scale in which \code{alignPeriod} is expressed.
 Possible values are: \code{"secs", "seconds", "mins", "minutes", "hours"}.}
@@ -42,7 +40,9 @@ specified by \code{tz}. By default, \code{marketOpen = "09:30:00"}.}
 specified by \code{tz}. By default, \code{marketClose = "16:00:00"}.}
 
 \item{tz}{fallback time zone used in case we we are unable to identify the timezone of the data, by default: \code{tz = NULL}. We attempt to extract the timezone from the DT column (or index) of the data, which may fail. 
-In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}
+In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}}
+
+\item{...}{extra arguments passed on to \code{\link{spotVol}} for the volatility estimation, and to \code{\link{spotDrift}}.
 
 The null hypothesis of the tests in this function is that there are no jumps in the price series}
 }

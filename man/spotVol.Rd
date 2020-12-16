@@ -7,12 +7,12 @@
 spotVol(
   data,
   method = "detPer",
-  ...,
   alignBy = "minutes",
   alignPeriod = 5,
   marketOpen = "09:30:00",
   marketClose = "16:00:00",
-  tz = "GMT"
+  tz = "GMT",
+  ...
 )
 }
 \arguments{
@@ -23,8 +23,6 @@ parameters \code{alignBy} and \code{alignPeriod}.}
 \item{method}{specifies which method will be used to estimate the spot
 volatility. Options include \code{"detPer"} and \code{"stochper"}.
 See 'Details'.}
-
-\item{...}{method-specific parameters (see 'Details').}
 
 \item{alignBy}{string indicating the time scale in which \code{alignPeriod} is expressed.
 Possible values are: \code{"secs", "seconds", "mins", "minutes", "hours"}.}
@@ -41,6 +39,8 @@ specified by \code{tz}. By default, \code{marketClose = "16:00:00"}.}
 
 \item{tz}{fallback time zone used in case we we are unable to identify the timezone of the data, by default: \code{tz = NULL}. We attempt to extract the timezone from the DT column (or index) of the data, which may fail. 
 In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}}
+
+\item{...}{method-specific parameters (see 'Details').}
 }
 \value{
 A \code{spotVol} object, which is a list containing one or more of the

@@ -86,7 +86,7 @@ tqDataCleaned <- tradesCleanupUsingQuotes(tData = tDataCleaned$tData[as.Date(DT)
 tqDataCleaned
 ```
 
-Here, we see that once more half of the trades are filtered out due to non-plausability.
+Here, we see that once more half of the trades are filtered out due to non-plausibility.
 
 ## References
 
