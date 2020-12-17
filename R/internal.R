@@ -41,9 +41,11 @@ applyGetList <- function(x, FUN, cor = FALSE, alignBy = NULL, alignPeriod = NULL
 #' @return A matrix containing the positive semi definite matrix.
 #'
 #' @references 
-#' Barndorff-Nielsen, O. and N. Shephard (2004). Measuring the impact of jumps in multivariate price processes using bipower covariation. Discussion paper, Nuffield College, Oxford University.
-#' Fan, J., Y. Li, and K. Yu (2010). Vast volatility matrix estimation using high frequency data for portfolio selection. Working paper.
-#' Rousseeuw, P. and G. Molenberghs (1993). Transformation of non positive semidefinite correlation matrices. Communications in Statistics - Theory and Methods 22, 965-984.
+#' Barndorff-Nielsen, O. E. and Shephard, N. (2004). Measuring the impact of jumps in multivariate price processes using bipower covariation. Discussion paper, Nuffield College, Oxford University.
+#' 
+#' Fan, J., Li, Y., and Yu, K. (2012). Vast volatility matrix estimation using high frequency data for portfolio selection. Journal of the American Statistical Association, 107, 497, 412-428
+#' 
+#' Rousseeuw, P. and Molenberghs, G. (1993). Transformation of non positive semidefinite correlation matrices. Communications in Statistics - Theory and Methods 22, 965-984.
 #' 
 #' @author Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 #' @keywords data manipulation

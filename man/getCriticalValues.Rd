@@ -16,6 +16,9 @@ getCriticalValues(x, alpha = 0.95)
 Method for DBH objects to calculate the critical value for the presence of a burst of drift.
 The critical value is that of the test described in appendix B in Christensen Oomen Reno
 }
+\references{
+Christensen, K., Oomen, R., and Reno, R. (2018) The Drift Burst Hypothesis (Working paper).
+}
 \author{
 Emil Sjoerup
 }

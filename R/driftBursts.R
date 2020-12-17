@@ -16,6 +16,7 @@
 #' @param nCores An \code{integer} denoting the number of cores to use for calculating the code when parallelized. 
 #' If this argument is not provided, sequential evaluation will be used even though \code{parallelize} is TRUE. Default is NA
 #' @param warnings A \code{logical} denoting whether warnings should be shown. Default is TRUE
+#' 
 #' @details 
 #' If the \code{testTimes} vector contains instructions to test before the first trade, or more than 15 minutes after the last trade, these entries will be deleted, as not doing so may cause crashes.
 #' The test statistic is unstable before \code{max(meanBandwidth , varianceBandwidth)} seconds has passed.
@@ -65,6 +66,8 @@
 #' print(DBH4, criticalValue = 3)
 #' max(abs(DBH4$tStat)) > getCriticalValues(DBH4, 0.99)$quantile
 #' }
+#' @references 
+#' Christensen, K., Oomen, R., and Reno, R. (2018) The Drift Burst Hypothesis (Working paper).
 #' 
 #' @author Emil Sjoerup
 #' @importFrom data.table is.data.table
@@ -455,6 +458,8 @@ print.DBH = function(x, ...){
 #' 
 #' @author Emil Sjoerup
 #' @aliases getCriticalValues.DBH
+#' @references 
+#' Christensen, K., Oomen, R., and Reno, R. (2018) The Drift Burst Hypothesis (Working paper).
 #' @export
 getCriticalValues <- function(x, alpha = 0.95){
   UseMethod('getCriticalValues', x)

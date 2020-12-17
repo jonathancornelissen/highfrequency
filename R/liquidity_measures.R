@@ -209,10 +209,13 @@
 #'  }
 #'  }
 #' 
-#' @references  
+#' @references
 #' Bessembinder, H. (2003). Issues in assessing trade execution costs. Journal of Financial Markets, 223-257.
+#' 
 #' Boehmer, E. (2005). Dimensions of execution quality: Recent evidence for US equity markets. Journal of Financial Economics 78 (3), 553-582.
-#' Hasbrouck, J. and D. J. Seppi (2001). Common factors in prices, order flows and liquidity. Journal of Financial Economics, 383-411.
+#' 
+#' Hasbrouck, J. and Seppi, D. J. (2001). Common factors in prices, order flows and liquidity. Journal of Financial Economics, 383-411.
+#' 
 #' Venkataraman, K. (2001). Automated versus floor trading: An analysis of execution costs on the Paris and New York exchanges. The Journal of Finance, 56, 1445-1485.
 #' 
 #' @examples
@@ -320,7 +323,7 @@ getLiquidityMeasures <- function(tqData, win = 300, type = NULL) {
 #' @return A vector which has values 1 or (-1) if the inferred trade direction
 #' is buy or sell respectively.
 #' 
-#' @references  Lee, C. M. C. and M. J. Ready (1991). Inferring trade direction from intraday data. Journal of Finance 46, 733-746.
+#' @references  Lee, C. M. C. and Ready, M. J. (1991). Inferring trade direction from intraday data. Journal of Finance 46, 733-746.
 #' 
 #' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup. Special thanks to Dirk Eddelbuettel.
 #' 

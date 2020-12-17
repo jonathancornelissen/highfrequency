@@ -1,5 +1,6 @@
 library("testthat")
 library("data.table")
+library("xts")
 context("DBH C++ error tests")
 test_that("DBH C++ error tests",{
   #these functions have broken before, hopefully they won't break again.
@@ -21,6 +22,7 @@ test_that("DBH sim test", {
   dat <- data.table(DT = as.POSIXct(timestamps, tz = 'UTC', origin = as.POSIXct("1970-01-01", tz = 'UTC')), PRICE = exp(p))
   DBH <- driftBursts(dat, testtimes, preAverage = 1, ACLag = -1, meanBandwidth = meanBandwidth, varianceBandwidth = 5*meanBandwidth, parallelize = FALSE)
   DBH2 <- driftBursts(as.xts(dat), testtimes, preAverage = 1, ACLag = -1, meanBandwidth = meanBandwidth, varianceBandwidth = 5*meanBandwidth, parallelize = FALSE)
+  
   expect_equal(as.numeric(DBH$tStat), as.numeric(DBH2$tStat))
   expect_equal(mean(DBH$tStat), 0.34463614)
   expect_equal(mean(DBH$sigma), 2.054827e-05)
