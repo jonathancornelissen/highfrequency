@@ -155,7 +155,7 @@ Rcpp::List DriftBurstLoopCPAR(const arma::colvec& vPreAveraged, const arma::colv
   const double invVB = 1.0/iVarBandwidth; // So we can multiply instead of divide which is much faster.
 #pragma omp parallel for                                                               \
   shared(vPreAveraged, diffedlogprices, vTime, vTesttime, iMeanBandwidth,              \
-         iVarBandwidth, iPreAverage, iAcLag, vMu, vSigma, iT, invMB, invVB)            \
+         iVarBandwidth, iPreAverage, iAcLag, vMu, vSigma, iT)            \
     private(vX, vWm, vWvar, iIdx, iQ, iAutoAcLag)
     for(int i = 0; i<iT; i++){
       
