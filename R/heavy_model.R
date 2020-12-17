@@ -275,7 +275,7 @@ print.HEAVYmodel <- function(x, digits = max(3, getOption("digits") - 3), ...) {
   cat(" \n")
   cat(paste0("The log-likelihoods are: \n",
              "Variance equation: ", sprintf("%.3f", x$llh[1]), "\n", 
-             "RM equation:", sprintf("%.3f", x$llh[2])))
+             "RM equation:", sprintf("%.3f", x$llh[2])), "\n")
 }
 
 #' @export
