@@ -63,13 +63,11 @@ test_that("HARModel",{
 context("HEAVYmodel")
 test_that("HEAVYmodel",{
   
-  returns <-  makeReturns(SPYRM$CLOSE)
-  bv      <-  SPYRM$BPV5
-  returns <- returns[!is.na(bv)]
-  bv <- bv[!is.na(bv)] # Remove NAs
-  output <- HEAVYmodel(ret = returns - mean(returns), rm = bv)
+  logReturns <- 100 * makeReturns(SPYRM$CLOSE)[-1]
+  logReturns <- logReturns - mean(logReturns)
+  output <- HEAVYmodel(logReturns, SPYRM$BPV5[-1] * 10000)
   expect_identical(
     formatC(sum(output$coefficients), digits = 6),
-    "2.61353"
+    "2.67386"
   )
 })

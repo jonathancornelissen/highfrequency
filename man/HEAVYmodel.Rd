@@ -39,6 +39,9 @@ logReturns <- logReturns - mean(logReturns)
 # Due to return calculation, the first observation is missing
 estimatedHEAVY <- HEAVYmodel(logReturns, SPYRM$RK5[-1] * 10000)
 
+# Examine tThe estimated coefficients and robust standard errors
+estimatedHEAVY
+
 # Calculate iterative multi-step-ahead forecasts
 predict(estimatedHEAVY, stepsAhead = 12)
 }

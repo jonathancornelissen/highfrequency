@@ -38,7 +38,7 @@ based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to
 \item{...}{used internally, do not use.}
 }
 \value{
-in case the input is and contains data from one day, an N by N matrix is returned. If the data is a univariate \code{xts} object with multiple days, an \code{xts} is returned. 
+in case the input is and contains data from one day, an N by N matrix is returned. If the data is a univariate \code{xts} object with multiple days, an \code{xts} is returned.
 If the data is multivariate and contains multiple days (\code{xts} or \code{data.table}), the function returns a list containing N by N matrices. Each item in the list has a name which corresponds to the date for the matrix.
 }
 \description{

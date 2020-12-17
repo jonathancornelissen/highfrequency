@@ -29,19 +29,19 @@ based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to
 \item{makeReturns}{boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.}
 }
 \value{
-in case the input is and contains data from one day, an N by N matrix is returned. If the data is a univariate \code{xts} object with multiple days, an \code{xts} is returned. 
+in case the input is and contains data from one day, an N by N matrix is returned. If the data is a univariate \code{xts} object with multiple days, an \code{xts} is returned.
 If the data is multivariate and contains multiple days (\code{xts} or \code{data.table}), the function returns a list containing N by N matrices. Each item in the list has a name which corresponds to the date for the matrix.
 }
 \description{
 Realized Covariance using average subsample.
 }
 \examples{
-# Average subsampled realized variance/covariance aligned at one minute returns at 
+# Average subsampled realized variance/covariance aligned at one minute returns at
 # 5 subgrids (5 minutes).
 
 # Univariate
 rvSub <- rAVGCov(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes",
-                 alignPeriod = 5, makeReturns = TRUE) 
+                 alignPeriod = 5, makeReturns = TRUE)
 rvSub
 
 \dontrun{
@@ -56,12 +56,12 @@ dat <- cbind(rnorm(23401) * sqrt(1/23401), rnorm(23401) * sqrt(1/23401))
 dat <- exp(cumsum(xts(dat, timestamps)))
 price1 <- dat[,1]
 price2 <- dat[,2]
-rcovSub <- rAVGCov(rData = cbind(price1, price2), alignBy = "minutes", 
+rcovSub <- rAVGCov(rData = cbind(price1, price2), alignBy = "minutes",
                    alignPeriod = 5, makeReturns = TRUE)
 rcovSub
 
 # Multivariate with a 30 second fast aggregation and a 2.5 minute slow aggregation.
-rcovSub <- rAVGCov(rData = cbind(price1, price2), 
+rcovSub <- rAVGCov(rData = cbind(price1, price2),
                    alignBy = "minutes", alignPeriod = 2.5, k = 0.5, makeReturns = TRUE)
 rcovSub
 }

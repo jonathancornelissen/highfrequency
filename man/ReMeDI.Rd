@@ -27,11 +27,11 @@ We Thank Merrick Li for contributing his Matlab code for this estimator.
 }
 \examples{
 remed <- ReMeDI(sampleTData[as.Date(DT) == "2018-01-02", ], kn = 2, lags = 1:8)
-# We can also use the algorithm for choosing the kn to 
+# We can also use the algorithm for choosing the kn to
 optimalKn <- knChooseReMeDI(sampleTData[as.Date(DT) == "2018-01-02",],
                             knMax = 10, tol = 0.05, size = 3,
                             lower = 2, upper = 5, plot = TRUE)
-optimalKn 
+optimalKn
 remed <- ReMeDI(sampleTData[as.Date(DT) == "2018-01-02", ], kn = optimalKn, lags = 1:8)
 }
 \references{

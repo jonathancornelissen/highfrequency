@@ -17,7 +17,7 @@ rTSCov(
 )
 }
 \arguments{
-\item{pData}{a list. Each list-item i contains an \code{xts} object with the intraday price data 
+\item{pData}{a list. Each list-item i contains an \code{xts} object with the intraday price data
 of stock i for day t.}
 
 \item{cor}{boolean, in case it is \code{TRUE}, and the input data is multivariate, the correlation is returned instead of the covariance matrix. \code{FALSE} by default.}
@@ -37,43 +37,43 @@ of stock i for day t.}
 \item{makePsd}{boolean, in case it is \code{TRUE}, the positive definite version of rTSCov is returned. \code{FALSE} by default.}
 }
 \value{
-in case the input is and contains data from one day, an N by N matrix is returned. If the data is a univariate \code{xts} object with multiple days, an \code{xts} is returned. 
+in case the input is and contains data from one day, an N by N matrix is returned. If the data is a univariate \code{xts} object with multiple days, an \code{xts} is returned.
 If the data is multivariate and contains multiple days (\code{xts} or \code{data.table}), the function returns a list containing N by N matrices. Each item in the list has a name which corresponds to the date for the matrix.
 }
 \description{
 Calculate the two time scale covariance matrix proposed in Zhang et al (2005) and Zhang (2010).
-By the use of two time scales, this covariance estimate 
+By the use of two time scales, this covariance estimate
 is robust to microstructure noise and non-synchronic trading.
 }
 \details{
-The rTSCov requires the tick-by-tick transaction prices. (Co)variances are then computed using log-returns calculated on a rolling basis 
+The rTSCov requires the tick-by-tick transaction prices. (Co)variances are then computed using log-returns calculated on a rolling basis
 on stock prices that are \eqn{K} (slow time scale) and \eqn{J} (fast time scale) steps apart.
 
-The diagonal elements of the rTSCov matrix are the variances, computed for log-price series \eqn{X} with \eqn{n} price observations 
-at times \eqn{  \tau_1,\tau_2,\ldots,\tau_n} as follows: 
+The diagonal elements of the rTSCov matrix are the variances, computed for log-price series \eqn{X} with \eqn{n} price observations
+at times \eqn{  \tau_1,\tau_2,\ldots,\tau_n} as follows:
 
 \deqn{(1-\frac{\overline{n}_K}{\overline{n}_J})^{-1}([X,X]_T^{(K)}-
        \frac{\overline{n}_K}{\overline{n}_J}[X,X]_T^{(J))}}
-       
-where \eqn{\overline{n}_K=(n-K+1)/K},  \eqn{\overline{n}_J=(n-J+1)/J} and
-\deqn{[X,X]_T^{(K)} =\frac{1}{K}\sum_{i=1}^{n-K+1}(X_{t_{i+K}}-X_{t_i})^2.} 
 
-The extradiagonal elements of the rTSCov are the covariances. 
+where \eqn{\overline{n}_K=(n-K+1)/K},  \eqn{\overline{n}_J=(n-J+1)/J} and
+\deqn{[X,X]_T^{(K)} =\frac{1}{K}\sum_{i=1}^{n-K+1}(X_{t_{i+K}}-X_{t_i})^2.}
+
+The extradiagonal elements of the rTSCov are the covariances.
 For their calculation, the data is first synchronized by the refresh time method proposed by Harris et al (1995).
-It uses the function \code{\link{refreshTime}} to collect first the so-called refresh times at which all assets have traded at least once 
-since the last refresh time point. Suppose we have two log-price series:  \eqn{X} and \eqn{Y}. Let \eqn{ \Gamma =\{ \tau_1,\tau_2,\ldots,\tau_{N^{\mbox{\tiny X}}_{\mbox{\tiny T}}}\}} and 
-\eqn{\Theta=\{\theta_1,\theta_2,\ldots,\theta_{N^{\mbox{\tiny Y}}_{\mbox{\tiny T}}}\}} 
-be the set of transaction times of these assets. 
-The first refresh time corresponds to the first time at which both stocks have traded, i.e. 
+It uses the function \code{\link{refreshTime}} to collect first the so-called refresh times at which all assets have traded at least once
+since the last refresh time point. Suppose we have two log-price series:  \eqn{X} and \eqn{Y}. Let \eqn{ \Gamma =\{ \tau_1,\tau_2,\ldots,\tau_{N^{\mbox{\tiny X}}_{\mbox{\tiny T}}}\}} and
+\eqn{\Theta=\{\theta_1,\theta_2,\ldots,\theta_{N^{\mbox{\tiny Y}}_{\mbox{\tiny T}}}\}}
+be the set of transaction times of these assets.
+The first refresh time corresponds to the first time at which both stocks have traded, i.e.
 \eqn{\phi_1=\max(\tau_1,\theta_1)}. The subsequent refresh time is defined as the first time when both stocks have again traded, i.e.
 \eqn{\phi_{j+1}=\max(\tau_{N^{\mbox{\tiny{X}}}_{\phi_j}+1},\theta_{N^{\mbox{\tiny{Y}}}_{\phi_j}+1})}. The
-complete refresh time sample grid is 
+complete refresh time sample grid is
 \eqn{\Phi=\{\phi_1,\phi_2,...,\phi_{M_N+1}\}}, where \eqn{M_N} is the total number of paired returns.  The
 sampling points of asset \eqn{X} and \eqn{Y} are defined to be
 \eqn{t_i=\max\{\tau\in\Gamma:\tau\leq \phi_i\}} and
 \eqn{s_i=\max\{\theta\in\Theta:\theta\leq \phi_i\}}.
 
-Given these refresh times, the covariance is computed as follows: 
+Given these refresh times, the covariance is computed as follows:
 \deqn{
 c_{N}( [X,Y]^{(K)}_T-\frac{\overline{n}_K}{\overline{n}_J}[X,Y]^{(J)}_T ),
 }
@@ -81,7 +81,7 @@ c_{N}( [X,Y]^{(K)}_T-\frac{\overline{n}_K}{\overline{n}_J}[X,Y]^{(J)}_T ),
 where
 \deqn{[X,Y]^{(K)}_T =\frac{1}{K} \sum_{i=1}^{M_N-K+1} (X_{t_{i+K}}-X_{t_{i}})(Y_{s_{i+K}}-Y_{s_{i}}).}
 
-Unfortunately, the rTSCov is not always positive semidefinite.  
+Unfortunately, the rTSCov is not always positive semidefinite.
 By setting the argument makePsd = TRUE, the function \code{\link{makePsd}} is used to return a positive semidefinite
 matrix. This function replaces the negative eigenvalues with zeroes.
 }
@@ -101,7 +101,7 @@ price1 <- dat[,1]
 price2 <- dat[,2]
 rcovts <- rTSCov(pData = list(price1, price2))
 # Note: List of prices as input
-rcovts 
+rcovts
 }
 
 }

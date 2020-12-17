@@ -18,22 +18,22 @@ based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to
 \item{makeReturns}{boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.}
 }
 \value{
-In case the input is an \code{xts} object with data from one day, a numeric of same length as the number of assets. 
-If the input data spans multiple days and is in \code{xts} format, an \code{xts} will be returned. 
+In case the input is an \code{xts} object with data from one day, a numeric of same length as the number of assets.
+If the input data spans multiple days and is in \code{xts} format, an \code{xts} will be returned.
 If the input data is a \code{data.table} object, the function returns a \code{data.table} with the same column names as the input data, containing the date and the realized measures
 }
 \description{
 Calculate the rQuar, defined in Andersen et al. (2012).
 
 Assume there is \eqn{N} equispaced returns in period \eqn{t}. Let \eqn{r_{t,i}} be a return (with \eqn{i=1, \ldots,N}) in period \eqn{t}.
- 
+
  Then, the rQuar is given by
  \deqn{
    \mbox{rQuar}_{t}=\frac{N}{3} \sum_{i=1}^{N} \mbox(r_{t,i}^4)
  }
 }
 \examples{
-rq <- rQuar(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes", 
+rq <- rQuar(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes",
             alignPeriod = 5, makeReturns = TRUE)
 rq
 }

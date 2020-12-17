@@ -13,7 +13,7 @@ rCholCov(
 )
 }
 \arguments{
-\item{pData}{a list. Each list-item i contains an \code{xts} object with the intraday price data 
+\item{pData}{a list. Each list-item i contains an \code{xts} object with the intraday price data
 of stock i for day t. The order of the data does not matter as it will be sorted according to the criterion specified in the \code{criterion} argument}
 
 \item{IVest}{integrated variance estimator, default is \code{"rMRC"}. For a list of implemented estimators, use \code{listCholCovEstimators()}.}
@@ -28,12 +28,12 @@ of stock i for day t. The order of the data does not matter as it will be sorted
 a list containing the covariance matrix \code{"CholCov"}, and the Cholesky decomposition \code{"L"} and \code{"G"} such that L * G * L' = CholCov
 }
 \description{
-Function that estimates the integrated covariance matrix using the CholCov algorithm. 
-The algorithm estimates the integrated covariance matrix by sequentially adding series and using `refreshTime` to synchronize the observations. 
+Function that estimates the integrated covariance matrix using the CholCov algorithm.
+The algorithm estimates the integrated covariance matrix by sequentially adding series and using `refreshTime` to synchronize the observations.
 This is done in order of liquidity, which means that the algorithm uses more data points than most other estimation techniques.
 }
 \details{
-additional arguments for \code{IVest} and \code{COVest} should be passed in the ... argument. 
+additional arguments for \code{IVest} and \code{COVest} should be passed in the ... argument.
 For the \code{rMRC} estimator, which is the default, the \code{theta} and \code{delta} parameters can be set. These default to 1 and 0.1 respectively.
 }
 \references{

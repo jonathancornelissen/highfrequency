@@ -29,20 +29,20 @@ based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to
 \item{makePsd}{boolean, in case it is \code{TRUE}, the positive definite version of rBPCov is returned. \code{FALSE} by default.}
 }
 \value{
-in case the input is and contains data from one day, an N by N matrix is returned. If the data is a univariate \code{xts} object with multiple days, an \code{xts} is returned. 
+in case the input is and contains data from one day, an N by N matrix is returned. If the data is a univariate \code{xts} object with multiple days, an \code{xts} is returned.
 If the data is multivariate and contains multiple days (\code{xts} or \code{data.table}), the function returns a list containing N by N matrices. Each item in the list has a name which corresponds to the date for the matrix.
 }
 \description{
-Calculate the Realized BiPower Covariance (rBPCov), 
+Calculate the Realized BiPower Covariance (rBPCov),
  defined in Barndorff-Nielsen and Shephard (2004).
- 
- Let \eqn{r_{t,i}} be an intraday \eqn{N x 1} return vector and \eqn{i=1,...,M} 
+
+ Let \eqn{r_{t,i}} be an intraday \eqn{N x 1} return vector and \eqn{i=1,...,M}
  the number of intraday returns.
- 
+
  The rBPCov is defined as the process whose value at time \eqn{t}
  is the \eqn{N}-dimensional square matrix with \eqn{k,q}-th element equal to
  \deqn{
-   \mbox{rBPCov}[k,q]_t = \frac{\pi}{8} \bigg( \sum_{i=2}^{M} 
+   \mbox{rBPCov}[k,q]_t = \frac{\pi}{8} \bigg( \sum_{i=2}^{M}
                                               \left|
                                                 r_{(k)t,i} + r_{(q)t,i} \right| \ \left| r_{(k)t,i-1} + r_{(q)t,i-1} \right|   \\
                                               - \left| r_{(k)t,i}  - r_{(q)t,i} \right| \ \left|
@@ -52,16 +52,16 @@ Calculate the Realized BiPower Covariance (rBPCov),
  \eqn{k}-th component of the return vector \eqn{r_{i,t}}.
 }
 \examples{
-# Realized Bipower Variance/Covariance for a price series aligned   
+# Realized Bipower Variance/Covariance for a price series aligned
 # at 5 minutes.
- 
-# Univariate: 
-rbpv <- rBPCov(rData = sampleTData[, list(DT, PRICE)], alignBy ="minutes", 
-               alignPeriod = 5, makeReturns = TRUE) 
-# Multivariate: 
+
+# Univariate:
+rbpv <- rBPCov(rData = sampleTData[, list(DT, PRICE)], alignBy ="minutes",
+               alignPeriod = 5, makeReturns = TRUE)
+# Multivariate:
 rbpc <- rBPCov(rData = sampleOneMinuteData, makeReturns = TRUE, makePsd = TRUE)
 rbpc
- 
+
 }
 \references{
 Barndorff-Nielsen, O. and N. Shephard (2004). Measuring the impact of

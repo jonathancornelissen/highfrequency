@@ -1,7 +1,7 @@
 
 
 #' HEAVY Model estimation
-#' @description This function calculates the High frEquency bAsed VolatilitY (HEAVY) model proposed in Shephard and Sheppard (2010, eq. (3,4)). 
+#' @description This function calculates the High frEquency bAsed VolatilitY (HEAVY) model proposed in Shephard and Sheppard (2010). 
 #'
 #' @param ret a vector of demeaned returns 
 #' @param rm a vector of realized stock market variation
@@ -32,6 +32,9 @@
 #' 
 #' # Due to return calculation, the first observation is missing
 #' estimatedHEAVY <- HEAVYmodel(logReturns, SPYRM$RK5[-1] * 10000)
+#' 
+#' # Examine tThe estimated coefficients and robust standard errors
+#' estimatedHEAVY
 #' 
 #' # Calculate iterative multi-step-ahead forecasts
 #' predict(estimatedHEAVY, stepsAhead = 12)
@@ -162,7 +165,7 @@ HEAVYmodel <- function(ret, rm, startingValues = NULL) {
   model$coefficients <- modelEstimates
   model$se <- c(robStdErrVarEq, robStdErrRMEq)
   model$residuals <- ret / sqrt(varCondVariances)
-  model$llh <- c(llhVar = parVarEq$value, llhRM = parRMEq$value)
+  model$llh <- c(llhVar = -parVarEq$value, llhRM = -parRMEq$value)
   model$varCondVariances <- varCondVariances
   model$RMCondVariances <- RMCondVariances
   model$data <- data.frame(ret = ret, rm = rm)

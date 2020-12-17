@@ -18,8 +18,8 @@ based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to
 \item{makeReturns}{boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.}
 }
 \value{
-In case the input is an \code{xts} object with data from one day, a numeric of same length as the number of assets. 
-If the input data spans multiple days and is in \code{xts} format, an \code{xts} will be returned. 
+In case the input is an \code{xts} object with data from one day, a numeric of same length as the number of assets.
+If the input data spans multiple days and is in \code{xts} format, an \code{xts} will be returned.
 If the input data is a \code{data.table} object, the function returns a \code{data.table} with the same column names as the input data, containing the date and the realized measures
 }
 \description{
@@ -34,18 +34,18 @@ Then, the rMedRV is given by
 }
 \details{
 The rMedRV belongs to the class of realized volatility measures in this package
-that use the series of high-frequency returns \eqn{r_{t,i}} of a day \eqn{t} 
-to produce an ex post estimate of the realized volatility of that day \eqn{t}. 
-rMedRV is designed to be robust to price jumps. 
-The difference between RV and rMedRV is an estimate of the realized jump 
-variability. Disentangling the continuous and jump components in RV 
-can lead to more precise volatility forecasts, 
+that use the series of high-frequency returns \eqn{r_{t,i}} of a day \eqn{t}
+to produce an ex post estimate of the realized volatility of that day \eqn{t}.
+rMedRV is designed to be robust to price jumps.
+The difference between RV and rMedRV is an estimate of the realized jump
+variability. Disentangling the continuous and jump components in RV
+can lead to more precise volatility forecasts,
 as shown in Andersen et al. (2007) and Corsi et al. (2010).
 }
 \examples{
-medrv <- rMedRV(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes", 
+medrv <- rMedRV(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes",
                alignPeriod = 5, makeReturns = TRUE)
-medrv 
+medrv
 }
 \references{
 Andersen, T. G., D. Dobrev, and E. Schaumburg (2012). Jump-robust volatility estimation using nearest neighbor truncation. Journal of Econometrics, 169 (1), 75-93.
