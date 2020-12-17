@@ -47,7 +47,7 @@ and \code{\link{aggregateQuotes}} to aggregate Trade or Quote data objects.
 }
 \details{
 The timestamps of the new time series are the closing times and/or days of the intervals. 
-E.g. for a weekly aggregation the new timestamp is the last day in that particular week (namely sunday).
+E.g. for a weekly aggregation the new timestamp is the last day in that particular week (namely Sunday).
 
 In case of previous tick aggregation, 
 for \code{alignBy} is either \code{"seconds"} \code{"minutes"}, or \code{"hours"},
@@ -55,7 +55,7 @@ the element of the returned series with e.g. timestamp 09:35:00 contains
 the last observation up to that point, including the value at 09:35:00 itself.
 
 Please note: In case an interval is empty, by default an NA is returned.. In case e.g. previous 
-tick aggregation it makes sense to fill these NA's by the function \code{na.locf}
+tick aggregation it makes sense to fill these NAs by the function \code{na.locf}
 (last observation carried forward) from the \pkg{zoo} package.
 
 In case \code{alignBy = "ticks"}, the sampling is done such the sampling starts on the first tick, and the last tick is always included.
@@ -63,15 +63,15 @@ For example, if 14 observations are made on one day, and these are 1, 2, 3, ... 
 Then, with \code{alignBy = "ticks"} and \code{alignPeriod = 3}, the output will be 1, 4, 7, 10, 13, 14.
 }
 \examples{
-#load sample price data
+# Load sample price data
 \dontrun{
 library(xts)
 ts <- as.xts(sampleTData[, list(DT, PRICE, SIZE)])
 
-#Previous tick aggregation to the 5-minute sampling frequency:
+# Previous tick aggregation to the 5-minute sampling frequency:
 tsagg5min <- aggregateTS(ts, alignBy = "minutes", alignPeriod = 5)
 head(tsagg5min)
-#Previous tick aggregation to the 30-second sampling frequency:
+# Previous tick aggregation to the 30-second sampling frequency:
 tsagg30sec <- aggregateTS(ts, alignBy = "seconds", alignPeriod = 30)
 tail(tsagg30sec)
 tsagg3ticks <- aggregateTS(ts, alignBy = "ticks", alignPeriod = 3)

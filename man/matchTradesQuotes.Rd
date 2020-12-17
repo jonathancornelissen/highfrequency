@@ -29,7 +29,7 @@ The small window is a tolerance for inaccuracies in the timestamps of bids and a
 
 \item{backwardsWindow}{a numeric denoting the length of the backwards window used when \code{BFM = TRUE}. Default is 3600, corresponding to one hour.}
 
-\item{forwardsWindow}{a numeric denoting the length of the forwards window used when \code{BFM = TRUE}. Default is 0.5, dorresponding to one half second.}
+\item{forwardsWindow}{a numeric denoting the length of the forwards window used when \code{BFM = TRUE}. Default is 0.5, corresponding to one half second.}
 
 \item{plot}{a logical denoting whether to visualize the forwards, backwards, and unmatched trades in a plot.}
 
@@ -44,7 +44,7 @@ Match the trades and quotes of the input data. All trades are retained and the l
  while 'old' quotes are discarded.
 }
 \examples{
-# multi-day input allowed
+# Multi-day input allowed
 tqData <- matchTradesQuotes(sampleTData, sampleQData)
 # Show output
 tqData

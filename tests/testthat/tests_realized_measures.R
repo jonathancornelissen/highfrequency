@@ -430,7 +430,7 @@ test_that("rQuar", {
 context("ivInference")
 test_that("ivInference", {
   expect_equal(
-    formatC(ivInference(as.xts(sampleTData[, list(DT, PRICE)]), IVestimator= "rMinRV", IQestimator = "rMedRQ", 
+    formatC(IVinference(as.xts(sampleTData[, list(DT, PRICE)]), IVestimator= "rMinRV", IQestimator = "rMedRQ", 
                         confidence = 0.95, makeReturns = TRUE)[[1]]$cb * 10000, digits = 5),
     c("0.84827", "1.0328")
   )

@@ -89,7 +89,7 @@ The following cleaning functions are performed sequentially:
 
 Since the function \code{\link{rmTradeOutliersUsingQuotes}}
 also requires cleaned quote data as input, it is not incorporated here and
-there is a seperate wrapper called \code{\link{tradesCleanupUsingQuotes}}.
+there is a separate wrapper called \code{\link{tradesCleanupUsingQuotes}}.
 }
 \details{
 Using the on-disk functionality with .csv.zip files which is the standard from the WRDS database
@@ -107,8 +107,8 @@ tDataAfterFirstCleaning <- tradesCleanup(tDataRaw = sampleTDataRaw,
                                          exchanges = list("N"))
 tDataAfterFirstCleaning$report
 dim(tDataAfterFirstCleaning$tData)
-#In case you have more data it is advised to use the on-disk functionality
-#via "dataSource" and "dataDestination" arguments
+# In case you have more data it is advised to use the on-disk functionality
+# via "dataSource" and "dataDestination" arguments
 
 }
 \references{

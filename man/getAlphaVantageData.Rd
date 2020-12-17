@@ -28,7 +28,7 @@ An object of type \code{xts} or \code{data.table} in case the length of symbols 
 \code{data.table} objects will be put into a list.
 }
 \description{
-Function to retrieve high frequency data from Alpha Vantage - wrapper around quantMods' getSymbols.av function
+Function to retrieve high frequency data from Alpha Vantage - wrapper around quantMod's getSymbols.av function
 }
 \details{
 The \code{doSleep} argument is set to true as default because Alpha Vantage has a limit of five calls per minute. 

@@ -6,14 +6,16 @@
 \alias{highfrequency-package}
 \title{highfrequency: Tools for Highfrequency Data Analysis}
 \description{
-The \pkg{highfrequency} package provides numerous tools for analyzing high frequency financial data. It has five main goals:
-
-\itemize{ 
-\item Provide functionality to manage, clean and match highfrequency trades and quotes data, 
-\item calculate various liquidity measures, 
-\item estimate and forecast volatility, 
-\item detect price jumps and 
-\item investigate microstructure noise and intraday periodicity.
+The \pkg{highfrequency} package provides numerous tools for analyzing high frequency financial data, including functionality to:
+\itemize{
+\item Clean, handle, and manage high frequency trades and quotes data.
+\item Calculate liquidity measures
+\item Calculate (multivariate) realized measures of the distribution of high frequency returns
+\item Forecast measures of realized variance
+\item Detect jumps in prices
+\item Analyze market mircrostructure noise
+\item Estimate spot volatility and drift as well as analyse intraday periodicity of spot volatility
+\item - and more!
 }
 
 To learn more about \pkg{highfrequency}, start with the vignettes:
@@ -27,11 +29,11 @@ Useful links:
 
 }
 \author{
-Kris Boudt, Jonathan Cornelissen, Scott Payseur
+Kris Boudt, Jonathan Cornelissen, Onno Kleen, Scott Payseur, Emil Sjoerup
 
 Maintainer: Kris Boudt <Kris.Boudt@ugent.be>
 
-Contributors: Giang Nguyen, Onno Kleen, Emil Sjoerup
+Contributors: Giang Nguyen
 
-Thanks: We would like to thank Brian Peterson, Chris Blakely, Eric Zivot and Maarten Schermer. We are also grateful to Dirk Eddelbuettel for his extraordinary support as a mentor during the Google Summer of Code 2019.
+Thanks: We would like to thank Brian Peterson, Chris Blakely, Dirk Eddelbuettel, Maarten Schermer, and Eric Zivot
 }

@@ -2,11 +2,11 @@
 % Please edit documentation in R/internal_jump_tests.R
 \name{mukp}
 \alias{mukp}
-\title{## mukp: to use when p,k different from range [4,6]}
+\title{to use when p,k different from range [4,6]}
 \usage{
 mukp(p, k, t = 1e+06)
 }
 \description{
-## mukp: to use when p,k different from range [4,6]
+to use when p,k different from range [4,6]
 }
 \keyword{internal}

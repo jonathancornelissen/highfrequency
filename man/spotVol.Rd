@@ -7,12 +7,12 @@
 spotVol(
   data,
   method = "detPer",
-  ...,
   alignBy = "minutes",
   alignPeriod = 5,
   marketOpen = "09:30:00",
   marketClose = "16:00:00",
-  tz = "GMT"
+  tz = "GMT",
+  ...
 )
 }
 \arguments{
@@ -23,8 +23,6 @@ parameters \code{alignBy} and \code{alignPeriod}.}
 \item{method}{specifies which method will be used to estimate the spot
 volatility. Options include \code{"detPer"} and \code{"stochper"}.
 See 'Details'.}
-
-\item{...}{method-specific parameters (see 'Details').}
 
 \item{alignBy}{string indicating the time scale in which \code{alignPeriod} is expressed.
 Possible values are: \code{"secs", "seconds", "mins", "minutes", "hours"}.}
@@ -41,6 +39,8 @@ specified by \code{tz}. By default, \code{marketClose = "16:00:00"}.}
 
 \item{tz}{fallback time zone used in case we we are unable to identify the timezone of the data, by default: \code{tz = NULL}. We attempt to extract the timezone from the DT column (or index) of the data, which may fail. 
 In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}}
+
+\item{...}{method-specific parameters (see 'Details').}
 }
 \value{
 A \code{spotVol} object, which is a list containing one or more of the
@@ -335,7 +335,7 @@ init <- list(sigma = 0.03, sigma_mu = 0.005, sigma_h = 0.007,
              delta_c = c(0.25, -0.05, -0.2, 0.13, 0.02),
              delta_s = c(-1.2, 0.11, 0.26, -0.03, 0.08))
 
-# next method will take around 110 iterations
+# Next method will take around 110 iterations
 vol1 <- spotVol(sampleOneMinuteData[, list(DT, PRICE = MARKET)], method = "stochper", init = init)
 plot(as.numeric(vol1$spot[1:780]), type="l")
 legend("topright", c("detPer", "stochper"), col = c("black", "red"), lty=1)}

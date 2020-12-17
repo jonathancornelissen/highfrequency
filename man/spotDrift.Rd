@@ -7,12 +7,12 @@
 spotDrift(
   data,
   method = "driftMean",
-  ...,
   alignBy = "minutes",
   alignPeriod = 5,
   marketOpen = "09:30:00",
   marketClose = "16:00:00",
-  tz = NULL
+  tz = NULL,
+  ...
 )
 }
 \arguments{
@@ -21,8 +21,6 @@ spotDrift(
 \item{method}{Which method to be used to estimate the spot-drift. Currently, three methods are available, 
 rolling mean and median as well as the kernel method of Christensen et al. 2018.
 The kernel is a left hand exponential kernel that will weigh newer observations more heavily than older observations.}
-
-\item{...}{Additional arguments for the individual methods. See details}
 
 \item{alignBy}{What time-frame should the estimator be applied? Accepted inputs are \code{"milliseconds"}, \code{"seconds"} and \code{"secs"} for seconds,
  \code{"minutes"} and \code{"mins"} for minutes, and \code{"hours"} for hours.
@@ -36,6 +34,8 @@ Standard is minutes}
 
 \item{tz}{fallback time zone used in case we we are unable to identify the timezone of the data, by default: \code{tz = NULL}. We attempt to extract the timezone from the DT column (or index) of the data, which may fail. 
 In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}}
+
+\item{...}{Additional arguments for the individual methods. See details}
 }
 \value{
 An object of class \code{"spotDrift"} containing at least the estimated spot drift process. Input on what this class should contain and methods for it is welcome.

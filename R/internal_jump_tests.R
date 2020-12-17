@@ -1,5 +1,5 @@
 
-#' ## mukp: to use when p,k different from range [4,6]
+#' to use when p,k different from range [4,6]
 #' @importFrom stats rnorm
 #' @keywords internal
 mukp <- function(p, k, t = 1000000) {

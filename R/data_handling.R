@@ -20,7 +20,7 @@
 #' for previous tick aggregation, by setting \code{FUN = "previoustick"} (default).
 #' @param tz character denoting which timezone the output should be in. Defaults to NULL
 #' @details The timestamps of the new time series are the closing times and/or days of the intervals. 
-#' E.g. for a weekly aggregation the new timestamp is the last day in that particular week (namely sunday).
+#' E.g. for a weekly aggregation the new timestamp is the last day in that particular week (namely Sunday).
 #' 
 #' In case of previous tick aggregation, 
 #' for \code{alignBy} is either \code{"seconds"} \code{"minutes"}, or \code{"hours"},
@@ -28,7 +28,7 @@
 #' the last observation up to that point, including the value at 09:35:00 itself.
 #' 
 #' Please note: In case an interval is empty, by default an NA is returned.. In case e.g. previous 
-#' tick aggregation it makes sense to fill these NA's by the function \code{na.locf}
+#' tick aggregation it makes sense to fill these NAs by the function \code{na.locf}
 #' (last observation carried forward) from the \pkg{zoo} package.
 #' 
 #' In case \code{alignBy = "ticks"}, the sampling is done such the sampling starts on the first tick, and the last tick is always included.
@@ -41,15 +41,15 @@
 #' @keywords data manipulation
 #' 
 #' @examples 
-#' #load sample price data
+#' # Load sample price data
 #' \dontrun{
 #' library(xts)
 #' ts <- as.xts(sampleTData[, list(DT, PRICE, SIZE)])
 #' 
-#' #Previous tick aggregation to the 5-minute sampling frequency:
+#' # Previous tick aggregation to the 5-minute sampling frequency:
 #' tsagg5min <- aggregateTS(ts, alignBy = "minutes", alignPeriod = 5)
 #' head(tsagg5min)
-#' #Previous tick aggregation to the 30-second sampling frequency:
+#' # Previous tick aggregation to the 30-second sampling frequency:
 #' tsagg30sec <- aggregateTS(ts, alignBy = "seconds", alignPeriod = 30)
 #' tail(tsagg30sec)
 #' tsagg3ticks <- aggregateTS(ts, alignBy = "ticks", alignPeriod = 3)
@@ -225,12 +225,12 @@ aggregateTS <- function (ts, FUN = "previoustick", alignBy = "minutes", alignPer
 #' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
 #' @keywords data manipulation
 #' @examples
-#' # aggregate price data to the 30 second frequency
+#' # Aggregate price data to the 30 second frequency
 #' aggregatePrice(sampleTData, alignBy = "secs", alignPeriod = 30)
-#' # aggregate price data to the 30 second frequency including zero return price changes
+#' # Aggregate price data to the 30 second frequency including zero return price changes
 #' aggregatePrice(sampleTData, alignBy = "secs", alignPeriod = 30)
 #'
-#' # aggregate price data to half a second frequency including zero return price changes
+#' # Aggregate price data to half a second frequency including zero return price changes
 #' aggregatePrice(sampleTData, alignBy = "milliseconds", alignPeriod = 500, fill = TRUE)
 #' @importFrom xts last tzone
 #' @importFrom data.table fifelse
@@ -393,7 +393,7 @@ aggregatePrice <- function(pData, alignBy = "minutes", alignPeriod = 1, marketOp
 #' Aggregate a \code{data.table} or \code{xts} object containing quote data
 #' 
 #' @description Aggregate tick-by-tick quote data and return a \code{data.table} or \code{xts} object containing the aggregated quote data.
-#' See \code{\link{sampleQData}} for an example of the argument qData. This function accepts arbitrary number of symbols over an aribtrary number of days.
+#' See \code{\link{sampleQData}} for an example of the argument qData. This function accepts arbitrary number of symbols over an arbitrary number of days.
 #' 
 #' @param qData \code{data.table} or \code{xts} object to be aggregated, containing the intraday quote data of a stock for one day.
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours", and "ticks".
@@ -419,7 +419,7 @@ aggregatePrice <- function(pData, alignBy = "minutes", alignPeriod = 1, marketOp
 #' @keywords data manipulation
 #' 
 #' @examples
-#' # aggregate quote data to the 30 second frequency
+#' # Aggregate quote data to the 30 second frequency
 #' qDataAggregated <- aggregateQuotes(sampleQData, alignBy = "seconds", alignPeriod = 30)
 #' qDataAggregated # Show the aggregated data
 #' @export
@@ -587,7 +587,7 @@ aggregateQuotes <- function(qData, alignBy = "minutes", alignPeriod = 5, marketO
 #' @keywords data manipulation
 #' 
 #' @examples 
-#' # aggregate trade data to 5 minute frequency
+#' # Aggregate trade data to 5 minute frequency
 #' tDataAggregated <- aggregateTrades(sampleTData, alignBy = "minutes", alignPeriod = 5)
 #' tDataAggregated
 #' @export
@@ -914,6 +914,7 @@ autoSelectExchangeQuotes <- function(qData, printExchange = TRUE) {
 exchangeHoursOnly <- function(data, marketOpen = "09:30:00", marketClose = "16:00:00", tz = NULL) {
   .N <- N <- DATE <- DT <- NULL # needed for data table (otherwise notes pop up in check())
   data <- checkColumnNames(data)
+  nm <- toupper(colnames(data))
   
   inputWasXts <- FALSE
   if (!is.data.table(data)) {
@@ -968,7 +969,7 @@ exchangeHoursOnly <- function(data, marketOpen = "09:30:00", marketClose = "16:0
   
   # Subset observations that does not fall between their respective market opening and market closing times.
   data <- data[between(DT, rep(marketOpenNumeric, obsPerDay), rep(marketCloseNumeric, obsPerDay))]
-  
+  data <- data[, nm, with = FALSE]
   if (inputWasXts) {
     return(xts(as.matrix(data[, -c("DT")]), order.by = data$DT, tzone = tzone(data$DT)))
   } else {
@@ -1081,7 +1082,7 @@ makeReturns <- function(ts) {
 #' The algorithm tries to match trades that fall outside the bid - ask and first tries to match a small window forwards and if this fails, it tries to match backwards in a bigger window.
 #' The small window is a tolerance for inaccuracies in the timestamps of bids and asks. The backwards window allow for matching of late reported trades. I.e. block trades.
 #' @param backwardsWindow a numeric denoting the length of the backwards window used when \code{BFM = TRUE}. Default is 3600, corresponding to one hour.
-#' @param forwardsWindow a numeric denoting the length of the forwards window used when \code{BFM = TRUE}. Default is 0.5, dorresponding to one half second.
+#' @param forwardsWindow a numeric denoting the length of the forwards window used when \code{BFM = TRUE}. Default is 0.5, corresponding to one half second.
 #' @param plot a logical denoting whether to visualize the forwards, backwards, and unmatched trades in a plot.
 #' @param ... used internally. Don't set this parameter
 #' 
@@ -1096,7 +1097,7 @@ makeReturns <- function(ts) {
 #' @keywords data manipulation
 #' 
 #' @examples 
-#' # multi-day input allowed
+#' # Multi-day input allowed
 #' tqData <- matchTradesQuotes(sampleTData, sampleQData)
 #' # Show output
 #' tqData
@@ -1499,7 +1500,7 @@ noZeroQuotes <- function(qData) {
 #' }. The default value is \code{"auto"} which automatically selects the exchange for the stocks and days independently using the \code{\link{autoSelectExchangeQuotes}}
 #' @param qDataRaw \code{xts} or \code{data.table} object containing raw quote data, possibly for multiple symbols over multiple days. This argument is \code{NULL} by default. 
 #' Enabling it means the arguments \code{dataSource} and \code{dataDestination} will be ignored. (only advisable for small chunks of data)
-#' @param report boolean and \code{TRUE} by default. In case it is true and we don't use the on-disk functionalit, the function returns (also) a vector indicating how many quotes were deleted by each cleaning step.
+#' @param report boolean and \code{TRUE} by default. In case it is true and we don't use the on-disk functionality, the function returns (also) a vector indicating how many quotes were deleted by each cleaning step.
 #' @param selection argument to be passed on to the cleaning routine \code{\link{mergeQuotesSameTimestamp}}. The default is \code{"median"}.
 #' @param maxi spreads which are greater than median spreads of the day times \code{maxi} are excluded.
 #' @param window argument to be passed on to the cleaning routine \code{\link{rmOutliersQuotes}}. 
@@ -1544,7 +1545,7 @@ noZeroQuotes <- function(qData) {
 #' dim(qDataAfterCleaning$qData)
 #' 
 #' # In case you have more data it is advised to use the on-disk functionality
-#' #via "dataSource" and "dataDestination" arguments
+#' # via "dataSource" and "dataDestination" arguments
 #' 
 #' @importFrom data.table fread
 #' @importFrom utils unzip
@@ -1819,7 +1820,7 @@ rmNegativeSpread <- function(qData) {
 #' The algorithm tries to match trades that fall outside the bid - ask and first tries to match a small window forwards and if this fails, it tries to match backwards in a bigger window.
 #' The small window is a tolerance for inaccuracies in the timestamps of bids and asks. The backwards window allow for matching of late reported trades. I.e. block trades.
 #' @param backwardsWindow a numeric denoting the length of the backwards window. Default is 3600, corresponding to one hour.
-#' @param forwardsWindow a numeric denoting the length of the forwards window. Default is 0.5, dorresponding to one half second.
+#' @param forwardsWindow a numeric denoting the length of the forwards window. Default is 0.5, corresponding to one half second.
 #' @param plot a logical denoting whether to visualize the forwards, backwards, and unmatched trades in a plot.
 #' @param ... used internally
 #' @details Note: in order to work correctly, the input data of this function should be
@@ -2049,7 +2050,7 @@ salesCondition <- function(tData, validConds = c('', '@', 'E', '@E', 'F', 'FI', 
 #' 
 #' @details To get more information on the sales conditions, see the NYSE documentation. Section about Daily TAQ Trades File.
 #' The current version (as of May 2020) can be found online at \href{https://www.nyse.com/publicdocs/nyse/data/Daily_TAQ_Client_Spec_v3.3.pdf}{NYSE's webpage}
-#' @note Some CSV readers and the WRDS API parses empty strings as NA's. We transform \code{NA} values in COND to \code{""}.
+#' @note Some CSV readers and the WRDS API parses empty strings as NAs. We transform \code{NA} values in COND to \code{""}.
 #' @return \code{xts} or \code{data.table} object depending on input
 #' 
 #' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
@@ -2148,7 +2149,7 @@ selectExchange <- function(data, exch = "N") {
 #' 
 #' Since the function \code{\link{rmTradeOutliersUsingQuotes}}
 #' also requires cleaned quote data as input, it is not incorporated here and
-#' there is a seperate wrapper called \code{\link{tradesCleanupUsingQuotes}}.
+#' there is a separate wrapper called \code{\link{tradesCleanupUsingQuotes}}.
 #' 
 #' @param dataSource character indicating the folder in which the original data is stored.
 #' @param dataDestination character indicating the folder in which the cleaned data is stored.
@@ -2208,8 +2209,8 @@ selectExchange <- function(data, exch = "N") {
 #'                                          exchanges = list("N"))
 #' tDataAfterFirstCleaning$report
 #' dim(tDataAfterFirstCleaning$tData)
-#' #In case you have more data it is advised to use the on-disk functionality
-#' #via "dataSource" and "dataDestination" arguments
+#' # In case you have more data it is advised to use the on-disk functionality
+#' # via "dataSource" and "dataDestination" arguments
 #' 
 #' @references Barndorff-Nielsen, O. E., P. R. Hansen, A. Lunde, and N. Shephard (2009). Realized kernels in practice: Trades and quotes. Econometrics Journal 12, C1-C32.
 #' 
@@ -2429,7 +2430,6 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
 #' # Consider you have raw trade data for 1 stock for 2 days 
 #' tDataAfterFirstCleaning <- tradesCleanup(tDataRaw = sampleTDataRaw, 
 #'                                           exchanges = "N", report = FALSE)
-#' # 
 #' qData <- quotesCleanup(qDataRaw = sampleQDataRaw, 
 #'                        exchanges = "N", report = FALSE)
 #' dim(tDataAfterFirstCleaning)
@@ -2437,8 +2437,8 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
 #'   tradesCleanupUsingQuotes(qData = qData[as.Date(DT) == "2018-01-02"],
 #'                            tData = tDataAfterFirstCleaning[as.Date(DT) == "2018-01-02"])
 #' dim(tDataAfterFinalCleaning)
-#' #In case you have more data it is advised to use the on-disk functionality
-#' #via the "tradeDataSource", "quoteDataSource", and "dataDestination" arguments
+#' # In case you have more data it is advised to use the on-disk functionality
+#' # via the "tradeDataSource", "quoteDataSource", and "dataDestination" arguments
 #' @keywords cleaning
 #' @export
 tradesCleanupUsingQuotes <- function(tradeDataSource = NULL, quoteDataSource = NULL, dataDestination = NULL, tData = NULL, qData = NULL, lagQuotes = 2,
@@ -2535,7 +2535,7 @@ tradesCleanupUsingQuotes <- function(tradeDataSource = NULL, quoteDataSource = N
 #' 
 #' @return An \code{xts} or \code{data.table} object containing the synchronized time series - depending on the input.
 #' 
-#' @references Harris, F., T. McInish, G. Shoesmith, and R. Wood (1995). Cointegration, error correction, and price discovery on infomationally linked security markets. Journal of Financial and Quantitative Analysis 30, 563-581.
+#' @references Harris, F., T. McInish, G. Shoesmith, and R. Wood (1995). Cointegration, error correction, and price discovery on informationally linked security markets. Journal of Financial and Quantitative Analysis 30, 563-581.
 #' 
 #' @examples 
 #' # Suppose irregular timepoints:
@@ -2819,7 +2819,7 @@ businessTimeAggregation <- function(pData, measure = "volume", obs = 390, bandwi
 
 #' Make Open-High-Low-Close-Volume bars
 #' 
-#' This function makes OHLC-V bars at arbitrary intevals. If the SIZE column is not present in the input, no volume column is created.
+#' This function makes OHLC-V bars at arbitrary intervals. If the SIZE column is not present in the input, no volume column is created.
 #' @param pData \code{data.table} or \code{xts} object to make the bars out of, containing the intraday price series of possibly multiple stocks for possibly multiple days.
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours", and "ticks".
 #' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
@@ -2830,21 +2830,21 @@ businessTimeAggregation <- function(pData, measure = "volume", obs = 390, bandwi
 #' @examples 
 #' \dontrun{
 #' minuteBars <- makeOHLCV(sampleTDataEurope, alignBy = "minutes", alignPeriod = 1)
-#' ## We can use the quantmod package's chartSeries function to plot the ohlcv data
+#' # We can use the quantmod package's chartSeries function to plot the ohlcv data
 #' quantmod::chartSeries(minuteBars)
 #' 
 #' minuteBars <- makeOHLCV(sampleTDataEurope[,], alignBy = "minutes", alignPeriod = 1)
-#' ## Again we plot the series with chartSeries
+#' # Again we plot the series with chartSeries
 #' quantmod::chartSeries(minuteBars)
 #' 
-#' ## We can also handle data across multiple days.
+#' # We can also handle data across multiple days.
 #' fiveMinuteBars <- makeOHLCV(sampleTData)
-#' ## Again we plot the series with chartSeries
+#' # Again we plot the series with chartSeries
 #' quantmod::chartSeries(fiveMinuteBars)
 #' 
-#' ## We can use arbitrary alignPeriod, here we choose pi
+#' # We can use arbitrary alignPeriod, here we choose pi
 #' bars <- makeOHLCV(sampleTDataEurope, alignBy = "seconds", alignPeriod = pi)
-#' ## Again we plot the series with chartSeries
+#' # Again we plot the series with chartSeries
 #' quantmod::chartSeries(bars)
 #' }
 #' @author Emil Sjoerup
@@ -2926,7 +2926,7 @@ makeOHLCV <- function(pData, alignBy = "minutes", alignPeriod = 5, tz = NULL){
 
 #' Convert to format for realized measures
 #' 
-#' Convenience function to split data from one \code{xts} or \code{data.table} with atleast DT, SYMBOL, and PRICE columns to a format that can be used in the 
+#' Convenience function to split data from one \code{xts} or \code{data.table} with at least DT, SYMBOL, and PRICE columns to a format that can be used in the 
 #' r* functions for calculation of realized measures.
 #' 
 #' @param data An \code{xts} or a \code{data.table} object with atleast DT, SYMBOL, and PRICE columns. This data should already be cleaned.

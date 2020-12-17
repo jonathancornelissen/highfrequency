@@ -16,7 +16,7 @@ hatIV <- function(rData, IVestimator, startV = NULL) {
          CTBV = ctBV(rData, startV = startV))
 }
 
-### ivInference help functions:
+### IVinference help functions:
 ##IQ estimator:
 #' @keywords internal
 hatIQ <- function (rData, IQestimator) {
@@ -52,7 +52,7 @@ IV <- function(IVestimator, iq) {
 #' 
 #' Assume there is \eqn{N} equispaced returns in period \eqn{t}.
 #' 
-#' Then the ivInference is given by: 
+#' Then the IVinference is given by: 
 #' \deqn{
 #' \mbox{standard error}= \frac{1}{\sqrt{N}} *sd
 #' }
@@ -89,7 +89,7 @@ IV <- function(IVestimator, iq) {
 #' \deqn{
 #' \mbox{X}_{t}=  \int_{0}^{t} a_udu + \int_{0}^{t}\sigma_{u}dW_{u}
 #' }
-#' where \eqn{a} is the drift term, \eqn{\sigma} denotes the spot volatility process, \eqn{W} is a standard Brownian motion (assume that there are no jumps). 
+#' where \eqn{a} is the drift term, \eqn{\sigma} denotes the spot vivInferenceolatility process, \eqn{W} is a standard Brownian motion (assume that there are no jumps). 
 #' 
 #' @references Andersen, T. G., D. Dobrev, and E. Schaumburg (2012). Jump-robust volatility estimation using nearest neighbor truncation. Journal of Econometrics, 169(1), 75- 93.
 #' 
@@ -100,18 +100,18 @@ IV <- function(IVestimator, iq) {
 #' @examples 
 #' \dontrun{
 #' library("xts") # This function only accepts xts data currently
-#' ivInf <- ivInference(as.xts(sampleTData[, list(DT, PRICE)]), IVestimator= "rMinRV",
+#' ivInf <- IVinference(as.xts(sampleTData[, list(DT, PRICE)]), IVestimator= "rMinRV",
 #'                      IQestimator = "rMedRQ", confidence = 0.95, makeReturns = TRUE)
 #' ivInf
 #' }
 #'             
-#' @keywords highfrequency ivInference
+#' @keywords highfrequency IVinference
 #' @export 
-ivInference <- function(rData, IVestimator = "RV", IQestimator = "rQuar", confidence = 0.95, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, ...) {
+IVinference <- function(rData, IVestimator = "RV", IQestimator = "rQuar", confidence = 0.95, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, ...) {
   
   if (checkMultiDays(rData)) { 
     
-    result <- applyGetList(rData, ivInference, IVestimator = IVestimator, IQestimator = IQestimator, confidence = confidence, alignBy = alignBy, 
+    result <- applyGetList(rData, IVinference, IVestimator = IVestimator, IQestimator = IQestimator, confidence = confidence, alignBy = alignBy, 
                           alignPeriod = alignPeriod, makeReturns = makeReturns)
     names(result) <- unique(as.Date(index(rData)))
     return(result)

@@ -22,6 +22,9 @@ ReMeDI(pData, kn = 1, lags = 1, knEqual = FALSE, makeCorrelation = FALSE)
 ReMeDI
 This function estimates the auto-covariance of market-microstructure noise
 }
+\note{
+We Thank Merrick Li for contributing his Matlab code for this estimator.
+}
 \examples{
 remed <- ReMeDI(sampleTData[as.Date(DT) == "2018-01-02", ], kn = 2, lags = 1:8)
 # We can also use the algorithm for choosing the kn to 

@@ -34,7 +34,7 @@ A \code{data.table} or an \code{xts} object containing the aggregated quote data
 }
 \description{
 Aggregate tick-by-tick quote data and return a \code{data.table} or \code{xts} object containing the aggregated quote data.
-See \code{\link{sampleQData}} for an example of the argument qData. This function accepts arbitrary number of symbols over an aribtrary number of days.
+See \code{\link{sampleQData}} for an example of the argument qData. This function accepts arbitrary number of symbols over an arbitrary number of days.
 }
 \details{
 The output "BID" and "OFR" columns are constructed using previous tick aggregation.
@@ -46,7 +46,7 @@ The timestamps of the new time series are the closing times of the intervals.
 Please note: Returned objects always contain the first observation (i.e. opening quotes,...).
 }
 \examples{
-# aggregate quote data to the 30 second frequency
+# Aggregate quote data to the 30 second frequency
 qDataAggregated <- aggregateQuotes(sampleQData, alignBy = "seconds", alignPeriod = 30)
 qDataAggregated # Show the aggregated data
 }

@@ -28,7 +28,7 @@ The small window is a tolerance for inaccuracies in the timestamps of bids and a
 
 \item{backwardsWindow}{a numeric denoting the length of the backwards window. Default is 3600, corresponding to one hour.}
 
-\item{forwardsWindow}{a numeric denoting the length of the forwards window. Default is 0.5, dorresponding to one half second.}
+\item{forwardsWindow}{a numeric denoting the length of the forwards window. Default is 0.5, corresponding to one half second.}
 
 \item{plot}{a logical denoting whether to visualize the forwards, backwards, and unmatched trades in a plot.}
 

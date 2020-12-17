@@ -6,13 +6,14 @@
 #' trades (in levels) respectively. If pData is an \code{xts} object and the number of columns is greater than one, PRICE must be present.
 #' @param testTimes A \code{numeric} containing the times at which to calculate the tests. The standard of \code{seq(34260, 57600, 60)} 
 #' denotes calculating the test-statistic once per minute, i.e. 390 times for a typical 6.5 hour trading day from 9:31:00 to 16:00:00. See details.
+#' Additionally, \code{testTimes} can be set to 'all' where the test statistic will be calculated on each tick more than 5 seconds after opening
 #' @param preAverage A positive \code{integer} denoting the length of pre-averaging window for the log-prices. Default is 5
 #' @param ACLag A positive \code{integer} greater than 1 denoting how many lags are to be used for the HAC estimator of the variance - the default
 #' of \code{-1} denotes using an automatic lag selection algorithm for each iteration. Default is -1L
 #' @param meanBandwidth An \code{integer} denoting the bandwidth for the left-sided exponential kernel for the mean. Default is 300L
 #' @param varianceBandwidth An \code{integer} denoting the bandwidth for the left-sided exponential kernel for the variance. Default is 900L
 #' @param parallelize A \code{logical} to determine whether to parallelize the underlying C++ code (Using OpenMP). Default is FALSE
-#' @param nCores An \code{integer} denoting the number of cores to use for calculating the code when paralellized. 
+#' @param nCores An \code{integer} denoting the number of cores to use for calculating the code when parallelized. 
 #' If this argument is not provided, sequential evaluation will be used even though \code{parallelize} is TRUE. Default is NA
 #' @param warnings A \code{logical} denoting whether warnings should be shown. Default is TRUE
 #' @details 
@@ -27,27 +28,28 @@
 #' retrieves critical values for the test described in appendix B 
 #' 
 #' @examples 
-#' ## Usage with data.table object
+#' # Usage with data.table object
 #' dat <- sampleTData[as.Date(DT) == "2018-01-02"]
-#' ## Testing every 60 seconds after 09:45:00
+#' # Testing every 60 seconds after 09:45:00
 #' DBH1 <- driftBursts(dat, testTimes = seq(35100, 57600, 60), preAverage = 2, ACLag = -1L,
 #'                     meanBandwidth = 300L, varianceBandwidth = 900L)
 #' print(DBH1)
 #' 
 #' plot(DBH1, pData = dat)
-#' ## Usage with xts object (1 column)
+#' # Usage with xts object (1 column)
 #' library("xts")
 #' dat <- xts(sampleTData[as.Date(DT) == "2018-01-03"]$PRICE, 
 #'            order.by = sampleTData[as.Date(DT) == "2018-01-03"]$DT)
-#' ## Testing every 60 seconds after 09:45:00
+#' # Testing every 60 seconds after 09:45:00
 #' DBH2 <- driftBursts(dat, testTimes = seq(35100, 57600, 60), preAverage = 2, ACLag = -1L,
 #'                     meanBandwidth = 300L, varianceBandwidth = 900L)
 #' plot(DBH2, pData = dat)
 #' 
-#' \dontrun{ ## This block takes some time
+#' \dontrun{ 
+#' # This block takes some time
 #' dat <- xts(sampleTDataEurope$PRICE, 
 #'            order.by = sampleTDataEurope$DT)
-#' ## Testing every 60 seconds after 09:00:00
+#' # Testing every 60 seconds after 09:00:00
 #' system.time({DBH4 <- driftBursts(dat, testTimes = seq(32400 + 900, 63000, 60), preAverage = 2, 
 #'              ACLag = -1L, meanBandwidth = 300L, varianceBandwidth = 900L)})
 #'
@@ -99,15 +101,15 @@ driftBursts <- function(pData, testTimes = seq(34260, 57600, 60),
       stop("pData must have columns DT and PRICE")
     }
     
-    timeZone <- attr(pData$DT, "tzone")
-    if(timeZone == ""){
+    timeZone <- format(pData$DT[1], format = "%Z")
+    if(is.null(timeZone) || timeZone == ""){
       tz <- "UTC"
       pData[, DT := as.POSIXct(format(DT, digits = 20, nsmall = 20), tz = tz)]
     } else {
       tz <- timeZone
     }
     
-    timestamps <- as.numeric(pData$DT, tz = tz) - as.numeric(as.POSIXct(paste0(as.Date(pData$DT[1], tz = tz)), format = "%Y-%m-%d", tz = tz), tz = tz)
+    timestamps <- as.numeric(pData$DT, tz = tz) - as.numeric(as.POSIXct(as.Date(pData$DT[1], tz = tz), format = "%Y-%m-%d", tz = tz), tz = tz)
     logPrices <- log(pData$PRICE)
     
   } else if (is.xts(pData)){ ##xts case
@@ -148,6 +150,11 @@ driftBursts <- function(pData, testTimes = seq(34260, 57600, 60),
     }
     parallelize <- FALSE
   }
+  
+  if(testTimes[1] == 'all'){
+    timestamps[timestamps > timestamps[1] + 5]
+  }
+  
   if(min(timestamps) + 5 >= min(testTimes)){ ## Safeguard to prevent faulty inputs that causes crashes!
     testTimes <- testTimes[-1]
     pad <- 1
@@ -237,7 +244,7 @@ driftBursts <- function(pData, testTimes = seq(34260, 57600, 60),
 #' both the drift and volatility processes are plotted. CaPiTAlizAtIOn doesn't matter}
 #' }
 #' @examples
-#' ## Testing every 60 seconds after 09:15:00
+#' # Testing every 60 seconds after 09:15:00
 #' DBH <- driftBursts(sampleTDataEurope, testTimes = seq(32400 + 900, 63000, 60), preAverage = 2, 
 #'                     ACLag = -1L, meanBandwidth = 300L, varianceBandwidth = 900L)
 #' plot(DBH)
@@ -283,8 +290,8 @@ plot.DBH <- function(x, ...){
         stop("pData must have columns DT and PRICE")
       }
       
-      timeZone <- attr(pData$DT, "tzone")
-      if(timeZone == ""){
+      timeZone <- format(pData$DT[1], format = "%Z")
+      if(is.null(timeZone) || timeZone == ""){
         tz <- "UTC"
         pData[, DT := as.POSIXct(format(DT, digits = 20, nsmall = 20), tz = tz)]
       } else {

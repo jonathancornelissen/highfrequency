@@ -529,7 +529,6 @@ JOjumpTest <- function(pData, power = 4, alignBy = NULL, alignPeriod = NULL, alp
 #' @param volEstimator character denoting which volatility estimator to use for the tests. See \link{spotVol}. Default = \code{"RM"} denoting realized measures.
 #' @param driftEstimator character denoting which drift estimator to use for the tests. See \link{spotDrift}. Default = \code{"none"} denoting no drift estimation.
 #' @param alpha numeric of length one determining what confidence level to use when constructing the critical values.
-#' @param ... extra arguments passed on to \code{\link{spotVol}} for the volatility estimation, and to \code{\link{spotDrift}}.
 #' @param alignBy string indicating the time scale in which \code{alignPeriod} is expressed.
 #' Possible values are: \code{"secs", "seconds", "mins", "minutes", "hours"}.
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
@@ -541,6 +540,7 @@ JOjumpTest <- function(pData, power = 4, alignBy = NULL, alignPeriod = NULL, alp
 #' specified by \code{tz}. By default, \code{marketClose = "16:00:00"}.
 #' @param tz fallback time zone used in case we we are unable to identify the timezone of the data, by default: \code{tz = NULL}. We attempt to extract the timezone from the DT column (or index) of the data, which may fail. 
 #' In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}
+#' @param ... extra arguments passed on to \code{\link{spotVol}} for the volatility estimation, and to \code{\link{spotDrift}}.
 #' 
 #' The null hypothesis of the tests in this function is that there are no jumps in the price series
 #' 
@@ -566,8 +566,8 @@ JOjumpTest <- function(pData, power = 4, alignBy = NULL, alignPeriod = NULL, alp
 #' @importFrom zoo index
 #' @export
 
-intradayJumpTest <- function(pData, volEstimator = "RM", driftEstimator = "none", alpha = 0.95, ..., alignBy = "minutes", alignPeriod = 5,
-                             marketOpen = "09:30:00", marketClose = "16:00:00", tz = "GMT"){
+intradayJumpTest <- function(pData, volEstimator = "RM", driftEstimator = "none", alpha = 0.95, alignBy = "minutes", alignPeriod = 5,
+                             marketOpen = "09:30:00", marketClose = "16:00:00", tz = "GMT", ...){
 
   PRICE = DATE = RETURN = DT = NULL
   
@@ -858,7 +858,7 @@ plot.intradayJumpTest <- function(x, ...){
 #' 
 #' @param marketPrice data.table or \code{xts}containing the market prices in levels
 #' @param stockPrices list containing the individual stock prices in either data.table or \code{xts}format. The format should be the the same as \code{marketPrice}
-#' @param alpha signicance level (in standard deviations) to use for the jump detections. Default is \code{c(5,3)} for 5 and 3 in the market and stocks respectively.
+#' @param alpha significance level (in standard deviations) to use for the jump detections. Default is \code{c(5,3)} for 5 and 3 in the market and stocks respectively.
 #' @param localWindow numeric denoting the local window for the bootstrap algorithm. Default is \code{30}
 #' @param coarseFreq numeric denoting the coarse sampling frequency. Default is \code{10}
 #' @param rank rank of the jump matrix under the null hypothesis. Default is \code{1}
@@ -877,7 +877,7 @@ plot.intradayJumpTest <- function(x, ...){
 #' @param tz string specifying the time zone to which the times in \code{data}
 #' and/or \code{marketOpen}/ \code{marketClose} belong. Default = \code{"GMT"}.
 #' 
-#' @return A list containing \code{criticalValues} which are the bootstrapped critcal values, \code{testStatistic} the test statistic of the jump test, \code{dimensions} which are the dimensions of the jump matrix
+#' @return A list containing \code{criticalValues} which are the bootstrapped critical values, \code{testStatistic} the test statistic of the jump test, \code{dimensions} which are the dimensions of the jump matrix
 #'  \code{marketJumpDetections} the jumps detected in the market prices, \code{stockJumpDetections} the co-jumps detected in the individual stock prices, and \code{jumpIndices} which are the indices of the detected jumps.
 #' 
 #' @references Li et al. (2019). Rank Tests at Jump Events, Journal of Business & Economic Statistics, 37(2), 312- 321.

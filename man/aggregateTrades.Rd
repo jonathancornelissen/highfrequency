@@ -52,7 +52,7 @@ the element of the returned series with e.g. timestamp 09:35:00 contains
 the last observation up to that point, including the value at 09:35:00 itself.
 }
 \examples{
-# aggregate trade data to 5 minute frequency
+# Aggregate trade data to 5 minute frequency
 tDataAggregated <- aggregateTrades(sampleTData, alignBy = "minutes", alignPeriod = 5)
 tDataAggregated
 }

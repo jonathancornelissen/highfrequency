@@ -1,6 +1,6 @@
 #' @title Get high frequency data from Alpha Vantage
 #' 
-#' @description Function to retrieve high frequency data from Alpha Vantage - wrapper around quantMods' getSymbols.av function
+#' @description Function to retrieve high frequency data from Alpha Vantage - wrapper around quantMod's getSymbols.av function
 #' 
 #' @param symbols character vector with the symbols to import.
 #' @param interval the sampling interval of the data retrieved. Should be one of one of "1min", "5min", "15min", "30min", or "60min"

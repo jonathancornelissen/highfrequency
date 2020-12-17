@@ -78,7 +78,7 @@ test_that("selectExchange and data cleaning functions", {
   
   expect_equal(
   dim(tradesCleanup(tDataRaw = sampleTDataRaw, exchanges = "N", report = FALSE)),
-  c(6140, 13)
+  c(6140, 12)
   )
 })
 
