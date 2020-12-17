@@ -52,7 +52,7 @@
 #' logReturns <- logReturns - mean(logReturns)
 #' 
 #' # Returns and 
-#' SPYxts <- xts(cbind(logReturns, SPYRM$RK5[-1] * 10000), order.by = SPYRM$DT[-1])
+#' SPYxts <- xts::xts(cbind(logReturns, SPYRM$RK5[-1] * 10000), order.by = SPYRM$DT[-1])
 #' 
 #' # Due to return calculation, the first observation is missing
 #' fittedHEAVY <- HEAVYmodel(SPYxts)
