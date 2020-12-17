@@ -55,13 +55,13 @@ logReturns <- 100 * makeReturns(SPYRM$CLOSE)[-1]
 # Returns are assumed to be demeaned
 logReturns <- logReturns - mean(logReturns)
 
-# Returns and 
-SPYxts <- xts::xts(cbind(logReturns, SPYRM$RK5[-1] * 10000), order.by = SPYRM$DT[-1])
+# Combine both returns and realized measures into one xts
+dataSPY <- xts::xts(cbind(logReturns, SPYRM$RK5[-1] * 10000), order.by = SPYRM$DT[-1])
 
 # Due to return calculation, the first observation is missing
-fittedHEAVY <- HEAVYmodel(SPYxts)
+fittedHEAVY <- HEAVYmodel(dataSPY)
 
-# Examine tThe estimated coefficients and robust standard errors
+# Examine the estimated coefficients and robust standard errors
 fittedHEAVY
 
 # Calculate iterative multi-step-ahead forecasts

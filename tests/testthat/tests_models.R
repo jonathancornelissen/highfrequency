@@ -65,8 +65,8 @@ test_that("HEAVYmodel",{
   
   logReturns <- 100 * makeReturns(SPYRM$CLOSE)[-1]
   logReturns <- logReturns - mean(logReturns)
-  SPYxts <- xts::xts(cbind(logReturns, SPYRM$BPV5[-1] * 10000), order.by = SPYRM$DT[-1])
-  output <- HEAVYmodel(SPYxts)
+  dataSPY <- xts::xts(cbind(logReturns, SPYRM$BPV5[-1] * 10000), order.by = SPYRM$DT[-1])
+  output <- HEAVYmodel(dataSPY)
   expect_identical(
     formatC(sum(output$coefficients), digits = 6),
     "2.67386"
