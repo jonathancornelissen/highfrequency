@@ -62,8 +62,8 @@ rBeta(a, b, RCOVestimator = "rBPCov", RVestimator = "rMinRV", makeReturns = TRUE
 
 }
 \references{
-Barndorff-Nielsen, O. E., & Shephard, N. (2004). Econometric analysis of realized covariation: High frequency based covariance, regression, and correlation in
-financial economics. Econometrica, 72(3), 885-925.
+Barndorff-Nielsen, O. E., Shephard, N. (2004). Econometric analysis of realized covariation: high frequency based covariance, regression, and correlation in
+financial economics. \emph{Econometrica}, 72, 885-925.
 }
 \author{
 Giang Nguyen, Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup

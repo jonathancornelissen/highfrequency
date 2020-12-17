@@ -37,7 +37,7 @@ additional arguments for \code{IVest} and \code{COVest} should be passed in the 
 For the \code{rMRC} estimator, which is the default, the \code{theta} and \code{delta} parameters can be set. These default to 1 and 0.1 respectively.
 }
 \references{
-Boudt, K., Laurent, S., Lunde, A., Quaedvlieg, R., and Sauri, O. (2017) Positive semidefinite integrated covariance estimation, factorizations and asynchronicity. Journal of Econometrics 196, 347-367
+Boudt, K., Laurent, S., Lunde, A., Quaedvlieg, R., and Sauri, O. (2017). Positive semidefinite integrated covariance estimation, factorizations and asynchronicity. \emph{Journal of Econometrics}, 196, 347-367.
 }
 \author{
 Emil Sjoerup

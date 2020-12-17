@@ -36,10 +36,6 @@ Let \eqn{ r_{t,i} } be an intraday \eqn{M x N} return matrix and \eqn{i=1,...,M}
 the number of intraday returns. Then, let \eqn{r_{t,i}^{+} = max(r_{t,i},0)} and \eqn{r_{t,i}^{-} = min(r_{t,i},0)}.
 
 Then, the realized semicovariance is given by the following three matrices:
-The mixed covariance matrix will have 0 on the diagonal.
-From these three matrices, the realized covariance can be constructed as pos + neg + mixed.
-The concordant semicovariance matrix is pos + neg.
-The off-diagonals of the concordant matrix is always positive, while for the mixed matrix, it is always negative.
 
 \deqn{
  \mbox{pos}_t =\sum_{i=1}^{M} r^{+}_{t,i} r^{+'}_{t,i}
@@ -50,6 +46,11 @@ The off-diagonals of the concordant matrix is always positive, while for the mix
 \deqn{
  \mbox{mixed}_t =\sum_{i=1}^{M} (r^{+}_{t,i} r^{-'}_{t,i} + r^{-}_{t,i} r^{+'}_{t,i})
 }
+
+The mixed covariance matrix will have 0 on the diagonal.
+From these three matrices, the realized covariance can be constructed as pos + neg + mixed.
+The concordant semicovariance matrix is pos + neg.
+The off-diagonals of the concordant matrix is always positive, while for the mixed matrix, it is always negative.
 }
 \details{
 In the case that cor is TRUE, the mixed matrix will be an \eqn{N x N} matrix filled with NA as mapping the mixed covariance matrix into correlation space is impossible due to the 0-diagonal.
@@ -78,7 +79,7 @@ addLegend(lty = 1) # Add legend so we can distinguish the series.
 }
 }
 \references{
-Bollerslev, T., Li, J., Patton, A. J., and Quaedvlieg, R. (2020). Realized Semicovariances. Econometrica 88, 4, 1515-1551.
+Bollerslev, T., Li, J., Patton, A. J., and Quaedvlieg, R. (2020). Realized semicovariances. \emph{Econometrica}, 88, 1515-1551.
 }
 \author{
 Emil Sjoerup

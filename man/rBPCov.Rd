@@ -64,9 +64,7 @@ rbpc
 
 }
 \references{
-Barndorff-Nielsen, O. E. and Shephard, N. (2004). Measuring the impact of
-jumps in multivariate price processes using bipower covariation. Discussion
-paper, Nuffield College, Oxford University.
+Barndorff-Nielsen, O. E., and Shephard, N. (2004). Measuring the impact of jumps in multivariate price processes using bipower covariation. Discussion paper, Nuffield College, Oxford University.
 }
 \author{
 Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
