@@ -2918,10 +2918,6 @@ rCholCov <- function(pData, IVest = "rMRC", COVest = "rMRC", criterion = "square
 #' the number of intraday returns. Then, let \eqn{r_{t,i}^{+} = max(r_{t,i},0)} and \eqn{r_{t,i}^{-} = min(r_{t,i},0)}.
 #'
 #' Then, the realized semicovariance is given by the following three matrices:
-#' The mixed covariance matrix will have 0 on the diagonal.
-#' From these three matrices, the realized covariance can be constructed as pos + neg + mixed.
-#' The concordant semicovariance matrix is pos + neg.
-#' The off-diagonals of the concordant matrix is always positive, while for the mixed matrix, it is always negative.
 #'
 #'\deqn{
 #'  \mbox{pos}_t =\sum_{i=1}^{M} r^{+}_{t,i} r^{+'}_{t,i}
@@ -2932,6 +2928,13 @@ rCholCov <- function(pData, IVest = "rMRC", COVest = "rMRC", criterion = "square
 #'\deqn{
 #'  \mbox{mixed}_t =\sum_{i=1}^{M} (r^{+}_{t,i} r^{-'}_{t,i} + r^{-}_{t,i} r^{+'}_{t,i})
 #'}
+#'
+#' The mixed covariance matrix will have 0 on the diagonal.
+#' From these three matrices, the realized covariance can be constructed as pos + neg + mixed.
+#' The concordant semicovariance matrix is pos + neg.
+#' The off-diagonals of the concordant matrix is always positive, while for the mixed matrix, it is always negative.
+#'
+#'
 #'
 #' @param rData an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days
 #' @param cor boolean, in case it is \code{TRUE}, and the input data is multivariate, the correlation is returned instead of the covariance matrix. \code{FALSE} by default.
