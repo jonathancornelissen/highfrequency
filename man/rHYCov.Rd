@@ -41,7 +41,7 @@ hy <- rHYCov(rData = as.xts(sampleOneMinuteData)["2001-08-05"],
 
 }
 \references{
-T. Hayashi and N. Yoshida. On covariance estimation of non-synchronously observed diffusion processes. \emph{Bernoulli}, 11, 359-379, 2005.
+Hayashi, T. and Yoshida, N. (2005) On covariance estimation of non-synchronously observed diffusion processes. \emph{Bernoulli}, 11, 359-379.
 }
 \author{
 Scott Payseur and Emil Sjoerup

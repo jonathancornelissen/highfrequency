@@ -78,7 +78,7 @@ addLegend(lty = 1) # Add legend so we can distinguish the series.
 }
 }
 \references{
-Bollerslev, T and Li, J and Patton, A J and Quaedvlieg, R (2020). Realized Semicovariances. Econometrica 88, 4, 1515-1551.
+Bollerslev, T., Li, J., Patton, A. J., and Quaedvlieg, R. (2020). Realized Semicovariances. Econometrica 88, 4, 1515-1551.
 }
 \author{
 Emil Sjoerup

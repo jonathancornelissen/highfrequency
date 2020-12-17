@@ -38,7 +38,7 @@ rq <- rQuar(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes",
 rq
 }
 \references{
-Andersen, T. G., D. Dobrev, and E. Schaumburg (2012). Jump-robust volatility estimation using nearest neighbor truncation. Journal of Econometrics, 169(1), 75- 93.
+Andersen, T. G., Dobrev, D., and Schaumburg, E. (2012). Jump-robust volatility estimation using nearest neighbor truncation. Journal of Econometrics, 169(1), 75- 93.
 }
 \author{
 Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup

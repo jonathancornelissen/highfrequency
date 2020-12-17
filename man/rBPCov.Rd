@@ -64,7 +64,7 @@ rbpc
  
 }
 \references{
-Barndorff-Nielsen, O. and N. Shephard (2004). Measuring the impact of
+Barndorff-Nielsen, O. E. and Shephard, N. (2004). Measuring the impact of
 jumps in multivariate price processes using bipower covariation. Discussion
 paper, Nuffield College, Oxford University.
 }

@@ -99,7 +99,7 @@ rowc
 
 }
 \references{
-Boudt, K., C. Croux, and S. Laurent (2008). Outlyingness weighted covariation. Mimeo.
+Boudt, K., Croux, C., and Laurent, S. (2008). Outlyingness weighted covariation. Mimeo.
 }
 \author{
 Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
