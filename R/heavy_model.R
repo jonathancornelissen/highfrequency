@@ -1,7 +1,7 @@
 
 
 #' HEAVY Model estimation
-#' @description This function calculates the High frEquency bAsed VolatilitY (HEAVY) model proposed in Shephard and Sheppard (2010). 
+#' @description This function calculates the High frEquency bAsed VolatilitY (HEAVY) model proposed in Shephard and Sheppard (2010, eq. (3,4)). 
 #'
 #' @param ret a vector of demeaned returns 
 #' @param rm a vector of realized stock market variation
@@ -76,19 +76,25 @@ HEAVYmodel <- function(ret, rm, startingValues = NULL) {
   
   control_neg <- list(fnscale = -1)
   
-  # Try BFGS first, otherwise Nelder-Mead
-  parVarEq <- try({optim(startingValuesVar, function(x) sum(heavyLLH(x)), method = "BFGS", control = control_neg)}, 
+  # Get into the direction of global minimum via nlminb
+  parVarEq <- try({suppressWarnings(nlminb(startingValuesVar, function(x) -sum(heavyLLH(x))))}, 
                   silent = TRUE)
   
-  parRMEq <- try({optim(startingValuesRM, function(x) sum(heavyLLH(x, RMEq = TRUE)), method = "BFGS", control = control_neg)},
+  parRMEq <- try({suppressWarnings(nlminb(startingValuesRM, function(x) -sum(heavyLLH(x, RMEq = TRUE))))},
                  silent = TRUE)
   
-  if (class(parVarEq) == "try-error") {
-    parVarEq <- optim(startingValuesVar, function(x) sum(heavyLLH(x)), control = control_neg)
-  }
+  parVarEq$value <- parVarEq$objective
+  parRMEq$value <- parRMEq$objective
   
-  if (class(parRMEq) == "try-error") {
-    parRMEq <- optim(startingValuesRM, function(x) sum(heavyLLH(x, RMEq = TRUE)), control = control_neg)
+  # Optimize w.r.t. gradient
+  parVarEqBFGS<- try({optim(parVarEq$par, function(x) -sum(heavyLLH(x)), method = "BFGS")}, silent = TRUE)
+  parRMEqBFGS<- try({optim(parRMEq$par, function(x) -sum(heavyLLH(x, RMEq = TRUE)), method = "BFGS")}, silent = TRUE)
+  
+  if (class(parVarEqBFGS) != "try-error") {
+    parVarEq <- parVarEqBFGS
+  }
+  if (class(parRMEqBFGS) != "try-error") {
+    parRMEq <- parRMEqBFGS
   }
   
   varCondVariances <- calcRecVarEq(parVarEq$par, rm)
@@ -98,14 +104,15 @@ HEAVYmodel <- function(ret, rm, startingValues = NULL) {
   names(modelEstimates) <- c("omegaVar", "alphaVar", "betaVar",
                              "omegaRM", "alphaRM", "betaRM")
   
-  # numDeriv::grad(func = function (theta) {
+  # print(numDeriv::grad(func = function (theta) {
   #   sum(heavyLLH(theta, RMEq = TRUE))
-  # }, x = parRMEq$par)
+  # }, x = parRMEq$par))
   # 
-  # numDeriv::grad(func = function (theta) {
+  # print(numDeriv::grad(func = function (theta) {
   #   sum(heavyLLH(theta, RMEq = FALSE))
-  # }, x = parVarEq$par)
-
+  # }, x = parVarEq$par))
+  # browser()
+  
   invHessianVarEq <- try({
     solve(-suppressWarnings(hessian(x = parVarEq$par, func = function (theta) {
       sum(heavyLLH(theta))
@@ -117,13 +124,28 @@ HEAVYmodel <- function(ret, rm, startingValues = NULL) {
     }, method.args=list(d = 0.0001, r = 6))))
   }, silent = TRUE)
   
+  
+  # inHessian <- solve(-suppressWarnings(hessian(x = c(parVarEq$par, parRMEq$par), func = function (theta) {
+  #   sum(heavyLLH(theta[1:3])) + sum(heavyLLH(theta[4:6], RMEq = TRUE))
+  # }, method.args=list(d = 0.0001, r = 6))))
+  # 
+  # cross_scores <- crossprod(jacobian(func = function (theta) {
+  #   heavyLLH(theta[1:3]) + heavyLLH(theta[4:6], RMEq = TRUE)
+  # }, c(parVarEq$par, parRMEq$par),  method.args=list(d = 0.0001, r = 6)))
+  # 
+  # sqrt(diag(inHessian %*% cross_scores %*% inHessian))
+  
+  # invHessianVarEq
+  # 
+  # rbind(cbind(invHessianVarEq, matrix(0,3,3)), cbind(matrix(0,3,3), invHessianRMEq))
+  
   if (class(invHessianVarEq)[1] == "try-error") {
     warning("Inverting the Hessian matrix failed. No robust standard errors calculated for variance equation.")
    robStdErrVarEq <- rep(NA, times = 3)
   } else {
    robStdErrVarEq <- 
      sqrt(diag(invHessianVarEq %*% 
-                 crossprod(jacobian(function(theta) sum(heavyLLH(theta)), parVarEq$par)) %*% 
+                 crossprod(jacobian(function(theta) heavyLLH(theta), parVarEq$par)) %*% 
                  invHessianVarEq))
   }
   if (class(invHessianRMEq)[1] == "try-error") {
@@ -132,7 +154,7 @@ HEAVYmodel <- function(ret, rm, startingValues = NULL) {
   } else {
     robStdErrRMEq <-
       sqrt(diag(invHessianRMEq %*% 
-                  crossprod(jacobian(function(theta) sum(heavyLLH(theta, RMEq = TRUE)), parRMEq$par)) %*% 
+                  crossprod(jacobian(function(theta) heavyLLH(theta, RMEq = TRUE), parRMEq$par)) %*% 
                   invHessianRMEq))
   }
   
