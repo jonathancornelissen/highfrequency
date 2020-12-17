@@ -3,8 +3,8 @@
 #' HEAVY Model estimation
 #' @description This function calculates the High frEquency bAsed VolatilitY (HEAVY) model proposed in Shephard and Sheppard (2010). 
 #'
-#' @param ret a vector of demeaned returns 
-#' @param rm a vector of realized stock market variation
+#' @param data an \code{xts} object where the first column is  a vector of demeaned returns 
+#' and the second column is a vector of realized stock market variation
 #' @param startingValues a vector of alternative starting values: first three arguments for variance equation and last three arguments for measurement equation.
 #' 
 #' @return The function outputs an object of class \code{HEAVYmodel}, a list containing
@@ -17,9 +17,30 @@
 #'   \item RMCondVariances = conditional variances in the RM equation
 #'   \item data = the input data
 #' }
+#' The class HEAVYmodel has the following methods: plot.HEAVYmodel, predict.HEAVYmodel, 
+#' print.HEAVYmodel, and summary.HEAVYmodel.
+#' 
+#' @details 
+#' Let \eqn{r_{t}} and \eqn{RM_{t}} be series of demeaned returns and realized measures of
+#' daily stock price variation. The HEAVY model is a two-component model.
+#' We assume \eqn{r_{t} = h_{t}^{1/2} Z_{t}} where \eqn{Z_t} is an i.i.d. zero-mean 
+#' and unit-variance innovation term. The dynamics of the HEAVY model are given by
+#'
+#' \deqn{
+#'    h_{t} = \omega + \alpha RM_{t-1} + \beta h_{t-1}
+#'  }
+#'  and 
+#'  \deqn{
+#'    \mu_{t} = \omega_{R} + \alpha_{R} RM_{t-1} + \beta_{R} \mu_{t-1}.
+#'  }
+#'  
+#' The two equations are estimated separately as mentioned in Shephard and Sheppard (2010).
+#' We report robust standard errors based on the matrix-product of inverted Hessians and
+#' the outer product of gradients.
 #' 
 #' @references Shephard, N. and K. Sheppard (2010). Realising the future: Forecasting with high frequency based volatility (HEAVY) models. Journal of Applied Econometrics 25, 197--231.
 #' @importFrom numDeriv jacobian hessian
+#' @importFrom stats nlminb
 #' @author Onno Kleen
 #' 
 #' @examples 
@@ -30,19 +51,26 @@
 #' # Returns are assumed to be demeaned
 #' logReturns <- logReturns - mean(logReturns)
 #' 
+#' # Returns and 
+#' SPYxts <- xts(cbind(logReturns, SPYRM$RK5[-1] * 10000), order.by = SPYRM$DT[-1])
+#' 
 #' # Due to return calculation, the first observation is missing
-#' estimatedHEAVY <- HEAVYmodel(logReturns, SPYRM$RK5[-1] * 10000)
+#' fittedHEAVY <- HEAVYmodel(SPYxts)
 #' 
 #' # Examine tThe estimated coefficients and robust standard errors
-#' estimatedHEAVY
+#' fittedHEAVY
 #' 
 #' # Calculate iterative multi-step-ahead forecasts
-#' predict(estimatedHEAVY, stepsAhead = 12)
+#' predict(fittedHEAVY, stepsAhead = 12)
+#' @seealso 
+#' 
+#' \code{\link{predict.HEAVYmodel}}
+#' 
 #' @export
-HEAVYmodel <- function(ret, rm, startingValues = NULL) {
+HEAVYmodel <- function(data, startingValues = NULL) {
   
-  ret <- as.numeric(ret)
-  rm <- as.numeric(rm)
+  ret <- as.numeric(data[,1])
+  rm <- as.numeric(data[,2])
   
   if (abs(mean(ret)) > 0.001) {
     warning("Returns are assumed to be demeaned but mean(ret) is unequal zero. Please check your data.")
@@ -104,17 +132,8 @@ HEAVYmodel <- function(ret, rm, startingValues = NULL) {
   RMCondVariances <- calcRecVarEq(parRMEq$par, rm)
   
   modelEstimates <- c(parVarEq$par, parRMEq$par)
-  names(modelEstimates) <- c("omegaVar", "alphaVar", "betaVar",
-                             "omegaRM", "alphaRM", "betaRM")
-  
-  # print(numDeriv::grad(func = function (theta) {
-  #   sum(heavyLLH(theta, RMEq = TRUE))
-  # }, x = parRMEq$par))
-  # 
-  # print(numDeriv::grad(func = function (theta) {
-  #   sum(heavyLLH(theta, RMEq = FALSE))
-  # }, x = parVarEq$par))
-  # browser()
+  names(modelEstimates) <- c("omega", "alpha", "beta",
+                             "omegaR", "alphaR", "betaR")
   
   invHessianVarEq <- try({
     solve(-suppressWarnings(hessian(x = parVarEq$par, func = function (theta) {
@@ -126,21 +145,6 @@ HEAVYmodel <- function(ret, rm, startingValues = NULL) {
       sum(heavyLLH(theta, RMEq = TRUE))
     }, method.args=list(d = 0.0001, r = 6))))
   }, silent = TRUE)
-  
-  
-  # inHessian <- solve(-suppressWarnings(hessian(x = c(parVarEq$par, parRMEq$par), func = function (theta) {
-  #   sum(heavyLLH(theta[1:3])) + sum(heavyLLH(theta[4:6], RMEq = TRUE))
-  # }, method.args=list(d = 0.0001, r = 6))))
-  # 
-  # cross_scores <- crossprod(jacobian(func = function (theta) {
-  #   heavyLLH(theta[1:3]) + heavyLLH(theta[4:6], RMEq = TRUE)
-  # }, c(parVarEq$par, parRMEq$par),  method.args=list(d = 0.0001, r = 6)))
-  # 
-  # sqrt(diag(inHessian %*% cross_scores %*% inHessian))
-  
-  # invHessianVarEq
-  # 
-  # rbind(cbind(invHessianVarEq, matrix(0,3,3)), cbind(matrix(0,3,3), invHessianRMEq))
   
   if (class(invHessianVarEq)[1] == "try-error") {
     warning("Inverting the Hessian matrix failed. No robust standard errors calculated for variance equation.")
@@ -168,14 +172,60 @@ HEAVYmodel <- function(ret, rm, startingValues = NULL) {
   model$llh <- c(llhVar = -parVarEq$value, llhRM = -parRMEq$value)
   model$varCondVariances <- varCondVariances
   model$RMCondVariances <- RMCondVariances
-  model$data <- data.frame(ret = ret, rm = rm)
+  model$data <- data
   
   class(model) <- "HEAVYmodel"
   
   model
 }
 
+
+#' Plotting method for HEAVYmodel objects
+#' @param x an object of class \code{HEAVYmodel}
+#' @param ... extra arguments, see details
+#' @details The plotting method has the following optional parameter:
+#' \itemize{
+#' \item{\code{legend.loc}}{ A string denoting the location of the legend passed on to \code{addLegend} of the \pkg{xts} package}
+#' }
+#' 
+#' @importFrom grDevices dev.interactive
+#' @importFrom graphics plot panel.smooth points par
+#' @importFrom stats residuals
+#' @importFrom xts addLegend
+#' @export
+plot.HEAVYmodel <- function(x, ...){
+  options <- list(...)
+  #### List of standard options
+  opt <- list(legend.loc = "topleft")
+  #### Override standard options where user passed new options
+  opt[names(options)] <- options
+  
+  observed   <- x$data[,1]^2
+  fitted     <- x$varCondVariances
+  dates <- index(x$data)
+  # dates      <- x$data
+  # dates      <- as.POSIXct(dates)
+  observed   <- xts(observed, order.by = dates)
+  fitted     <- xts(fitted, order.by = dates)
+  # type       <- x$type
+  legend.loc <- opt$legend.loc
+  g_range <- range(fitted,observed)
+  g_range[1] <- 0.95 * g_range[1]
+  g_range[2] <- 1.05 * g_range[2]
+  #ind = seq(1,length(fitted),length.out=5);
+  title <- "Observed squeared returns and fitted variances based on HEAVY Model"
+  plot(cbind(fitted,observed), col = c('blue', 'red'), main = title, lty = c(1,2), yaxis.right = FALSE)
+  
+  addLegend(legend.loc = legend.loc, on = 1,
+            legend.names = c("Fitted condidional variances", "Observed squared returns"),
+            lty = c(1, 2), lwd = c(2, 2),
+            col = c("blue", "red"))
+}
+
 #' Iterative multi-step-ahead forecasting for HEAVY models
+#' 
+#' Calculates forecasts for \eqn{h_{T+k}}, where \eqn{T} denotes the end of the estimation
+#' period for fitting the HEAVYmodel and \eqn{k = 1, \dots, \code{stepsAhead}}.
 #' 
 #' @param object an object of class HEAVYmodel
 #' @param stepsAhead the number of days iterative forecasts are calculated for (default 10)
@@ -199,8 +249,8 @@ predict.HEAVYmodel <- function(object, stepsAhead = 10, ...) {
   
   forecastsHEAVY <- function(stepsAhead) {
     
-    oneStep <- c(parVarEq[1] + parVarEq[2] * last(object$data$rm) + parVarEq[3] * last(object$varCondVariances),
-                  parRMEq[1] + parRMEq[2] * last(object$data$rm) + parRMEq[3] * last(object$RMCondVariances))
+    oneStep <- c(parVarEq[1] + parVarEq[2] * last(object$data[,2]) + parVarEq[3] * last(object$varCondVariances),
+                  parRMEq[1] + parRMEq[2] * last(object$data[,2]) + parRMEq[3] * last(object$RMCondVariances))
     if (stepsAhead == 1) {
       oneStep
     } else {

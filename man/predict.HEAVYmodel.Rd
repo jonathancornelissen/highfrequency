@@ -14,5 +14,6 @@
 \item{...}{further arguments passed to or from other methods}
 }
 \description{
-Iterative multi-step-ahead forecasting for HEAVY models
+Calculates forecasts for \eqn{h_{T+k}}, where \eqn{T} denotes the end of the estimation
+period for fitting the HEAVYmodel and \eqn{k = 1, \dots, \code{stepsAhead}}.
 }

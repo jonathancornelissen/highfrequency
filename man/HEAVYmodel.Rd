@@ -4,12 +4,11 @@
 \alias{HEAVYmodel}
 \title{HEAVY Model estimation}
 \usage{
-HEAVYmodel(ret, rm, startingValues = NULL)
+HEAVYmodel(data, startingValues = NULL)
 }
 \arguments{
-\item{ret}{a vector of demeaned returns}
-
-\item{rm}{a vector of realized stock market variation}
+\item{data}{an \code{xts} object where the first column is  a vector of demeaned returns 
+and the second column is a vector of realized stock market variation}
 
 \item{startingValues}{a vector of alternative starting values: first three arguments for variance equation and last three arguments for measurement equation.}
 }
@@ -24,9 +23,29 @@ The function outputs an object of class \code{HEAVYmodel}, a list containing
   \item RMCondVariances = conditional variances in the RM equation
   \item data = the input data
 }
+The class HEAVYmodel has the following methods: plot.HEAVYmodel, predict.HEAVYmodel, 
+print.HEAVYmodel, and summary.HEAVYmodel.
 }
 \description{
 This function calculates the High frEquency bAsed VolatilitY (HEAVY) model proposed in Shephard and Sheppard (2010).
+}
+\details{
+Let \eqn{r_{t}} and \eqn{RM_{t}} be series of demeaned returns and realized measures of
+daily stock price variation. The HEAVY model is a two-component model.
+We assume \eqn{r_{t} = h_{t}^{1/2} Z_{t}} where \eqn{Z_t} is an i.i.d. zero-mean 
+and unit-variance innovation term. The dynamics of the HEAVY model are given by
+
+\deqn{
+   h_{t} = \omega + \alpha RM_{t-1} + \beta h_{t-1}
+ }
+ and 
+ \deqn{
+   \mu_{t} = \omega_{R} + \alpha_{R} RM_{t-1} + \beta_{R} \mu_{t-1}.
+ }
+ 
+The two equations are estimated separately as mentioned in Shephard and Sheppard (2010).
+We report robust standard errors based on the matrix-product of inverted Hessians and
+the outer product of gradients.
 }
 \examples{
 
@@ -36,17 +55,23 @@ logReturns <- 100 * makeReturns(SPYRM$CLOSE)[-1]
 # Returns are assumed to be demeaned
 logReturns <- logReturns - mean(logReturns)
 
+# Returns and 
+SPYxts <- xts(cbind(logReturns, SPYRM$RK5[-1] * 10000), order.by = SPYRM$DT[-1])
+
 # Due to return calculation, the first observation is missing
-estimatedHEAVY <- HEAVYmodel(logReturns, SPYRM$RK5[-1] * 10000)
+fittedHEAVY <- HEAVYmodel(SPYxts)
 
 # Examine tThe estimated coefficients and robust standard errors
-estimatedHEAVY
+fittedHEAVY
 
 # Calculate iterative multi-step-ahead forecasts
-predict(estimatedHEAVY, stepsAhead = 12)
+predict(fittedHEAVY, stepsAhead = 12)
 }
 \references{
 Shephard, N. and K. Sheppard (2010). Realising the future: Forecasting with high frequency based volatility (HEAVY) models. Journal of Applied Econometrics 25, 197--231.
+}
+\seealso{
+\code{\link{predict.HEAVYmodel}}
 }
 \author{
 Onno Kleen
