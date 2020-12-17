@@ -1522,8 +1522,11 @@ noZeroQuotes <- function(qData) {
 #' In case you supply the argument \code{qDataRaw}, the on-disk functionality is ignored
 #' and the function returns a list with the cleaned quotes as an \code{xts} or \code{data.table} object depending on input (see examples).
 #' 
-#' @references Barndorff-Nielsen, O. E., P. R. Hansen, A. Lunde, and N. Shephard (2009). Realized kernels in practice: Trades and quotes. Econometrics Journal 12, C1-C32.
+#' @references
+#' Barndorff-Nielsen, O. E., Hansen, P. R., Lunde, A., and Shephard, N. (2009). Realized kernels in practice: Trades and quotes. Econometrics Journal 12, C1-C32.
+#' 
 #' Brownlees, C.T. and Gallo, G.M. (2006). Financial econometric analysis at ultra-high frequency: Data handling concerns. Computational Statistics & Data Analysis, 51, pages 2232-2245.
+#' 
 #' Falkenberry, T.N. (2002). High frequency data filtering. Unpublished technical report.
 #' 
 #' @details 
@@ -2212,7 +2215,8 @@ selectExchange <- function(data, exch = "N") {
 #' # In case you have more data it is advised to use the on-disk functionality
 #' # via "dataSource" and "dataDestination" arguments
 #' 
-#' @references Barndorff-Nielsen, O. E., P. R. Hansen, A. Lunde, and N. Shephard (2009). Realized kernels in practice: Trades and quotes. Econometrics Journal 12, C1-C32.
+#' @references
+#' Barndorff-Nielsen, O. E., Hansen, P. R., Lunde, A., and Shephard, N. (2009). Realized kernels in practice: Trades and quotes. Econometrics Journal 12, C1-C32.
 #' 
 #' Brownlees, C.T. and Gallo, G.M. (2006). Financial econometric analysis at ultra-high frequency: Data handling concerns. Computational Statistics & Data Analysis, 51, pp. 2232-2245.
 #' 
@@ -2420,7 +2424,8 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
 #' 
 #' When using the on-disk functionality and tradeDataSource and quoteDataSource are the same, the quote files are all files in the folder that contains 'quote', and the rest are treated as containing trade data.
 #' 
-#' @references Barndorff-Nielsen, O. E., P. R. Hansen, A. Lunde, and N. Shephard (2009). Realized kernels in practice: Trades and quotes. Econometrics Journal 12, C1-C32.
+#' @references
+#' Barndorff-Nielsen, O. E., Hansen, P. R., Lunde, A., and Shephard, N. (2009). Realized kernels in practice: Trades and quotes. Econometrics Journal 12, C1-C32.
 #' 
 #' Brownlees, C.T. and Gallo, G.M. (2006). Financial econometric analysis at ultra-high frequency: Data handling concerns. Computational Statistics & Data Analysis, 51, pages 2232-2245.
 #' 
@@ -2535,7 +2540,7 @@ tradesCleanupUsingQuotes <- function(tradeDataSource = NULL, quoteDataSource = N
 #' 
 #' @return An \code{xts} or \code{data.table} object containing the synchronized time series - depending on the input.
 #' 
-#' @references Harris, F., T. McInish, G. Shoesmith, and R. Wood (1995). Cointegration, error correction, and price discovery on informationally linked security markets. Journal of Financial and Quantitative Analysis 30, 563-581.
+#' @references Harris, F., T. McInish, Shoesmith, G., and Wood, R. (1995). Cointegration, error correction, and price discovery on informationally linked security markets. Journal of Financial and Quantitative Analysis 30, 563-581.
 #' 
 #' @examples 
 #' # Suppose irregular timepoints:
@@ -2705,9 +2710,9 @@ refreshTime <- function (pData, sort = FALSE, criterion = "squared duration") {
 #' rCov(agged$pData[,list(DT, PRICE)], makeReturns = TRUE)
 #' rCov(pData[,list(DT, PRICE)], makeReturns = TRUE, alignBy = "minutes", alignPeriod = 5)
 #' 
-#' @references Roel C. A. Oomen Properties of realized variance under alternative sampling schemes. (2006) Journal of Business & Economic Statistics 24, pages 219-237
-#' 
-#' Yingjie Dong and Yiu Kuen Tse. (2017) Business time sampling scheme with applications to testing semi-martingale hypothesis and estimating integrated volatility. Econometrics, 5
+#' @references 
+#' Oomen, R. C. A. (2006) Properties of realized variance under alternative sampling schemes. Journal of Business & Economic Statistics 24, pages 219-237
+#' Dong, Y. and Tse, Y. K. (2017) Business time sampling scheme with applications to testing semi-martingale hypothesis and estimating integrated volatility. Econometrics, 5
 #' 
 #' @importFrom zoo index
 #' @importFrom xts is.xts

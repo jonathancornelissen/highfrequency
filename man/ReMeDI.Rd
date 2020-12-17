@@ -35,7 +35,7 @@ optimalKn
 remed <- ReMeDI(sampleTData[as.Date(DT) == "2018-01-02", ], kn = optimalKn, lags = 1:8)
 }
 \references{
-Li and Linton (2019) (Working paper): "A ReMeDI for microstructure noise."
+Li, M. and Linton, O. (2020). A ReMeDI for Microstructure Noise. Forthcoming
 }
 \author{
 Emil Sjoerup

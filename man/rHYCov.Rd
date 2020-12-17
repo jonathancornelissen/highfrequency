@@ -34,8 +34,14 @@ based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to
 \description{
 Calculates the Hayashi-Yoshida Covariance estimator
 }
+\examples{
+library("xts")
+hy <- rHYCov(rData = as.xts(sampleOneMinuteData)["2001-08-05"],
+             period = 5, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)
+
+}
 \references{
-T. Hayashi and N. Yoshida. On covariance estimation of non-synchronously observed diffusion processes. \emph{Bernoulli}, 11, 359-379, 2005.
+Hayashi, T. and Yoshida, N. (2005) On covariance estimation of non-synchronously observed diffusion processes. \emph{Bernoulli}, 11, 359-379.
 }
 \author{
 Scott Payseur, Onno Kleen, and Emil Sjoerup

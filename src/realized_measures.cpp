@@ -129,12 +129,13 @@ double rv(NumericVector a, NumericVector b, int na, int period, NumericVector tm
 NumericVector pcovcc(NumericVector a, NumericVector ap, NumericVector b, NumericVector at, NumericVector atp, NumericVector bt, int na, int nap, int nb, int period) {
   int i, prevj = 0, j;
   double tmpRet = 0;
-  NumericVector ans;
+  NumericVector ans(nap);
   
   for(i = 0; i < na; i++) {
     ap[i / period] += a[i];
     atp[i / period] = at[i];
   }
+  
   for(i = 0; i < nap; i++) {
     tmpRet = 0;
     for(j = prevj; j < nb; j++) {

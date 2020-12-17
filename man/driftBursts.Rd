@@ -95,7 +95,9 @@ print(DBH4, alpha = 0.99)
 print(DBH4, criticalValue = 3)
 max(abs(DBH4$tStat)) > getCriticalValues(DBH4, 0.99)$quantile
 }
-
+}
+\references{
+Christensen, K., Oomen, R., and Reno, R. (2018) The Drift Burst Hypothesis (Working paper).
 }
 \author{
 Emil Sjoerup
