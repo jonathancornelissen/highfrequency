@@ -2,7 +2,7 @@
 #' 
 #' @description Aggregate a time series as \code{xts} object. 
 #' It can handle irregularly spaced timeseries and returns a regularly spaced one.
-#' Use univariate timeseries as input for this function, and check out \code{\link{aggregateTrades}}
+#' Use univariate timeseries as input for this function and check out \code{\link{aggregateTrades}}
 #' and \code{\link{aggregateQuotes}} to aggregate Trade or Quote data objects.
 #' 
 #' @param ts \code{xts} object to aggregate.
@@ -31,13 +31,13 @@
 #' tick aggregation it makes sense to fill these NAs by the function \code{na.locf}
 #' (last observation carried forward) from the \pkg{zoo} package.
 #' 
-#' In case \code{alignBy = "ticks"}, the sampling is done such the sampling starts on the first tick, and the last tick is always included.
+#' In case \code{alignBy = "ticks"}, the sampling is done such the sampling starts on the first tick and the last tick is always included.
 #' For example, if 14 observations are made on one day, and these are 1, 2, 3, ... 14.
 #' Then, with \code{alignBy = "ticks"} and \code{alignPeriod = 3}, the output will be 1, 4, 7, 10, 13, 14.
 #' 
 #' @return An \code{xts} object containing the aggregated time series.
 #' 
-#' @author Jonathan Cornelissen, Kris Boudt and Emil Sjoerup
+#' @author Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 #' @keywords data manipulation
 #' 
 #' @examples 
@@ -904,7 +904,7 @@ autoSelectExchangeQuotes <- function(qData, printExchange = TRUE) {
 #' 
 #' @return \code{xts} or \code{data.table} object depending on input
 #'
-#' @references Brownlees, C.T. and Gallo, G.M. (2006). Financial econometric analysis at ultra-high frequency: Data handling concerns. Computational Statistics & Data Analysis, 51, pages 2232-2245.
+#' @references Brownlees, C. T. and Gallo, G. M. (2006). Financial econometric analysis at ultra-high frequency: Data handling concerns. Computational Statistics & Data Analysis, 51, pages 2232-2245.
 #' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
 #' @examples 
 #' exchangeHoursOnly(sampleTDataRaw)
@@ -1940,9 +1940,9 @@ rmTradeOutliersUsingQuotes <- function(tData, qData, lagQuotes = 2, BFM = FALSE,
 #' 
 #' @return \code{xts} object or \code{data.table} depending on type of input
 #' 
-#' @references Barndorff-Nielsen, O. E., P. R. Hansen, A. Lunde, and N. Shephard (2009). Realized kernels in practice: Trades and quotes. Econometrics Journal 12, C1-C32.
+#' @references Barndorff-Nielsen, O. E., P. R. Hansen, A. Lunde, and N. Shephard (2009). Realized kernels in practice: Trades and quotes. \emph{Econometrics Journal}, 12, C1-C32.
 #' 
-#' Brownlees, C.T. and Gallo, G.M. (2006). Financial econometric analysis at ultra-high frequency: Data handling concerns. Computational Statistics & Data Analysis, 51, pages 2232-2245.
+#' Brownlees, C.T., and Gallo, G.M. (2006). Financial econometric analysis at ultra-high frequency: Data handling concerns. \emph{Computational Statistics & Data Analysis}, 51, 2232-2245.
 #' 
 #' @author Jonathan Cornelissen and Kris Boudt
 #' 
@@ -2216,9 +2216,9 @@ selectExchange <- function(data, exch = "N") {
 #' # via "dataSource" and "dataDestination" arguments
 #' 
 #' @references
-#' Barndorff-Nielsen, O. E., Hansen, P. R., Lunde, A., and Shephard, N. (2009). Realized kernels in practice: Trades and quotes. Econometrics Journal 12, C1-C32.
+#' Barndorff-Nielsen, O. E., Hansen, P. R., Lunde, A., and Shephard, N. (2009). Realized kernels in practice: Trades and quotes. \emph{Econometrics Journal}, 12, C1-C32.
 #' 
-#' Brownlees, C.T. and Gallo, G.M. (2006). Financial econometric analysis at ultra-high frequency: Data handling concerns. Computational Statistics & Data Analysis, 51, pp. 2232-2245.
+#' Brownlees, C.T. and Gallo, G.M. (2006). Financial econometric analysis at ultra-high frequency: Data handling concerns. \emph{Computational Statistics & Data Analysis}, 51, 2232-2245.
 #' 
 #' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
 #' @importFrom data.table fread
@@ -2425,9 +2425,9 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
 #' When using the on-disk functionality and tradeDataSource and quoteDataSource are the same, the quote files are all files in the folder that contains 'quote', and the rest are treated as containing trade data.
 #' 
 #' @references
-#' Barndorff-Nielsen, O. E., Hansen, P. R., Lunde, A., and Shephard, N. (2009). Realized kernels in practice: Trades and quotes. Econometrics Journal 12, C1-C32.
+#' Barndorff-Nielsen, O. E., Hansen, P. R., Lunde, A., and Shephard, N. (2009). Realized kernels in practice: Trades and quotes. \emph{Econometrics Journal}, 12, C1-C32.
 #' 
-#' Brownlees, C.T. and Gallo, G.M. (2006). Financial econometric analysis at ultra-high frequency: Data handling concerns. Computational Statistics & Data Analysis, 51, pages 2232-2245.
+#' Brownlees, C.T., and Gallo, G.M. (2006). Financial econometric analysis at ultra-high frequency: Data handling concerns. \emph{Computational Statistics & Data Analysis}, 51, 2232-2245.
 #' 
 #' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
 #' 
@@ -2535,12 +2535,12 @@ tradesCleanupUsingQuotes <- function(tradeDataSource = NULL, quoteDataSource = N
 #' This process is repeated until the end of one time series is reached.
 #' 
 #' @param pData a list. Each list-item contains an \code{xts} or a \code{data.table} object (with first column DT (datetime)) containing the original time series (one day only and typically a price series).
-#' @param sort logical determining whether to sort the index based on a criterion (will only sort descending (i.e. most liquid first)). Default is FALSE
+#' @param sort logical determining whether to sort the index based on a criterion (will only sort descending; i.e., most liquid first). Default is FALSE.
 #' @param criterion character determining which criterion used. Currently supports "squared duration" and "duration". Default is "squared duration".
 #' 
 #' @return An \code{xts} or \code{data.table} object containing the synchronized time series - depending on the input.
 #' 
-#' @references Harris, F., T. McInish, Shoesmith, G., and Wood, R. (1995). Cointegration, error correction, and price discovery on informationally linked security markets. Journal of Financial and Quantitative Analysis 30, 563-581.
+#' @references Harris, F., T. McInish, Shoesmith, G., and Wood, R. (1995). Cointegration, error correction, and price discovery on informationally linked security markets. \emph{Journal of Financial and Quantitative Analysis}, 30, 563-581.
 #' 
 #' @examples 
 #' # Suppose irregular timepoints:
@@ -2711,8 +2711,8 @@ refreshTime <- function (pData, sort = FALSE, criterion = "squared duration") {
 #' rCov(pData[,list(DT, PRICE)], makeReturns = TRUE, alignBy = "minutes", alignPeriod = 5)
 #' 
 #' @references 
-#' Oomen, R. C. A. (2006) Properties of realized variance under alternative sampling schemes. Journal of Business & Economic Statistics 24, pages 219-237
-#' Dong, Y. and Tse, Y. K. (2017) Business time sampling scheme with applications to testing semi-martingale hypothesis and estimating integrated volatility. Econometrics, 5
+#' Oomen, R. C. A. (2006). Properties of realized variance under alternative sampling schemes. \emph{Journal of Business & Economic Statistics}, 24, 219-237
+#' Dong, Y., and Tse, Y. K. (2017). Business time sampling scheme with applications to testing semi-martingale hypothesis and estimating integrated volatility. \emph{Econometrics}, 5, 51.
 #' 
 #' @importFrom zoo index
 #' @importFrom xts is.xts

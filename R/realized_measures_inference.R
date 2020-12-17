@@ -92,9 +92,9 @@ IV <- function(IVestimator, iq) {
 #' where \eqn{a} is the drift term, \eqn{\sigma} denotes the spot vivInferenceolatility process, \eqn{W} is a standard Brownian motion (assume that there are no jumps). 
 #' 
 #' @references
-#' Andersen, T. G., Dobrev, D., and Schaumburg, E. (2012). Jump-robust volatility estimation using nearest neighbor truncation. Journal of Econometrics, 169(1), 75- 93.
+#' Andersen, T. G., Dobrev, D., and Schaumburg, E. (2012). Jump-robust volatility estimation using nearest neighbor truncation. \emph{Journal of Econometrics}, 169, 75-93.
 #' 
-#' Barndorff-Nielsen, O. E. (2002). Econometric analysis of realized volatility and its use in estimating stochastic volatility models. Journal of the Royal Statistical Society: Series B (Statistical Methodology), 64(2), 253-280.
+#' Barndorff-Nielsen, O. E. (2002). Econometric analysis of realized volatility and its use in estimating stochastic volatility models. \emph{Journal of the Royal Statistical Society: Series B (Statistical Methodology)}, 64, 253-280.
 #' 
 #' @author Giang Nguyen, Jonathan Cornelissen and Kris Boudt
 #' 

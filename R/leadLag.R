@@ -19,7 +19,7 @@
 #' 
 #' @details The lead-lag-ratio (LLR) can be used to see if one asset leads the other. If LLR < 1, then price1 MAY be leading price2 and vice versa if LLR > 1.
 #' 
-#' @references Hoffmann, M., Rosenbaum, M., and Yoshida, N. (2013). Estimation of the lead-lag parameter from non-synchronous data. Bernoulli 19 1-37.
+#' @references Hoffmann, M., Rosenbaum, M., and Yoshida, N. (2013). Estimation of the lead-lag parameter from non-synchronous data. \emph{Bernoulli}, 19, 1-37.
 #' 
 #' @examples 
 #' \dontrun{

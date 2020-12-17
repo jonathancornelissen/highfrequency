@@ -42,7 +42,7 @@ An \code{xts} object containing the aggregated time series.
 \description{
 Aggregate a time series as \code{xts} object. 
 It can handle irregularly spaced timeseries and returns a regularly spaced one.
-Use univariate timeseries as input for this function, and check out \code{\link{aggregateTrades}}
+Use univariate timeseries as input for this function and check out \code{\link{aggregateTrades}}
 and \code{\link{aggregateQuotes}} to aggregate Trade or Quote data objects.
 }
 \details{
@@ -58,7 +58,7 @@ Please note: In case an interval is empty, by default an NA is returned.. In cas
 tick aggregation it makes sense to fill these NAs by the function \code{na.locf}
 (last observation carried forward) from the \pkg{zoo} package.
 
-In case \code{alignBy = "ticks"}, the sampling is done such the sampling starts on the first tick, and the last tick is always included.
+In case \code{alignBy = "ticks"}, the sampling is done such the sampling starts on the first tick and the last tick is always included.
 For example, if 14 observations are made on one day, and these are 1, 2, 3, ... 14.
 Then, with \code{alignBy = "ticks"} and \code{alignPeriod = 3}, the output will be 1, 4, 7, 10, 13, 14.
 }
@@ -80,7 +80,7 @@ tsagg3ticks <- aggregateTS(ts, alignBy = "ticks", alignPeriod = 3)
 
 }
 \author{
-Jonathan Cornelissen, Kris Boudt and Emil Sjoerup
+Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 }
 \keyword{data}
 \keyword{manipulation}

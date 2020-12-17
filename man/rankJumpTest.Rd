@@ -64,8 +64,8 @@ A list containing \code{criticalValues} which are the bootstrapped critical valu
 Rank jump test
 }
 \references{
-Li et al. (2019). Rank Tests at Jump Events, Journal of Business & Economic Statistics, 37(2), 312- 321.
+Li, j., Todorov, V., Tauchen, G., and Lin, H. (2019). Rank Tests at Jump Events. \emph{Journal of Business & Economic Statistics}, 37, 312-321.
 }
 \author{
-Emil Sjoerup, based on Matlab code by Li et al.
+Emil Sjoerup, based on Matlab code provided by Li et al. (2019)
 }

@@ -457,7 +457,7 @@ rMedRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
 #'     \mbox{MRC}^{\delta}= \frac{N}{N-k_N+2}\frac{1}{\psi_2k_N}\sum_{i=0}^{N-k_N+1}\bar{\boldsymbol{r}}_i\cdot \bar{\boldsymbol{r}}'_i
 #' }
 #'
-#' @references Hautsch, N., Podolskij, M. (2013). Preaveraging-based estimation of quadratic variation in the presence of noise and jumps: theory, implementation, and empirical Evidence. \emph{Journal of Business & Economic Statistics}, 31, 165-183.
+#' @references Hautsch, N., and Podolskij, M. (2013). Preaveraging-based estimation of quadratic variation in the presence of noise and jumps: theory, implementation, and empirical Evidence. \emph{Journal of Business & Economic Statistics}, 31, 165-183.
 #'
 #' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 #'
@@ -797,7 +797,7 @@ rAVGCov <- function(rData, cor = FALSE, alignBy = "minutes", alignPeriod = 5, k 
 #' Note: It is worth to note that the function does not support to calculate for data of multiple days.
 #'
 #' @references
-#' Barndorff-Nielsen, O. E., Shephard, N. (2004). Econometric analysis of realized covariation: high frequency based covariance, regression, and correlation in
+#' Barndorff-Nielsen, O. E. and Shephard, N. (2004). Econometric analysis of realized covariation: high frequency based covariance, regression, and correlation in
 #' financial economics. \emph{Econometrica}, 72, 885-925.
 #'
 #' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
@@ -1178,7 +1178,7 @@ rCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeRet
 #' @param makeReturns boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.
 #' @param makePsd boolean, in case it is \code{TRUE}, the positive definite version of rHYCov is returned. \code{FALSE} by default.
 #'
-#' @references Hayashi, T., and Yoshida, N. (2005). On covariance estimation of non-synchronously observed diffusion processes. \emph{Bernoulli}, 11, 359-379.
+#' @references Hayashi, T. and Yoshida, N. (2005). On covariance estimation of non-synchronously observed diffusion processes. \emph{Bernoulli}, 11, 359-379.
 #'
 #' @author Scott Payseur and Emil Sjoerup
 #' @examples
@@ -1288,9 +1288,9 @@ rHYCov <- function(rData, cor = FALSE, period = 1, alignBy = "seconds", alignPer
 #' @references
 #' Barndorff-Nielsen, O. E., Hansen, P. R., Lunde, A., and Shephard, N. (2008). Designing realized kernels to measure the ex post variation of equity prices in the presence of noise. \emph{Econometrica}, 76, 1481-1536.
 #'
-#' B. Zhou. (1996). High-frequency data and volatility in foreign-exchange rates. \emph{Journal of Business & Economic Statistics}, 14:45-52.
+#' Zhou., B. (1996). High-frequency data and volatility in foreign-exchange rates. \emph{Journal of Business & Economic Statistics}, 14, 45-52.
 #'
-#' Hansen, P. and Lunde, A. (2006). Realized variance and market microstructure noise. \emph{Journal of Business and Economic Statistics}, 24:127-218.
+#' Hansen, P. and Lunde, A. (2006). Realized variance and market microstructure noise. \emph{Journal of Business and Economic Statistics}, 24, 127-218.
 #'
 #' @author Scott Payseur, Onno Kleen, and Emil Sjoerup
 #'
@@ -1696,8 +1696,7 @@ rMPV <- function(rData, m = 2, p = 2, alignBy = NULL, alignPeriod = NULL, makeRe
 #' of the series. This means that a potentially large proportion of the returns receives
 #' a zero weight, due to which the rOWCov can have a low finite sample efficiency in higher dimensions
 #'
-#' @references Boudt, K., Croux, C., and Laurent, S. (2008). Outlyingness weighted covariation.
-#' \emph{Journal of Financial Econometrics}, 9, 657–684
+#' @references Boudt, K., Croux, C., and Laurent, S. (2008). Outlyingness weighted covariation. \emph{Journal of Financial Econometrics}, 9, 657–684
 #'
 #' @author Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 #'
@@ -2042,11 +2041,11 @@ rSV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, 
 #' If the data is multivariate and contains multiple days (\code{xts} or \code{data.table}), the function returns a list containing N by N matrices. Each item in the list has a name which corresponds to the date for the matrix.
 #'
 #' @references
-#' Barndorff-Nielsen, O., and Shephard, N. (2004). Measuring the impact of jumps in multivariate price processes using bipower covariation. Discussion paper, Nuffield College, Oxford University.
+#' Barndorff-Nielsen, O. and Shephard, N. (2004). Measuring the impact of jumps in multivariate price processes using bipower covariation. Discussion paper, Nuffield College, Oxford University.
 #'
-#' Jacod, J., and Todorov, V. (2009). Testing for common arrival of jumps in discretely-observed multidimensional processes. \emph{Annals of Statistics}, 37, 1792-1838.
+#' Jacod, J. and Todorov, V. (2009). Testing for common arrival of jumps in discretely-observed multidimensional processes. \emph{Annals of Statistics}, 37, 1792-1838.
 #'
-#' Mancini, C., and Gobbi, F. (2012). Identifying the brownian covariation from the co-jumps given discrete observations. \emph{Econometric Theory}, 28, 249-273.
+#' Mancini, C. and Gobbi, F. (2012). Identifying the brownian covariation from the co-jumps given discrete observations. \emph{Econometric Theory}, 28, 249-273.
 #'
 #' @author Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 #'
@@ -3098,7 +3097,7 @@ listCholCovEstimators <- function(){
 #' @param knEqual Use an altered version of the ReMeDI estimator, where we instead use equal kn, instead of kn and 2*kn for the windows. See Figure 1 of paper in reference section.
 #' @param makeCorrelation logical indicating whether to transform the autocovariances into autocorrelations. The estimate of variance is imprecise and thus, constructing the correlation like this may show correlations that fall outside (-1,1)
 #'
-#' @references Li, M., and Linton, O. (2019). A ReMeDI for microstructure noise. Cambridge Working Papers in Economics 1908.
+#' @references Li, M. and Linton, O. (2019). A ReMeDI for microstructure noise. Cambridge Working Papers in Economics 1908.
 #' @keywords microstructure noise autocovariance autocorrelation
 #' @note We Thank Merrick Li for contributing his Matlab code for this estimator.
 #' @examples

@@ -37,30 +37,11 @@ rq <- rMedRQ(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes",
             alignPeriod = 5, makeReturns = TRUE)
 rq
 }
+\references{
+Andersen, T. G., Dobrev, D., and Schaumburg, E. (2012). Jump-robust volatility estimation using nearest neighbor truncation. \emph{Journal of Econometrics}, 169, 75-93.
+}
 \author{
 Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 }
-\keyword{(1),}
-\keyword{(2012).}
-\keyword{169}
-\keyword{75-93.}
-\keyword{Andersen,}
-\keyword{D.,}
-\keyword{Dobrev,}
-\keyword{E.}
-\keyword{Econometrics,}
-\keyword{G.,}
-\keyword{Journal}
-\keyword{Jump-robust}
-\keyword{Schaumburg,}
-\keyword{T.}
-\keyword{and}
-\keyword{estimation}
 \keyword{highfrequency}
-\keyword{nearest}
-\keyword{neighbor}
-\keyword{of}
 \keyword{rMedRQ}
-\keyword{truncation.}
-\keyword{using}
-\keyword{volatility}

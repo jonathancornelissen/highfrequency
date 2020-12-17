@@ -9,7 +9,7 @@ refreshTime(pData, sort = FALSE, criterion = "squared duration")
 \arguments{
 \item{pData}{a list. Each list-item contains an \code{xts} or a \code{data.table} object (with first column DT (datetime)) containing the original time series (one day only and typically a price series).}
 
-\item{sort}{logical determining whether to sort the index based on a criterion (will only sort descending (i.e. most liquid first)). Default is FALSE}
+\item{sort}{logical determining whether to sort the index based on a criterion (will only sort descending; i.e., most liquid first). Default is FALSE.}
 
 \item{criterion}{character determining which criterion used. Currently supports "squared duration" and "duration". Default is "squared duration".}
 }
@@ -38,7 +38,7 @@ refreshTime(list(a,b))
 
 }
 \references{
-Harris, F., T. McInish, Shoesmith, G., and Wood, R. (1995). Cointegration, error correction, and price discovery on informationally linked security markets. Journal of Financial and Quantitative Analysis 30, 563-581.
+Harris, F., T. McInish, Shoesmith, G., and Wood, R. (1995). Cointegration, error correction, and price discovery on informationally linked security markets. \emph{Journal of Financial and Quantitative Analysis}, 30, 563-581.
 }
 \author{
 Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup

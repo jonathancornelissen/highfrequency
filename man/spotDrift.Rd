@@ -66,7 +66,7 @@ plot(kerneldrift)
 
 }
 \references{
-Christensen, K., Oomen, R., and Reno, R. (2018) The Drift Burst Hypothesis (Working paper).
+Christensen, K., Oomen, R., and Reno, R. (2018). The Drift Burst Hypothesis. Working paper.
 }
 \author{
 Emil Sjoerup

@@ -99,8 +99,7 @@ rowc
 
 }
 \references{
-Boudt, K., Croux, C., and Laurent, S. (2008). Outlyingness weighted covariation.
-\emph{Journal of Financial Econometrics}, 9, 657–684
+Boudt, K., Croux, C., and Laurent, S. (2008). Outlyingness weighted covariation. \emph{Journal of Financial Econometrics}, 9, 657–684
 }
 \author{
 Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
