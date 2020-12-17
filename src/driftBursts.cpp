@@ -151,8 +151,8 @@ Rcpp::List DriftBurstLoopCPAR(const arma::colvec& vPreAveraged, const arma::colv
   arma::colvec vWm;
   arma::colvec vWvar;
   //Parallelization setup
-  double invMB = 1.0/iMeanBandwidth; // So we can multiply instead of divide which is much faster.
-  double invVB = 1.0/iVarBandwidth; // So we can multiply instead of divide which is much faster.
+  const double invMB = 1.0/iMeanBandwidth; // So we can multiply instead of divide which is much faster.
+  const double invVB = 1.0/iVarBandwidth; // So we can multiply instead of divide which is much faster.
 #pragma omp parallel for                                                               \
   shared(vPreAveraged, diffedlogprices, vTime, vTesttime, iMeanBandwidth,              \
          iVarBandwidth, iPreAverage, iAcLag, vMu, vSigma, iT)            \
