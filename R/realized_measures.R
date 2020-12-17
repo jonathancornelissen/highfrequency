@@ -54,7 +54,8 @@ listAvailableKernels <- function() {
 #'             alignPeriod = 5, makeReturns = TRUE)
 #' rq
 #' @keywords highfrequency rMedRQ
-#' Andersen, T. G., Dobrev, D., and Schaumburg, E. (2012). Jump-robust volatility estimation using nearest neighbor truncation. Journal of Econometrics, 169 (1), 75-93.
+#' @references 
+#' Andersen, T. G., Dobrev, D., and Schaumburg, E. (2012). Jump-robust volatility estimation using nearest neighbor truncation. \emph{Journal of Econometrics}, 169, 75-93.
 #' @importFrom zoo rollmedian
 #' @export
 rMedRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE) {
@@ -297,7 +298,7 @@ rMinRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
 #' rMedRV
 #'
 #' @description
-#' Calculate the rMedRV, defined in Andersen et al. (2009).
+#' Calculate the rMedRV, defined in Andersen et al. (2012).
 #'
 #' Let \eqn{r_{t,i}} be a return (with \eqn{i=1,\ldots,M}) in period \eqn{t}.
 #'
@@ -321,7 +322,7 @@ rMinRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
 #' The difference between RV and rMedRV is an estimate of the realized jump
 #' variability. Disentangling the continuous and jump components in RV
 #' can lead to more precise volatility forecasts,
-#' as shown in Andersen et al. (2007) and Corsi et al. (2010).
+#' as shown in Andersen et al. (2012)
 #'
 #' @return In case the input is an \code{xts} object with data from one day, a numeric of same length as the number of assets.
 #' If the input data spans multiple days and is in \code{xts} format, an \code{xts} will be returned.
@@ -329,10 +330,6 @@ rMinRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
 #'
 #' @references
 #' Andersen, T. G., Dobrev, D., and Schaumburg, E. (2012). Jump-robust volatility estimation using nearest neighbor truncation. \emph{Journal of Econometrics}, 169, 75-93.
-#'
-#' Andersen, T.G., Bollerslev, T., and Diebold, F. (2007). Roughing it up: including jump components in the measurement, modelling and forecasting of return volatility. \emph{The Review of Economics and Statistics}, 89, 701-720.
-#'
-#' Corsi, F., Pirino, D.,  and Reno, R. (2010). Threshold bipower variation and the impact of jumps on volatility forecasting. \emph{Journal of Econometrics}, 159, 276-288.
 #'
 #' @author Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 #'
@@ -2168,10 +2165,10 @@ rThresholdCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL
 #' @param noisevar vector containing the estimates of the noise variance of the assets, needed in the truncation. Is NULL by default.
 #' @param K positive integer, slow time scale returns are computed on prices that are K steps apart.
 #' @param J positive integer, fast time scale returns are computed on prices that are J steps apart.
-#' @param K_cov positive integer, for the extradiagonal covariance elements the slow time scale returns are computed on prices that are K steps apart.
-#' @param J_cov positive integer, for the extradiagonal covariance elements the fast time scale returns are computed on prices that are J steps apart.
-#' @param K_var vector of positive integers, for the diagonal variance elements the slow time scale returns are computed on prices that are K steps apart.
-#' @param J_var vector of positive integers, for the diagonal variance elements the fast time scale returns are computed on prices that are J steps apart.
+#' @param KCov positive integer, for the extradiagonal covariance elements the slow time scale returns are computed on prices that are K steps apart.
+#' @param JCov positive integer, for the extradiagonal covariance elements the fast time scale returns are computed on prices that are J steps apart.
+#' @param KVar vector of positive integers, for the diagonal variance elements the slow time scale returns are computed on prices that are K steps apart.
+#' @param JVar vector of positive integers, for the diagonal variance elements the fast time scale returns are computed on prices that are J steps apart.
 #' @param makePsd boolean, in case it is \code{TRUE}, the positive definite version of rRTSCov is returned. \code{FALSE} by default.
 #' @param eta positive real number, squared standardized high-frequency returns that exceed eta are detected as jumps.
 #'
@@ -2251,8 +2248,8 @@ rThresholdCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL
 #' @export
 rRTSCov <- function (pData, cor = FALSE, startIV = NULL, noisevar = NULL,
                      K = 300, J = 1,
-                     K_cov = NULL , J_cov = NULL,
-                     K_var = NULL , J_var = NULL ,
+                     KCov = NULL , JCov = NULL,
+                     KVar = NULL , JVar = NULL ,
                      eta = 9, makePsd = FALSE){
   if (!is.list(pData)) {
     n <- 1
@@ -2287,32 +2284,32 @@ rRTSCov <- function (pData, cor = FALSE, startIV = NULL, noisevar = NULL,
 
     cov <- matrix(rep(0, n * n), ncol = n)
     diagonal <- numeric(n)
-    if (is.null(K_cov)) {
-      K_cov <- K
+    if (is.null(KCov)) {
+      KCov <- K
     }
-    if (is.null(J_cov)) {
-      J_cov <- J
+    if (is.null(JCov)) {
+      JCov <- J
     }
-    if (is.null(K_var)) {
-      K_var <- rep(K,n)
+    if (is.null(KVar)) {
+      KVar <- rep(K,n)
     }
-    if (is.null(J_var)) {
-      J_var <- rep(J,n)
+    if (is.null(JVar)) {
+      JVar <- rep(J,n)
     }
     for (i in 1:n){
       diagonal[i] <- RTSRV(pData[[i]], startIV = startIV[i],
-                           noisevar = noisevar[i], K = K_var[i], J = J_var[i],
+                           noisevar = noisevar[i], K = KVar[i], J = JVar[i],
                            eta = eta)
     }
     diag(cov) <- diagonal
-    if( is.null(K_cov)){ K_cov = K }
-    if( is.null(J_cov)){ J_cov = J }
+    if( is.null(KCov)){ KCov = K }
+    if( is.null(JCov)){ JCov = J }
     for (i in 2:n) {
       for (j in 1:(i - 1)) {
         cov[i, j] = cov[j, i] = RTSCov_bi(pData[[i]],
                                           pData[[j]], startIV1 = diagonal[i], startIV2 = diagonal[j],
                                           noisevar1 = noisevar[i], noisevar2 = noisevar[j],
-                                          K = K_cov, J = J_cov, eta = eta)
+                                          K = KCov, J = JCov, eta = eta)
       }
     }
     if (!cor) {
@@ -2369,7 +2366,8 @@ RV <- function(rData) {
 #' If the input data spans multiple days and is in \code{xts} format, an \code{xts} will be returned.
 #' If the input data is a \code{data.table} object, the function returns a \code{data.table} with the same column names as the input data, containing the date and the realized measures
 #'
-#' @references Andersen, T. G., Dobrev, D., and Schaumburg, E. (2012). Jump-robust volatility estimation using nearest neighbor truncation. \emph{Journal of Econometrics}, 169, 75-93.
+#' @references 
+#' Andersen, T. G., Dobrev, D., and Schaumburg, E. (2012). Jump-robust volatility estimation using nearest neighbor truncation. \emph{Journal of Econometrics}, 169, 75-93.
 #'
 #' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 #'
@@ -2452,7 +2450,8 @@ rTPQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FAL
 #' If the input data spans multiple days and is in \code{xts} format, an \code{xts} will be returned.
 #' If the input data is a \code{data.table} object, the function returns a \code{data.table} with the same column names as the input data, containing the date and the realized measures
 #'
-#' @references Andersen, T. G., Dobrev, D., and Schaumburg, E. (2012). Jump-robust volatility estimation using nearest neighbor truncation. \emph{Journal of Econometrics}, 169, 75-93.
+#' @references 
+#' Andersen, T. G., Dobrev, D., and Schaumburg, E. (2012). Jump-robust volatility estimation using nearest neighbor truncation. \emph{Journal of Econometrics}, 169, 75-93.
 #' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 #'
 #' @examples
@@ -2535,7 +2534,8 @@ rQPVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
 #' If the input data is a \code{data.table} object, the function returns a \code{data.table} with the same column names as the input data, containing the date and the realized measures
 #'
 #' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
-#' @references Andersen, T. G., Dobrev, D., and Schaumburg, E. (2012). Jump-robust volatility estimation using nearest neighbor truncation. \emph{Journal of Econometrics}, 169, 75-93.
+#' @references 
+#' Andersen, T. G., Dobrev, D., and Schaumburg, E. (2012). Jump-robust volatility estimation using nearest neighbor truncation. \emph{Journal of Econometrics}, 169, 75-93.
 #' @examples
 #' rq <- rQuar(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes",
 #'             alignPeriod = 5, makeReturns = TRUE)
@@ -2602,10 +2602,10 @@ rQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #' @param cor boolean, in case it is \code{TRUE}, and the input data is multivariate, the correlation is returned instead of the covariance matrix. \code{FALSE} by default.
 #' @param K positive integer, slow time scale returns are computed on prices that are K steps apart.
 #' @param J positive integer, fast time scale returns are computed on prices that are J steps apart.
-#' @param K_cov positive integer, for the extradiagonal covariance elements the slow time scale returns are computed on prices that are K steps apart.
-#' @param J_cov positive integer, for the extradiagonal covariance elements the fast time scale returns are computed on prices that are J steps apart.
-#' @param K_var vector of positive integers, for the diagonal variance elements the slow time scale returns are computed on prices that are K steps apart.
-#' @param J_var vector of positive integers, for the diagonal variance elements the fast time scale returns are computed on prices that are J steps apart.
+#' @param KCov positive integer, for the extradiagonal covariance elements the slow time scale returns are computed on prices that are K steps apart.
+#' @param JCov positive integer, for the extradiagonal covariance elements the fast time scale returns are computed on prices that are J steps apart.
+#' @param KVar vector of positive integers, for the diagonal variance elements the slow time scale returns are computed on prices that are K steps apart.
+#' @param JVar vector of positive integers, for the diagonal variance elements the fast time scale returns are computed on prices that are J steps apart.
 #' @param makePsd boolean, in case it is \code{TRUE}, the positive definite version of rTSCov is returned. \code{FALSE} by default.
 #'
 #' @return in case the input is and contains data from one day, an N by N matrix is returned. If the data is a univariate \code{xts} object with multiple days, an \code{xts} is returned.
@@ -2679,8 +2679,8 @@ rQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #'
 #' @keywords volatility
 #' @export
-rTSCov <- function (pData, cor = FALSE, K = 300, J = 1, K_cov = NULL, J_cov = NULL,
-                    K_var = NULL, J_var = NULL, makePsd = FALSE) {
+rTSCov <- function (pData, cor = FALSE, K = 300, J = 1, KCov = NULL, JCov = NULL,
+                    KVar = NULL, JVar = NULL, makePsd = FALSE) {
   if (!is.list(pData)) {
     n <- 1
   }
@@ -2711,29 +2711,29 @@ rTSCov <- function (pData, cor = FALSE, K = 300, J = 1, K_cov = NULL, J_cov = NU
     }
 
     cov <- matrix(rep(0, n * n), ncol = n)
-    if (is.null(K_cov)) {
-      K_cov <- K
+    if (is.null(KCov)) {
+      KCov <- K
     }
-    if (is.null(J_cov)) {
-      J_cov <- J
+    if (is.null(JCov)) {
+      JCov <- J
     }
-    if (is.null(K_var)) {
-      K_var <- rep(K,n)
+    if (is.null(KVar)) {
+      KVar <- rep(K,n)
     }
-    if (is.null(J_var)) {
-      J_var <- rep(J,n)
+    if (is.null(JVar)) {
+      JVar <- rep(J,n)
     }
 
     diagonal <- c()
     for (i in 1:n) {
-      diagonal[i] = TSRV(pData[[i]], K = K_var[i], J = J_var[i])
+      diagonal[i] = TSRV(pData[[i]], K = KVar[i], J = JVar[i])
     }
     diag(cov) <- diagonal
 
     for (i in 2:n) {
       for (j in 1:(i - 1)) {
         cov[i, j] = cov[j, i] = TSCov_bi(pData[[i]],
-                                         pData[[j]], K = K_cov, J = J_cov)
+                                         pData[[j]], K = KCov, J = JCov)
       }
     }
     if (!cor) {
@@ -2805,7 +2805,7 @@ rCholCov <- function(pData, IVest = "rMRC", COVest = "rMRC", criterion = "square
 
   options <- list(...)
   op <- list("delta" = 0.1, "theta" = 1, "alignBy" = "minutes", "alignPeriod" = 5, "kernelType" = "rectangular", "kernelParam" = 1, "kernelDOFadj" = TRUE,
-             "startIV" = NULL, "noisevar" = NULL, "K" = 300, "J" = 1, "K_cov" = NULL, "J_cov" = NULL, "K_var" = NULL, "J_var" = NULL, "eta" = 9, "makePsd" = FALSE, "k" = 1)
+             "startIV" = NULL, "noisevar" = NULL, "K" = 300, "J" = 1, "KCov" = NULL, "JCov" = NULL, "KVar" = NULL, "JVar" = NULL, "eta" = 9, "makePsd" = FALSE, "k" = 1)
   op[names(options)] <- options
   delta <- op[["delta"]]
   theta <- op[["theta"]]
@@ -2816,10 +2816,10 @@ rCholCov <- function(pData, IVest = "rMRC", COVest = "rMRC", criterion = "square
   kernelDOFadj <- op[["kernelDOFadj"]]
   startIV <- op[["startIV"]]
   noisevar <- op[["noisevar"]]
-  K_cov <- op[["K_cov"]]
-  J_cov <- op[["J_cov"]]
-  K_var <- op[["K_var"]]
-  J_var <- op[["J_var"]]
+  KCov <- op[["KCov"]]
+  JCov <- op[["JCov"]]
+  KVar <- op[["KVar"]]
+  JVar <- op[["JVar"]]
   eta <- op[["eta"]]
   makePsd <- op[["makePsd"]]
   K <- op[["K"]]
@@ -2864,7 +2864,7 @@ rCholCov <- function(pData, IVest = "rMRC", COVest = "rMRC", criterion = "square
                                            makeReturns = TRUE, kernelType = kernelType, kernelParam = kernelParam, kernelDOFadj = kernelDOFadj),
                    rOWCov = rOWCov(exp(cumsum(cbind(returns[,l], f[,m]))), alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = TRUE),
                    rRTSCov = rRTSCov(exp(cumsum(cbind(returns[,l], f[,m]))), cor = FALSE, startIV = startIV, noisevar = noisevar, K = K, J = J,
-                                     K_cov = K_cov, J_cov=J_cov, K_var=K_var, J_var = J_var, eta = eta, makePsd = makePsd ),
+                                     KCov = KCov, JCov=JCov, KVar=KVar, JVar = JVar, eta = eta, makePsd = makePsd ),
                    rThresholdCov = rThresholdCov(exp(cumsum(cbind(returns[,l], f[,m]))), alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = TRUE),
                    rSemiCov = rSemiCov(exp(cumsum(cbind(returns[,l], f[,m]))), alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = TRUE)
                    )
@@ -2892,7 +2892,7 @@ rCholCov <- function(pData, IVest = "rMRC", COVest = "rMRC", criterion = "square
                                                   makeReturns = TRUE, kernelType = kernelType, kernelParam = kernelParam, kernelDOFadj = kernelDOFadj),
                        rOWCov =        rOWCov(xts(exp(cumsum(f[,d])), order.by = index(returns)), alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = TRUE),
                        rRTSCov =       rRTSCov(xts(exp(cumsum(f[,d])), order.by = index(returns)), cor = FALSE, startIV = startIV, noisevar = noisevar, K = K, J = J,
-                                               K_cov = K_cov, J_cov=J_cov, K_var=K_var, J_var = J_var, eta = eta, makePsd = makePsd ),
+                                               KCov = KCov, JCov=JCov, KVar=KVar, JVar = JVar, eta = eta, makePsd = makePsd ),
                        rThresholdCov = rThresholdCov(xts(exp(cumsum(f[,d])), order.by = index(returns)), alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = TRUE),
                        rSemiCov = rSemiCov(xts(exp(cumsum(f[,d])), order.by = index(returns)), alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = TRUE)
                        )

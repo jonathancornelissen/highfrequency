@@ -1,6 +1,6 @@
 
 
-#' HEAVY Model estimation
+#' HEAVY model estimation
 #' @description This function calculates the High frEquency bAsed VolatilitY (HEAVY) model proposed in Shephard and Sheppard (2010). 
 #'
 #' @param data an \code{xts} object where the first column is  a vector of demeaned returns 
@@ -99,7 +99,6 @@ HEAVYmodel <- function(data, startingValues = NULL) {
   if (is.null(startingValues)) {
     startingValuesVar <- c(var(ret) * (1 - 0.3 - 0.5), 0.3, 0.5) 
     startingValuesRM <- c(mean(rm) * (1 - 0.6 - 0.3), 0.6, 0.3)
-    # startingValuesRM <- c(0.04, 0.6, 0.3) 
   } else {
     startingValuesVar <-startingValues[1:3]
     startingValuesRM <-startingValues[4:6]

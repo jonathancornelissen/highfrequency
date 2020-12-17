@@ -9,10 +9,10 @@ rTSCov(
   cor = FALSE,
   K = 300,
   J = 1,
-  K_cov = NULL,
-  J_cov = NULL,
-  K_var = NULL,
-  J_var = NULL,
+  KCov = NULL,
+  JCov = NULL,
+  KVar = NULL,
+  JVar = NULL,
   makePsd = FALSE
 )
 }
@@ -26,13 +26,13 @@ of stock i for day t.}
 
 \item{J}{positive integer, fast time scale returns are computed on prices that are J steps apart.}
 
-\item{K_cov}{positive integer, for the extradiagonal covariance elements the slow time scale returns are computed on prices that are K steps apart.}
+\item{KCov}{positive integer, for the extradiagonal covariance elements the slow time scale returns are computed on prices that are K steps apart.}
 
-\item{J_cov}{positive integer, for the extradiagonal covariance elements the fast time scale returns are computed on prices that are J steps apart.}
+\item{JCov}{positive integer, for the extradiagonal covariance elements the fast time scale returns are computed on prices that are J steps apart.}
 
-\item{K_var}{vector of positive integers, for the diagonal variance elements the slow time scale returns are computed on prices that are K steps apart.}
+\item{KVar}{vector of positive integers, for the diagonal variance elements the slow time scale returns are computed on prices that are K steps apart.}
 
-\item{J_var}{vector of positive integers, for the diagonal variance elements the fast time scale returns are computed on prices that are J steps apart.}
+\item{JVar}{vector of positive integers, for the diagonal variance elements the fast time scale returns are computed on prices that are J steps apart.}
 
 \item{makePsd}{boolean, in case it is \code{TRUE}, the positive definite version of rTSCov is returned. \code{FALSE} by default.}
 }
@@ -110,7 +110,7 @@ Harris, F., McInish, T., Shoesmith, G., and Wood, R. (1995). Cointegration, erro
 
 Zhang, L., Mykland, P. A., and Ait-Sahalia, Y. (2005). A tale of two time scales: Determining integrated volatility with noisy high-frequency data. \emph{Journal of the American Statistical Association}, 100, 1394-1411.
 
-Zhang, L. (2011). Estimating covariation: Epps effect, microstructure noise. Journal of Econometrics 160, 33-47.
+Zhang, L. (2011). Estimating covariation: Epps effect, microstructure noise. \emph{Journal of Econometrics}, 160, 33-47.
 }
 \author{
 Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
