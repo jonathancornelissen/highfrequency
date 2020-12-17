@@ -35,9 +35,9 @@ based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to
 Calculates the Hayashi-Yoshida Covariance estimator
 }
 \examples{
-# Average Hayashi-Yoshida Covariance estimator is calculated on five-minute returns
-realized_cov <- rHYCov(rData = cbind(lltc, sbux, fill = 0), period = 5, alignBy = "minutes", 
-                       alignPeriod = 5, makeReturns = FALSE)
+library("xts")
+hy <- rHYCov(rData = as.xts(sampleOneMinuteData)["2001-08-05"],
+             period = 5, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)
 
 }
 \references{
