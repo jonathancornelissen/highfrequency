@@ -3098,7 +3098,7 @@ listCholCovEstimators <- function(){
 #' @param knEqual Use an altered version of the ReMeDI estimator, where we instead use equal kn, instead of kn and 2*kn for the windows. See Figure 1 of paper in reference section.
 #' @param makeCorrelation logical indicating whether to transform the autocovariances into autocorrelations. The estimate of variance is imprecise and thus, constructing the correlation like this may show correlations that fall outside (-1,1)
 #'
-#' @references Li, M., and Linton, O. (2020). A ReMeDI for microstructure noise. Cambridge Working Papers in Economics 1908.
+#' @references Li, M., and Linton, O. (2019). A ReMeDI for microstructure noise. Cambridge Working Papers in Economics 1908.
 #' @keywords microstructure noise autocovariance autocorrelation
 #' @note We Thank Merrick Li for contributing his Matlab code for this estimator.
 #' @examples
@@ -3296,7 +3296,7 @@ ReMeDI <- function(pData, kn = 1, lags = 1, knEqual = FALSE,
 #'
 #' @author Emil Sjoerup
 #' @importFrom stats plot.ts
-#' @references Li, M. and Linton, O. (2020). A ReMeDI for microstructure noise. Cambridge Working Papers in Economics 1908.
+#' @references Li, M. and Linton, O. (2019). A ReMeDI for microstructure noise. Cambridge Working Papers in Economics 1908.
 #' @return integer containing the optimal kn
 #' @export
 knChooseReMeDI <- function(pData, knEqual = FALSE,
