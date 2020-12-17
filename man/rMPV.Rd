@@ -33,26 +33,26 @@ numeric
 }
 \description{
 Calculate the rMPV, defined in Andersen et al. (2012).
-  
+
   Assume there is \eqn{N} equispaced returns in period \eqn{t}. Let \eqn{r_{t,i}} be a return (with \eqn{i=1, \ldots,N}) in period \eqn{t}.
-  
+
   Then, the rMPV is given by
   \deqn{
     \mbox{rMPV}_{N}(m,p)= d_{m,p} \frac{N^{p/2}}{N-m+1} \sum_{i=1}^{N-m+1}|r_{t,i}|^{p/m} \ldots |r_{t,i+m-1}|^{p/m}
   }
-  
+
   in which
-  
+
   \eqn{d_{m,p} = \mu_{p/m}^{-m}}:
-    
+
     \eqn{m}: the window size of return blocks;
-  
+
   \eqn{p}: the power of the variation;
-  
+
   and \eqn{m} > \eqn{p/2}.
 }
 \examples{
-mpv <- rMPV(sampleTData[, list(DT, PRICE)], m = 2, p = 3, alignBy = "minutes", 
+mpv <- rMPV(sampleTData[, list(DT, PRICE)], m = 2, p = 3, alignBy = "minutes",
             alignPeriod = 5, makeReturns = TRUE)
 mpv
 }

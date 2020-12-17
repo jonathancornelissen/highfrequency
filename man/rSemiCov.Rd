@@ -55,11 +55,11 @@ The off-diagonals of the concordant matrix is always positive, while for the mix
 In the case that cor is TRUE, the mixed matrix will be an \eqn{N x N} matrix filled with NA as mapping the mixed covariance matrix into correlation space is impossible due to the 0-diagonal.
 }
 \examples{
-# Realized semi-variance/semi-covariance for prices aligned   
+# Realized semi-variance/semi-covariance for prices aligned
 # at 5 minutes.
 
-# Univariate: 
-rSV = rSemiCov(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes", 
+# Univariate:
+rSV = rSemiCov(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes",
                    alignPeriod = 5, makeReturns = TRUE)
 rSV
 \dontrun{

@@ -18,8 +18,8 @@ based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to
 \item{makeReturns}{boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.}
 }
 \value{
-In case the input is an \code{xts} object with data from one day, a numeric of same length as the number of assets. 
-If the input data spans multiple days and is in \code{xts} format, an \code{xts} will be returned. 
+In case the input is an \code{xts} object with data from one day, a numeric of same length as the number of assets.
+If the input data spans multiple days and is in \code{xts} format, an \code{xts} will be returned.
 If the input data is a \code{data.table} object, the function returns a \code{data.table} with the same column names as the input data, containing the date and the realized measures
 }
 \description{
@@ -29,9 +29,9 @@ Assume there is \eqn{N} equispaced returns in period \eqn{t}. Let \eqn{r_{t,i}} 
 
 Then, the rSkew is given by
   \deqn{
-    \mbox{rSkew}_{t}= \frac{\sqrt{N} \sum_{i=1}^{N}(r_{t,i})^3}{RV_{t}^{3/2}} 
+    \mbox{rSkew}_{t}= \frac{\sqrt{N} \sum_{i=1}^{N}(r_{t,i})^3}{RV_{t}^{3/2}}
   }
-  
+
 in which
 \eqn{RV_{t}:} realized variance
 }
@@ -44,7 +44,7 @@ rs
 Amaya, D., Christoffersen, P., Jacobs, K. and Vasquez, A. (2015). Does realized skewness and kurtosis predict the cross-section of equity returns?. Journal of Financial Economics, 118, 1, 135-167.
 }
 \author{
-Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
+Giang Nguyen, Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
 }
 \keyword{highfrequency}
 \keyword{rSkew}

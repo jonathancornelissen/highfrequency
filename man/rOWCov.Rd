@@ -30,23 +30,23 @@ based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to
 
 \item{makeReturns}{boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.}
 
-\item{seasadjR}{a \eqn{(M x N)} \code{xts} object containing 
+\item{seasadjR}{a \eqn{(M x N)} \code{xts} object containing
 the seasonally adjusted returns. This is an optional argument.}
 
-\item{wFunction}{determines whether 
+\item{wFunction}{determines whether
 a zero-one weight function (one if no jump is detected based on \eqn{d_{t,i}} and 0 otherwise)
-or 
+or
 Soft Rejection ("SR") weight function is to be used.
 By default a zero-one weight function (wFunction = "HR") is used.}
 
-\item{alphaMCD}{a numeric parameter, controlling the size of 
-the subsets over which the determinant is minimized. 
-Allowed values are between 0.5 and 1 and 
+\item{alphaMCD}{a numeric parameter, controlling the size of
+the subsets over which the determinant is minimized.
+Allowed values are between 0.5 and 1 and
 the default is 0.75. See Boudt et al. (2008) or the \code{covMcd} function in the
 \pkg{\link[robustbase:covMcd]{robustbase}} package.}
 
-\item{alpha}{is a parameter between 0 and 0.5, 
-that determines the rejection threshold value 
+\item{alpha}{is a parameter between 0 and 0.5,
+that determines the rejection threshold value
 (see Boudt et al. (2008) for details).}
 }
 \value{
@@ -66,8 +66,8 @@ Then, the rOWCov is given by
 \mbox{rOWCov}_{t}=c_{w}\frac{\sum_{i=1}^{M}w(d_{t,i})r_{t,i}r'_{t,i}}{\frac{1}{M}\sum_{i=1}^{M}w(d_{t,i})},
 }
 The weight  \eqn{w_{i,\Delta}} is one if the multivariate jump test statistic for \eqn{r_{i,\Delta}} in Boudt et al. (2008) is less
-than the 99.9\% percentile of the chi-square distribution with \eqn{N} degrees of freedom and zero otherwise. 
-The scalar \eqn{c_{w}} is a correction factor ensuring consistency of the rOWCov for the Integrated Covariance, 
+than the 99.9\% percentile of the chi-square distribution with \eqn{N} degrees of freedom and zero otherwise.
+The scalar \eqn{c_{w}} is a correction factor ensuring consistency of the rOWCov for the Integrated Covariance,
 under the Brownian Semimartingale with Finite Activity Jumps model.
 }
 \details{
@@ -83,16 +83,16 @@ a zero weight, due to which the rOWCov can have a low finite sample efficiency i
 \examples{
 \dontrun{
 library("xts")
-# Realized Outlyingness Weighted Variance/Covariance for prices aligned   
+# Realized Outlyingness Weighted Variance/Covariance for prices aligned
 # at 1 minutes.
 
-# Univariate: 
-row <- rOWCov(rData = as.xts(sampleOneMinuteData[as.Date(DT) == "2001-08-04", 
+# Univariate:
+row <- rOWCov(rData = as.xts(sampleOneMinuteData[as.Date(DT) == "2001-08-04",
                                                  list(DT, MARKET)]), makeReturns = TRUE)
 row
 
-# Multivariate: 
-rowc <- rOWCov(rData = as.xts(sampleOneMinuteData[as.Date(DT) == "2001-08-04",]), 
+# Multivariate:
+rowc <- rOWCov(rData = as.xts(sampleOneMinuteData[as.Date(DT) == "2001-08-04",]),
                makeReturns = TRUE)
 rowc
 }

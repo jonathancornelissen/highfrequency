@@ -4,96 +4,75 @@
 \alias{HEAVYmodel}
 \title{HEAVY Model estimation}
 \usage{
-HEAVYmodel(
-  data,
-  p = matrix(c(0, 0, 1, 1), ncol = 2),
-  q = matrix(c(1, 0, 0, 1), ncol = 2),
-  startingValues = NULL,
-  LB = NULL,
-  UB = NULL,
-  backCast = NULL,
-  compConst = FALSE
-)
+HEAVYmodel(data, startingValues = NULL)
 }
 \arguments{
-\item{data}{a (T x K) matrix containing the data, with T the number of days. For the traditional HEAVY model: K = 2, the first column contains the squared daily demeaned returns, the second column contains the realized measures.}
+\item{data}{an \code{xts} object where the first column is  a vector of demeaned returns 
+and the second column is a vector of realized stock market variation}
 
-\item{p}{a (K x K) matrix containing the lag length for the model innovations. Position (i, j) in the matrix indicates the number of lags in equation i of the model for the innovations in data column j. For the traditional heavy model p is given by matrix(c(0,0,1,1), ncol = 2) (default).}
-
-\item{q}{a (K x K) matrix containing the lag length for the conditional variances. Position (i, j) in the matrix indicates the number of lags in equation i of the model for conditional variances corresponding to series j. For the traditional heavy model introduced above q is given by matrix( c(1,0,0,1),ncol=2 ) (default).}
-
-\item{startingValues}{a vector containing the starting values to be used in the optimization to find the optimal parameters estimates.}
-
-\item{LB}{a vector of length K indicating the lower bounds to be used in the estimation. If NULL it is set to a vector of zeros by default.}
-
-\item{UB}{a vector of length K indicating the upper bounds to be used in the estimation. If NULL it is set to a vector of Inf by default.}
-
-\item{backCast}{a vector of length K used to initialize the estimation. If NULL the unconditional estimates are taken.}
-
-\item{compConst}{a boolean variable. In case TRUE, the omega values are estimated in the optimization. In case FALSE, volatility targeting is done and omega is just 1 minus the sum of all relevant alpha's and beta's multiplied by the unconditional variance.}
+\item{startingValues}{a vector of alternative starting values: first three arguments for variance equation and last three arguments for measurement equation.}
 }
 \value{
-A list with the following values:
-(i) loglikelihood: the log likelihood evaluated at the parameter estimates.
-(ii) likelihoods: an xts object of length T containing the log likelihoods per day.
-(iii) condvar: a (T x K) xts object containing the conditional variances
-(iv) estparams: a vector with the parameter estimates. The order in which the
-parameters are reported is as follows: First the estimates for omega then the
-estimates for the non-zero alpha's with the most recent lags first in case max(p) > 1,
-then the estimates for the non-zero beta's with the most recent lag first in case
-max(q) > 1.
-(v) convergence: an integer code indicating the successfulness of the optimization. See \verb{optim} for more information.
+The function outputs an object of class \code{HEAVYmodel}, a list containing
+\itemize{
+  \item coefficients = estimated coefficients
+  \item se = robust standard errors based on inverted Hessian matrix
+  \item residuals = the residuals in the return equation
+  \item llh = the two-component log-likelihood values
+  \item varCondVariances = conditional variances in the variance equation
+  \item RMCondVariances = conditional variances in the RM equation
+  \item data = the input data
+}
+The class HEAVYmodel has the following methods: plot.HEAVYmodel, predict.HEAVYmodel, 
+print.HEAVYmodel, and summary.HEAVYmodel.
 }
 \description{
-This function calculates the High frEquency bAsed VolatilitY (HEAVY) model proposed in Shephard and Sheppard (2010). This function is used as a predictive volatility model built to exploit highfrequency data.
+This function calculates the High frEquency bAsed VolatilitY (HEAVY) model proposed in Shephard and Sheppard (2010).
 }
 \details{
-Assume there are \eqn{T} daily returns and realized measures in the period \eqn{t}. Let \eqn{r_i} and \eqn{RM_i} be the \eqn{i^{th}} daily return and daily realized measure respectively (with \eqn{i=1, \ldots,T}).
+Let \eqn{r_{t}} and \eqn{RM_{t}} be series of demeaned returns and realized measures of
+daily stock price variation. The HEAVY model is a two-component model.
+We assume \eqn{r_{t} = h_{t}^{1/2} Z_{t}} where \eqn{Z_t} is an i.i.d. zero-mean 
+and unit-variance innovation term. The dynamics of the HEAVY model are given by
 
-The most basic heavy model is the one with lag matrices p of \eqn{\left( \begin{array}{ccc} 0 & 1 \\ 0 & 1 \end{array} \right)} and q of \eqn{\left( \begin{array}{ccc} 1 & 0 \\ 0 & 1 \end{array} \right)}. This can be represented by the following equations:
 \deqn{
-     \mbox{var}{\left(r_t \right)} = h_t = w + \alpha RM_{t-1} + \beta h_{t-1}; w,\alpha \geq 0, \beta \in [0,1]
-}
-\deqn{
- \mbox{E}{\left(RM_t \right)} = \mu_t = w_R + \alpha_R RM_{t-1} + \beta_R \mu_{t-1}; w_R,\alpha_R, \beta_R \geq 0, \alpha_R+\beta_R \in [0,1]
-}
-
-Equivalently, they can be presented in terms of matrix notation as below:
-\deqn{
-\left( \begin{array}{ccc} h_t \\ \mu_t \end{array} \right) = \left( \begin{array}{ccc} w \\ w_R \end{array} \right)  + \left( \begin{array}{ccc} 0 & \alpha \\ 0 & \alpha_R \end{array} \right) \left( \begin{array}{ccc} r^2_{t-1} \\ RM_{t-1} \end{array} \right) + \left( \begin{array}{ccc} \beta & 0 \\ 0 & \beta_R \end{array} \right) \left( \begin{array}{ccc} h_{t-1} \\ \mu_{t-1} \end{array} \right)
-}
-
-In this version, the parameters vector to be estimated is \eqn{\left( w, w_R,\alpha, \alpha_R, \beta, \beta_R \right) }.
-
-In terms of startingValues, Shephard and Sheppard recommend for this version of the Heavy model to set  \eqn{\beta} be around 0.6 and sum of \eqn{\alpha}+\eqn{\beta} to be close to but slightly less than one.
-In general, the lag length for the model innovation and the conditional covariance can be greater than 1. Consider, for example, matrix p is  \eqn{\left( \begin{array}{ccc} 0 & 2 \\ 0 & 1 \end{array} \right)} and matrix q is the same as above. Matrix notation will be as below:
-\deqn{
-\left( \begin{array}{ccc} h_t \\ \mu_t \end{array} \right) = \left( \begin{array}{ccc} w \\ w_R \end{array} \right)  + \left( \begin{array}{ccc} 0 & \alpha_1 \\ 0 & \alpha_R \end{array} \right) \left( \begin{array}{ccc} r^2_{t-1} \\ RM_{t-1} \end{array} \right) +\left( \begin{array}{ccc} 0 & \alpha_2 \\ 0 & 0 \end{array} \right) \left( \begin{array}{ccc} r^2_{t-2} \\ RM_{t-2} \end{array} \right) + \left( \begin{array}{ccc} \beta & 0 \\ 0 & \beta_R \end{array} \right) \left( \begin{array}{ccc} h_{t-1} \\ \mu_{t-1} \end{array} \right)}
-
-In this version, the parameters vector to be estimated is \eqn{\left( w, w_R,\alpha_1, \alpha_R, \alpha_2, \beta, \beta_R \right) }.
+   h_{t} = \omega + \alpha RM_{t-1} + \beta h_{t-1}
+ }
+ and 
+ \deqn{
+   \mu_{t} = \omega_{R} + \alpha_{R} RM_{t-1} + \beta_{R} \mu_{t-1}.
+ }
+ 
+The two equations are estimated separately as mentioned in Shephard and Sheppard (2010).
+We report robust standard errors based on the matrix-product of inverted Hessians and
+the outer product of gradients.
 }
 \examples{
-returns <-  makeReturns(SPYRM$CLOSE)
-bv      <-  SPYRM$BPV5
-returns <- returns[!is.na(bv)]
-bv <- bv[!is.na(bv)] # Remove NA's
-data <- cbind( returns^2, bv) # Make data matrix with returns and realized measures
-backCast <- matrix(c(var(returns), mean(bv)), ncol = 1)
 
-#For traditional (default) version:
-output <- HEAVYmodel(data = as.matrix(data,ncol=2), compConst = FALSE, backCast = backCast)
-#For general version:
-startvalues <- c(0.004, 0.02, 0.44, 0.4, 0.41, 0.74, 0.56) # Initial values;
-p <- matrix(c(2, 0, 0, 1), ncol = 2)
-q <- matrix(c(1, 0, 0, 1), ncol = 2)
+# Calculate annualized returns in percentages
+logReturns <- 100 * makeReturns(SPYRM$CLOSE)[-1]
 
-heavy_model <- HEAVYmodel(data = as.matrix(data, ncol = 2), p = p, q = q, compConst = FALSE,
-                      startingValues = startvalues, backCast = backCast)
+# Returns are assumed to be demeaned
+logReturns <- logReturns - mean(logReturns)
 
+# Combine both returns and realized measures into one xts
+dataSPY <- xts::xts(cbind(logReturns, SPYRM$RK5[-1] * 10000), order.by = SPYRM$DT[-1])
+
+# Due to return calculation, the first observation is missing
+fittedHEAVY <- HEAVYmodel(dataSPY)
+
+# Examine the estimated coefficients and robust standard errors
+fittedHEAVY
+
+# Calculate iterative multi-step-ahead forecasts
+predict(fittedHEAVY, stepsAhead = 12)
 }
 \references{
-Shephard, N. and K. Sheppard (2010). Realising the future: forecasting with high frequency based volatility (heavy) models. Journal of Applied Econometrics 25, 197-231.
+Shephard, N. and K. Sheppard (2010). Realising the future: Forecasting with high frequency based volatility (HEAVY) models. Journal of Applied Econometrics 25, 197--231.
+}
+\seealso{
+\code{\link{predict.HEAVYmodel}}
 }
 \author{
-Giang Nguyen, Jonathan Cornelissen, Kris Boudt and Onno Kleen.
+Onno Kleen
 }

@@ -1,9 +1,8 @@
-library(xts)
 library(testthat)
 rets <- as.xts(sampleOneMinuteData)[, 1]
 
 for (date in unique(as.character(as.Date(index(rets))))) {
- rets[date] <- makeReturns(rets[date])
+  rets[date] <- makeReturns(rets[date])
 }
 
 
@@ -12,7 +11,7 @@ test_that("HARModel",{
   
   expect_equal(
     formatC(sum(HARmodel(rets, periods = c(1, 5, 10), periodsJ = c(1),
-                             RVest = c("rCov", "rBPCov"), type = "HARCJ", transform = "sqrt", inputType = "returns")$coefficients, na.rm = TRUE), 
+                         RVest = c("rCov", "rBPCov"), type = "HARCJ", transform = "sqrt", inputType = "returns")$coefficients, na.rm = TRUE), 
             digits = 5),
     "0.58084"
   )
@@ -40,7 +39,7 @@ test_that("HARModel",{
   
   model <- HARmodel(as.xts(SPYRM[, list(DT, RV5, RQ5)]), type = "HARQ")
   expect_equal(model$coefficients, c("(Intercept)" = 3.285615865e-06, "RV1" = 9.754440119e-01, "RV5" = 7.909932136e-03, "RV22" = 2.366579823e-02, "RQ1" = -3.881445184e-01 ))
-                
+  
   model <- HARmodel(as.xts(SPYRM[, list(DT, RV5, RQ5)]), type = "HARQ", periodsQ = c(1,5,22))
   expect_equal(model$coefficients,  
                c("(Intercept)" = -6.413188e-07, "RV1" = 9.163777832e-01, "RV5" = 1.609612721e-01, "RV22" = 6.218964e-02, 
@@ -51,7 +50,7 @@ test_that("HARModel",{
   expect_equal(model$coefficients,
                c("(Intercept)" = 3.278421768e-06, "RV1" = 9.738665838e-01, "RV5" = 7.578418611e-03, "RV22" = 2.352647045e-02 , 
                  "J1" = 2.665076387e-02, "RQ1" = -3.874289127e-01 )
-               )
+  )
   
   model <- HARmodel(as.xts(SPYRM[, list(DT, RV5)]), periods = c(1,5,22), externalRegressor = xts(1:nrow(SPYRM), order.by = SPYRM$DT), periodsExternal = c(1))
   expect_true(all(model$model[,"externalRegressor"] == 22:(nrow(SPYRM)-1)))
@@ -59,27 +58,17 @@ test_that("HARModel",{
   model <- HARmodel(as.xts(SPYRM[1:1000 , list(DT, RV5)]))
   expect_equal(predict(model), sum(coefficients(model) * tail(cbind(1, model$model[,-1]),1)))
   
-  
-  
 })
-
-
-
 
 context("HEAVYmodel")
 test_that("HEAVYmodel",{
   
-  returns <-  makeReturns(SPYRM$CLOSE)
-  bv      <-  SPYRM$BPV5
-  returns <- returns[!is.na(bv)]
-  bv <- bv[!is.na(bv)] # Remove NA's
-  data <- cbind( returns^2, bv) # Make data matrix with returns and realized measures
-  backCast <- matrix(c(var(returns), mean(bv)), ncol = 1)
-  
-  #For traditional (default) version:
-  output <- HEAVYmodel(data = as.matrix(data,ncol=2), compConst = FALSE, backCast = backCast)
+  logReturns <- 100 * makeReturns(SPYRM$CLOSE)[-1]
+  logReturns <- logReturns - mean(logReturns)
+  dataSPY <- xts::xts(cbind(logReturns, SPYRM$BPV5[-1] * 10000), order.by = SPYRM$DT[-1])
+  output <- HEAVYmodel(dataSPY)
   expect_identical(
-      formatC(sum(output$estparams), digits = 7),
-    "1.935699"
+    formatC(sum(output$coefficients), digits = 6),
+    "2.67386"
   )
 })

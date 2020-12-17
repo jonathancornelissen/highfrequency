@@ -18,22 +18,22 @@ based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to
 \item{makeReturns}{boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.}
 }
 \value{
-In case the input is an \code{xts} object with data from one day, a numeric of same length as the number of assets. 
-If the input data spans multiple days and is in \code{xts} format, an \code{xts} will be returned. 
+In case the input is an \code{xts} object with data from one day, a numeric of same length as the number of assets.
+If the input data spans multiple days and is in \code{xts} format, an \code{xts} will be returned.
 If the input data is a \code{data.table} object, the function returns a \code{data.table} with the same column names as the input data, containing the date and the realized measures
 }
 \description{
 Calculate the rMedRQ, defined in Andersen et al. (2012).
-  
+
   Assume there is \eqn{N} equispaced returns in period \eqn{t}. Let \eqn{r_{t,i}} be a return (with \eqn{i=1, \ldots,N}) in period \eqn{t}.
-  
+
   Then, the rMedRQ is given by
  \deqn{
    \mbox{rMedRQ}_{t}=\frac{3\pi N}{9\pi +72 - 52\sqrt{3}} \left(\frac{N}{N-2}\right) \sum_{i=2}^{N-1} \mbox{med}(|r_{t,i-1}|, |r_{t,i}|, |r_{t,i+1}|)^4
   }
 }
 \examples{
-rq <- rMedRQ(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes", 
+rq <- rMedRQ(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes",
             alignPeriod = 5, makeReturns = TRUE)
 rq
 }

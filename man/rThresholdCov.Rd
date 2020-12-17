@@ -26,13 +26,13 @@ based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to
 \item{makeReturns}{boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.}
 }
 \value{
-in case the input is and contains data from one day, an N by N matrix is returned. If the data is a univariate \code{xts} object with multiple days, an \code{xts} is returned. 
+in case the input is and contains data from one day, an N by N matrix is returned. If the data is a univariate \code{xts} object with multiple days, an \code{xts} is returned.
 If the data is multivariate and contains multiple days (\code{xts} or \code{data.table}), the function returns a list containing N by N matrices. Each item in the list has a name which corresponds to the date for the matrix.
 }
 \description{
 Calculate the threshold covariance matrix proposed in Gobbi and Mancini (2009).
 Unlike the \code{\link{rOWCov}}, the rThresholdCov uses univariate jump detection rules to truncate the effect of jumps on the covariance
-estimate. As such, it remains feasible in high dimensions, but it is less robust to small cojumps. 
+estimate. As such, it remains feasible in high dimensions, but it is less robust to small cojumps.
 
 Let \eqn{r_{t,i}} be an intraday \eqn{N x 1} return vector and \eqn{i=1,...,M}
 the number of intraday returns.
@@ -42,11 +42,11 @@ Then, the \eqn{k,q}-th element of the threshold covariance matrix is defined as
 \deqn{
 \mbox{thresholdcov}[k,q]_{t} = \sum_{i=1}^{M} r_{(k)t,i} 1_{\{r_{(k)t,i}^2 \leq TR_{M}\}}  \ \ r_{(q)t,i} 1_{\{r_{(q)t,i}^2 \leq TR_{M}\}},
 }
-with the threshold value \eqn{TR_{M}} set to \eqn{9 \Delta^{-1}} times the daily realized bi-power variation of asset \eqn{k}, 
+with the threshold value \eqn{TR_{M}} set to \eqn{9 \Delta^{-1}} times the daily realized bi-power variation of asset \eqn{k},
 as suggested in Jacod and Todorov (2009).
 }
 \examples{
-# Realized threshold  Variance/Covariance: 
+# Realized threshold  Variance/Covariance:
 # Multivariate:
 \dontrun{
 library("xts")
@@ -58,7 +58,7 @@ dat <- cbind(rnorm(23401) * sqrt(1/23401), rnorm(23401) * sqrt(1/23401))
 
 dat <- exp(cumsum(xts(dat, timestamps)))
 rcThreshold <- rThresholdCov(dat, alignBy = "minutes", alignPeriod = 1, makeReturns = TRUE)
-rcThreshold  
+rcThreshold
 }
 
 }

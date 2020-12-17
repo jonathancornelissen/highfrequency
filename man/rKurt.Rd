@@ -18,8 +18,8 @@ based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to
 \item{makeReturns}{boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.}
 }
 \value{
-In case the input is an \code{xts} object with data from one day, a numeric of same length as the number of assets. 
-If the input data spans multiple days and is in \code{xts} format, an \code{xts} will be returned. 
+In case the input is an \code{xts} object with data from one day, a numeric of same length as the number of assets.
+If the input data spans multiple days and is in \code{xts} format, an \code{xts} will be returned.
 If the input data is a \code{data.table} object, the function returns a \code{data.table} with the same column names as the input data, containing the date and the realized measures
 }
 \description{
@@ -30,12 +30,12 @@ Assume there is \eqn{N} equispaced returns in period \eqn{t}. Let \eqn{r_{t,i}} 
 
 Then, the rKurt is given by
 \deqn{
-  \mbox{rKurt}_{t}= \frac{N \sum_{i=1}^{N}(r_{t,i})^4}{RV_{t}^2} 
+  \mbox{rKurt}_{t}= \frac{N \sum_{i=1}^{N}(r_{t,i})^4}{RV_{t}^2}
   }
  in which \eqn{RV_t:} realized variance
 }
 \examples{
-rk <- rKurt(sampleTData[, list(DT, PRICE)], alignBy = "minutes", 
+rk <- rKurt(sampleTData[, list(DT, PRICE)], alignBy = "minutes",
             alignPeriod = 5, makeReturns = TRUE)
 rk
 }

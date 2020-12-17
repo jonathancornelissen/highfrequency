@@ -43,11 +43,11 @@ in which
 \details{
 Suppose there are \eqn{N} equispaced returns on day \eqn{t} for the asset j and the index m. Denote \eqn{r_{(j)i,t}}, \eqn{r_{(m)i,t}} as the \eqn{i}th return on day \eqn{t} for asset \eqn{j} and index \eqn{m} (with \eqn{i=1, \ldots,N}).
 
-By default, the RCov is used and the realized beta coefficient is computed as:  
+By default, the RCov is used and the realized beta coefficient is computed as:
 \deqn{
 \hat{\beta}_{(jm)t}= \frac{\sum_{i=1}^{N} r_{(j)i,t} r_{(m)i,t}}{\sum_{i=1}^{N} r_{(m)i,t}^2}
 }
- 
+
 (Barndorff & Shephard (2004)).
 
 Note: It is worth to note that the function does not support to calculate for data of multiple days.
@@ -62,7 +62,7 @@ rBeta(a, b, RCOVestimator = "rBPCov", RVestimator = "rMinRV", makeReturns = TRUE
 
 }
 \references{
-Barndorff-Nielsen, O. E., & Shephard, N. (2004). Econometric analysis of realized covariation: High frequency based covariance, regression, and correlation in 
+Barndorff-Nielsen, O. E., & Shephard, N. (2004). Econometric analysis of realized covariation: High frequency based covariance, regression, and correlation in
 financial economics. Econometrica, 72(3), 885-925.
 }
 \author{
