@@ -33,7 +33,7 @@ Assume there is \eqn{N} equispaced returns in period \eqn{t}. Let \eqn{r_{t,i}} 
  }
 }
 \examples{
-rq <- rQuar(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes",
+rq <- rQuar(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes", 
             alignPeriod = 5, makeReturns = TRUE)
 rq
 }

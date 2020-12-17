@@ -50,6 +50,11 @@ The off-diagonals of the concordant matrix is always positive, while for the mix
 \deqn{
  \mbox{mixed}_t =\sum_{i=1}^{M} (r^{+}_{t,i} r^{-'}_{t,i} + r^{-}_{t,i} r^{+'}_{t,i})
 }
+
+The mixed covariance matrix will have 0 on the diagonal.
+From these three matrices, the realized covariance can be constructed as pos + neg + mixed.
+The concordant semicovariance matrix is pos + neg.
+The off-diagonals of the concordant matrix is always positive, while for the mixed matrix, it is always negative.
 }
 \details{
 In the case that cor is TRUE, the mixed matrix will be an \eqn{N x N} matrix filled with NA as mapping the mixed covariance matrix into correlation space is impossible due to the 0-diagonal.
