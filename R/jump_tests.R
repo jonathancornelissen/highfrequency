@@ -237,15 +237,15 @@ AJjumpTest <- function(pData, p = 4 , k = 2, alignBy = NULL, alignPeriod = NULL,
 #' where \eqn{k_j} are nonzero random variables. The counting process can be either finite or infinite for finite or infinite activity jumps.
 #' 
 #' Since the realized volatility converges to the sum of integrated variance and jump variation, while the robust IVestimator converges to the integrated variance, 
-#' it follows that the difference between  \eqn{RV_{t,N}} and the IVestimator captures the jump part only, and this observation underlines the BNS test for jumps. (Theodosiou& Zikes(2009))
+#' it follows that the difference between  \eqn{RV_{t,N}} and the IVestimator captures the jump part only, and this observation underlines the BNS test for jumps (Theodosiou and Zikes, 2009).
 #' 
-#' @references Barndorff-Nielsen, O. E., & Shephard, N. (2006). Econometrics of testing for jumps in financial economics using bipower variation. Journal of financial Econometrics, 4(1), 1-30. 
+#' @references Barndorff-Nielsen, O. E., and Shephard, N. (2006). Econometrics of testing for jumps in financial economics using bipower variation. \emph{Journal of Financial Econometrics}, 4, 1-30. 
 #' 
-#' Corsi, F., Pirino, D., & Reno, R. (2010). Threshold bipower variation and the impact of jumps on volatility forecasting. Journal of Econometrics, 159(2), 276-288.
+#' Corsi, F., Pirino, D., and Reno, R. (2010). Threshold bipower variation and the impact of jumps on volatility forecasting. \emph{Journal of Econometrics}, 159, 276-288.
 #' 
-#' Huang, X., & Tauchen, G. (2005). The relative contribution of jumps to total price variance. Journal of financial econometrics, 3(4), 456-499.
+#' Huang, X., and Tauchen, G. (2005). The relative contribution of jumps to total price variance. \emph{Journal of Financial Econometrics}, 3, 456-499.
 #' 
-#' Theodosiou, M., & Zikes, F. (2009). A comprehensive comparison of alternative tests for jumps in asset prices. Unpublished manuscript, Graduate School of Business, Imperial College London.
+#' Theodosiou, M., and Zikes, F. (2009). A comprehensive comparison of alternative tests for jumps in asset prices. Unpublished manuscript, Graduate School of Business, Imperial College London.
 #' 
 #' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 #' 
@@ -419,14 +419,14 @@ BNSjumpTest <- function (rData, IVestimator = "BV", IQestimator = "TP", type = "
 #'    }
 #'  where \eqn{k_j} are nonzero random variables. The counting process can be either finite or infinite for finite or infinite activity jumps.
 #'  
-#'  The Jiang and Oomen test is that: in the absence of jumps, the accumulated difference between the simple return and the log return captures one half of the integrated variance. (Theodosiou& Zikes(2009))
+#'  The Jiang and Oomen test is that: in the absence of jumps, the accumulated difference between the simple return and the log return captures one half of the integrated variance (Theodosiou and Zikes, 2009).
 #'  
 #' @references 
-#' Andersen, T. G., Dobrev, D., and Schaumburg, E. (2012). Jump-robust volatility estimation using nearest neighbor truncation. Journal of Econometrics, 169(1), 75- 93.
+#' Andersen, T. G., Dobrev, D., and Schaumburg, E. (2012). Jump-robust volatility estimation using nearest neighbor truncation. \emph{Journal of Econometrics}, 169, 75- 93.
 #' 
-#' Jiang, J.G. and Oomen, R.C.A (2008). Testing for jumps when asset prices are observed with noise- a "swap variance" approach. Journal of Econometrics,144(2), 352-370.
+#' Jiang, J. G., and Oomen, R. C. A (2008). Testing for jumps when asset prices are observed with noise- a "swap variance" approach. \emph{Journal of Econometrics}, 144, 352-370.
 #' 
-#' Theodosiou, M., & Zikes, F. (2009). A comprehensive comparison of alternative tests for jumps in asset prices. Unpublished manuscript, Graduate School of Business, Imperial College London.
+#' Theodosiou, M., Zikes, F. (2009). A comprehensive comparison of alternative tests for jumps in asset prices. Unpublished manuscript, Graduate School of Business, Imperial College London.
 #' 
 #' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 #' 
@@ -880,9 +880,9 @@ plot.intradayJumpTest <- function(x, ...){
 #' @return A list containing \code{criticalValues} which are the bootstrapped critical values, \code{testStatistic} the test statistic of the jump test, \code{dimensions} which are the dimensions of the jump matrix
 #'  \code{marketJumpDetections} the jumps detected in the market prices, \code{stockJumpDetections} the co-jumps detected in the individual stock prices, and \code{jumpIndices} which are the indices of the detected jumps.
 #' 
-#' @references Li et al. (2019). Rank Tests at Jump Events, Journal of Business & Economic Statistics, 37(2), 312- 321.
+#' @references Li, j., Todorov, V., Tauchen, G., and Lin, H. (2019). Rank Tests at Jump Events. \emph{Journal of Business & Economic Statistics}, 37, 312-321.
 #' 
-#' @author Emil Sjoerup, based on Matlab code by Li et al.
+#' @author Emil Sjoerup, based on Matlab code provided by Li et al. (2019)
 #' @importFrom stats na.omit quantile runif
 #' @importFrom zoo coredata
 #' @export

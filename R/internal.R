@@ -21,31 +21,31 @@ applyGetList <- function(x, FUN, cor = FALSE, alignBy = NULL, alignPeriod = NULL
   return(result)
 }
 
-#' Returns the positive semidinite projection of a symmetric matrix using the eigenvalue method
+#' Returns the positive semidefinite projection of a symmetric matrix using the eigenvalue method
 #' 
-#' @description Function returns the positive semidinite projection of a symmetric matrix using the eigenvalue method.
+#' @description Function returns the positive semidefinite projection of a symmetric matrix using the eigenvalue method.
 #' 
 #' @param S a non-PSD matrix.
 #' @param method character, indicating whether the negative eigenvalues of the correlation or covariance should be replaced by zero. Possible values are "covariance" and "correlation".
 #' 
 #' @details We use the eigenvalue method to transform \eqn{S} into a positive
-#' semidefinite covariance matrix (see e.g. Barndorff-Nielsen and Shephard, 2004, and Rousseeuw and Molenberghs, 1993).  Let \eqn{\Gamma} be the
+#' semidefinite covariance matrix (see, e.g., Barndorff-Nielsen and Shephard, 2004, and Rousseeuw and Molenberghs, 1993).  Let \eqn{\Gamma} be the
 #' orthogonal matrix consisting of the \eqn{p} eigenvectors of \eqn{S}. Denote
 #' \eqn{\lambda_1^+,\ldots,\lambda_p^+} its \eqn{p} eigenvalues, whereby the negative eigenvalues have been replaced by zeroes.
 #' Under this approach, the positive semi-definite
 #' projection of \eqn{S} is \eqn{ S^+ = \Gamma' \mbox{diag}(\lambda_1^+,\ldots,\lambda_p^+) \Gamma}. 
 #' 
 #' If method = "correlation", the eigenvalues of the correlation matrix corresponding to the matrix \eqn{S} are 
-#' transformed. See Fan et al (2010).  
+#' transformed, see Fan et al. (2010).  
 #' 
 #' @return A matrix containing the positive semi definite matrix.
 #'
 #' @references 
 #' Barndorff-Nielsen, O. E. and Shephard, N. (2004). Measuring the impact of jumps in multivariate price processes using bipower covariation. Discussion paper, Nuffield College, Oxford University.
 #' 
-#' Fan, J., Li, Y., and Yu, K. (2012). Vast volatility matrix estimation using high frequency data for portfolio selection. Journal of the American Statistical Association, 107, 497, 412-428
+#' Fan, J., Li, Y., and Yu, K. (2012). Vast volatility matrix estimation using high frequency data for portfolio selection. \emph{Journal of the American Statistical Association}, 107,  412-428
 #' 
-#' Rousseeuw, P. and Molenberghs, G. (1993). Transformation of non positive semidefinite correlation matrices. Communications in Statistics - Theory and Methods 22, 965-984.
+#' Rousseeuw, P. and Molenberghs, G. (1993). Transformation of non positive semidefinite correlation matrices. \emph{Communications in Statistics - Theory and Methods}, 22, 965-984.
 #' 
 #' @author Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 #' @keywords data manipulation

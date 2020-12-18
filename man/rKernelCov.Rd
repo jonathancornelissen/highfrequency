@@ -69,11 +69,11 @@ rcKernel
 }
 }
 \references{
-Barndorff-Nielsen, O. E. and Hansen, P. R. And Lunde, A. and Shephard, N. (2008). Designing Realized Kernels to Measure the ex post Variation of Equity Prices in the Presence of Noise. Econometrica, 76, pp. 1481-1536.
+Barndorff-Nielsen, O. E., Hansen, P. R., Lunde, A., and Shephard, N. (2008). Designing realized kernels to measure the ex post variation of equity prices in the presence of noise. \emph{Econometrica}, 76, 1481-1536.
 
-B. Zhou. (1996) High-frequency data and volatility in foreign-exchange rates. \emph{Journal of Business & Economic Statistics}, 14:45-52.
+Zhou., B. (1996). High-frequency data and volatility in foreign-exchange rates. \emph{Journal of Business & Economic Statistics}, 14, 45-52.
 
-Hansen, P. and Lunde, A. (2006) Realized variance and market microstructure noise. \emph{Journal of Business and Economic Statistics}, 24:127-218.
+Hansen, P. and Lunde, A. (2006). Realized variance and market microstructure noise. \emph{Journal of Business and Economic Statistics}, 24, 127-218.
 }
 \author{
 Scott Payseur, Onno Kleen, and Emil Sjoerup

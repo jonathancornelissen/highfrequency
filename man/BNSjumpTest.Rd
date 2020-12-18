@@ -74,7 +74,7 @@ where \eqn{a} is the drift term, \eqn{\sigma} denotes the spot volatility proces
 where \eqn{k_j} are nonzero random variables. The counting process can be either finite or infinite for finite or infinite activity jumps.
 
 Since the realized volatility converges to the sum of integrated variance and jump variation, while the robust IVestimator converges to the integrated variance, 
-it follows that the difference between  \eqn{RV_{t,N}} and the IVestimator captures the jump part only, and this observation underlines the BNS test for jumps. (Theodosiou& Zikes(2009))
+it follows that the difference between  \eqn{RV_{t,N}} and the IVestimator captures the jump part only, and this observation underlines the BNS test for jumps (Theodosiou and Zikes, 2009).
 }
 \examples{
 bns <- BNSjumpTest(sampleTData[, list(DT, PRICE)], IVestimator= "rMinRV",
@@ -83,13 +83,13 @@ bns
 
 }
 \references{
-Barndorff-Nielsen, O. E., & Shephard, N. (2006). Econometrics of testing for jumps in financial economics using bipower variation. Journal of financial Econometrics, 4(1), 1-30. 
+Barndorff-Nielsen, O. E., and Shephard, N. (2006). Econometrics of testing for jumps in financial economics using bipower variation. \emph{Journal of Financial Econometrics}, 4, 1-30. 
 
-Corsi, F., Pirino, D., & Reno, R. (2010). Threshold bipower variation and the impact of jumps on volatility forecasting. Journal of Econometrics, 159(2), 276-288.
+Corsi, F., Pirino, D., and Reno, R. (2010). Threshold bipower variation and the impact of jumps on volatility forecasting. \emph{Journal of Econometrics}, 159, 276-288.
 
-Huang, X., & Tauchen, G. (2005). The relative contribution of jumps to total price variance. Journal of financial econometrics, 3(4), 456-499.
+Huang, X., and Tauchen, G. (2005). The relative contribution of jumps to total price variance. \emph{Journal of Financial Econometrics}, 3, 456-499.
 
-Theodosiou, M., & Zikes, F. (2009). A comprehensive comparison of alternative tests for jumps in asset prices. Unpublished manuscript, Graduate School of Business, Imperial College London.
+Theodosiou, M., and Zikes, F. (2009). A comprehensive comparison of alternative tests for jumps in asset prices. Unpublished manuscript, Graduate School of Business, Imperial College London.
 }
 \author{
 Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup

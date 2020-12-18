@@ -2,7 +2,7 @@
 % Please edit documentation in R/heavy_model.R
 \name{HEAVYmodel}
 \alias{HEAVYmodel}
-\title{HEAVY Model estimation}
+\title{HEAVY model estimation}
 \usage{
 HEAVYmodel(data, startingValues = NULL)
 }

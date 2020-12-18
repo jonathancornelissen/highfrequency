@@ -17,19 +17,19 @@ mukp <- function(p, k, t = 1000000) {
 #' @keywords internal
 fmupk <- function(p,k){
   mupk <- NULL;
-  if (p==2) {
+  if (p == 2) {
     mupk <- switch(as.character(k),
                   "2" = 4.00,
                   "3" = 5.00,
                   "4" = 6.00)
   }
-  if (p==3) {
+  if (p == 3) {
     mupk <- switch(as.character(k),
                   "2" = 24.07,
                   "3" = 33.63,
                   "4" = 43.74)
   }
-  if (p==4) {
+  if (p == 4) {
     mupk <- switch(as.character(k),
                   "2" = 204.04,
                   "3" = 320.26,

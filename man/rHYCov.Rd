@@ -41,13 +41,9 @@ hy <- rHYCov(rData = as.xts(sampleOneMinuteData)["2001-08-05"],
 
 }
 \references{
-Hayashi, T. and Yoshida, N. (2005) On covariance estimation of non-synchronously observed diffusion processes. \emph{Bernoulli}, 11, 359-379.
+Hayashi, T. and Yoshida, N. (2005). On covariance estimation of non-synchronously observed diffusion processes. \emph{Bernoulli}, 11, 359-379.
 }
 \author{
-Scott Payseur, Onno Kleen, and Emil Sjoerup
-
-# Average Hayashi-Yoshida Covariance estimator is calculated on five-minute returns
-realized_cov <- rHYCov(rData = cbind(lltc, sbux, fill = 0), period = 5, alignBy = "minutes",
-                       alignPeriod = 5, makeReturns = FALSE)
+Scott Payseur and Emil Sjoerup
 }
 \keyword{volatility}

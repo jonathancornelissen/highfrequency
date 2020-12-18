@@ -16,7 +16,7 @@ Returns a vector of the available kernels.
 listAvailableKernels
 }
 \references{
-Barndorff-Nielsen, O. E. and Hansen, P. R. And Lunde, A. and Shephard, N. (2008). Designing Realized Kernels to Measure the ex post Variation of Equity Prices in the Presence of Noise. Econometrica, 76, pp. 1481-1536.
+Barndorff-Nielsen, O. E., Hansen, P. R., Lunde, A., and Shephard, N. (2008). Designing realized kernels to measure the ex post variation of equity prices in the presence of noise. \emph{Econometrica}, 76, 1481-1536.
 }
 \author{
 Scott Payseur

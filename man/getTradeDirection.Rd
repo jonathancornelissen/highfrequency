@@ -29,7 +29,7 @@ head(directions)
 
 }
 \references{
-Lee, C. M. C. and Ready, M. J. (1991). Inferring trade direction from intraday data. Journal of Finance 46, 733-746.
+Lee, C. M. C. and Ready, M. J. (1991). Inferring trade direction from intraday data. \emph{Journal of Finance}, 46, 733-746.
 }
 \author{
 Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup. Special thanks to Dirk Eddelbuettel.

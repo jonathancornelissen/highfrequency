@@ -2,11 +2,11 @@
 #' Available Kernels
 #'
 #' @description Returns a vector of the available kernels.
-#' 
-#' @return character vector 
-#' 
-#' @references Barndorff-Nielsen, O. E. and Hansen, P. R. And Lunde, A. and Shephard, N. (2008). Designing Realized Kernels to Measure the ex post Variation of Equity Prices in the Presence of Noise. Econometrica, 76, pp. 1481-1536.
-#' 
+#'
+#' @return character vector
+#'
+#' @references Barndorff-Nielsen, O. E., Hansen, P. R., Lunde, A., and Shephard, N. (2008). Designing realized kernels to measure the ex post variation of equity prices in the presence of noise. \emph{Econometrica}, 76, 1481-1536.
+#'
 #' @author Scott Payseur
 #'
 #' @examples
@@ -54,7 +54,8 @@ listAvailableKernels <- function() {
 #'             alignPeriod = 5, makeReturns = TRUE)
 #' rq
 #' @keywords highfrequency rMedRQ
-#' Andersen, T. G., Dobrev, D., and Schaumburg, E. (2012). Jump-robust volatility estimation using nearest neighbor truncation. Journal of Econometrics, 169 (1), 75-93.
+#' @references 
+#' Andersen, T. G., Dobrev, D., and Schaumburg, E. (2012). Jump-robust volatility estimation using nearest neighbor truncation. \emph{Journal of Econometrics}, 169, 75-93.
 #' @importFrom zoo rollmedian
 #' @export
 rMedRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE) {
@@ -146,8 +147,8 @@ rMedRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
 #' rq <- rMinRQ(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes",
 #'             alignPeriod = 5, makeReturns = TRUE)
 #' rq
-#' @references 
-#' Andersen, T. G., Dobrev, D., and Schaumburg, E. (2012). Jump-robust volatility estimation using nearest neighbor truncation. Journal of Econometrics, 169 (1), 75-93.
+#' @references
+#' Andersen, T. G., Dobrev, D., and Schaumburg, E. (2012). Jump-robust volatility estimation using nearest neighbor truncation. \emph{Journal of Econometrics}, 169, 75-93.
 #' @importFrom zoo rollapply
 #' @export
 rMinRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE) {
@@ -222,10 +223,10 @@ rMinRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
 #' @return In case the input is an \code{xts} object with data from one day, a numeric of same length as the number of assets.
 #' If the input data spans multiple days and is in \code{xts} format, an \code{xts} will be returned.
 #' If the input data is a \code{data.table} object, the function returns a \code{data.table} with the same column names as the input data, containing the date and the realized measures
-#' 
-#' @references 
-#' Andersen, T. G., Dobrev, D., and Schaumburg, E. (2012). Jump-robust volatility estimation using nearest neighbor truncation. Journal of Econometrics, 169 (1), 75-93.
-#' 
+#'
+#' @references
+#' Andersen, T. G., Dobrev, D., and Schaumburg, E. (2012). Jump-robust volatility estimation using nearest neighbor truncation. \emph{Journal of Econometrics}, 169, 75-93.
+#'
 #' @author Jonathan Cornelissen, Kris Boudt, Emil Sjoerup
 #'
 #' @examples
@@ -297,7 +298,7 @@ rMinRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
 #' rMedRV
 #'
 #' @description
-#' Calculate the rMedRV, defined in Andersen et al. (2009).
+#' Calculate the rMedRV, defined in Andersen et al. (2012).
 #'
 #' Let \eqn{r_{t,i}} be a return (with \eqn{i=1,\ldots,M}) in period \eqn{t}.
 #'
@@ -321,18 +322,15 @@ rMinRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
 #' The difference between RV and rMedRV is an estimate of the realized jump
 #' variability. Disentangling the continuous and jump components in RV
 #' can lead to more precise volatility forecasts,
-#' as shown in Andersen et al. (2007) and Corsi et al. (2010).
+#' as shown in Andersen et al. (2012)
 #'
 #' @return In case the input is an \code{xts} object with data from one day, a numeric of same length as the number of assets.
 #' If the input data spans multiple days and is in \code{xts} format, an \code{xts} will be returned.
 #' If the input data is a \code{data.table} object, the function returns a \code{data.table} with the same column names as the input data, containing the date and the realized measures
-#' @references 
-#' Andersen, T. G., Dobrev, D., and Schaumburg, E. (2012). Jump-robust volatility estimation using nearest neighbor truncation. Journal of Econometrics, 169 (1), 75-93.
-#' 
-#' Andersen, T.G., Bollerslev, T., and Diebold, F. (2007). Roughing it up: including jump components in the measurement, modelling and forecasting of return volatility. The Review of Economics and Statistics 89 (4), 701-720.
-#' 
-#' Corsi, F., Pirino, D.,  and Reno, R. (2010). Threshold Bipower Variation and the Impact of Jumps on Volatility Forecasting. Journal of Econometrics 159 (2), 276-288.
-#' 
+#'
+#' @references
+#' Andersen, T. G., Dobrev, D., and Schaumburg, E. (2012). Jump-robust volatility estimation using nearest neighbor truncation. \emph{Journal of Econometrics}, 169, 75-93.
+#'
 #' @author Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 #'
 #' @examples
@@ -459,7 +457,7 @@ rMedRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
 #'     \mbox{MRC}^{\delta}= \frac{N}{N-k_N+2}\frac{1}{\psi_2k_N}\sum_{i=0}^{N-k_N+1}\bar{\boldsymbol{r}}_i\cdot \bar{\boldsymbol{r}}'_i
 #' }
 #'
-#' @references Hautsch, N., & Podolskij, M. (2013). Preaveraging-Based Estimation of Quadratic Variation in the Presence of Noise and Jumps: Theory, Implementation, and Empirical Evidence. Journal of Business & Economic Statistics, 31(2), 165-183.
+#' @references Hautsch, N., and Podolskij, M. (2013). Preaveraging-based estimation of quadratic variation in the presence of noise and jumps: theory, implementation, and empirical Evidence. \emph{Journal of Business & Economic Statistics}, 31, 165-183.
 #'
 #' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 #'
@@ -555,12 +553,12 @@ rMRC <- function(pData, pairwise = FALSE, makePsd = FALSE) {
 #'
 #' @return in case the input is and contains data from one day, an N by N matrix is returned. If the data is a univariate \code{xts} object with multiple days, an \code{xts} is returned.
 #' If the data is multivariate and contains multiple days (\code{xts} or \code{data.table}), the function returns a list containing N by N matrices. Each item in the list has a name which corresponds to the date for the matrix.
-#' 
-#' @references 
-#' L. Zhang, P. A. Mykland, and Y. Ait-Sahalia. (2005) A tale of two time scales: Determining integrated volatility with noisy high-frequency data. Journal of the American Statistical Association.
-#' 
-#' Pooter M. D., Martens M. and Dijk v D. (2008) Predicting the daily covariance matrix for S&P100 stocks using intraday data - but which frequency to use? Econometric Reviews.
-#' 
+#'
+#' @references
+#' L. Zhang, P. A. Mykland, and Y. Ait-Sahalia (2005). A tale of two time scales: Determining integrated volatility with noisy high-frequency data. \emph{Journal of the American Statistical Association}, 100, 1394-1411.
+#'
+#' Pooter M. D., Martens M. and Dijk v D. (2008). Predicting the daily covariance matrix for S&P100 stocks using intraday data - but which frequency to use? \emph{Econometric Reviews}, 27, 199-229.
+#'
 #' @author Scott Payseur, Onno Kleen, and Emil Sjoerup
 #'
 #' @examples
@@ -799,8 +797,8 @@ rAVGCov <- function(rData, cor = FALSE, alignBy = "minutes", alignPeriod = 5, k 
 #' Note: It is worth to note that the function does not support to calculate for data of multiple days.
 #'
 #' @references
-#' Barndorff-Nielsen, O. E., & Shephard, N. (2004). Econometric analysis of realized covariation: High frequency based covariance, regression, and correlation in
-#' financial economics. Econometrica, 72(3), 885-925.
+#' Barndorff-Nielsen, O. E. and Shephard, N. (2004). Econometric analysis of realized covariation: high frequency based covariance, regression, and correlation in
+#' financial economics. \emph{Econometrica}, 72, 885-925.
 #'
 #' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
 #'
@@ -918,11 +916,9 @@ rBeta <- function(rData, rIndex, RCOVestimator = "rCov", RVestimator = "RV", mak
 #'
 #' @return in case the input is and contains data from one day, an N by N matrix is returned. If the data is a univariate \code{xts} object with multiple days, an \code{xts} is returned.
 #' If the data is multivariate and contains multiple days (\code{xts} or \code{data.table}), the function returns a list containing N by N matrices. Each item in the list has a name which corresponds to the date for the matrix.
-#' 
-#' @references 
-#' Barndorff-Nielsen, O. E. and Shephard, N. (2004). Measuring the impact of
-#' jumps in multivariate price processes using bipower covariation. Discussion
-#' paper, Nuffield College, Oxford University.
+#'
+#' @references
+#' Barndorff-Nielsen, O. E., and Shephard, N. (2004). Measuring the impact of jumps in multivariate price processes using bipower covariation. Discussion paper, Nuffield College, Oxford University.
 #'
 #' @author Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 #'
@@ -1181,15 +1177,15 @@ rCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeRet
 #' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
 #' @param makeReturns boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.
 #' @param makePsd boolean, in case it is \code{TRUE}, the positive definite version of rHYCov is returned. \code{FALSE} by default.
-#' 
-#' @references Hayashi, T. and Yoshida, N. (2005) On covariance estimation of non-synchronously observed diffusion processes. \emph{Bernoulli}, 11, 359-379.
-#' 
+#'
+#' @references Hayashi, T. and Yoshida, N. (2005). On covariance estimation of non-synchronously observed diffusion processes. \emph{Bernoulli}, 11, 359-379.
+#'
 #' @author Scott Payseur and Emil Sjoerup
 #' @examples
 #' library("xts")
 #' hy <- rHYCov(rData = as.xts(sampleOneMinuteData)["2001-08-05"],
 #'              period = 5, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)
-#' 
+#'
 #' @keywords volatility
 #' @export
 rHYCov <- function(rData, cor = FALSE, period = 1, alignBy = "seconds", alignPeriod = 1, makeReturns = FALSE, makePsd = TRUE) {
@@ -1288,13 +1284,13 @@ rHYCov <- function(rData, cor = FALSE, period = 1, alignBy = "seconds", alignPer
 #'
 #' @return in case the input is and contains data from one day, an N by N matrix is returned. If the data is a univariate \code{xts} object with multiple days, an \code{xts} is returned.
 #' If the data is multivariate and contains multiple days (\code{xts} or \code{data.table}), the function returns a list containing N by N matrices. Each item in the list has a name which corresponds to the date for the matrix.
-#' 
-#' @references 
-#' Barndorff-Nielsen, O. E. and Hansen, P. R. And Lunde, A. and Shephard, N. (2008). Designing Realized Kernels to Measure the ex post Variation of Equity Prices in the Presence of Noise. Econometrica, 76, pp. 1481-1536.
 #'
-#' B. Zhou. (1996) High-frequency data and volatility in foreign-exchange rates. \emph{Journal of Business & Economic Statistics}, 14:45-52.
+#' @references
+#' Barndorff-Nielsen, O. E., Hansen, P. R., Lunde, A., and Shephard, N. (2008). Designing realized kernels to measure the ex post variation of equity prices in the presence of noise. \emph{Econometrica}, 76, 1481-1536.
 #'
-#' Hansen, P. and Lunde, A. (2006) Realized variance and market microstructure noise. \emph{Journal of Business and Economic Statistics}, 24:127-218.
+#' Zhou., B. (1996). High-frequency data and volatility in foreign-exchange rates. \emph{Journal of Business & Economic Statistics}, 14, 45-52.
+#'
+#' Hansen, P. and Lunde, A. (2006). Realized variance and market microstructure noise. \emph{Journal of Business and Economic Statistics}, 24, 127-218.
 #'
 #' @author Scott Payseur, Onno Kleen, and Emil Sjoerup
 #'
@@ -1459,8 +1455,8 @@ rKernelCov <- function(rData, cor = FALSE,  alignBy = "seconds", alignPeriod = 1
 #' If the input data spans multiple days and is in \code{xts} format, an \code{xts} will be returned.
 #' If the input data is a \code{data.table} object, the function returns a \code{data.table} with the same column names as the input data, containing the date and the realized measures
 #'
-#' @references 
-#' Amaya, D., Christoffersen, P., Jacobs, K. and Vasquez, A. (2015). Does realized skewness and kurtosis predict the cross-section of equity returns?. Journal of Financial Economics, 118, 1, 135-167.
+#' @references
+#' Amaya, D., Christoffersen, P., Jacobs, K., and Vasquez, A. (2015). Does realized skewness and kurtosis predict the cross-section of equity returns? \emph{Journal of Financial Economics}, 118, 135-167.
 #'
 #' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
 #'
@@ -1565,8 +1561,9 @@ rKurt <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #' @param makeReturns boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.
 #'
 #' @return numeric
-#' @references 
-#' Andersen, T. G., Dobrev, D., and Schaumburg, E. (2012). Jump-robust volatility estimation using nearest neighbor truncation. Journal of Econometrics, 169(1), 75- 93.
+#'
+#' @references
+#' Andersen, T. G., Dobrev, D., and Schaumburg, E. (2012). Jump-robust volatility estimation using nearest neighbor truncation. \emph{Journal of Econometrics}, 169, 75-93.
 #'
 #' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 #'
@@ -1698,9 +1695,9 @@ rMPV <- function(rData, m = 2, p = 2, alignBy = NULL, alignPeriod = NULL, makeRe
 #' with at least one component being affected by jumps increases fast with the dimension
 #' of the series. This means that a potentially large proportion of the returns receives
 #' a zero weight, due to which the rOWCov can have a low finite sample efficiency in higher dimensions
-#' 
-#' @references Boudt, K., Croux, C., and Laurent, S. (2008). Outlyingness weighted covariation. Mimeo.
-#' 
+#'
+#' @references Boudt, K., Croux, C., and Laurent, S. (2008). Outlyingness weighted covariation. \emph{Journal of Financial Econometrics}, 9, 657–684
+#'
 #' @author Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 #'
 #' @examples
@@ -1837,8 +1834,9 @@ rOWCov <- function (rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, make
 #' @return In case the input is an \code{xts} object with data from one day, a numeric of same length as the number of assets.
 #' If the input data spans multiple days and is in \code{xts} format, an \code{xts} will be returned.
 #' If the input data is a \code{data.table} object, the function returns a \code{data.table} with the same column names as the input data, containing the date and the realized measures
-#' @references 
-#' Amaya, D., Christoffersen, P., Jacobs, K. and Vasquez, A. (2015). Does realized skewness and kurtosis predict the cross-section of equity returns?. Journal of Financial Economics, 118, 1, 135-167.
+#'
+#' @references
+#' Amaya, D., Christoffersen, P., Jacobs, K., and Vasquez, A. (2015). Does realized skewness and kurtosis predict the cross-section of equity returns? \emph{Journal of Financial Economics}, 118, 135-167.
 #'
 #' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
 #'
@@ -1935,8 +1933,9 @@ rSkew <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #' sv <- rSV(sampleTData[, list(DT, PRICE)], alignBy = "minutes",
 #'           alignPeriod = 5, makeReturns = TRUE)
 #' sv
-#' @references 
-#' Barndorff-Nielsen, O.E., Kinnebrock, S. and Shephard N. (2008). Measuring downside risk - realized semivariance. CREATES research paper. p. 3-5.
+#' @references
+#' Barndorff-Nielsen, O. E., Kinnebrock, S., and Shephard N. (2010). \emph{Measuring downside risk: realised semivariance}. In: Volatility and Time Series Econometrics: Essays in Honor of Robert F. Engle,
+#' (Edited by Bollerslev, T., Russell, J., and Watson, M.), 117-136. Oxford University Press.
 #' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 #' @keywords  highfrequency rSV
 #' @export
@@ -2043,11 +2042,11 @@ rSV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, 
 #'
 #' @references
 #' Barndorff-Nielsen, O. and Shephard, N. (2004). Measuring the impact of jumps in multivariate price processes using bipower covariation. Discussion paper, Nuffield College, Oxford University.
-#' 
-#' Jacod, J. and Todorov, V. (2009). Testing for common arrival of jumps in discretely-observed multidimensional processes. Annals of Statistics 37, 1792-1838.
-#' 
-#' Mancini, C. and Gobbi, F. (2009). Identifying the covariation between the diffusion parts and the co-jumps given discrete observations. Mimeo.
-#' 
+#'
+#' Jacod, J. and Todorov, V. (2009). Testing for common arrival of jumps in discretely-observed multidimensional processes. \emph{Annals of Statistics}, 37, 1792-1838.
+#'
+#' Mancini, C. and Gobbi, F. (2012). Identifying the brownian covariation from the co-jumps given discrete observations. \emph{Econometric Theory}, 28, 249-273.
+#'
 #' @author Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 #'
 #' @examples # Realized threshold  Variance/Covariance:
@@ -2165,10 +2164,10 @@ rThresholdCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL
 #' @param noisevar vector containing the estimates of the noise variance of the assets, needed in the truncation. Is NULL by default.
 #' @param K positive integer, slow time scale returns are computed on prices that are K steps apart.
 #' @param J positive integer, fast time scale returns are computed on prices that are J steps apart.
-#' @param K_cov positive integer, for the extradiagonal covariance elements the slow time scale returns are computed on prices that are K steps apart.
-#' @param J_cov positive integer, for the extradiagonal covariance elements the fast time scale returns are computed on prices that are J steps apart.
-#' @param K_var vector of positive integers, for the diagonal variance elements the slow time scale returns are computed on prices that are K steps apart.
-#' @param J_var vector of positive integers, for the diagonal variance elements the fast time scale returns are computed on prices that are J steps apart.
+#' @param KCov positive integer, for the extradiagonal covariance elements the slow time scale returns are computed on prices that are K steps apart.
+#' @param JCov positive integer, for the extradiagonal covariance elements the fast time scale returns are computed on prices that are J steps apart.
+#' @param KVar vector of positive integers, for the diagonal variance elements the slow time scale returns are computed on prices that are K steps apart.
+#' @param JVar vector of positive integers, for the diagonal variance elements the fast time scale returns are computed on prices that are J steps apart.
 #' @param makePsd boolean, in case it is \code{TRUE}, the positive definite version of rRTSCov is returned. \code{FALSE} by default.
 #' @param eta positive real number, squared standardized high-frequency returns that exceed eta are detected as jumps.
 #'
@@ -2221,11 +2220,11 @@ rThresholdCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL
 #'
 #' @references
 #' Boudt K. and Zhang, J. 2010. Jump robust two time scale covariance estimation and realized volatility budgets. Mimeo.
-#' 
-#' Harris, F., McInish, T., Shoesmith, G., and Wood, R. (1995). Cointegration, error correction, and price discovery on informationally linked security markets. Journal of Financial and Quantitative Analysis 30, 563-581.
-#' 
-#' Zhang, L., Mykland, P. A., and Ait-Sahalia, Y. (2005). A tale of two time scales: Determining integrated volatility with noisy high-frequency data. Journal of the American Statistical Association 100, 1394-1411.
-#' 
+#'
+#' Harris, F., McInish, T., Shoesmith, G., and Wood, R. (1995). Cointegration, error correction, and price discovery on informationally linked security markets. \emph{Journal of Financial and Quantitative Analysis}, 30, 563-581.
+#'
+#' Zhang, L., Mykland, P. A., and Ait-Sahalia, Y. (2005). A tale of two time scales: Determining integrated volatility with noisy high-frequency data. \emph{Journal of the American Statistical Association}, 100, 1394-1411.
+#'
 #' @author Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 #' @examples
 #' \dontrun{
@@ -2248,8 +2247,8 @@ rThresholdCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL
 #' @export
 rRTSCov <- function (pData, cor = FALSE, startIV = NULL, noisevar = NULL,
                      K = 300, J = 1,
-                     K_cov = NULL , J_cov = NULL,
-                     K_var = NULL , J_var = NULL ,
+                     KCov = NULL , JCov = NULL,
+                     KVar = NULL , JVar = NULL ,
                      eta = 9, makePsd = FALSE){
   if (!is.list(pData)) {
     n <- 1
@@ -2284,32 +2283,32 @@ rRTSCov <- function (pData, cor = FALSE, startIV = NULL, noisevar = NULL,
 
     cov <- matrix(rep(0, n * n), ncol = n)
     diagonal <- numeric(n)
-    if (is.null(K_cov)) {
-      K_cov <- K
+    if (is.null(KCov)) {
+      KCov <- K
     }
-    if (is.null(J_cov)) {
-      J_cov <- J
+    if (is.null(JCov)) {
+      JCov <- J
     }
-    if (is.null(K_var)) {
-      K_var <- rep(K,n)
+    if (is.null(KVar)) {
+      KVar <- rep(K,n)
     }
-    if (is.null(J_var)) {
-      J_var <- rep(J,n)
+    if (is.null(JVar)) {
+      JVar <- rep(J,n)
     }
     for (i in 1:n){
       diagonal[i] <- RTSRV(pData[[i]], startIV = startIV[i],
-                           noisevar = noisevar[i], K = K_var[i], J = J_var[i],
+                           noisevar = noisevar[i], K = KVar[i], J = JVar[i],
                            eta = eta)
     }
     diag(cov) <- diagonal
-    if( is.null(K_cov)){ K_cov = K }
-    if( is.null(J_cov)){ J_cov = J }
+    if( is.null(KCov)){ KCov = K }
+    if( is.null(JCov)){ JCov = J }
     for (i in 2:n) {
       for (j in 1:(i - 1)) {
         cov[i, j] = cov[j, i] = RTSCov_bi(pData[[i]],
                                           pData[[j]], startIV1 = diagonal[i], startIV2 = diagonal[j],
                                           noisevar1 = noisevar[i], noisevar2 = noisevar[j],
-                                          K = K_cov, J = J_cov, eta = eta)
+                                          K = KCov, J = JCov, eta = eta)
       }
     }
     if (!cor) {
@@ -2365,9 +2364,10 @@ RV <- function(rData) {
 #' @return In case the input is an \code{xts} object with data from one day, a numeric of same length as the number of assets.
 #' If the input data spans multiple days and is in \code{xts} format, an \code{xts} will be returned.
 #' If the input data is a \code{data.table} object, the function returns a \code{data.table} with the same column names as the input data, containing the date and the realized measures
-#' 
-#' @references Andersen, T. G., Dobrev, D., and Schaumburg, E. (2012). Jump-robust volatility estimation using nearest neighbor truncation. Journal of Econometrics, 169(1), 75- 93.
-#'  
+#'
+#' @references 
+#' Andersen, T. G., Dobrev, D., and Schaumburg, E. (2012). Jump-robust volatility estimation using nearest neighbor truncation. \emph{Journal of Econometrics}, 169, 75-93.
+#'
 #' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 #'
 #' @examples
@@ -2449,7 +2449,8 @@ rTPQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FAL
 #' If the input data spans multiple days and is in \code{xts} format, an \code{xts} will be returned.
 #' If the input data is a \code{data.table} object, the function returns a \code{data.table} with the same column names as the input data, containing the date and the realized measures
 #'
-#' @references Andersen, T. G., Dobrev, D., and Schaumburg, E. (2012). Jump-robust volatility estimation using nearest neighbor truncation. Journal of Econometrics, 169(1), 75- 93.
+#' @references 
+#' Andersen, T. G., Dobrev, D., and Schaumburg, E. (2012). Jump-robust volatility estimation using nearest neighbor truncation. \emph{Journal of Econometrics}, 169, 75-93.
 #' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 #'
 #' @examples
@@ -2532,9 +2533,10 @@ rQPVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
 #' If the input data is a \code{data.table} object, the function returns a \code{data.table} with the same column names as the input data, containing the date and the realized measures
 #'
 #' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
-#' @references Andersen, T. G., Dobrev, D., and Schaumburg, E. (2012). Jump-robust volatility estimation using nearest neighbor truncation. Journal of Econometrics, 169(1), 75- 93.
-#' @examples 
-#' rq <- rQuar(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes", 
+#' @references 
+#' Andersen, T. G., Dobrev, D., and Schaumburg, E. (2012). Jump-robust volatility estimation using nearest neighbor truncation. \emph{Journal of Econometrics}, 169, 75-93.
+#' @examples
+#' rq <- rQuar(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes",
 #'             alignPeriod = 5, makeReturns = TRUE)
 #' rq
 #' @keywords  highfrequency rQuar
@@ -2599,10 +2601,10 @@ rQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #' @param cor boolean, in case it is \code{TRUE}, and the input data is multivariate, the correlation is returned instead of the covariance matrix. \code{FALSE} by default.
 #' @param K positive integer, slow time scale returns are computed on prices that are K steps apart.
 #' @param J positive integer, fast time scale returns are computed on prices that are J steps apart.
-#' @param K_cov positive integer, for the extradiagonal covariance elements the slow time scale returns are computed on prices that are K steps apart.
-#' @param J_cov positive integer, for the extradiagonal covariance elements the fast time scale returns are computed on prices that are J steps apart.
-#' @param K_var vector of positive integers, for the diagonal variance elements the slow time scale returns are computed on prices that are K steps apart.
-#' @param J_var vector of positive integers, for the diagonal variance elements the fast time scale returns are computed on prices that are J steps apart.
+#' @param KCov positive integer, for the extradiagonal covariance elements the slow time scale returns are computed on prices that are K steps apart.
+#' @param JCov positive integer, for the extradiagonal covariance elements the fast time scale returns are computed on prices that are J steps apart.
+#' @param KVar vector of positive integers, for the diagonal variance elements the slow time scale returns are computed on prices that are K steps apart.
+#' @param JVar vector of positive integers, for the diagonal variance elements the fast time scale returns are computed on prices that are J steps apart.
 #' @param makePsd boolean, in case it is \code{TRUE}, the positive definite version of rTSCov is returned. \code{FALSE} by default.
 #'
 #' @return in case the input is and contains data from one day, an N by N matrix is returned. If the data is a univariate \code{xts} object with multiple days, an \code{xts} is returned.
@@ -2646,12 +2648,13 @@ rQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #' Unfortunately, the rTSCov is not always positive semidefinite.
 #' By setting the argument makePsd = TRUE, the function \code{\link{makePsd}} is used to return a positive semidefinite
 #' matrix. This function replaces the negative eigenvalues with zeroes.
-#' @references 
-#' Harris, F., McInish, T., Shoesmith, G., and Wood, R. (1995). Cointegration, error correction, and price discovery on informationally linked security markets. Journal of Financial and Quantitative Analysis 30, 563-581.
-#' 
-#' Zhang, L., Mykland, P. A., and Ait-Sahalia, Y. (2005). A tale of two time scales: Determining integrated volatility with noisy high-frequency data. Journal of the American Statistical Association 100, 1394-1411.
-#' 
-#' Zhang, L. (2011). Estimating covariation: Epps effect, microstructure noise. Journal of Econometrics 160, 33-47.
+#'
+#' @references
+#' Harris, F., McInish, T., Shoesmith, G., and Wood, R. (1995). Cointegration, error correction, and price discovery on informationally linked security markets. \emph{Journal of Financial and Quantitative Analysis}, 30, 563-581.
+#'
+#' Zhang, L., Mykland, P. A., and Ait-Sahalia, Y. (2005). A tale of two time scales: Determining integrated volatility with noisy high-frequency data. \emph{Journal of the American Statistical Association}, 100, 1394-1411.
+#'
+#' Zhang, L. (2011). Estimating covariation: Epps effect, microstructure noise. \emph{Journal of Econometrics}, 160, 33-47.
 #'
 #' @author Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 #' @examples
@@ -2675,8 +2678,8 @@ rQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #'
 #' @keywords volatility
 #' @export
-rTSCov <- function (pData, cor = FALSE, K = 300, J = 1, K_cov = NULL, J_cov = NULL,
-                    K_var = NULL, J_var = NULL, makePsd = FALSE) {
+rTSCov <- function (pData, cor = FALSE, K = 300, J = 1, KCov = NULL, JCov = NULL,
+                    KVar = NULL, JVar = NULL, makePsd = FALSE) {
   if (!is.list(pData)) {
     n <- 1
   }
@@ -2707,29 +2710,29 @@ rTSCov <- function (pData, cor = FALSE, K = 300, J = 1, K_cov = NULL, J_cov = NU
     }
 
     cov <- matrix(rep(0, n * n), ncol = n)
-    if (is.null(K_cov)) {
-      K_cov <- K
+    if (is.null(KCov)) {
+      KCov <- K
     }
-    if (is.null(J_cov)) {
-      J_cov <- J
+    if (is.null(JCov)) {
+      JCov <- J
     }
-    if (is.null(K_var)) {
-      K_var <- rep(K,n)
+    if (is.null(KVar)) {
+      KVar <- rep(K,n)
     }
-    if (is.null(J_var)) {
-      J_var <- rep(J,n)
+    if (is.null(JVar)) {
+      JVar <- rep(J,n)
     }
 
     diagonal <- c()
     for (i in 1:n) {
-      diagonal[i] = TSRV(pData[[i]], K = K_var[i], J = J_var[i])
+      diagonal[i] = TSRV(pData[[i]], K = KVar[i], J = JVar[i])
     }
     diag(cov) <- diagonal
 
     for (i in 2:n) {
       for (j in 1:(i - 1)) {
         cov[i, j] = cov[j, i] = TSCov_bi(pData[[i]],
-                                         pData[[j]], K = K_cov, J = J_cov)
+                                         pData[[j]], K = KCov, J = JCov)
       }
     }
     if (!cor) {
@@ -2768,9 +2771,9 @@ rTSCov <- function (pData, cor = FALSE, K = 300, J = 1, K_cov = NULL, J_cov = NU
 #' @details
 #' additional arguments for \code{IVest} and \code{COVest} should be passed in the ... argument.
 #' For the \code{rMRC} estimator, which is the default, the \code{theta} and \code{delta} parameters can be set. These default to 1 and 0.1 respectively.
-#' 
-#' @references 
-#' Boudt, K., Laurent, S., Lunde, A., Quaedvlieg, R., and Sauri, O. (2017) Positive semidefinite integrated covariance estimation, factorizations and asynchronicity. Journal of Econometrics 196, 347-367
+#'
+#' @references
+#' Boudt, K., Laurent, S., Lunde, A., Quaedvlieg, R., and Sauri, O. (2017). Positive semidefinite integrated covariance estimation, factorizations and asynchronicity. \emph{Journal of Econometrics}, 196, 347-367.
 #' @author Emil Sjoerup
 #'
 #' @importFrom xts xts
@@ -2801,7 +2804,7 @@ rCholCov <- function(pData, IVest = "rMRC", COVest = "rMRC", criterion = "square
 
   options <- list(...)
   op <- list("delta" = 0.1, "theta" = 1, "alignBy" = "minutes", "alignPeriod" = 5, "kernelType" = "rectangular", "kernelParam" = 1, "kernelDOFadj" = TRUE,
-             "startIV" = NULL, "noisevar" = NULL, "K" = 300, "J" = 1, "K_cov" = NULL, "J_cov" = NULL, "K_var" = NULL, "J_var" = NULL, "eta" = 9, "makePsd" = FALSE, "k" = 1)
+             "startIV" = NULL, "noisevar" = NULL, "K" = 300, "J" = 1, "KCov" = NULL, "JCov" = NULL, "KVar" = NULL, "JVar" = NULL, "eta" = 9, "makePsd" = FALSE, "k" = 1)
   op[names(options)] <- options
   delta <- op[["delta"]]
   theta <- op[["theta"]]
@@ -2812,10 +2815,10 @@ rCholCov <- function(pData, IVest = "rMRC", COVest = "rMRC", criterion = "square
   kernelDOFadj <- op[["kernelDOFadj"]]
   startIV <- op[["startIV"]]
   noisevar <- op[["noisevar"]]
-  K_cov <- op[["K_cov"]]
-  J_cov <- op[["J_cov"]]
-  K_var <- op[["K_var"]]
-  J_var <- op[["J_var"]]
+  KCov <- op[["KCov"]]
+  JCov <- op[["JCov"]]
+  KVar <- op[["KVar"]]
+  JVar <- op[["JVar"]]
   eta <- op[["eta"]]
   makePsd <- op[["makePsd"]]
   K <- op[["K"]]
@@ -2860,7 +2863,7 @@ rCholCov <- function(pData, IVest = "rMRC", COVest = "rMRC", criterion = "square
                                            makeReturns = TRUE, kernelType = kernelType, kernelParam = kernelParam, kernelDOFadj = kernelDOFadj),
                    rOWCov = rOWCov(exp(cumsum(cbind(returns[,l], f[,m]))), alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = TRUE),
                    rRTSCov = rRTSCov(exp(cumsum(cbind(returns[,l], f[,m]))), cor = FALSE, startIV = startIV, noisevar = noisevar, K = K, J = J,
-                                     K_cov = K_cov, J_cov=J_cov, K_var=K_var, J_var = J_var, eta = eta, makePsd = makePsd ),
+                                     KCov = KCov, JCov=JCov, KVar=KVar, JVar = JVar, eta = eta, makePsd = makePsd ),
                    rThresholdCov = rThresholdCov(exp(cumsum(cbind(returns[,l], f[,m]))), alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = TRUE),
                    rSemiCov = rSemiCov(exp(cumsum(cbind(returns[,l], f[,m]))), alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = TRUE)
                    )
@@ -2888,7 +2891,7 @@ rCholCov <- function(pData, IVest = "rMRC", COVest = "rMRC", criterion = "square
                                                   makeReturns = TRUE, kernelType = kernelType, kernelParam = kernelParam, kernelDOFadj = kernelDOFadj),
                        rOWCov =        rOWCov(xts(exp(cumsum(f[,d])), order.by = index(returns)), alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = TRUE),
                        rRTSCov =       rRTSCov(xts(exp(cumsum(f[,d])), order.by = index(returns)), cor = FALSE, startIV = startIV, noisevar = noisevar, K = K, J = J,
-                                               K_cov = K_cov, J_cov=J_cov, K_var=K_var, J_var = J_var, eta = eta, makePsd = makePsd ),
+                                               KCov = KCov, JCov=JCov, KVar=KVar, JVar = JVar, eta = eta, makePsd = makePsd ),
                        rThresholdCov = rThresholdCov(xts(exp(cumsum(f[,d])), order.by = index(returns)), alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = TRUE),
                        rSemiCov = rSemiCov(xts(exp(cumsum(f[,d])), order.by = index(returns)), alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = TRUE)
                        )
@@ -2912,16 +2915,12 @@ rCholCov <- function(pData, IVest = "rMRC", COVest = "rMRC", criterion = "square
 #' @description Calculate the Realized Semicovariances (rSemiCov).
 #' Let \eqn{ r_{t,i} } be an intraday \eqn{M x N} return matrix and \eqn{i=1,...,M}
 #' the number of intraday returns. Then, let \eqn{r_{t,i}^{+} = max(r_{t,i},0)} and \eqn{r_{t,i}^{-} = min(r_{t,i},0)}.
-#' 
+#'
 #' Then, the realized semicovariance is given by the following three matrices:
-#' The mixed covariance matrix will have 0 on the diagonal.
-#' From these three matrices, the realized covariance can be constructed as pos + neg + mixed.
-#' The concordant semicovariance matrix is pos + neg.
-#' The off-diagonals of the concordant matrix is always positive, while for the mixed matrix, it is always negative.
-#' 
+#'
 #'\deqn{
 #'  \mbox{pos}_t =\sum_{i=1}^{M} r^{+}_{t,i} r^{+'}_{t,i}
-#'} 
+#'}
 #'\deqn{
 #'  \mbox{neg}_t =\sum_{i=1}^{M} r^{-}_{t,i} r^{-'}_{t,i}
 #'}
@@ -2935,7 +2934,7 @@ rCholCov <- function(pData, IVest = "rMRC", COVest = "rMRC", criterion = "square
 #' The off-diagonals of the concordant matrix is always positive, while for the mixed matrix, it is always negative.
 #'
 #'
-#'  
+#'
 #' @param rData an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days
 #' @param cor boolean, in case it is \code{TRUE}, and the input data is multivariate, the correlation is returned instead of the covariance matrix. \code{FALSE} by default.
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
@@ -2973,9 +2972,9 @@ rCholCov <- function(pData, IVest = "rMRC", COVest = "rMRC", criterion = "square
 #' addLegend(lty = 1) # Add legend so we can distinguish the series.
 #' }
 #' @author Emil Sjoerup
-#' 
-#' @references 
-#' Bollerslev, T., Li, J., Patton, A. J., and Quaedvlieg, R. (2020). Realized Semicovariances. Econometrica 88, 4, 1515-1551.
+#'
+#' @references
+#' Bollerslev, T., Li, J., Patton, A. J., and Quaedvlieg, R. (2020). Realized semicovariances. \emph{Econometrica}, 88, 1515-1551.
 #' @keywords volatility
 #' @importFrom data.table between
 #' @export
@@ -3098,7 +3097,7 @@ listCholCovEstimators <- function(){
 #' @param knEqual Use an altered version of the ReMeDI estimator, where we instead use equal kn, instead of kn and 2*kn for the windows. See Figure 1 of paper in reference section.
 #' @param makeCorrelation logical indicating whether to transform the autocovariances into autocorrelations. The estimate of variance is imprecise and thus, constructing the correlation like this may show correlations that fall outside (-1,1)
 #'
-#' @references Li, M. and Linton, O. (2020). A ReMeDI for Microstructure Noise. Forthcoming
+#' @references Li, M. and Linton, O. (2019). A ReMeDI for microstructure noise. Cambridge Working Papers in Economics 1908.
 #' @keywords microstructure noise autocovariance autocorrelation
 #' @note We Thank Merrick Li for contributing his Matlab code for this estimator.
 #' @examples
@@ -3296,7 +3295,7 @@ ReMeDI <- function(pData, kn = 1, lags = 1, knEqual = FALSE,
 #'
 #' @author Emil Sjoerup
 #' @importFrom stats plot.ts
-#' @references Li, M. and Linton, O. (2020). A ReMeDI for Microstructure Noise. Forthcoming
+#' @references Li, M. and Linton, O. (2019). A ReMeDI for microstructure noise. Cambridge Working Papers in Economics 1908.
 #' @return integer containing the optimal kn
 #' @export
 knChooseReMeDI <- function(pData, knEqual = FALSE,

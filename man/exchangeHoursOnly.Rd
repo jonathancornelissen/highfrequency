@@ -35,7 +35,7 @@ By default, \code{marketOpen} and \code{marketClose} are set to "09:30:00" and "
 exchangeHoursOnly(sampleTDataRaw)
 }
 \references{
-Brownlees, C.T. and Gallo, G.M. (2006). Financial econometric analysis at ultra-high frequency: Data handling concerns. Computational Statistics & Data Analysis, 51, pages 2232-2245.
+Brownlees, C. T. and Gallo, G. M. (2006). Financial econometric analysis at ultra-high frequency: Data handling concerns. Computational Statistics & Data Analysis, 51, pages 2232-2245.
 }
 \author{
 Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
