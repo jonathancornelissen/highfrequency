@@ -51,8 +51,8 @@ rCov(pData[,list(DT, PRICE)], makeReturns = TRUE, alignBy = "minutes", alignPeri
 
 }
 \references{
-Oomen, R. C. A. (2006) Properties of realized variance under alternative sampling schemes. Journal of Business & Economic Statistics 24, pages 219-237
-Dong, Y. and Tse, Y. K. (2017) Business time sampling scheme with applications to testing semi-martingale hypothesis and estimating integrated volatility. Econometrics, 5
+Oomen, R. C. A. (2006). Properties of realized variance under alternative sampling schemes. \emph{Journal of Business & Economic Statistics}, 24, 219-237
+Dong, Y., and Tse, Y. K. (2017). Business time sampling scheme with applications to testing semi-martingale hypothesis and estimating integrated volatility. \emph{Econometrics}, 5, 51.
 }
 \author{
 Emil Sjoerup

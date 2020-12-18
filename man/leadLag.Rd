@@ -63,5 +63,5 @@ plot(ll)
 
 }
 \references{
-Hoffmann, M., Rosenbaum, M., and Yoshida, N. (2013). Estimation of the lead-lag parameter from non-synchronous data. Bernoulli 19 1-37.
+Hoffmann, M., Rosenbaum, M., and Yoshida, N. (2013). Estimation of the lead-lag parameter from non-synchronous data. \emph{Bernoulli}, 19, 1-37.
 }

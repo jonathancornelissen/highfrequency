@@ -61,7 +61,7 @@ optimalKn
 
 }
 \references{
-Li, M. and Linton, O. (2020). A ReMeDI for Microstructure Noise. Forthcoming
+Li, M. and Linton, O. (2019). A ReMeDI for microstructure noise. Cambridge Working Papers in Economics 1908.
 }
 \author{
 Emil Sjoerup

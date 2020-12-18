@@ -23,7 +23,7 @@ If the input data spans multiple days and is in \code{xts} format, an \code{xts}
 If the input data is a \code{data.table} object, the function returns a \code{data.table} with the same column names as the input data, containing the date and the realized measures
 }
 \description{
-Calculate the rMedRV, defined in Andersen et al. (2009).
+Calculate the rMedRV, defined in Andersen et al. (2012).
 
 Let \eqn{r_{t,i}} be a return (with \eqn{i=1,\ldots,M}) in period \eqn{t}.
 
@@ -40,7 +40,7 @@ rMedRV is designed to be robust to price jumps.
 The difference between RV and rMedRV is an estimate of the realized jump
 variability. Disentangling the continuous and jump components in RV
 can lead to more precise volatility forecasts,
-as shown in Andersen et al. (2007) and Corsi et al. (2010).
+as shown in Andersen et al. (2012)
 }
 \examples{
 medrv <- rMedRV(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes",
@@ -48,11 +48,7 @@ medrv <- rMedRV(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes",
 medrv
 }
 \references{
-Andersen, T. G., Dobrev, D., and Schaumburg, E. (2012). Jump-robust volatility estimation using nearest neighbor truncation. Journal of Econometrics, 169 (1), 75-93.
-
-Andersen, T.G., Bollerslev, T., and Diebold, F. (2007). Roughing it up: including jump components in the measurement, modelling and forecasting of return volatility. The Review of Economics and Statistics 89 (4), 701-720.
-
-Corsi, F., Pirino, D.,  and Reno, R. (2010). Threshold Bipower Variation and the Impact of Jumps on Volatility Forecasting. Journal of Econometrics 159 (2), 276-288.
+Andersen, T. G., Dobrev, D., and Schaumburg, E. (2012). Jump-robust volatility estimation using nearest neighbor truncation. \emph{Journal of Econometrics}, 169, 75-93.
 }
 \author{
 Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup

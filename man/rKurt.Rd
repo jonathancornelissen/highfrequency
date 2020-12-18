@@ -40,7 +40,7 @@ rk <- rKurt(sampleTData[, list(DT, PRICE)], alignBy = "minutes",
 rk
 }
 \references{
-Amaya, D., Christoffersen, P., Jacobs, K. and Vasquez, A. (2015). Does realized skewness and kurtosis predict the cross-section of equity returns?. Journal of Financial Economics, 118, 1, 135-167.
+Amaya, D., Christoffersen, P., Jacobs, K., and Vasquez, A. (2015). Does realized skewness and kurtosis predict the cross-section of equity returns? \emph{Journal of Financial Economics}, 118, 135-167.
 }
 \author{
 Giang Nguyen, Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup

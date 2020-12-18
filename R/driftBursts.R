@@ -67,7 +67,7 @@
 #' max(abs(DBH4$tStat)) > getCriticalValues(DBH4, 0.99)$quantile
 #' }
 #' @references 
-#' Christensen, K., Oomen, R., and Reno, R. (2018) The Drift Burst Hypothesis (Working paper).
+#' Christensen, K., Oomen, R., and Reno, R. (2018) The drift burst hypothesis. Working paper.
 #' 
 #' @author Emil Sjoerup
 #' @importFrom data.table is.data.table
@@ -459,7 +459,7 @@ print.DBH = function(x, ...){
 #' @author Emil Sjoerup
 #' @aliases getCriticalValues.DBH
 #' @references 
-#' Christensen, K., Oomen, R., and Reno, R. (2018) The Drift Burst Hypothesis (Working paper).
+#' Christensen, K., Oomen, R., and Reno, R. (2018). The drift burst hypothesis. Working paper.
 #' @export
 getCriticalValues <- function(x, alpha = 0.95){
   UseMethod('getCriticalValues', x)

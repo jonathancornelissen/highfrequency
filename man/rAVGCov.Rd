@@ -67,9 +67,9 @@ rcovSub
 }
 }
 \references{
-L. Zhang, P. A. Mykland, and Y. Ait-Sahalia. (2005) A tale of two time scales: Determining integrated volatility with noisy high-frequency data. Journal of the American Statistical Association.
+L. Zhang, P. A. Mykland, and Y. Ait-Sahalia (2005). A tale of two time scales: Determining integrated volatility with noisy high-frequency data. \emph{Journal of the American Statistical Association}, 100, 1394-1411.
 
-Pooter M. D., Martens M. and Dijk v D. (2008) Predicting the daily covariance matrix for S&P100 stocks using intraday data - but which frequency to use? Econometric Reviews.
+Pooter M. D., Martens M. and Dijk v D. (2008). Predicting the daily covariance matrix for S&P100 stocks using intraday data - but which frequency to use? \emph{Econometric Reviews}, 27, 199-229.
 }
 \author{
 Scott Payseur, Onno Kleen, and Emil Sjoerup
