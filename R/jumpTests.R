@@ -202,10 +202,10 @@ AJjumpTest <- function(pData, p = 4 , k = 2, alignBy = NULL, alignPeriod = NULL,
 #' 
 #' @param rData either an \code{xts} or a \code{data.table} containing the log-returns or prices of a single asset, possibly over multiple days-
 #' @param IVestimator can be chosen among jump robust integrated variance estimators: 
-#' \code{\link{BV}}, \code{\link{rMinRV}}, \code{\link{rMedRV}} and corrected threshold bipower variation (\code{\link{CTBV}}). 
-#' If \code{\link{CTBV}} is chosen, an argument of \code{startV}, start point of auxiliary estimators in threshold estimation can be included. \code{\link{BV}} by default.
-#' @param IQestimator can be chosen among jump robust integrated quarticity estimators: \code{\link{TP}}, \code{\link{QP}}, \code{\link{rMinRQ}} and \code{\link{rMedRQ}}. 
-#' \code{\link{TP}} by default.
+#' \code{\link{rBPCov}}, \code{\link{rMinRV}}, \code{\link{rMedRV}} and corrected threshold bipower variation (\code{\link{rThresholdCov}}). 
+#' If \code{\link{rThresholdCov}} is chosen, an argument of \code{startV}, start point of auxiliary estimators in threshold estimation can be included. \code{\link{rBPCov}} by default.
+#' @param IQestimator can be chosen among jump robust integrated quarticity estimators: \code{\link{rTPQuar}}, \code{\link{rQPVar}}, \code{\link{rMinRQ}} and \code{\link{rMedRQ}}. 
+#' \code{\link{rTPQuar}} by default.
 #' @param type a method of BNS testing: can be linear or ratio. Linear by default.
 #' @param logTransform boolean, should be \code{TRUE} when \code{QVestimator} and \code{IVestimator} are in logarithm form. \code{FALSE} by default.
 #' @param max boolean, should be \code{TRUE} when max adjustment in SE. \code{FALSE} by default.

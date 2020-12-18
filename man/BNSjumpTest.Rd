@@ -21,11 +21,11 @@ BNSjumpTest(
 \item{rData}{either an \code{xts} or a \code{data.table} containing the log-returns or prices of a single asset, possibly over multiple days-}
 
 \item{IVestimator}{can be chosen among jump robust integrated variance estimators: 
-\code{\link{BV}}, \code{\link{rMinRV}}, \code{\link{rMedRV}} and corrected threshold bipower variation (\code{\link{CTBV}}). 
-If \code{\link{CTBV}} is chosen, an argument of \code{startV}, start point of auxiliary estimators in threshold estimation can be included. \code{\link{BV}} by default.}
+\code{\link{rBPCov}}, \code{\link{rMinRV}}, \code{\link{rMedRV}} and corrected threshold bipower variation (\code{\link{rThresholdCov}}). 
+If \code{\link{rThresholdCov}} is chosen, an argument of \code{startV}, start point of auxiliary estimators in threshold estimation can be included. \code{\link{rBPCov}} by default.}
 
-\item{IQestimator}{can be chosen among jump robust integrated quarticity estimators: \code{\link{TP}}, \code{\link{QP}}, \code{\link{rMinRQ}} and \code{\link{rMedRQ}}. 
-\code{\link{TP}} by default.}
+\item{IQestimator}{can be chosen among jump robust integrated quarticity estimators: \code{\link{rTPQuar}}, \code{\link{rQPVar}}, \code{\link{rMinRQ}} and \code{\link{rMedRQ}}. 
+\code{\link{rTPQuar}} by default.}
 
 \item{type}{a method of BNS testing: can be linear or ratio. Linear by default.}
 
