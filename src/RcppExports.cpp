@@ -6,6 +6,31 @@
 
 using namespace Rcpp;
 
+// har_agg
+arma::mat har_agg(arma::vec RM, arma::vec periods, int iNperiods);
+RcppExport SEXP _highfrequency_har_agg(SEXP RMSEXP, SEXP periodsSEXP, SEXP iNperiodsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type RM(RMSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type periods(periodsSEXP);
+    Rcpp::traits::input_parameter< int >::type iNperiods(iNperiodsSEXP);
+    rcpp_result_gen = Rcpp::wrap(har_agg(RM, periods, iNperiods));
+    return rcpp_result_gen;
+END_RCPP
+}
+// calcRecVarEq
+NumericVector calcRecVarEq(NumericVector par, NumericVector rm);
+RcppExport SEXP _highfrequency_calcRecVarEq(SEXP parSEXP, SEXP rmSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type par(parSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type rm(rmSEXP);
+    rcpp_result_gen = Rcpp::wrap(calcRecVarEq(par, rm));
+    return rcpp_result_gen;
+END_RCPP
+}
 // quadraticKernel
 arma::vec quadraticKernel(const arma::vec& x);
 RcppExport SEXP _highfrequency_quadraticKernel(SEXP xSEXP) {
@@ -87,31 +112,6 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type iAcLag(iAcLagSEXP);
     Rcpp::traits::input_parameter< int >::type iCores(iCoresSEXP);
     rcpp_result_gen = Rcpp::wrap(DriftBurstLoopCPAR(vPreAveraged, diffedlogprices, vTime, vTesttime, iMeanBandwidth, iVarBandwidth, iPreAverage, iAcLag, iCores));
-    return rcpp_result_gen;
-END_RCPP
-}
-// har_agg
-arma::mat har_agg(arma::vec RM, arma::vec periods, int iNperiods);
-RcppExport SEXP _highfrequency_har_agg(SEXP RMSEXP, SEXP periodsSEXP, SEXP iNperiodsSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::vec >::type RM(RMSEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type periods(periodsSEXP);
-    Rcpp::traits::input_parameter< int >::type iNperiods(iNperiodsSEXP);
-    rcpp_result_gen = Rcpp::wrap(har_agg(RM, periods, iNperiods));
-    return rcpp_result_gen;
-END_RCPP
-}
-// calcRecVarEq
-NumericVector calcRecVarEq(NumericVector par, NumericVector rm);
-RcppExport SEXP _highfrequency_calcRecVarEq(SEXP parSEXP, SEXP rmSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type par(parSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type rm(rmSEXP);
-    rcpp_result_gen = Rcpp::wrap(calcRecVarEq(par, rm));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -364,14 +364,14 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_highfrequency_har_agg", (DL_FUNC) &_highfrequency_har_agg, 3},
+    {"_highfrequency_calcRecVarEq", (DL_FUNC) &_highfrequency_calcRecVarEq, 2},
     {"_highfrequency_quadraticKernel", (DL_FUNC) &_highfrequency_quadraticKernel, 1},
     {"_highfrequency_tradeIntensityProcessCpp", (DL_FUNC) &_highfrequency_tradeIntensityProcessCpp, 2},
     {"_highfrequency_AsymptoticVarianceC", (DL_FUNC) &_highfrequency_AsymptoticVarianceC, 2},
     {"_highfrequency_AutomaticLagSelectionC", (DL_FUNC) &_highfrequency_AutomaticLagSelectionC, 2},
     {"_highfrequency_DriftBurstLoopC", (DL_FUNC) &_highfrequency_DriftBurstLoopC, 8},
     {"_highfrequency_DriftBurstLoopCPAR", (DL_FUNC) &_highfrequency_DriftBurstLoopCPAR, 9},
-    {"_highfrequency_har_agg", (DL_FUNC) &_highfrequency_har_agg, 3},
-    {"_highfrequency_calcRecVarEq", (DL_FUNC) &_highfrequency_calcRecVarEq, 2},
     {"_highfrequency_colCumsum", (DL_FUNC) &_highfrequency_colCumsum, 1},
     {"_highfrequency_refreshTimeMathing", (DL_FUNC) &_highfrequency_refreshTimeMathing, 2},
     {"_highfrequency_preAveragingReturnsInternal", (DL_FUNC) &_highfrequency_preAveragingReturnsInternal, 2},
