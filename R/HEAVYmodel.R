@@ -1,21 +1,22 @@
 
 
 #' HEAVY model estimation
+#' 
 #' @description This function calculates the High frEquency bAsed VolatilitY (HEAVY) model proposed in Shephard and Sheppard (2010). 
 #'
 #' @param data an \code{xts} object where the first column is  a vector of demeaned returns 
-#' and the second column is a vector of realized stock market variation
+#' and the second column is a vector of realized stock market variation.
 #' @param startingValues a vector of alternative starting values: first three arguments for variance equation and last three arguments for measurement equation.
 #' 
 #' @return The function outputs an object of class \code{HEAVYmodel}, a list containing
 #' \itemize{
-#'   \item coefficients = estimated coefficients
-#'   \item se = robust standard errors based on inverted Hessian matrix
-#'   \item residuals = the residuals in the return equation
-#'   \item llh = the two-component log-likelihood values
-#'   \item varCondVariances = conditional variances in the variance equation
-#'   \item RMCondVariances = conditional variances in the RM equation
-#'   \item data = the input data
+#'   \item coefficients = estimated coefficients.
+#'   \item se = robust standard errors based on inverted Hessian matrix.
+#'   \item residuals = the residuals in the return equation.
+#'   \item llh = the two-component log-likelihood values.
+#'   \item varCondVariances = conditional variances in the variance equation.
+#'   \item RMCondVariances = conditional variances in the RM equation.
+#'   \item data = the input data.
 #' }
 #' The class HEAVYmodel has the following methods: plot.HEAVYmodel, predict.HEAVYmodel, 
 #' print.HEAVYmodel, and summary.HEAVYmodel.
@@ -38,10 +39,10 @@
 #' We report robust standard errors based on the matrix-product of inverted Hessians and
 #' the outer product of gradients.
 #' 
-#' @references Shephard, N. and K. Sheppard (2010). Realising the future: Forecasting with high frequency based volatility (HEAVY) models. Journal of Applied Econometrics 25, 197--231.
+#' @references Shephard, N. and K. Sheppard (2010). Realising the future: Forecasting with high frequency based volatility (HEAVY) models. Journal of Applied Econometrics 25, 197-231.
 #' @importFrom numDeriv jacobian hessian
 #' @importFrom stats nlminb
-#' @author Onno Kleen
+#' @author Onno Kleen.
 #' 
 #' @examples 
 #' 
@@ -180,9 +181,10 @@ HEAVYmodel <- function(data, startingValues = NULL) {
 
 
 #' Plotting method for HEAVYmodel objects
-#' @param x an object of class \code{HEAVYmodel}
-#' @param ... extra arguments, see details
-#' @details The plotting method has the following optional parameter:
+#' @param x an object of class \code{HEAVYmodel}.
+#' @param ... extra arguments, see details.
+#' @details 
+#' The plotting method has the following optional parameter:
 #' \itemize{
 #' \item{\code{legend.loc}}{ A string denoting the location of the legend passed on to \code{addLegend} of the \pkg{xts} package}
 #' }
@@ -226,9 +228,9 @@ plot.HEAVYmodel <- function(x, ...){
 #' Calculates forecasts for \eqn{h_{T+k}}, where \eqn{T} denotes the end of the estimation
 #' period for fitting the HEAVYmodel and \eqn{k = 1, \dots, \code{stepsAhead}}.
 #' 
-#' @param object an object of class HEAVYmodel
-#' @param stepsAhead the number of days iterative forecasts are calculated for (default 10)
-#' @param ... further arguments passed to or from other methods
+#' @param object an object of class HEAVYmodel.
+#' @param stepsAhead the number of days iterative forecasts are calculated for (default 10).
+#' @param ... further arguments passed to or from other methods.
 #' @export
 predict.HEAVYmodel <- function(object, stepsAhead = 10, ...) {
   

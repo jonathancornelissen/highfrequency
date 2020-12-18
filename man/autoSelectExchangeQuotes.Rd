@@ -7,11 +7,11 @@
 autoSelectExchangeQuotes(qData, printExchange = TRUE)
 }
 \arguments{
-\item{qData}{a \code{data.table} or \code{xts} object with at least a column "EX", indicating the exchange symbol 
-and columns "BIDSIZ" and "OFRSIZ", indicating 
+\item{qData}{a \code{data.table} or \code{xts} object with at least a column \code{"EX"}, indicating the exchange symbol 
+and columns \code{"BIDSIZ"} and \code{"OFRSIZ"}, indicating 
 the volume available at the bid and ask respectively.}
 
-\item{printExchange}{indicates whether the chosen exchange is printed on the console, default is TRUE.
+\item{printExchange}{indicates whether the chosen exchange is printed on the console, default is \code{TRUE}.
 The possible exchanges are:
 \itemize{
 \item A: AMEX
@@ -29,17 +29,17 @@ The possible exchanges are:
 }}
 }
 \value{
-\code{data.table} or \code{xts} object depending on input
+\code{data.table} or \code{xts} object depending on input.
 }
 \description{
 Filters raw quote data and return only data that stems from the exchange with the highest
-value for the sum of "BIDSIZ" and "OFRSIZ", i.e. the highest quote volume.
+value for the sum of \code{"BIDSIZ"} and \code{"OFRSIZ"}, i.e. the highest quote volume.
 }
 \examples{
 autoSelectExchangeQuotes(sampleQDataRaw)
 
 }
 \author{
-Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
+Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
 }
 \keyword{cleaning}

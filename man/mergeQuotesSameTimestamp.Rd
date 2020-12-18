@@ -14,11 +14,11 @@ prices. For \code{data.table} an additional column \code{DT} is necessary that s
 
 \item{selection}{indicates how the bid and ask price for a certain time stamp
 should be calculated in case of multiple observation for a certain time
-stamp. By default, selection = "median", and the median price is taken. Alternatively:
+stamp. By default, \code{selection = "median"}, and the median price is taken. Alternatively:
 \itemize{
-\item selection = "max.volume": use the (bid/ask) price of the entry with
+\item \code{selection = "max.volume"}: use the (bid/ask) price of the entry with
 largest (bid/ask) volume.
-\item selection = "weighted.average": take the weighted average of all bid (ask) prices,
+\item \code{selection = "weighted.average"}: take the weighted average of all bid (ask) prices,
 weighted by "BIDSIZ" ("OFRSIZ").
 }}
 }
@@ -30,6 +30,6 @@ Merge quote entries that have the same time stamp to a single one and returns an
  with unique time stamps only.
 }
 \author{
-Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
+Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
 }
 \keyword{cleaning}

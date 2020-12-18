@@ -19,7 +19,7 @@ rmOutliersQuotes(qData, maxi = 10, window = 50, type = "advanced", tz = NULL)
 In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}.}
 }
 \value{
-\code{xts} object or \code{data.table} depending on type of input
+\code{xts} object or \code{data.table} depending on type of input.
 }
 \description{
 If type = "standard": Function deletes entries for which the mid-quote deviated by more than "maxi"
@@ -50,6 +50,6 @@ Barndorff-Nielsen, O. E., P. R. Hansen, A. Lunde, and N. Shephard (2009). Realiz
 Brownlees, C.T., and Gallo, G.M. (2006). Financial econometric analysis at ultra-high frequency: Data handling concerns. \emph{Computational Statistics & Data Analysis}, 51, 2232-2245.
 }
 \author{
-Jonathan Cornelissen and Kris Boudt
+Jonathan Cornelissen and Kris Boudt.
 }
 \keyword{cleaning}

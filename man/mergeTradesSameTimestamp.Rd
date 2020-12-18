@@ -21,7 +21,7 @@ largest volume.
 }}
 }
 \value{
-\code{data.table} or \code{xts} object depending on input
+\code{data.table} or \code{xts} object depending on input.
 }
 \description{
 Merge trade entries that have the same time stamp to a single one and returns an \code{xts} or a \code{data.table} object
@@ -31,6 +31,6 @@ Merge trade entries that have the same time stamp to a single one and returns an
 previously this function returned the mean of the size of the merged trades (pre version 0.7 and when not using max.volume as the criterion), now it returns the sum.
 }
 \author{
-Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
+Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
 }
 \keyword{cleaning}

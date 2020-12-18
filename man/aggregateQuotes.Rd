@@ -51,7 +51,7 @@ qDataAggregated <- aggregateQuotes(sampleQData, alignBy = "seconds", alignPeriod
 qDataAggregated # Show the aggregated data
 }
 \author{
-Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
+Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
 }
 \keyword{data}
 \keyword{manipulation}

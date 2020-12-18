@@ -10,12 +10,12 @@ noZeroPrices(tData)
 \item{tData}{an \code{xts} or \code{data.table} object at least containing a column \code{PRICE}.}
 }
 \value{
-an \code{xts} or \code{data.table} object depending on input
+an \code{xts} or \code{data.table} object depending on input.
 }
 \description{
 Function deletes the observations where the price is zero.
 }
 \author{
-Jonathan Cornelissen and Kris Boudt
+Jonathan Cornelissen and Kris Boudt.
 }
 \keyword{cleaning}

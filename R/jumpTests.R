@@ -10,12 +10,13 @@ ABDJumptest <- function(RV, BPV, TQ) { # Compute jump detection stat mentioned i
 #' Ait-Sahalia and Jacod (2009) tests for the presence of jumps in the price series. 
 #' 
 #' @description 
-#' This test examines the presence of jumps in highfrequency price series. It is based on the theory of Ait-Sahalia and Jacod (2009) (AJ). It consists in comparing the multipower variation of equispaced returns computed at a fast time scale (\eqn{h}), \eqn{r_{t,i}} (\eqn{i=1, \ldots,N}) and those computed at the slower time scale (\eqn{kh}), \eqn{y_{t,i}}(\eqn{i=1, \ldots ,\mbox{N/k}}).
+#' This test examines the presence of jumps in highfrequency price series. It is based on the theory of Ait-Sahalia and Jacod (2009). 
+#' It consists in comparing the multi-power variation of equi-spaced returns computed at a fast time scale (\eqn{h}), \eqn{r_{t,i}} (\eqn{i=1, \ldots,N}) and those computed at the slower time scale (\eqn{kh}), \eqn{y_{t,i}}(\eqn{i=1, \ldots ,\mbox{N/k}}).
 #' 
 #' They found that the limit (for \eqn{N} \eqn{\to} \eqn{\infty} ) of the realized power variation is invariant for different sampling scales and that their ratio is \eqn{1} in case of jumps and \eqn{\mbox{k}^{p/2}-1} if no jumps.
 #' Therefore the AJ test detects the presence of jump using the ratio of realized power variation sampled from two scales. The null hypothesis is no jumps.
 #' 
-#' The function returns three outcomes: 1.z-test value 2.critical value under confidence level of \eqn{95\%} and 3.p-value.
+#' The function returns three outcomes: 1.z-test value 2.critical value under confidence level of \eqn{95\%} and 3. \eqn{p}-value.
 #' 
 #' Assume there is \eqn{N} equispaced returns in period \eqn{t}. Let \eqn{r_{t,i}} be a return (with \eqn{i=1, \ldots,N}) in period \eqn{t}.
 #' 
@@ -61,15 +62,16 @@ ABDJumptest <- function(RV, BPV, TQ) { # Compute jump detection stat mentioned i
 #' @param pData either an \code{xts} or a \code{data.table} containing the prices of a single asset, possibly over multiple days.
 #' @param p can be chosen among 2 or 3 or 4. The author suggests 4. 4 by default.
 #' @param k can be chosen among 2 or 3 or 4. The author suggests 2. 2 by default.
-#' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".
+#' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. 
+#' Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}.
 #' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
-#' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
-#' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
+#' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. For example, to aggregate
+#' based on a 5 minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
 #' @param alphaMultiplier alpha multiplier
 #' @param alpha numeric of length one with the significance level to use for the jump test(s). Defaults to 0.975.
 #' @param ... used internally
 #' 
-#' @return list or \code{xts}in case the input prices span more than one day.
+#' @return a list or \code{xts} in depending on whether input prices span more than one day.
 #' 
 #' @details 
 #'  The theoretical framework underlying jump test is that the logarithmic price process \eqn{X_t} belongs to the class of Brownian semimartingales, which can be written as:
@@ -82,14 +84,16 @@ ABDJumptest <- function(RV, BPV, TQ) { # Compute jump detection stat mentioned i
 #'    }
 #'  where \eqn{k_j} are nonzero random variables. The counting process can be either finite or infinite for finite or infinite activity jumps.
 #'  
-#'  The Ait-Sahalia and Jacod test is that: Using the convergence properties of power variation and its dependence on the time scale on which it is measured, Ait-Sahalia and Jacod (2009) define a new variable which converges to 1 in the presence of jumps in the underlying return series, or to another deterministic and known number in the absence of jumps. (Theodosiou& Zikes(2009))
+#' Using the convergence properties of power variation and its dependence on the time scale on which it is measured, 
+#' Ait-Sahalia and Jacod (2009) define a new variable which converges to 1 in the presence of jumps in the underlying return series, 
+#' or to another deterministic and known number in the absence of jumps (Theodosiou and Zikes, 2009).
 #'  
 #' @references 
-#' Ait-Sahalia, Y. and Jacod, J. (2009). Testing for jumps in a discretely observed process. The Annals of Statistics, 37(1), 184- 222.
+#' Ait-Sahalia, Y. and Jacod, J. (2009). Testing for jumps in a discretely observed process. The Annals of Statistics, 37(1), 184-222.
 #' 
 #' Theodosiou, M., & Zikes, F. (2009). A comprehensive comparison of alternative tests for jumps in asset prices. Unpublished manuscript, Graduate School of Business, Imperial College London.
 #' 
-#' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
+#' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup.
 #'
 #' @examples
 #' jt <- AJjumpTest(sampleTData[, list(DT, PRICE)], p = 2, k = 3, 
@@ -193,42 +197,50 @@ AJjumpTest <- function(pData, p = 4 , k = 2, alignBy = NULL, alignPeriod = NULL,
 
 #' Barndorff-Nielsen and Shephard (2006) tests for the presence of jumps in the price series.
 #' 
-#' @description This test examines the presence of jumps in highfrequency price series. It is based on theory of Barndorff- Nielsen and Shephard (BNS). The null hypothesis is no jumps. 
-#' Depending on the choice of estimator (integrated variance (IVestimator), integrated quarticity (IQestimator)), mechanism (linear, ratio) and adjustment (logarithm), the function returns the result.
-#' Function returns three outcomes: 1.z-test value 2.critical value(with confidence level of 95\%) and 3.pvalue of the test. 
-#' Assume there is \eqn{N} equispaced returns in period \eqn{t}. 
-#' 
-#' Assume the Realized variance (RV), IVestimator and IQestimator are based on \eqn{N} equispaced returns. 
-#' 
-#' Let \eqn{r_{t,i}} be a return (with \eqn{i=1, \ldots,N}) in period \eqn{t}. 
-#' 
-#' Then the BNSjumpTest is given by: 
-#' \deqn{
-#' \mbox{BNSjumpTest}= \frac{RV - IVestimator}{\sqrt{(\theta-2)\frac{1}{N} {IQestimator}}}
-#' }
-#' in which, \eqn{IVestimator} can be: bipower variance (BV), rMinRV, rMedRV. 
-#' \eqn{IQestimator} can be: tripower quarticity (TP), quadpower quarticity (QP), rMinRQ, rMedRQ.
-#' 
-#' \eqn{\theta}: depends on IVestimator (Huang and Tauchen (2005)).
+#' @description This test examines the presence of jumps in highfrequency price series. It is based on theory of Barndorff-Nielsen and Shephard (2006). 
+#' The null hypothesis is that there are no jumps. 
 #' 
 #' @param rData either an \code{xts} or a \code{data.table} containing the log-returns or prices of a single asset, possibly over multiple days-
-#' @param IVestimator can be chosen among jump robust integrated variance estimators: BV, rMinRV, rMedRV and corrected threshold bipower variation (CTBV). If CTBV is chosen, an argument of \eqn{startV}, start point of auxiliary estimators in threshold estimation (Corsi et al. (2010) can be included. BV by default.
-#' @param IQestimator can be chosen among jump robust integrated quarticity estimators: TP, QP, rMinRQ and rMedRQ. TP by default.
+#' @param IVestimator can be chosen among jump robust integrated variance estimators: 
+#' \code{\link{BV}}, \code{\link{rMinRV}}, \code{\link{rMedRV}} and corrected threshold bipower variation (\code{\link{CTBV}}). 
+#' If \code{\link{CTBV}} is chosen, an argument of \code{startV}, start point of auxiliary estimators in threshold estimation can be included. \code{\link{BV}} by default.
+#' @param IQestimator can be chosen among jump robust integrated quarticity estimators: \code{\link{TP}}, \code{\link{QP}}, \code{\link{rMinRQ}} and \code{\link{rMedRQ}}. 
+#' \code{\link{TP}} by default.
 #' @param type a method of BNS testing: can be linear or ratio. Linear by default.
-#' @param logTransform boolean, should be TRUE when QVestimator and IVestimator are in logarithm form. FALSE by default.
-#' @param max boolean, should be TRUE when max adjustment in SE. FALSE by default.
-#' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".
-#' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
-#' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
-#' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
-#' @param makeReturns boolean, should be TRUE when pData contains prices. FALSE by default.
+#' @param logTransform boolean, should be \code{TRUE} when \code{QVestimator} and \code{IVestimator} are in logarithm form. \code{FALSE} by default.
+#' @param max boolean, should be \code{TRUE} when max adjustment in SE. \code{FALSE} by default.
+#' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. 
+#' Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}.
+#' To aggregate based on a 5 minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
+#' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. For example, to aggregate
+#' based on a 5 minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
+#' @param makeReturns boolean, should be \code{TRUE} when \code{pData} contains prices. \code{FALSE} by default.
 #' @param alpha numeric of length one with the significance level to use for the jump test(s). Defaults to 0.975.
 #' 
-#' @return list or \code{xts}in case the input prices span more than one day.
+#' @return a list or \code{xts} (depending on whether input prices span more than one day)
+#' with the following values:
+#' \itemize{
+#' \item \eqn{z}-test value.
+#' \item critical value (with confidence level of 95\%).
+#' \item \eqn{p}-value of the test. 
+#' }
 #' 
-#' @details The theoretical framework underlying jump test is that the logarithmic price process \eqn{X_t} belongs to the class of Brownian semimartingales, which can be written as:
+#' @details 
+#' 
+#' Assume there is \eqn{N} equispaced returns in period \eqn{t}. 
+#' Assume the Realized variance (RV), IVestimator and IQestimator are based on \eqn{N} equi-spaced returns. 
+#' 
+#' Let \eqn{r_{t,i}} be a return (with \eqn{i = 1, \ldots, N}) in period \eqn{t}. 
+#' 
+#' Then the BNSjumpTest is given by
 #' \deqn{
-#' \mbox{X}_{t}=  \int_{0}^{t} a_udu + \int_{0}^{t}\sigma_{u}dW_{u} + Z_t
+#' \mbox{BNSjumpTest}= \frac{\code{RV} - \code{IVestimator}}{\sqrt{(\theta-2)\frac{1}{N} {\code{IQestimator}}}}.
+#' }
+#' The options for \code{IVestimator} and \code{IQestimator} are listed above. \eqn{\theta} depends on the chosen \code{IVestimator} (Huang and Tauchen, 2005).
+#' 
+#' The theoretical framework underlying the jump test is that the logarithmic price process \eqn{X_t} belongs to the class of Brownian semimartingales, which can be written as:
+#' \deqn{
+#' \mbox{X}_{t}=  \int_{0}^{t} a_u \ du + \int_{0}^{t}\sigma_{u} \ dW_{u} + Z_t
 #' }
 #' where \eqn{a} is the drift term, \eqn{\sigma} denotes the spot volatility process, \eqn{W} is a standard Brownian motion and \eqn{Z} is a jump process defined by:
 #' \deqn{
@@ -236,8 +248,8 @@ AJjumpTest <- function(pData, p = 4 , k = 2, alignBy = NULL, alignPeriod = NULL,
 #' }
 #' where \eqn{k_j} are nonzero random variables. The counting process can be either finite or infinite for finite or infinite activity jumps.
 #' 
-#' Since the realized volatility converges to the sum of integrated variance and jump variation, while the robust IVestimator converges to the integrated variance, 
-#' it follows that the difference between  \eqn{RV_{t,N}} and the IVestimator captures the jump part only, and this observation underlines the BNS test for jumps (Theodosiou and Zikes, 2009).
+#' Since the realized volatility converges to the sum of integrated variance and jump variation, while the robust \code{IVestimator} converges to the integrated variance, 
+#' it follows that the difference between \code{RV} and the \code{IVestimator} captures the jump part only, and this observation underlines the BNS test for jumps (Theodosiou and Zikes, 2009).
 #' 
 #' @references Barndorff-Nielsen, O. E., and Shephard, N. (2006). Econometrics of testing for jumps in financial economics using bipower variation. \emph{Journal of Financial Econometrics}, 4, 1-30. 
 #' 
@@ -247,7 +259,7 @@ AJjumpTest <- function(pData, p = 4 , k = 2, alignBy = NULL, alignPeriod = NULL,
 #' 
 #' Theodosiou, M., and Zikes, F. (2009). A comprehensive comparison of alternative tests for jumps in asset prices. Unpublished manuscript, Graduate School of Business, Imperial College London.
 #' 
-#' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
+#' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup.
 #' 
 #' @examples 
 #' bns <- BNSjumpTest(sampleTData[, list(DT, PRICE)], IVestimator= "rMinRV",

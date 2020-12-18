@@ -16,11 +16,11 @@ aggregateTrades(
 \arguments{
 \item{tData}{\code{data.table} or \code{xts} object to be aggregated, containing the intraday price series of a stock for possibly multiple days.}
 
-\item{alignBy}{character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".
-To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.}
+\item{alignBy}{character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}.
+To aggregate based on a 5 minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.}
 
-\item{alignPeriod}{positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
-based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.}
+\item{alignPeriod}{positive numeric, indicating the number of periods to aggregate over. For example, to aggregate
+based on a 5 minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.}
 
 \item{marketOpen}{the market opening time, by default: \code{marketOpen = "09:30:00"}.}
 
@@ -37,18 +37,18 @@ Aggregate tick-by-tick trade data and return a time series as a \code{data.table
 and subsequent observations are the closing prices over the interval. This function accepts arbitrary number of symbols over an arbitrary number of days.
 }
 \details{
-The timestamps of the new time series are the closing times and/or days of the intervals. 
+The time stamps of the new time series are the closing times and/or days of the intervals. 
 
-The output "PRICE" column is constructed using previous tick aggregation.
+The output \code{"PRICE"} column is constructed using previous tick aggregation.
 
-The variable "SIZE" is aggregated by taking the sum over each interval.
+The variable \code{"SIZE"} is aggregated by taking the sum over each interval.
 
-The variable "VWPRICE" is the aggregated price weighted by volume.
+The variable \code{"VWPRICE"} is the aggregated price weighted by volume.
 
-The timestamps of the new time series are the closing times of the intervals. 
+The time stamps of the new time series are the closing times of the intervals. 
 
-In case of previous tick aggregation or alignBy = "seconds"/"minutes"/"hours",
-the element of the returned series with e.g. timestamp 09:35:00 contains 
+In case of previous tick aggregation or \code{alignBy = "seconds"/"minutes"/"hours"},
+the element of the returned series with e.g. time stamp 09:35:00 contains 
 the last observation up to that point, including the value at 09:35:00 itself.
 }
 \examples{
@@ -57,7 +57,7 @@ tDataAggregated <- aggregateTrades(sampleTData, alignBy = "minutes", alignPeriod
 tDataAggregated
 }
 \author{
-Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
+Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
 }
 \keyword{data}
 \keyword{manipulation}

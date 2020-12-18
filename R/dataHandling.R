@@ -1,8 +1,8 @@
 #' Aggregate a time series
 #' 
 #' @description Aggregate a time series as \code{xts} object. 
-#' It can handle irregularly spaced timeseries and returns a regularly spaced one.
-#' Use univariate timeseries as input for this function and check out \code{\link{aggregateTrades}}
+#' It can handle irregularly spaced time series and returns a regularly spaced one.
+#' Use univariate time series as input for this function and check out \code{\link{aggregateTrades}}
 #' and \code{\link{aggregateQuotes}} to aggregate Trade or Quote data objects.
 #' 
 #' @param ts \code{xts} object to aggregate.
@@ -10,17 +10,17 @@
 #' Alternatively one can set e.g. FUN = "mean".
 #' In case weights are supplied, this argument is ignored and a weighted average is taken.
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: "secs", "seconds", "mins", "minutes", "hours", "days", "weeks", "ticks".
-#' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
+#' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. For example, to aggregate
 #' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
 #' @param weights By default, no weighting scheme is used. 
 #' When you assign an \code{xts} object with weights to this argument, a weighted mean is taken over each interval. 
-#' Of course, the weights should have the same timestamps as the supplied time series.
+#' Of course, the weights should have the same time stamps as the supplied time series.
 #' @param dropna boolean, which determines whether empty intervals should be dropped.
 #' By default, an NA is returned in case an interval is empty, except when the user opts
 #' for previous tick aggregation, by setting \code{FUN = "previoustick"} (default).
-#' @param tz character denoting which timezone the output should be in. Defaults to NULL
-#' @details The timestamps of the new time series are the closing times and/or days of the intervals. 
-#' E.g. for a weekly aggregation the new timestamp is the last day in that particular week (namely Sunday).
+#' @param tz character denoting which timezone the output should be in. Defaults to \code{NULL}
+#' @details The time stamps of the new time series are the closing times and/or days of the intervals. 
+#' For example, for a weekly aggregation the new time stamp is the last day in that particular week (namely Sunday).
 #' 
 #' In case of previous tick aggregation, 
 #' for \code{alignBy} is either \code{"seconds"} \code{"minutes"}, or \code{"hours"},
@@ -37,7 +37,7 @@
 #' 
 #' @return An \code{xts} object containing the aggregated time series.
 #' 
-#' @author Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
+#' @author Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup.
 #' @keywords data manipulation
 #' 
 #' @examples 
@@ -199,7 +199,7 @@ aggregateTS <- function (ts, FUN = "previoustick", alignBy = "minutes", alignPer
 #' Alternatively the aggregation can be done by number of ticks. In case we DON'T do tick-based aggregation, 
 #' this function accepts arbitrary number of symbols over a arbitrary number of days. Although the function has the word Price in the name,
 #' the function is general and works on arbitrary time series, either \code{xts} or \code{data.table} objects the latter requires a \code{DT}
-#' column containing POSIXct timestamps.
+#' column containing POSIXct time stamps.
 #' 
 #' @param pData \code{data.table} or \code{xts} object to be aggregated containing the intraday price series, possibly across multiple days.
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours", and "ticks".
@@ -212,8 +212,8 @@ aggregateTS <- function (ts, FUN = "previoustick", alignBy = "minutes", alignPer
 #' @param tz fallback time zone used in case we we are unable to identify the timezone of the data, by default: \code{tz = NULL}. We attempt to extract the timezone from the DT column (or index) of the data, which may fail. 
 #' In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}
 #' @details
-#' The timestamps of the new time series are the closing times and/or days of the intervals. 
-#' The element of the returned series with e.g. timestamp 09:35:00 contains
+#' The time stamps of the new time series are the closing times and/or days of the intervals. 
+#' The element of the returned series with e.g. time stamp 09:35:00 contains
 #' the last observation up to that point, including the value at 09:35:00 itself.
 #'
 #' In case \code{alignBy = "ticks"}, the sampling is done such the sampling starts on the first tick, and the last tick is always included.
@@ -222,7 +222,7 @@ aggregateTS <- function (ts, FUN = "previoustick", alignBy = "minutes", alignPer
 #'
 #' @return A \code{data.table} or \code{xts} object containing the aggregated time series.
 #'
-#' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
+#' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
 #' @keywords data manipulation
 #' @examples
 #' # Aggregate price data to the 30 second frequency
@@ -415,7 +415,7 @@ aggregatePrice <- function(pData, alignBy = "minutes", alignPeriod = 1, marketOp
 #' 
 #' @return A \code{data.table} or an \code{xts} object containing the aggregated quote data.
 #' 
-#' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
+#' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
 #' @keywords data manipulation
 #' 
 #' @examples
@@ -559,31 +559,31 @@ aggregateQuotes <- function(qData, alignBy = "minutes", alignPeriod = 5, marketO
 #' and subsequent observations are the closing prices over the interval. This function accepts arbitrary number of symbols over an arbitrary number of days.
 #' 
 #' @param tData \code{data.table} or \code{xts} object to be aggregated, containing the intraday price series of a stock for possibly multiple days.
-#' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".
-#' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
-#' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
-#' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
+#' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}.
+#' To aggregate based on a 5 minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
+#' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. For example, to aggregate
+#' based on a 5 minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
 #' @param marketOpen the market opening time, by default: \code{marketOpen = "09:30:00"}.
 #' @param marketClose the market closing time, by default: \code{marketClose = "16:00:00"}.
 #' @param tz fallback time zone used in case we we are unable to identify the timezone of the data, by default: \code{tz = NULL}. We attempt to extract the timezone from the DT column (or index) of the data, which may fail. 
 #' In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}
-#' @details The timestamps of the new time series are the closing times and/or days of the intervals. 
+#' @details The time stamps of the new time series are the closing times and/or days of the intervals. 
 #' 
-#' The output "PRICE" column is constructed using previous tick aggregation.
+#' The output \code{"PRICE"} column is constructed using previous tick aggregation.
 #' 
-#' The variable "SIZE" is aggregated by taking the sum over each interval.
+#' The variable \code{"SIZE"} is aggregated by taking the sum over each interval.
 #' 
-#' The variable "VWPRICE" is the aggregated price weighted by volume.
+#' The variable \code{"VWPRICE"} is the aggregated price weighted by volume.
 #' 
-#' The timestamps of the new time series are the closing times of the intervals. 
+#' The time stamps of the new time series are the closing times of the intervals. 
 #' 
-#' In case of previous tick aggregation or alignBy = "seconds"/"minutes"/"hours",
-#' the element of the returned series with e.g. timestamp 09:35:00 contains 
+#' In case of previous tick aggregation or \code{alignBy = "seconds"/"minutes"/"hours"},
+#' the element of the returned series with e.g. time stamp 09:35:00 contains 
 #' the last observation up to that point, including the value at 09:35:00 itself.
 #' 
 #' @return A \code{data.table} or \code{xts} object containing the aggregated time series.
 #' 
-#' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
+#' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
 #' @keywords data manipulation
 #' 
 #' @examples 
@@ -728,10 +728,10 @@ aggregateTrades <- function(tData, alignBy = "minutes", alignPeriod = 5, marketO
 #' 
 #' @description Filters raw trade data and return only data that stems from the exchange with the highest
 #'  value for the variable "SIZE", i.e. the highest trade volume.
-#' @param tData an \code{xts} object with at least a column "EX", 
-#' indicating the exchange symbol and "SIZE", 
+#' @param tData an \code{xts} object with at least a column \code{"EX"} 
+#' indicating the exchange symbol and \code{"SIZE"}
 #' indicating the trade volume. 
-#' @param printExchange indicates whether the chosen exchange is printed on the console, default is TRUE.
+#' @param printExchange indicates whether the chosen exchange is printed on the console, default is \code{TRUE}.
 #' The possible exchanges are:
 #' \itemize{
 #' \item A: AMEX
@@ -747,11 +747,11 @@ aggregateTrades <- function(tData, alignBy = "minutes", alignPeriod = 5, marketO
 #' \item W: CBOE
 #' \item Z: BATS
 #' }
-#' @return \code{data.table} or \code{xts} object depending on input
+#' @return \code{data.table} or \code{xts} object depending on input.
 #' 
 #' @examples autoSelectExchangeTrades(sampleTDataRaw)
 #' 
-#' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
+#' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
 #' 
 #' @keywords cleaning
 #' @export
@@ -806,12 +806,12 @@ autoSelectExchangeTrades <- function(tData, printExchange = TRUE) {
 #' Retain only data from the stock exchange with the highest volume
 #' 
 #' @description Filters raw quote data and return only data that stems from the exchange with the highest
-#' value for the sum of "BIDSIZ" and "OFRSIZ", i.e. the highest quote volume.
+#' value for the sum of \code{"BIDSIZ"} and \code{"OFRSIZ"}, i.e. the highest quote volume.
 #' 
-#' @param qData a \code{data.table} or \code{xts} object with at least a column "EX", indicating the exchange symbol 
-#' and columns "BIDSIZ" and "OFRSIZ", indicating 
+#' @param qData a \code{data.table} or \code{xts} object with at least a column \code{"EX"}, indicating the exchange symbol 
+#' and columns \code{"BIDSIZ"} and \code{"OFRSIZ"}, indicating 
 #' the volume available at the bid and ask respectively.
-#' @param printExchange indicates whether the chosen exchange is printed on the console, default is TRUE.
+#' @param printExchange indicates whether the chosen exchange is printed on the console, default is \code{TRUE}.
 #' The possible exchanges are:
 #' \itemize{
 #' \item A: AMEX
@@ -828,12 +828,12 @@ autoSelectExchangeTrades <- function(tData, printExchange = TRUE) {
 #' \item Z: BATS
 #' }
 #' 
-#' @return \code{data.table} or \code{xts} object depending on input
+#' @return \code{data.table} or \code{xts} object depending on input.
 #' 
 #' @examples 
 #' autoSelectExchangeQuotes(sampleQDataRaw)
 #'
-#' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
+#' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
 #' 
 #' @keywords cleaning
 #' @export
@@ -888,10 +888,10 @@ autoSelectExchangeQuotes <- function(qData, printExchange = TRUE) {
 }
 
 
-#' Extract data from an \code{xts} object for the Exchange Hours Only
+#' Extract data from an \code{xts} object for the exchange hours only
 #' 
 #' @description Filter raw trade data such and return only data between market close and market open. 
-#' By default, \code{marketOpen} and \code{marketClose} are set to "09:30:00" and "16:00:00" respectively (see Brownlees and Gallo (2006) for more information on good choices for these arguments).
+#' By default, \code{marketOpen = "09:30:00"} and \code{marketClose = "16:00:00"} (see Brownlees and Gallo (2006) for more information on good choices for these arguments).
 #' 
 #' @param data a \code{data.table} or \code{xts} object containing the time series data. 
 #' Multiple days of input are allowed.
@@ -902,10 +902,10 @@ autoSelectExchangeQuotes <- function(qData, printExchange = TRUE) {
 #' @param tz fallback time zone used in case we we are unable to identify the timezone of the data, by default: \code{tz = NULL}. We attempt to extract the timezone from the DT column of the data, which may fail. 
 #' In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}
 #' 
-#' @return \code{xts} or \code{data.table} object depending on input
+#' @return \code{xts} or \code{data.table} object depending on input.
 #'
 #' @references Brownlees, C. T. and Gallo, G. M. (2006). Financial econometric analysis at ultra-high frequency: Data handling concerns. Computational Statistics & Data Analysis, 51, pages 2232-2245.
-#' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
+#' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
 #' @examples 
 #' exchangeHoursOnly(sampleTDataRaw)
 #' @keywords cleaning
@@ -1087,12 +1087,12 @@ makeReturns <- function(ts) {
 #' @param ... used internally. Don't set this parameter
 #' 
 #' @return Depending on the input data type, we return either a \code{data.table} or an \code{xts} object containing the matched trade and quote data.
-#' When using the BFM algorithm, a report of the matched and unmatched trades are also returned. (This is omitted when we call this function from the \code{\link{tradesCleanupUsingQuotes}} function)
+#' When using the BFM algorithm, a report of the matched and unmatched trades are also returned (This is omitted when we call this function from the \code{\link{tradesCleanupUsingQuotes}} function).
 #' 
 #' @references  Vergote, O. (2005). How to match trades and quotes for NYSE stocks?
 #' K.U.Leuven working paper.
 #' 
-#' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
+#' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
 #' 
 #' @keywords data manipulation
 #' 
@@ -1224,17 +1224,17 @@ matchTradesQuotes <- function(tData, qData, lagQuotes = 0, BFM = FALSE, backward
 #' prices. For \code{data.table} an additional column \code{DT} is necessary that stores the date/time information.
 #' @param selection indicates how the bid and ask price for a certain time stamp
 #' should be calculated in case of multiple observation for a certain time
-#' stamp. By default, selection = "median", and the median price is taken. Alternatively:
+#' stamp. By default, \code{selection = "median"}, and the median price is taken. Alternatively:
 #' \itemize{
-#' \item selection = "max.volume": use the (bid/ask) price of the entry with
+#' \item \code{selection = "max.volume"}: use the (bid/ask) price of the entry with
 #' largest (bid/ask) volume.
-#' \item selection = "weighted.average": take the weighted average of all bid (ask) prices,
+#' \item \code{selection = "weighted.average"}: take the weighted average of all bid (ask) prices,
 #' weighted by "BIDSIZ" ("OFRSIZ").
 #' }
 #' 
 #' @return Depending on the input data type, we return either a \code{data.table} or an \code{xts} object containing the quote data which has been cleaned.
 #' 
-#' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
+#' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
 #' @keywords cleaning 
 #' @export
 mergeQuotesSameTimestamp <- function(qData, selection = "median") {
@@ -1320,9 +1320,9 @@ mergeQuotesSameTimestamp <- function(qData, selection = "median") {
 #' \item \code{selection = "weighted.average"}: take the weighted average of all prices.
 #' }
 #' @note previously this function returned the mean of the size of the merged trades (pre version 0.7 and when not using max.volume as the criterion), now it returns the sum.
-#' @return \code{data.table} or \code{xts} object depending on input
+#' @return \code{data.table} or \code{xts} object depending on input.
 #' 
-#' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
+#' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
 #' @keywords cleaning
 #' @export
 mergeTradesSameTimestamp <- function(tData, selection = "median") {
@@ -1397,9 +1397,9 @@ mergeTradesSameTimestamp <- function(tData, selection = "median") {
 #' 
 #' @param tData an \code{xts} or \code{data.table} object at least containing a column \code{PRICE}. 
 #' 
-#' @return an \code{xts} or \code{data.table} object depending on input
+#' @return an \code{xts} or \code{data.table} object depending on input.
 #' 
-#' @author Jonathan Cornelissen and Kris Boudt
+#' @author Jonathan Cornelissen and Kris Boudt.
 #' @keywords cleaning
 noZeroPrices <- function(tData) {
   PRICE <- NULL
@@ -1434,9 +1434,9 @@ noZeroPrices <- function(tData) {
 #' 
 #' @param qData an \code{xts} or \code{data.table} object at least containing the columns \code{BID} and \code{OFR}.
 #' 
-#' @return \code{xts} object or \code{data.table} depending on type of input
+#' @return \code{xts} object or \code{data.table} depending on type of input.
 #' 
-#' @author Jonathan Cornelissen and Kris Boudt
+#' @author Jonathan Cornelissen and Kris Boudt.
 #' @keywords cleaning
 #' @export
 noZeroQuotes <- function(qData) {
@@ -1516,7 +1516,9 @@ noZeroQuotes <- function(qData) {
 #' @param tz fallback time zone used in case we we are unable to identify the timezone of the data, by default: \code{tz = NULL}. With the non-disk functionality, we attempt to extract the timezone from the DT column (or index) of the data, which may fail. 
 #' In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}. 
 #' In the on-disk functionality, if \code{tz} is not specified, the timezone used will be the system default.
+#' 
 #' @return The function converts every (compressed) csv (or rds) file in \code{dataSource} into multiple \code{xts} or \code{data.table} files.
+#' 
 #' In \code{dataDestination}, there will be one folder for each symbol containing .rds files with cleaned data stored either in \code{data.table} or \code{xts} format.
 #' 
 #' In case you supply the argument \code{qDataRaw}, the on-disk functionality is ignored
@@ -1537,7 +1539,7 @@ noZeroQuotes <- function(qData) {
 #' 
 #' If the input \code{data.table} does not contain a \code{DT} column but it does contain \code{DATE} and \code{TIME_M} columns, we create the \code{DT} column by REFERENCE, altering the \code{data.table} that may be in the user's environment!
 #' 
-#' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
+#' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
 #' 
 #' @examples
 #' # Consider you have raw quote data for 1 stock for 2 days
@@ -1718,11 +1720,11 @@ quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
 
 #' Delete entries for which the spread is more than \code{maxi} times the median spread
 #' 
-#' @description Function deletes entries for which the spread is more than "maxi" times the median
+#' @description Function deletes entries for which the spread is more than \code{"maxi"} times the median
 #' spread on that day.
 #' 
-#' @param qData an \code{xts} or \code{data.table} object at least containing the columns "BID" and "OFR".
-#' @param maxi an integer. By default maxi = "50", which means that entries are deleted 
+#' @param qData an \code{xts} or \code{data.table} object at least containing the columns \code{"BID"} and \code{"OFR"}.
+#' @param maxi an integer. By default \code{maxi = "50"}, which means that entries are deleted 
 #' if the spread is more than 50 times the median spread on that day.
 #' @param tz fallback time zone used in case we we are unable to identify the timezone of the data, by default: \code{tz = NULL}. With the non-disk functionality, we attempt to extract the timezone from the DT column (or index) of the data, which may fail. 
 #' In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}. 
@@ -1730,7 +1732,7 @@ quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
 #' 
 #' @return \code{xts} or \code{data.table} object depending on input.
 #' 
-#' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
+#' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
 #' @keywords cleaning
 #' @export
 rmLargeSpread <- function(qData, maxi = 50, tz = NULL) {
@@ -1816,12 +1818,12 @@ rmNegativeSpread <- function(qData) {
 #' @description Function deletes entries with prices that are above the ask plus the bid-ask spread.
 #' Similar for entries with prices below the bid minus the bid-ask spread.
 #' 
-#' @param tData a \code{data.table} or \code{xts} object containing the time series data, with at least the column "PRICE", containing the transaction price.
-#' @param qData a \code{data.table} or \code{xts} object containing the time series data with at least the columns "BID" and "OFR", containing the bid and ask prices.
+#' @param tData a \code{data.table} or \code{xts} object containing the time series data, with at least the column \code{"PRICE"}, containing the transaction price.
+#' @param qData a \code{data.table} or \code{xts} object containing the time series data with at least the columns \code{"BID"} and \code{"OFR"}, containing the bid and ask prices.
 #' @param lagQuotes a numeric of length 1 that denotes how many seconds to lag the quotes. Default is 2 seconds. See Details.
 #' @param BFM a logical determining whether to conduct 'Backwards - Forwards matching' of trades and quotes.
 #' The algorithm tries to match trades that fall outside the bid - ask and first tries to match a small window forwards and if this fails, it tries to match backwards in a bigger window.
-#' The small window is a tolerance for inaccuracies in the timestamps of bids and asks. The backwards window allow for matching of late reported trades. I.e. block trades.
+#' The small window is a tolerance for inaccuracies in the timestamps of bids and asks. The backwards window allow for matching of late reported trades, i.e. block trades.
 #' @param backwardsWindow a numeric denoting the length of the backwards window. Default is 3600, corresponding to one hour.
 #' @param forwardsWindow a numeric denoting the length of the forwards window. Default is 0.5, corresponding to one half second.
 #' @param plot a logical denoting whether to visualize the forwards, backwards, and unmatched trades in a plot.
@@ -1831,12 +1833,12 @@ rmNegativeSpread <- function(qData) {
 #' In older high frequency datasets the trades frequently lag the quotes. In newer datasets this tends to happen 
 #' only during extreme market activity when exchange networks are at maximum capacity.
 #' 
-#' @return \code{xts} or \code{data.table} object depending on input
+#' @return \code{xts} or \code{data.table} object depending on input.
 #' 
 #' @references  Vergote, O. (2005). How to match trades and quotes for NYSE stocks?
 #' K.U.Leuven working paper.
 #' 
-#' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
+#' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
 #' @keywords cleaning
 #' @importFrom data.table setkey set
 #' @export
@@ -1883,9 +1885,6 @@ rmTradeOutliersUsingQuotes <- function(tData, qData, lagQuotes = 2, BFM = FALSE,
       stop("tData neeeds DT column.")
     }
   }
-  
-  
-  
   
   tqData <- matchTradesQuotes(tData, qData, lagQuotes = lagQuotes, BFM = BFM, backwardsWindow = backwardsWindow, forwardsWindow = forwardsWindow, plot = plot, ... = ...)
   
@@ -1938,13 +1937,13 @@ rmTradeOutliersUsingQuotes <- function(tData, qData, lagQuotes = 2, BFM = FALSE,
 #' @param tz fallback time zone used in case we we are unable to identify the timezone of the data, by default: \code{tz = NULL}. With the non-disk functionality, we attempt to extract the timezone from the DT column (or index) of the data, which may fail. 
 #' In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}. 
 #' 
-#' @return \code{xts} object or \code{data.table} depending on type of input
+#' @return \code{xts} object or \code{data.table} depending on type of input.
 #' 
 #' @references Barndorff-Nielsen, O. E., P. R. Hansen, A. Lunde, and N. Shephard (2009). Realized kernels in practice: Trades and quotes. \emph{Econometrics Journal}, 12, C1-C32.
 #' 
 #' Brownlees, C.T., and Gallo, G.M. (2006). Financial econometric analysis at ultra-high frequency: Data handling concerns. \emph{Computational Statistics & Data Analysis}, 51, 2232-2245.
 #' 
-#' @author Jonathan Cornelissen and Kris Boudt
+#' @author Jonathan Cornelissen and Kris Boudt.
 #' 
 #' @keywords cleaning
 #' @importFrom stats mad median
@@ -2054,9 +2053,10 @@ salesCondition <- function(tData, validConds = c('', '@', 'E', '@E', 'F', 'FI', 
 #' @details To get more information on the sales conditions, see the NYSE documentation. Section about Daily TAQ Trades File.
 #' The current version (as of May 2020) can be found online at \href{https://www.nyse.com/publicdocs/nyse/data/Daily_TAQ_Client_Spec_v3.3.pdf}{NYSE's webpage}
 #' @note Some CSV readers and the WRDS API parses empty strings as NAs. We transform \code{NA} values in COND to \code{""}.
-#' @return \code{xts} or \code{data.table} object depending on input
 #' 
-#' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
+#' @return \code{xts} or \code{data.table} object depending on input.
+#' 
+#' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
 #' 
 #' @keywords cleaning
 #' @export
@@ -2097,7 +2097,7 @@ tradesCondition <- function(tData, validConds = c('', '@', 'E', '@E', 'F', 'FI',
 #' @param data an \code{xts} or \code{data.table} object containing the time series data. 
 #' The object should have a column "EX", indicating the exchange by its symbol.
 #' @param exch The (vector of) symbol(s) of the stock exchange(s) that should be selected.
-#' By default the NYSE is chosen (exch = "N"). Other exchange symbols are:
+#' By default the NYSE is chosen (\code{exch = "N"}). Other exchange symbols are:
 #' \itemize{
 #' \item A: AMEX
 #' \item N: NYSE
@@ -2112,9 +2112,9 @@ tradesCondition <- function(tData, validConds = c('', '@', 'E', '@E', 'F', 'FI',
 #' \item W: CBOE
 #' \item Z: BATS
 #' }
-#' @return \code{xts} or \code{data.table} object depending on input
+#' @return \code{xts} or \code{data.table} object depending on input.
 #' 
-#' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
+#' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
 #' @keywords cleaning
 #' @export
 selectExchange <- function(data, exch = "N") { 
@@ -2174,9 +2174,9 @@ selectExchange <- function(data, exch = "N") {
 #' \item Z: BATS
 #' } The default value is \code{"auto"} which automatically selects the exchange for the stocks and days independently using the \code{\link{autoSelectExchangeTrades}}
 #' 
-#' @param tDataRaw \code{xts} object containing raw trade data. This argument is NULL by default. Enabling it means the arguments
-#' from, to, dataSource and dataDestination will be ignored. (only advisable for small chunks of data)
-#' @param report boolean and TRUE by default. In case it is true the function returns (also) a vector indicating how many trades remained after each cleaning step.
+#' @param tDataRaw \code{xts} object containing raw trade data. This argument is \code{NULL} by default. Enabling it means the arguments
+#' \code{from}, \code{to}, \code{dataSource} and \code{dataDestination} will be ignored (only advisable for small chunks of data).
+#' @param report boolean and \code{TRUE} by default. In case it is true the function returns (also) a vector indicating how many trades remained after each cleaning step.
 #' @param selection argument to be passed on to the cleaning routine \code{\link{mergeTradesSameTimestamp}}. The default is "median".
 #' @param validConds character vector containing valid sales conditions. Passed through to \code{\link{tradesCondition}}.
 #' @param marketOpen character in the format of \code{"HH:MM:SS"},
@@ -2190,20 +2190,21 @@ selectExchange <- function(data, exch = "N") {
 #' With the non-disk functionality, we attempt to extract the timezone from the DT column (or index) of the data, which may fail. 
 #' In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}. 
 #' In the on-disk functionality, if \code{tz} is not specified, the timezone used will be the system default.
+#' 
 #' @return For each day an \code{xts} or \code{data.table} object is saved into the folder of that date, containing the cleaned data.
-#' This procedure is performed for each stock in "ticker".
+#' This procedure is performed for each stock in \code{"ticker"}.
 #' The function returns a vector indicating how many trades remained after each cleaning step.
 #' 
-#' In case you supply the argument "rawtData", the on-disk functionality is ignored
+#' In case you supply the argument \code{rawtData}, the on-disk functionality is ignored
 #' and the function returns a list with the cleaned trades as \code{xts} object (see examples).
 #' 
 #' @details 
-#' Using the on-disk functionality with .csv.zip files which is the standard from the WRDS database
+#' Using the on-disk functionality with .csv.zip files from the WRDS database
 #' will write temporary files on your machine in order to unzip the files - we try to clean up after it,
 #' but cannot guarantee that there won't be files that slip through the crack if the permission settings on your machine does not match 
-#' ours
+#' ours.
 #' 
-#' If the input \code{data.table} does not contain a DT column but it does contain DATE and TIME_M columns, we create the DT column by REFERENCE, altering the \code{data.table} that may be in the user's environment!
+#' If the input \code{data.table} does not contain a DT column but it does contain DATE and TIME_M columns, we create the DT column by REFERENCE, altering the \code{data.table} that may be in the user's environment.
 #' @examples 
 #' # Consider you have raw trade data for 1 stock for 2 days 
 #' head(sampleTDataRaw)
@@ -2403,16 +2404,16 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
 #' 
 #' @param tradeDataSource character indicating the folder in which the original trade data is stored.
 #' @param quoteDataSource character indicating the folder in which the original quote data is stored.
-#' @param dataDestination character indicating the folder in which the cleaned data is stored, folder of dataSource by default.
-#' @param tData \code{data.table} or \code{xts} object containing trade data cleaned by \code{\link{tradesCleanup}}. This argument is NULL by default. Enabling it, means the arguments
-#' from, to, dataSource and dataDestination will be ignored. (only advisable for small chunks of data)
+#' @param dataDestination character indicating the folder in which the cleaned data is stored, folder of \code{dataSource} by default.
+#' @param tData \code{data.table} or \code{xts} object containing trade data cleaned by \code{\link{tradesCleanup}}. This argument is \code{NULL} by default. Enabling it, means the arguments
+#' \code{from}, \code{to}, \code{dataSource} and \code{dataDestination} will be ignored (only advisable for small chunks of data).
 #' @param qData \code{data.table} or \code{xts} object containing cleaned quote data. This argument is NULL by default. Enabling it means the arguments
-#' from, to, dataSource, dataDestination will be ignored. (only advisable for small chunks of data)
+#' \code{from}, \code{to}, \code{dataSource}, \code{dataDestination} will be ignored (only advisable for small chunks of data).
 #' @param lagQuotes numeric, number of seconds the quotes are registered faster than
-#' the trades (should be round and positive). Default is 0. For older datasets, i.e. before 2010, it may be a good idea to set this to e.g. 2. See Vergote (2005)
-#' @param BFM a logical determining whether to conduct 'Backwards - Forwards matching' of trades and quotes.
+#' the trades (should be round and positive). Default is 0. For older datasets, i.e. before 2010, it may be a good idea to set this to, e.g., 2 (see, Vergote, 2005).
+#' @param BFM a logical determining whether to conduct "Backwards - Forwards matching" of trades and quotes.
 #' The algorithm tries to match trades that fall outside the bid - ask and first tries to match a small window forwards and if this fails, it tries to match backwards in a bigger window.
-#' The small window is a tolerance for inaccuracies in the timestamps of bids and asks. The backwards window allow for matching of late reported trades. I.e. block trades.
+#' The small window is a tolerance for inaccuracies in the timestamps of bids and asks. The backwards window allow for matching of late reported trades, i.e. block trades.
 #' @param backwardsWindow a numeric denoting the length of the backwards window used when \code{BFM = TRUE}. Default is 3600, corresponding to one hour.
 #' @param forwardsWindow a numeric denoting the length of the forwards window used when \code{BFM = TRUE}. Default is 0.5, corresponding to one half second.
 #' @param plot a logical denoting whether to visualize the forwards, backwards, and unmatched trades in a plot. Passed on to \code{\link{rmTradeOutliersUsingQuotes}}
@@ -2429,7 +2430,7 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
 #' 
 #' Brownlees, C.T., and Gallo, G.M. (2006). Financial econometric analysis at ultra-high frequency: Data handling concerns. \emph{Computational Statistics & Data Analysis}, 51, 2232-2245.
 #' 
-#' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
+#' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
 #' 
 #' @examples 
 #' # Consider you have raw trade data for 1 stock for 2 days 
@@ -2535,8 +2536,8 @@ tradesCleanupUsingQuotes <- function(tradeDataSource = NULL, quoteDataSource = N
 #' This process is repeated until the end of one time series is reached.
 #' 
 #' @param pData a list. Each list-item contains an \code{xts} or a \code{data.table} object (with first column DT (datetime)) containing the original time series (one day only and typically a price series).
-#' @param sort logical determining whether to sort the index based on a criterion (will only sort descending; i.e., most liquid first). Default is FALSE.
-#' @param criterion character determining which criterion used. Currently supports "squared duration" and "duration". Default is "squared duration".
+#' @param sort logical determining whether to sort the index based on a criterion (will only sort descending; i.e., most liquid first). Default is \code{FALSE}.
+#' @param criterion character determining which criterion used. Currently supports \code{"squared duration"} and \code{"duration"}. Default is \code{"squared duration"}.
 #' 
 #' @return An \code{xts} or \code{data.table} object containing the synchronized time series - depending on the input.
 #' 
@@ -2555,7 +2556,7 @@ tradesCleanupUsingQuotes <- function(tradeDataSource = NULL, quoteDataSource = N
 #' # Calculate the synchronized timeseries:
 #' refreshTime(list(a,b))
 #' 
-#' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
+#' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
 #' @keywords data manipulation
 #' @importFrom xts xts tzone
 #' @importFrom data.table merge.data.table
@@ -2686,15 +2687,15 @@ refreshTime <- function (pData, sort = FALSE, criterion = "squared duration") {
 #' For example when sampling based on volume, business time aggregation will result in a time series that has an equal amount of volume between each observation (if possible).
 #' 
 #' @param pData \code{xts} or \code{data.table} containing data to aggregate.
-#' @param measure character denoting which measure to use. Valid options are "intensity", "vol", and "volume", denoting the trade intensity process of Oomen (2005),
-#' volatility, and volume, respectively. Default is "volume"
+#' @param measure character denoting which measure to use. Valid options are \code{"intensity"}, \code{"vol"}, and \code{"volume"}, 
+#' denoting the trade intensity process of Oomen (2005), volatility, and volume, respectively. Default is \code{"volume"}.
 #' @param obs integer valued numeric of length 1 denoting how many observations is wanted after the aggregation procedure.
-#' @param bandwidth numeric of length one, denoting which bandwidth parameter to use in the trade intensity process estimation of Oomen (2005.)
+#' @param bandwidth numeric of length one, denoting which bandwidth parameter to use in the trade intensity process estimation of Oomen (2005).
 #' @param tz fallback time zone used in case we we are unable to identify the timezone of the data, by default: \code{tz = NULL}. We attempt to extract the timezone from the DT column (or index) of the data, which may fail. 
-#' In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}
-#' @param ... extra arguments passed on to \code{\link{spotVol}} when measure is "vol"
+#' In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}.
+#' @param ... extra arguments passed on to \code{\link{spotVol}} when measure is \code{"vol"}.
 #' 
-#' @return A list containing "pData" which is the aggregated data and a list containing the intensity process, split up day by day.
+#' @return A list containing \code{"pData"} which is the aggregated data and a list containing the intensity process, split up day by day.
 #' 
 #' @examples
 #' pData <- sampleTData[,list(DT, PRICE, SIZE)]
@@ -2712,12 +2713,13 @@ refreshTime <- function (pData, sort = FALSE, criterion = "squared duration") {
 #' 
 #' @references 
 #' Oomen, R. C. A. (2006). Properties of realized variance under alternative sampling schemes. \emph{Journal of Business & Economic Statistics}, 24, 219-237
+#' 
 #' Dong, Y., and Tse, Y. K. (2017). Business time sampling scheme with applications to testing semi-martingale hypothesis and estimating integrated volatility. \emph{Econometrics}, 5, 51.
 #' 
 #' @importFrom zoo index
 #' @importFrom xts is.xts
 #' @importFrom data.table copy as.xts.data.table
-#' @author Emil Sjoerup
+#' @author Emil Sjoerup.
 #' @export
 businessTimeAggregation <- function(pData, measure = "volume", obs = 390, bandwidth = 0.075, tz = NULL, ...){
   aggregated <- SIZE <- PRICE <- DT <- intensityProcess <- NULL
@@ -2825,12 +2827,15 @@ businessTimeAggregation <- function(pData, measure = "volume", obs = 390, bandwi
 #' Make Open-High-Low-Close-Volume bars
 #' 
 #' This function makes OHLC-V bars at arbitrary intervals. If the SIZE column is not present in the input, no volume column is created.
-#' @param pData \code{data.table} or \code{xts} object to make the bars out of, containing the intraday price series of possibly multiple stocks for possibly multiple days.
-#' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours", and "ticks".
+#' @param pData \code{data.table} or \code{xts} object to make the bars out of, 
+#' containing the intraday price series of possibly multiple stocks for possibly multiple days.
+#' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. 
+#' Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}, and \code{"ticks"}.
 #' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
-#' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
+#' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. For example, to aggregate
 #' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
-#' @param tz fallback time zone used in case we we are unable to identify the timezone of the data, by default: \code{tz = NULL}. With the non-disk functionality, we attempt to extract the timezone from the DT column (or index) of the data, which may fail. 
+#' @param tz fallback time zone used in case we we are unable to identify the timezone of the data, by default: \code{tz = NULL}. 
+#' With the non-disk functionality, we attempt to extract the timezone from the DT column (or index) of the data, which may fail. 
 #' In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}. 
 #' @examples 
 #' \dontrun{
@@ -2895,7 +2900,6 @@ makeOHLCV <- function(pData, alignBy = "minutes", alignPeriod = 5, tz = NULL){
     pData <- pData[, list(DT, PRICE, SIZE, SYMBOL)]
   }
   
-  
   timeZone <- format(pData$DT[1], format = "%Z")
   if(is.null(timeZone) || timeZone == ""){
     if(is.null(tz)){
@@ -2931,12 +2935,15 @@ makeOHLCV <- function(pData, alignBy = "minutes", alignPeriod = 5, tz = NULL){
 
 #' Convert to format for realized measures
 #' 
-#' Convenience function to split data from one \code{xts} or \code{data.table} with at least DT, SYMBOL, and PRICE columns to a format that can be used in the 
-#' r* functions for calculation of realized measures.
+#' Convenience function to split data from one \code{xts} or \code{data.table} 
+#' with at least \code{"DT"}, \code{"SYMBOL"}, and \code{"PRICE"} columns to a format 
+#' that can be used in the functions for calculation of realized measures.
 #' 
-#' @param data An \code{xts} or a \code{data.table} object with atleast DT, SYMBOL, and PRICE columns. This data should already be cleaned.
+#' @param data An \code{xts} or a \code{data.table} object with at least \code{"DT"}, 
+#' \code{"SYMBOL"}, and \code{"PRICE"} columns. This data should already be cleaned.
 #' 
-#' @return An \code{xts} or a \code{data.table} object with columns DT and a column named after each unique entrance in the SYMBOL column of the input. 
+#' @return An \code{xts} or a \code{data.table} object with columns \code{"DT"} and 
+#' a column named after each unique entrance in the \code{"SYMBOL"} column of the input. 
 #' These columns contain the price of the associated symbol. 
 #' 
 #' @examples
@@ -2952,14 +2959,16 @@ makeOHLCV <- function(pData, alignBy = "minutes", alignPeriod = 5, tz = NULL){
 #' 
 #' rCov(dat, alignBy = 'minutes', alignPeriod = 5, makeReturns = TRUE, cor = TRUE) 
 #' }
-#' @author Emil Sjoerup
+#' @author Emil Sjoerup.
 #' @importFrom data.table merge.data.table setkey
 #' @importFrom xts is.xts
 #' @export
 makeRMFormat <- function(data){
   SYMBOL <- PRICE <- DT <- NULL
   if(any(!(c("SYMBOL", "PRICE") %in% colnames(data)))){
-    stop(paste("Could not find column(s)", c("SYMBOL", "PRICE")[!(c("SYMBOL", "PRICE") %in% colnames(data))]), "these columns must be present")
+    stop(paste("Could not find column(s)", 
+               c("SYMBOL", "PRICE")[!(c("SYMBOL", "PRICE") %in% colnames(data))]), 
+         "these columns must be present")
   }
   inputWasXts <- FALSE
   if (!is.data.table(data)) {
@@ -2977,7 +2986,6 @@ makeRMFormat <- function(data){
   }
   splitted <- split(data[,list(DT, PRICE, SYMBOL)], by = 'SYMBOL')
   
-  
   collected <- Reduce(function(x,y) merge.data.table(x,y, by = "DT", all = TRUE), lapply(splitted, function(x){
     name <- x[1, SYMBOL]
     x <- x[, list(DT,PRICE)]
@@ -2985,8 +2993,7 @@ makeRMFormat <- function(data){
     return(x)
   }))
   
-  
-  if(inputWasXts){
+  if (inputWasXts) {
     collected <- as.xts(collected)
     storage.mode(collected) <- 'numeric'
     return(collected)

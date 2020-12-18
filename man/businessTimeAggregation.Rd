@@ -16,20 +16,20 @@ businessTimeAggregation(
 \arguments{
 \item{pData}{\code{xts} or \code{data.table} containing data to aggregate.}
 
-\item{measure}{character denoting which measure to use. Valid options are "intensity", "vol", and "volume", denoting the trade intensity process of Oomen (2005),
-volatility, and volume, respectively. Default is "volume"}
+\item{measure}{character denoting which measure to use. Valid options are \code{"intensity"}, \code{"vol"}, and \code{"volume"}, 
+denoting the trade intensity process of Oomen (2005), volatility, and volume, respectively. Default is \code{"volume"}.}
 
 \item{obs}{integer valued numeric of length 1 denoting how many observations is wanted after the aggregation procedure.}
 
-\item{bandwidth}{numeric of length one, denoting which bandwidth parameter to use in the trade intensity process estimation of Oomen (2005.)}
+\item{bandwidth}{numeric of length one, denoting which bandwidth parameter to use in the trade intensity process estimation of Oomen (2005).}
 
 \item{tz}{fallback time zone used in case we we are unable to identify the timezone of the data, by default: \code{tz = NULL}. We attempt to extract the timezone from the DT column (or index) of the data, which may fail. 
-In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}}
+In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}.}
 
-\item{...}{extra arguments passed on to \code{\link{spotVol}} when measure is "vol"}
+\item{...}{extra arguments passed on to \code{\link{spotVol}} when measure is \code{"vol"}.}
 }
 \value{
-A list containing "pData" which is the aggregated data and a list containing the intensity process, split up day by day.
+A list containing \code{"pData"} which is the aggregated data and a list containing the intensity process, split up day by day.
 }
 \description{
 Time series aggregation based on `business time` statistics. Instead of equidistant sampling based on time during a trading day, business time sampling creates measures and samples equidistantly using these instead.
@@ -52,8 +52,9 @@ rCov(pData[,list(DT, PRICE)], makeReturns = TRUE, alignBy = "minutes", alignPeri
 }
 \references{
 Oomen, R. C. A. (2006). Properties of realized variance under alternative sampling schemes. \emph{Journal of Business & Economic Statistics}, 24, 219-237
+
 Dong, Y., and Tse, Y. K. (2017). Business time sampling scheme with applications to testing semi-martingale hypothesis and estimating integrated volatility. \emph{Econometrics}, 5, 51.
 }
 \author{
-Emil Sjoerup
+Emil Sjoerup.
 }

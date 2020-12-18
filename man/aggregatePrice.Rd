@@ -40,11 +40,11 @@ Function to aggregate high frequency data by last tick aggregation to an arbitra
 Alternatively the aggregation can be done by number of ticks. In case we DON'T do tick-based aggregation, 
 this function accepts arbitrary number of symbols over a arbitrary number of days. Although the function has the word Price in the name,
 the function is general and works on arbitrary time series, either \code{xts} or \code{data.table} objects the latter requires a \code{DT}
-column containing POSIXct timestamps.
+column containing POSIXct time stamps.
 }
 \details{
-The timestamps of the new time series are the closing times and/or days of the intervals. 
-The element of the returned series with e.g. timestamp 09:35:00 contains
+The time stamps of the new time series are the closing times and/or days of the intervals. 
+The element of the returned series with e.g. time stamp 09:35:00 contains
 the last observation up to that point, including the value at 09:35:00 itself.
 
 In case \code{alignBy = "ticks"}, the sampling is done such the sampling starts on the first tick, and the last tick is always included.
@@ -61,7 +61,7 @@ aggregatePrice(sampleTData, alignBy = "secs", alignPeriod = 30)
 aggregatePrice(sampleTData, alignBy = "milliseconds", alignPeriod = 500, fill = TRUE)
 }
 \author{
-Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
+Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
 }
 \keyword{data}
 \keyword{manipulation}

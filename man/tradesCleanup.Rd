@@ -42,10 +42,10 @@ The possible exchange symbols are:
 \item Z: BATS
 } The default value is \code{"auto"} which automatically selects the exchange for the stocks and days independently using the \code{\link{autoSelectExchangeTrades}}}
 
-\item{tDataRaw}{\code{xts} object containing raw trade data. This argument is NULL by default. Enabling it means the arguments
-from, to, dataSource and dataDestination will be ignored. (only advisable for small chunks of data)}
+\item{tDataRaw}{\code{xts} object containing raw trade data. This argument is \code{NULL} by default. Enabling it means the arguments
+\code{from}, \code{to}, \code{dataSource} and \code{dataDestination} will be ignored (only advisable for small chunks of data).}
 
-\item{report}{boolean and TRUE by default. In case it is true the function returns (also) a vector indicating how many trades remained after each cleaning step.}
+\item{report}{boolean and \code{TRUE} by default. In case it is true the function returns (also) a vector indicating how many trades remained after each cleaning step.}
 
 \item{selection}{argument to be passed on to the cleaning routine \code{\link{mergeTradesSameTimestamp}}. The default is "median".}
 
@@ -69,10 +69,10 @@ In the on-disk functionality, if \code{tz} is not specified, the timezone used w
 }
 \value{
 For each day an \code{xts} or \code{data.table} object is saved into the folder of that date, containing the cleaned data.
-This procedure is performed for each stock in "ticker".
+This procedure is performed for each stock in \code{"ticker"}.
 The function returns a vector indicating how many trades remained after each cleaning step.
 
-In case you supply the argument "rawtData", the on-disk functionality is ignored
+In case you supply the argument \code{rawtData}, the on-disk functionality is ignored
 and the function returns a list with the cleaned trades as \code{xts} object (see examples).
 }
 \description{
@@ -92,12 +92,12 @@ also requires cleaned quote data as input, it is not incorporated here and
 there is a separate wrapper called \code{\link{tradesCleanupUsingQuotes}}.
 }
 \details{
-Using the on-disk functionality with .csv.zip files which is the standard from the WRDS database
+Using the on-disk functionality with .csv.zip files from the WRDS database
 will write temporary files on your machine in order to unzip the files - we try to clean up after it,
 but cannot guarantee that there won't be files that slip through the crack if the permission settings on your machine does not match 
-ours
+ours.
 
-If the input \code{data.table} does not contain a DT column but it does contain DATE and TIME_M columns, we create the DT column by REFERENCE, altering the \code{data.table} that may be in the user's environment!
+If the input \code{data.table} does not contain a DT column but it does contain DATE and TIME_M columns, we create the DT column by REFERENCE, altering the \code{data.table} that may be in the user's environment.
 }
 \examples{
 # Consider you have raw trade data for 1 stock for 2 days 

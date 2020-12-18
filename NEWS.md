@@ -1,11 +1,11 @@
-eChanges in version 0.8.0
+Changes in version 0.8.0
  - Various bugfixes and performance improvements
- - Added lowercase r in front of realized measures that did not have it, so it can easily be found in IDEs e.g. with highfrequency::
+ - Added lowercase "r" in front of realized measures that did not have it, so it can easily be found in IDEs with highfrequency::
  - Added drift burst code
  - Added Backwards - Forwards matching algorithm to cleaning step. Thanks to Kim Christensen for providing his Matlab code.
- - removed various datasets, outdated TAQ format,  simulated 5 minute prices, returns, and prices with jumps
+ - removed various datasets, outdated TAQ format, simulated 5-minute prices, returns, and prices with jumps
  - Added European sample data, anonymized one-minute data with anonymous stock and market data, as well as home-grown dataset with realized measures
- - on and k in data handling is now alignBy and alignPeriod respectively. This means that the realized measures and data handling functions have similar notation
+ - The arguments "on" and "k" in data handling is now "alignBy" and "alignPeriod" respectively. This means that the realized measures and data handling functions have similar notation
  - Improved UX in data cleaning functions by having more clear report on the trades when prompted and adding defaults that follow the standard in the literature
  - Added data.table support to (most) realized measures
  - Added functions makeRMFormat and makeOHLCV to convert data from a long format to a format that can be used for realized measures, and to make arbitrary period bars.
@@ -13,14 +13,14 @@ eChanges in version 0.8.0
  - add asymptotic variance estimator for ReMeDI estimation - thanks to Merrick Li for contributing his Matlab code
  
 Changes in version 0.7.0
- - New naming convention.
+ - New naming convention
  - Bugfix in BNSjumpTest, JOjumpTest, AJjumpTest. These functions behaved in an unexpected and inconsistent manner when the input spanned more than one day
  - Bugfix in aggregateTS function which in edge cases returned data from AFTER the input data
  - Implement intradayJumpTest function which allows for flexible Lee-Mykland style jump tests
  - Implement rankJumpTest to test for the rank of the jump matrix
  - Implement new features in spotVol. Now the local volatility can be estimated with realized measures, they can also be used with pre-averaged realized measures.
  - Implement a wrapper around quantmod's getSymbols.av function
- - harModel now includes Newey-West standard errors in the output.
+ - harModel now includes Newey-West standard errors in the output
  - Bugfix for refreshTime function and large performance improvement
  - Implement CholCov estimator in rCholCov
  - Bugfixes in data handling functions, which sometimes produced different results depending on the options(digits.secs) setting. Most data handling functions now run considerably faster as a consequence of internally using numerics for timestamps.
@@ -30,7 +30,6 @@ Changes in version 0.7.0
  - More transparantly handle the lagging of quotes when matching these with trades, now the user has control of this.
  - Add business time sampling
  - Changes to the included datasets. The microseconds quote datasets have been thinned out aggressively for exchanges != "N"
-
 
 Changes in version 0.6.5
  - bug fix for kernelCov if cor = TRUE

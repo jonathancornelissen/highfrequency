@@ -9,9 +9,9 @@ refreshTime(pData, sort = FALSE, criterion = "squared duration")
 \arguments{
 \item{pData}{a list. Each list-item contains an \code{xts} or a \code{data.table} object (with first column DT (datetime)) containing the original time series (one day only and typically a price series).}
 
-\item{sort}{logical determining whether to sort the index based on a criterion (will only sort descending; i.e., most liquid first). Default is FALSE.}
+\item{sort}{logical determining whether to sort the index based on a criterion (will only sort descending; i.e., most liquid first). Default is \code{FALSE}.}
 
-\item{criterion}{character determining which criterion used. Currently supports "squared duration" and "duration". Default is "squared duration".}
+\item{criterion}{character determining which criterion used. Currently supports \code{"squared duration"} and \code{"duration"}. Default is \code{"squared duration"}.}
 }
 \value{
 An \code{xts} or \code{data.table} object containing the synchronized time series - depending on the input.
@@ -41,7 +41,7 @@ refreshTime(list(a,b))
 Harris, F., T. McInish, Shoesmith, G., and Wood, R. (1995). Cointegration, error correction, and price discovery on informationally linked security markets. \emph{Journal of Financial and Quantitative Analysis}, 30, 563-581.
 }
 \author{
-Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
+Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
 }
 \keyword{data}
 \keyword{manipulation}

@@ -8,20 +8,20 @@ HEAVYmodel(data, startingValues = NULL)
 }
 \arguments{
 \item{data}{an \code{xts} object where the first column is  a vector of demeaned returns 
-and the second column is a vector of realized stock market variation}
+and the second column is a vector of realized stock market variation.}
 
 \item{startingValues}{a vector of alternative starting values: first three arguments for variance equation and last three arguments for measurement equation.}
 }
 \value{
 The function outputs an object of class \code{HEAVYmodel}, a list containing
 \itemize{
-  \item coefficients = estimated coefficients
-  \item se = robust standard errors based on inverted Hessian matrix
-  \item residuals = the residuals in the return equation
-  \item llh = the two-component log-likelihood values
-  \item varCondVariances = conditional variances in the variance equation
-  \item RMCondVariances = conditional variances in the RM equation
-  \item data = the input data
+  \item coefficients = estimated coefficients.
+  \item se = robust standard errors based on inverted Hessian matrix.
+  \item residuals = the residuals in the return equation.
+  \item llh = the two-component log-likelihood values.
+  \item varCondVariances = conditional variances in the variance equation.
+  \item RMCondVariances = conditional variances in the RM equation.
+  \item data = the input data.
 }
 The class HEAVYmodel has the following methods: plot.HEAVYmodel, predict.HEAVYmodel, 
 print.HEAVYmodel, and summary.HEAVYmodel.
@@ -68,11 +68,11 @@ fittedHEAVY
 predict(fittedHEAVY, stepsAhead = 12)
 }
 \references{
-Shephard, N. and K. Sheppard (2010). Realising the future: Forecasting with high frequency based volatility (HEAVY) models. Journal of Applied Econometrics 25, 197--231.
+Shephard, N. and K. Sheppard (2010). Realising the future: Forecasting with high frequency based volatility (HEAVY) models. Journal of Applied Econometrics 25, 197-231.
 }
 \seealso{
 \code{\link{predict.HEAVYmodel}}
 }
 \author{
-Onno Kleen
+Onno Kleen.
 }

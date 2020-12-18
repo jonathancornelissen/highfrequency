@@ -77,6 +77,7 @@ In the on-disk functionality, if \code{tz} is not specified, the timezone used w
 }
 \value{
 The function converts every (compressed) csv (or rds) file in \code{dataSource} into multiple \code{xts} or \code{data.table} files.
+
 In \code{dataDestination}, there will be one folder for each symbol containing .rds files with cleaned data stored either in \code{data.table} or \code{xts} format.
 
 In case you supply the argument \code{qDataRaw}, the on-disk functionality is ignored
@@ -121,6 +122,6 @@ Brownlees, C.T. and Gallo, G.M. (2006). Financial econometric analysis at ultra-
 Falkenberry, T.N. (2002). High frequency data filtering. Unpublished technical report.
 }
 \author{
-Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
+Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
 }
 \keyword{cleaning}
