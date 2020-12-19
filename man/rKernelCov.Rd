@@ -12,8 +12,7 @@ rKernelCov(
   makeReturns = FALSE,
   kernelType = "rectangular",
   kernelParam = 1,
-  kernelDOFadj = TRUE,
-  ...
+  kernelDOFadj = TRUE
 )
 }
 \arguments{

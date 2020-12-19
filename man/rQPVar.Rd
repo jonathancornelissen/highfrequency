@@ -2,7 +2,7 @@
 % Please edit documentation in R/realizedMeasures.R
 \name{rQPVar}
 \alias{rQPVar}
-\title{Realized quad-power variation of highfrequency return series.}
+\title{Realized quad-power variation of intraday returns}
 \usage{
 rQPVar(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE)
 }
@@ -27,9 +27,7 @@ based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to
 \description{
 Calculate the realized quad-power variation, defined in Andersen et al. (2012).
 
- Assume there are \eqn{N} equispaced returns \eqn{r_{t,i}} in period \eqn{t}, \eqn{i=1, \ldots,N}.
-
- Then, the rQPVar is given by
+ Assume there are \eqn{N} equispaced returns \eqn{r_{t,i}} in period \eqn{t}, \eqn{i=1, \ldots,N}. Then, the rQPVar is given by
  \deqn{
    \mbox{rQPVar}_{t}=N*\frac{N}{N-3} \left(\frac{\pi^2}{4} \right)^{-4} \mbox({|r_{t,i}|} {|r_{t,i-1}|} {|r_{t,i-2}|} {|r_{t,i-3}|})
  }

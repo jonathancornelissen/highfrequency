@@ -20,7 +20,7 @@ rThresholdCov(
 \item{alignBy}{character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
 To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.}
 
-\item{alignPeriod}{positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
+\item{alignPeriod}{positive numeric, indicating the number of periods to aggregate over. For example, to aggregate
 based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.}
 
 \item{makeReturns}{boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.}
@@ -34,8 +34,8 @@ Calculate the threshold covariance matrix proposed in Gobbi and Mancini (2009).
 Unlike the \code{\link{rOWCov}}, the rThresholdCov uses univariate jump detection rules to truncate the effect of jumps on the covariance
 estimate. As such, it remains feasible in high dimensions, but it is less robust to small cojumps.
 
-Let \eqn{r_{t,i}} be an intraday \eqn{N x 1} return vector and \eqn{i=1,...,M}
-the number of intraday returns.
+Let \eqn{r_{t,i}} be an intraday \eqn{N x 1} return vector of \eqn{N} assets where \eqn{i=1,...,M} and
+\eqn{M} being the number of intraday returns.
 
 Then, the \eqn{k,q}-th element of the threshold covariance matrix is defined as
 
@@ -70,6 +70,6 @@ Jacod, J. and Todorov, V. (2009). Testing for common arrival of jumps in discret
 Mancini, C. and Gobbi, F. (2012). Identifying the brownian covariation from the co-jumps given discrete observations. \emph{Econometric Theory}, 28, 249-273.
 }
 \author{
-Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
+Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup.
 }
 \keyword{volatility}

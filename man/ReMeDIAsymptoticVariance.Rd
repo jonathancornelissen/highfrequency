@@ -9,7 +9,7 @@ ReMeDIAsymptoticVariance(pData, kn, lags, phi, i)
 \arguments{
 \item{pData}{\code{xts} or \code{data.table} containing the log-prices of the asset}
 
-\item{kn}{numeric of length 1 determining the tuning parameter kn this controls the lengths of the non-overlapping interval in the ReMeDI estimation}
+\item{kn}{numerical value determining the tuning parameter kn this controls the lengths of the non-overlapping interval in the ReMeDI estimation}
 
 \item{lags}{numeric containing integer values indicating the lags for which to estimate the (co)variance}
 

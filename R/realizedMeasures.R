@@ -1353,7 +1353,7 @@ rHYCov <- function(rData, cor = FALSE, period = 1, alignBy = "seconds", alignPer
 #' @export
 rKernelCov <- function(rData, cor = FALSE,  alignBy = "seconds", alignPeriod = 1,
                        makeReturns = FALSE, kernelType = "rectangular", kernelParam = 1,
-                       kernelDOFadj = TRUE, ...) {
+                       kernelDOFadj = TRUE) {
 
   if (is.xts(rData) && checkMultiDays(rData)) {
     if (is.null(dim(rData))) {
