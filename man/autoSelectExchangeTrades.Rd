@@ -7,11 +7,11 @@
 autoSelectExchangeTrades(tData, printExchange = TRUE)
 }
 \arguments{
-\item{tData}{an \code{xts} object with at least a column "EX", 
-indicating the exchange symbol and "SIZE", 
+\item{tData}{an \code{xts} object with at least a column \code{"EX"} 
+indicating the exchange symbol and \code{"SIZE"}
 indicating the trade volume.}
 
-\item{printExchange}{indicates whether the chosen exchange is printed on the console, default is TRUE.
+\item{printExchange}{indicates whether the chosen exchange is printed on the console, default is \code{TRUE}.
 The possible exchanges are:
 \itemize{
 \item A: AMEX
@@ -29,7 +29,7 @@ The possible exchanges are:
 }}
 }
 \value{
-\code{data.table} or \code{xts} object depending on input
+\code{data.table} or \code{xts} object depending on input.
 }
 \description{
 Filters raw trade data and return only data that stems from the exchange with the highest
@@ -40,6 +40,6 @@ autoSelectExchangeTrades(sampleTDataRaw)
 
 }
 \author{
-Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
+Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
 }
 \keyword{cleaning}

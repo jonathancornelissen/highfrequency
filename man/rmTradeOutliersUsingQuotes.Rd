@@ -16,15 +16,15 @@ rmTradeOutliersUsingQuotes(
 )
 }
 \arguments{
-\item{tData}{a \code{data.table} or \code{xts} object containing the time series data, with at least the column "PRICE", containing the transaction price.}
+\item{tData}{a \code{data.table} or \code{xts} object containing the time series data, with at least the column \code{"PRICE"}, containing the transaction price.}
 
-\item{qData}{a \code{data.table} or \code{xts} object containing the time series data with at least the columns "BID" and "OFR", containing the bid and ask prices.}
+\item{qData}{a \code{data.table} or \code{xts} object containing the time series data with at least the columns \code{"BID"} and \code{"OFR"}, containing the bid and ask prices.}
 
 \item{lagQuotes}{a numeric of length 1 that denotes how many seconds to lag the quotes. Default is 2 seconds. See Details.}
 
 \item{BFM}{a logical determining whether to conduct 'Backwards - Forwards matching' of trades and quotes.
 The algorithm tries to match trades that fall outside the bid - ask and first tries to match a small window forwards and if this fails, it tries to match backwards in a bigger window.
-The small window is a tolerance for inaccuracies in the timestamps of bids and asks. The backwards window allow for matching of late reported trades. I.e. block trades.}
+The small window is a tolerance for inaccuracies in the timestamps of bids and asks. The backwards window allow for matching of late reported trades, i.e. block trades.}
 
 \item{backwardsWindow}{a numeric denoting the length of the backwards window. Default is 3600, corresponding to one hour.}
 
@@ -35,7 +35,7 @@ The small window is a tolerance for inaccuracies in the timestamps of bids and a
 \item{...}{used internally}
 }
 \value{
-\code{xts} or \code{data.table} object depending on input
+\code{xts} or \code{data.table} object depending on input.
 }
 \description{
 Function deletes entries with prices that are above the ask plus the bid-ask spread.
@@ -52,6 +52,6 @@ Vergote, O. (2005). How to match trades and quotes for NYSE stocks?
 K.U.Leuven working paper.
 }
 \author{
-Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
+Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
 }
 \keyword{cleaning}

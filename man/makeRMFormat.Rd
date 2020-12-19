@@ -7,15 +7,18 @@
 makeRMFormat(data)
 }
 \arguments{
-\item{data}{An \code{xts} or a \code{data.table} object with atleast DT, SYMBOL, and PRICE columns. This data should already be cleaned.}
+\item{data}{An \code{xts} or a \code{data.table} object with at least \code{"DT"}, 
+\code{"SYMBOL"}, and \code{"PRICE"} columns. This data should already be cleaned.}
 }
 \value{
-An \code{xts} or a \code{data.table} object with columns DT and a column named after each unique entrance in the SYMBOL column of the input. 
+An \code{xts} or a \code{data.table} object with columns \code{"DT"} and 
+a column named after each unique entrance in the \code{"SYMBOL"} column of the input. 
 These columns contain the price of the associated symbol.
 }
 \description{
-Convenience function to split data from one \code{xts} or \code{data.table} with at least DT, SYMBOL, and PRICE columns to a format that can be used in the 
-r* functions for calculation of realized measures.
+Convenience function to split data from one \code{xts} or \code{data.table} 
+with at least \code{"DT"}, \code{"SYMBOL"}, and \code{"PRICE"} columns to a format 
+that can be used in the functions for calculation of realized measures.
 }
 \examples{
 \dontrun{
@@ -32,5 +35,5 @@ rCov(dat, alignBy = 'minutes', alignPeriod = 5, makeReturns = TRUE, cor = TRUE)
 }
 }
 \author{
-Emil Sjoerup
+Emil Sjoerup.
 }

@@ -7,9 +7,9 @@
 rmLargeSpread(qData, maxi = 50, tz = NULL)
 }
 \arguments{
-\item{qData}{an \code{xts} or \code{data.table} object at least containing the columns "BID" and "OFR".}
+\item{qData}{an \code{xts} or \code{data.table} object at least containing the columns \code{"BID"} and \code{"OFR"}.}
 
-\item{maxi}{an integer. By default maxi = "50", which means that entries are deleted 
+\item{maxi}{an integer. By default \code{maxi = "50"}, which means that entries are deleted 
 if the spread is more than 50 times the median spread on that day.}
 
 \item{tz}{fallback time zone used in case we we are unable to identify the timezone of the data, by default: \code{tz = NULL}. With the non-disk functionality, we attempt to extract the timezone from the DT column (or index) of the data, which may fail. 
@@ -20,10 +20,10 @@ In the on-disk functionality, if tz is not specified, the timezone used will be 
 \code{xts} or \code{data.table} object depending on input.
 }
 \description{
-Function deletes entries for which the spread is more than "maxi" times the median
+Function deletes entries for which the spread is more than \code{"maxi"} times the median
 spread on that day.
 }
 \author{
-Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
+Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
 }
 \keyword{cleaning}

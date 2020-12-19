@@ -36,7 +36,7 @@ Fan, J., Li, Y., and Yu, K. (2012). Vast volatility matrix estimation using high
 Rousseeuw, P. and Molenberghs, G. (1993). Transformation of non positive semidefinite correlation matrices. \emph{Communications in Statistics - Theory and Methods}, 22, 965-984.
 }
 \author{
-Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
+Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup.
 }
 \keyword{data}
 \keyword{manipulation}

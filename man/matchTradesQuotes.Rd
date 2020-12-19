@@ -37,7 +37,7 @@ The small window is a tolerance for inaccuracies in the timestamps of bids and a
 }
 \value{
 Depending on the input data type, we return either a \code{data.table} or an \code{xts} object containing the matched trade and quote data.
-When using the BFM algorithm, a report of the matched and unmatched trades are also returned. (This is omitted when we call this function from the \code{\link{tradesCleanupUsingQuotes}} function)
+When using the BFM algorithm, a report of the matched and unmatched trades are also returned (This is omitted when we call this function from the \code{\link{tradesCleanupUsingQuotes}} function).
 }
 \description{
 Match the trades and quotes of the input data. All trades are retained and the latest bids and offers are retained,
@@ -54,7 +54,7 @@ Vergote, O. (2005). How to match trades and quotes for NYSE stocks?
 K.U.Leuven working paper.
 }
 \author{
-Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
+Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
 }
 \keyword{data}
 \keyword{manipulation}

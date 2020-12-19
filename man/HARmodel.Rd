@@ -2,7 +2,7 @@
 % Please edit documentation in R/HARmodel.R
 \name{HARmodel}
 \alias{HARmodel}
-\title{HAR model estimation (Heterogeneous Autoregressive model for Realized volatility)}
+\title{Heterogeneous autoregressive (HAR) model for realized volatility model estimation}
 \usage{
 HARmodel(
   data,
@@ -23,38 +23,48 @@ HARmodel(
 )
 }
 \arguments{
-\item{data}{an \code{xts} object containing either: intra-day (log-)returns or realized measures already computed from such returns. 
+\item{data}{an \code{xts} object containing either: intraday (log-)returns or realized measures already computed from such returns. 
 In case more than one realized measure is needed, the object should have the as many columns as realized measures needed. 
-The first column should always be the realized variance proxy. In case type is either "HARQJ" or "CHARQ" the order should be "RV", "BPV", "RQ", or the relevant proxies.}
+The first column should always be the realized variance proxy. 
+In case type is either \code{"HARQJ"} or \code{"CHARQ"} the order should be 
+\code{"RV"}, \code{"BPV"}, \code{"RQ"}, or the relevant proxies.}
 
-\item{periods}{a vector of integers indicating over how days the realized measures in the model should be aggregated. By default  periods = c(1,5,22), which corresponds to one day, one week and one month respectively. This default is in line with Andersen et al. (2007).}
+\item{periods}{a vector of integers indicating over how days the realized measures in the model should be aggregated. 
+By default  \code{periods = c(1,5,22)}, which corresponds to one day, one week and one month respectively. This default is in line with Andersen et al. (2007).}
 
-\item{periodsJ}{a vector of integers indicating over what time periods the jump components in the model should be aggregated. By default periodsJ = c(1,5,22), which corresponds to one day, one week and one month respectively.}
+\item{periodsJ}{a vector of integers indicating over what time periods the jump components in the model should be aggregated. 
+By default \code{periodsJ = c(1,5,22)}, which corresponds to one day, one week and one month respectively.}
 
-\item{periodsQ}{a vector of integers indicating over what time periods the realized quarticity in the model should be aggregated. By default periodsQ = c(1,5,22), which corresponds to one day, one week and one month respectively.}
+\item{periodsQ}{a vector of integers indicating over what time periods the realized quarticity in the model should be aggregated. 
+By default \code{periodsQ = c(1,5,22)}, which corresponds to one day, one week and one month respectively.}
 
 \item{leverage}{a vector of integers indicating over what periods the negative returns should be aggregated.
-See Corsi and Reno (2012) for more information. By default leverage = NULL and the model assumes the absence of a  leverage effect. Set leverage = c(1,5,22) to mimic the analysis in Corsi and Reno (2012).}
+See Corsi and Reno (2012) for more information. By default \code{leverage = NULL} and the model assumes the absence of a  leverage effect. 
+Set \code{leverage = c(1,5,22)} to mimic the analysis in Corsi and Reno (2012).}
 
 \item{RVest}{a character vector with one, two, or three elements. The first element always refers to the name of the function to estimate the daily integrated variance (non-jump-robust).
-The second and third element depends on which type of model is estimated: If type = "HARJ", type = "HARCJ", type = "HARQJ" the second element refers to the name of the function to estimate the continuous component of daily volatility (jump robust). If type = "HARQ", the second element refers to the name of the function used to estimate the integrated quarticity.
-If type = "HARQJ" the third element always refers to the name of the function used to estimate integrated quarticity.
-By default RVest = c("rCov","rBPCov","rQuar"), i.e. using the Realized Volatility, Realized Bi-Power Variance, and Realized Quarticity.}
+The second and third element depends on which type of model is estimated: 
+If \code{type = "HARJ"}, \code{type = "HARCJ"}, \code{type = "HARQJ"} the second element refers to the name of the function to estimate the continuous component of daily volatility (jump robust). 
+If type = "HARQ", the second element refers to the name of the function used to estimate the integrated quarticity.
+If \code{type = "HARQJ"} the third element always refers to the name of the function used to estimate integrated quarticity.
+By default \code{RVest = c("rCov","rBPCov","rQuar")}, i.e. using the realized volatility, realized bi-power variance, and realized quarticity.}
 
-\item{type}{a string referring to the type of HAR model you would like to estimate. By default type = "HAR", the most basic model. Other valid options are type = "HARJ", type = "HARCJ", type = "HARQ", type = "HARQJ", type = "CHAR", or type = "CHARQ".}
+\item{type}{a string referring to the type of HAR model you would like to estimate. By default \code{type = "HAR"}, the most basic model. 
+Other valid options for type are \code{"HARJ"}, \code{"HARCJ"}, \code{"HARQ"}, \code{"HARQJ"}, \code{"CHAR"}, or \code{"CHARQ"}.}
 
-\item{inputType}{a string denoting if the input data consists of realized measures or high-frequency returns, default "RM" is the only way to denote realized measures and everything else denotes returns.}
+\item{inputType}{a string denoting if the input data consists of realized measures or high-frequency returns. 
+Default "RM" is the only way to denote realized measures and everything else denotes returns.}
 
-\item{jumpTest}{the function name of a function used to test whether the test statistic which determines whether the jump variability is significant that day. By default jumpTest = "ABDJumptest", hence using the test statistic in Equation or Equation (18) of Andersen et al. (2007).}
+\item{jumpTest}{the function name of a function used to test whether the test statistic which determines whether the jump variability is significant that day. By default \code{jumpTest = "ABDJumptest"}, hence using the test statistic in Equation or Equation (18) of Andersen et al. (2007).}
 
-\item{alpha}{a real indicating the confidence level used in testing for jumps. By default alpha = 0.05.}
+\item{alpha}{a real indicating the confidence level used in testing for jumps. By default \code{alpha = 0.05}.}
 
 \item{h}{an integer indicating the number over how many days the dependent variable should be aggregated.
-By default, h=1, i.e. no aggregation takes place, you just model the daily realized volatility.}
+By default, \code{h = 1}, i.e. no aggregation takes place, you just model the daily realized volatility.}
 
-\item{transform}{optionally a string referring to a function that transforms both the dependent and explanatory variables in the model. By default transform=NULL, so no transformation is done. Typical other choices in this context would be "log" or "sqrt".}
+\item{transform}{optionally a string referring to a function that transforms both the dependent and explanatory variables in the model. By default \code{transform = NULL}, so no transformation is done. Typical other choices in this context would be "log" or "sqrt".}
 
-\item{externalRegressor}{an \code{xts} object of same number of rows as \code{data}, and one column. This is used as an external regressor. Default is NULL}
+\item{externalRegressor}{an \code{xts} object of same number of rows as \code{data}, and one column. This is used as an external regressor. Default is \code{NULL}.}
 
 \item{periodsExternal}{a vector of integers indicating over how days \code{externalRegressor} should be aggregated.}
 
@@ -65,9 +75,23 @@ The function outputs an object of class \code{HARmodel} and \code{\link{lm}} (so
 of class \code{HARmodel} has the following methods \code{\link{plot.HARmodel}}, \code{\link{predict.HARmodel}}, \code{\link{print.HARmodel}}, and \code{\link{summary.HARmodel}}.
 }
 \description{
-Function returns the estimates for the Heterogeneous Autoregressive model
-for Realized volatility discussed in Andersen et al. (2007) and Corsi (2009).
-This model is mainly used to forecast the next day's volatility based on the high-frequency returns of the past. Consult the vignette for more information.
+Function returns the estimates for the heterogeneous autoregressive model (HAR)
+for realized volatility  discussed in Andersen et al. (2007) and Corsi (2009).
+This model is mainly used to forecast the next day's volatility based on the high-frequency returns of the past.
+}
+\details{
+The basic specification in Corsi (2009) is as follows. 
+Let \eqn{RV_{t}} be the realized variances at day \eqn{t} and \eqn{RV_{t-k:t}} the average
+realized variance in between \eqn{t-k} and \eqn{t}, \eqn{k \geq 0}. 
+
+The dynamics of the model are given by
+\deqn{
+RV_{t+1} = \beta_0 + \beta_1 \ RV_{t} + \beta_2 \ RV_{t-4:t} + \beta_3 \ RV_{t-21:t} + \varepsilon_{t+1}
+}
+which is estimated by ordinary least squares under the assumption that at time \eqn{t},
+the conditional mean of  \eqn{\varepsilon_{t+1}} is equal to zero.
+
+For other specifications, please refer to the cited papers.
 }
 \examples{
 # Example 1: HAR
@@ -128,7 +152,7 @@ predict(x)
 
 }
 \references{
-Andersen, T. G., Bollerslev, T., and Diebold, F. (2007). Roughing it up: including jump components in the measurement, modelling and forecasting of return volatility. \emph{The Review of Economics and Statistics}, 89, 701-720.
+Andersen, T. G., Bollerslev, T., and Diebold, F. (2007). Roughing it up: Including jump components in the measurement, modelling and forecasting of return volatility. \emph{The Review of Economics and Statistics}, 89, 701-720.
 
 Corsi, F. (2009). A simple approximate long memory model of realized volatility. \emph{Journal of Financial Econometrics}, 7, 174-196.
 
@@ -137,6 +161,6 @@ Corsi, F. and Reno R. (2012). Discrete-time volatility forecasting with persiste
 Bollerslev, T., Patton, A., and Quaedvlieg, R. (2016).  Exploiting the errors: A simple approach for improved volatility forecasting, \emph{Journal of Econometrics}, 192, 1-18.
 }
 \author{
-Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
+Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
 }
 \keyword{forecasting}

@@ -17,7 +17,7 @@ one column named \code{"COND"} indicating the Sale Condition.}
 \code{c('', '@', 'E', '@E', 'F', 'FI', '@F', '@FI', 'I', '@I')}. See details.}
 }
 \value{
-\code{xts} or \code{data.table} object depending on input
+\code{xts} or \code{data.table} object depending on input.
 }
 \description{
 Delete entries with abnormal trades condition
@@ -30,6 +30,6 @@ The current version (as of May 2020) can be found online at \href{https://www.ny
 Some CSV readers and the WRDS API parses empty strings as NAs. We transform \code{NA} values in COND to \code{""}.
 }
 \author{
-Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
+Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
 }
 \keyword{cleaning}

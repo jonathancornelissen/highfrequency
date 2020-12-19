@@ -2,7 +2,7 @@
 % Please edit documentation in R/dataHandling.R
 \name{exchangeHoursOnly}
 \alias{exchangeHoursOnly}
-\title{Extract data from an \code{xts} object for the Exchange Hours Only}
+\title{Extract data from an \code{xts} object for the exchange hours only}
 \usage{
 exchangeHoursOnly(
   data,
@@ -25,11 +25,11 @@ specifying the closing time of the exchange(s).}
 In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}}
 }
 \value{
-\code{xts} or \code{data.table} object depending on input
+\code{xts} or \code{data.table} object depending on input.
 }
 \description{
 Filter raw trade data such and return only data between market close and market open. 
-By default, \code{marketOpen} and \code{marketClose} are set to "09:30:00" and "16:00:00" respectively (see Brownlees and Gallo (2006) for more information on good choices for these arguments).
+By default, \code{marketOpen = "09:30:00"} and \code{marketClose = "16:00:00"} (see Brownlees and Gallo (2006) for more information on good choices for these arguments).
 }
 \examples{
 exchangeHoursOnly(sampleTDataRaw)
@@ -38,6 +38,6 @@ exchangeHoursOnly(sampleTDataRaw)
 Brownlees, C. T. and Gallo, G. M. (2006). Financial econometric analysis at ultra-high frequency: Data handling concerns. Computational Statistics & Data Analysis, 51, pages 2232-2245.
 }
 \author{
-Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
+Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
 }
 \keyword{cleaning}

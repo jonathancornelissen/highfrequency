@@ -22,20 +22,20 @@ tradesCleanupUsingQuotes(
 
 \item{quoteDataSource}{character indicating the folder in which the original quote data is stored.}
 
-\item{dataDestination}{character indicating the folder in which the cleaned data is stored, folder of dataSource by default.}
+\item{dataDestination}{character indicating the folder in which the cleaned data is stored, folder of \code{dataSource} by default.}
 
-\item{tData}{\code{data.table} or \code{xts} object containing trade data cleaned by \code{\link{tradesCleanup}}. This argument is NULL by default. Enabling it, means the arguments
-from, to, dataSource and dataDestination will be ignored. (only advisable for small chunks of data)}
+\item{tData}{\code{data.table} or \code{xts} object containing trade data cleaned by \code{\link{tradesCleanup}}. This argument is \code{NULL} by default. Enabling it, means the arguments
+\code{from}, \code{to}, \code{dataSource} and \code{dataDestination} will be ignored (only advisable for small chunks of data).}
 
 \item{qData}{\code{data.table} or \code{xts} object containing cleaned quote data. This argument is NULL by default. Enabling it means the arguments
-from, to, dataSource, dataDestination will be ignored. (only advisable for small chunks of data)}
+\code{from}, \code{to}, \code{dataSource}, \code{dataDestination} will be ignored (only advisable for small chunks of data).}
 
 \item{lagQuotes}{numeric, number of seconds the quotes are registered faster than
-the trades (should be round and positive). Default is 0. For older datasets, i.e. before 2010, it may be a good idea to set this to e.g. 2. See Vergote (2005)}
+the trades (should be round and positive). Default is 0. For older datasets, i.e. before 2010, it may be a good idea to set this to, e.g., 2 (see, Vergote, 2005).}
 
-\item{BFM}{a logical determining whether to conduct 'Backwards - Forwards matching' of trades and quotes.
+\item{BFM}{a logical determining whether to conduct "Backwards - Forwards matching" of trades and quotes.
 The algorithm tries to match trades that fall outside the bid - ask and first tries to match a small window forwards and if this fails, it tries to match backwards in a bigger window.
-The small window is a tolerance for inaccuracies in the timestamps of bids and asks. The backwards window allow for matching of late reported trades. I.e. block trades.}
+The small window is a tolerance for inaccuracies in the timestamps of bids and asks. The backwards window allow for matching of late reported trades, i.e. block trades.}
 
 \item{backwardsWindow}{a numeric denoting the length of the backwards window used when \code{BFM = TRUE}. Default is 3600, corresponding to one hour.}
 
@@ -79,6 +79,6 @@ Barndorff-Nielsen, O. E., Hansen, P. R., Lunde, A., and Shephard, N. (2009). Rea
 Brownlees, C.T., and Gallo, G.M. (2006). Financial econometric analysis at ultra-high frequency: Data handling concerns. \emph{Computational Statistics & Data Analysis}, 51, 2232-2245.
 }
 \author{
-Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
+Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
 }
 \keyword{cleaning}

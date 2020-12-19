@@ -7,9 +7,9 @@
 \method{plot}{HEAVYmodel}(x, ...)
 }
 \arguments{
-\item{x}{an object of class \code{HEAVYmodel}}
+\item{x}{an object of class \code{HEAVYmodel}.}
 
-\item{...}{extra arguments, see details}
+\item{...}{extra arguments, see details.}
 }
 \description{
 Plotting method for HEAVYmodel objects

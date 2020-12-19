@@ -47,7 +47,7 @@ applyGetList <- function(x, FUN, cor = FALSE, alignBy = NULL, alignPeriod = NULL
 #' 
 #' Rousseeuw, P. and Molenberghs, G. (1993). Transformation of non positive semidefinite correlation matrices. \emph{Communications in Statistics - Theory and Methods}, 22, 965-984.
 #' 
-#' @author Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
+#' @author Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup.
 #' @keywords data manipulation
 #' @export
 makePsd <- function(S, method = "covariance") {
