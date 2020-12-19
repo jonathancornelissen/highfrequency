@@ -7,10 +7,27 @@
 listAvailableKernels()
 }
 \value{
-character vector
+a character vector.
 }
 \description{
 Returns a vector of the available kernels.
+}
+\details{
+The available kernels are: 
+\itemize{
+\item Rectangular: \eqn{K(x) = 1}.
+\item Bartlett: \eqn{K(x) = 1 - x}.
+\item Second-order: \eqn{K(x) = 1 - 2x - x^2}.
+\item Epanechnikov: \eqn{K(x) = 1 - x^2}.
+\item Cubic: \eqn{K(x) = 1 - 3 x^2 + 2 x^3}.
+\item Fifth: \eqn{K(x) = 1 - 10 x^3 + 15 x^4 - 6 x^5}.
+\item Sixth: \eqn{K(x) = 1 - 15 x^4 + 24 x^5 - 10 x^6}
+\item Seventh: \eqn{K(x) = 1 - 21 x^5 + 35 x^6 - 15 x^7}.
+\item Eighth: \eqn{K(x) = 1 - 28 x^6 + 48 x^7 - 21 x^8}.
+\item Parzen: \eqn{K(x) = 1- 6 x^2 + 6 x^3} if \eqn{k \leq 0.5} and \eqn{K(x) = 2 (1-x)^3} if \eqn{k > 0.5}.
+\item TukeyHanning: \eqn{K(x) = 1 + \sin(\pi/2 - \pi \cdot x))/2}.
+\item ModifiedTukeyHanning: \eqn{K(x) = (1 - \sin(\pi/2 - \pi \ (1 - x)^2 ) / 2}.
+}
 }
 \examples{
 listAvailableKernels
@@ -19,6 +36,6 @@ listAvailableKernels
 Barndorff-Nielsen, O. E., Hansen, P. R., Lunde, A., and Shephard, N. (2008). Designing realized kernels to measure the ex post variation of equity prices in the presence of noise. \emph{Econometrica}, 76, 1481-1536.
 }
 \author{
-Scott Payseur
+Scott Payseur.
 }
 \keyword{volatility}

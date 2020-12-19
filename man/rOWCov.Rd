@@ -55,8 +55,8 @@ an \eqn{N x N} matrix
 \description{
 Calculate the Realized Outlyingness Weighted Covariance, defined in Boudt et al. (2008).
 
-Let \eqn{r_{t,i}}, for \eqn{i=1,...,M} be a sample
-of \eqn{M} high-frequency \eqn{(N x 1)} return vectors and \eqn{d_{t,i}}
+Let \eqn{r_{t,i}}, for \eqn{i = 1,..., M} be a sample
+of \eqn{M} high-frequency \eqn{(N \times 1)} return vectors and \eqn{d_{t,i}}
 their outlyingness given by the squared Mahalanobis distance between
 the return vector and zero in terms of the reweighted MCD covariance
 estimate based on these returns.
@@ -71,14 +71,14 @@ The scalar \eqn{c_{w}} is a correction factor ensuring consistency of the rOWCov
 under the Brownian Semimartingale with Finite Activity Jumps model.
 }
 \details{
-Advantages of the rOWCov compared to the \code{\link{rBPCov}} include a higher statistical efficiency, positive semidefiniteness and affine equivariance.
+Advantages of the rOWCov compared to the \code{\link{rBPCov}} include a higher statistical efficiency, positive semi-definiteness and affine equi-variance.
 However, the rOWCov suffers from a curse of dimensionality.
 The rOWCov gives a zero weight to a return vector
 if at least one of the components is affected by a jump.
 In the case of independent jump occurrences, the average proportion of observations
 with at least one component being affected by jumps increases fast with the dimension
 of the series. This means that a potentially large proportion of the returns receives
-a zero weight, due to which the rOWCov can have a low finite sample efficiency in higher dimensions
+a zero weight, due to which the rOWCov can have a low finite sample efficiency in higher dimensions.
 }
 \examples{
 \dontrun{
@@ -99,9 +99,9 @@ rowc
 
 }
 \references{
-Boudt, K., Croux, C., and Laurent, S. (2008). Outlyingness weighted covariation. \emph{Journal of Financial Econometrics}, 9, 657–684
+Boudt, K., Croux, C., and Laurent, S. (2008). Outlyingness weighted covariation. \emph{Journal of Financial Econometrics}, 9, 657–684.
 }
 \author{
-Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
+Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup.
 }
 \keyword{volatility}

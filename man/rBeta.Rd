@@ -19,7 +19,8 @@ rBeta(
 
 \item{RCOVestimator}{can be chosen among realized covariance estimators: \code{"rCov"}, \code{"rAVGCov"}, \code{"rBPCov"}, \code{"rHYCov"}, \code{"rKernelCov"}, \code{"rOWCov"}, \code{"rRTSCov"}, \code{"rThresholdCov"} and \code{"rTSCov"} \code{"rCov"} by default.}
 
-\item{RVestimator}{can be chosen among realized variance estimators: \code{"RV"}, \code{"rMinRV"} and \code{"rMedRV"}. \code{"RV"} by default. In case of missing \code{RVestimator}, \code{RCOVestimator} function applying for \code{rIndex} will be used.}
+\item{RVestimator}{can be chosen among realized variance estimators: \code{"RV"}, \code{"rMinRV"} and \code{"rMedRV"}. \code{"RV"} by default. 
+In case of missing \code{RVestimator}, \code{RCOVestimator} function applying for \code{rIndex} will be used.}
 
 \item{makeReturns}{boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.}
 }
@@ -27,7 +28,8 @@ rBeta(
 numeric
 }
 \description{
-Depending on users' choices of estimator (realized covariance (RCOVestimator) and realized variance (RVestimator)), the function returns the realized beta, defined as the ratio between both.
+Depending on users' choices of estimator (realized covariance (RCOVestimator) and realized variance (RVestimator)), 
+the function returns the realized beta, defined as the ratio between both.
 
 The realized beta is given by
 \deqn{
@@ -36,21 +38,20 @@ The realized beta is given by
 
 in which
 
-\eqn{RCOVestimator:} Realized covariance of asset j and market index m.
+\eqn{RCOVestimator:} Realized covariance of asset j and market index \eqn{m}.
 
-\eqn{RVestimator:} Realized variance of market index m.
+\eqn{RVestimator:} Realized variance of market index \eqn{m}.
 }
 \details{
-Suppose there are \eqn{N} equispaced returns on day \eqn{t} for the asset j and the index m. Denote \eqn{r_{(j)i,t}}, \eqn{r_{(m)i,t}} as the \eqn{i}th return on day \eqn{t} for asset \eqn{j} and index \eqn{m} (with \eqn{i=1, \ldots,N}).
+Suppose there are \eqn{N} equispaced returns on day \eqn{t} for the asset \eqn{j} and the index \eqn{m}. 
+Denote \eqn{r_{(j)i,t}}, \eqn{r_{(m)i,t}} as the \eqn{i}th return on day \eqn{t} for asset \eqn{j} and index \eqn{m} (with \eqn{i=1, \ldots,N}).
 
 By default, the RCov is used and the realized beta coefficient is computed as:
 \deqn{
-\hat{\beta}_{(jm)t}= \frac{\sum_{i=1}^{N} r_{(j)i,t} r_{(m)i,t}}{\sum_{i=1}^{N} r_{(m)i,t}^2}
+\hat{\beta}_{(jm)t}= \frac{\sum_{i=1}^{N} r_{(j)i,t} r_{(m)i,t}}{\sum_{i=1}^{N} r_{(m)i,t}^2}.
 }
 
-(Barndorff & Shephard (2004)).
-
-Note: It is worth to note that the function does not support to calculate for data of multiple days.
+Note: The function does not support to calculate betas across multiple days.
 }
 \examples{
 \dontrun{

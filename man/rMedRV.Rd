@@ -18,15 +18,15 @@ based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to
 \item{makeReturns}{boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.}
 }
 \value{
-In case the input is an \code{xts} object with data from one day, a numeric of same length as the number of assets.
-If the input data spans multiple days and is in \code{xts} format, an \code{xts} will be returned.
-If the input data is a \code{data.table} object, the function returns a \code{data.table} with the same column names as the input data, containing the date and the realized measures
+\itemize{
+\item In case the input is an \code{xts} object with data from one day, a numeric of the same length as the number of assets.
+\item If the input data spans multiple days and is in \code{xts} format, an \code{xts} will be returned.
+\item If the input data is a \code{data.table} object, the function returns a \code{data.table} with the same column names as the input data, containing the date and the realized measures.
+}
 }
 \description{
-Calculate the rMedRV, defined in Andersen et al. (2012).
-
+Calculate the rMedRV, defined in Andersen et al. (2012). 
 Let \eqn{r_{t,i}} be a return (with \eqn{i=1,\ldots,M}) in period \eqn{t}.
-
 Then, the rMedRV is given by
 \deqn{
  \mbox{rMedRV}_{t}=\frac{\pi}{6-4\sqrt{3}+\pi}\left(\frac{M}{M-2}\right) \sum_{i=2}^{M-1} \mbox{med}(|r_{t,i-1}|,|r_{t,i}|, |r_{t,i+1}|)^2

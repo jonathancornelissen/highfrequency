@@ -29,8 +29,8 @@ based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to
 \item{makePsd}{boolean, in case it is \code{TRUE}, the positive definite version of rBPCov is returned. \code{FALSE} by default.}
 }
 \value{
-in case the input is and contains data from one day, an N by N matrix is returned. If the data is a univariate \code{xts} object with multiple days, an \code{xts} is returned.
-If the data is multivariate and contains multiple days (\code{xts} or \code{data.table}), the function returns a list containing N by N matrices. Each item in the list has a name which corresponds to the date for the matrix.
+in case the input is and contains data from one day, an \eqn{N} by \eqn{N} matrix is returned. If the data is a univariate \code{xts} object with multiple days, an \code{xts} is returned.
+If the data is multivariate and contains multiple days (\code{xts} or \code{data.table}), the function returns a list containing \eqn{N} by \eqn{N} matrices. Each item in the list has a name which corresponds to the date for the matrix.
 }
 \description{
 Calculate the Realized BiPower Covariance (rBPCov),
@@ -67,6 +67,6 @@ rbpc
 Barndorff-Nielsen, O. E., and Shephard, N. (2004). Measuring the impact of jumps in multivariate price processes using bipower covariation. Discussion paper, Nuffield College, Oxford University.
 }
 \author{
-Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
+Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup.
 }
 \keyword{volatility}

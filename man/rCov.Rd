@@ -48,7 +48,7 @@ rv = rCov(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes",
 rv
 
 # Multivariate:
-rc = rCov(rData = sampleOneMinuteData, makeReturns=TRUE)
+rc = rCov(rData = sampleOneMinuteData, makeReturns = TRUE)
 rc
 }
 \author{

@@ -7,7 +7,7 @@
 rMinRV(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE)
 }
 \arguments{
-\item{rData}{an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days}
+\item{rData}{an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days.}
 
 \item{alignBy}{character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
 To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.}
@@ -18,15 +18,15 @@ based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to
 \item{makeReturns}{boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.}
 }
 \value{
-In case the input is an \code{xts} object with data from one day, a numeric of same length as the number of assets.
-If the input data spans multiple days and is in \code{xts} format, an \code{xts} will be returned.
-If the input data is a \code{data.table} object, the function returns a \code{data.table} with the same column names as the input data, containing the date and the realized measures
+\itemize{
+\item In case the input is an \code{xts} object with data from one day, a numeric of the same length as the number of assets.
+\item If the input data spans multiple days and is in \code{xts} format, an \code{xts} will be returned.
+\item If the input data is a \code{data.table} object, the function returns a \code{data.table} with the same column names as the input data, containing the date and the realized measures.
+}
 }
 \description{
 Calculate the rMinRV, defined in Andersen et al. (2009).
-
 Let \eqn{r_{t,i}} be a return (with \eqn{i=1,\ldots,M}) in period \eqn{t}.
-
 Then, the rMinRV is given by
 \deqn{
 \mbox{rMinRV}_{t}=\frac{\pi}{\pi - 2}\left(\frac{M}{M-1}\right) \sum_{i=1}^{M-1} \mbox{min}(|r_{t,i}| ,|r_{t,i+1}|)^2
@@ -42,6 +42,6 @@ minrv
 Andersen, T. G., Dobrev, D., and Schaumburg, E. (2012). Jump-robust volatility estimation using nearest neighbor truncation. \emph{Journal of Econometrics}, 169, 75-93.
 }
 \author{
-Jonathan Cornelissen, Kris Boudt, Emil Sjoerup
+Jonathan Cornelissen, Kris Boudt, Emil Sjoerup.
 }
 \keyword{volatility}
