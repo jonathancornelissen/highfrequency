@@ -50,8 +50,9 @@ tqData <- matchTradesQuotes(sampleTData, sampleQData)
 tqData
 }
 \references{
-Vergote, O. (2005). How to match trades and quotes for NYSE stocks?
-K.U.Leuven working paper.
+Vergote, O. (2005). How to match trades and quotes for NYSE stocks? K.U.Leuven working paper.
+
+Christensen, K., Oomen, R. C. A., Podolskij, M. (2014): Fact or Friction: Jumps at ultra high frequency. \emph{Journal of Financial Economics}, 144, 576-599
 }
 \author{
 Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
