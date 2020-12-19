@@ -1,7 +1,42 @@
 #' driftBursts
 #'   Drift Bursts
 #' @description Calculates the Test-Statistic for the Drift Burst Hypothesis
-#'  
+#' 
+#' Let the efficient log-price be defined as:
+#' \deqn{
+#'     dX_{t} = \mu_{t}dt + \sigma_{t}dW_{t} + dJ_{t},
+#' }
+#' where \eqn{\mu_{t}}, \eqn{\sigma_{t}}, and \eqn{J_{t}} are the spot drift, the spot volatility, and a jump process respectively.
+#' However, due to microstructure noise, the observed log-price is 
+#' \deqn{
+#'     Y_{t} = X_{t} + \varepsilon_{t}
+#' }
+#' 
+#' In order robustify the results to the presence of market microstructure noise, the pre-averaged returns are used:#' 
+#' \deqn{
+#'     \Delta_{i}^{n}\overline{Y} = \sum_{j=1}^{k_{n}-1}g_{j}^{n}\Delta_{i+j}^{n}Y,
+#' }
+#'
+#' where \eqn{g(\cdot)} is a weighting function, \eqn{min(x, 1-x)}, and \eqn{k_{n}} is the pre-averaging horizon.
+#'
+#' The test statistic for the Drift Burst Hypothesis can then be calculated as
+#'
+#' \deqn{
+#'     \bar{T}_{t}^{n} = \sqrt{\frac{h_{n}}{K_{2}}}\frac{\hat{\bar{\mu}}_{t}^{n}}{\sqrt{\hat{\bar{\sigma}}_{t}^{n}}},
+#' }
+#' where
+#' \deqn{
+#'     \hat{\bar{\mu}}_{t}^{n} = \frac{1}{h_{n}}\sum_{i=1}^{n-k_{n}+2}K\left(\frac{t_{i-1}-t}{h_{n}}\right)\Delta_{i-1}^{n}\overline{Y},
+#' }
+#' and
+#' \deqn{
+#'     \hat{\bar{\sigma}}_{t}^{n} = \frac{1}{h_{n}'}\left[\sum_{i=1}^{n-k_{n}+2}\left(K\left(\frac{t_{i-1}-t}{h'_{n}}\right)\Delta_{i-1}^{n}\overline{Y}\right)^{2}+2\sum_{L=1}^{L_{n}}\omega\left(\frac{L}{L_{n}}\right)\sum_{i=1}^{n-k_{n}-L+2}K\left(\frac{t_{i-1}-t}{h_{n}'}\right)K\left(\frac{t_{i+L-1}-t}{h_{n}'}\right)\Delta_{i-1}^{n}\overline{Y}\Delta_{i-1+L}^{n}\overline{Y}\right],
+#' }
+#' where \eqn{\omega(\cdot)} is a smooth kernel function, in this case the Parzen kernel. \eqn{L_{n}} is the lag length for adjusting for auto-correlation and \eqn{K(\cdot)}
+#' is a kernel weighting function, which in this case is the left-sided exponential kernel. 
+#' 
+#' 
+#' 
 #' @param pData Either a \code{data.table} or an \code{xts} object. If pData is a data.table, columns DT and PRICE must be present, containing timestamps of the trades and the price of the 
 #' trades (in levels) respectively. If pData is an \code{xts} object and the number of columns is greater than one, PRICE must be present.
 #' @param testTimes A \code{numeric} containing the times at which to calculate the tests. The standard of \code{seq(34260, 57600, 60)} 

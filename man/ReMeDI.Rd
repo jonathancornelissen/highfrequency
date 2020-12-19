@@ -2,8 +2,7 @@
 % Please edit documentation in R/realizedMeasures.R
 \name{ReMeDI}
 \alias{ReMeDI}
-\title{ReMeDI
-This function estimates the auto-covariance of market-microstructure noise}
+\title{ReMeDI}
 \usage{
 ReMeDI(pData, kn = 1, lags = 1, knEqual = FALSE, makeCorrelation = FALSE)
 }
@@ -19,15 +18,22 @@ ReMeDI(pData, kn = 1, lags = 1, knEqual = FALSE, makeCorrelation = FALSE)
 \item{makeCorrelation}{logical indicating whether to transform the autocovariances into autocorrelations. The estimate of variance is imprecise and thus, constructing the correlation like this may show correlations that fall outside (-1,1)}
 }
 \description{
-ReMeDI
 This function estimates the auto-covariance of market-microstructure noise
+
+Let the observed price \eqn{Y_{t}} be given as \eqn{Y_{t} = X_{t} + \varepsilon_{t}}, where \eqn{X_{t}} is the efficient price and \eqn{\varepsilon_t} is the market microstructure noise
+
+The estimator of the \eqn{l}'th lag of the market microstructure is defined as:
+\deqn{
+    \hat{R}^{n}_{t,l} = \frac{1}{n_{t}} \sum_{i=2k_{n}}^{n_{t}-k_{n}-l} \left(Y_{i+l}^n - Y_{i+l+k_{n}}^{n} \right) \left(Y_{i}^n - Y_{i- 2k_{n}}^{n} \right),
+}
+where \eqn{k_{n}} is a tuning parameter. In the function \code{\link{knChooseReMeDI}}, we provide a function to estimate the optimal \eqn{k_{n}} parameter.
 }
 \note{
 We Thank Merrick Li for contributing his Matlab code for this estimator.
 }
 \examples{
 remed <- ReMeDI(sampleTData[as.Date(DT) == "2018-01-02", ], kn = 2, lags = 1:8)
-# We can also use the algorithm for choosing the kn to
+# We can also use the algorithm for choosing the kn tuning parameter
 optimalKn <- knChooseReMeDI(sampleTData[as.Date(DT) == "2018-01-02",],
                             knMax = 10, tol = 0.05, size = 3,
                             lower = 2, upper = 5, plot = TRUE)

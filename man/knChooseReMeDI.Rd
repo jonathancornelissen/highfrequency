@@ -2,8 +2,7 @@
 % Please edit documentation in R/realizedMeasures.R
 \name{knChooseReMeDI}
 \alias{knChooseReMeDI}
-\title{ReMeDI tuning parameter
-function to choose the tuning parameter, kn in ReMeDI estimation}
+\title{ReMeDI tuning parameter}
 \usage{
 knChooseReMeDI(
   pData,
@@ -37,8 +36,13 @@ knChooseReMeDI(
 integer containing the optimal kn
 }
 \description{
-ReMeDI tuning parameter
-function to choose the tuning parameter, kn in ReMeDI estimation
+Function to choose the tuning parameter, kn in ReMeDI estimation. 
+
+The optimal parameter \code{kn} is the smallest value that where the criterion:
+\deqn{
+    SqErr(k_{n})^{n}_{t} = \left(\hat{R}^{n,k_{n}}_{t,0} - \hat{R}^{n,k_{n}}_{t,1} - \hat{R}^{n,k_{n}}_{t,2} + \hat{R}^{n,k_{n}}_{t,3} - \hat{R}^{n, k_{n}}_{t,l}\right)^{2}
+}
+is perceived to be zero. The tuning parameter \code{tol} can be set to choose the tolerance of the perception of 'close to zero', a higher tolerance will lead to a higher optimal value.
 }
 \details{
 This is the algorithm B.2 in the appendix of the Li and Linton (2019) working paper
@@ -53,7 +57,7 @@ optimalKn <- knChooseReMeDI(sampleTData[as.Date(DT) == "2018-01-02",],
 optimalKn
 \dontrun{
 # We can also have a much larger search-space
-optimalKn <- knChooseReMeDI(sampleTData[as.Date(DT) == "2018-01-02",],
+optimalKn <- knChooseReMeDI(sampleTDataEurope,
                             knMax = 50, tol = 0.05,
                             size = 3, lower = 2, upper = 5, plot = TRUE)
 optimalKn

@@ -3089,7 +3089,16 @@ listCholCovEstimators <- function(){
 
 #
 #' ReMeDI
+#' @description 
 #' This function estimates the auto-covariance of market-microstructure noise
+#'
+#' Let the observed price \eqn{Y_{t}} be given as \eqn{Y_{t} = X_{t} + \varepsilon_{t}}, where \eqn{X_{t}} is the efficient price and \eqn{\varepsilon_t} is the market microstructure noise
+#' 
+#' The estimator of the \eqn{l}'th lag of the market microstructure is defined as:
+#' \deqn{
+#'     \hat{R}^{n}_{t,l} = \frac{1}{n_{t}} \sum_{i=2k_{n}}^{n_{t}-k_{n}-l} \left(Y_{i+l}^n - Y_{i+l+k_{n}}^{n} \right) \left(Y_{i}^n - Y_{i- 2k_{n}}^{n} \right),
+#' }
+#' where \eqn{k_{n}} is a tuning parameter. In the function \code{\link{knChooseReMeDI}}, we provide a function to estimate the optimal \eqn{k_{n}} parameter.
 #'
 #' @param pData \code{xts} or \code{data.table} containing the log-prices of the asset
 #' @param kn numeric of length 1 determining the tuning parameter kn this controls the lengths of the non-overlapping interval in the ReMeDI estimation
@@ -3102,7 +3111,7 @@ listCholCovEstimators <- function(){
 #' @note We Thank Merrick Li for contributing his Matlab code for this estimator.
 #' @examples
 #' remed <- ReMeDI(sampleTData[as.Date(DT) == "2018-01-02", ], kn = 2, lags = 1:8)
-#' # We can also use the algorithm for choosing the kn to
+#' # We can also use the algorithm for choosing the kn tuning parameter
 #' optimalKn <- knChooseReMeDI(sampleTData[as.Date(DT) == "2018-01-02",],
 #'                             knMax = 10, tol = 0.05, size = 3,
 #'                             lower = 2, upper = 5, plot = TRUE)
@@ -3268,8 +3277,14 @@ ReMeDI <- function(pData, kn = 1, lags = 1, knEqual = FALSE,
 
 
 #' ReMeDI tuning parameter
-#' function to choose the tuning parameter, kn in ReMeDI estimation
-#'
+#' @description 
+#' Function to choose the tuning parameter, kn in ReMeDI estimation. 
+#' 
+#' The optimal parameter \code{kn} is the smallest value that where the criterion:
+#' \deqn{
+#'     SqErr(k_{n})^{n}_{t} = \left(\hat{R}^{n,k_{n}}_{t,0} - \hat{R}^{n,k_{n}}_{t,1} - \hat{R}^{n,k_{n}}_{t,2} + \hat{R}^{n,k_{n}}_{t,3} - \hat{R}^{n, k_{n}}_{t,l}\right)^{2}
+#' }
+#' is perceived to be zero. The tuning parameter \code{tol} can be set to choose the tolerance of the perception of 'close to zero', a higher tolerance will lead to a higher optimal value.
 #' @param pData \code{xts} or \code{data.table} containing the log-prices of the asset.
 #' @param knEqual Use an altered version of the ReMeDI estimator, where we instead use equal \code{kn}, instead of \code{kn} and \code{2*kn} for the windows. See Figure 1 of paper in reference section.
 #' @param knMax max value of \code{kn} to be considered
@@ -3287,7 +3302,7 @@ ReMeDI <- function(pData, kn = 1, lags = 1, knEqual = FALSE,
 #' optimalKn
 #' \dontrun{
 #' # We can also have a much larger search-space
-#' optimalKn <- knChooseReMeDI(sampleTData[as.Date(DT) == "2018-01-02",],
+#' optimalKn <- knChooseReMeDI(sampleTDataEurope,
 #'                             knMax = 50, tol = 0.05,
 #'                             size = 3, lower = 2, upper = 5, plot = TRUE)
 #' optimalKn
