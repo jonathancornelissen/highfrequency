@@ -44,7 +44,7 @@ remed <- ReMeDI(sampleTData[as.Date(DT) == "2018-01-02", ], kn = optimalKn, lags
 Li, M. and Linton, O. (2019). A ReMeDI for microstructure noise. Cambridge Working Papers in Economics 1908.
 }
 \author{
-Emil Sjoerup
+Emil Sjoerup.
 }
 \keyword{autocorrelation}
 \keyword{autocovariance}

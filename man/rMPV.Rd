@@ -34,22 +34,20 @@ numeric
 \description{
 Calculate the rMPV, defined in Andersen et al. (2012).
 
-  Assume there is \eqn{N} equispaced returns in period \eqn{t}. Let \eqn{r_{t,i}} be a return (with \eqn{i=1, \ldots,N}) in period \eqn{t}.
-
-  Then, the rMPV is given by
+Assume there are \eqn{N} equispaced returns \eqn{r_{t,i}} in period \eqn{t}, \eqn{i=1, \ldots,N}. Then, the rMPV is given by
   \deqn{
     \mbox{rMPV}_{N}(m,p)= d_{m,p} \frac{N^{p/2}}{N-m+1} \sum_{i=1}^{N-m+1}|r_{t,i}|^{p/m} \ldots |r_{t,i+m-1}|^{p/m}
   }
 
-  in which
+in which
 
-  \eqn{d_{m,p} = \mu_{p/m}^{-m}}:
+\eqn{d_{m,p} = \mu_{p/m}^{-m}}:
 
-    \eqn{m}: the window size of return blocks;
+\eqn{m}: the window size of return blocks;
 
-  \eqn{p}: the power of the variation;
+\eqn{p}: the power of the variation;
 
-  and \eqn{m} > \eqn{p/2}.
+and \eqn{m} > \eqn{p/2}.
 }
 \examples{
 mpv <- rMPV(sampleTData[, list(DT, PRICE)], m = 2, p = 3, alignBy = "minutes",
@@ -60,7 +58,7 @@ mpv
 Andersen, T. G., Dobrev, D., and Schaumburg, E. (2012). Jump-robust volatility estimation using nearest neighbor truncation. \emph{Journal of Econometrics}, 169, 75-93.
 }
 \author{
-Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
+Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup.
 }
 \keyword{highfrequency}
 \keyword{rMPV}

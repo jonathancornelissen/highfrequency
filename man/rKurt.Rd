@@ -7,7 +7,7 @@
 rKurt(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE)
 }
 \arguments{
-\item{rData}{an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days}
+\item{rData}{an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days.}
 
 \item{alignBy}{character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
 To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.}
@@ -18,21 +18,20 @@ based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to
 \item{makeReturns}{boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.}
 }
 \value{
-In case the input is an \code{xts} object with data from one day, a numeric of same length as the number of assets.
-If the input data spans multiple days and is in \code{xts} format, an \code{xts} will be returned.
-If the input data is a \code{data.table} object, the function returns a \code{data.table} with the same column names as the input data, containing the date and the realized measures
+\itemize{
+\item In case the input is an \code{xts} object with data from one day, a numeric of the same length as the number of assets.
+\item If the input data spans multiple days and is in \code{xts} format, an \code{xts} will be returned.
+\item If the input data is a \code{data.table} object, the function returns a \code{data.table} with the same column names as the input data, containing the date and the realized measures.
+}
 }
 \description{
-Calculate the Realized kurtosis, defined in Amaya et al. (2011).
-}
-\details{
-Assume there is \eqn{N} equispaced returns in period \eqn{t}. Let \eqn{r_{t,i}} be a return (with \eqn{i=1, \ldots,N}) in period \eqn{t}.
+Calculate the realized kurtosis as defined in Amaya et al. (2015).
 
-Then, the rKurt is given by
+Assume there are \eqn{N} equispaced returns in period \eqn{t}. Let \eqn{r_{t,i}} be a return (with \eqn{i=1, \ldots,N}) in period \eqn{t}.
+Then, \code{rKurt} is given by
 \deqn{
-  \mbox{rKurt}_{t}= \frac{N \sum_{i=1}^{N}(r_{t,i})^4}{RV_{t}^2}
+  \mbox{rKurt}_{t} = \frac{N \sum_{i=1}^{N}(r_{t,i})^4}{\left( \sum_{i=1}^N r_{t,i}^2 \right)^2}.
   }
- in which \eqn{RV_t:} realized variance
 }
 \examples{
 rk <- rKurt(sampleTData[, list(DT, PRICE)], alignBy = "minutes",
@@ -43,7 +42,7 @@ rk
 Amaya, D., Christoffersen, P., Jacobs, K., and Vasquez, A. (2015). Does realized skewness and kurtosis predict the cross-section of equity returns? \emph{Journal of Financial Economics}, 118, 135-167.
 }
 \author{
-Giang Nguyen, Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
+Giang Nguyen, Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
 }
 \keyword{highfrequency}
 \keyword{rKurt}

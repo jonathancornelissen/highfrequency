@@ -2,19 +2,19 @@
 % Please edit documentation in R/realizedMeasures.R
 \name{rMRC}
 \alias{rMRC}
-\title{Modulated Realized Covariance (rMRC): Return univariate or multivariate preaveraged estimator.}
+\title{Modulated realized covariance}
 \usage{
 rMRC(pData, pairwise = FALSE, makePsd = FALSE)
 }
 \arguments{
 \item{pData}{a list. Each list-item contains an \code{xts} object with the intraday price data of a stock.}
 
-\item{pairwise}{boolean, should be TRUE when refresh times are based on pairs of assets. FALSE by default.}
+\item{pairwise}{boolean, should be \code{TRUE} when refresh times are based on pairs of assets. \code{FALSE} by default.}
 
 \item{makePsd}{boolean, in case it is \code{TRUE}, the positive definite version of rMRC is returned. \code{FALSE} by default.}
 }
 \value{
-A \eqn{d x d} covariance matrix
+A \eqn{d \times d} covariance matrix.
 }
 \description{
 Calculate univariate or multivariate preaveraged estimator, as defined in Hautsch and Podolskij (2013).
@@ -68,7 +68,7 @@ An alternative is to slightly enlarge the bandwidth such that \eqn{\mbox{k}_{N} 
 \examples{
 \dontrun{
 library("xts")
-## Note that this ought to be tick-by-tick data and this example is only to show the usage!
+# Note that this ought to be tick-by-tick data and this example is only to show the usage.
 a <- list(as.xts(sampleOneMinuteData[as.Date(DT) == "2001-08-04", list(DT, MARKET)]),
           as.xts(sampleOneMinuteData[as.Date(DT) == "2001-08-04", list(DT, STOCK)]))
 rMRC(a, pairwise = TRUE, makePsd = TRUE)
