@@ -7,12 +7,12 @@
 rSV(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, ...)
 }
 \arguments{
-\item{rData}{an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days}
+\item{rData}{an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days.}
 
 \item{alignBy}{character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
 To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.}
 
-\item{alignPeriod}{positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
+\item{alignPeriod}{positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate.
 based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.}
 
 \item{makeReturns}{boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.}
@@ -25,11 +25,16 @@ list with two entries, the realized positive and negative semivariances
 \description{
 Calculate the realized semivariances, defined in Barndorff-Nielsen et al. (2008).
 
-Function returns two outcomes: 1.Downside realized semivariance and 2.Upside realized semivariance.
+Function returns two outcomes: 
 
-Assume there is \eqn{N} equispaced returns in period \eqn{t}. Let \eqn{r_{t,i}} be a return (with \eqn{i=1, \ldots,N}) in period \eqn{t}.
+\enumerate{
+\item Downside realized semivariance 
+\item Upside realized semivariance.
+}
 
-Then, the rSV is given by
+Assume there are \eqn{N} equispaced returns \eqn{r_{t,i}} in period \eqn{t}, \eqn{i=1, \ldots,N}.
+
+Then, the \code{rSV} is given by
 \deqn{
   \mbox{rSVdownside}_{t}= \sum_{i=1}^{N} (r_{t,i})^2  \ \times \ I [ r_{t,i} <0 ]
 }

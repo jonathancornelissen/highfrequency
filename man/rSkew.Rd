@@ -18,22 +18,19 @@ based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to
 \item{makeReturns}{boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.}
 }
 \value{
-In case the input is an \code{xts} object with data from one day, a numeric of same length as the number of assets.
-If the input data spans multiple days and is in \code{xts} format, an \code{xts} will be returned.
-If the input data is a \code{data.table} object, the function returns a \code{data.table} with the same column names as the input data, containing the date and the realized measures
+\itemize{
+\item In case the input is an \code{xts} object with data from one day, a numeric of the same length as the number of assets.
+\item If the input data spans multiple days and is in \code{xts} format, an \code{xts} will be returned.
+\item If the input data is a \code{data.table} object, the function returns a \code{data.table} with the same column names as the input data, containing the date and the realized measures.
+}
 }
 \description{
-Calculate the Realized skewness, defined in Amaya et al. (2011).
+Calculate the Realized skewness, defined in Amaya et al. (2015).
 
-Assume there is \eqn{N} equispaced returns in period \eqn{t}. Let \eqn{r_{t,i}} be a return (with \eqn{i=1, \ldots,N}) in period \eqn{t}.
-
-Then, the rSkew is given by
+Assume there are \eqn{N} equispaced returns in period \eqn{t}. Let \eqn{r_{t,i}} be a return (with \eqn{i=1, \ldots,N}) in period \eqn{t}. Then, \code{rSkew} is given by
   \deqn{
-    \mbox{rSkew}_{t}= \frac{\sqrt{N} \sum_{i=1}^{N}(r_{t,i})^3}{RV_{t}^{3/2}}
+    \mbox{rSkew}_{t}= \frac{\sqrt{N} \sum_{i=1}^{N}(r_{t,i})^3}{\left(\sum r_{i,t}^2\right)^{3/2}}.
   }
-
-in which
-\eqn{RV_{t}:} realized variance
 }
 \examples{
 rs <- rSkew(sampleTData[, list(DT, PRICE)],alignBy ="minutes", alignPeriod =5,

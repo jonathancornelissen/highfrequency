@@ -2,7 +2,7 @@
 % Please edit documentation in R/realizedMeasures.R
 \name{rKernelCov}
 \alias{rKernelCov}
-\title{Realized Covariance: Kernel}
+\title{Realized kernel estimator}
 \usage{
 rKernelCov(
   rData,
@@ -12,40 +12,52 @@ rKernelCov(
   makeReturns = FALSE,
   kernelType = "rectangular",
   kernelParam = 1,
-  kernelDOFadj = TRUE,
-  ...
+  kernelDOFadj = TRUE
 )
 }
 \arguments{
 \item{rData}{an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days}
 
-\item{cor}{boolean, in case it is \code{TRUE}, and the input data is multivariate, the correlation is returned instead of the covariance matrix. \code{FALSE} by default.}
+\item{cor}{boolean, in case it is \code{TRUE}, and the input data is multivariate, the correlation is returned instead of the covariance matrix. 
+\code{FALSE} by default.}
 
-\item{alignBy}{character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}.
+\item{alignBy}{character, indicating the time scale in which \code{alignPeriod} is expressed. 
+Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}.
 To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.}
 
-\item{alignPeriod}{positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
+\item{alignPeriod}{positive numeric, indicating the number of periods to aggregate over. 
+For example, to aggregate
 based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.}
 
 \item{makeReturns}{boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.}
 
-\item{kernelType}{Kernel name (or number)}
+\item{kernelType}{Kernel name.}
 
-\item{kernelParam}{Kernel parameter (usually lags)}
+\item{kernelParam}{Kernel parameter.}
 
-\item{kernelDOFadj}{Kernel Degree of freedom adjustment}
-
-\item{...}{used internally, do not use.}
+\item{kernelDOFadj}{Kernel degree of freedom adjustment.}
 }
 \value{
-in case the input is and contains data from one day, an N by N matrix is returned. If the data is a univariate \code{xts} object with multiple days, an \code{xts} is returned.
-If the data is multivariate and contains multiple days (\code{xts} or \code{data.table}), the function returns a list containing N by N matrices. Each item in the list has a name which corresponds to the date for the matrix.
+in case the input is and contains data from one day, an \eqn{N} by \eqn{N} matrix is returned. 
+If the data is a univariate \code{xts} object with multiple days, an \code{xts} is returned.
+If the data is multivariate and contains multiple days (\code{xts} or \code{data.table}), the function returns a list containing \eqn{N} by \eqn{N} matrices. 
+Each item in the list has a name which corresponds to the date for the matrix.
 }
 \description{
-Realized covariance calculation using a kernel estimator.
+Realized covariance calculation using a kernel estimator. 
+The different types of kernels available can be found using \code{\link{listAvailableKernels}}.
 }
 \details{
-The different types of kernels can be found using \code{\link{listAvailableKernels}}.
+Let \eqn{r_{t,i}} be \eqn{N} returns in period \eqn{t}, \eqn{i = 1, \ldots, N}. The returns or prices 
+do not have to be equidistant. The kernel estimator for \eqn{H = \code{kernelParam}} is given by
+\deqn{
+\gamma_0 + 2 \sum_{h = 1}^H k \left(\frac{h-1}{H}\right) \gamma_h,
+}
+where \eqn{k(x)} is the chosen kernel function and 
+\deqn{
+\gamma_h = \sum_{i = h}^N r_{t,i} \times r_{t,i-h}
+}
+is the empirical autocovariance function. The multivariate version employs the cross-covariances instead.
 }
 \examples{
 # Univariate:
@@ -54,28 +66,18 @@ rvKernel <- rKernelCov(rData = sampleTData[, list(DT, PRICE)], alignBy = "minute
 rvKernel
 
 # Multivariate:
-\dontrun{
-library(xts)
-set.seed(123)
-start <- strptime("1970-01-01", format = "\%Y-\%m-\%d", tz = "UTC")
-timestamps <- start + seq(34200, 57600, length.out = 23401)
-
-dat <- cbind(rnorm(23401) * sqrt(1/23401), rnorm(23401) * sqrt(1/23401))
-
-dat <- exp(cumsum(xts(dat, timestamps)))
-rcKernel <- rKernelCov(rData = dat, alignBy = "minutes",
-                       alignPeriod = 5, makeReturns = TRUE)
+rcKernel <- rKernelCov(rData = sampleOneMinuteData, makeReturns = TRUE)
 rcKernel
-}
+
 }
 \references{
 Barndorff-Nielsen, O. E., Hansen, P. R., Lunde, A., and Shephard, N. (2008). Designing realized kernels to measure the ex post variation of equity prices in the presence of noise. \emph{Econometrica}, 76, 1481-1536.
 
-Zhou., B. (1996). High-frequency data and volatility in foreign-exchange rates. \emph{Journal of Business & Economic Statistics}, 14, 45-52.
-
 Hansen, P. and Lunde, A. (2006). Realized variance and market microstructure noise. \emph{Journal of Business and Economic Statistics}, 24, 127-218.
+
+Zhou., B. (1996). High-frequency data and volatility in foreign-exchange rates. \emph{Journal of Business & Economic Statistics}, 14, 45-52.
 }
 \author{
-Scott Payseur, Onno Kleen, and Emil Sjoerup
+Scott Payseur, Onno Kleen, and Emil Sjoerup.
 }
 \keyword{volatility}

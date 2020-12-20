@@ -22,26 +22,26 @@ of stock i for day t.}
 
 \item{cor}{boolean, in case it is \code{TRUE}, and the input data is multivariate, the correlation is returned instead of the covariance matrix. \code{FALSE} by default.}
 
-\item{K}{positive integer, slow time scale returns are computed on prices that are K steps apart.}
+\item{K}{positive integer, slow time scale returns are computed on prices that are \code{K} steps apart.}
 
-\item{J}{positive integer, fast time scale returns are computed on prices that are J steps apart.}
+\item{J}{positive integer, fast time scale returns are computed on prices that are \code{J} steps apart.}
 
-\item{KCov}{positive integer, for the extradiagonal covariance elements the slow time scale returns are computed on prices that are K steps apart.}
+\item{KCov}{positive integer, for the extradiagonal covariance elements the slow time scale returns are computed on prices that are \code{K} steps apart.}
 
-\item{JCov}{positive integer, for the extradiagonal covariance elements the fast time scale returns are computed on prices that are J steps apart.}
+\item{JCov}{positive integer, for the extradiagonal covariance elements the fast time scale returns are computed on prices that are \code{J} steps apart.}
 
-\item{KVar}{vector of positive integers, for the diagonal variance elements the slow time scale returns are computed on prices that are K steps apart.}
+\item{KVar}{vector of positive integers, for the diagonal variance elements the slow time scale returns are computed on prices that are \code{K} steps apart.}
 
-\item{JVar}{vector of positive integers, for the diagonal variance elements the fast time scale returns are computed on prices that are J steps apart.}
+\item{JVar}{vector of positive integers, for the diagonal variance elements the fast time scale returns are computed on prices that are \code{J} steps apart.}
 
-\item{makePsd}{boolean, in case it is \code{TRUE}, the positive definite version of rTSCov is returned. \code{FALSE} by default.}
+\item{makePsd}{boolean, in case it is \code{TRUE}, the positive definite version of \code{rTSCov} is returned. \code{FALSE} by default.}
 }
 \value{
 in case the input is and contains data from one day, an N by N matrix is returned. If the data is a univariate \code{xts} object with multiple days, an \code{xts} is returned.
 If the data is multivariate and contains multiple days (\code{xts} or \code{data.table}), the function returns a list containing N by N matrices. Each item in the list has a name which corresponds to the date for the matrix.
 }
 \description{
-Calculate the two time scale covariance matrix proposed in Zhang et al (2005) and Zhang (2010).
+Calculate the two time scale covariance matrix proposed in Zhang et al. (2005) and Zhang (2010).
 By the use of two time scales, this covariance estimate
 is robust to microstructure noise and non-synchronic trading.
 }

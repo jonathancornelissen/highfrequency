@@ -2,7 +2,7 @@
 % Please edit documentation in R/realizedMeasures.R
 \name{rAVGCov}
 \alias{rAVGCov}
-\title{Realized Covariance: Average Subsample}
+\title{Realized covariances via subsample averaging}
 \usage{
 rAVGCov(
   rData,
@@ -14,64 +14,68 @@ rAVGCov(
 )
 }
 \arguments{
-\item{rData}{an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days}
+\item{rData}{an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days.}
 
 \item{cor}{boolean, in case it is \code{TRUE}, and the input data is multivariate, the correlation is returned instead of the covariance matrix. \code{FALSE} by default.}
 
 \item{alignBy}{character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
-To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.}
+To aggregate based on a 5-minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.}
 
-\item{alignPeriod}{positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
-based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.}
+\item{alignPeriod}{positive numeric, indicating the number of periods to aggregate over. For example, to aggregate
+based on a 5-minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.}
 
-\item{k}{numeric denoting which horizon to use for the subsambles. This can be a fraction as long as k is a divisor of \code{alignPeriod} default is \code{1}}
+\item{k}{numeric denoting which horizon to use for the subsambles. This can be a fraction as long as \eqn{k} is a divisor of \code{alignPeriod} default is \code{1}.}
 
 \item{makeReturns}{boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.}
 }
 \value{
-in case the input is and contains data from one day, an N by N matrix is returned. If the data is a univariate \code{xts} object with multiple days, an \code{xts} is returned.
-If the data is multivariate and contains multiple days (\code{xts} or \code{data.table}), the function returns a list containing N by N matrices. Each item in the list has a name which corresponds to the date for the matrix.
+in case the input is and contains data from one day, an \eqn{N} by \eqn{N} matrix is returned. If the data is a univariate \code{xts} object with multiple days, an \code{xts} is returned.
+If the data is multivariate and contains multiple days (\code{xts} or \code{data.table}), the function returns a list containing \eqn{N} by \eqn{N} matrices. 
+Each item in the list has a name which corresponds to the date for the matrix.
 }
 \description{
-Realized Covariance using average subsample.
+Calculates realized variances via averaging across partially
+overlapping grids, first introduced by Zhang et al. (2005).
+This estimator is basically an average across different \code{\link{rCov}} estimates that start at
+different points in time, see details below.
+}
+\details{
+Suppose that in period \eqn{t}, there are \eqn{N} equispaced returns \eqn{r_{i,t}} 
+and let \eqn{\Delta} be equal to \code{alignPeriod}. For \eqn{\ i \geq \Delta}, 
+we define the subsampled \eqn{\Delta}-period return as
+\deqn{
+\tilde r_{t,i} = \sum_{k = 0}^{\Delta - 1} r_{t,i-k}, .
+}
+Now define \eqn{N^*(j) = N/\Delta} if \eqn{j = 0} and  \eqn{N^*(j) = N/\Delta - 1} otherwise.
+The \eqn{j}-th component of the \code{rAVGCov} estimator is given by
+\deqn{
+RV_t^j = \sum_{i = 1}^{N^*(j)} \tilde r_{t, j + i \cdot \Delta}^2.
+}
+Now taking the average across the different \eqn{RV_t^j, \ j = 0, \dots, \Delta-1,} defines the \code{rAVGCov} estimator.
+The multivariate version follows analogously.
+
+Note that Liu et al. (2015) show that \code{rAVGCov} is not only theoretically but also empirically a more reliable estimator than rCov.
 }
 \examples{
 # Average subsampled realized variance/covariance aligned at one minute returns at
-# 5 subgrids (5 minutes).
+# 5 sub-grids (5 minutes).
 
-# Univariate
-rvSub <- rAVGCov(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes",
-                 alignPeriod = 5, makeReturns = TRUE)
-rvSub
+# Univariate subsampled realized variance
+rvAvgSub <- rAVGCov(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes",
+                    makeReturns = TRUE)
+rvAvgSub
 
-\dontrun{
-# Multivariate:
-library(xts)
-set.seed(123)
-start <- strptime("1970-01-01", format = "\%Y-\%m-\%d", tz = "UTC")
-timestamps <- start + seq(34200, 57600, length.out = 23401)
+# Multivariate subsampled realized variance
+rvAvgCovSub <- rAVGCov(rData = sampleOneMinuteData[1:391], makeReturns = TRUE)
+rvAvgCovSub
 
-dat <- cbind(rnorm(23401) * sqrt(1/23401), rnorm(23401) * sqrt(1/23401))
-
-dat <- exp(cumsum(xts(dat, timestamps)))
-price1 <- dat[,1]
-price2 <- dat[,2]
-rcovSub <- rAVGCov(rData = cbind(price1, price2), alignBy = "minutes",
-                   alignPeriod = 5, makeReturns = TRUE)
-rcovSub
-
-# Multivariate with a 30 second fast aggregation and a 2.5 minute slow aggregation.
-rcovSub <- rAVGCov(rData = cbind(price1, price2),
-                   alignBy = "minutes", alignPeriod = 2.5, k = 0.5, makeReturns = TRUE)
-rcovSub
-}
 }
 \references{
-L. Zhang, P. A. Mykland, and Y. Ait-Sahalia (2005). A tale of two time scales: Determining integrated volatility with noisy high-frequency data. \emph{Journal of the American Statistical Association}, 100, 1394-1411.
+Liu, L. Y., Patton, A. J., Sheppard, K. (2015). Does anything beat 5-minute RV? A comparison of realized measures across multiple asset classes. \emph{Journal of Econometrics}, 187, 293-311.
 
-Pooter M. D., Martens M. and Dijk v D. (2008). Predicting the daily covariance matrix for S&P100 stocks using intraday data - but which frequency to use? \emph{Econometric Reviews}, 27, 199-229.
+Zhang, L., Mykland, P. A. , and Ait-Sahalia, Y. (2005). A tale of two time scales: Determining integrated volatility with noisy high-frequency data. \emph{Journal of the American Statistical Association}, 100, 1394-1411.
 }
 \author{
-Scott Payseur, Onno Kleen, and Emil Sjoerup
+Scott Payseur, Onno Kleen, and Emil Sjoerup.
 }
 \keyword{volatility}

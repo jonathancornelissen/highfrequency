@@ -21,25 +21,25 @@ rRTSCov(
 }
 \arguments{
 \item{pData}{a list. Each list-item i contains an \code{xts} object with the intraday price data
-of stock i for day t.}
+of stock \eqn{i} for day \eqn{t}.}
 
 \item{cor}{boolean, in case it is \code{TRUE}, and the input data is multivariate, the correlation is returned instead of the covariance matrix. \code{FALSE} by default.}
 
-\item{startIV}{vector containing the first step estimates of the integrated variance of the assets, needed in the truncation. Is NULL by default.}
+\item{startIV}{vector containing the first step estimates of the integrated variance of the assets, needed in the truncation. Is \code{NULL} by default.}
 
-\item{noisevar}{vector containing the estimates of the noise variance of the assets, needed in the truncation. Is NULL by default.}
+\item{noisevar}{vector containing the estimates of the noise variance of the assets, needed in the truncation. Is \code{NULL} by default.}
 
-\item{K}{positive integer, slow time scale returns are computed on prices that are K steps apart.}
+\item{K}{positive integer, slow time scale returns are computed on prices that are \code{K} steps apart.}
 
-\item{J}{positive integer, fast time scale returns are computed on prices that are J steps apart.}
+\item{J}{positive integer, fast time scale returns are computed on prices that are \code{J} steps apart.}
 
-\item{KCov}{positive integer, for the extradiagonal covariance elements the slow time scale returns are computed on prices that are K steps apart.}
+\item{KCov}{positive integer, for the extradiagonal covariance elements the slow time scale returns are computed on prices that are \code{K} steps apart.}
 
-\item{JCov}{positive integer, for the extradiagonal covariance elements the fast time scale returns are computed on prices that are J steps apart.}
+\item{JCov}{positive integer, for the extradiagonal covariance elements the fast time scale returns are computed on prices that are \code{J} steps apart.}
 
-\item{KVar}{vector of positive integers, for the diagonal variance elements the slow time scale returns are computed on prices that are K steps apart.}
+\item{KVar}{vector of positive integers, for the diagonal variance elements the slow time scale returns are computed on prices that are \code{K} steps apart.}
 
-\item{JVar}{vector of positive integers, for the diagonal variance elements the fast time scale returns are computed on prices that are J steps apart.}
+\item{JVar}{vector of positive integers, for the diagonal variance elements the fast time scale returns are computed on prices that are \code{J} steps apart.}
 
 \item{eta}{positive real number, squared standardized high-frequency returns that exceed eta are detected as jumps.}
 
@@ -50,7 +50,7 @@ an \eqn{N x N} matrix
 }
 \description{
 Calculate the robust two time scale covariance matrix proposed in Boudt and Zhang (2010).
-Unlike the \code{\link{rOWCov}}, but similarly to the \code{\link{rThresholdCov}}, the rRTSCov uses  univariate jump detection rules
+Unlike the \code{\link{rOWCov}}, but similarly to the \code{\link{rThresholdCov}}, the \code{rRTSCov} uses univariate jump detection rules
 to truncate the effect of jumps on the covariance
 estimate. By the use of two time scales, this covariance estimate
 is not only robust to price jumps, but also to microstructure noise and non-synchronic trading.
