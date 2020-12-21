@@ -2,7 +2,7 @@
 % Please edit documentation in R/realizedMeasures.R
 \name{rBeta}
 \alias{rBeta}
-\title{Realized beta: a tool in measuring risk with respect to the market.}
+\title{Realized beta}
 \usage{
 rBeta(
   rData,

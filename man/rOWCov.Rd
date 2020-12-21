@@ -2,7 +2,7 @@
 % Please edit documentation in R/realizedMeasures.R
 \name{rOWCov}
 \alias{rOWCov}
-\title{Realized Outlyingness Weighted Covariance}
+\title{Realized outlyingness weighted covariance}
 \usage{
 rOWCov(
   rData,
@@ -54,7 +54,7 @@ that determines the rejection threshold value
 an \eqn{N \times N} matrix
 }
 \description{
-Calculate the Realized Outlyingness Weighted Covariance, defined in Boudt et al. (2008).
+Calculate the Realized Outlyingness Weighted Covariance (rOWCov), defined in Boudt et al. (2008).
 
 Let \eqn{r_{t,i}}, for \eqn{i = 1,..., M} be a sample
 of \eqn{M} high-frequency \eqn{(N \times 1)} return vectors and \eqn{d_{t,i}}

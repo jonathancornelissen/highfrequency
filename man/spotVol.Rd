@@ -16,19 +16,20 @@ spotVol(
 )
 }
 \arguments{
-\item{data}{Can be one of two input types, \code{xts} or \code{data.table}. It is assumed that the input comprises prices in levels. Irregularly spaced
+\item{data}{Can be one of two input types, \code{xts} or \code{data.table}. 
+It is assumed that the input comprises prices in levels. Irregularly spaced
 observations are allowed. They will be aggregated to the level specified by
 parameters \code{alignBy} and \code{alignPeriod}.}
 
 \item{method}{specifies which method will be used to estimate the spot
 volatility. Options include \code{"detPer"} and \code{"stochper"}.
-See 'Details'.}
+See `Details'.}
 
 \item{alignBy}{string indicating the time scale in which \code{alignPeriod} is expressed.
 Possible values are: \code{"secs", "seconds", "mins", "minutes", "hours"}.}
 
 \item{alignPeriod}{positive integer, indicating the number of periods to aggregate
-over. E.g. to aggregate an \code{xts} object to the 5-minute frequency, set
+over. For example, to aggregate an \code{xts} object to the 5-minute frequency, set
 \code{alignPeriod = 5} and \code{alignBy = "minutes"}.}
 
 \item{marketOpen}{the market opening time. This should be in the time zone
@@ -41,13 +42,14 @@ specified by \code{tz}. By default, \code{marketClose = "16:00:00"}.}
 We attempt to extract the timezone from the DT column (or index) of the data, which may fail. 
 In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}}
 
-\item{...}{method-specific parameters (see 'Details').}
+\item{...}{method-specific parameters (see `Details' below).}
 }
 \value{
 A \code{spotVol} object, which is a list containing one or more of the
 following outputs, depending on the method used:
 
-\code{spot}
+\itemize{ 
+\item \code{spot}
 
 An \code{xts} or \code{matrix} object (depending on the input) containing
 spot volatility estimates \eqn{\sigma_{t,i}}, reported for each interval
@@ -61,7 +63,7 @@ estimates of the daily volatility levels for each day \eqn{t} in \code{data},
 if the used method decomposed spot volatility into a daily and an intraday
 component. Methods that provide this output: \code{"detPer"}.
 
-\code{periodic}
+\item \code{periodic}
 
 An \code{xts} or \code{numeric} object (depending on the input) containing
 estimates of the intraday periodicity factor for each day interval \eqn{i}
@@ -71,20 +73,20 @@ decomposed into a daily and an intraday component. If the output is in
 the input data, but it is identical for each day in the sample. Methods that
 provide this output: \code{"detPer"}.
 
-\code{par}
+\item \code{par}
 
 A named list containing parameter estimates, for methods that estimate one
 or more parameters. Methods that provide this output:
 \code{"stochper", "kernel"}.
 
-\code{cp}
+\item \code{cp}
 
 A vector containing the change points in the volatility, i.e. the observation
 indices after which the volatility level changed, according to the applied
 tests. The vector starts with a 0. Methods that provide this output:
  \code{"piecewise"}.
 
-\code{ugarchfit}
+\item \code{ugarchfit}
 
 A \code{ugarchfit} object, as used by the \code{rugarch}
 package, containing all output from fitting the GARCH model to the data.
@@ -93,16 +95,17 @@ Methods that provide this output: \code{"garch"}.
 The \code{spotVol} function offers several methods to estimate spot
 volatility and its intraday seasonality, using high-frequency data. It
 returns an object of class \code{spotVol}, which can contain various outputs,
-depending on the method used. See 'Details' for a description of each method.
+depending on the method used. See `Details' for a description of each method.
 In any case, the output will contain the spot volatility estimates.
 
 The input can consist of price data or return data, either tick by tick or
 sampled at set intervals. The data will be converted to equispaced
-high-frequency returns \eqn{r_{t,i}} (read: the \eqn{i}th return on day
+high-frequency returns \eqn{r_{t,i}} (read: the \eqn{i}-th return on day
                                      \eqn{t}).
 }
+}
 \description{
-Spot volatility estimation
+Estimates a wide variety of spot volatility estimators.
 }
 \details{
 The following estimation methods can be specified in \code{method}:
@@ -110,47 +113,74 @@ The following estimation methods can be specified in \code{method}:
 \strong{Deterministic periodicity method (\code{"detPer"})}
 
 Parameters:
-  \itemize{
-   \item{\code{dailyvol}} {A string specifying the estimation method for the daily component \eqn{s_t}.
-   Possible values are \code{"bipower", "rv", "medrv"}. Default = \code{"bipower"}.}
-    \item{\code{periodicvol}} { A string specifying the estimation method for the component of intraday volatility,
-    that depends in a deterministic way on the intraday time at which the return is observed.
-     Possible values are \code{"TML", "SD", "WSD", "OLS"}. See Boudt et al. (2011) for details. Default = \code{"TML"}.}
-    \item{\code{P1}}  {A positive integer corresponding to the number of cosine terms used in the flexible Fourier
-    specification of the periodicity function, see Andersen et al. (1997) for details. Default = 5.}
-   \item{\code{P2}}{  Same as \code{P1}, but for the sine terms. Default = 5.}
-   \item{\code{dummies}}{  Boolean: in case it is \code{TRUE}, the parametric estimator of periodic standard deviation
-   specifies the periodicity function as the sum of dummy variables corresponding to each intraday period.
-   If it is \code{FALSE}, the parametric estimator uses the flexible Fourier specification. Default = \code{FALSE}.}
-}
-Outputs (see 'Value' for a full description of each component):
 \itemize{
-\item{\code{spot}}
-\item{\code{daily}}
-\item{\code{periodic}}
+\item \code{dailyvol} A string specifying the estimation method for the daily component \eqn{s_t}.
+Possible values are \code{"bipower", "rv", "medrv"}. \code{"bipower"} by default.
+\item \code{periodicvol} A string specifying the estimation method for the component of intraday volatility,
+that depends in a deterministic way on the intraday time at which the return is observed.
+Possible values are \code{"SD", "WSD", "TML", "OLS"}. See Boudt et al. (2011) for details. Default = \code{"TML"}.
+\item \code{P1} A positive integer corresponding to the number of cosine terms used in the flexible Fourier
+specification of the periodicity function, see Andersen et al. (1997) for details. Default = 5.
+\item \code{P2} Same as \code{P1}, but for the sine terms. Default = 5. 
+\item \code{dummies} Boolean: in case it is \code{TRUE}, the parametric estimator of periodic standard deviation
+specifies the periodicity function as the sum of dummy variables corresponding to each intraday period.
+If it is \code{FALSE}, the parametric estimator uses the flexible Fourier specification. Default is \code{FALSE}. 
 }
+
+Outputs (see `Value' for a full description of each component):
+\itemize{
+\item \code{spot}
+\item \code{daily}
+\item \code{periodic}
+}
+
+Let there be \eqn{T} days of \eqn{N} equally spaced and continuous returns \eqn{r_{i,t}}.
+In this setup returns are modeled as
+\deqn{
+r_{i,t} = f_i s_t u_{i,t}
+}
+with independent \eqn{u_{i,t} \sim \mathcal{N}(0,1)}.
 The spot volatility is decomposed into a deterministic periodic factor
 \eqn{f_{i}} (identical for every day in the sample) and a daily factor
-\eqn{s_{t}} (identical for all observations within a day). Both components
-are then estimated separately. For more details, see Taylor and Xu (1997)
+\eqn{s_{t}} (identical for all observations within a day). 
+Both components are then estimated separately, see Taylor and Xu (1997)
 and Andersen and Bollerslev (1997). The jump robust versions by Boudt et al.
 (2011) have also been implemented.
+
+If \code{periodicvol = "SD"}, we have
+\deqn{
+\hat f_i^{SD} = \frac{SD_i}{\sqrt{\frac{1}{\lfloor{\lambda / \Delta}\rfloor} \sum_{j = 1}^N SD_j^2}}
+}
+with \eqn{\Delta = 1 / N}, cross-daily averages \eqn{SD_i = \sqrt{1/T \sum_{i = t}^T r_{i,t}^2}}, 
+and \eqn{\lambda} being the length of the intraday time intervals.
+
+If \code{periodicvol = "WSD"}, we have another nonparametric estimator that is robust to jumps in contrast to
+\code{periodicvol = "SD"}. The definition of this estimator can be found in Boudt et al. (2011, Eqs. 2.9-2.12).
+
+The estimates when \code{periodicvol = "OLS"} and \code{periodicvol = "TML"} are based on the regression equation
+\deqn{
+\log \left| 1/T \sum_{t = 1}^T r_{i,t} \right| - c = \log f_i + \varepsilon_i
+}
+with \emph{i.i.d.} zero-mean error term \eqn{\varepsilon_i} and \eqn{c = -0.63518}. 
+\code{periodicvol = "OLS"} employs ordinary-least-squares estimation and 
+\code{periodicvol = "TML"} truncated maximum-likelihood estimation (see Boudt et al., 2011, Section 2.2).
 
 \strong{Stochastic periodicity method (\code{"stochper"})}
 Parameters:
 \itemize{
-\item{\code{P1}}{A positive integer corresponding to the number of cosine terms used in the flexible Fourier
+\item{\code{P1}: A positive integer corresponding to the number of cosine terms used in the flexible Fourier
  specification of the periodicity function. Default = 5. }
-\item{\code{P2}}{Same as \code{P1}, but for the sine terms. Default = 5.}
-\item{\code{init}}{A named list of initial values to be used in the optimization routine (\code{"BFGS"} in \code{optim}).
+\item{\code{P2}: Same as \code{P1}, but for the sine terms. Default = 5.}
+\item{\code{init}: A named list of initial values to be used in the optimization routine (\code{"BFGS"} in \code{optim}).
  Default = \code{list(sigma = 0.03, sigma_mu = 0.005, sigma_h = 0.005, sigma_k = 0.05,
   phi = 0.2, rho = 0.98, mu = c(2, -0.5), delta_c = rep(0, max(1,P1)),
 delta_s = rep(0, max(1,P2)))}. 
-See Beltratti & Morana (2001) for a definition of each parameter. \code{init} can contain any number of these parameters.
+The naming of the parameters follows Beltratti and Morana (2001), the corresponding model equations are listed below.
+\code{init} can contain any number of these parameters.
 For parameters not specified in \code{init}, the default initial value will be used.}
-\item{\code{control}}{A list of options to be passed down to \code{optim}.}
+\item{\code{control}: A list of options to be passed down to \code{optim}.}
 }
-Outputs (see 'Value' for a full description of each component):
+Outputs (see `Value' for a full description of each component):
 \itemize{
 \item{\code{spot}}
 \item{\code{par}}
@@ -162,6 +192,62 @@ a deterministic cyclical process. The model is estimated using a
 quasi-maximum likelihood method based on the Kalman Filter. The package
 \code{FKF} is used to apply the Kalman filter. In addition to
 the spot volatility estimates, all parameter estimates are returned.
+
+The model for the intraday change in the return series is given by
+
+\deqn{
+r_{t,n} = \sigma_{t,n} \varepsilon_{t,n}, \ t = 1, \dots, T; \ n = 1, \dots, N,
+}
+where \eqn{\sigma_{t,n}} is the conditional standard deviation of the \eqn{n}-th interval
+of day \eqn{t} and \eqn{\varepsilon_{t,n}} is a \emph{i.i.d.} mean-zero unit-variance process.
+The conditional standard deviations are modeled as
+\deqn{
+\sigma_{t,n} = \sigma \exp \left(\frac{\mu_{t,n} + h_{t,n} + c_{t,n}}{2} \right)
+}
+with \eqn{\sigma} being a scaling factor and \eqn{\mu_{t,n}} is the non-stationary volatility
+component
+\deqn{
+\mu_{t,n} = \mu_{t,n-1} + \xi_{t,n}
+}
+with independent \eqn{\xi_{t,n} \sim \mathcal{N}(0,\sigma_\xi^2)}. 
+\eqn{h_{t,n}} is the stochastic stationary acyclical volatility component
+\deqn{
+h_{t,n} = \phi h_{t,n-1} + \nu_{t,n} 
+}
+with independent \eqn{\eta_{t,n} \sim \mathcal{N}(0,\sigma_\eta^2)} and \eqn{| \phi | \leq 1}.
+The cyclical component is separated in two components:
+\deqn{
+c_{t,n} = c_{1,t,n} + c_{2,t,n}
+} 
+The first component is written in state-space form, 
+\deqn{
+\left( \begin{array}{r}
+c_{1,t,n} \\ c_{1,t,n}^*
+\end{array}\right) =
+\rho 
+\left(\begin{array}{rr}
+\cos \lambda & \sin \lambda \\ -\sin \lambda & \cos \lambda
+\end{array}\right)
+\left(\begin{array}{r}
+c_{1,t,n - 1} \\ c_{1,t,n-1}^*
+\end{array}\right)
++
+\left(\begin{array}{r}
+\kappa_{1,t,n} \\ \kappa_{1,t,n}^*
+\end{array}\right)
+}
+with \eqn{0 \leq \rho \leq 1} and \eqn{\kappa_{1,t,n}, \kappa_{1,t,n}^*} are 
+mutually independent zero-mean normal random variables with variance \eqn{\sigma_\kappa^2}.
+All other parameters and the process \eqn{c_{1,t,n}^*} in the state-space representation 
+are only of instrumental use and are not part of
+the return value which is why we won't introduce them in detail
+in this vignette; see Beltratti and Morana (2001, pp. 208-209) for more information.
+
+The second component is given by
+\deqn{
+c_{2,t,n} = \mu_1 n_1 + \mu_2 n_2 + \sum_{p = 2}^P (\delta_{cp} \cos(p\lambda) + \delta_{sp} \sin (p \lambda n))
+}
+with \eqn{n_1 = 2n / (N+1)} and \eqn{n_2 = 6n^2 / (N+1) / (N+2)}. 
 
 \strong{Nonparametric filtering (\code{"kernel"})}
 
@@ -178,15 +264,15 @@ values include \code{"cv", "quarticity"}. Method \code{"cv"} equals
 cross-validation, which chooses the bandwidth that minimizes the Integrated
 Square Error. \code{"quarticity"} multiplies the simple plug-in estimator
 by a factor based on the daily quarticity of the returns. \code{est} is
-obsolete if \code{h} has already been specified by the user. Default =
-\code{"cv"}.}
+obsolete if \code{h} has already been specified by the user.
+\code{"cv"} by default.}
 \item{\code{lower}}{Lower bound to be used in bandwidth optimization routine,
 when using cross-validation method. Default is \eqn{0.1n^{-0.2}}.}
 \item{\code{upper}}{Upper bound to be used in bandwidth optimization routine,
 when using cross-validation method. Default is \eqn{n^{-0.2}}.}
 }
 
-Outputs (see 'Value' for a full description of each component):
+Outputs (see `Value' for a full description of each component):
 \itemize{
 \item{\code{spot}}
 \item{\code{par}}
@@ -207,7 +293,7 @@ the estimation results are appropriate.
 One way to estimate \eqn{h}, is by using cross-validation. For each day in
 the sample, \eqn{h} is chosen as to minimize the Integrated Square Error,
 which is a function of \eqn{h}. However, this function often has multiple
-local minima, or no minima at all (\eqn{h -> \infty}). To ensure a reasonable
+local minima, or no minima at all (\eqn{h \rightarrow \infty}). To ensure a reasonable
 optimum is reached, strict boundaries have to be imposed on \eqn{h}. These
 can be specified by \code{lower} and \code{upper}, which by default are
 \eqn{0.1n^{-0.2}} and \eqn{n^{-0.2}} respectively, where \eqn{n} is the
@@ -216,40 +302,46 @@ number of observations in a day.
 When using the method \code{"kernel"}, in addition to the spot volatility
 estimates, all used values of the bandwidth \eqn{h} are returned.
 
+A formal definition of the estimator is too extensive for the context of this vignette.
+Please refer to Kristensen (2010) for more detailed information. Our parameter
+names are aligned with this reference.
+
 \strong{Piecewise constant volatility (\code{"piecewise"})}
 
 Parameters:
 \itemize{
-\item{\code{type}}{String specifying the type of test to be used. Options
+\item{\code{type} string specifying the type of test to be used. Options
 include \code{"MDa", "MDb", "DM"}. See Fried (2012) for details. Default = \code{"MDa"}.}
-\item{\code{m}}{Number of observations to include in reference window.
+\item{\code{m} number of observations to include in reference window.
 Default = \code{40}.}
-\item{\code{n}}{Number of observations to include in test window.
+\item{\code{n} number of observations to include in test window.
 Default = \code{20}.}
-\item{\code{alpha}}{Significance level to be used in tests. Note that the test
+\item{\code{alpha} significance level to be used in tests. Note that the test
 will be executed many times (roughly equal to the total number of
 observations), so it is advised to use a small value for \code{alpha}, to
 avoid a lot of false positives. Default = \code{0.005}.}
-\item{\code{volest}}{String specifying the realized volatility estimator to be
+\item{\code{volest} string specifying the realized volatility estimator to be
 used in local windows. Possible values are \code{"bipower", "rv", "medrv"}.
 Default = \code{"bipower"}.}
-\item{\code{online}}{Boolean indicating whether estimations at a certain point
+\item{\code{online} boolean indicating whether estimations at a certain point
 \eqn{t} should be done online (using only information available at
 \eqn{t-1}), or ex post (using all observations between two change points).
 Default = \code{TRUE}.}
 }
 
-Outputs (see 'Value' for a full description of each component):
+Outputs (see `Value' for a full description of each component):
 \itemize{
 \item{\code{spot}}
 \item{\code{cp}}
 }
 
-This nonparametric method by Fried (2012) assumes the volatility to be
+This nonparametric method by Fried (2012) is a two-step approach and 
+assumes the volatility to be
 piecewise constant over local windows. Robust two-sample tests are applied to
 detect changes in variability between subsequent windows. The spot volatility
 can then be estimated by evaluating regular realized volatility estimators
 within each local window.
+\code{"MDa", "MDb", "DM"} refer to different test statistics, see Section 2.2 in Fried (2012).
 
 Along with the spot volatility estimates, this method will return the
 detected change points in the volatility level. When plotting a
@@ -260,49 +352,61 @@ visualized.
 
 Parameters:
 \itemize{
-\item{\code{model}}{String specifying the type of test to be used. Options
+\item{\code{model} string specifying the type of test to be used. Options
 include \code{"sGARCH", "eGARCH"}. See \code{ugarchspec} in the
 \code{rugarch} package. Default = \code{"eGARCH"}.}
-\item{\code{garchorder}}{Numeric value of length 2, containing the order of
+\item{\code{garchorder} numeric value of length 2, containing the order of
 the GARCH model to be estimated. Default = \code{c(1,1)}.}
-\item{\code{dist}}{String specifying the distribution to be assumed on the
+\item{\code{dist} string specifying the distribution to be assumed on the
 innovations. See \code{distribution.model} in \code{ugarchspec} for
 possible options. Default = \code{"norm"}.}
-\item{\code{solver.control}}{List containing solver options.
+\item{\code{solver.control} list containing solver options.
 See \code{ugarchfit} for possible values. Default = \code{list()}.}
-\item{\code{P1}}{A positive integer corresponding to the number of cosine
+\item{\code{P1} a positive integer corresponding to the number of cosine
 terms used in the flexible Fourier specification of the periodicity function.
 Default = 5.}
-\item{\code{P2}}{Same as \code{P1}, but for the sinus terms. Default = 5.}
+\item{\code{P2} same as \code{P1}, but for the sinus terms. Default = 5.}
 }
 
-Outputs (see 'Value' for a full description of each component):
+Outputs (see `Value' for a full description of each component):
 \itemize{
 \item{\code{spot}}
 \item{\code{ugarchfit}}
 }
-This method generates the external regressors needed to model the intraday
-seasonality with a Flexible Fourier form. The \code{rugarch} package
-is then employed to estimate the specified GARCH(1,1) model.
 
 Along with the spot volatility estimates, this method will return the
 \code{ugarchfit} object used by the \code{rugarch} package.
 
+In this model, daily returns \eqn{r_t} based on intraday observations \eqn{r_{i,t}, i = 1, \dots, N}
+are modeled as
+\deqn{
+r_t = \sum_{i = 1}^N r_{i,t} = \sigma_t \frac{1}{\sqrt{N}} \sum_{i = 1}^N s_i Z_{i,t}.
+}
+
+The overall approach is as in Appendix B of Andersen and Bollerslev (1997).
+This method generates the external regressors \eqn{s_i} needed to model the intraday
+seasonality with a flexible fourier form (Andersen and Bollerslev, 1997, Eqs. A.1-A.4). 
+The \code{rugarch} package
+is then employed to estimate the specified GARCH(1,1) model on \eqn{r_{i,t} / s_i}.
+
 
 \strong{Realized Measures (\code{"RM"})}
 
+This estimator takes trailing rolling window observations of intraday returns to estimate the spot volatility.
+
 Parameters:
 \itemize{
-\item{\code{RM}}{String denoting which realized measure to use to estimate the local volatility. Possible values are: \code{"bipower", "medrv", "minrv", "rv"}
-Default = \code{"bipower"}}
-\item{\code{lookBackPeriod}}{positive integer denoting the amount of sub-sampled returns to use 
-for the estimation of the local volatility. Default is \code{10.}}
-\item{\code{dontIncludeLast}}{logical indicating whether to omit the last return in the calculation of the local volatility.
+\item{\code{RM} string denoting which realized measure to use to estimate the local volatility. 
+Possible values are: \code{"bipower", "medrv", "minrv", "rv"}.
+Default = \code{"bipower"}}.
+\item{\code{lookBackPeriod} positive integer denoting the amount of sub-sampled returns to use 
+for the estimation of the local volatility. Default is \code{10}.}
+\item{\code{dontIncludeLast} logical indicating whether to omit the last return in the calculation of the local volatility.
  This is done in Lee-Mykland (2008) to produce jump-robust estimates of spot volatility. 
- Setting this to \code{TRUE} will then use \code{lookBackPeriod - 1} returns in the construction of the realized measures. Default = \code{FALSE}}
+ Setting this to \code{TRUE} will then use \code{lookBackPeriod - 1} returns in the construction of the realized measures. Default = \code{FALSE}}.
 }
 
-Outputs (see 'Value' for a full description of each component):
+Outputs (see `Value' for a full description of each component):
 \itemize{
 \item{\code{spot}}
 \item{\code{RM}}
@@ -311,17 +415,20 @@ Outputs (see 'Value' for a full description of each component):
 
 This method returns the estimates of the spot volatility, a string containing the realized measure used, and the lookBackPeriod.
 
-
 \strong{(Non-overlapping) Pre-Averaged Realized Measures (\code{"PARM"})}
+
+This estimator takes rolling historical window observations of intraday returns to estimate the spot volatility 
+as in the option \code{"RM"} but adds return pre-averaging of the realized measures. 
+For a description of return pre-averaging see the details on \code{\link{spotDrift}.}
 
 Parameters:
 \itemize{
-\item{\code{RM}}{String denoting which realized measure to use to estimate the local volatility.
- Possible values are: "bipower", "medrv", "minrv", and "rv". Default = "BPV"}
-\item{\code{lookBackPeriod}}{positive integer denoting the amount of sub-sampled returns to use for the estimation of the local volatility. Default = 50.}
+\item{\code{RM} String denoting which realized measure to use to estimate the local volatility.
+ Possible values are: \code{"bipower", "medrv", "minrv", and "rv"}. Default = \code{"bipower"}}.
+\item{\code{lookBackPeriod} positive integer denoting the amount of sub-sampled returns to use for the estimation of the local volatility. Default = 50.}
 }
 
-Outputs (see 'Value' for a full description of each component):
+Outputs (see `Value' for a full description of each component):
 \itemize{
 \item{\code{spot}}
 \item{\code{RM}}
@@ -336,10 +443,10 @@ init <- list(sigma = 0.03, sigma_mu = 0.005, sigma_h = 0.007,
              delta_c = c(0.25, -0.05, -0.2, 0.13, 0.02),
              delta_s = c(-1.2, 0.11, 0.26, -0.03, 0.08))
 
-# Next method will take around 110 iterations
+# Next method will take around 360 iterations
 vol1 <- spotVol(sampleOneMinuteData[, list(DT, PRICE = MARKET)], method = "stochper", init = init)
 plot(as.numeric(vol1$spot[1:780]), type="l")
-legend("topright", c("detPer", "stochper"), col = c("black", "red"), lty=1)}
+legend("topright", c("stochper"), col = c("black"), lty=1)}
 
 # Various kernel estimates
 \dontrun{
@@ -368,7 +475,7 @@ vol6 <- spotVol(sampleOneMinuteData[, list(DT, PRICE = MARKET)], method = "garch
 vol7 <- spotVol(sampleOneMinuteData[, list(DT, PRICE = STOCK)], method = "garch", model = "eGARCH")
 plot(as.numeric(t(vol6$spot)), type = "l")
 lines(as.numeric(t(vol7$spot)), col = "red")
-legend("topleft", c("GARCH", "eGARCH"), col = c("black", "red"), lty=1)
+legend("topleft", c("GARCH", "eGARCH"), col = c("black", "red"), lty = 1)
 }
 
 }
@@ -384,4 +491,7 @@ Fried, R. (2012). On the online estimation of local constant volatilities. \emph
 Kristensen, D. (2010). Nonparametric filtering of the realized spot volatility: A kernel-based approach. \emph{Econometric Theory}, 26, 60-93.
 
 Taylor, S. J. and Xu, X. (1997). The incremental volatility information in one million foreign exchange quotations. \emph{Journal of Empirical Finance}, 4, 317-340.
+}
+\author{
+Jonathan Cornelissen, Kris Boudt, and Emil Sjorup.
 }

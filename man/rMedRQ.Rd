@@ -2,7 +2,7 @@
 % Please edit documentation in R/realizedMeasures.R
 \name{rMedRQ}
 \alias{rMedRQ}
-\title{An estimator of integrated quarticity from applying the median operator on blocks of three returns.}
+\title{An estimator of integrated quarticity from applying the median operator on blocks of three returns}
 \usage{
 rMedRQ(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE)
 }

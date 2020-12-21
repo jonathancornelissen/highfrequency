@@ -2,7 +2,7 @@
 % Please edit documentation in R/realizedMeasures.R
 \name{rSkew}
 \alias{rSkew}
-\title{Realized skewness of highfrequency return series.}
+\title{Realized skewness}
 \usage{
 rSkew(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE)
 }
@@ -25,7 +25,7 @@ based on a 5-minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "m
 }
 }
 \description{
-Calculate the Realized skewness, defined in Amaya et al. (2015).
+Calculate the realized skewness, defined in Amaya et al. (2015).
 
 Assume there are \eqn{N} equispaced returns in period \eqn{t}. Let \eqn{r_{t,i}} be a return (with \eqn{i=1, \ldots,N}) in period \eqn{t}. Then, \code{rSkew} is given by
   \deqn{

@@ -2545,7 +2545,7 @@ rQPVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
     q <- rollApplyProdWrapper(q, 4)
     #q <- rollapply(q, width = 4, FUN = prod, align = "left")
     N <- nrow(q) + 3
-    rQPVar <- N* (N / (N-3)) * (pi^2 / 4) * colSums(q)
+    rQPVar <- N * (N / (N-3)) * (pi^2 / 4) * colSums(q)
     return(rQPVar)
   }
 }

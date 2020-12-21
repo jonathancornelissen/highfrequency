@@ -2,7 +2,7 @@
 % Please edit documentation in R/realizedMeasures.R
 \name{rSemiCov}
 \alias{rSemiCov}
-\title{Realized Semicovariance}
+\title{Realized semicovariance}
 \usage{
 rSemiCov(
   rData,
@@ -47,8 +47,8 @@ Then, the realized semicovariance is given by the following three matrices:
 }
 
 The mixed covariance matrix will have 0 on the diagonal.
-From these three matrices, the realized covariance can be constructed as pos + neg + mixed.
-The concordant semicovariance matrix is pos + neg.
+From these three matrices, the realized covariance can be constructed as \eqn{pos + neg + mixed}.
+The concordant semicovariance matrix is \eqn{pos + neg}.
 The off-diagonals of the concordant matrix is always positive, while for the mixed matrix, it is always negative.
 }
 \details{

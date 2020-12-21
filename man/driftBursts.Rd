@@ -2,8 +2,7 @@
 % Please edit documentation in R/driftBursts.R
 \name{driftBursts}
 \alias{driftBursts}
-\title{driftBursts
-  Drift Bursts}
+\title{Inference on drift burst hypothesis}
 \usage{
 driftBursts(
   pData,
@@ -49,7 +48,7 @@ Objects of class \code{DBH} has the methods \code{\link{print.DBH}}, \code{\link
 retrieves critical values for the test described in appendix B
 }
 \description{
-Calculates the Test-Statistic for the Drift Burst Hypothesis
+Calculates the test-statistic for the drift burst hypothesis
 
 Let the efficient log-price be defined as:
 \deqn{

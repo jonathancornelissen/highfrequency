@@ -1,6 +1,6 @@
-#' driftBursts
-#'   Drift Bursts
-#' @description Calculates the Test-Statistic for the Drift Burst Hypothesis
+#' Inference on drift burst hypothesis
+#' 
+#' @description Calculates the test-statistic for the drift burst hypothesis
 #' 
 #' Let the efficient log-price be defined as:
 #' \deqn{
@@ -486,6 +486,7 @@ print.DBH = function(x, ...){
 
 
 #' Get critical value for the drift burst hypothesis t-statistic
+#' 
 #' @description Method for DBH objects to calculate the critical value for the presence of a burst of drift.
 #' The critical value is that of the test described in appendix B in Christensen Oomen Reno
 #' @param x object of class \code{DBH}

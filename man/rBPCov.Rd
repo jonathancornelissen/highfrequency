@@ -2,7 +2,7 @@
 % Please edit documentation in R/realizedMeasures.R
 \name{rBPCov}
 \alias{rBPCov}
-\title{Realized BiPower Covariance}
+\title{Realized bipower covariance}
 \usage{
 rBPCov(
   rData,

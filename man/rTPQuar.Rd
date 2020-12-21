@@ -2,7 +2,7 @@
 % Please edit documentation in R/realizedMeasures.R
 \name{rTPQuar}
 \alias{rTPQuar}
-\title{Realized tri-power quarticity for a highfrequency return series.}
+\title{Realized tri-power quarticity}
 \usage{
 rTPQuar(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE)
 }

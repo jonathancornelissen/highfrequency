@@ -2,7 +2,7 @@
 % Please edit documentation in R/realizedMeasures.R
 \name{rQuar}
 \alias{rQuar}
-\title{Realized quarticity of highfrequency return series.}
+\title{Realized quarticity}
 \usage{
 rQuar(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE)
 }
@@ -24,7 +24,7 @@ based on a 5-minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "m
 }
 }
 \description{
-Calculate the rQuar, defined in Andersen et al. (2012).
+Calculate the realized quarticity (rQuar), defined in Andersen et al. (2012).
 
 Assume there are \eqn{N} equispaced returns \eqn{r_{t,i}} in period \eqn{t}, \eqn{i=1, \ldots,N}.
 

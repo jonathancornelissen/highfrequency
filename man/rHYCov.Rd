@@ -2,7 +2,7 @@
 % Please edit documentation in R/realizedMeasures.R
 \name{rHYCov}
 \alias{rHYCov}
-\title{Hayashi-Yoshida Covariance}
+\title{Hayashi-Yoshida covariance}
 \usage{
 rHYCov(
   rData,

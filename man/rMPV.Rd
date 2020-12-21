@@ -2,7 +2,7 @@
 % Please edit documentation in R/realizedMeasures.R
 \name{rMPV}
 \alias{rMPV}
-\title{Realized multipower variation (MPV), an estimator of integrated power variation.}
+\title{Realized multipower variation}
 \usage{
 rMPV(
   rData,
@@ -32,7 +32,7 @@ based on a 5-minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "m
 numeric
 }
 \description{
-Calculate the rMPV, defined in Andersen et al. (2012).
+Calculate the Realized Multipower Variation rMPV, defined in Andersen et al. (2012).
 
 Assume there are \eqn{N} equispaced returns \eqn{r_{t,i}} in period \eqn{t}, \eqn{i=1, \ldots,N}. Then, the rMPV is given by
   \deqn{

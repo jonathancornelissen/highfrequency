@@ -2,7 +2,7 @@
 % Please edit documentation in R/realizedMeasures.R
 \name{rCov}
 \alias{rCov}
-\title{Realized Covariance}
+\title{Realized covariance}
 \usage{
 rCov(
   rData,

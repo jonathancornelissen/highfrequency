@@ -2,7 +2,7 @@
 % Please edit documentation in R/realizedMeasures.R
 \name{rMinRQ}
 \alias{rMinRQ}
-\title{An estimator of integrated quarticity from applying the minimum operator on blocks of two returns.}
+\title{An estimator of integrated quarticity from applying the minimum operator on blocks of two returns}
 \usage{
 rMinRQ(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE)
 }
