@@ -68,10 +68,10 @@ library("xts")
 # Multivariate multi day:
 rSC <- rSemiCov(sampleOneMinuteData, makeReturns = TRUE) # rSC is a list of lists
 # We extract the covariance between stock 1 and stock 2 for all three covariances.
-mixed <- do.call(rbind, lapply(rSC, function(x) x[["mixed"]][1,2]))
-neg <- do.call(rbind, lapply(rSC, function(x) x[["negative"]][1,2]))
-pos <- do.call(rbind, lapply(rSC, function(x) x[["positive"]][1,2]))
-covariances <- xts(cbind(mixed, neg, pos), as.Date(rownames(pos)))
+mixed <- sapply(rSC, function(x) x[["mixed"]][1,2])
+neg <- sapply(rSC, function(x) x[["negative"]][1,2])
+pos <- sapply(rSC, function(x) x[["positive"]][1,2])
+covariances <- xts(cbind(mixed, neg, pos), as.Date(names(rSC)))
 colnames(covariances) <- c("mixed", "neg", "pos")
 # We make a quick plot of the different covariances
 plot(covariances)
