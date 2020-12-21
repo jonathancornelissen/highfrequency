@@ -18,7 +18,7 @@ rTSCov(
 }
 \arguments{
 \item{pData}{a list. Each list-item i contains an \code{xts} object with the intraday price data
-of stock i for day t.}
+of stock \eqn{i} for day \eqn{t}.}
 
 \item{cor}{boolean, in case it is \code{TRUE}, and the input data is multivariate, the correlation is returned instead of the covariance matrix. \code{FALSE} by default.}
 
@@ -113,6 +113,6 @@ Zhang, L., Mykland, P. A., and Ait-Sahalia, Y. (2005). A tale of two time scales
 Zhang, L. (2011). Estimating covariation: Epps effect, microstructure noise. \emph{Journal of Econometrics}, 160, 33-47.
 }
 \author{
-Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
+Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup.
 }
 \keyword{volatility}

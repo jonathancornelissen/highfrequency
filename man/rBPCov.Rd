@@ -2,7 +2,7 @@
 % Please edit documentation in R/realizedMeasures.R
 \name{rBPCov}
 \alias{rBPCov}
-\title{Realized BiPower Covariance}
+\title{Realized bipower covariance}
 \usage{
 rBPCov(
   rData,
@@ -18,11 +18,10 @@ rBPCov(
 
 \item{cor}{boolean, in case it is \code{TRUE}, and the input data is multivariate, the correlation is returned instead of the covariance matrix. \code{FALSE} by default.}
 
-\item{alignBy}{character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
-To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.}
+\item{alignBy}{character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}}
 
 \item{alignPeriod}{positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
-based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.}
+based on a 5-minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.}
 
 \item{makeReturns}{boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.}
 

@@ -1017,7 +1017,7 @@ realizedMeasureSpotVol <- function(mR, rData, options = list()){
 
 #' @keywords internal
 #' @importFrom xts as.xts
-preAveragedRealizedMeasureSpotVol <- function(data, options = list()){
+preAveragedRealizedMeasureSpotVol <- function(data, options = list()) {
   
   DT <- NULL;
   

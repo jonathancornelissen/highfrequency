@@ -18,13 +18,14 @@ knChooseReMeDI(
 \arguments{
 \item{pData}{\code{xts} or \code{data.table} containing the log-prices of the asset.}
 
-\item{knEqual}{Use an altered version of the ReMeDI estimator, where we instead use equal \code{kn}, instead of \code{kn} and \code{2*kn} for the windows. See Figure 1 of paper in reference section.}
+\item{knEqual}{Use an altered version of the ReMeDI estimator, where we instead use equal \code{kn}, instead of \code{kn} and \code{2*kn} for the windows. 
+See Figure 1 of paper in reference section.}
 
-\item{knMax}{max value of \code{kn} to be considered}
+\item{knMax}{max value of \code{kn} to be considered.}
 
 \item{tol}{tolerance for the minimizing value. If \code{tol} is high, the algorithm will choose a lower optimal value.}
 
-\item{size}{size of the local window}
+\item{size}{size of the local window.}
 
 \item{lower}{lower boundary for the method if it fails to find an optimal value. If this is the case, the best kn between lower and upper is returned}
 
@@ -44,7 +45,7 @@ The optimal parameter \code{kn} is the smallest value that where the criterion:
 is perceived to be zero. The tuning parameter \code{tol} can be set to choose the tolerance of the perception of 'close to zero', a higher tolerance will lead to a higher optimal value.
 }
 \details{
-This is the algorithm B.2 in the appendix of the Li and Linton (2019) working paper
+This is the algorithm B.2 in the appendix of the Li and Linton (2019) working paper.
 }
 \note{
 We Thank Merrick Li for contributing his Matlab code for this estimator.
@@ -67,5 +68,5 @@ optimalKn
 Li, M. and Linton, O. (2019). A ReMeDI for microstructure noise. Cambridge Working Papers in Economics 1908.
 }
 \author{
-Emil Sjoerup
+Emil Sjoerup.
 }

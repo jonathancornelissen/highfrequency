@@ -44,10 +44,8 @@ Let
 \deqn{
     U\left(4;\boldsymbol{j},\boldsymbol{j}'\right)_{t}^{n}=-\sum_{i=2^{q-1}k_{n}}^{n_{t}-\omega\left(4\right)_{n}}\Delta_{\boldsymbol{j}}\left(Y\right)\Delta_{\boldsymbol{j}^{\prime}}\left(Y\right)_{i+\omega\left(3\right)_{3}^{n}}^{n},
 }
-\preformatted{
 \deqn{
-    U\left(5,k;\boldsymbol{j},\boldsymbol{j}'\right)_{t}^{n}=\sum_{Q_{q}\in\mathcal{Q}_{q}}\sum_{i=2^{e\left(Q_{q}\right)}k_{n}}^{n_{t}-\omega\left(5\right)_{n}}\Delta\boldsymbol{_{j}}_{Q_{q}\oplus\left(\boldsymbol{j}\prime{}_{Q_{q'}}\left(+k\right)\right)}\left(Y\right)_{i}^{n}\prod_{\ell:l_{\ell}\in Q_{q}^{c}}\Delta_{\left(j_{l_{\ell}},j\prime_{l_{\ell}}+k\right)\left(Y\right)_{i+\omega\left(5\right)_{\ell+1}^{n}\prime}},
-}
+    U\left(5,k;\boldsymbol{j},\boldsymbol{j}'\right)_{t}^{n}=\sum_{Q_{q}\in\mathcal{Q}_{q}}\sum_{i=2^{e\left(Q_{q}\right)}k_{n}}^{n_{t}-\omega\left(5\right)_{n}}\Delta_{\boldsymbol{j}_{Q_{q}\oplus\left(\boldsymbol{j}\prime_{Q_{q'}}\left(+k\right)\right)}}\left(Y\right)_{i}^{n}\prod_{\ell:l_{\ell}\in Q_{q}^{c}}\Delta_{\left(j_{l_{\ell}},j\prime_{l_{\ell}}+k\right)\left(Y\right)_{i+\omega\left(5\right)_{\ell+1}^{n}\prime}},
 }
 
 \eqn{

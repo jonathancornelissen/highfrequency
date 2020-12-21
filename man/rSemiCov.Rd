@@ -2,7 +2,7 @@
 % Please edit documentation in R/realizedMeasures.R
 \name{rSemiCov}
 \alias{rSemiCov}
-\title{Realized Semicovariance}
+\title{Realized semicovariance}
 \usage{
 rSemiCov(
   rData,
@@ -13,20 +13,19 @@ rSemiCov(
 )
 }
 \arguments{
-\item{rData}{an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days}
+\item{rData}{an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days.}
 
 \item{cor}{boolean, in case it is \code{TRUE}, and the input data is multivariate, the correlation is returned instead of the covariance matrix. \code{FALSE} by default.}
 
-\item{alignBy}{character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
-To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.}
+\item{alignBy}{character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}}
 
 \item{alignPeriod}{positive numeric, indicating the number of periods to aggregate over. For example, to aggregate
-based on a 5 minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.}
+based on a 5-minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.}
 
 \item{makeReturns}{boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.}
 }
 \value{
-In case the data consists of one day a list of five \eqn{N x N} matrices are returned. These matrices are named \code{mixed}, \code{positive}, \code{negative}, \code{concordant}, and \code{rCov}.
+In case the data consists of one day a list of five \eqn{N \times N} matrices are returned. These matrices are named \code{mixed}, \code{positive}, \code{negative}, \code{concordant}, and \code{rCov}.
 The latter matrix corresponds to the realized covariance estimator and is thus named like the function \code{\link{rCov}}.
 In case the data spans more than one day, the list for each day will be put into another list named according to the date of the estimates.
 }
@@ -48,12 +47,12 @@ Then, the realized semicovariance is given by the following three matrices:
 }
 
 The mixed covariance matrix will have 0 on the diagonal.
-From these three matrices, the realized covariance can be constructed as pos + neg + mixed.
-The concordant semicovariance matrix is pos + neg.
+From these three matrices, the realized covariance can be constructed as \eqn{pos + neg + mixed}.
+The concordant semicovariance matrix is \eqn{pos + neg}.
 The off-diagonals of the concordant matrix is always positive, while for the mixed matrix, it is always negative.
 }
 \details{
-In the case that cor is TRUE, the mixed matrix will be an \eqn{N x N} matrix filled with NA as mapping the mixed covariance matrix into correlation space is impossible due to the 0-diagonal.
+In the case that cor is \code{TRUE}, the mixed matrix will be an \eqn{N \times N} matrix filled with NA as mapping the mixed covariance matrix into correlation space is impossible due to the 0-diagonal.
 }
 \examples{
 # Realized semi-variance/semi-covariance for prices aligned
@@ -82,6 +81,6 @@ addLegend(lty = 1) # Add legend so we can distinguish the series.
 Bollerslev, T., Li, J., Patton, A. J., and Quaedvlieg, R. (2020). Realized semicovariances. \emph{Econometrica}, 88, 1515-1551.
 }
 \author{
-Emil Sjoerup
+Emil Sjoerup.
 }
 \keyword{volatility}
