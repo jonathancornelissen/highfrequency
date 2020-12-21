@@ -50,7 +50,7 @@ that determines the rejection threshold value
 (see Boudt et al. (2008) for details).}
 }
 \value{
-an \eqn{N x N} matrix
+an \eqn{N \times N} matrix
 }
 \description{
 Calculate the Realized Outlyingness Weighted Covariance, defined in Boudt et al. (2008).

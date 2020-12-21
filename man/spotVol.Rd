@@ -28,7 +28,7 @@ See 'Details'.}
 Possible values are: \code{"secs", "seconds", "mins", "minutes", "hours"}.}
 
 \item{alignPeriod}{positive integer, indicating the number of periods to aggregate
-over. E.g. to aggregate an \code{xts} object to the 5 minute frequency, set
+over. E.g. to aggregate an \code{xts} object to the 5-minute frequency, set
 \code{alignPeriod = 5} and \code{alignBy = "minutes"}.}
 
 \item{marketOpen}{the market opening time. This should be in the time zone
@@ -37,7 +37,8 @@ specified by \code{tz}. By default, \code{marketOpen = "09:30:00"}.}
 \item{marketClose}{the market closing time. This should be in the time zone
 specified by \code{tz}. By default, \code{marketClose = "16:00:00"}.}
 
-\item{tz}{fallback time zone used in case we we are unable to identify the timezone of the data, by default: \code{tz = NULL}. We attempt to extract the timezone from the DT column (or index) of the data, which may fail. 
+\item{tz}{fallback time zone used in case we we are unable to identify the timezone of the data, by default: \code{tz = NULL}. 
+We attempt to extract the timezone from the DT column (or index) of the data, which may fail. 
 In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}}
 
 \item{...}{method-specific parameters (see 'Details').}
@@ -292,13 +293,13 @@ Along with the spot volatility estimates, this method will return the
 
 Parameters:
 \itemize{
-\item{\code{RM}}{String denoting which realized measure to use to estimate the local volatility. Possible values are: "bipower", "medrv", "minrv", "rv"
-Default = "bipower"}
+\item{\code{RM}}{String denoting which realized measure to use to estimate the local volatility. Possible values are: \code{"bipower", "medrv", "minrv", "rv"}
+Default = \code{"bipower"}}
 \item{\code{lookBackPeriod}}{positive integer denoting the amount of sub-sampled returns to use 
-for the estimation of the local volatility. Default = 10.}
+for the estimation of the local volatility. Default is \code{10.}}
 \item{\code{dontIncludeLast}}{logical indicating whether to omit the last return in the calculation of the local volatility.
- This is done in e.g. Lee-Mykland (2008) to produce jump-robust estimates of spot volatility. 
- Setting this to TRUE will then use lookBackPeriod - 1 returns in the construction of the realized measures. Default = FALSE}
+ This is done in Lee-Mykland (2008) to produce jump-robust estimates of spot volatility. 
+ Setting this to \code{TRUE} will then use \code{lookBackPeriod - 1} returns in the construction of the realized measures. Default = \code{FALSE}}
 }
 
 Outputs (see 'Value' for a full description of each component):

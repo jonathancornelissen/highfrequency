@@ -46,7 +46,7 @@ of stock \eqn{i} for day \eqn{t}.}
 \item{makePsd}{boolean, in case it is \code{TRUE}, the positive definite version of rRTSCov is returned. \code{FALSE} by default.}
 }
 \value{
-an \eqn{N x N} matrix
+an \eqn{N \times N} matrix
 }
 \description{
 Calculate the robust two time scale covariance matrix proposed in Boudt and Zhang (2010).

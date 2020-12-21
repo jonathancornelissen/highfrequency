@@ -33,7 +33,7 @@ The possible exchanges are:
 }
 \description{
 Filters raw trade data and return only data that stems from the exchange with the highest
- value for the variable "SIZE", i.e. the highest trade volume.
+ value for the variable \code{"SIZE"}, i.e. the highest trade volume.
 }
 \examples{
 autoSelectExchangeTrades(sampleTDataRaw)

@@ -18,7 +18,7 @@ rTSCov(
 }
 \arguments{
 \item{pData}{a list. Each list-item i contains an \code{xts} object with the intraday price data
-of stock i for day t.}
+of stock \eqn{i} for day \eqn{t}.}
 
 \item{cor}{boolean, in case it is \code{TRUE}, and the input data is multivariate, the correlation is returned instead of the covariance matrix. \code{FALSE} by default.}
 

@@ -19,7 +19,8 @@ knChooseReMeDI(
 \arguments{
 \item{pData}{\code{xts} or \code{data.table} containing the log-prices of the asset.}
 
-\item{knEqual}{Use an altered version of the ReMeDI estimator, where we instead use equal \code{kn}, instead of \code{kn} and \code{2*kn} for the windows. See Figure 1 of paper in reference section.}
+\item{knEqual}{Use an altered version of the ReMeDI estimator, where we instead use equal \code{kn}, instead of \code{kn} and \code{2*kn} for the windows. 
+See Figure 1 of paper in reference section.}
 
 \item{knMax}{max value of \code{kn} to be considered}
 

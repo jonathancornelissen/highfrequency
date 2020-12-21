@@ -14,7 +14,7 @@ rCholCov(
 }
 \arguments{
 \item{pData}{a list. Each list-item i contains an \code{xts} object with the intraday price data
-of stock i for day t. The order of the data does not matter as it will be sorted according to the criterion specified in the \code{criterion} argument}
+of stock \eqn{i} for day \eqn{t}. The order of the data does not matter as it will be sorted according to the criterion specified in the \code{criterion} argument}
 
 \item{IVest}{integrated variance estimator, default is \code{"rMRC"}. For a list of implemented estimators, use \code{listCholCovEstimators()}.}
 
@@ -33,7 +33,7 @@ The algorithm estimates the integrated covariance matrix by sequentially adding 
 This is done in order of liquidity, which means that the algorithm uses more data points than most other estimation techniques.
 }
 \details{
-additional arguments for \code{IVest} and \code{COVest} should be passed in the ... argument.
+Additional arguments for \code{IVest} and \code{COVest} should be passed in the ... argument.
 For the \code{rMRC} estimator, which is the default, the \code{theta} and \code{delta} parameters can be set. These default to 1 and 0.1 respectively.
 }
 \references{

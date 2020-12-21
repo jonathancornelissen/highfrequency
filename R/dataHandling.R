@@ -727,7 +727,7 @@ aggregateTrades <- function(tData, alignBy = "minutes", alignPeriod = 5, marketO
 #' Retain only data from the stock exchange with the highest trading volume
 #' 
 #' @description Filters raw trade data and return only data that stems from the exchange with the highest
-#'  value for the variable "SIZE", i.e. the highest trade volume.
+#'  value for the variable \code{"SIZE"}, i.e. the highest trade volume.
 #' @param tData an \code{xts} object with at least a column \code{"EX"} 
 #' indicating the exchange symbol and \code{"SIZE"}
 #' indicating the trade volume. 
@@ -1906,21 +1906,35 @@ rmTradeOutliersUsingQuotes <- function(tData, qData, lagQuotes = 2, BFM = FALSE,
   
 }
 
-#' Delete entries for which the mid-quote is outlying with respect to surrounding entries
+#' Remove outliers in quotes
 #' 
-#' @description If type = "standard": Function deletes entries for which the mid-quote deviated by more than "maxi"
+#' @description 
+#' Delete entries for which the mid-quote is outlying with respect to surrounding entries.
+#' 
+#' @param qData a \code{data.table} or \code{xts} object at least containing the columns \code{"BID"} and \code{"OFR"}.
+#' @param maxi an integer, indicating the maximum number of median absolute deviations allowed.
+#' @param window an integer, indicating the time window for which the "outlyingness" is considered.
+#' @param type should be \code{"standard"} or \code{"advanced"} (see details).
+#' @param tz fallback time zone used in case we we are unable to identify the timezone of the data, by default: \code{tz = NULL}. 
+#' With the non-disk functionality, we attempt to extract the timezone from the \code{DT} column (or index) of the data, which may fail. 
+#' In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}. 
+#' 
+#' @return \code{xts} object or \code{data.table} depending on type of input.
+#' 
+#' @details
+#' 
+#' \itemize{
+#' \item If \code{type = "standard"}: Function deletes entries for which the mid-quote deviated by more than "maxi"
 #' median absolute deviations from a rolling centered median (excluding
-#' the observation under consideration) of "window" observations.
-#' 
-#' If type = "advanced":  Function deletes entries for which the mid-quote deviates by more than "maxi"
+#' the observation under consideration) of window observations.
+#' \item If \code{type = "advanced"}:  Function deletes entries for which the mid-quote deviates by more than "maxi"
 #' median absolute deviations from the value closest to the mid-quote of
 #' these three options:
 #' \enumerate{
 #'  \item Rolling centered median (excluding the observation under consideration)
-#'  \item Rolling median of the following "window" observations
-#'  \item Rolling median of the previous "window" observations
+#'  \item Rolling median of the following window of observations
+#'  \item Rolling median of the previous window of observations
 #' }
-#'  
 #' The advantage of this procedure compared to the "standard" proposed
 #' by Barndorff-Nielsen et al. (2010) is that it will not incorrectly remove
 #' large price jumps. Therefore this procedure has been set as the default
@@ -1929,15 +1943,7 @@ rmTradeOutliersUsingQuotes <- function(tData, qData, lagQuotes = 2, BFM = FALSE,
 #' Note that the median absolute deviation is taken over the entire
 #' day. In case it is zero (which can happen if mid-quotes don't change much), 
 #' the median absolute deviation is taken over a subsample without constant mid-quotes.
-#' 
-#' @param qData a \code{data.table} or \code{xts} object at least containing the columns "BID" and "OFR".
-#' @param maxi an integer, indicating the maximum number of median absolute deviations allowed.
-#' @param window an integer, indicating the time window for which the "outlyingness" is considered.
-#' @param type should be "standard" or "advanced" (see description).
-#' @param tz fallback time zone used in case we we are unable to identify the timezone of the data, by default: \code{tz = NULL}. With the non-disk functionality, we attempt to extract the timezone from the DT column (or index) of the data, which may fail. 
-#' In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}. 
-#' 
-#' @return \code{xts} object or \code{data.table} depending on type of input.
+#' }
 #' 
 #' @references Barndorff-Nielsen, O. E., P. R. Hansen, A. Lunde, and N. Shephard (2009). Realized kernels in practice: Trades and quotes. \emph{Econometrics Journal}, 12, C1-C32.
 #' 
