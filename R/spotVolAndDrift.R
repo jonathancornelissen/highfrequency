@@ -284,8 +284,9 @@ spotDrift <- function(data, method = "mean", alignBy = "minutes", alignPeriod = 
 #' \item \code{periodic}
 #' }
 #' 
-#' Let there be \eqn{T} days of \eqn{N} equally spaced and continuous returns \eqn{r_{i,t}}.
-#' In this setup returns are modeled as
+#' Let there be \eqn{T} days of \eqn{N} equally-spaced log-returns \eqn{r_{i,t}}, 
+#' \eqn{i = 1, \dots, N} and \eqn{i = 1, \dots, T}.
+#' In case of \code{method = "detper"}, the returns are modeled as
 #' \deqn{
 #' r_{i,t} = f_i s_t u_{i,t}
 #' }
@@ -313,7 +314,7 @@ spotDrift <- function(data, method = "mean", alignBy = "minutes", alignPeriod = 
 #' }
 #' with \emph{i.i.d.} zero-mean error term \eqn{\varepsilon_i} and \eqn{c = -0.63518}. 
 #' \code{periodicvol = "OLS"} employs ordinary-least-squares estimation and 
-#' \code{periodicvol = "TML"} truncated maximum-likelihood estimation (see Boudt et al., 2011, Section 2.2).
+#' \code{periodicvol = "TML"} truncated maximum-likelihood estimation (see Boudt et al., 2011, Section 2.2, for further details).
 #' 
 #' \strong{Stochastic periodicity method (\code{"stochper"})}
 #' Parameters:
@@ -532,13 +533,14 @@ spotDrift <- function(data, method = "mean", alignBy = "minutes", alignPeriod = 
 #' \deqn{
 #' r_t = \sum_{i = 1}^N r_{i,t} = \sigma_t \frac{1}{\sqrt{N}} \sum_{i = 1}^N s_i Z_{i,t}.
 #' }
+#' with \eqn{\sigma_t > 0}, intraday seasonality \eqn{s_i} > 0, and \eqn{Z_{i,t}} being 
+#' a zero-mean unit-variance error term.  
 #' 
 #' The overall approach is as in Appendix B of Andersen and Bollerslev (1997).
 #' This method generates the external regressors \eqn{s_i} needed to model the intraday
-#' seasonality with a flexible fourier form (Andersen and Bollerslev, 1997, Eqs. A.1-A.4). 
-#' The \code{rugarch} package
-#' is then employed to estimate the specified GARCH(1,1) model on \eqn{r_{i,t} / s_i}.
-#'
+#' seasonality with a flexible Fourier form (Andersen and Bollerslev, 1997, Eqs. A.1-A.4). 
+#' The \code{rugarch} package is then employed to estimate the specified intraday GARCH(1,1) model 
+#' on the residuals \eqn{r_{i,t} / s_i}.
 #'
 #' \strong{Realized Measures (\code{"RM"})}
 #' 
