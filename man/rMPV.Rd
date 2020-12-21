@@ -2,7 +2,7 @@
 % Please edit documentation in R/realizedMeasures.R
 \name{rMPV}
 \alias{rMPV}
-\title{Realized multipower variation (MPV), an estimator of integrated power variation.}
+\title{Realized multipower variation}
 \usage{
 rMPV(
   rData,
@@ -14,17 +14,17 @@ rMPV(
 )
 }
 \arguments{
-\item{rData}{an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days}
+\item{rData}{an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days.}
 
 \item{m}{the window size of return blocks. 2 by default.}
 
 \item{p}{the power of the variation. 2 by default.}
 
-\item{alignBy}{character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
-To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.}
+\item{alignBy}{character, indicating the time scale in which \code{alignPeriod} is expressed. 
+Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}}
 
-\item{alignPeriod}{positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
-based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.}
+\item{alignPeriod}{positive numeric, indicating the number of periods to aggregate over. For example, to aggregate
+based on a 5-minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.}
 
 \item{makeReturns}{boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.}
 }
@@ -32,7 +32,7 @@ based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to
 numeric
 }
 \description{
-Calculate the rMPV, defined in Andersen et al. (2012).
+Calculate the Realized Multipower Variation rMPV, defined in Andersen et al. (2012).
 
 Assume there are \eqn{N} equispaced returns \eqn{r_{t,i}} in period \eqn{t}, \eqn{i=1, \ldots,N}. Then, the rMPV is given by
   \deqn{

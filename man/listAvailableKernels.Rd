@@ -2,7 +2,7 @@
 % Please edit documentation in R/realizedMeasures.R
 \name{listAvailableKernels}
 \alias{listAvailableKernels}
-\title{Available Kernels}
+\title{Available kernels}
 \usage{
 listAvailableKernels()
 }

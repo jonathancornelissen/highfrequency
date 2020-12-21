@@ -2,7 +2,7 @@
 % Please edit documentation in R/realizedMeasures.R
 \name{rOWCov}
 \alias{rOWCov}
-\title{Realized Outlyingness Weighted Covariance}
+\title{Realized outlyingness weighted covariance}
 \usage{
 rOWCov(
   rData,
@@ -20,13 +20,14 @@ rOWCov(
 \item{rData}{a \eqn{(M x N)} \code{xts} object containing the \eqn{N}
 return series over period \eqn{t}, with \eqn{M} observations during \eqn{t}.}
 
-\item{cor}{boolean, in case it is \code{TRUE}, and the input data is multivariate, the correlation is returned instead of the covariance matrix. \code{FALSE} by default.}
+\item{cor}{boolean, in case it is \code{TRUE}, and the input data is multivariate, the correlation is returned instead of the covariance matrix. 
+\code{FALSE} by default.}
 
-\item{alignBy}{character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
-To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.}
+\item{alignBy}{character, indicating the time scale in which \code{alignPeriod} is expressed. 
+Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}.}
 
-\item{alignPeriod}{positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
-based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.}
+\item{alignPeriod}{positive numeric, indicating the number of periods to aggregate over. For example, to aggregate
+based on a 5-minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.}
 
 \item{makeReturns}{boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.}
 
@@ -50,10 +51,10 @@ that determines the rejection threshold value
 (see Boudt et al. (2008) for details).}
 }
 \value{
-an \eqn{N x N} matrix
+an \eqn{N \times N} matrix
 }
 \description{
-Calculate the Realized Outlyingness Weighted Covariance, defined in Boudt et al. (2008).
+Calculate the Realized Outlyingness Weighted Covariance (rOWCov), defined in Boudt et al. (2008).
 
 Let \eqn{r_{t,i}}, for \eqn{i = 1,..., M} be a sample
 of \eqn{M} high-frequency \eqn{(N \times 1)} return vectors and \eqn{d_{t,i}}

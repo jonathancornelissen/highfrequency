@@ -19,7 +19,7 @@ spotDrift(
 \item{data}{Can be one of two input types, \code{xts} or \code{data.table}. It is assumed that the input comprises prices in levels.}
 
 \item{method}{Which method to be used to estimate the spot-drift. Currently, three methods are available, 
-rolling mean and median as well as the kernel method of Christensen et al. 2018.
+rolling mean and median as well as the kernel method of Christensen et al. (2018).
 The kernel is a left hand exponential kernel that will weigh newer observations more heavily than older observations.}
 
 \item{alignBy}{What time-frame should the estimator be applied? Accepted inputs are \code{"milliseconds"}, \code{"seconds"} and \code{"secs"} for seconds,
@@ -28,24 +28,29 @@ Standard is minutes}
 
 \item{alignPeriod}{How often should the estimation take place? If \code{alignPeriod} is 5 the estimation will be done every fifth unit of \code{alignBy}.}
 
-\item{marketOpen}{Opening time of the market, standard is "09:30:00"}
+\item{marketOpen}{Opening time of the market, standard is "09:30:00".}
 
-\item{marketClose}{Closing time of the market, standard is "16:00:00"}
+\item{marketClose}{Closing time of the market, standard is "16:00:00".}
 
-\item{tz}{fallback time zone used in case we we are unable to identify the timezone of the data, by default: \code{tz = NULL}. We attempt to extract the timezone from the DT column (or index) of the data, which may fail. 
-In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}}
+\item{tz}{fallback time zone used in case we we are unable to identify the timezone of the data, by default: \code{tz = NULL}. 
+We attempt to extract the timezone from the \code{DT} column (or index) of the data, which may fail. 
+In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}.}
 
-\item{...}{Additional arguments for the individual methods. See details}
+\item{...}{Additional arguments for the individual methods. See `Details'.}
 }
 \value{
-An object of class \code{"spotDrift"} containing at least the estimated spot drift process. Input on what this class should contain and methods for it is welcome.
+An object of class \code{"spotDrift"} containing at least the estimated spot drift process. 
+Input on what this class should contain and methods for it is welcome.
 }
 \description{
 Function used to estimate the spot drift of intraday (tick) stock prices/returns
 }
 \details{
-The additional arguments for the mean and median methods are: \code{periods} for the rolling window length which is 5 by standard and
-\code{align} to allow for control of the alignment, should one wish to do so, the standard is \code{"right"}. 
+The additional arguments for the mean and median methods are: 
+\itemize{
+\item \code{periods} for the rolling window length which is 5 by default.
+\item \code{align} controls the alignment. The default is \code{"right"}. 
+}
 For the kernel mean estimator, the arguments \code{meanBandwidth} can be used to control the bandwidth of the 
 drift estimator and the \code{preAverage} argument, which can be used to control the pre-averaging horizon. 
 These arguments default to 300 and 5 respectively.
@@ -61,13 +66,13 @@ Estimates the spot drift by applying a rolling mean over returns.
 where \eqn{k} is the argument \code{periods}.
 Parameters:
 \itemize{
-   \item{\code{periods}}{ How big the window for the estimation should be. The estimator will have \code{periods} \code{NA}s at the beginning of each trading day.}
-   \item{\code{align}}{ Alignment method for returns. Defaults to \code{"left"}, which includes only past data, but other choices, \code{"center"} and \code{"right"} are available.
-    These values includes FUTURE DATA, so beware!}
+   \item{\code{periods}}{ how big the window for the estimation should be. The estimator will have \code{periods} \code{NA}s at the beginning of each trading day.}
+   \item{\code{align}}{ alignment method for returns. Defaults to \code{"left"}, which includes only past data, but other choices, \code{"center"} and \code{"right"} are available.
+    Warning: These values includes future data.}
 }
 Outputs:
 \itemize{
- \item{\code{mu} A matrix containing the spot drift estimates}
+ \item{\code{mu} a matrix containing the spot drift estimates}
 }
   
 \strong{Rolling window median (\code{"median"})}
@@ -85,7 +90,7 @@ Parameters:
 }
 Outputs:
 \itemize{
- \item{\code{mu} A matrix containing the spot drift estimates}
+ \item{\code{mu} a matrix containing the spot drift estimates}
 }
 
 \strong{kernel spot drift estimator (\code{"kernel"})}
@@ -111,12 +116,12 @@ The spot drift estimator is then:
 }
 The kernel estimation method has the following parameters:
  \itemize{
-   \item{\code{preAverage}}{ A positive \code{integer} denoting the length of pre-averaging window for the log-prices. Default is 5}
-   \item{\code{meanBandwidth}}{ An \code{integer} denoting the bandwidth for the left-sided exponential kernel for the mean. Default is \code{300L}}
+   \item{\code{preAverage}}{ a positive \code{integer} denoting the length of pre-averaging window for the log-prices. Default is 5}
+   \item{\code{meanBandwidth}}{ an \code{integer} denoting the bandwidth for the left-sided exponential kernel for the mean. Default is \code{300L}}
 }
 Outputs:
 \itemize{
- \item{\code{mu} A matrix containing the spot drift estimates}
+ \item{\code{mu} a matrix containing the spot drift estimates}
 }
 }
 \examples{
@@ -139,6 +144,6 @@ plot(kerneldrift)
 Christensen, K., Oomen, R., and Reno, R. (2018). The Drift Burst Hypothesis. Working paper.
 }
 \author{
-Emil Sjoerup
+Emil Sjoerup.
 }
 \keyword{Drift}
