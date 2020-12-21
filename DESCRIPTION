@@ -25,8 +25,6 @@ Authors@R:
       person(given = "Emil",
              family = "Sjoerup",
              role = "aut"))
-Maintainer: Kris Boudt
-    <kris.boudt@ugent.be>
 Description: Provide functionality to manage, clean and match highfrequency
     trades and quotes data, calculate various liquidity measures, estimate and
     forecast volatility, detect price jumps and investigate microstructure noise and intraday
