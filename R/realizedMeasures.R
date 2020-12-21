@@ -1966,6 +1966,7 @@ rSkew <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate.
 #' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
 #' @param makeReturns boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.
+#' @param ... used internally
 #' @return list with two entries, the realized positive and negative semivariances
 #' @examples
 #' sv <- rSV(sampleTData[, list(DT, PRICE)], alignBy = "minutes",
@@ -1977,7 +1978,7 @@ rSkew <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 #' @keywords  highfrequency rSV
 #' @export
-rSV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE) {
+rSV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, ...) {
 
   # self-reference for multi-day input
   if (is.xts(rData) && checkMultiDays(rData)) {
@@ -1988,7 +1989,8 @@ rSV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE) 
       })
       colnames(result) = c("downside", "upside")
     } else {
-      result <- applyGetList(rData, rSV, alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = makeReturns)
+      # ... is needed because applyGetList calls functions with ... if this argument is removed from rSV we will get an unused argument error
+      result <- applyGetList(rData, rSV, alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = makeReturns, ... = ...) 
       names(result) <- unique(as.Date(index(rData)))
       ## Names
     }
