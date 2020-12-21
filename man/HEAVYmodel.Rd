@@ -7,8 +7,8 @@
 HEAVYmodel(data, startingValues = NULL)
 }
 \arguments{
-\item{data}{an \code{xts} object where the first column is  a vector of demeaned returns 
-and the second column is a vector of realized stock market variation.}
+\item{data}{an \code{xts} object where the first column is a vector of returns 
+and the second column is a vector of realized stock market variation}
 
 \item{startingValues}{a vector of alternative starting values: first three arguments for variance equation and last three arguments for measurement equation.}
 }
@@ -46,14 +46,13 @@ and unit-variance innovation term. The dynamics of the HEAVY model are given by
 The two equations are estimated separately as mentioned in Shephard and Sheppard (2010).
 We report robust standard errors based on the matrix-product of inverted Hessians and
 the outer product of gradients.
+
+Note that we always demean the returns in the data input as we don't include a constant in the mean equation.
 }
 \examples{
 
 # Calculate annualized returns in percentages
 logReturns <- 100 * makeReturns(SPYRM$CLOSE)[-1]
-
-# Returns are assumed to be demeaned
-logReturns <- logReturns - mean(logReturns)
 
 # Combine both returns and realized measures into one xts
 dataSPY <- xts::xts(cbind(logReturns, SPYRM$RK5[-1] * 10000), order.by = SPYRM$DT[-1])
@@ -68,7 +67,7 @@ fittedHEAVY
 predict(fittedHEAVY, stepsAhead = 12)
 }
 \references{
-Shephard, N. and K. Sheppard (2010). Realising the future: Forecasting with high frequency based volatility (HEAVY) models. Journal of Applied Econometrics 25, 197-231.
+Shephard, N. and Sheppard, K. (2010). Realising the future: Forecasting with high frequency based volatility (HEAVY) models. Journal of Applied Econometrics 25, 197--231.
 }
 \seealso{
 \code{\link{predict.HEAVYmodel}}

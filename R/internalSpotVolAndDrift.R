@@ -10,9 +10,8 @@ driftKernel <- function(data, intraday, options) {
   op <- list(preAverage = 5, meanBandwidth = 300)
   op[names(options)] <- options
   datap          <- log(data$PRICE)
-  #vX             <- c(0,diff(datap)[-1])
   k              <- op$preAverage
-  meanBandwidth      <- op$meanBandwidth
+  meanBandwidth  <- op$meanBandwidth
   iT             <- length(datap)
   vpreAveraged   <- rep(0 , iT-1) 
   mu             <- numeric(length(intraday))
@@ -82,7 +81,7 @@ plot.spotDrift <- function(x, ...) {
   if (dim(mu)[2] > 1) {
     #browser()
     ####What should it look like??
-    plot(as.numeric(mu), main = "Daily Drift", xlab = "", ylab = "", type = "l")
+    plot.ts(mu, main = "Spot Drift", xlab = "time", ylab = "drift", plot.type = "single", col = 1:dim(mu)[2])
   } else {
     plot(mu, type = "l", main = "Spot Drift", ylab = "", xlab = "")
   }

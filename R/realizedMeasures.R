@@ -2796,7 +2796,54 @@ rTSCov <- function (pData, cor = FALSE, K = 300, J = 1, KCov = NULL, JCov = NULL
 
 
 
-#' rCholCov positive semi-definite covariance estimation using the CholCov algorithm
+#' @title CholCov estimator
+#' 
+#' @description 
+#' 
+#' Positive semi-definite covariance estimation using the CholCov algorithm.
+#' 
+#' The CholCov estimation algorithm is useful for estimating covariances of \eqn{d} series that are sampled asynchronously and with different liquidities.
+#' The CholCov estimation algorithm is as follows:
+#' 
+#' \itemize{
+#'     \item First sort the series in terms of decreasing liquidity according to a liquidity criterion, such that series \eqn{1} is the most liquid, and series \eqn{d} the least.
+#'     \item Step 1:
+#'     
+#'     Apply refresh-time on \eqn{{a} = \{1\}} to obtain the grid \eqn{\tau^{a}}. 
+#'     
+#'     Estimate \eqn{\hat{g}_{11}} using an IV estimator on  \eqn{f_{\tau^{a}_j}^{(1)}= \hat{u}_{\tau^{a}_j}^{(1)}}.
+#'     
+#'     \item Step 2:
+#'     
+#'     Apply refresh-time on \eqn{{b} = \{1,2\}} to obtain the grid \eqn{\tau^{b}}. 
+#'     
+#'     Estimate \eqn{\hat{h}^{b}_{21}} as the realized beta between \eqn{f_{\tau^{b}_j}^{(1)}} and \eqn{\hat{u}_{\tau^{b}_j}^{(2)}$. Set $\hat{h}_{21}=\hat{h}^{b}_{21}}.
+#'     
+#'     Estimate \eqn{\hat{g}_{22}} using an IV estimator on  \eqn{f_{\tau^{b}_j}^{(2)}= \hat{u}_{\tau^{b}_j}^{(2)}-\hat{h}_{21}f_{\tau^{b}_j}^{(1)}}. 
+#'     
+#'     \item  Step 3:
+#'     
+#'     Apply refresh-time on \eqn{{c} = \{1,3\}} to obtain the grid \eqn{\tau^{c}}. 
+#'     
+#'     Estimate \eqn{\hat{h}^{c}_{31}} as the realized beta between \eqn{f_{\tau^{c}_j}^{(1)}} and \eqn{\hat{u}_{\tau^{c}_j}^{(3)}}. Set \eqn{\hat{h}_{31}= \hat{h}^{c}_{31}}.
+#'     
+#'     Apply refresh-time on \eqn{{d} = \{1,2,3\}} to obtain the grid \eqn{\tau^{d}}.
+#'     
+#'     Re-estimate \eqn{\hat{h}_{21}^{d}} at the new grid, such that the projections \eqn{f_{\tau^{d}_j}^{(1)}} and \eqn{f_{\tau^{d}_j}^{(2)}} are orthogonal.
+#'     
+#'     Estimate \eqn{\hat{h}^{d}_{32}} as the realized beta between \eqn{f_{\tau^{d}_j}^{(2)}} and \eqn{\hat{u}_{\tau^{d}_j}^{(3)}}. Set \eqn{\hat{h}_{32} = \hat{h}^{d}_{32}}. 
+#'     
+#'     Estimate \eqn{\hat{g}_{33}} using an IV estimator on \eqn{f_{\tau^{d}_j}^{(3)}= \hat{u}_{\tau^{d}_j}^{(3)}-\hat{h}_{32}f_{\tau^{d}_j}^{(2)} -\hat{h}_{31}f_{\tau^{d}_j}^{(1)}}. 
+#'     
+#'     \item Step 4 to d:
+#'     
+#'     Continue in the same fashion by sampling over \eqn{{1,...,k,l}} to estimate \eqn{h_{lk}} using the smallest possible set. 
+#'     
+#'     Re-estimate the \eqn{h_{nm}} with \eqn{m<n\leq k} at every new grid to obtain orthogonal projections. 
+#'     
+#'     Estimate the \eqn{g_{kk}} as the IV of projections based on the final estimates, \eqn{\hat{h}}.
+#' }
+#' 
 #' @description Function that estimates the integrated covariance matrix using the CholCov algorithm.
 #' The algorithm estimates the integrated covariance matrix by sequentially adding series and using `refreshTime` to synchronize the observations.
 #' This is done in order of liquidity, which means that the algorithm uses more data points than most other estimation techniques.
@@ -3131,7 +3178,16 @@ listCholCovEstimators <- function(){
 
 #
 #' ReMeDI
+#' @description 
 #' This function estimates the auto-covariance of market-microstructure noise
+#'
+#' Let the observed price \eqn{Y_{t}} be given as \eqn{Y_{t} = X_{t} + \varepsilon_{t}}, where \eqn{X_{t}} is the efficient price and \eqn{\varepsilon_t} is the market microstructure noise
+#' 
+#' The estimator of the \eqn{l}'th lag of the market microstructure is defined as:
+#' \deqn{
+#'     \hat{R}^{n}_{t,l} = \frac{1}{n_{t}} \sum_{i=2k_{n}}^{n_{t}-k_{n}-l} \left(Y_{i+l}^n - Y_{i+l+k_{n}}^{n} \right) \left(Y_{i}^n - Y_{i- 2k_{n}}^{n} \right),
+#' }
+#' where \eqn{k_{n}} is a tuning parameter. In the function \code{\link{knChooseReMeDI}}, we provide a function to estimate the optimal \eqn{k_{n}} parameter.
 #'
 #' @param pData \code{xts} or \code{data.table} containing the log-prices of the asset
 #' @param kn numeric of length 1 determining the tuning parameter kn this controls the lengths of the non-overlapping interval in the ReMeDI estimation
@@ -3145,7 +3201,7 @@ listCholCovEstimators <- function(){
 #' @note We Thank Merrick Li for contributing his Matlab code for this estimator.
 #' @examples
 #' remed <- ReMeDI(sampleTData[as.Date(DT) == "2018-01-02", ], kn = 2, lags = 1:8)
-#' # We can also use the algorithm for choosing the kn to
+#' # We can also use the algorithm for choosing the kn tuning parameter
 #' optimalKn <- knChooseReMeDI(sampleTData[as.Date(DT) == "2018-01-02",],
 #'                             knMax = 10, tol = 0.05, size = 3,
 #'                             lower = 2, upper = 5, plot = TRUE)
@@ -3311,8 +3367,13 @@ ReMeDI <- function(pData, kn = 1, lags = 1, knEqual = FALSE,
 
 
 #' ReMeDI tuning parameter
-#' function to choose the tuning parameter, kn in ReMeDI estimation
-#'
+#' @description 
+#' Function to choose the tuning parameter, kn in ReMeDI estimation. 
+#' The optimal parameter \code{kn} is the smallest value that where the criterion:
+#' \deqn{
+#'     SqErr(k_{n})^{n}_{t} = \left(\hat{R}^{n,k_{n}}_{t,0} - \hat{R}^{n,k_{n}}_{t,1} - \hat{R}^{n,k_{n}}_{t,2} + \hat{R}^{n,k_{n}}_{t,3} - \hat{R}^{n, k_{n}}_{t,l}\right)^{2}
+#' }
+#' is perceived to be zero. The tuning parameter \code{tol} can be set to choose the tolerance of the perception of 'close to zero', a higher tolerance will lead to a higher optimal value.
 #' @param pData \code{xts} or \code{data.table} containing the log-prices of the asset.
 #' @param knEqual Use an altered version of the ReMeDI estimator, where we instead use equal \code{kn}, instead of \code{kn} and \code{2*kn} for the windows. 
 #' See Figure 1 of paper in reference section.
@@ -3331,7 +3392,7 @@ ReMeDI <- function(pData, kn = 1, lags = 1, knEqual = FALSE,
 #' optimalKn
 #' \dontrun{
 #' # We can also have a much larger search-space
-#' optimalKn <- knChooseReMeDI(sampleTData[as.Date(DT) == "2018-01-02",],
+#' optimalKn <- knChooseReMeDI(sampleTDataEurope,
 #'                             knMax = 50, tol = 0.05,
 #'                             size = 3, lower = 2, upper = 5, plot = TRUE)
 #' optimalKn
@@ -3373,13 +3434,113 @@ knChooseReMeDI <- function(pData, knEqual = FALSE,
 }
 
 #' Asymptotic variance of ReMeDI estimator
+#' @description 
+#' 
+#' 
+#' Some notation is needed for the estimator of the asymptotic covariance of the ReMeDI estimator.
+#' Let
+#' \deqn{
+#'     \delta\left(n, i\right) = t_{i}^{n}-t_{t-1}^{n}, i\geq 1,
+#' }
+#' \deqn{
+#'     \hat{\delta}_{t}^{n}=\left(\frac{k_{n}\delta\left(n,i+1+k_{n}\right)-t_{i+2+2k_{n}}^{n}+t_{i+2+k_{n}}^{n}}{\left(t_{i+k_{n}}^{n}-t_{i}^{n}\right)\vee\phi_{n}}\right)^{2},
+#' }
 #'
+#' \deqn{
+#'     U\left(1\right)_{t}^{n}=\sum_{i=0}^{n_{t}-\omega\left(1\right)_{n}}\hat{\delta}_{i}^{n},
+#' }
+#' \deqn{
+#'     U\left(2,\boldsymbol{j}\right)_{t}^{n}=\sum_{i=0}^{n_{t}-\omega\left(2\right)_{n}}\hat{\delta}_{i}^{n}\Delta_{\boldsymbol{j}}\left(Y\right)_{i+\omega\left(2\right)_{2}^{n}}^{n},
+#' }
+#' 
+#' \deqn{
+#'     U\left(3,\boldsymbol{j},\boldsymbol{j}'\right)_{t}^{n}=\sum_{i=0}^{n_{t}-\omega\left(3\right)_{n}}\hat{\delta}_{i}^{n}\Delta_{\boldsymbol{j}}\left(Y\right)_{i+\omega\left(3\right)_{2}^{n}}^{n}\Delta_{\boldsymbol{j}'}\left(Y\right)_{i+\omega\left(3\right)_{3}^{n}}^{n},
+#' }
+#' 
+#' \deqn{
+#'     U\left(4;\boldsymbol{j},\boldsymbol{j}'\right)_{t}^{n}=-\sum_{i=2^{q-1}k_{n}}^{n_{t}-\omega\left(4\right)_{n}}\Delta_{\boldsymbol{j}}\left(Y\right)\Delta_{\boldsymbol{j}^{\prime}}\left(Y\right)_{i+\omega\left(3\right)_{3}^{n}}^{n},
+#' }
+#' \preformatted{
+#' \deqn{
+#'     U\left(5,k;\boldsymbol{j},\boldsymbol{j}'\right)_{t}^{n}=\sum_{Q_{q}\in\mathcal{Q}_{q}}\sum_{i=2^{e\left(Q_{q}\right)}k_{n}}^{n_{t}-\omega\left(5\right)_{n}}\Delta\boldsymbol{_{j}}_{Q_{q}\oplus\left(\boldsymbol{j}\prime{}_{Q_{q'}}\left(+k\right)\right)}\left(Y\right)_{i}^{n}\prod_{\ell:l_{\ell}\in Q_{q}^{c}}\Delta_{\left(j_{l_{\ell}},j\prime_{l_{\ell}}+k\right)\left(Y\right)_{i+\omega\left(5\right)_{\ell+1}^{n}\prime}},
+#' }
+#' }
+#' 
+#' \eqn{
+#'     U\left(6,k;\boldsymbol{j},\boldsymbol{j}^{\prime}\right)=\sum_{j_{l}\in\boldsymbol{j},j_{l^{\prime}}^{\prime}\in\boldsymbol{j}^{\prime}}\sum_{i=2k_{n}}^{n_{t}-\omega\left(6\right)n}\Delta_{\left(j_{l},j_{l^{\prime}}^{\prime}+k\right)}\left(Y\right)_{i}^{n}\Delta_{\boldsymbol{j}_{-l}}\left(Y\right)_{i+\omega\left(6\right)_{2}^{n}}^{n}\Delta_{\boldsymbol{j}_{-l^{\prime}}^{\prime}}\left(Y\right)_{i+\omega\left(6\right)_{3}^{n}}^{n} \\
+#'     -\sum_{j_{l}\in\boldsymbol{j}}\sum_{i=2^{q}k_{n}}^{n_{t}-\omega^{\prime}\left(6\right)_{n}}\Delta_{\left\{ j_{l}\right\} \oplus\boldsymbol{j}^{\prime}\left(+k\right)}\left(Y\right)_{i}^{n}\Delta_{\boldsymbol{j}-l}\left(Y\right)_{i+\omega^{\prime}\left(6\right)_{2}^{n}}^{n} \\
+#'     -\sum_{j_{l^{\prime}\in\boldsymbol{j}^{\prime}}^{\prime}}\sum_{i=2^{q}k_{n}}^{n_{t}-\omega^{\prime\prime}\left(6\right)n}\Delta_{\left\{ j_{l^{\prime}}^{\prime}+k\right\} \oplus\boldsymbol{j}}\left(Y\right)_{i}^{n}\Delta_{\boldsymbol{j}_{-l^{\prime}}^{\prime}}\left(Y\right)_{i+\omega^{\prime\prime}\left(6\right)_{2}^{n}\prime}^{n},
+#' }
+#'
+#' \deqn{
+#'     U\left(7,k;\boldsymbol{j},\boldsymbol{j}^{\prime}\right)_{t}^{n}=ReMeDI\left(\boldsymbol{j}\oplus\boldsymbol{j}^{\prime}\left(+k\right)\right)_{t}^{n},
+#' }
+#' \deqn{
+#'     U\left(k;\boldsymbol{j},\boldsymbol{j}^{\prime}\right)_{t}^{n}=\sum_{\ell=5}^{7}U\left(\ell,k;\boldsymbol{j},\boldsymbol{j}^{\prime}\right)_{t}^{n},
+#' } 
+#' \deqn{
+#'     U\left(k;\boldsymbol{j},\boldsymbol{j}^{\prime}\right)_{t}^{n}=\sum_{\ell=5}^{7}U\left(\ell,k;\boldsymbol{j},\boldsymbol{j}^{\prime}\right)_{t}^{n},
+#' }
+#' 
+#' Where the indices are given by:
+#' \deqn{
+#'     \omega\left(1\right)_{n}=2+2k_{n},\ \omega\left(2\right)_{2}^{n}=2+\left(3+2^{q-1}\right)k_{n},\ \omega\left(2\right)_{n}=\omega\left(2\right)_{2}^{n}+j_{1}+k_{n},
+#' }
+#' 
+#' \deqn{
+#'     \omega\left(3\right)_{2}^{n}=2+\left(3+2^{q-1}\right)k_{n},\ \omega\left(3\right)_{3}^{n}=2+\left(5+2^{q-1}+2^{q^{\prime}-1}\right)k_{n}+j_{1},
+#' }
+#' 
+#' \deqn{
+#'     \omega\left(3\right)_{n}=\omega\left(3\right)_{3}^{n}+j_{1}^{\prime}+k_{n},\ \omega\left(4\right)_{2}^{n}=2k_{n}+q_{n}^{\prime}+j_{1},\ \omega\left(4\right)_{n}=\omega\left(4\right)_{2}^{n}+j_{1}^{\prime}+k_{n},
+#' }
+#' \deqn{
+#'     e\left(Q_{q}\right)=\left(2\left|Q_{q}\right|+q^{\prime}-q-1\right)\vee1,\ \omega\left(5\right)_{\ell+1}^{n}=4\ell k_{n}+\sum_{\ell^{\prime}=1}^{\ell}j_{l_{\ell^{\prime}}}\vee\left(j_{l_{\ell}}^{\prime}+k\right)\textrm{for}\ell\geq 1,
+#' }
+#' \deqn{
+#'     \omega\left(5\right)_{n}=\omega\left(5\right)_{\left|Q_{q}^{c}\right|+1}^{n}+j_{l_{\left|Q_{q}^{c}\right|}}\vee\left(j_{l_{\left|Q_{q}^{c}\right|}}+k\right)+k_{n},
+#' }
+#' 
+#' \deqn{
+#'     \omega\left(6\right)_{2}^{n}=\left(2^{q-2}+2\right)k_{n}+j_{\ell}\vee\left(j_{\ell^{\prime}}^{\prime}+k\right),\ \omega\left(6\right)_{3}^{n}=\left(2^{q-2}+2^{q^{\prime}-2}+2\right)k_{n}+j_{1}+j_{\ell}\vee\left(j_{\ell}^{\prime}+k\right),
+#' }
+#' 
+#' \deqn{
+#'     \omega^{\prime}\left(6\right)_{2}^{n}=\left(2^{q-2}+2\right)k_{n}+j_{\ell}\vee\left(j_{1}^{\prime}+k\right),\ \omega^{\prime\prime}\left(6\right)_{2}^{n}=\left(2^{q^{\prime}-2}+1\right)k_{n}+\left(j_{\ell^{\prime}}^{\prime}+k\right)\vee j_{1},
+#' }
+#' \deqn{
+#'     \omega\left(6\right)_{n}=\omega\left(6\right)_{3}^{n}+j^{\prime}+k_{n},\ \omega^{\prime}\left(6\right)_{n}=\omega^{\prime}\left(6\right)_{2}^{n}+j_{1}+k_{n},\ \omega^{\prime\prime}\left(6\right)_{n}=\omega^{\prime\prime}\left(6\right)_{2}^{n}j_{1}^{\prime}+k_{n},
+#' }
+#' 
+#' The asymptotic variance estimator is then given by
+#' 
+#' \deqn{
+#'     \hat{\sigma}\left(\boldsymbol{j},\boldsymbol{j}^{\prime}\right)_{t}^{n}=\frac{1}{n_{t}}\sum_{\ell=1}^{3}\hat{\sigma}_{\ell}\left(\boldsymbol{j},\boldsymbol{j}^{\prime}\right)_{t}^{n},
+#' }
+#' 
+#' where 
+#' \deqn{
+#'     \hat{\sigma}_{1}\left(\boldsymbol{j},\boldsymbol{j}^{\prime}\right)_{t}^{n}=U\left(0;\boldsymbol{j},\boldsymbol{j}^{\prime}\right)+\sum_{k=1}^{i_{n}}\left(U\left(k;\boldsymbol{j},\boldsymbol{j}^{\prime}\right)_{t}^{n}\right)+\left(2i_{n}+1\right)U\left(4;\boldsymbol{j},\boldsymbol{j}\right)_{t}^{n},
+#' }
+#' 
+#' \deqn{
+#'     \hat{\sigma}_{2}\left(\boldsymbol{j},\boldsymbol{j}^{\prime}\right)_{t}^{n}=U\left(3;\boldsymbol{j},\boldsymbol{j}^{\prime}\right),
+#' }
+#' \deqn{
+#'     \hat{\sigma}_{3}\left(\boldsymbol{j},\boldsymbol{j}^{\prime}\right)_{t}^{n}=\frac{1}{n_{t}^{2}}\textrm{ReMeDI}\left(Y,\boldsymbol{j}\right)_{t}^{n}\textrm{ReMeDI}\left(Y,\boldsymbol{j}^{\prime}\right)_{t}^{n}U\left(1\right)_{t}^{n}\\,
+#' }
+#' \deqn{
+#'     -\frac{1}{n_{t}}\left(\textrm{ReMeDI}\left(Y,\boldsymbol{j}\right)_{t}^{n}U\left(2,\boldsymbol{j}^{\prime}\right)_{t}^{n}+\textrm{ReMeDI}\left(Y,\boldsymbol{j}^{\prime}\right)_{t}^{n}U\left(2,\boldsymbol{j}\right)_{t}^{n}\right),
+#' }
+#' 
+#' 
+#' 
 #' @param pData \code{xts} or \code{data.table} containing the log-prices of the asset
 #' @param kn numerical value determining the tuning parameter kn this controls the lengths of the non-overlapping interval in the ReMeDI estimation
 #' @param lags numeric containing integer values indicating the lags for which to estimate the (co)variance
 #' @param phi tuning parameter phi
 #' @param i tuning parameter i
-#'
+#' @note We Thank Merrick Li for contributing his Matlab code for this estimator.
 #' @return a list with components ReMeDI and asympVar
 #' @export
 ReMeDIAsymptoticVariance <- function(pData, kn, lags, phi, i){

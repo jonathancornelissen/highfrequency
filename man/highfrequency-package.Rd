@@ -26,7 +26,6 @@ Useful links:
 }
 \author{
 Kris Boudt, Jonathan Cornelissen, Onno Kleen, Scott Payseur, Emil Sjoerup
-
 Maintainer: Kris Boudt <Kris.Boudt@ugent.be>
 
 Contributors: Giang Nguyen

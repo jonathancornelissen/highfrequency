@@ -69,6 +69,9 @@ plot(FoFtest)
 
 }
 }
+\references{
+Christensen, K., Oomen, R. C. A., Podolskij, M. (2014): Fact or Friction: Jumps at ultra high frequency. \emph{Journal of Financial Economics}, 144, 576-599
+}
 \author{
 Emil Sjoerup
 }

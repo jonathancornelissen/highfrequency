@@ -1089,8 +1089,11 @@ makeReturns <- function(ts) {
 #' @return Depending on the input data type, we return either a \code{data.table} or an \code{xts} object containing the matched trade and quote data.
 #' When using the BFM algorithm, a report of the matched and unmatched trades are also returned (This is omitted when we call this function from the \code{\link{tradesCleanupUsingQuotes}} function).
 #' 
-#' @references  Vergote, O. (2005). How to match trades and quotes for NYSE stocks?
-#' K.U.Leuven working paper.
+#' @references
+#' 
+#' Vergote, O. (2005). How to match trades and quotes for NYSE stocks? K.U.Leuven working paper.
+#'
+#' Christensen, K., Oomen, R. C. A., Podolskij, M. (2014): Fact or Friction: Jumps at ultra high frequency. \emph{Journal of Financial Economics}, 144, 576-599
 #' 
 #' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
 #' 
@@ -1835,8 +1838,11 @@ rmNegativeSpread <- function(qData) {
 #' 
 #' @return \code{xts} or \code{data.table} object depending on input.
 #' 
-#' @references  Vergote, O. (2005). How to match trades and quotes for NYSE stocks?
-#' K.U.Leuven working paper.
+#' @references  
+#' 
+#' Vergote, O. (2005). How to match trades and quotes for NYSE stocks? K.U.Leuven working paper.
+#' 
+#' Christensen, K., Oomen, R. C. A., Podolskij, M. (2014): Fact or Friction: Jumps at ultra high frequency. \emph{Journal of Financial Economics}, 144, 576-599
 #' 
 #' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
 #' @keywords cleaning
@@ -2435,7 +2441,8 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
 #' Barndorff-Nielsen, O. E., Hansen, P. R., Lunde, A., and Shephard, N. (2009). Realized kernels in practice: Trades and quotes. \emph{Econometrics Journal}, 12, C1-C32.
 #' 
 #' Brownlees, C.T., and Gallo, G.M. (2006). Financial econometric analysis at ultra-high frequency: Data handling concerns. \emph{Computational Statistics & Data Analysis}, 51, 2232-2245.
-#' 
+#'
+#' Christensen, K., Oomen, R. C. A., Podolskij, M. (2014): Fact or Friction: Jumps at ultra high frequency. \emph{Journal of Financial Economics}, 144, 576-599
 #' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
 #' 
 #' @examples 

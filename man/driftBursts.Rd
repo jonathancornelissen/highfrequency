@@ -25,21 +25,21 @@ trades (in levels) respectively. If pData is an \code{xts} object and the number
 denotes calculating the test-statistic once per minute, i.e. 390 times for a typical 6.5 hour trading day from 9:31:00 to 16:00:00. See details.
 Additionally, \code{testTimes} can be set to 'all' where the test statistic will be calculated on each tick more than 5 seconds after opening}
 
-\item{preAverage}{A positive \code{integer} denoting the length of pre-averaging window for the log-prices. Default is 5}
+\item{preAverage}{A positive \code{integer} denoting the length of pre-averaging window for the log-prices. Default is \code{5}}
 
 \item{ACLag}{A positive \code{integer} greater than 1 denoting how many lags are to be used for the HAC estimator of the variance - the default
-of \code{-1} denotes using an automatic lag selection algorithm for each iteration. Default is -1L}
+of \code{-1} denotes using an automatic lag selection algorithm for each iteration. Default is \code{-1L}}
 
-\item{meanBandwidth}{An \code{integer} denoting the bandwidth for the left-sided exponential kernel for the mean. Default is 300L}
+\item{meanBandwidth}{An \code{integer} denoting the bandwidth for the left-sided exponential kernel for the mean. Default is \code{300L}}
 
-\item{varianceBandwidth}{An \code{integer} denoting the bandwidth for the left-sided exponential kernel for the variance. Default is 900L}
+\item{varianceBandwidth}{An \code{integer} denoting the bandwidth for the left-sided exponential kernel for the variance. Default is \code{900L}}
 
-\item{parallelize}{A \code{logical} to determine whether to parallelize the underlying C++ code (Using OpenMP). Default is FALSE}
+\item{parallelize}{A \code{logical} to determine whether to parallelize the underlying C++ code (Using OpenMP). Default is \code{FALSE}}
 
 \item{nCores}{An \code{integer} denoting the number of cores to use for calculating the code when parallelized. 
-If this argument is not provided, sequential evaluation will be used even though \code{parallelize} is TRUE. Default is NA}
+If this argument is not provided, sequential evaluation will be used even though \code{parallelize} is TRUE. Default is \code{NA}}
 
-\item{warnings}{A \code{logical} denoting whether warnings should be shown. Default is TRUE}
+\item{warnings}{A \code{logical} denoting whether warnings should be shown. Default is \code{TRUE}}
 }
 \value{
 An object of class \code{DBH} and \code{list} containing the series of the drift burst hypothesis test-statistic as well as the estimated spot drift and variance series. 
@@ -50,6 +50,39 @@ retrieves critical values for the test described in appendix B
 }
 \description{
 Calculates the Test-Statistic for the Drift Burst Hypothesis
+
+Let the efficient log-price be defined as:
+\deqn{
+    dX_{t} = \mu_{t}dt + \sigma_{t}dW_{t} + dJ_{t},
+}
+where \eqn{\mu_{t}}, \eqn{\sigma_{t}}, and \eqn{J_{t}} are the spot drift, the spot volatility, and a jump process respectively.
+However, due to microstructure noise, the observed log-price is 
+\deqn{
+    Y_{t} = X_{t} + \varepsilon_{t}
+}
+
+In order robustify the results to the presence of market microstructure noise, the pre-averaged returns are used:
+\deqn{
+    \Delta_{i}^{n}\overline{Y} = \sum_{j=1}^{k_{n}-1}g_{j}^{n}\Delta_{i+j}^{n}Y,
+}
+
+where \eqn{g(\cdot)} is a weighting function, \eqn{min(x, 1-x)}, and \eqn{k_{n}} is the pre-averaging horizon.
+
+The test statistic for the Drift Burst Hypothesis can then be calculated as
+
+\deqn{
+    \bar{T}_{t}^{n} = \sqrt{\frac{h_{n}}{K_{2}}}\frac{\hat{\bar{\mu}}_{t}^{n}}{\sqrt{\hat{\bar{\sigma}}_{t}^{n}}},
+}
+where
+\deqn{
+    \hat{\bar{\mu}}_{t}^{n} = \frac{1}{h_{n}}\sum_{i=1}^{n-k_{n}+2}K\left(\frac{t_{i-1}-t}{h_{n}}\right)\Delta_{i-1}^{n}\overline{Y},
+}
+and
+\deqn{
+    \hat{\bar{\sigma}}_{t}^{n} = \frac{1}{h_{n}'}\left[\sum_{i=1}^{n-k_{n}+2}\left(K\left(\frac{t_{i-1}-t}{h'_{n}}\right)\Delta_{i-1}^{n}\overline{Y}\right)^{2}+2\sum_{L=1}^{L_{n}}\omega\left(\frac{L}{L_{n}}\right)\sum_{i=1}^{n-k_{n}-L+2}K\left(\frac{t_{i-1}-t}{h_{n}'}\right)K\left(\frac{t_{i+L-1}-t}{h_{n}'}\right)\Delta_{i-1}^{n}\overline{Y}\Delta_{i-1+L}^{n}\overline{Y}\right],
+}
+where \eqn{\omega(\cdot)} is a smooth kernel function, in this case the Parzen kernel. \eqn{L_{n}} is the lag length for adjusting for auto-correlation and \eqn{K(\cdot)}
+is a kernel weighting function, which in this case is the left-sided exponential kernel.
 }
 \details{
 If the \code{testTimes} vector contains instructions to test before the first trade, or more than 15 minutes after the last trade, these entries will be deleted, as not doing so may cause crashes.

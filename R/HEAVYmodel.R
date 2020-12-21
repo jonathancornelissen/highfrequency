@@ -4,8 +4,8 @@
 #' 
 #' @description This function calculates the High frEquency bAsed VolatilitY (HEAVY) model proposed in Shephard and Sheppard (2010). 
 #'
-#' @param data an \code{xts} object where the first column is  a vector of demeaned returns 
-#' and the second column is a vector of realized stock market variation.
+#' @param data an \code{xts} object where the first column is a vector of returns 
+#' and the second column is a vector of realized stock market variation
 #' @param startingValues a vector of alternative starting values: first three arguments for variance equation and last three arguments for measurement equation.
 #' 
 #' @return The function outputs an object of class \code{HEAVYmodel}, a list containing
@@ -39,7 +39,9 @@
 #' We report robust standard errors based on the matrix-product of inverted Hessians and
 #' the outer product of gradients.
 #' 
-#' @references Shephard, N. and K. Sheppard (2010). Realising the future: Forecasting with high frequency based volatility (HEAVY) models. Journal of Applied Econometrics 25, 197-231.
+#' Note that we always demean the returns in the data input as we don't include a constant in the mean equation.
+#' 
+#' @references Shephard, N. and Sheppard, K. (2010). Realising the future: Forecasting with high frequency based volatility (HEAVY) models. Journal of Applied Econometrics 25, 197--231.
 #' @importFrom numDeriv jacobian hessian
 #' @importFrom stats nlminb
 #' @author Onno Kleen.
@@ -48,9 +50,6 @@
 #' 
 #' # Calculate annualized returns in percentages
 #' logReturns <- 100 * makeReturns(SPYRM$CLOSE)[-1]
-#' 
-#' # Returns are assumed to be demeaned
-#' logReturns <- logReturns - mean(logReturns)
 #' 
 #' # Combine both returns and realized measures into one xts
 #' dataSPY <- xts::xts(cbind(logReturns, SPYRM$RK5[-1] * 10000), order.by = SPYRM$DT[-1])
@@ -72,10 +71,7 @@ HEAVYmodel <- function(data, startingValues = NULL) {
   
   ret <- as.numeric(data[,1])
   rm <- as.numeric(data[,2])
-  
-  if (abs(mean(ret)) > 0.001) {
-    warning("Returns are assumed to be demeaned but mean(ret) is unequal zero. Please check your data.")
-  }
+  ret <- ret - mean(ret)
   
   heavyLLH <- function(par, RMEq = FALSE) {
     # if (RMEq) {
