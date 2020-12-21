@@ -26,9 +26,9 @@ driftKernel <- function(data, intraday, options) {
     x     <- time - intraday[i]
     vWm   <- exp(-abs(x/meanBandwidth)) * (x <= 0)    ##left sided exponential kernel
     idx   <- sum(x <= 0)                        # makes sure we don't include future data!
-    mu[i] <- (sum(vWm[1:idx] * vpreAveraged[1:idx])) / meanBandwidth
+    mu[i] <- sum(vWm[1:idx] * vpreAveraged[1:idx])
   }
-  mu = as.matrix(mu * meanBandwidth, ncol = 1)
+  mu = as.matrix(mu, ncol = 1)
   out = list("mu" = mu)
   class(out) <- "spotDrift"
   return(out)

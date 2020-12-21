@@ -107,7 +107,7 @@ In order robustify the results to the presence of market microstructure noise, t
 where \eqn{g(\cdot)} is a weighting function, \eqn{min(x, 1-x)}, and \eqn{k_{n}} is the pre-averaging horizon.
 The spot drift estimator is then:
 \deqn{
-    \hat{\bar{\mu}}_{t}^{n} = \frac{1}{h_{n}}\sum_{i=1}^{n-k_{n}+2}K\left(\frac{t_{i-1}-t}{h_{n}}\right)\Delta_{i-1}^{n}\overline{Y} * h_{n},
+    \hat{\bar{\mu}}_{t}^{n} = \sum_{i=1}^{n-k_{n}+2}K\left(\frac{t_{i-1}-t}{h_{n}}\right)\Delta_{i-1}^{n}\overline{Y},
 }
 The kernel estimation method has the following parameters:
  \itemize{
