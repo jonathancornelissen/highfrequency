@@ -12,7 +12,7 @@
 #'     Y_{t} = X_{t} + \varepsilon_{t}
 #' }
 #' 
-#' In order robustify the results to the presence of market microstructure noise, the pre-averaged returns are used:#' 
+#' In order robustify the results to the presence of market microstructure noise, the pre-averaged returns are used:
 #' \deqn{
 #'     \Delta_{i}^{n}\overline{Y} = \sum_{j=1}^{k_{n}-1}g_{j}^{n}\Delta_{i+j}^{n}Y,
 #' }
@@ -42,15 +42,15 @@
 #' @param testTimes A \code{numeric} containing the times at which to calculate the tests. The standard of \code{seq(34260, 57600, 60)} 
 #' denotes calculating the test-statistic once per minute, i.e. 390 times for a typical 6.5 hour trading day from 9:31:00 to 16:00:00. See details.
 #' Additionally, \code{testTimes} can be set to 'all' where the test statistic will be calculated on each tick more than 5 seconds after opening
-#' @param preAverage A positive \code{integer} denoting the length of pre-averaging window for the log-prices. Default is 5
+#' @param preAverage A positive \code{integer} denoting the length of pre-averaging window for the log-prices. Default is \code{5}
 #' @param ACLag A positive \code{integer} greater than 1 denoting how many lags are to be used for the HAC estimator of the variance - the default
-#' of \code{-1} denotes using an automatic lag selection algorithm for each iteration. Default is -1L
-#' @param meanBandwidth An \code{integer} denoting the bandwidth for the left-sided exponential kernel for the mean. Default is 300L
-#' @param varianceBandwidth An \code{integer} denoting the bandwidth for the left-sided exponential kernel for the variance. Default is 900L
-#' @param parallelize A \code{logical} to determine whether to parallelize the underlying C++ code (Using OpenMP). Default is FALSE
+#' of \code{-1} denotes using an automatic lag selection algorithm for each iteration. Default is \code{-1L}
+#' @param meanBandwidth An \code{integer} denoting the bandwidth for the left-sided exponential kernel for the mean. Default is \code{300L}
+#' @param varianceBandwidth An \code{integer} denoting the bandwidth for the left-sided exponential kernel for the variance. Default is \code{900L}
+#' @param parallelize A \code{logical} to determine whether to parallelize the underlying C++ code (Using OpenMP). Default is \code{FALSE}
 #' @param nCores An \code{integer} denoting the number of cores to use for calculating the code when parallelized. 
-#' If this argument is not provided, sequential evaluation will be used even though \code{parallelize} is TRUE. Default is NA
-#' @param warnings A \code{logical} denoting whether warnings should be shown. Default is TRUE
+#' If this argument is not provided, sequential evaluation will be used even though \code{parallelize} is TRUE. Default is \code{NA}
+#' @param warnings A \code{logical} denoting whether warnings should be shown. Default is \code{TRUE}
 #' 
 #' @details 
 #' If the \code{testTimes} vector contains instructions to test before the first trade, or more than 15 minutes after the last trade, these entries will be deleted, as not doing so may cause crashes.

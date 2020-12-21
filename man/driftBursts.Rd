@@ -25,21 +25,21 @@ trades (in levels) respectively. If pData is an \code{xts} object and the number
 denotes calculating the test-statistic once per minute, i.e. 390 times for a typical 6.5 hour trading day from 9:31:00 to 16:00:00. See details.
 Additionally, \code{testTimes} can be set to 'all' where the test statistic will be calculated on each tick more than 5 seconds after opening}
 
-\item{preAverage}{A positive \code{integer} denoting the length of pre-averaging window for the log-prices. Default is 5}
+\item{preAverage}{A positive \code{integer} denoting the length of pre-averaging window for the log-prices. Default is \code{5}}
 
 \item{ACLag}{A positive \code{integer} greater than 1 denoting how many lags are to be used for the HAC estimator of the variance - the default
-of \code{-1} denotes using an automatic lag selection algorithm for each iteration. Default is -1L}
+of \code{-1} denotes using an automatic lag selection algorithm for each iteration. Default is \code{-1L}}
 
-\item{meanBandwidth}{An \code{integer} denoting the bandwidth for the left-sided exponential kernel for the mean. Default is 300L}
+\item{meanBandwidth}{An \code{integer} denoting the bandwidth for the left-sided exponential kernel for the mean. Default is \code{300L}}
 
-\item{varianceBandwidth}{An \code{integer} denoting the bandwidth for the left-sided exponential kernel for the variance. Default is 900L}
+\item{varianceBandwidth}{An \code{integer} denoting the bandwidth for the left-sided exponential kernel for the variance. Default is \code{900L}}
 
-\item{parallelize}{A \code{logical} to determine whether to parallelize the underlying C++ code (Using OpenMP). Default is FALSE}
+\item{parallelize}{A \code{logical} to determine whether to parallelize the underlying C++ code (Using OpenMP). Default is \code{FALSE}}
 
 \item{nCores}{An \code{integer} denoting the number of cores to use for calculating the code when parallelized. 
-If this argument is not provided, sequential evaluation will be used even though \code{parallelize} is TRUE. Default is NA}
+If this argument is not provided, sequential evaluation will be used even though \code{parallelize} is TRUE. Default is \code{NA}}
 
-\item{warnings}{A \code{logical} denoting whether warnings should be shown. Default is TRUE}
+\item{warnings}{A \code{logical} denoting whether warnings should be shown. Default is \code{TRUE}}
 }
 \value{
 An object of class \code{DBH} and \code{list} containing the series of the drift burst hypothesis test-statistic as well as the estimated spot drift and variance series. 
@@ -61,7 +61,7 @@ However, due to microstructure noise, the observed log-price is
     Y_{t} = X_{t} + \varepsilon_{t}
 }
 
-In order robustify the results to the presence of market microstructure noise, the pre-averaged returns are used:#' 
+In order robustify the results to the presence of market microstructure noise, the pre-averaged returns are used:
 \deqn{
     \Delta_{i}^{n}\overline{Y} = \sum_{j=1}^{k_{n}-1}g_{j}^{n}\Delta_{i+j}^{n}Y,
 }

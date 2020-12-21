@@ -37,7 +37,6 @@ integer containing the optimal kn
 }
 \description{
 Function to choose the tuning parameter, kn in ReMeDI estimation. 
-
 The optimal parameter \code{kn} is the smallest value that where the criterion:
 \deqn{
     SqErr(k_{n})^{n}_{t} = \left(\hat{R}^{n,k_{n}}_{t,0} - \hat{R}^{n,k_{n}}_{t,1} - \hat{R}^{n,k_{n}}_{t,2} + \hat{R}^{n,k_{n}}_{t,3} - \hat{R}^{n, k_{n}}_{t,l}\right)^{2}

@@ -4,7 +4,7 @@
 \alias{rSV}
 \title{Realized semivariance of highfrequency return series.}
 \usage{
-rSV(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, ...)
+rSV(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE)
 }
 \arguments{
 \item{rData}{an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days.}
@@ -16,8 +16,6 @@ To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \cod
 based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.}
 
 \item{makeReturns}{boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.}
-
-\item{...}{used internally, any input is ignored.}
 }
 \value{
 list with two entries, the realized positive and negative semivariances

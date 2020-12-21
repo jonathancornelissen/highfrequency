@@ -6,7 +6,7 @@
 \usage{
 spotDrift(
   data,
-  method = "driftMean",
+  method = "mean",
   alignBy = "minutes",
   alignPeriod = 5,
   marketOpen = "09:30:00",
@@ -49,18 +49,88 @@ The additional arguments for the mean and median methods are: \code{periods} for
 For the kernel mean estimator, the arguments \code{meanBandwidth} can be used to control the bandwidth of the 
 drift estimator and the \code{preAverage} argument, which can be used to control the pre-averaging horizon. 
 These arguments default to 300 and 5 respectively.
+
+The following estimation methods can be specified in \code{method}:
+
+\strong{Rolling window mean (\code{"mean"})}
+
+Estimates the spot drift by applying a rolling mean over returns.
+\deqn{
+    \hat{\mu_{t}} = \sum_{t = k}^{T} \textrm{mean} \left(r_{t-k : t} \right),
+}
+where \eqn{k} is the argument \code{periods}.
+Parameters:
+\itemize{
+   \item{\code{periods}}{ How big the window for the estimation should be. The estimator will have \code{periods} \code{NA}s at the beginning of each trading day.}
+   \item{\code{align}}{ Alignment method for returns. Defaults to \code{"left"}, which includes only past data, but other choices, \code{"center"} and \code{"right"} are available.
+    These values includes FUTURE DATA, so beware!}
+}
+Outputs:
+\itemize{
+ \item{\code{mu} A matrix containing the spot drift estimates}
+}
+  
+\strong{Rolling window median (\code{"median"})}
+
+Estimates the spot drift by applying a rolling mean over returns.
+\deqn{
+    \hat{\mu_{t}} = \sum_{t = k}^{T} \textrm{median} \left(r_{t-k : t} \right),
+}
+where \eqn{k} is the argument \code{periods}.
+Parameters:
+ \itemize{
+   \item{\code{periods}}{ How big the window for the estimation should be. The estimator will have \code{periods} \code{NA}s at the beginning of each trading day.}
+   \item{\code{align}}{ Alignment method for returns. Defaults to \code{"left"}, which includes only past data, but other choices, \code{"center"} and \code{"right"} are available.
+    These values includes FUTURE DATA, so beware!}
+}
+Outputs:
+\itemize{
+ \item{\code{mu} A matrix containing the spot drift estimates}
+}
+
+\strong{kernel spot drift estimator (\code{"kernel"})}
+
+\deqn{
+    dX_{t} = \mu_{t}dt + \sigma_{t}dW_{t} + dJ_{t},
+}
+where \eqn{\mu_{t}}, \eqn{\sigma_{t}}, and \eqn{J_{t}} are the spot drift, the spot volatility, and a jump process respectively.
+However, due to microstructure noise, the observed log-price is 
+\deqn{
+    Y_{t} = X_{t} + \varepsilon_{t}
+}
+
+In order robustify the results to the presence of market microstructure noise, the pre-averaged returns are used:
+\deqn{
+    \Delta_{i}^{n}\overline{Y} = \sum_{j=1}^{k_{n}-1}g_{j}^{n}\Delta_{i+j}^{n}Y,
+}
+
+where \eqn{g(\cdot)} is a weighting function, \eqn{min(x, 1-x)}, and \eqn{k_{n}} is the pre-averaging horizon.
+The spot drift estimator is then:
+\deqn{
+    \hat{\bar{\mu}}_{t}^{n} = \frac{1}{h_{n}}\sum_{i=1}^{n-k_{n}+2}K\left(\frac{t_{i-1}-t}{h_{n}}\right)\Delta_{i-1}^{n}\overline{Y} * h_{n},
+}
+The kernel estimation method has the following parameters:
+ \itemize{
+   \item{\code{preAverage}}{ A positive \code{integer} denoting the length of pre-averaging window for the log-prices. Default is 5}
+   \item{\code{meanBandwidth}}{ An \code{integer} denoting the bandwidth for the left-sided exponential kernel for the mean. Default is \code{300L}}
+}
+Outputs:
+\itemize{
+ \item{\code{mu} A matrix containing the spot drift estimates}
+}
 }
 \examples{
 # Example 1: Rolling mean and median estimators for 2 days
-meandrift <- spotDrift(data = sampleTData, alignPeriod = 1, tz = "EST")
-mediandrift <- spotDrift(data = sampleTData, method = "driftMedian", 
+meandrift <- spotDrift(data = sampleTData, alignPeriod = 1)
+mediandrift <- spotDrift(data = sampleTData, method = "median", 
                          alignBy = "seconds", alignPeriod = 30, tz = "EST")
 plot(meandrift)
 plot(mediandrift)
 \dontrun{
 # Example 2: Kernel based estimator for one day with data.table format
 price <- sampleTData[as.Date(DT) == "2018-01-02", list(DT, PRICE)]
-kerneldrift <- spotDrift(price, method = "driftKernel", alignBy = "minutes", alignPeriod = 1)
+kerneldrift <- spotDrift(sampleTDataEurope, method = "driftKernel",
+                         alignBy = "minutes", alignPeriod = 1)
 plot(kerneldrift)
 }
 
