@@ -20,12 +20,13 @@ of stock \eqn{i} for day \eqn{t}. The order of the data does not matter as it wi
 
 \item{COVest}{covariance estimator, default is \code{"rMRC"}. For a list of implemented estimators, use \code{listCholCovEstimators()}.}
 
-\item{criterion}{criterion to use for sorting the data according to liquidity. Possible values are \code{"squared duration"}, \code{"duration"}, \code{"count"}, defaults to \code{"squared duration"}.}
+\item{criterion}{criterion to use for sorting the data according to liquidity. 
+Possible values are \code{"squared duration"}, \code{"duration"}, \code{"count"}, defaults to \code{"squared duration"}.}
 
 \item{...}{additional arguments to pass to \code{IVest} and \code{COVest}. See details.}
 }
 \value{
-a list containing the covariance matrix \code{"CholCov"}, and the Cholesky decomposition \code{"L"} and \code{"G"} such that L * G * L' = CholCov
+a list containing the covariance matrix \code{"CholCov"}, and the Cholesky decomposition \code{"L"} and \code{"G"} such that \eqn{\code{L} \times \code{G} \times \code{L}' = \code{CholCov}}.
 }
 \description{
 Positive semi-definite covariance estimation using the CholCov algorithm.

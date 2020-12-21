@@ -67,7 +67,7 @@ Barndorff-Nielsen, O. E. and Shephard, N. (2004). Econometric analysis of realiz
 financial economics. \emph{Econometrica}, 72, 885-925.
 }
 \author{
-Giang Nguyen, Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
+Giang Nguyen, Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
 }
 \keyword{highfrequency}
 \keyword{rBeta}

@@ -1,5 +1,5 @@
 
-#' Available Kernels
+#' Available kernels
 #'
 #' @description Returns a vector of the available kernels.
 #'
@@ -44,18 +44,18 @@ listAvailableKernels <- function() {
     "ModifiedTukeyHanning")
 }
 
-#' An estimator of integrated quarticity from applying the median operator on blocks of three returns.
+#' An estimator of integrated quarticity from applying the median operator on blocks of three returns
 #' @description 
 #' Calculate the rMedRQ, defined in Andersen et al. (2012). Assume there are \eqn{N} equispaced returns \eqn{r_{t,i}} in period \eqn{t}, \eqn{i=1, \ldots,N}. 
 #' Then, the rMedRQ is given by
 #' \deqn{
-#'   \mbox{rMedRQ}_{t}=\frac{3\pi N}{9\pi +72 - 52\sqrt{3}} \left(\frac{N}{N-2}\right) \sum_{i=2}^{N-1} \mbox{med}(|r_{t,i-1}|, |r_{t,i}|, |r_{t,i+1}|)^4
+#'   \mbox{rMedRQ}_{t}=\frac{3\pi N}{9\pi +72 - 52\sqrt{3}} \left(\frac{N}{N-2}\right) \sum_{i=2}^{N-1} \mbox{med}(|r_{t,i-1}|, |r_{t,i}|, |r_{t,i+1}|)^4.
 #' }
 #'   
-#' @param rData an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days
+#' @param rData an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days.
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"},\code{"hours"}.
-#' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
-#' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
+#' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. For example, to aggregate
+#' based on a 5-minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
 #' @param makeReturns boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.
 #'
 #' @return 
@@ -65,7 +65,7 @@ listAvailableKernels <- function() {
 #' \item If the input data is a \code{data.table} object, the function returns a \code{data.table} with the same column names as the input data, containing the date and the realized measures.
 #' }
 #' 
-#' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
+#' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup.
 #'
 #' @examples
 #' rq <- rMedRQ(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes",
@@ -140,7 +140,7 @@ rMedRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
   }
 }
 
-#' An estimator of integrated quarticity from applying the minimum operator on blocks of two returns.
+#' An estimator of integrated quarticity from applying the minimum operator on blocks of two returns
 #' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 #' @description 
 #' Calculate the rMinRQ, defined in Andersen et al. (2012).
@@ -152,7 +152,7 @@ rMedRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
 #' @param rData an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}.
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. For example, to aggregate
-#' based on a 5 minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
+#' based on a 5-minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
 #' @param makeReturns boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.
 #'
 #' @return 
@@ -232,9 +232,10 @@ rMinRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
 #' }
 #'
 #' @param rData an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days.
-#' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}.
+#' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. 
+#' Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}.
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. For example, to aggregate
-#' based on a 5 minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
+#' based on a 5-minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
 #' @param makeReturns boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.
 #'
 #' @return 
@@ -328,7 +329,7 @@ rMinRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
 #' @param rData an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}.
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. For example, to aggregate
-#' based on a 5 minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
+#' based on a 5-minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
 #' @param makeReturns boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.
 #'
 #' @details
@@ -351,7 +352,7 @@ rMinRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
 #' @references
 #' Andersen, T. G., Dobrev, D., and Schaumburg, E. (2012). Jump-robust volatility estimation using nearest neighbor truncation. \emph{Journal of Econometrics}, 169, 75-93.
 #'
-#' @author Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
+#' @author Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup.
 #'
 #' @examples
 #' medrv <- rMedRV(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes",
@@ -784,7 +785,7 @@ rAVGCov <- function(rData, cor = FALSE, alignBy = "minutes", alignPeriod = 5, k 
 }
 
 
-#' Realized beta: a tool in measuring risk with respect to the market.
+#' Realized beta
 #'
 #' @description Depending on users' choices of estimator (realized covariance (RCOVestimator) and realized variance (RVestimator)), 
 #' the function returns the realized beta, defined as the ratio between both.
@@ -824,7 +825,7 @@ rAVGCov <- function(rData, cor = FALSE, alignBy = "minutes", alignPeriod = 5, k 
 #' Barndorff-Nielsen, O. E. and Shephard, N. (2004). Econometric analysis of realized covariation: high frequency based covariance, regression, and correlation in
 #' financial economics. \emph{Econometrica}, 72, 885-925.
 #'
-#' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
+#' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
 #'
 #' @examples
 #' \dontrun{
@@ -909,7 +910,7 @@ rBeta <- function(rData, rIndex, RCOVestimator = "rCov", RVestimator = "RV", mak
 
 
 
-#' Realized BiPower Covariance
+#' Realized bipower covariance
 #'
 #' @description Calculate the Realized BiPower Covariance (rBPCov),
 #'  defined in Barndorff-Nielsen and Shephard (2004).
@@ -933,7 +934,7 @@ rBeta <- function(rData, rIndex, RCOVestimator = "rCov", RVestimator = "RV", mak
 #' @param cor boolean, in case it is \code{TRUE}, and the input data is multivariate, the correlation is returned instead of the covariance matrix. \code{FALSE} by default.
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
-#' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
+#' based on a 5-minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
 #' @param makeReturns boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.
 #' @param makePsd boolean, in case it is \code{TRUE}, the positive definite version of rBPCov is returned. \code{FALSE} by default.
 #'
@@ -1060,7 +1061,7 @@ rBPCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeR
   }
 }
 
-#' Realized Covariance
+#' Realized covariance
 #'
 #' @description Function returns the Realized Covariation (rCov).
 #' Let \eqn{r_{t,i}} be an intraday \eqn{N \times M} return vector and \eqn{i=1,...,M}
@@ -1078,17 +1079,18 @@ rBPCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeR
 #' return series over period \eqn{t}, with \eqn{M} observations during \eqn{t}.
 #' In case of a matrix, no multi-day adjustment is possible.
 #'
-#' @param rData an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days
+#' @param rData an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days.
 #' @param cor boolean, in case it is \code{TRUE}, and the input data is multivariate, the correlation is returned instead of the covariance matrix. \code{FALSE} by default.
-#' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
-#' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
-#' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
+#' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. 
+#' Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
+#' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. For example, to aggregate
+#' based on a 5-minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
 #' @param makeReturns boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.
 #'
-#' @return in case the input is and contains data from one day, an N by N matrix is returned. If the data is a univariate \code{xts} object with multiple days, an \code{xts} is returned.
+#' @return in case the input is and contains data from one day, an \eqn{N \times N} matrix is returned. If the data is a univariate \code{xts} object with multiple days, an \code{xts} is returned.
 #' If the data is multivariate and contains multiple days (\code{xts} or \code{data.table}), the function returns a list containing N by N matrices. Each item in the list has a name which corresponds to the date for the matrix.
 #'
-#' @author Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
+#' @author Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup.
 #'
 #' @examples
 #' # Realized Variance/Covariance for prices aligned at 5 minutes.
@@ -1187,15 +1189,15 @@ rCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeRet
   }
 }
 
-#' Hayashi-Yoshida Covariance
+#' Hayashi-Yoshida covariance
 #' @description Calculates the Hayashi-Yoshida Covariance estimator
 #'
-#' @param rData an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days
+#' @param rData an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days.
 #' @param cor boolean, in case it is \code{TRUE}, and the input data is multivariate, the correlation is returned instead of the covariance matrix. \code{FALSE} by default.
 #' @param period Sampling period
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
-#' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
-#' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
+#' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. For example, to aggregate
+#' based on a 5-minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
 #' @param makeReturns boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.
 #' @param makePsd boolean, in case it is \code{TRUE}, the positive definite version of rHYCov is returned. \code{FALSE} by default.
 #'
@@ -1297,8 +1299,7 @@ rHYCov <- function(rData, cor = FALSE, period = 1, alignBy = "seconds", alignPer
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. 
 #' Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}.
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. 
-#' For example, to aggregate
-#' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
+#' For example, to aggregate based on a 5-minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
 #' @param makeReturns boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.
 #' @param kernelType Kernel name.
 #' @param kernelParam Kernel parameter.
@@ -1473,8 +1474,8 @@ rKernelCov <- function(rData, cor = FALSE,  alignBy = "seconds", alignPeriod = 1
 #' @param rData an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days.
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. 
 #' Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}.
-#' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
-#' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
+#' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. For example, to aggregate
+#' based on a 5-minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
 #' @param makeReturns boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.
 #'
 #' @return 
@@ -1559,9 +1560,9 @@ rKurt <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 }
 
 
-#' Realized multipower variation (MPV), an estimator of integrated power variation.
+#' Realized multipower variation
 #'
-#' @description Calculate the rMPV, defined in Andersen et al. (2012).
+#' @description Calculate the Realized Multipower Variation rMPV, defined in Andersen et al. (2012).
 #'
 #' Assume there are \eqn{N} equispaced returns \eqn{r_{t,i}} in period \eqn{t}, \eqn{i=1, \ldots,N}. Then, the rMPV is given by
 #'   \deqn{
@@ -1584,7 +1585,7 @@ rKurt <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. 
 #' Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. For example, to aggregate
-#' based on a 5 minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
+#' based on a 5-minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
 #' @param makeReturns boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.
 #'
 #' @return numeric
@@ -1668,9 +1669,9 @@ rMPV <- function(rData, m = 2, p = 2, alignBy = NULL, alignPeriod = NULL, makeRe
   }
 }
 
-#' Realized Outlyingness Weighted Covariance
+#' Realized outlyingness weighted covariance
 #'
-#' @description Calculate the Realized Outlyingness Weighted Covariance, defined in Boudt et al. (2008).
+#' @description Calculate the Realized Outlyingness Weighted Covariance (rOWCov), defined in Boudt et al. (2008).
 #'
 #' Let \eqn{r_{t,i}}, for \eqn{i = 1,..., M} be a sample
 #' of \eqn{M} high-frequency \eqn{(N \times 1)} return vectors and \eqn{d_{t,i}}
@@ -1694,7 +1695,7 @@ rMPV <- function(rData, m = 2, p = 2, alignBy = NULL, alignPeriod = NULL, makeRe
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. 
 #' Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}.
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. For example, to aggregate
-#' based on a 5 minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
+#' based on a 5-minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
 #' @param makeReturns boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.
 #' @param seasadjR a \eqn{(M x N)} \code{xts} object containing
 #' the seasonally adjusted returns. This is an optional argument.
@@ -1838,20 +1839,20 @@ rOWCov <- function (rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, make
   }
 }
 
-#' Realized skewness of highfrequency return series.
+#' Realized skewness
 #'
-#' @description Calculate the Realized skewness, defined in Amaya et al. (2015).
+#' @description Calculate the realized skewness, defined in Amaya et al. (2015).
 #'
 #' Assume there are \eqn{N} equispaced returns in period \eqn{t}. Let \eqn{r_{t,i}} be a return (with \eqn{i=1, \ldots,N}) in period \eqn{t}. Then, \code{rSkew} is given by
 #'   \deqn{
 #'     \mbox{rSkew}_{t}= \frac{\sqrt{N} \sum_{i=1}^{N}(r_{t,i})^3}{\left(\sum r_{i,t}^2\right)^{3/2}}.
 #'   }
 #'
-#' @param rData an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days
+#' @param rData an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days.
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. 
-#' Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
+#' Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}.
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. For example, to aggregate
-#' based on a 5 minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
+#' based on a 5-minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
 #' @param makeReturns boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.
 #'
 #' @return 
@@ -1864,7 +1865,7 @@ rOWCov <- function (rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, make
 #' @references
 #' Amaya, D., Christoffersen, P., Jacobs, K., and Vasquez, A. (2015). Does realized skewness and kurtosis predict the cross-section of equity returns? \emph{Journal of Financial Economics}, 118, 135-167.
 #'
-#' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
+#' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
 #'
 #' @examples
 #' rs <- rSkew(sampleTData[, list(DT, PRICE)],alignBy ="minutes", alignPeriod =5,
@@ -1955,9 +1956,9 @@ rSkew <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #' }
 #' @param rData an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days.
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. 
-#' Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
+#' Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}.
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. For example to aggregate.
-#' based on a 5 minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
+#' based on a 5-minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
 #' @param makeReturns boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. 
 #' \code{FALSE} by default.
 #' @return list with two entries, the realized positive and negative semivariances
@@ -1968,7 +1969,7 @@ rSkew <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #' @references
 #' Barndorff-Nielsen, O. E., Kinnebrock, S., and Shephard N. (2010). \emph{Measuring downside risk: realised semivariance}. In: Volatility and Time Series Econometrics: Essays in Honor of Robert F. Engle,
 #' (Edited by Bollerslev, T., Russell, J., and Watson, M.), 117-136. Oxford University Press.
-#' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
+#' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup.
 #' @keywords  highfrequency rSV
 #' @export
 rSV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, ...) {
@@ -2066,7 +2067,7 @@ rSV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, 
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. 
 #' Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}.
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. For example, to aggregate
-#' based on a 5 minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
+#' based on a 5-minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
 #' @param makeReturns boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. 
 #' \code{FALSE} by default.
 #'
@@ -2260,7 +2261,7 @@ rThresholdCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL
 #'
 #' Zhang, L., Mykland, P. A., and Ait-Sahalia, Y. (2005). A tale of two time scales: Determining integrated volatility with noisy high-frequency data. \emph{Journal of the American Statistical Association}, 100, 1394-1411.
 #'
-#' @author Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
+#' @author Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup.
 #' @examples
 #' \dontrun{
 #' library(xts)
@@ -2378,7 +2379,7 @@ RV <- function(rData) {
 }
 
 
-#' Realized tri-power quarticity for a highfrequency return series.
+#' Realized tri-power quarticity
 #'
 #' @description Calculate the rTPQuar, defined in Andersen et al. (2012).
 #'
@@ -2391,7 +2392,7 @@ RV <- function(rData) {
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. 
 #' Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}.
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. For example, to aggregate
-#' based on a 5 minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
+#' based on a 5-minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
 #' @param makeReturns boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.
 #'
 #' @return 
@@ -2404,7 +2405,7 @@ RV <- function(rData) {
 #' @references 
 #' Andersen, T. G., Dobrev, D., and Schaumburg, E. (2012). Jump-robust volatility estimation using nearest neighbor truncation. \emph{Journal of Econometrics}, 169, 75-93.
 #'
-#' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
+#' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup.
 #'
 #' @examples
 #' tpv <- rTPQuar(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes",
@@ -2476,8 +2477,8 @@ rTPQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FAL
 #' @param rData an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
 #'
-#' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
-#' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
+#' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. For example, to aggregate
+#' based on a 5-minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
 #' @param makeReturns boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.
 #'
 #' @return 
@@ -2549,8 +2550,8 @@ rQPVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
   }
 }
 
-#' Realized quarticity of highfrequency return series.
-#' @description  Calculate the rQuar, defined in Andersen et al. (2012).
+#' Realized quarticity
+#' @description  Calculate the realized quarticity (rQuar), defined in Andersen et al. (2012).
 #'
 #' Assume there are \eqn{N} equispaced returns \eqn{r_{t,i}} in period \eqn{t}, \eqn{i=1, \ldots,N}.
 #'
@@ -2559,11 +2560,11 @@ rQPVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
 #'    \mbox{rQuar}_{t}=\frac{N}{3} \sum_{i=1}^{N} \mbox(r_{t,i}^4)
 #'  }
 #'
-#' @param rData an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days
+#' @param rData an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days.
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
 #'
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. For example, to aggregate
-#' based on a 5 minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
+#' based on a 5-minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
 #' @param makeReturns boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.
 #'
 #' @return 
@@ -2573,7 +2574,7 @@ rQPVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
 #' \item If the input data is a \code{data.table} object, the function returns a \code{data.table} with the same column names as the input data, containing the date and the realized measures.
 #' }
 #'
-#' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
+#' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup.
 #' @references 
 #' Andersen, T. G., Dobrev, D., and Schaumburg, E. (2012). Jump-robust volatility estimation using nearest neighbor truncation. \emph{Journal of Econometrics}, 169, 75-93.
 #' @examples
@@ -2697,7 +2698,7 @@ rQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #'
 #' Zhang, L. (2011). Estimating covariation: Epps effect, microstructure noise. \emph{Journal of Econometrics}, 160, 33-47.
 #'
-#' @author Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
+#' @author Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup.
 #' @examples
 #' # Robust Realized two timescales Variance/Covariance
 #' # Multivariate:
@@ -2999,7 +3000,7 @@ rCholCov <- function(pData, IVest = "rMRC", COVest = "rMRC", criterion = "square
 
 
 
-#' Realized Semicovariance
+#' Realized semicovariance
 #'
 #' @description Calculate the Realized Semicovariances (rSemiCov).
 #' Let \eqn{ r_{t,i} } be an intraday \eqn{M x N} return matrix and \eqn{i=1,...,M}
@@ -3018,18 +3019,17 @@ rCholCov <- function(pData, IVest = "rMRC", COVest = "rMRC", criterion = "square
 #'}
 #'
 #' The mixed covariance matrix will have 0 on the diagonal.
-#' From these three matrices, the realized covariance can be constructed as pos + neg + mixed.
-#' The concordant semicovariance matrix is pos + neg.
+#' From these three matrices, the realized covariance can be constructed as \eqn{pos + neg + mixed}.
+#' The concordant semicovariance matrix is \eqn{pos + neg}.
 #' The off-diagonals of the concordant matrix is always positive, while for the mixed matrix, it is always negative.
 #'
 #'
 #'
-#' @param rData an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days
+#' @param rData an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days.
 #' @param cor boolean, in case it is \code{TRUE}, and the input data is multivariate, the correlation is returned instead of the covariance matrix. \code{FALSE} by default.
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
-#'
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. For example, to aggregate
-#' based on a 5 minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
+#' based on a 5-minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
 #' @param makeReturns boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.
 #'
 #' @return In case the data consists of one day a list of five \eqn{N \times N} matrices are returned. These matrices are named \code{mixed}, \code{positive}, \code{negative}, \code{concordant}, and \code{rCov}.
@@ -3060,7 +3060,7 @@ rCholCov <- function(pData, IVest = "rMRC", COVest = "rMRC", criterion = "square
 #' plot(covariances)
 #' addLegend(lty = 1) # Add legend so we can distinguish the series.
 #' }
-#' @author Emil Sjoerup
+#' @author Emil Sjoerup.
 #'
 #' @references
 #' Bollerslev, T., Li, J., Patton, A. J., and Quaedvlieg, R. (2020). Realized semicovariances. \emph{Econometrica}, 88, 1515-1551.
@@ -3460,10 +3460,8 @@ knChooseReMeDI <- function(pData, knEqual = FALSE,
 #' \deqn{
 #'     U\left(4;\boldsymbol{j},\boldsymbol{j}'\right)_{t}^{n}=-\sum_{i=2^{q-1}k_{n}}^{n_{t}-\omega\left(4\right)_{n}}\Delta_{\boldsymbol{j}}\left(Y\right)\Delta_{\boldsymbol{j}^{\prime}}\left(Y\right)_{i+\omega\left(3\right)_{3}^{n}}^{n},
 #' }
-#' \preformatted{
 #' \deqn{
-#'     U\left(5,k;\boldsymbol{j},\boldsymbol{j}'\right)_{t}^{n}=\sum_{Q_{q}\in\mathcal{Q}_{q}}\sum_{i=2^{e\left(Q_{q}\right)}k_{n}}^{n_{t}-\omega\left(5\right)_{n}}\Delta\boldsymbol{_{j}}_{Q_{q}\oplus\left(\boldsymbol{j}\prime{}_{Q_{q'}}\left(+k\right)\right)}\left(Y\right)_{i}^{n}\prod_{\ell:l_{\ell}\in Q_{q}^{c}}\Delta_{\left(j_{l_{\ell}},j\prime_{l_{\ell}}+k\right)\left(Y\right)_{i+\omega\left(5\right)_{\ell+1}^{n}\prime}},
-#' }
+#'     U\left(5,k;\boldsymbol{j},\boldsymbol{j}'\right)_{t}^{n}=\sum_{Q_{q}\in\mathcal{Q}_{q}}\sum_{i=2^{e\left(Q_{q}\right)}k_{n}}^{n_{t}-\omega\left(5\right)_{n}}\Delta\boldsymbol{{j}}_{Q_{q}\oplus\left(\boldsymbol{j}\prime{}_{Q_{q'}}\left(+k\right)\right)}\left(Y\right)_{i}^{n}\prod_{\ell:l_{\ell}\in Q_{q}^{c}}\Delta_{\left(j_{l_{\ell}},j\prime_{l_{\ell}}+k\right)\left(Y\right)_{i+\omega\left(5\right)_{\ell+1}^{n}\prime}},
 #' }
 #' 
 #' \eqn{

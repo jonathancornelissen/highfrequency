@@ -43,7 +43,8 @@ of stock \eqn{i} for day \eqn{t}.}
 
 \item{eta}{positive real number, squared standardized high-frequency returns that exceed eta are detected as jumps.}
 
-\item{makePsd}{boolean, in case it is \code{TRUE}, the positive definite version of rRTSCov is returned. \code{FALSE} by default.}
+\item{makePsd}{boolean, in case it is \code{TRUE}, the positive definite version of rRTSCov is returned. 
+\code{FALSE} by default.}
 }
 \value{
 an \eqn{N \times N} matrix
@@ -56,7 +57,8 @@ estimate. By the use of two time scales, this covariance estimate
 is not only robust to price jumps, but also to microstructure noise and non-synchronic trading.
 }
 \details{
-The rRTSCov requires the tick-by-tick transaction prices. (Co)variances are then computed using log-returns calculated on a rolling basis
+The rRTSCov requires the tick-by-tick transaction prices. 
+(Co)variances are then computed using log-returns calculated on a rolling basis
 on stock prices that are \eqn{K} (slow time scale) and \eqn{J} (fast time scale) steps apart.
 
 The diagonal elements of the rRTSCov matrix are the variances, computed for log-price series \eqn{X} with \eqn{n} price observations
@@ -97,7 +99,7 @@ I_{Y}^K(i;\eta)}{\frac{1}{M_N-K+1}\sum_{i=1}^{M_N-K+1}{I_X^K(i;\eta)I_Y^K(i;\eta
 with  \eqn{I_{X}^K(i;\eta)} the same jump indicator function as for the variance and \eqn{c_N} a constant to adjust for the bias due to the thresholding.
 
 Unfortunately, the rRTSCov is not always positive semidefinite.
-By setting the argument makePsd = TRUE, the function  \code{\link{makePsd}} is used to return a positive semidefinite
+By setting the argument \code{makePsd = TRUE}, the function  \code{\link{makePsd}} is used to return a positive semidefinite
 matrix. This function replaces the negative eigenvalues with zeroes.
 }
 \examples{
@@ -126,6 +128,6 @@ Harris, F., McInish, T., Shoesmith, G., and Wood, R. (1995). Cointegration, erro
 Zhang, L., Mykland, P. A., and Ait-Sahalia, Y. (2005). A tale of two time scales: Determining integrated volatility with noisy high-frequency data. \emph{Journal of the American Statistical Association}, 100, 1394-1411.
 }
 \author{
-Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
+Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup.
 }
 \keyword{volatility}

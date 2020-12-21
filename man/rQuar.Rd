@@ -7,13 +7,12 @@
 rQuar(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE)
 }
 \arguments{
-\item{rData}{an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days}
+\item{rData}{an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days.}
 
-\item{alignBy}{character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
-To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.}
+\item{alignBy}{character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}}
 
 \item{alignPeriod}{positive numeric, indicating the number of periods to aggregate over. For example, to aggregate
-based on a 5 minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.}
+based on a 5-minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.}
 
 \item{makeReturns}{boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.}
 }
@@ -43,7 +42,7 @@ rq
 Andersen, T. G., Dobrev, D., and Schaumburg, E. (2012). Jump-robust volatility estimation using nearest neighbor truncation. \emph{Journal of Econometrics}, 169, 75-93.
 }
 \author{
-Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
+Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup.
 }
 \keyword{highfrequency}
 \keyword{rQuar}
