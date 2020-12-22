@@ -21,6 +21,9 @@ ReMeDIAsymptoticVariance(pData, kn, lags, phi, i)
 a list with components ReMeDI and asympVar
 }
 \description{
+Estimates the asymptotic variance of the ReMeDI estimator.
+}
+\details{
 Some notation is needed for the estimator of the asymptotic covariance of the ReMeDI estimator.
 Let
 \deqn{

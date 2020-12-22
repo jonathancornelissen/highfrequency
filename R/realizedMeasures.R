@@ -3434,9 +3434,12 @@ knChooseReMeDI <- function(pData, knEqual = FALSE,
 }
 
 #' Asymptotic variance of ReMeDI estimator
+#' 
 #' @description 
 #' 
+#' Estimates the asymptotic variance of the ReMeDI estimator.
 #' 
+#' @details 
 #' Some notation is needed for the estimator of the asymptotic covariance of the ReMeDI estimator.
 #' Let
 #' \deqn{
