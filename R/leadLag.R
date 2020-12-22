@@ -1,6 +1,32 @@
 #' Lead-Lag estimation
 #' @description Function that estimates whether one series leads (or lags) another.
 #' 
+#' Let \eqn{X_{t}} and \eqn{Y_{t}} be two observed price over the time interval \eqn{[0,1]}.
+#' 
+#' For every integer \eqn{k \in \cal{Z}}, we form the shifted time series
+#' 
+#' \deqn{
+#'    Y_{\left(k+i\right)/n},  \quad i = 1, 2, \dots
+#' }
+#' \eqn{H=\left(\underline{H},\overline{H}\right]} is an interval for \eqn{\vartheta\in\Theta}, define the shift interval \eqn{H_{\vartheta}=H+\vartheta=\left(\underline{H}+\vartheta,\overline{H}+\vartheta\right]} then let
+#' 
+#' \deqn{
+#'     X\left(H\right)_{t}=\int_{0}^{t}1_{H}\left(s\right)\textrm{d}X_{s}
+#' }
+#' 
+#' Which will be abbreviated:
+#' \deqn{
+#'     X\left(H\right)=X\left(H\right)_{T+\delta}=\int_{0}^{T+\delta}1_{H}\left(s\right)\textrm{d}X_{s}
+#' }
+#' 
+#' Then the shifted HY contrast function is:
+#' \deqn{
+#'     \tilde{\vartheta}\rightarrow U^{n}\left(\tilde{\vartheta}\right)= \\
+#'     1_{\tilde{\vartheta}\geq0}\sum_{I\in{\cal{I}},J\in{\cal{J}},\overline{I}\leq T}X\left(I\right)Y\left(J\right)1_{\left\{ I\cap J_{-\tilde{\vartheta}}\neq\emptyset\right\}} \\
+#'     +1_{\tilde{\vartheta}<0}\sum_{I\in{\cal{I}},J\in{\cal{J}},\overline{J}\leq T}X\left(I\right)Y\left(Y\right)1_{\left\{ J\cap I_{\tilde{\vartheta}}\neq\emptyset\right\} }
+#' }
+#' This contrast function is then calculated for all the lags passed in the argument \code{lags}
+#' 
 #' @param price1 \code{xts} or \code{data.table} containing prices in levels, in case of data.table,
 #'  use a column DT to denote the date-time in POSIXct format, and a column PRICE to denote the price
 #' @param price2 \code{xts} or \code{data.table} containing prices in levels, in case of data.table,
@@ -14,7 +40,7 @@
 #' @param nCores integer valued numeric denoting how many cores to use for the lead-lag estimation procedure in case parallelize is TRUE. 
 #' Default is NA, which does not parallelize the code.
 #' 
-#' @return A list with class "leadLag" which containing 'contrasts', 'lead-lag-ratio', and 'lags', denoting the estimated values for each lag calculated,
+#' @return A list with class \code{leadLag} which contains \code{contrasts}, \code{lead-lag-ratio}, and \code{lags}, denoting the estimated values for each lag calculated,
 #' the lead-lag-ratio, and the tested lags respectively.
 #' 
 #' @details The lead-lag-ratio (LLR) can be used to see if one asset leads the other. If LLR < 1, then price1 MAY be leading price2 and vice versa if LLR > 1.
