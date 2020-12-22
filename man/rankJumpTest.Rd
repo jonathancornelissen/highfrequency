@@ -12,6 +12,7 @@ rankJumpTest(
   localWindow = 30,
   rank = 1,
   BoxCox = 1,
+  quantiles = c(0.9, 0.95, 0.99),
   nBoot = 1000,
   dontTestAtBoundaries = TRUE,
   alignBy = "minutes",
@@ -36,32 +37,81 @@ rankJumpTest(
 
 \item{BoxCox}{numeric of exponents for the Box-Cox transformation, default is \code{1}}
 
+\item{quantiles}{numeric denoting which quantiles of the bootstrapped critical values to return and compare against. Default is \code{c(0.9, 0.95, 0.99)}}
+
 \item{nBoot}{numeric denoting how many replications to be used for the bootstrap algorithm. Default is \code{1000}}
 
 \item{dontTestAtBoundaries}{logical determining whether to exclude data across different days. Default is \code{TRUE}}
 
-\item{alignBy}{string indicating the time scale in which \code{alignPeriod} is expressed.
-Possible values are: \code{"secs", "seconds", "mins", "minutes", "hours"}.}
+\item{alignBy}{character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours", and "ticks".
+To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.}
 
 \item{alignPeriod}{positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
-based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
-\code{alignPeriod = 5} and \code{alignBy = "minutes"}.}
+based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.}
 
-\item{marketOpen}{the market opening time. This should be in the time zone
-specified by \code{tz}. By default, \code{marketOpen = "09:30:00"}.}
+\item{marketOpen}{the market opening time, by default: \code{marketOpen = "09:30:00"}.}
 
-\item{marketClose}{the market closing time. This should be in the time zone
-specified by \code{tz}. By default, \code{marketClose = "16:00:00"}.}
+\item{marketClose}{the market closing time, by default: \code{marketClose = "16:00:00"}.}
 
-\item{tz}{string specifying the time zone to which the times in \code{data}
-and/or \code{marketOpen}/ \code{marketClose} belong. Default = \code{"GMT"}.}
+\item{tz}{fallback time zone used in case we we are unable to identify the timezone of the data, by default: \code{tz = NULL}. 
+We attempt to extract the timezone from the DT column (or index) of the data, which may fail. 
+In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}}
 }
 \value{
 A list containing \code{criticalValues} which are the bootstrapped critical values, \code{testStatistic} the test statistic of the jump test, \code{dimensions} which are the dimensions of the jump matrix
  \code{marketJumpDetections} the jumps detected in the market prices, \code{stockJumpDetections} the co-jumps detected in the individual stock prices, and \code{jumpIndices} which are the indices of the detected jumps.
 }
 \description{
-Rank jump test
+Calculate the rank jump test of Li et al. (2019).
+The procedure tests for the rank of the jump matrix at simultaneous jump events in market returns as well as individual assets.
+}
+\details{
+Let the jump times be defined as:
+\deqn{
+    {\cal I}_{n} = \left\{ i:\left|\Delta_{i}^{n}Z\right|>u_{n}\right\} 
+}
+
+Then the estimated jump matrix is:
+\deqn{
+    \hat{\boldsymbol{J}_{n}}=\left[\Delta_{i,k}^{n}\boldsymbol{X}\right]_{i\in{\cal I}_{n}}
+}   
+
+Let \eqn{\hat{\lambda}_{n,1}^{2}\geq\hat{\lambda}_{n,2}^{2}\geq\cdots\geq\hat{\lambda}_{n,d}^{2}} be the ordered eigenvalues of \eqn{\hat{\boldsymbol{J}}_{n}\hat{\boldsymbol{J}}_{n}^{\prime}}, then test statistic is
+\deqn{
+    \hat{S}_{n,t}=\sum_{j=r+1}^{d}\hat{\lambda}_{n,j}^{2}.
+}
+
+The critical values are computed by applying a bootstrapping method 
+
+The singular value decomposition of the jump matrix \eqn{\hat{\boldsymbol{J}}_{n}} is:
+\deqn{
+    \hat{\boldsymbol{J}}=\hat{\boldsymbol{U}}_{n}\hat{\boldsymbol{D}}_{n}\hat{\boldsymbol{V}}_{n}^{\prime}
+}
+
+then \eqn{\hat{\boldsymbol{U}}_{n}=\left[\hat{\boldsymbol{U}}_{1n}:\hat{\boldsymbol{U}}_{2n}\right]} and \eqn{\hat{\boldsymbol{V}}_{n}=\left[\hat{\boldsymbol{V}}_{1n}:\hat{\boldsymbol{V}}_{2n}\right]}
+
+\eqn{\boldsymbol{\upsilon}_{n}=\left(\upsilon_{j,n}\right)_{1\leq j\leq d}} such that \eqn{\upsilon_{j,n}\asymp\Delta_{n}^{\varpi} for \varpi\in\left(0,1/2\right)} which is used to trim jumps. The bootstrapping method is calculated by the following algorithm
+\itemize{
+\item{
+Step 1.
+
+For each \eqn{i\in{\cal I}_{n}}, draw \eqn{\kappa_{i}^{\star}\sim\textrm{Uniform}\left[0,1\right]} and draw with equal probability,
+\deqn{
+    \boldsymbol{\xi}_{n,i-}^{\star} \textrm{from}\left\{ \min\left(\max\left(\Delta_{i-j}^{n}\boldsymbol{X},-\boldsymbol{\upsilon}_{n}\right),\boldsymbol{\upsilon}_{n}\right):1\leq j\leq k_{n}\right\}, 
+}
+\deqn{
+    \boldsymbol{\xi}_{n,i+}^{\star} \textrm{from}\left\{ \min\left(\max\left(\Delta_{i+j}^{n}\boldsymbol{X},-\boldsymbol{\upsilon}_{n}\right),\boldsymbol{\upsilon}_{n}\right):1\leq j\leq k_{n}\right\},
+}
+
+and set \eqn{\boldsymbol{\zeta}_{n,i}^{\star}=\sqrt{\kappa_{i}^{\star}}\boldsymbol{\xi}_{n,i-}^{\star}+\sqrt{k-\kappa_{i}^{\star}}\boldsymbol{\xi}_{n,i+}^{\star}} and \eqn{\boldsymbol{\zeta}_{n}^{\star}=\left[\boldsymbol{\zeta}_{n,i}^{\star}\right]_{i\in{\cal I}_{n}}}
+
+}
+\item{
+Step 2.
+
+Repeat 1 for a large number of iterations. Set \eqn{c\upsilon_{n,\alpha}} as as the \eqn{1-\alpha} quantile of \eqn{\left\Vert \hat{\boldsymbol{U}}_{2n}^{\prime}\boldsymbol{\xi}_{n}^{\star}\hat{\boldsymbol{V}}_{2n}\right\Vert ^{2}} in the simulated sample.
+}
+}
 }
 \references{
 Li, j., Todorov, V., Tauchen, G., and Lin, H. (2019). Rank Tests at Jump Events. \emph{Journal of Business & Economic Statistics}, 37, 312-321.

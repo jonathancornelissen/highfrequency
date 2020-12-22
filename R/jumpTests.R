@@ -879,7 +879,57 @@ plot.intradayJumpTest <- function(x, ...){
 #' 
 #' @description 
 #' 
-#' Calculate the 
+#' Calculate the rank jump test of Li et al. (2019).
+#' The procedure tests for the rank of the jump matrix at simultaneous jump events in market returns as well as individual assets.
+#' 
+#' @details 
+#' 
+#' Let the jump times be defined as:
+#' \deqn{
+#'     {\cal I}_{n} = \left\{ i:\left|\Delta_{i}^{n}Z\right|>u_{n}\right\} 
+#' }
+#' 
+#' Then the estimated jump matrix is:
+#' \deqn{
+#'     \hat{\boldsymbol{J}_{n}}=\left[\Delta_{i,k}^{n}\boldsymbol{X}\right]_{i\in{\cal I}_{n}}
+#' }   
+#' 
+#' Let \eqn{\hat{\lambda}_{n,1}^{2}\geq\hat{\lambda}_{n,2}^{2}\geq\cdots\geq\hat{\lambda}_{n,d}^{2}} be the ordered eigenvalues of \eqn{\hat{\boldsymbol{J}}_{n}\hat{\boldsymbol{J}}_{n}^{\prime}}, then test statistic is
+#' \deqn{
+#'     \hat{S}_{n,t}=\sum_{j=r+1}^{d}\hat{\lambda}_{n,j}^{2}.
+#' }
+#' 
+#' The critical values are computed by applying a bootstrapping method 
+#' 
+#' The singular value decomposition of the jump matrix \eqn{\hat{\boldsymbol{J}}_{n}} is:
+#' \deqn{
+#'     \hat{\boldsymbol{J}}=\hat{\boldsymbol{U}}_{n}\hat{\boldsymbol{D}}_{n}\hat{\boldsymbol{V}}_{n}^{\prime}
+#' }
+#' 
+#' then \eqn{\hat{\boldsymbol{U}}_{n}=\left[\hat{\boldsymbol{U}}_{1n}:\hat{\boldsymbol{U}}_{2n}\right]} and \eqn{\hat{\boldsymbol{V}}_{n}=\left[\hat{\boldsymbol{V}}_{1n}:\hat{\boldsymbol{V}}_{2n}\right]}
+#' 
+#' \eqn{\boldsymbol{\upsilon}_{n}=\left(\upsilon_{j,n}\right)_{1\leq j\leq d}} such that \eqn{\upsilon_{j,n}\asymp\Delta_{n}^{\varpi} for \varpi\in\left(0,1/2\right)} which is used to trim jumps. The bootstrapping method is calculated by the following algorithm
+#' \itemize{
+#' \item{
+#' Step 1.
+#' 
+#' For each \eqn{i\in{\cal I}_{n}}, draw \eqn{\kappa_{i}^{\star}\sim\textrm{Uniform}\left[0,1\right]} and draw with equal probability,
+#' \deqn{
+#'     \boldsymbol{\xi}_{n,i-}^{\star} \textrm{from}\left\{ \min\left(\max\left(\Delta_{i-j}^{n}\boldsymbol{X},-\boldsymbol{\upsilon}_{n}\right),\boldsymbol{\upsilon}_{n}\right):1\leq j\leq k_{n}\right\}, 
+#' }
+#' \deqn{
+#'     \boldsymbol{\xi}_{n,i+}^{\star} \textrm{from}\left\{ \min\left(\max\left(\Delta_{i+j}^{n}\boldsymbol{X},-\boldsymbol{\upsilon}_{n}\right),\boldsymbol{\upsilon}_{n}\right):1\leq j\leq k_{n}\right\},
+#'}
+#' 
+#' and set \eqn{\boldsymbol{\zeta}_{n,i}^{\star}=\sqrt{\kappa_{i}^{\star}}\boldsymbol{\xi}_{n,i-}^{\star}+\sqrt{k-\kappa_{i}^{\star}}\boldsymbol{\xi}_{n,i+}^{\star}} and \eqn{\boldsymbol{\zeta}_{n}^{\star}=\left[\boldsymbol{\zeta}_{n,i}^{\star}\right]_{i\in{\cal I}_{n}}}
+#' 
+#' }
+#' \item{
+#' Step 2.
+#' 
+#' Repeat 1 for a large number of iterations. Set \eqn{c\upsilon_{n,\alpha}} as as the \eqn{1-\alpha} quantile of \eqn{\left\Vert \hat{\boldsymbol{U}}_{2n}^{\prime}\boldsymbol{\xi}_{n}^{\star}\hat{\boldsymbol{V}}_{2n}\right\Vert ^{2}} in the simulated sample.
+#' }
+#' }
 #' 
 #' @param marketPrice data.table or \code{xts}containing the market prices in levels
 #' @param stockPrices list containing the individual stock prices in either data.table or \code{xts}format. The format should be the the same as \code{marketPrice}
