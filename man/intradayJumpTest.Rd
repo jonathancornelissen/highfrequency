@@ -20,9 +20,9 @@ intradayJumpTest(
 \arguments{
 \item{pData}{\code{xts}or data.table of the price data in levels. This data can (and should in some cases) be tick-level data. The data can span more than one day.}
 
-\item{volEstimator}{character denoting which volatility estimator to use for the tests. See \link{spotVol}. Default = \code{"RM"} denoting realized measures.}
+\item{volEstimator}{character denoting which volatility estimator to use for the tests. See \code{\link{spotVol}}. Default = \code{"RM"} denoting realized measures.}
 
-\item{driftEstimator}{character denoting which drift estimator to use for the tests. See \link{spotDrift}. Default = \code{"none"} denoting no drift estimation.}
+\item{driftEstimator}{character denoting which drift estimator to use for the tests. See \code{\link{spotDrift}}. Default = \code{"none"} denoting no drift estimation.}
 
 \item{alpha}{numeric of length one determining what confidence level to use when constructing the critical values.}
 
@@ -48,7 +48,10 @@ The null hypothesis of the tests in this function is that there are no jumps in 
 }
 \description{
 This function can be used to  test for jumps in intraday price paths.
+
 The tests are of the form \eqn{L(t) = (R(t) - mu(t))/sigma(t)}.
+
+See \code{\link{spotVol}} and \code{\link{spotDrift}} for Estimators for \eqn{\sigma(t)} and \eqn{\mu(t)}, respectively.
 }
 \examples{
 \dontrun{
