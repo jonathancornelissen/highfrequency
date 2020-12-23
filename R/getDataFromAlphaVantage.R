@@ -1,6 +1,6 @@
 #' @title Get high frequency data from Alpha Vantage
 #' 
-#' @description Function to retrieve high frequency data from Alpha Vantage - wrapper around quantMod's getSymbols.av function
+#' @description Function to retrieve high frequency data from Alpha Vantage - wrapper around quantmod's getSymbols.av function
 #' 
 #' @param symbols character vector with the symbols to import.
 #' @param interval the sampling interval of the data retrieved. Should be one of one of "1min", "5min", "15min", "30min", or "60min"
@@ -15,9 +15,9 @@
 #' @return An object of type \code{xts} or \code{data.table} in case the length of symbols is 1. If the length of symbols > 1 the \code{xts} and 
 #' \code{data.table} objects will be put into a list.
 #' 
-#' @author Emil Sjoerup (wrapper only) Paul Teetor (for quantMod's getSymbols.av)
+#' @author Emil Sjoerup (wrapper only) Paul Teetor (for quantmod's getSymbols.av)
 #' 
-#' @seealso The getSymbols.av function in the quantMod package
+#' @seealso The getSymbols.av function in the quantmod package
 #' @examples
 #' \dontrun{
 #' # Get data for SPY at an interval of 1 minute in the standard xts format.
@@ -39,14 +39,14 @@
 #' @export
 getAlphaVantageData <- function(symbols = NULL, interval = "5min", outputType = "xts", apiKey = NULL, doSleep = TRUE) {
   # Check for API key set in quantmod if it is not present, we kindly remind the user to get it.
-  if (is.null(quantmod::getDefaults(quantmod::getSymbols.av, "api.key")$api.key) & is.null(apiKey)) {
+  if (is.null(apiKey) && is.null(quantmod::getDefaults(quantmod::getSymbols.av, "api.key")$api.key)) {
     stop("Your AlphaVantage API key is not set in the quantmod package and no API key was provided. 
           An API key is required but can be obtained for free.
           Please see the getSymbols.av function in the quantmod package for details on how to set a default API key for the current session.
           Alternatively, use the apiKey argument to provide the key.")
   }
   if (is.null(apiKey)) {
-    apiKey <- quantmod::getDefaults(quantmod::getSymbols.av, "api.key")$api.key #quantMod handles the extra quotes.
+    apiKey <- quantmod::getDefaults(quantmod::getSymbols.av, "api.key")$api.key #quantmod handles the extra quotes.
   }
   
   

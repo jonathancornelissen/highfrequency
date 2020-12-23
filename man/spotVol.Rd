@@ -255,7 +255,7 @@ with \eqn{n_1 = 2n / (N+1)} and \eqn{n_2 = 6n^2 / (N+1) / (N+2)}.
 Parameters:
 \itemize{
 \item{\code{type}}{String specifying the type of kernel to be used. Options
-include \code{"gaussian", "epanechnikov", "beta"}. Default = \code{"gaussian"}.}
+include \code{"gaussian"}, \code{"epanechnikov"}, \code{"beta"}. Default = \code{"gaussian"}.}
 \item{\code{h}}{Scalar or vector specifying bandwidth(s) to be used in kernel.
 If \code{h} is a scalar, it will be assumed equal throughout the sample. If
 it is a vector, it should contain bandwidths for each day. If left empty,
@@ -495,5 +495,5 @@ Kristensen, D. (2010). Nonparametric filtering of the realized spot volatility: 
 Taylor, S. J. and Xu, X. (1997). The incremental volatility information in one million foreign exchange quotations. \emph{Journal of Empirical Finance}, 4, 317-340.
 }
 \author{
-Jonathan Cornelissen, Kris Boudt, and Emil Sjorup.
+Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
 }

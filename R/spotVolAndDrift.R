@@ -405,7 +405,7 @@ spotDrift <- function(data, method = "mean", alignBy = "minutes", alignPeriod = 
 #' Parameters:
 #' \itemize{
 #' \item{\code{type}}{String specifying the type of kernel to be used. Options
-#' include \code{"gaussian", "epanechnikov", "beta"}. Default = \code{"gaussian"}.}
+#' include \code{"gaussian"}, \code{"epanechnikov"}, \code{"beta"}. Default = \code{"gaussian"}.}
 #' \item{\code{h}}{Scalar or vector specifying bandwidth(s) to be used in kernel.
 #' If \code{h} is a scalar, it will be assumed equal throughout the sample. If
 #' it is a vector, it should contain bandwidths for each day. If left empty,
@@ -630,7 +630,7 @@ spotDrift <- function(data, method = "mean", alignBy = "minutes", alignPeriod = 
 #' legend("topleft", c("GARCH", "eGARCH"), col = c("black", "red"), lty = 1)
 #' }
 #' 
-#' @author Jonathan Cornelissen, Kris Boudt, and Emil Sjorup.
+#' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
 #'
 #' @references 
 #' Andersen, T. G. and Bollerslev, T. (1997). Intraday periodicity and volatility persistence in financial markets. \emph{Journal of Empirical Finance}, 4, 115-158.
