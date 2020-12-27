@@ -19,7 +19,7 @@ rankJumpTest(
   alignPeriod = 5,
   marketOpen = "09:30:00",
   marketClose = "16:00:00",
-  tz = "GMT"
+  tz = NULL
 )
 }
 \arguments{

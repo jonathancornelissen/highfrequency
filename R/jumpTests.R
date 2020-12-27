@@ -416,7 +416,7 @@ BNSjumpTest <- function (rData, IVestimator = "BV", IQestimator = "TP", type = "
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
 #' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
 #' @param alpha numeric of length one with the significance level to use for the jump test(s). Defaults to 0.975.
-#' @param ... additional arguments. (Currently unused)
+#' @param ... Used internally, do not set.
 #'
 #' @return list
 #' 
@@ -431,7 +431,8 @@ BNSjumpTest <- function (rData, IVestimator = "BV", IQestimator = "TP", type = "
 #'    }
 #'  where \eqn{k_j} are nonzero random variables. The counting process can be either finite or infinite for finite or infinite activity jumps.
 #'  
-#'  The Jiang and Oomen test is that: in the absence of jumps, the accumulated difference between the simple return and the log return captures one half of the integrated variance (Theodosiou and Zikes, 2009).
+#'  The the Jiang and Ooment test is that in the absence of jumps, the accumulated difference between the simple returns and log returns captures half of the integrated variance. (Theodosiou and Zikes, 2009).
+#'  If this difference is too great, the null hypothesis of no jumps is rejected.
 #'  
 #' @references 
 #' Andersen, T. G., Dobrev, D., and Schaumburg, E. (2012). Jump-robust volatility estimation using nearest neighbor truncation. \emph{Journal of Econometrics}, 169, 75- 93.
@@ -588,7 +589,7 @@ JOjumpTest <- function(pData, power = 4, alignBy = NULL, alignPeriod = NULL, alp
 #' @export
 
 intradayJumpTest <- function(pData, volEstimator = "RM", driftEstimator = "none", alpha = 0.95, alignBy = "minutes", alignPeriod = 5,
-                             marketOpen = "09:30:00", marketClose = "16:00:00", tz = "GMT", ...){
+                             marketOpen = "09:30:00", marketClose = "16:00:00", tz = NULL, ...){
 
   PRICE = DATE = RETURN = DT = NULL
   
@@ -638,10 +639,9 @@ intradayJumpTest <- function(pData, volEstimator = "RM", driftEstimator = "none"
 
   
   if (volEstimator != "PARM") {
-    prices <- aggregatePrice(pData, alignBy = alignBy, alignPeriod = alignPeriod , marketOpen = marketOpen,
+    prices <- aggregatePrice(pData[, DATE := ""], alignBy = alignBy, alignPeriod = alignPeriod , marketOpen = marketOpen,
                    marketClose = marketClose, tz = tz, fill = TRUE)
     setkeyv(prices, "DT")
-    prices[, DATE := as.Date(DT, tz = tz)]
     returns <- prices[, RETURN := log(PRICE) - shift(log(PRICE), type = "lag"), by = "DATE"][!is.na(RETURN)]
     
   } else { # volEstimator == "PARM" i.e. we have pre-averaged realized measures
@@ -962,7 +962,7 @@ plot.intradayJumpTest <- function(x, ...){
 #' @export
 rankJumpTest <- function(marketPrice, stockPrices, alpha = c(5,3), coarseFreq = 10, localWindow = 30, rank = 1, BoxCox = 1, quantiles = c(0.9, 0.95, 0.99), 
                          nBoot = 1000, dontTestAtBoundaries = TRUE, alignBy = "minutes", alignPeriod = 5,
-                         marketOpen = "09:30:00", marketClose = "16:00:00", tz = "GMT"){
+                         marketOpen = "09:30:00", marketClose = "16:00:00", tz = NULL){
   
   ## Preparation of data
   PRICE = DATE = RETURN = DT = NULL
@@ -996,9 +996,8 @@ rankJumpTest <- function(marketPrice, stockPrices, alpha = c(5,3), coarseFreq = 
     
   }
 
-  marketPrice <- aggregatePrice(marketPrice, alignBy = alignBy, alignPeriod = alignPeriod , marketOpen = marketOpen,
+  marketPrice <- aggregatePrice(marketPrice[, DATE := ""], alignBy = alignBy, alignPeriod = alignPeriod , marketOpen = marketOpen,
                           marketClose = marketClose, tz = tz, fill = TRUE)
-  marketPrice[, DATE := as.Date(DT, tz = tzone(marketPrice$DT))]
   setkeyv(marketPrice, "DT")
   marketPrice <- marketPrice[, RETURN := log(PRICE) - shift(log(PRICE), type = "lag"), by = "DATE"][!is.na(RETURN)]
   marketReturns <- xts(marketPrice$RETURN, order.by = marketPrice$DT)

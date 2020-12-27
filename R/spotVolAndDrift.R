@@ -317,6 +317,7 @@ spotDrift <- function(data, method = "mean", alignBy = "minutes", alignPeriod = 
 #' \code{periodicvol = "TML"} truncated maximum-likelihood estimation (see Boudt et al., 2011, Section 2.2, for further details).
 #' 
 #' \strong{Stochastic periodicity method (\code{"stochper"})}
+#' 
 #' Parameters:
 #' \itemize{
 #' \item{\code{P1}: A positive integer corresponding to the number of cosine terms used in the flexible Fourier
@@ -331,6 +332,7 @@ spotDrift <- function(data, method = "mean", alignBy = "minutes", alignPeriod = 
 #' For parameters not specified in \code{init}, the default initial value will be used.}
 #' \item{\code{control}: A list of options to be passed down to \code{optim}.}
 #' }
+#' 
 #' Outputs (see `Value' for a full description of each component):
 #' \itemize{
 #' \item{\code{spot}}
@@ -405,7 +407,7 @@ spotDrift <- function(data, method = "mean", alignBy = "minutes", alignPeriod = 
 #' Parameters:
 #' \itemize{
 #' \item{\code{type}}{String specifying the type of kernel to be used. Options
-#' include \code{"gaussian"}, \code{"epanechnikov"}, \code{"beta"}. Default = \code{"gaussian"}.}
+#' include \code{"gaussian", "epanechnikov", "beta"}. Default = \code{"gaussian"}.}
 #' \item{\code{h}}{Scalar or vector specifying bandwidth(s) to be used in kernel.
 #' If \code{h} is a scalar, it will be assumed equal throughout the sample. If
 #' it is a vector, it should contain bandwidths for each day. If left empty,

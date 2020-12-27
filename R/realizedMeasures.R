@@ -3542,7 +3542,7 @@ knChooseReMeDI <- function(pData, knEqual = FALSE,
 #' @param phi tuning parameter phi
 #' @param i tuning parameter i
 #' @note We Thank Merrick Li for contributing his Matlab code for this estimator.
-#' @return a list with components ReMeDI and asympVar
+#' @return a list with components \code{ReMeDI} and \code{asympVar} containing the ReMeDI estimation and it's asymptotic variance respectively
 #' @export
 ReMeDIAsymptoticVariance <- function(pData, kn, lags, phi, i){
   PRICE <- DT <- NULL

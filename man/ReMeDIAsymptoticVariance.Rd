@@ -18,7 +18,7 @@ ReMeDIAsymptoticVariance(pData, kn, lags, phi, i)
 \item{i}{tuning parameter i}
 }
 \value{
-a list with components ReMeDI and asympVar
+a list with components \code{ReMeDI} and \code{asympVar} containing the ReMeDI estimation and it's asymptotic variance respectively
 }
 \description{
 Estimates the asymptotic variance of the ReMeDI estimator.

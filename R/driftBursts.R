@@ -29,13 +29,15 @@
 #'     \hat{\bar{\mu}}_{t}^{n} = \frac{1}{h_{n}}\sum_{i=1}^{n-k_{n}+2}K\left(\frac{t_{i-1}-t}{h_{n}}\right)\Delta_{i-1}^{n}\overline{Y},
 #' }
 #' and
-#' \deqn{
-#'     \hat{\bar{\sigma}}_{t}^{n} = \frac{1}{h_{n}'}\left[\sum_{i=1}^{n-k_{n}+2}\left(K\left(\frac{t_{i-1}-t}{h'_{n}}\right)\Delta_{i-1}^{n}\overline{Y}\right)^{2}+2\sum_{L=1}^{L_{n}}\omega\left(\frac{L}{L_{n}}\right)\sum_{i=1}^{n-k_{n}-L+2}K\left(\frac{t_{i-1}-t}{h_{n}'}\right)K\left(\frac{t_{i+L-1}-t}{h_{n}'}\right)\Delta_{i-1}^{n}\overline{Y}\Delta_{i-1+L}^{n}\overline{Y}\right],
+#' 
+#' \eqn{
+#'     \hat{\bar{\sigma}}_{t}^{n} = \frac{1}{h_{n}'}\bigg[\sum_{i=1}^{n-k_{n}+2}\left(K\left(\frac{t_{i-1}-t}{h'_{n}}\right)\Delta_{i-1}^{n}\overline{Y}\right)^{2} \\
+#'     + 2\sum_{L=1}^{L_{n}}\omega\left(\frac{L}{L_{n}}\right)\sum_{i=1}^{n-k_{n}-L+2}K\left(\frac{t_{i-1}-t}{h_{n}'}\right)K\left(\frac{t_{i+L-1}-t}{h_{n}'}\right)\Delta_{i-1}^{n}\overline{Y}\Delta_{i-1+L}^{n}\overline{Y}\bigg],
 #' }
+#' 
+#' 
 #' where \eqn{\omega(\cdot)} is a smooth kernel function, in this case the Parzen kernel. \eqn{L_{n}} is the lag length for adjusting for auto-correlation and \eqn{K(\cdot)}
 #' is a kernel weighting function, which in this case is the left-sided exponential kernel. 
-#' 
-#' 
 #' 
 #' @param pData Either a \code{data.table} or an \code{xts} object. If pData is a data.table, columns DT and PRICE must be present, containing timestamps of the trades and the price of the 
 #' trades (in levels) respectively. If pData is an \code{xts} object and the number of columns is greater than one, PRICE must be present.
@@ -61,7 +63,7 @@
 #' The list also contains some information such as the variance and mean bandwidths along with the pre-averaging setting and the amount of observations. 
 #' Additionally, the list will contain information on whether testing happened for all \code{testTimes} entries.
 #' Objects of class \code{DBH} has the methods \code{\link{print.DBH}}, \code{\link{plot.DBH}}, and \code{\link{getCriticalValues.DBH}} which prints, plots, and
-#' retrieves critical values for the test described in appendix B 
+#' retrieves critical values for the test described in appendix B of Christensen, Oomen, and Reno (2018).
 #' 
 #' @examples 
 #' # Usage with data.table object
@@ -113,7 +115,7 @@ driftBursts <- function(pData, testTimes = seq(34260, 57600, 60),
                        varianceBandwidth = 900L, #sessionStart = 34200, sessionEnd = 57600,
                        parallelize = FALSE, nCores = NA, warnings = TRUE){
   PRICE <- DT <- NULL
-  ###Checks###
+  # Checks on inputs
   if (meanBandwidth < 0 | meanBandwidth %% 1 != 0) {
     stop("meanBandwidth must be a positive integer")
   }
@@ -130,7 +132,7 @@ driftBursts <- function(pData, testTimes = seq(34260, 57600, 60),
   }
   
   
-  ## Initialization
+  # Initialization
   wasXTS <- FALSE
   # Data table case
   if(is.data.table(pData)){
@@ -173,7 +175,7 @@ driftBursts <- function(pData, testTimes = seq(34260, 57600, 60),
   pad <- removedFromEnd <- 0
   tt                    <- testTimes #tt is returned in the Info list. 
   
-  #########  init end  ############
+  # Init end
 
   if((anyNA(timestamps) & !is.null(timestamps)) | anyNA(logPrices) | anyNA(testTimes)){
     stop("NA's in timestamps, logPrices or testTimes - might cause crashes and are thus disallowed")
@@ -438,7 +440,7 @@ plot.DBH <- function(x, ...){
 #' 
 #' @examples
 #' \dontrun{
-#' DBH <- driftBursts(sampleTDataEurope, testTimes = seq(32400 + 900, 63000, 60), preAverage = 2, 
+#' DBH <- driftBursts(sampleTDataEurope, testTimes = seq(32400 + 900, 63000, 300), preAverage = 2, 
 #'                    ACLag = -1L, meanBandwidth = 300L, varianceBandwidth = 900L)
 #' print(DBH)
 #' print(DBH, criticalValue = 1) # This value doesn't make sense - don't actually use it!

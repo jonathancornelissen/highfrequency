@@ -423,7 +423,7 @@ aggregatePrice <- function(pData, alignBy = "minutes", alignPeriod = 1, marketOp
 #' qDataAggregated <- aggregateQuotes(sampleQData, alignBy = "seconds", alignPeriod = 30)
 #' qDataAggregated # Show the aggregated data
 #' @export
-aggregateQuotes <- function(qData, alignBy = "minutes", alignPeriod = 5, marketOpen = "09:30:00", marketClose = "16:00:00", tz = "GMT") {
+aggregateQuotes <- function(qData, alignBy = "minutes", alignPeriod = 5, marketOpen = "09:30:00", marketClose = "16:00:00", tz = NULL) {
   .I <- .N <- N <- DATE <- BID <- OFR <- BIDSIZ <- OFRSIZ <- DT <- FIRST_DT <- DT_ROUND <-LAST_DT <- SYMBOL <- NULL
   nm <- toupper(colnames(qData))
   if (!("SYMBOL" %in% nm)) {
@@ -591,7 +591,7 @@ aggregateQuotes <- function(qData, alignBy = "minutes", alignPeriod = 5, marketO
 #' tDataAggregated <- aggregateTrades(sampleTData, alignBy = "minutes", alignPeriod = 5)
 #' tDataAggregated
 #' @export
-aggregateTrades <- function(tData, alignBy = "minutes", alignPeriod = 5, marketOpen = "09:30:00", marketClose = "16:00:00", tz = "GMT") {
+aggregateTrades <- function(tData, alignBy = "minutes", alignPeriod = 5, marketOpen = "09:30:00", marketClose = "16:00:00", tz = NULL) {
   .I <- .N <- N <- DATE <- SIZE <- DT <- FIRST_DT <- DT_ROUND <- LAST_DT <- SYMBOL <- PRICE <- VWPRICE <- SIZETPRICE <- SIZESUM <- NULL
   nm <- toupper(colnames(tData))
   if (!("SYMBOL" %in% nm)) {
@@ -2725,9 +2725,9 @@ refreshTime <- function (pData, sort = FALSE, criterion = "squared duration") {
 #' rCov(pData[,list(DT, PRICE)], makeReturns = TRUE, alignBy = "minutes", alignPeriod = 5)
 #' 
 #' @references 
-#' Oomen, R. C. A. (2006). Properties of realized variance under alternative sampling schemes. \emph{Journal of Business & Economic Statistics}, 24, 219-237
-#' 
 #' Dong, Y., and Tse, Y. K. (2017). Business time sampling scheme with applications to testing semi-martingale hypothesis and estimating integrated volatility. \emph{Econometrics}, 5, 51.
+#' 
+#' Oomen, R. C. A. (2006). Properties of realized variance under alternative sampling schemes. \emph{Journal of Business & Economic Statistics}, 24, 219-237
 #' 
 #' @importFrom zoo index
 #' @importFrom xts is.xts

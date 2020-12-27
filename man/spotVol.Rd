@@ -167,6 +167,7 @@ with \emph{i.i.d.} zero-mean error term \eqn{\varepsilon_i} and \eqn{c = -0.6351
 \code{periodicvol = "TML"} truncated maximum-likelihood estimation (see Boudt et al., 2011, Section 2.2, for further details).
 
 \strong{Stochastic periodicity method (\code{"stochper"})}
+
 Parameters:
 \itemize{
 \item{\code{P1}: A positive integer corresponding to the number of cosine terms used in the flexible Fourier
@@ -181,6 +182,7 @@ The naming of the parameters follows Beltratti and Morana (2001), the correspond
 For parameters not specified in \code{init}, the default initial value will be used.}
 \item{\code{control}: A list of options to be passed down to \code{optim}.}
 }
+
 Outputs (see `Value' for a full description of each component):
 \itemize{
 \item{\code{spot}}
@@ -255,7 +257,7 @@ with \eqn{n_1 = 2n / (N+1)} and \eqn{n_2 = 6n^2 / (N+1) / (N+2)}.
 Parameters:
 \itemize{
 \item{\code{type}}{String specifying the type of kernel to be used. Options
-include \code{"gaussian"}, \code{"epanechnikov"}, \code{"beta"}. Default = \code{"gaussian"}.}
+include \code{"gaussian", "epanechnikov", "beta"}. Default = \code{"gaussian"}.}
 \item{\code{h}}{Scalar or vector specifying bandwidth(s) to be used in kernel.
 If \code{h} is a scalar, it will be assumed equal throughout the sample. If
 it is a vector, it should contain bandwidths for each day. If left empty,

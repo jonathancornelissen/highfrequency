@@ -26,7 +26,7 @@ based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to
 
 \item{alpha}{numeric of length one with the significance level to use for the jump test(s). Defaults to 0.975.}
 
-\item{...}{additional arguments. (Currently unused)}
+\item{...}{Used internally, do not set.}
 }
 \value{
 list
@@ -75,7 +75,8 @@ The theoretical framework underlying jump test is that the logarithmic price pro
    }
  where \eqn{k_j} are nonzero random variables. The counting process can be either finite or infinite for finite or infinite activity jumps.
  
- The Jiang and Oomen test is that: in the absence of jumps, the accumulated difference between the simple return and the log return captures one half of the integrated variance (Theodosiou and Zikes, 2009).
+ The the Jiang and Ooment test is that in the absence of jumps, the accumulated difference between the simple returns and log returns captures half of the integrated variance. (Theodosiou and Zikes, 2009).
+ If this difference is too great, the null hypothesis of no jumps is rejected.
 }
 \examples{
 joDT <- JOjumpTest(sampleTData[, list(DT, PRICE)])

@@ -24,7 +24,7 @@ The default value is 0.95}
 }
 \examples{
 \dontrun{
-DBH <- driftBursts(sampleTDataEurope, testTimes = seq(32400 + 900, 63000, 60), preAverage = 2, 
+DBH <- driftBursts(sampleTDataEurope, testTimes = seq(32400 + 900, 63000, 300), preAverage = 2, 
                    ACLag = -1L, meanBandwidth = 300L, varianceBandwidth = 900L)
 print(DBH)
 print(DBH, criticalValue = 1) # This value doesn't make sense - don't actually use it!
