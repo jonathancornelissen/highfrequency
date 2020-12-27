@@ -17,21 +17,21 @@ getAlphaVantageData(
 
 \item{interval}{the sampling interval of the data retrieved. Should be one of one of "1min", "5min", "15min", "30min", or "60min"}
 
-\item{outputType}{string either "xts" or "DT" to denote the type of output wanted. "xts" will yield an xts object, "DT" will yield a data.table object.}
+\item{outputType}{string either \code{"xts"} or \code{"DT"} to denote the type of output wanted. \code{"xts"} will yield an xts object, \code{"DT"} will yield a data.table object.}
 
 \item{apiKey}{string with the api key provided by Alpha Vantage.}
 
 \item{doSleep}{logical when the length of symbols > 5 the function will sleep for 12 seconds by default.}
 }
 \value{
-An object of type xts or data.table in case the length of symbols is 1. If the length of symbols > 1 the xts and 
-data.table objects will be put into a list.
+An object of type \code{xts} or \code{data.table} in case the length of symbols is 1. If the length of symbols > 1 the \code{xts} and 
+\code{data.table} objects will be put into a list.
 }
 \description{
-Function to retrieve high frequency data from Alpha Vantage - wrapper around quantMods' getSymbols.av function
+Function to retrieve high frequency data from Alpha Vantage - wrapper around quantmod's getSymbols.av function
 }
 \details{
-#' The doSleep argument is set to true as default because Alpha Vantage has a limit of five calls per minute. 
+The \code{doSleep} argument is set to true as default because Alpha Vantage has a limit of five calls per minute. 
 The function does not try to extract when the last API call was made which means that if
 you made successive calls to get 3 symbols in rapid succession, the function may not retrieve all the data.
 }
@@ -48,14 +48,14 @@ data <- getAlphaVantageData(symbols = c("MMM", "GS"), interval = "5min",
 # Get data for JPM and Citicorp at a 15 minute interval in the xts format. 
 # The xts objects will be put in a list.
 data <- getAlphaVantageData(symbols = c("JPM", "C"), interval = "15min", 
-                  outputType = "xts", apiKey = 'yourKey')
+                  outputType = "xts", apiKey = "yourKey")
 }
 
 }
 \seealso{
-The getSymbols.av function in the quantMod package
+The getSymbols.av function in the quantmod package
 }
 \author{
-Emil Sjoerup (wrapper only) Paul Teetor (for quantMod's getSymbols.av)
+Emil Sjoerup (wrapper only) Paul Teetor (for quantmod's getSymbols.av)
 }
 \keyword{data}

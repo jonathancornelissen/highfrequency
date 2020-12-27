@@ -26,11 +26,11 @@ install_github("https://github.com/jonathancornelissen/highfrequency")
 ```r
 library(highfrequency)
 # Print raw quotes data to console
-sampleQDataRawMicroseconds
+sampleQDataRaw
 # Cleanup quotes leaves 46566 out of 464221 observations.
-quotesCleanup(qDataRaw = sampleQDataRawMicroseconds, exchanges = "N")
+quotesCleanup(qDataRaw = sampleQDataRaw, exchanges = "N")
 ```
 
 ## Special thanks
 
-We would like to thank [Brian Peterson](https://github.com/braverock), [Chris Blakely](https://github.com/clisztian), [Eric Zivot](https://faculty.washington.edu/ezivot/) and Maarten Schermer. We are also grateful to [Dirk Eddelbuettel](https://github.com/eddelbuettel) for his support as a mentor during the Google Summmer of Code 2019. 
+We would like to thank [Brian Peterson](https://github.com/braverock), [Chris Blakely](https://github.com/clisztian), [Eric Zivot](https://faculty.washington.edu/ezivot/) and Maarten Schermer. We are also grateful to [Dirk Eddelbuettel](https://github.com/eddelbuettel) for his support as a mentor during the Google Summer of Code 2019. 

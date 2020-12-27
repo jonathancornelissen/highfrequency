@@ -3,29 +3,31 @@
 \docType{data}
 \name{sampleTData}
 \alias{sampleTData}
-\title{Sample of cleaned trades for stock XXX for 1 day}
+\title{Sample of cleaned trades for stock XXX for 2 days}
 \format{
-A large \code{xts} object.
+A data.table object.
 }
 \usage{
 sampleTData
 }
 \description{
-An xts object containing the trades for the imaginary stock XXX for 1 day, in the typical NYSE TAQ database format.
-This is the cleaned version of the data sample \code{\link{sampleTDataRaw}}, using \code{tradesCleanup} and \code{tradesCleanupUsingQuotes}.
+A \code{data.table} object containing the trades for the imaginary stock XXX for 2 days, in the typical NYSE TAQ database format.
+This is the cleaned version of the data sample \code{\link{sampleTDataRaw}}, using \code{tradesCleanup}.
 }
 \examples{
 \dontrun{
-#The code to create sampleTData from raw data is 
+# The code to create the sampleTData dataset from raw data is
+sampleQData <- quotesCleanup(qDataRaw = sampleQDataRaw,
+                                         exchanges = "N", type = "standard", report = FALSE)
+
 tradesAfterFirstCleaning <- tradesCleanup(tDataRaw = sampleTDataRaw, 
                                           exchanges = "N", report = FALSE)
-                                          
-cleanedQuotes <- quotesCleanup(qDataRaw = sampleQDataRaw, exchanges = "N", 
-                               type = "standard", report = FALSE)
-sampleTData <- tradesCleanupUsingQuotes(tData = tradesAfterFirstCleaning,
-                                        qData = cleanedQuotes, lagQuotes = 2)
-sampleTData <- sampleTData[,c("SYMBOL", "EX",  "PRICE", "SIZE", "COND", "CORR", "G127")]
-# These are the historically included columns.
+
+sampleTData <- tradesCleanupUsingQuotes(
+  tData = tradesAfterFirstCleaning,
+  qData = sampleQData,
+  lagQuotes = 0)[, c("DT", "SYMBOL", "PRICE", "SIZE")]
+# Only some columns are included. These are the ones that were historically included.
 }
 
 }

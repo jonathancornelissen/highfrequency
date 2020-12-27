@@ -3,14 +3,14 @@
 \docType{data}
 \name{sampleQDataRaw}
 \alias{sampleQDataRaw}
-\title{Sample of raw quotes for stock XXX for 1 day}
+\title{Sample of raw quotes for stock XXX for 2 days measured in microseconds}
 \format{
-xts object
+data.table object
 }
 \usage{
 sampleQDataRaw
 }
 \description{
-An imaginary xts object containing the raw quotes for stock XXX for 1 day, in the typical NYSE TAQ database format.
+A \code{data.table} object containing the raw quotes for stock XXX for 2 days, in the typical NYSE TAQ database format.
 }
 \keyword{datasets}

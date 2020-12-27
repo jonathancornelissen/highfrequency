@@ -1,81 +1,74 @@
-library(xts)
+library(testthat)
+rets <- as.xts(sampleOneMinuteData)[, 1]
+
+for (date in unique(as.character(as.Date(index(rets))))) {
+  rets[date] <- makeReturns(rets[date])
+}
+
 
 context("HARmodel")
 test_that("HARModel",{
+  
   expect_equal(
-    formatC(sum(sum(HARmodel(makeReturns(sample5MinPricesJumps[, 1]), periods = c(1, 5, 10), periodsJ = c(1, 5, 10),
-                             RVest = c("rCov", "rBPCov"), type = "HARRVCJ", transform = "sqrt", inputType = "returns")$coefficients)), 
+    formatC(sum(HARmodel(rets, periods = c(1, 5, 10), periodsJ = c(1),
+                         RVest = c("rCov", "rBPCov"), type = "HARCJ", transform = "sqrt", inputType = "returns")$coefficients, na.rm = TRUE), 
             digits = 5),
-    "7.6406"
+    "0.58084"
   )
   
   expect_identical(
-    {blub <- HARmodel(makeReturns(sample5MinPricesJumps[, 1]), periods = c(1, 5, 10), periodsJ = c(1, 5, 10),
-                      RVest = c("rCov", "rBPCov"), type = "HARRVCJ", transform = "sqrt", inputType = "returns")
+    {blub <- HARmodel(rets, periods = c(1, 5, 10), periodsJ = c(1),
+                      RVest = c("rCov", "rBPCov"), type = "HARCJ", transform = "sqrt", inputType = "returns")
     blub2 <- plot(blub)
     blub2$get_xlim()},
-    c(1263916800, 1264780800)
+    c(998150400, 999532800)
   )
   
   expect_identical(
-    {blub <- HARmodel(makeReturns(sample5MinPricesJumps[, 1]), periods = c(1, 5, 10), periodsJ = c(1, 5, 10),
-                      RVest = c("rCov", "rBPCov"), type = "HARRVCJ", transform = "sqrt", inputType = "returns")
+    {blub <- HARmodel(rets, periods = c(1, 5, 10), periodsJ = c(1, 5, 10),
+                      RVest = c("rCov", "rBPCov"), type = "HARCJ", transform = "sqrt", inputType = "returns")
     blub2 <- plot(blub)
     blub2$get_xlim()},
-    c(1263916800, 1264780800)
+    c(998150400, 999532800)
   )
-  model <- HARmodel(SP500RM$RV)
+  model <- HARmodel(as.xts(SPYRM[, list(DT, RV5)]))
   info <- summary(model)
   expect_equal(info$call, "RV1 = beta0  +  beta1 * RV1 +  beta2 * RV5 +  beta3 * RV22")
   ## Testing with BPQ's data 
-  expect_equal(model$coefficients, c("(Intercept)" = 0.1123142,"RV1" = 0.22734364,"RV5" = 0.49034938, "RV22" = 0.18637662))
+  expect_equal(model$coefficients, c("(Intercept)" = 1.160000921e-05 ,"RV1" = 2.953165771e-01,"RV5" = 2.813334173e-01, "RV22" = 1.471632893e-01 ))
   
-  model <- HARmodel(SP500RM[, c("RV", "RQ")], type = "HARRVQ")
-  expect_equal(model$coefficients, c("(Intercept)" = -0.009805735, "RV1" = 0.576823481, "RV5" = 0.358626466, "RV22" = 0.097615353, "RQ1" = -0.360196901))
-                
-  model <- HARmodel(SP500RM[, c("RV", "RQ")], type = "HARRVQ", periodsQ = c(1,5,22))
+  model <- HARmodel(as.xts(SPYRM[, list(DT, RV5, RQ5)]), type = "HARQ")
+  expect_equal(model$coefficients, c("(Intercept)" = 3.285615865e-06, "RV1" = 9.754440119e-01, "RV5" = 7.909932136e-03, "RV22" = 2.366579823e-02, "RQ1" = -3.881445184e-01 ))
+  
+  model <- HARmodel(as.xts(SPYRM[, list(DT, RV5, RQ5)]), type = "HARQ", periodsQ = c(1,5,22))
   expect_equal(model$coefficients,  
-               c("(Intercept)" = -0.01868119, "RV1" = 0.55739295, "RV5" = 0.43113396, "RV22" = 0.05390772, 
-                 "RQ1" = -0.33898605, "RQ5" = -0.14063204, "RQ22" = 0.08558724))
-  expect_equal(summary(model)$r.squared, 0.56229227)
+               c("(Intercept)" = -6.413188e-07, "RV1" = 9.163777832e-01, "RV5" = 1.609612721e-01, "RV22" = 6.218964e-02, 
+                 "RQ1" = -3.581803794e-01 , "RQ5" = -1.695874367e-01  , "RQ22" = -2.373133e-01))
+  expect_equal(summary(model)$r.squared, 0.3205499342)
   
-  model <- HARmodel(SP500RM[, c("RV", "BPV", "RQ")], type = "HARRVQJ", periodsJ = c(1))
+  model <- HARmodel(as.xts(SPYRM[, list(DT, RV5, BPV5, RQ5)]), type = "HARQJ", periodsJ = c(1))
   expect_equal(model$coefficients,
-               c("(Intercept)" = 0.004452336, "RV1" = 0.589002342, "RV5" = 0.351905075, "RV22" = 0.105652537, "J1" = -0.339255775, "RQ1" = -0.326558434)
-               )
+               c("(Intercept)" = 3.278421768e-06, "RV1" = 9.738665838e-01, "RV5" = 7.578418611e-03, "RV22" = 2.352647045e-02 , 
+                 "J1" = 2.665076387e-02, "RQ1" = -3.874289127e-01 )
+  )
   
+  model <- HARmodel(as.xts(SPYRM[, list(DT, RV5)]), periods = c(1,5,22), externalRegressor = xts(1:nrow(SPYRM), order.by = SPYRM$DT), periodsExternal = c(1))
+  expect_true(all(model$model[,"externalRegressor"] == 22:(nrow(SPYRM)-1)))
   
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
+  model <- HARmodel(as.xts(SPYRM[1:1000 , list(DT, RV5)]))
+  expect_equal(predict(model), sum(coefficients(model) * tail(cbind(1, model$model[,-1]),1)))
   
 })
 
-
-
-
 context("HEAVYmodel")
 test_that("HEAVYmodel",{
-  data("realizedLibrary")
-  returns <-  realizedLibrary$open_to_close
-  bv      <-  realizedLibrary$bv
-  returns <- returns[!is.na(bv)]
-  bv <- bv[!is.na(bv)] # Remove NA's
-  data <- cbind( returns^2, bv) # Make data matrix with returns and realized measures
-  backCast <- matrix(c(var(returns), mean(bv)), ncol = 1)
   
-  #For traditional (default) version:
-  startValues <- c(0.004,0.02,0.44,0.41,0.74,0.56) # Initial values
-  output <- HEAVYmodel(data = as.matrix(data,ncol=2), startingValues = startValues, compConst = FALSE, backCast = backCast)
+  logReturns <- 100 * makeReturns(SPYRM$CLOSE)[-1]
+  logReturns <- logReturns - mean(logReturns)
+  dataSPY <- xts::xts(cbind(logReturns, SPYRM$BPV5[-1] * 10000), order.by = SPYRM$DT[-1])
+  output <- HEAVYmodel(dataSPY)
   expect_identical(
-      formatC(sum(output$estparams), digits = 7),
-    "2.207789"
+    formatC(sum(output$coefficients), digits = 6),
+    "2.67386"
   )
 })

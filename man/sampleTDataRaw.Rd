@@ -3,14 +3,14 @@
 \docType{data}
 \name{sampleTDataRaw}
 \alias{sampleTDataRaw}
-\title{Sample of raw trades for stock XXX for 1 day}
+\title{Sample of raw trades for stock XXX for 2 days}
 \format{
-A large \code{xts} object.
+A data.table object.
 }
 \usage{
 sampleTDataRaw
 }
 \description{
-An imaginary xts object containing the raw trades for stock XXX for 1 day, in the typical NYSE TAQ database format.
+An imaginary \code{data.table} object containing the raw trades for stock XXX for 2 days, in the typical NYSE TAQ database format.
 }
 \keyword{datasets}

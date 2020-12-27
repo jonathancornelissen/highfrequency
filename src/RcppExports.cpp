@@ -6,6 +6,31 @@
 
 using namespace Rcpp;
 
+// har_agg
+arma::mat har_agg(arma::vec RM, arma::vec periods, int iNperiods);
+RcppExport SEXP _highfrequency_har_agg(SEXP RMSEXP, SEXP periodsSEXP, SEXP iNperiodsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type RM(RMSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type periods(periodsSEXP);
+    Rcpp::traits::input_parameter< int >::type iNperiods(iNperiodsSEXP);
+    rcpp_result_gen = Rcpp::wrap(har_agg(RM, periods, iNperiods));
+    return rcpp_result_gen;
+END_RCPP
+}
+// calcRecVarEq
+NumericVector calcRecVarEq(NumericVector par, NumericVector rm);
+RcppExport SEXP _highfrequency_calcRecVarEq(SEXP parSEXP, SEXP rmSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type par(parSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type rm(rmSEXP);
+    rcpp_result_gen = Rcpp::wrap(calcRecVarEq(par, rm));
+    return rcpp_result_gen;
+END_RCPP
+}
 // quadraticKernel
 arma::vec quadraticKernel(const arma::vec& x);
 RcppExport SEXP _highfrequency_quadraticKernel(SEXP xSEXP) {
@@ -29,79 +54,64 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// har_agg
-arma::mat har_agg(arma::vec RM, arma::vec periods, int iNperiods);
-RcppExport SEXP _highfrequency_har_agg(SEXP RMSEXP, SEXP periodsSEXP, SEXP iNperiodsSEXP) {
+// AsymptoticVarianceC
+double AsymptoticVarianceC(const arma::colvec& vIn, int iLag);
+RcppExport SEXP _highfrequency_AsymptoticVarianceC(SEXP vInSEXP, SEXP iLagSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::vec >::type RM(RMSEXP);
-    Rcpp::traits::input_parameter< arma::vec >::type periods(periodsSEXP);
-    Rcpp::traits::input_parameter< int >::type iNperiods(iNperiodsSEXP);
-    rcpp_result_gen = Rcpp::wrap(har_agg(RM, periods, iNperiods));
+    Rcpp::traits::input_parameter< const arma::colvec& >::type vIn(vInSEXP);
+    Rcpp::traits::input_parameter< int >::type iLag(iLagSEXP);
+    rcpp_result_gen = Rcpp::wrap(AsymptoticVarianceC(vIn, iLag));
     return rcpp_result_gen;
 END_RCPP
 }
-// heavy_parameter_transformR_
-List heavy_parameter_transformR_(NumericVector parameters, int K, IntegerVector p, IntegerVector q, NumericVector O, NumericVector A, NumericVector B, IntegerVector pMax1, IntegerVector qMax1);
-RcppExport SEXP _highfrequency_heavy_parameter_transformR_(SEXP parametersSEXP, SEXP KSEXP, SEXP pSEXP, SEXP qSEXP, SEXP OSEXP, SEXP ASEXP, SEXP BSEXP, SEXP pMax1SEXP, SEXP qMax1SEXP) {
+// AutomaticLagSelectionC
+int AutomaticLagSelectionC(const arma::colvec& vX, double dMu);
+RcppExport SEXP _highfrequency_AutomaticLagSelectionC(SEXP vXSEXP, SEXP dMuSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type parameters(parametersSEXP);
-    Rcpp::traits::input_parameter< int >::type K(KSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type p(pSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type q(qSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type O(OSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type A(ASEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type B(BSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type pMax1(pMax1SEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type qMax1(qMax1SEXP);
-    rcpp_result_gen = Rcpp::wrap(heavy_parameter_transformR_(parameters, K, p, q, O, A, B, pMax1, qMax1));
+    Rcpp::traits::input_parameter< const arma::colvec& >::type vX(vXSEXP);
+    Rcpp::traits::input_parameter< double >::type dMu(dMuSEXP);
+    rcpp_result_gen = Rcpp::wrap(AutomaticLagSelectionC(vX, dMu));
     return rcpp_result_gen;
 END_RCPP
 }
-// heavy_parameter_transform_RetrackR_
-List heavy_parameter_transform_RetrackR_(NumericVector parameters, int K, IntegerVector p, IntegerVector q, NumericVector means, NumericVector O, NumericVector A, NumericVector B, IntegerVector pMax1, IntegerVector qMax1);
-RcppExport SEXP _highfrequency_heavy_parameter_transform_RetrackR_(SEXP parametersSEXP, SEXP KSEXP, SEXP pSEXP, SEXP qSEXP, SEXP meansSEXP, SEXP OSEXP, SEXP ASEXP, SEXP BSEXP, SEXP pMax1SEXP, SEXP qMax1SEXP) {
+// DriftBurstLoopC
+Rcpp::List DriftBurstLoopC(const arma::colvec& vPreAveraged, const arma::colvec& diffedlogprices, const arma::colvec& vTime, const arma::colvec& vTesttime, double iMeanBandwidth, double iVarBandwidth, int iPreAverage, int iAcLag);
+RcppExport SEXP _highfrequency_DriftBurstLoopC(SEXP vPreAveragedSEXP, SEXP diffedlogpricesSEXP, SEXP vTimeSEXP, SEXP vTesttimeSEXP, SEXP iMeanBandwidthSEXP, SEXP iVarBandwidthSEXP, SEXP iPreAverageSEXP, SEXP iAcLagSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type parameters(parametersSEXP);
-    Rcpp::traits::input_parameter< int >::type K(KSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type p(pSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type q(qSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type means(meansSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type O(OSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type A(ASEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type B(BSEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type pMax1(pMax1SEXP);
-    Rcpp::traits::input_parameter< IntegerVector >::type qMax1(qMax1SEXP);
-    rcpp_result_gen = Rcpp::wrap(heavy_parameter_transform_RetrackR_(parameters, K, p, q, means, O, A, B, pMax1, qMax1));
+    Rcpp::traits::input_parameter< const arma::colvec& >::type vPreAveraged(vPreAveragedSEXP);
+    Rcpp::traits::input_parameter< const arma::colvec& >::type diffedlogprices(diffedlogpricesSEXP);
+    Rcpp::traits::input_parameter< const arma::colvec& >::type vTime(vTimeSEXP);
+    Rcpp::traits::input_parameter< const arma::colvec& >::type vTesttime(vTesttimeSEXP);
+    Rcpp::traits::input_parameter< double >::type iMeanBandwidth(iMeanBandwidthSEXP);
+    Rcpp::traits::input_parameter< double >::type iVarBandwidth(iVarBandwidthSEXP);
+    Rcpp::traits::input_parameter< int >::type iPreAverage(iPreAverageSEXP);
+    Rcpp::traits::input_parameter< int >::type iAcLag(iAcLagSEXP);
+    rcpp_result_gen = Rcpp::wrap(DriftBurstLoopC(vPreAveraged, diffedlogprices, vTime, vTesttime, iMeanBandwidth, iVarBandwidth, iPreAverage, iAcLag));
     return rcpp_result_gen;
 END_RCPP
 }
-// heavy_likelihoodR_
-List heavy_likelihoodR_(NumericVector h, NumericVector O, NumericVector A, NumericVector B, int TT, int K, int pMax, int qMax, NumericVector data, NumericVector backCast, NumericVector LB, NumericVector UB, NumericVector llRM, NumericVector lls);
-RcppExport SEXP _highfrequency_heavy_likelihoodR_(SEXP hSEXP, SEXP OSEXP, SEXP ASEXP, SEXP BSEXP, SEXP TTSEXP, SEXP KSEXP, SEXP pMaxSEXP, SEXP qMaxSEXP, SEXP dataSEXP, SEXP backCastSEXP, SEXP LBSEXP, SEXP UBSEXP, SEXP llRMSEXP, SEXP llsSEXP) {
+// DriftBurstLoopCPAR
+Rcpp::List DriftBurstLoopCPAR(const arma::colvec& vPreAveraged, const arma::colvec& diffedlogprices, const arma::colvec& vTime, const arma::colvec& vTesttime, double iMeanBandwidth, double iVarBandwidth, int iPreAverage, int iAcLag, int iCores);
+RcppExport SEXP _highfrequency_DriftBurstLoopCPAR(SEXP vPreAveragedSEXP, SEXP diffedlogpricesSEXP, SEXP vTimeSEXP, SEXP vTesttimeSEXP, SEXP iMeanBandwidthSEXP, SEXP iVarBandwidthSEXP, SEXP iPreAverageSEXP, SEXP iAcLagSEXP, SEXP iCoresSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type h(hSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type O(OSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type A(ASEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type B(BSEXP);
-    Rcpp::traits::input_parameter< int >::type TT(TTSEXP);
-    Rcpp::traits::input_parameter< int >::type K(KSEXP);
-    Rcpp::traits::input_parameter< int >::type pMax(pMaxSEXP);
-    Rcpp::traits::input_parameter< int >::type qMax(qMaxSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type data(dataSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type backCast(backCastSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type LB(LBSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type UB(UBSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type llRM(llRMSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type lls(llsSEXP);
-    rcpp_result_gen = Rcpp::wrap(heavy_likelihoodR_(h, O, A, B, TT, K, pMax, qMax, data, backCast, LB, UB, llRM, lls));
+    Rcpp::traits::input_parameter< const arma::colvec& >::type vPreAveraged(vPreAveragedSEXP);
+    Rcpp::traits::input_parameter< const arma::colvec& >::type diffedlogprices(diffedlogpricesSEXP);
+    Rcpp::traits::input_parameter< const arma::colvec& >::type vTime(vTimeSEXP);
+    Rcpp::traits::input_parameter< const arma::colvec& >::type vTesttime(vTesttimeSEXP);
+    Rcpp::traits::input_parameter< double >::type iMeanBandwidth(iMeanBandwidthSEXP);
+    Rcpp::traits::input_parameter< double >::type iVarBandwidth(iVarBandwidthSEXP);
+    Rcpp::traits::input_parameter< int >::type iPreAverage(iPreAverageSEXP);
+    Rcpp::traits::input_parameter< int >::type iAcLag(iAcLagSEXP);
+    Rcpp::traits::input_parameter< int >::type iCores(iCoresSEXP);
+    rcpp_result_gen = Rcpp::wrap(DriftBurstLoopCPAR(vPreAveraged, diffedlogprices, vTime, vTesttime, iMeanBandwidth, iVarBandwidth, iPreAverage, iAcLag, iCores));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -176,6 +186,64 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::vec >::type ends(endsSEXP);
     Rcpp::traits::input_parameter< double >::type scaleFactor(scaleFactorSEXP);
     rcpp_result_gen = Rcpp::wrap(mSeq(starts, ends, scaleFactor));
+    return rcpp_result_gen;
+END_RCPP
+}
+// cfilter
+arma::vec cfilter(arma::vec x, arma::vec filter);
+RcppExport SEXP _highfrequency_cfilter(SEXP xSEXP, SEXP filterSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type x(xSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type filter(filterSEXP);
+    rcpp_result_gen = Rcpp::wrap(cfilter(x, filter));
+    return rcpp_result_gen;
+END_RCPP
+}
+// mldivide
+arma::vec mldivide(arma::mat A, arma::vec B);
+RcppExport SEXP _highfrequency_mldivide(SEXP ASEXP, SEXP BSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type A(ASEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type B(BSEXP);
+    rcpp_result_gen = Rcpp::wrap(mldivide(A, B));
+    return rcpp_result_gen;
+END_RCPP
+}
+// rollApplyMinWrapper
+arma::mat rollApplyMinWrapper(const arma::mat& x);
+RcppExport SEXP _highfrequency_rollApplyMinWrapper(SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::mat& >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(rollApplyMinWrapper(x));
+    return rcpp_result_gen;
+END_RCPP
+}
+// rollApplyMedianWrapper
+arma::mat rollApplyMedianWrapper(const arma::mat& x);
+RcppExport SEXP _highfrequency_rollApplyMedianWrapper(SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::mat& >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(rollApplyMedianWrapper(x));
+    return rcpp_result_gen;
+END_RCPP
+}
+// rollApplyProdWrapper
+arma::mat rollApplyProdWrapper(const arma::mat& x, int m);
+RcppExport SEXP _highfrequency_rollApplyProdWrapper(SEXP xSEXP, SEXP mSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::mat& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< int >::type m(mSEXP);
+    rcpp_result_gen = Rcpp::wrap(rollApplyProdWrapper(x, m));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -296,18 +364,25 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_highfrequency_har_agg", (DL_FUNC) &_highfrequency_har_agg, 3},
+    {"_highfrequency_calcRecVarEq", (DL_FUNC) &_highfrequency_calcRecVarEq, 2},
     {"_highfrequency_quadraticKernel", (DL_FUNC) &_highfrequency_quadraticKernel, 1},
     {"_highfrequency_tradeIntensityProcessCpp", (DL_FUNC) &_highfrequency_tradeIntensityProcessCpp, 2},
-    {"_highfrequency_har_agg", (DL_FUNC) &_highfrequency_har_agg, 3},
-    {"_highfrequency_heavy_parameter_transformR_", (DL_FUNC) &_highfrequency_heavy_parameter_transformR_, 9},
-    {"_highfrequency_heavy_parameter_transform_RetrackR_", (DL_FUNC) &_highfrequency_heavy_parameter_transform_RetrackR_, 10},
-    {"_highfrequency_heavy_likelihoodR_", (DL_FUNC) &_highfrequency_heavy_likelihoodR_, 14},
+    {"_highfrequency_AsymptoticVarianceC", (DL_FUNC) &_highfrequency_AsymptoticVarianceC, 2},
+    {"_highfrequency_AutomaticLagSelectionC", (DL_FUNC) &_highfrequency_AutomaticLagSelectionC, 2},
+    {"_highfrequency_DriftBurstLoopC", (DL_FUNC) &_highfrequency_DriftBurstLoopC, 8},
+    {"_highfrequency_DriftBurstLoopCPAR", (DL_FUNC) &_highfrequency_DriftBurstLoopCPAR, 9},
     {"_highfrequency_colCumsum", (DL_FUNC) &_highfrequency_colCumsum, 1},
     {"_highfrequency_refreshTimeMathing", (DL_FUNC) &_highfrequency_refreshTimeMathing, 2},
     {"_highfrequency_preAveragingReturnsInternal", (DL_FUNC) &_highfrequency_preAveragingReturnsInternal, 2},
     {"_highfrequency_findFirst", (DL_FUNC) &_highfrequency_findFirst, 2},
     {"_highfrequency_overlap", (DL_FUNC) &_highfrequency_overlap, 4},
     {"_highfrequency_mSeq", (DL_FUNC) &_highfrequency_mSeq, 3},
+    {"_highfrequency_cfilter", (DL_FUNC) &_highfrequency_cfilter, 2},
+    {"_highfrequency_mldivide", (DL_FUNC) &_highfrequency_mldivide, 2},
+    {"_highfrequency_rollApplyMinWrapper", (DL_FUNC) &_highfrequency_rollApplyMinWrapper, 1},
+    {"_highfrequency_rollApplyMedianWrapper", (DL_FUNC) &_highfrequency_rollApplyMedianWrapper, 1},
+    {"_highfrequency_rollApplyProdWrapper", (DL_FUNC) &_highfrequency_rollApplyProdWrapper, 2},
     {"_highfrequency_leadLagCpp", (DL_FUNC) &_highfrequency_leadLagCpp, 6},
     {"_highfrequency_leadLagCppPAR", (DL_FUNC) &_highfrequency_leadLagCppPAR, 7},
     {"_highfrequency_nsmaller", (DL_FUNC) &_highfrequency_nsmaller, 5},

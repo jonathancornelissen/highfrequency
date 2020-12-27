@@ -142,5 +142,75 @@ arma::vec mSeq(arma::vec starts, arma::vec ends, double scaleFactor){ // multipl
 }
 
 
+// The following code is modified from the repository: https://github.com/coatless/r-to-armadillo which is a collection of R functions written in C++
+//[[Rcpp::export]]
+arma::vec cfilter(arma::vec x, arma::vec filter)
+{
+  
+  int nx = x.n_elem;
+  int nf = filter.n_elem;
+  int nshift = nf/2;
+  
+  double z, tmp;
+  
+  
+  arma::vec out = arma::zeros<arma::vec>(nx);
+  
+  for(int i = 0; i < nx; i++) {
+    z = 0;
+    if(i + nshift - (nf - 1) < 0 || i + nshift >= nx) {
+      out(i) = NA_REAL;
+      continue;
+    }
+    for(int j = std::max(0, nshift + i - nx); j < std::min(nf, i + nshift + 1) ; j++) {
+      tmp = x(i + nshift - j);
+      z += filter(j) * tmp;
+    }
+    out(i) = z;
+  }
+  
+  return out;
+}
 
 
+//[[Rcpp::export]]
+arma::vec mldivide(arma::mat A, arma::vec B){
+  return(arma::solve(A,B));
+}
+
+
+//[[Rcpp::export]]
+arma::mat rollApplyMinWrapper(const arma::mat& x){
+  
+  arma::mat out = arma::mat(x.n_rows - 1, x.n_cols); // One row less than the input as we take min of i and i-1
+  const arma::uword N = x.n_cols;
+  for(arma::uword i = 1; i < x.n_rows; i++){
+    out.row(i-1) = min(x(span(i-1, i), span(0, N-1)), 0);
+  }
+  return(out);
+}
+
+//[[Rcpp::export]]
+arma::mat rollApplyMedianWrapper(const arma::mat& x){
+  
+  arma::mat out = arma::mat(x.n_rows - 2, x.n_cols);
+  const arma::uword N = x.n_cols;
+  
+  for(arma::uword i = 1; i < x.n_rows - 1; i++){
+    out.row(i-1) = median(x(span(i - 1, i + 1), span(0, N - 1)), 0);
+  }
+  return(out);
+  
+}
+
+//[[Rcpp::export]]
+arma::mat rollApplyProdWrapper(const arma::mat& x, int m){
+  m = m - 1;
+  arma::mat out = arma::mat(x.n_rows - m, x.n_cols); 
+  const arma::uword N = x.n_cols;
+  for(arma::uword i = m; i < x.n_rows; i++){
+    out.row(i-m) = prod(x(span(i-m, i), span(0, N-1)), 0);
+  }
+  return(out);
+  
+}

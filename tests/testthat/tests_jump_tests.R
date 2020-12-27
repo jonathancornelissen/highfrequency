@@ -1,11 +1,11 @@
 library(testthat)
 library(highfrequency)
-
+library(xts)
 context("AJjumpTest unit test")
 test_that("AJjumpTest unit test",{
   expect_equal(
-    formatC(AJjumpTest(sampleTData$PRICE, p = 2, k = 3, alignBy = "seconds", alignPeriod = 5, makeReturns = TRUE)$ztest, digits = 10),
-    "-2.462012017"
+    as.numeric(AJjumpTest(as.xts(sampleTData[,list(DT, PRICE)]), p = 2, k = 3, alignBy = "seconds", alignPeriod = 5, makeReturns = TRUE)[,1]),
+    c(-1.1620534373, -0.1330522019)
   )
 })
 
@@ -13,24 +13,24 @@ test_that("AJjumpTest unit test",{
 context("JO jump test unit test")
 test_that("JO jump test unit test",{
   expect_equal(
-    formatC(as.numeric(JOjumpTest(sample5MinPricesJumps[,1], power = 6)$ztest), digits = 10),
-    c("0.2237433282","0.8492610224", "8.714153635", "-18.43875721",  "33.00286362",   "-1.12530156",   
-      "-0.1693194718", "1.946341487", "-0.8662709953", "14.27443109", " 2.90820588", "5.505960335","-1.437705957",
-      "-0.07068737283","0.7935449771", "-10.81545189", "1.577474946", "-0.09450737237","-3.262432421")
+    as.numeric(JOjumpTest(as.xts(sampleOneMinuteData)[,1], power = 6)$ztest),
+    c(1.58839272530, -2.23596371826, 1.43940624574, -1.62044376089, -0.16071177517, 0.42242944882, -0.51764968793, -3.84231423189, 6.11221556860, 0.42155384715,
+      -0.23981850002, 1.89611556565, -1.18434897661, 3.04518285659, -0.07857489704, 0.18955107699, -1.08415509224, -0.29925793964, 1.11070405246, 1.80433849107,
+      1.59206104645, 1.95829451255)
   )
   
   expect_equal(
-    formatC(as.numeric(JOjumpTest(sample5MinPricesJumps[,1], power = 4)$ztest), digits = 4),
-    c("0.2345","1.043", "6.265", "-13.97", " 29.4", "-0.9539", "-0.1651", "1.328", "-0.9089", "   17", "2.782", "4.522", "-1.585", "-0.0738", "0.636",
-    "-11.33", "1.072", "-0.09093", "-2.554")
+    as.numeric(JOjumpTest(as.xts(sampleOneMinuteData)[,1], power = 4)$ztest),
+    c(1.82173389154, -2.39176475648, 1.01422852838, -1.43946546204, -0.19394671424, 0.29908656815, -0.37650298919, -2.66443521869, 2.80829134982, 0.43105071484, -0.26540328125, 
+      1.38399907441, -1.44534259783, 3.20191265277, -0.05577322167, 0.18755879172, -1.21634307408, -0.31449501972, 1.22257863035, 1.70472241982, 1.51144383711, 1.49120113899)
   )
 })
 
 context("BNSjumpTest")
 test_that("BNSjumpTest", {
   expect_equal(
-    formatC(BNSjumpTest(sampleTData$PRICE, IVestimator= "minRV", 209, IQestimator = "medRQ", type= "linear", makeReturns = TRUE)$pvalue, digits = 0),
-    c(PRICE = "0")
+    as.numeric(BNSjumpTest(as.xts(sampleTData[, list(DT, PRICE)]), IVestimator= "rMinRV", IQestimator = "rMedRQ", type= "linear", makeReturns = TRUE)[, "p.value"]),
+    c(1.794624516e-02, 2.913249385e-05)
   )
 })
 
@@ -38,7 +38,7 @@ context("intradayJumpTest")
 test_that("LM test",{
   ## Extract the prices and set the time-zone to the local time-zone
   library(xts)
-  dat <- sampleTDataMicroseconds[as.Date(DT) == "2018-01-02", list(DT, PRICE)]
+  dat <- sampleTData[as.Date(DT) == "2018-01-02", list(DT, PRICE)]
   
   jumpTest <- intradayJumpTest(pData = dat, volEstimator = "RM", driftEstimator = "none", alpha = 0.95, RM = "bipower", 
                                lookBackPeriod = 10, dontIncludeLast = TRUE, on = "minutes", k = 5,
@@ -57,22 +57,13 @@ test_that("LM test",{
 })
 
 test_that("FoF test",{
-  dat <- sampleTData$PRICE
-  tzone(dat) <- "GMT"
-  storage.mode(dat) <- "numeric"
+  dat <- sampleTData[, list(DT, PRICE)]
   FoFtest <- intradayJumpTest(pData = dat, volEstimator = "PARM", driftEstimator = "none", alpha = 0.95, RM = "bipower", 
                               theta = 1, lookBackPeriod = 50, marketOpen = "9:30:00", marketClose = "16:00:00", tz = "GMT")
   
-  
-  P1 <- plot(FoFtest)
-  lims <- P1$get_xlim()
-  
-  expect_equal(
-    lims[1], as.numeric(index(dat))[1]
-  )
-  expect_equal(
-    lims[2], as.numeric(index(dat))[nrow(dat)]
-  )
+  expect_equal(sum(FoFtest$ztest), -17.62862858)
+  expect_equal(sum(FoFtest$vol$spot), 0.03685386024)
+  expect_equal(sum(FoFtest$drift), 0)
   
 })
 

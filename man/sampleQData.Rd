@@ -3,25 +3,21 @@
 \docType{data}
 \name{sampleQData}
 \alias{sampleQData}
-\title{Sample of cleaned quotes for stock XXX for 1 day}
+\title{Sample of cleaned quotes for stock XXX for 2 days measured in microseconds}
 \format{
-xts object
+data.table object
 }
 \usage{
 sampleQData
 }
 \description{
-An xts object containing the raw quotes for the imaginary stock XXX for 1 day, in the typical NYSE TAQ database format. 
-This is the cleaned version of the data sample \code{\link{sampleQDataRaw}}, using \code{quotesCleanup}.
+A \code{data.table} object containing the quotes for the imaginary stock XXX for 2 days. This is the cleaned version of the data sample \code{\link{sampleQDataRaw}}, using \code{quotesCleanup}.
 }
 \examples{
 \dontrun{
-#The code to create sampleQData from raw data is 
-sampleQData <- quotesCleanup(
-qDataRaw = sampleQDataRaw, exchanges = "N", type = "standard", 
-report = FALSE)[, c("SYMBOL", "BID", "BIDSIZ", "OFR", "OFRSIZ", "MODE")]
-# These are the historically included columns.
+# The code to create the sampleQData dataset from raw data is
+sampleQData <- quotesCleanup(qDataRaw = sampleQDataRaw,
+                                         exchanges = "N", type = "standard", report = FALSE)
 }
-
 }
 \keyword{datasets}
