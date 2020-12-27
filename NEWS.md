@@ -11,6 +11,7 @@ Changes in version 0.8.0
  - Added functions makeRMFormat and makeOHLCV to convert data from a long format to a format that can be used for realized measures, and to make arbitrary period bars.
  - HARmodel has less 'RV' in the types - much easier to type and read, also it now supports an external regressor and has robust standard errors reported in the summary.
  - add asymptotic variance estimator for ReMeDI estimation - thanks to Merrick Li for contributing his Matlab code
+ - In general, improved documentation. Also, better documentation of methods which were, in most cases undocumented and not clearly exported
  
 Changes in version 0.7.0
  - New naming convention
@@ -27,7 +28,7 @@ Changes in version 0.7.0
  - Implemented new realized semi-covariance estimator in rSemiCov
  - Implemented new lead-lag estimation in leadLag
  - Implemented ReMeDI estimation in ReMeDI
- - More transparantly handle the lagging of quotes when matching these with trades, now the user has control of this.
+ - More transparently handle the lagging of quotes when matching these with trades, now the user has control of this.
  - Add business time sampling
  - Changes to the included datasets. The microseconds quote datasets have been thinned out aggressively for exchanges != "N"
 
@@ -56,7 +57,7 @@ Changes in version 0.6.0
    - testing via test_that
    - covr integration on github
  - microsecond compatibility for WRDS files
- - improved doumentation
+ - improved documentation
  - new options in harModel
  - updated data sets
  - updated references
