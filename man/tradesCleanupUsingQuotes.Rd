@@ -10,7 +10,7 @@ tradesCleanupUsingQuotes(
   dataDestination = NULL,
   tData = NULL,
   qData = NULL,
-  lagQuotes = 2,
+  lagQuotes = 0,
   BFM = FALSE,
   backwardsWindow = 3600,
   forwardsWindow = 0.5,

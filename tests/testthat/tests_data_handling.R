@@ -46,7 +46,7 @@ test_that("selectExchange and data cleaning functions", {
   )
   
   expect_equal(
-    dim(rmTradeOutliersUsingQuotes(selectExchange(sampleTDataRaw, "P"), selectExchange(sampleQDataRaw, "N"))),
+    dim(rmTradeOutliersUsingQuotes(selectExchange(sampleTDataRaw, "P"), selectExchange(sampleQDataRaw, "N"), lagQuotes = 2)),
     c(5502, 22)
   )
   
@@ -72,7 +72,7 @@ test_that("selectExchange and data cleaning functions", {
   
   
   expect_equal(
-  dim(tradesCleanupUsingQuotes(tData = sampleTDataRaw, qData = sampleQData)),
+  dim(tradesCleanupUsingQuotes(tData = sampleTDataRaw, qData = sampleQData, lagQuotes = 2)),
   c(72035, 23)
   )
   
@@ -137,7 +137,7 @@ test_that("tradesCleanup on-disk functionality", {
   sampleTDataDay1 <-
     tradesCleanupUsingQuotes(
       tData = tradesCleanup(tDataRaw = sampleTDataRaw[as.Date(DT) == "2018-01-02"], exchanges = "N", report = FALSE),
-      qData = quotesCleanup(qDataRaw = sampleQDataRaw[as.Date(DT) == "2018-01-02"], exchanges = "N", type = "advanced", report = FALSE),
+      qData = quotesCleanup(qDataRaw = sampleQDataRaw[as.Date(DT) == "2018-01-02"], exchanges = "N", type = "standard", report = FALSE),
       lagQuotes = 0
     )[, c("DT", "SYMBOL", "PRICE", "SIZE")]
   
@@ -409,3 +409,15 @@ test_that("aggregateTrades, aggregatePrice, and aggregateQuotes multisymbol mult
   all(split(aggQuotes2, by = "SYMBOL")[[2]] == aggregatePrice(sampleQData), na.rm = TRUE)
   
 })
+
+
+context("Backwards-forwards matching algorithm produces correct result")
+test_that("Backwards-forwards matching algorithm produces correct result", {
+  
+  bfmMatched <- tradesCleanupUsingQuotes(tData = tradesCleanup(tDataRaw = sampleTDataRaw, report = FALSE, exchanges = 'D'),
+                                  qData = quotesCleanup(qDataRaw = sampleQDataRaw, type = 'standard', report = FALSE, exchanges = 'N'), 
+                                  BFM = TRUE, lagQuotes = 0)
+  
+  expect_equal(dim(bfmMatched), c(19887, 18))
+})
+
