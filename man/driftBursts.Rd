@@ -45,7 +45,7 @@ An object of class \code{DBH} and \code{list} containing the series of the drift
 The list also contains some information such as the variance and mean bandwidths along with the pre-averaging setting and the amount of observations. 
 Additionally, the list will contain information on whether testing happened for all \code{testTimes} entries.
 Objects of class \code{DBH} has the methods \code{\link{print.DBH}}, \code{\link{plot.DBH}}, and \code{\link{getCriticalValues.DBH}} which prints, plots, and
-retrieves critical values for the test described in appendix B of Christensen, Oomen, and Reno (2018).
+retrieves critical values for the test described in appendix B of Christensen, Oomen, and Reno (2020).
 }
 \description{
 Calculates the test-statistic for the drift burst hypothesis
@@ -133,7 +133,7 @@ max(abs(DBH4$tStat)) > getCriticalValues(DBH4, 0.99)$quantile
 }
 }
 \references{
-Christensen, K., Oomen, R., and Reno, R. (2018) The drift burst hypothesis. Working paper.
+Christensen, K., Oomen, R., and Reno, R. (2020) The drift burst hypothesis. Journal of Econometrics. Forthcoming.
 }
 \author{
 Emil Sjoerup

@@ -63,7 +63,7 @@
 #' The list also contains some information such as the variance and mean bandwidths along with the pre-averaging setting and the amount of observations. 
 #' Additionally, the list will contain information on whether testing happened for all \code{testTimes} entries.
 #' Objects of class \code{DBH} has the methods \code{\link{print.DBH}}, \code{\link{plot.DBH}}, and \code{\link{getCriticalValues.DBH}} which prints, plots, and
-#' retrieves critical values for the test described in appendix B of Christensen, Oomen, and Reno (2018).
+#' retrieves critical values for the test described in appendix B of Christensen, Oomen, and Reno (2020).
 #' 
 #' @examples 
 #' # Usage with data.table object
@@ -104,7 +104,7 @@
 #' max(abs(DBH4$tStat)) > getCriticalValues(DBH4, 0.99)$quantile
 #' }
 #' @references 
-#' Christensen, K., Oomen, R., and Reno, R. (2018) The drift burst hypothesis. Working paper.
+#' Christensen, K., Oomen, R., and Reno, R. (2020) The drift burst hypothesis. Journal of Econometrics. Forthcoming.
 #' 
 #' @author Emil Sjoerup
 #' @importFrom data.table is.data.table
@@ -497,7 +497,7 @@ print.DBH = function(x, ...){
 #' @author Emil Sjoerup
 #' @aliases getCriticalValues.DBH
 #' @references 
-#' Christensen, K., Oomen, R., and Reno, R. (2018). The drift burst hypothesis. Working paper.
+#' Christensen, K., Oomen, R., and Reno, R. (2020) The drift burst hypothesis. Journal of Econometrics. Forthcoming.
 #' @export
 getCriticalValues <- function(x, alpha = 0.95){
   UseMethod('getCriticalValues', x)
