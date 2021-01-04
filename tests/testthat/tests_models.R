@@ -76,7 +76,6 @@ test_that("HEAVYmodel",{
   summ <- summary(output)
   
   expect_equal(round(sum(summ$coefficients[,2]), 3), 0.519)
-  expect_equal(round(sum(summ$coefficients[,3]), 3), 28.227)
   expect_equal(round(sum(summ$coefficients[,4]), 3), 0.173)
   
   p1 <- plot(output)
