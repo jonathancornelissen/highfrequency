@@ -18,5 +18,7 @@ Plotting method for HEAVYmodel objects
 The plotting method has the following optional parameter:
 \itemize{
 \item{\code{legend.loc}}{ A string denoting the location of the legend passed on to \code{addLegend} of the \pkg{xts} package}
+\item{\code{type}}{ A string denoting the type of lot to be made. If \code{type} is \code{"condVar"} the fitted values of the conditional variance of the returns
+is shown. If \code{type} is different from \code{"condVar"}, the fitted values of the realized measure is shown. Default is \code{"condVar"}}
 }
 }

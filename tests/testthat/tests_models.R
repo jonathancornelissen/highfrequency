@@ -1,4 +1,5 @@
-library(testthat)
+library("testthat")
+library("xts")
 rets <- as.xts(sampleOneMinuteData)[, 1]
 
 for (date in unique(as.character(as.Date(index(rets))))) {
@@ -65,10 +66,30 @@ test_that("HEAVYmodel",{
   
   logReturns <- 100 * makeReturns(SPYRM$CLOSE)[-1]
   logReturns <- logReturns - mean(logReturns)
-  dataSPY <- xts::xts(cbind(logReturns, SPYRM$BPV5[-1] * 10000), order.by = SPYRM$DT[-1])
+  dataSPY <- xts(cbind(logReturns, SPYRM$BPV5[-1] * 10000), order.by = SPYRM$DT[-1])
   output <- HEAVYmodel(dataSPY)
   expect_identical(
     formatC(sum(output$coefficients), digits = 6),
     "2.67386"
   )
+  
+  summ <- summary(output)
+  
+  expect_equal(round(sum(summ$coefficients[,2]), 3), 0.519)
+  expect_equal(round(sum(summ$coefficients[,3]), 3), 28.227)
+  expect_equal(round(sum(summ$coefficients[,4]), 3), 0.173)
+  
+  p1 <- plot(output)
+  p2 <- plot(output, type = 'RM')
+  expect_equal(p1$get_xlim(),  p2$get_xlim()) # Make sure we plot the same range
+  expect_equal(as.numeric(p1$get_ylim()[[2]]), range(range(dataSPY[,1]^2),  range(output$varCondVariances)))
+  expect_equal(as.numeric(p1$get_ylim()[[2]]), c(7.700748e-08, 3.850425e+01))
+  expect_equal(as.numeric(p2$get_ylim()[[2]]), range(range(dataSPY[,2]),  range(output$RMCondVariances)))
+  expect_equal(as.numeric(p2$get_ylim()[[2]]), c(0.01864006, 26.22013470))
+  
+  pred <- predict(output, stepsAhead = 1)
+  expect_equal(as.numeric(pred), c(0.17950597, 0.2154706))
+  pred <- predict(output, stepsAhead = 2)
+  expect_equal(as.numeric(pred), c(0.17950597, 0.16517459, 0.2154706, 0.6670120))
+  
 })
