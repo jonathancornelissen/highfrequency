@@ -4,7 +4,7 @@
 \alias{Bj}
 \title{Internal HEAVY functions}
 \usage{
-Bj(j, parRMEq, parVarEq)
+Bj(j, parVarEq, parRMEq)
 }
 \description{
 Internal HEAVY functions

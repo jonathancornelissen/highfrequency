@@ -44,7 +44,8 @@
 #' @references Shephard, N. and Sheppard, K. (2010). Realising the future: Forecasting with high frequency based volatility (HEAVY) models. Journal of Applied Econometrics 25, 197--231.
 #' @importFrom numDeriv jacobian hessian
 #' @importFrom stats nlminb
-#' @author Onno Kleen.
+#' @importFrom Rsolnp solnp
+#' @author Onno Kleen and Emil Sjorup.
 #' 
 #' @examples 
 #' 
@@ -52,7 +53,7 @@
 #' logReturns <- 100 * makeReturns(SPYRM$CLOSE)[-1]
 #' 
 #' # Combine both returns and realized measures into one xts
-#' dataSPY <- xts::xts(cbind(logReturns, SPYRM$RK5[-1] * 10000), order.by = SPYRM$DT[-1])
+#' dataSPY <- xts::xts(cbind(logReturns, SPYRM$BPV5[-1] * 10000), order.by = SPYRM$DT[-1])
 #' 
 #' # Due to return calculation, the first observation is missing
 #' fittedHEAVY <- HEAVYmodel(dataSPY)
@@ -73,63 +74,46 @@ HEAVYmodel <- function(data, startingValues = NULL) {
   rm <- as.numeric(data[,2])
   ret <- ret - mean(ret)
   
-  
-  
   if (is.null(startingValues)) {
-    startingValuesVar <- c(var(ret) * (1 - 0.3 - 0.5), 0.3, 0.5) 
+    startingValuesVar <- c(mean(ret^2) * (1 - 0.3 * mean(rm) / mean(ret^2) - 0.5), 0.3, 0.5) 
     startingValuesRM <- c(mean(rm) * (1 - 0.6 - 0.3), 0.6, 0.3)
   } else {
     startingValuesVar <-startingValues[1:3]
     startingValuesRM <-startingValues[4:6]
   }
   
-  # control_neg <- list(fnscale = -1)
+  rsolVar <- solnp(pars = startingValuesVar, fun = function(x) -sum(heavyLLH(x, ret = ret, rm = rm)),
+                   ineqfun = function(x) c(x, x[2] + x[3]),  ineqLB = c(0,0,0,0), ineqUB = c(Inf, Inf, 1, Inf), control = list(trace = 0))
+  rsolRM <- solnp(pars = startingValuesRM, fun = function(x) -sum(heavyLLH(x, rm = rm, RMEq = TRUE)),
+                  ineqfun = function(x) c(x, x[2] + x[3]),  ineqLB = c(0,0,0,0), ineqUB = c(Inf, 1, 1, 1), control = list(trace = 0))
   
-  # Get into the direction of global minimum via nlminb
-  parVarEq <- try({suppressWarnings(nlminb(startingValuesVar, function(x) -sum(heavyLLH(x, ret = ret, rm = rm))))}, 
-                  silent = TRUE)
   
-  parRMEq <- try({suppressWarnings(nlminb(startingValuesRM, function(x) -sum(heavyLLH(x, rm = rm, RMEq = TRUE))))},
-                 silent = TRUE)
+  varCondVariances <- calcRecVarEq(rsolVar$par, rm)
+  RMCondVariances <- calcRecVarEq(rsolRM$par, rm)
   
-  parVarEq$value <- parVarEq$objective
-  parRMEq$value <- parRMEq$objective
-  
-  # Optimize w.r.t. gradient
-  parVarEqBFGS<- try({optim(parVarEq$par, function(x) -sum(heavyLLH(x, ret = ret, rm = rm)), method = "BFGS")}, silent = TRUE)
-  parRMEqBFGS<- try({optim(parRMEq$par, function(x) -sum(heavyLLH(x, rm = rm, RMEq = TRUE)), method = "BFGS")}, silent = TRUE)
-  
-  if (class(parVarEqBFGS) != "try-error") {
-    parVarEq <- parVarEqBFGS
-  }
-  if (class(parRMEqBFGS) != "try-error") {
-    parRMEq <- parRMEqBFGS
-  }
-  
-  varCondVariances <- calcRecVarEq(parVarEq$par, rm)
-  RMCondVariances <- calcRecVarEq(parRMEq$par, rm)
-  
-  modelEstimates <- c(parVarEq$par, parRMEq$par)
+  modelEstimates <- c(rsolVar$par, rsolRM$par)
   names(modelEstimates) <- c("omega", "alpha", "beta",
                              "omegaR", "alphaR", "betaR")
   
+  
+  
   invHessianVarEq <- try({
-    solve(-suppressWarnings(hessian(x = parVarEq$par, func = function (theta) {
+    solve(-suppressWarnings(hessian(x = rsolVar$par, func = function (theta) {
       sum(heavyLLH(theta, rm = rm, ret = ret))
     }, method.args=list(d = 0.0001, r = 6))))
   }, silent = TRUE)
   invHessianRMEq <- try({
-    solve(-suppressWarnings(hessian(x = parRMEq$par, func = function (theta) {
+    solve(-suppressWarnings(hessian(x = rsolRM$par, func = function (theta) {
       sum(heavyLLH(theta, rm = rm, RMEq = TRUE))
-    }, method.args=list(d = 0.0001, r = 6))))
+    }, method.args = list(d = 0.0001, r = 6))))
   }, silent = TRUE)
   
   if (class(invHessianVarEq)[1] == "try-error") {
     warning("Inverting the Hessian matrix failed. No robust standard errors calculated for variance equation.")
-   robStdErrVarEq <- rep(NA, times = 3)
+    robStdErrVarEq <- rep(NA, times = 3)
   } else {
     robStdErrVarEq <- sqrt(diag(invHessianVarEq %*% 
-                                  crossprod(jacobian(function(theta) heavyLLH(theta, rm = rm, ret = ret), parVarEq$par)) %*% 
+                                  crossprod(jacobian(function(theta) heavyLLH(theta, rm = rm, ret = ret), rsolVar$par)) %*% 
                                   invHessianVarEq))
   }
   if (class(invHessianRMEq)[1] == "try-error") {
@@ -138,18 +122,21 @@ HEAVYmodel <- function(data, startingValues = NULL) {
   } else {
     robStdErrRMEq <-
       sqrt(diag(invHessianRMEq %*% 
-                  crossprod(jacobian(function(theta) heavyLLH(theta, rm = rm, RMEq = TRUE), parRMEq$par)) %*% 
+                  crossprod(jacobian(function(theta) heavyLLH(theta, rm = rm, RMEq = TRUE), rsolRM$par)) %*% 
                   invHessianRMEq))
   }
   
   model <- list(
-  "coefficients" = modelEstimates,
-  "se" = c(robStdErrVarEq, robStdErrRMEq),
-  "residuals" = ret / sqrt(varCondVariances),
-  "llh" = c(llhVar = -parVarEq$value, llhRM = -parRMEq$value),
-  "varCondVariances" = varCondVariances,
-  "RMCondVariances" = RMCondVariances,
-  "data" = data)
+    "coefficients" = modelEstimates,
+    "se" = c(robStdErrVarEq, robStdErrRMEq),
+    "residuals" = ret / sqrt(varCondVariances),
+    "llh" = c(llhVar = -rsolVar$value, llhRM = -rsolRM$value),
+    "varCondVariances" = varCondVariances,
+    "RMCondVariances" = RMCondVariances,
+    "data" = data,
+    "rsolvar" = rsolVar,
+    "rsolRM" = rsolRM
+  )
   
   class(model) <- "HEAVYmodel"
   
@@ -228,17 +215,17 @@ plot.HEAVYmodel <- function(x, ...){
 #' @export
 predict.HEAVYmodel <- function(object, stepsAhead = 10, ...) {
   
-  parRMEq <- object$coefficients[1:3]
-  parVarEq <- object$coefficients[4:6]
+  parVarEq <- object$coefficients[1:3]
+  parRMEq <- object$coefficients[4:6]
   
-  fcts <- t(vapply(c(1:stepsAhead), function(x) forecastsHEAVY(x, object, parRMEq, parVarEq), numeric(2)))
+  Bjs <- lapply(c(0:(stepsAhead)), function(s) Bj(s, parVarEq, parRMEq))
+  
+  fcts <- t(vapply(c(1:stepsAhead), function(x) forecastsHEAVY(x, object, parVarEq, parRMEq, Bjs), numeric(2)))
   
   rownames(fcts) <- paste0("T + ", c(1:stepsAhead))
-  colnames(fcts) <- c('conditional Variance', 'realized measure')
+  colnames(fcts) <- c('CondVar', 'CondRM')
   fcts
 }
-
-
 
 
 #' @export
