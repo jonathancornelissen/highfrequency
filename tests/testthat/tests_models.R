@@ -68,27 +68,22 @@ test_that("HEAVYmodel",{
   logReturns <- logReturns - mean(logReturns)
   dataSPY <- xts(cbind(logReturns, SPYRM$BPV5[-1] * 10000), order.by = SPYRM$DT[-1])
   output <- HEAVYmodel(dataSPY)
-  expect_identical(
-    formatC(sum(output$coefficients), digits = 6),
-    "2.67386"
-  )
+  expect_equal(round(sum(output$coefficients), 3), 1.981)
   
   summ <- summary(output)
   
-  expect_equal(round(sum(summ$coefficients[,2]), 3), 0.519)
-  expect_equal(round(sum(summ$coefficients[,4]), 3), 0.173)
+  expect_equal(round(sum(summ$coefficients[,2]), 3), 0.219)
+  expect_equal(round(sum(summ$coefficients[,4]), 3), 0.001)
   
   p1 <- plot(output)
   p2 <- plot(output, type = 'RM')
   expect_equal(p1$get_xlim(),  p2$get_xlim()) # Make sure we plot the same range
   expect_equal(as.numeric(p1$get_ylim()[[2]]), range(range(dataSPY[,1]^2),  range(output$varCondVariances)))
-  expect_equal(as.numeric(p1$get_ylim()[[2]]), c(7.700748e-08, 3.850425e+01))
+  expect_equal(round(as.numeric(p1$get_ylim()[[2]]),4), c(0.0000, 17.9841))
   expect_equal(as.numeric(p2$get_ylim()[[2]]), range(range(dataSPY[,2]),  range(output$RMCondVariances)))
-  expect_equal(as.numeric(p2$get_ylim()[[2]]), c(0.01864006, 26.22013470))
+  expect_equal(round(as.numeric(p2$get_ylim()[[2]]),4), c(0.0186, 26.2201))
   
-  pred <- predict(output, stepsAhead = 1)
-  expect_equal(as.numeric(pred), c(0.17950597, 0.2154706))
   pred <- predict(output, stepsAhead = 2)
-  expect_equal(as.numeric(pred), c(0.17950597, 0.16517459, 0.2154706, 0.6670120))
+  expect_equal(as.numeric(round(pred, 5)), c(0.24265, 0.26215, 0.14614, 0.19149))
   
 })

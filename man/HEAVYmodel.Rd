@@ -55,7 +55,7 @@ Note that we always demean the returns in the data input as we don't include a c
 logReturns <- 100 * makeReturns(SPYRM$CLOSE)[-1]
 
 # Combine both returns and realized measures into one xts
-dataSPY <- xts::xts(cbind(logReturns, SPYRM$RK5[-1] * 10000), order.by = SPYRM$DT[-1])
+dataSPY <- xts::xts(cbind(logReturns, SPYRM$BPV5[-1] * 10000), order.by = SPYRM$DT[-1])
 
 # Due to return calculation, the first observation is missing
 fittedHEAVY <- HEAVYmodel(dataSPY)
@@ -73,5 +73,5 @@ Shephard, N. and Sheppard, K. (2010). Realising the future: Forecasting with hig
 \code{\link{predict.HEAVYmodel}}
 }
 \author{
-Onno Kleen.
+Onno Kleen and Emil Sjorup.
 }

@@ -52,7 +52,8 @@ Imports:
     RcppRoll,
     quantmod,
     sandwich,
-    numDeriv
+    numDeriv,
+    Rsolnp
 LinkingTo: Rcpp, RcppArmadillo
 Suggests:
     covr,
