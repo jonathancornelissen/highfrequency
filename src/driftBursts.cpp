@@ -85,7 +85,13 @@ int AutomaticLagSelectionC(const arma::colvec& vX, double dMu){
 Rcpp::List DriftBurstLoopC(const arma::colvec& vPreAveraged, const arma::colvec& diffedlogprices, 
                            const arma::colvec& vTime, const arma::colvec& vTesttime, 
                            double iMeanBandwidth, double iVarBandwidth, int iPreAverage, int iAcLag){
-  
+#ifdef _OPENMP
+  // From experimentation, setting the number of threads to 1 is much faster than using multi-threaded code. (Why??)
+  // We capture the number of threads that omp is set to, 
+  // set the number of threads using omp_set_num_threads and reset it to the previous value.
+  const int THREADS = omp_get_num_threads(); // Get number of threads to reset later
+  omp_set_num_threads(1); // Set the threading to 1.
+#endif
   // Initialization
   int iT = vTesttime.size();
   int iQ;
@@ -130,7 +136,15 @@ Rcpp::List DriftBurstLoopC(const arma::colvec& vPreAveraged, const arma::colvec&
   Rcpp::List lOut = Rcpp::List::create(Rcpp::Named("tStat") = vDB,
                                        Rcpp::Named("sigma") = vSigma * invVB,
                                        Rcpp::Named("mu") = vMu * invMB);
+  
+#ifdef _OPENMP
+  omp_set_num_threads(THREADS); // Reset number of threads to earlier value
+#endif  
+  
+  
   return(lOut);
+  
+
 }
 
 
