@@ -49,13 +49,14 @@
 #' 
 #' @examples 
 #' 
-#' # Calculate annualized returns in percentages
+#' # Calculate returns in percentages
 #' logReturns <- 100 * makeReturns(SPYRM$CLOSE)[-1]
 #' 
 #' # Combine both returns and realized measures into one xts
+#' # Due to return calculation, the first observation is missing
 #' dataSPY <- xts::xts(cbind(logReturns, SPYRM$BPV5[-1] * 10000), order.by = SPYRM$DT[-1])
 #' 
-#' # Due to return calculation, the first observation is missing
+#' # Fit the HEAVY model
 #' fittedHEAVY <- HEAVYmodel(dataSPY)
 #' 
 #' # Examine the estimated coefficients and robust standard errors
@@ -95,23 +96,12 @@ HEAVYmodel <- function(data, startingValues = NULL) {
   names(modelEstimates) <- c("omega", "alpha", "beta",
                              "omegaR", "alphaR", "betaR")
   
-  
   invHessianVarEq <- try({
       solve(-rsolVar$hessian[(nrow(rsolVar$hessian)-2):nrow(rsolVar$hessian),(nrow(rsolVar$hessian)-2):nrow(rsolVar$hessian)])
     }, silent = TRUE)
   invHessianRMEq <- try({
       solve(-rsolRM$hessian[(nrow(rsolRM$hessian)-2):nrow(rsolRM$hessian),(nrow(rsolRM$hessian)-2):nrow(rsolRM$hessian)])
     }, silent = TRUE)
-  # invHessianVarEq <- try({
-  #   solve(-suppressWarnings(hessian(x = rsolVar$par, func = function (theta) {
-  #     sum(heavyLLH(theta, rm = rm, ret = ret))
-  #   }, method.args=list(d = 0.0001, r = 6))))
-  # }, silent = TRUE)
-  # invHessianRMEq <- try({
-  #   solve(-suppressWarnings(hessian(x = rsolRM$par, func = function (theta) {
-  #     sum(heavyLLH(theta, rm = rm, RMEq = TRUE))
-  #   }, method.args = list(d = 0.0001, r = 6))))
-  # }, silent = TRUE)
   
   if (class(invHessianVarEq)[1] == "try-error") {
     warning("Inverting the Hessian matrix failed. No robust standard errors calculated for variance equation.")
@@ -229,7 +219,6 @@ predict.HEAVYmodel <- function(object, stepsAhead = 10, ...) {
   colnames(fcts) <- c('CondVar', 'CondRM')
   fcts
 }
-
 
 #' @export
 print.HEAVYmodel <- function(x, digits = max(3, getOption("digits") - 3), ...) {
