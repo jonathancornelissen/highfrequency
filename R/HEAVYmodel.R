@@ -88,32 +88,37 @@ HEAVYmodel <- function(data, startingValues = NULL) {
                   ineqfun = function(x) c(x, x[2] + x[3]),  ineqLB = c(0,0,0,0), ineqUB = c(Inf, 1, 1, 1), control = list(trace = 0))
   
   
-  varCondVariances <- calcRecVarEq(rsolVar$par, rm)
-  RMCondVariances <- calcRecVarEq(rsolRM$par, rm)
+  varCondVariances <- calcRecVarEq(rsolVar$pars, rm)
+  RMCondVariances <- calcRecVarEq(rsolRM$pars, rm)
   
-  modelEstimates <- c(rsolVar$par, rsolRM$par)
+  modelEstimates <- c(rsolVar$pars, rsolRM$pars)
   names(modelEstimates) <- c("omega", "alpha", "beta",
                              "omegaR", "alphaR", "betaR")
   
   
-  
   invHessianVarEq <- try({
-    solve(-suppressWarnings(hessian(x = rsolVar$par, func = function (theta) {
-      sum(heavyLLH(theta, rm = rm, ret = ret))
-    }, method.args=list(d = 0.0001, r = 6))))
-  }, silent = TRUE)
+      solve(-rsolVar$hessian[(nrow(rsolVar$hessian)-2):nrow(rsolVar$hessian),(nrow(rsolVar$hessian)-2):nrow(rsolVar$hessian)])
+    }, silent = TRUE)
   invHessianRMEq <- try({
-    solve(-suppressWarnings(hessian(x = rsolRM$par, func = function (theta) {
-      sum(heavyLLH(theta, rm = rm, RMEq = TRUE))
-    }, method.args = list(d = 0.0001, r = 6))))
-  }, silent = TRUE)
+      solve(-rsolRM$hessian[(nrow(rsolRM$hessian)-2):nrow(rsolRM$hessian),(nrow(rsolRM$hessian)-2):nrow(rsolRM$hessian)])
+    }, silent = TRUE)
+  # invHessianVarEq <- try({
+  #   solve(-suppressWarnings(hessian(x = rsolVar$par, func = function (theta) {
+  #     sum(heavyLLH(theta, rm = rm, ret = ret))
+  #   }, method.args=list(d = 0.0001, r = 6))))
+  # }, silent = TRUE)
+  # invHessianRMEq <- try({
+  #   solve(-suppressWarnings(hessian(x = rsolRM$par, func = function (theta) {
+  #     sum(heavyLLH(theta, rm = rm, RMEq = TRUE))
+  #   }, method.args = list(d = 0.0001, r = 6))))
+  # }, silent = TRUE)
   
   if (class(invHessianVarEq)[1] == "try-error") {
     warning("Inverting the Hessian matrix failed. No robust standard errors calculated for variance equation.")
     robStdErrVarEq <- rep(NA, times = 3)
   } else {
     robStdErrVarEq <- sqrt(diag(invHessianVarEq %*% 
-                                  crossprod(jacobian(function(theta) heavyLLH(theta, rm = rm, ret = ret), rsolVar$par)) %*% 
+                                  crossprod(jacobian(function(theta) heavyLLH(theta, rm = rm, ret = ret), rsolVar$pars)) %*% 
                                   invHessianVarEq))
   }
   if (class(invHessianRMEq)[1] == "try-error") {
@@ -122,7 +127,7 @@ HEAVYmodel <- function(data, startingValues = NULL) {
   } else {
     robStdErrRMEq <-
       sqrt(diag(invHessianRMEq %*% 
-                  crossprod(jacobian(function(theta) heavyLLH(theta, rm = rm, RMEq = TRUE), rsolRM$par)) %*% 
+                  crossprod(jacobian(function(theta) heavyLLH(theta, rm = rm, RMEq = TRUE), rsolRM$pars)) %*% 
                   invHessianRMEq))
   }
   
@@ -133,9 +138,7 @@ HEAVYmodel <- function(data, startingValues = NULL) {
     "llh" = c(llhVar = -rsolVar$value, llhRM = -rsolRM$value),
     "varCondVariances" = varCondVariances,
     "RMCondVariances" = RMCondVariances,
-    "data" = data,
-    "rsolvar" = rsolVar,
-    "rsolRM" = rsolRM
+    "data" = data
   )
   
   class(model) <- "HEAVYmodel"

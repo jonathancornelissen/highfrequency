@@ -72,8 +72,8 @@ test_that("HEAVYmodel",{
   
   summ <- summary(output)
   
-  expect_equal(round(sum(summ$coefficients[,2]), 3), 0.219)
-  expect_equal(round(sum(summ$coefficients[,4]), 3), 0.001)
+  expect_equal(round(sum(summ$coefficients[,2]), 5), 0.22693)
+  expect_equal(round(sum(summ$coefficients[,4]), 5), 0.00084)
   
   p1 <- plot(output)
   p2 <- plot(output, type = 'RM')
@@ -83,7 +83,9 @@ test_that("HEAVYmodel",{
   expect_equal(as.numeric(p2$get_ylim()[[2]]), range(range(dataSPY[,2]),  range(output$RMCondVariances)))
   expect_equal(round(as.numeric(p2$get_ylim()[[2]]),4), c(0.0186, 26.2201))
   
-  pred <- predict(output, stepsAhead = 2)
-  expect_equal(as.numeric(round(pred, 5)), c(0.24265, 0.26215, 0.14614, 0.19149))
+  pred <- predict(output, stepsAhead = 12)
+  expect_equal(as.numeric(round(pred, 5)), c(0.24265, 0.26215, 0.27462, 0.28815, 0.30235, 0.31691, 0.33162, 0.34633, 0.36090, 0.37527,
+                                             0.38937, 0.40315, 0.14614, 0.19149, 0.21304, 0.23387, 0.25402, 0.27349, 0.29232, 0.31052,
+                                             0.32812, 0.34514, 0.36159, 0.37749))
   
 })
