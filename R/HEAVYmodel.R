@@ -44,17 +44,19 @@
 #' @references Shephard, N. and Sheppard, K. (2010). Realising the future: Forecasting with high frequency based volatility (HEAVY) models. Journal of Applied Econometrics 25, 197--231.
 #' @importFrom numDeriv jacobian hessian
 #' @importFrom stats nlminb
-#' @author Onno Kleen.
+#' @importFrom Rsolnp solnp
+#' @author Onno Kleen and Emil Sjorup.
 #' 
 #' @examples 
 #' 
-#' # Calculate annualized returns in percentages
+#' # Calculate returns in percentages
 #' logReturns <- 100 * makeReturns(SPYRM$CLOSE)[-1]
 #' 
 #' # Combine both returns and realized measures into one xts
-#' dataSPY <- xts::xts(cbind(logReturns, SPYRM$RK5[-1] * 10000), order.by = SPYRM$DT[-1])
-#' 
 #' # Due to return calculation, the first observation is missing
+#' dataSPY <- xts::xts(cbind(logReturns, SPYRM$BPV5[-1] * 10000), order.by = SPYRM$DT[-1])
+#' 
+#' # Fit the HEAVY model
 #' fittedHEAVY <- HEAVYmodel(dataSPY)
 #' 
 #' # Examine the estimated coefficients and robust standard errors
@@ -73,83 +75,41 @@ HEAVYmodel <- function(data, startingValues = NULL) {
   rm <- as.numeric(data[,2])
   ret <- ret - mean(ret)
   
-  heavyLLH <- function(par, RMEq = FALSE) {
-    # if (RMEq) {
-    #   browser()
-    # }
-    condVar <- calcRecVarEq(par, rm)
-    if (RMEq) {
-      if (sum(condVar < 0) > 0 | par[1] < 0 | par[2] < 0 | par[3] < 0 | par[2] + par[3] >= 1) {
-        NA
-      } else {
-        -1/2 * log(2 * pi) - 1 / 2 * (log(condVar) + rm / condVar)
-      }
-    } else {
-      if (sum(condVar < 0) > 0 | par[1] < 0 | (par[2] < 0) | par[3] < 0 | par[3] >= 1) {
-        NA
-      } else {
-        -1/2 * log(2 * pi) - 1 / 2 * (log(condVar) + ret^2 / condVar)
-      }
-    }
-  }
-  
   if (is.null(startingValues)) {
-    startingValuesVar <- c(var(ret) * (1 - 0.3 - 0.5), 0.3, 0.5) 
+    startingValuesVar <- c(mean(ret^2) * (1 - 0.3 * mean(rm) / mean(ret^2) - 0.5), 0.3, 0.5) 
     startingValuesRM <- c(mean(rm) * (1 - 0.6 - 0.3), 0.6, 0.3)
   } else {
     startingValuesVar <-startingValues[1:3]
     startingValuesRM <-startingValues[4:6]
   }
   
-  control_neg <- list(fnscale = -1)
+  rsolVar <- solnp(pars = startingValuesVar, fun = function(x) -sum(heavyLLH(x, ret = ret, rm = rm)),
+                   ineqfun = function(x) c(x, x[2] + x[3]),  ineqLB = c(0,0,0,0), ineqUB = c(Inf, Inf, 1, Inf), control = list(trace = 0))
+  rsolRM <- solnp(pars = startingValuesRM, fun = function(x) -sum(heavyLLH(x, rm = rm, RMEq = TRUE)),
+                  ineqfun = function(x) c(x, x[2] + x[3]),  ineqLB = c(0,0,0,0), ineqUB = c(Inf, 1, 1, 1), control = list(trace = 0))
   
-  # Get into the direction of global minimum via nlminb
-  parVarEq <- try({suppressWarnings(nlminb(startingValuesVar, function(x) -sum(heavyLLH(x))))}, 
-                  silent = TRUE)
   
-  parRMEq <- try({suppressWarnings(nlminb(startingValuesRM, function(x) -sum(heavyLLH(x, RMEq = TRUE))))},
-                 silent = TRUE)
+  varCondVariances <- calcRecVarEq(rsolVar$pars, rm)
+  RMCondVariances <- calcRecVarEq(rsolRM$pars, rm)
   
-  parVarEq$value <- parVarEq$objective
-  parRMEq$value <- parRMEq$objective
-  
-  # Optimize w.r.t. gradient
-  parVarEqBFGS<- try({optim(parVarEq$par, function(x) -sum(heavyLLH(x)), method = "BFGS")}, silent = TRUE)
-  parRMEqBFGS<- try({optim(parRMEq$par, function(x) -sum(heavyLLH(x, RMEq = TRUE)), method = "BFGS")}, silent = TRUE)
-  
-  if (class(parVarEqBFGS) != "try-error") {
-    parVarEq <- parVarEqBFGS
-  }
-  if (class(parRMEqBFGS) != "try-error") {
-    parRMEq <- parRMEqBFGS
-  }
-  
-  varCondVariances <- calcRecVarEq(parVarEq$par, rm)
-  RMCondVariances <- calcRecVarEq(parRMEq$par, rm)
-  
-  modelEstimates <- c(parVarEq$par, parRMEq$par)
+  modelEstimates <- c(rsolVar$pars, rsolRM$pars)
   names(modelEstimates) <- c("omega", "alpha", "beta",
                              "omegaR", "alphaR", "betaR")
   
   invHessianVarEq <- try({
-    solve(-suppressWarnings(hessian(x = parVarEq$par, func = function (theta) {
-      sum(heavyLLH(theta))
-    }, method.args=list(d = 0.0001, r = 6))))
-  }, silent = TRUE)
+      solve(-rsolVar$hessian[(nrow(rsolVar$hessian)-2):nrow(rsolVar$hessian),(nrow(rsolVar$hessian)-2):nrow(rsolVar$hessian)])
+    }, silent = TRUE)
   invHessianRMEq <- try({
-    solve(-suppressWarnings(hessian(x = parRMEq$par, func = function (theta) {
-      sum(heavyLLH(theta, RMEq = TRUE))
-    }, method.args=list(d = 0.0001, r = 6))))
-  }, silent = TRUE)
+      solve(-rsolRM$hessian[(nrow(rsolRM$hessian)-2):nrow(rsolRM$hessian),(nrow(rsolRM$hessian)-2):nrow(rsolRM$hessian)])
+    }, silent = TRUE)
   
   if (class(invHessianVarEq)[1] == "try-error") {
     warning("Inverting the Hessian matrix failed. No robust standard errors calculated for variance equation.")
-   robStdErrVarEq <- rep(NA, times = 3)
+    robStdErrVarEq <- rep(NA, times = 3)
   } else {
-   robStdErrVarEq <- 
-     sqrt(diag(invHessianVarEq %*% 
-                 crossprod(jacobian(function(theta) heavyLLH(theta), parVarEq$par)) %*% 
-                 invHessianVarEq))
+    robStdErrVarEq <- sqrt(diag(invHessianVarEq %*% 
+                                  crossprod(jacobian(function(theta) heavyLLH(theta, rm = rm, ret = ret), rsolVar$pars)) %*% 
+                                  invHessianVarEq))
   }
   if (class(invHessianRMEq)[1] == "try-error") {
     warning("Inverting the Hessian matrix failed. No robust standard errors calculated for RM equation.")
@@ -157,18 +117,19 @@ HEAVYmodel <- function(data, startingValues = NULL) {
   } else {
     robStdErrRMEq <-
       sqrt(diag(invHessianRMEq %*% 
-                  crossprod(jacobian(function(theta) heavyLLH(theta, RMEq = TRUE), parRMEq$par)) %*% 
+                  crossprod(jacobian(function(theta) heavyLLH(theta, rm = rm, RMEq = TRUE), rsolRM$pars)) %*% 
                   invHessianRMEq))
   }
   
-  model <- list()
-  model$coefficients <- modelEstimates
-  model$se <- c(robStdErrVarEq, robStdErrRMEq)
-  model$residuals <- ret / sqrt(varCondVariances)
-  model$llh <- c(llhVar = -parVarEq$value, llhRM = -parRMEq$value)
-  model$varCondVariances <- varCondVariances
-  model$RMCondVariances <- RMCondVariances
-  model$data <- data
+  model <- list(
+    "coefficients" = modelEstimates,
+    "se" = c(robStdErrVarEq, robStdErrRMEq),
+    "residuals" = ret / sqrt(varCondVariances),
+    "llh" = c(llhVar = -rsolVar$value, llhRM = -rsolRM$value),
+    "varCondVariances" = varCondVariances,
+    "RMCondVariances" = RMCondVariances,
+    "data" = data
+  )
   
   class(model) <- "HEAVYmodel"
   
@@ -183,6 +144,8 @@ HEAVYmodel <- function(data, startingValues = NULL) {
 #' The plotting method has the following optional parameter:
 #' \itemize{
 #' \item{\code{legend.loc}}{ A string denoting the location of the legend passed on to \code{addLegend} of the \pkg{xts} package}
+#' \item{\code{type}}{ A string denoting the type of lot to be made. If \code{type} is \code{"condVar"} the fitted values of the conditional variance of the returns
+#' is shown. If \code{type} is different from \code{"condVar"}, the fitted values of the realized measure is shown. Default is \code{"condVar"}}
 #' }
 #' 
 #' @importFrom grDevices dev.interactive
@@ -193,30 +156,45 @@ HEAVYmodel <- function(data, startingValues = NULL) {
 plot.HEAVYmodel <- function(x, ...){
   options <- list(...)
   #### List of standard options
-  opt <- list(legend.loc = "topleft")
+  opt <- list(legend.loc = "topleft", type = "condVar")
   #### Override standard options where user passed new options
   opt[names(options)] <- options
   
-  observed   <- x$data[,1]^2
-  fitted     <- x$varCondVariances
-  dates <- index(x$data)
-  # dates      <- x$data
-  # dates      <- as.POSIXct(dates)
-  observed   <- xts(observed, order.by = dates)
-  fitted     <- xts(fitted, order.by = dates)
-  # type       <- x$type
-  legend.loc <- opt$legend.loc
-  g_range <- range(fitted,observed)
-  g_range[1] <- 0.95 * g_range[1]
-  g_range[2] <- 1.05 * g_range[2]
-  #ind = seq(1,length(fitted),length.out=5);
-  title <- "Observed squeared returns and fitted variances based on HEAVY Model"
-  plot(cbind(fitted,observed), col = c('blue', 'red'), main = title, lty = c(1,2), yaxis.right = FALSE)
   
-  addLegend(legend.loc = legend.loc, on = 1,
-            legend.names = c("Fitted condidional variances", "Observed squared returns"),
-            lty = c(1, 2), lwd = c(2, 2),
-            col = c("blue", "red"))
+  if(opt$type == "condVar"){
+    observed   <- x$data[,1]^2
+    fitted     <- x$varCondVariances
+    # dates      <- x$data
+    # dates      <- as.POSIXct(dates)
+    # type       <- x$type
+    legend.loc <- opt$legend.loc
+    
+    
+    title <- "Observed squared returns and fitted variances based on HEAVY Model"
+    plot(cbind(fitted,observed), col = c('blue', 'red'), main = title, lty = c(1,2), yaxis.right = FALSE)
+    
+    addLegend(legend.loc = legend.loc, on = 1,
+              legend.names = c("Fitted condidional variances", "Observed squared returns"),
+              lty = c(1, 2), lwd = c(2, 2),
+              col = c("blue", "red"))
+  } else {
+    observed   <- x$data[,2]
+    fitted     <- x$RMCondVariances
+    # dates      <- x$data
+    # dates      <- as.POSIXct(dates)
+    # type       <- x$type
+    legend.loc <- opt$legend.loc
+    
+    
+    title <- "Observed realized measure and fitted realized measure based on HEAVY Model"
+    plot(cbind(fitted,observed), col = c('blue', 'red'), main = title, lty = c(1,2), yaxis.right = FALSE)
+    
+    addLegend(legend.loc = legend.loc, on = 1,
+              legend.names = c("Fitted realized measure", "Observed realized measure"),
+              lty = c(1, 2), lwd = c(2, 2),
+              col = c("blue", "red"))
+  }
+  
 }
 
 #' Iterative multi-step-ahead forecasting for HEAVY models
@@ -230,38 +208,15 @@ plot.HEAVYmodel <- function(x, ...){
 #' @export
 predict.HEAVYmodel <- function(object, stepsAhead = 10, ...) {
   
-  parRMEq <- object$coefficients[1:3]
-  parVarEq <- object$coefficients[4:6]
+  parVarEq <- object$coefficients[1:3]
+  parRMEq <- object$coefficients[4:6]
   
-  Bj <- function(j) {
-    if (j == 0) {
-      matrix(c(1, 0, 0, 1), nrow = 2)
-    } else {
-      nu <- parRMEq[2] + parRMEq[3]
-      rbind(c(parVarEq[2]^j, 
-              parVarEq[1] * sum(sapply(c(1:(j)), function(l) nu^(j - l) * parVarEq[2]^(l-1)))),
-            c(0, nu^j))
-    }
-  }
+  Bjs <- lapply(c(0:(stepsAhead)), function(s) Bj(s, parVarEq, parRMEq))
   
-  forecastsHEAVY <- function(stepsAhead) {
-    
-    oneStep <- c(parVarEq[1] + parVarEq[2] * last(object$data[,2]) + parVarEq[3] * last(object$varCondVariances),
-                  parRMEq[1] + parRMEq[2] * last(object$data[,2]) + parRMEq[3] * last(object$RMCondVariances))
-    if (stepsAhead == 1) {
-      oneStep
-    } else {
-      sumB <- 
-        Reduce('+', lapply(c(0:(stepsAhead - 1)), function(s) Bj(s))) %*% 
-        c(parVarEq[1], parRMEq[1]) + 
-        Bj(stepsAhead) %*% 
-        oneStep
-      sumB
-    }
-  } 
+  fcts <- t(vapply(c(1:stepsAhead), function(x) forecastsHEAVY(x, object, parVarEq, parRMEq, Bjs), numeric(2)))
   
-  fcts <- sapply(c(1:stepsAhead), function(x) forecastsHEAVY(x)[1])
-  names(fcts) <- c(1:stepsAhead)
+  rownames(fcts) <- paste0("T + ", c(1:stepsAhead))
+  colnames(fcts) <- c('CondVar', 'CondRM')
   fcts
 }
 

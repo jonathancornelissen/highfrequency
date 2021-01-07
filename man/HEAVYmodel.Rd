@@ -51,13 +51,14 @@ Note that we always demean the returns in the data input as we don't include a c
 }
 \examples{
 
-# Calculate annualized returns in percentages
+# Calculate returns in percentages
 logReturns <- 100 * makeReturns(SPYRM$CLOSE)[-1]
 
 # Combine both returns and realized measures into one xts
-dataSPY <- xts::xts(cbind(logReturns, SPYRM$RK5[-1] * 10000), order.by = SPYRM$DT[-1])
-
 # Due to return calculation, the first observation is missing
+dataSPY <- xts::xts(cbind(logReturns, SPYRM$BPV5[-1] * 10000), order.by = SPYRM$DT[-1])
+
+# Fit the HEAVY model
 fittedHEAVY <- HEAVYmodel(dataSPY)
 
 # Examine the estimated coefficients and robust standard errors
@@ -73,5 +74,5 @@ Shephard, N. and Sheppard, K. (2010). Realising the future: Forecasting with hig
 \code{\link{predict.HEAVYmodel}}
 }
 \author{
-Onno Kleen.
+Onno Kleen and Emil Sjorup.
 }

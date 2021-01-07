@@ -17,7 +17,7 @@ Method for DBH objects to calculate the critical value for the presence of a bur
 The critical value is that of the test described in appendix B in Christensen Oomen Reno
 }
 \references{
-Christensen, K., Oomen, R., and Reno, R. (2018). The drift burst hypothesis. Working paper.
+Christensen, K., Oomen, R., and Reno, R. (2020) The drift burst hypothesis. Journal of Econometrics. Forthcoming.
 }
 \author{
 Emil Sjoerup

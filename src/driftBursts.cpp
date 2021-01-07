@@ -85,7 +85,13 @@ int AutomaticLagSelectionC(const arma::colvec& vX, double dMu){
 Rcpp::List DriftBurstLoopC(const arma::colvec& vPreAveraged, const arma::colvec& diffedlogprices, 
                            const arma::colvec& vTime, const arma::colvec& vTesttime, 
                            double iMeanBandwidth, double iVarBandwidth, int iPreAverage, int iAcLag){
-  
+#ifdef _OPENMP
+  // From experimentation, setting the number of threads to 1 is much faster than using multi-threaded code. (Why??)
+  // We capture the number of threads that omp is set to, 
+  // set the number of threads using omp_set_num_threads and reset it to the previous value.
+  const int THREADS = omp_get_num_threads(); // Get number of threads to reset later
+  omp_set_num_threads(1); // Set the threading to 1.
+#endif
   // Initialization
   int iT = vTesttime.size();
   int iQ;
@@ -130,7 +136,15 @@ Rcpp::List DriftBurstLoopC(const arma::colvec& vPreAveraged, const arma::colvec&
   Rcpp::List lOut = Rcpp::List::create(Rcpp::Named("tStat") = vDB,
                                        Rcpp::Named("sigma") = vSigma * invVB,
                                        Rcpp::Named("mu") = vMu * invMB);
+  
+#ifdef _OPENMP
+  omp_set_num_threads(THREADS); // Reset number of threads to earlier value
+#endif  
+  
+  
   return(lOut);
+  
+
 }
 
 
@@ -153,8 +167,8 @@ Rcpp::List DriftBurstLoopCPAR(const arma::colvec& vPreAveraged, const arma::colv
   //Parallelization setup
   const double invMB = 1.0/iMeanBandwidth; // So we can multiply instead of divide which is much faster.
   const double invVB = 1.0/iVarBandwidth; // So we can multiply instead of divide which is much faster.
-#pragma omp parallel for                                                               \
-  shared(vPreAveraged, diffedlogprices, vTime, vTesttime, iMeanBandwidth,              \
+#pragma omp parallel for                                                 \
+  shared(vPreAveraged, diffedlogprices, vTime, vTesttime, iMeanBandwidth,\
          iVarBandwidth, iPreAverage, iAcLag, vMu, vSigma, iT)            \
     private(vX, vWm, vWvar, iIdx, iQ, iAutoAcLag)
     for(int i = 0; i<iT; i++){
@@ -188,8 +202,7 @@ Rcpp::List DriftBurstLoopCPAR(const arma::colvec& vPreAveraged, const arma::colv
 #else
   // If openMP is not available, we use single core execution.
   Rf_warning("OpenMP is not available. Sequential processing is used.");
-  Rcpp::List lOut = DriftBurstLoopC(vPreAveraged, diffedlogprices, vTime ,\
-                                    vTesttime, iMeanBandwidth, iVarBandwidth, iPreAverage, iAcLag);
+  Rcpp::List lOut = DriftBurstLoopC(vPreAveraged, diffedlogprices, vTime, vTesttime, iMeanBandwidth, iVarBandwidth, iPreAverage, iAcLag);
 #endif
   
   return(lOut);

@@ -1,4 +1,5 @@
-library(testthat)
+library("testthat")
+library("xts")
 rets <- as.xts(sampleOneMinuteData)[, 1]
 
 for (date in unique(as.character(as.Date(index(rets))))) {
@@ -65,10 +66,30 @@ test_that("HEAVYmodel",{
   
   logReturns <- 100 * makeReturns(SPYRM$CLOSE)[-1]
   logReturns <- logReturns - mean(logReturns)
-  dataSPY <- xts::xts(cbind(logReturns, SPYRM$BPV5[-1] * 10000), order.by = SPYRM$DT[-1])
+  dataSPY <- xts(cbind(logReturns, SPYRM$BPV5[-1] * 10000), order.by = SPYRM$DT[-1])
   output <- HEAVYmodel(dataSPY)
-  expect_identical(
-    formatC(sum(output$coefficients), digits = 6),
-    "2.67386"
-  )
+  expect_equal(round(sum(output$coefficients), 3), 1.981)
+  
+  summ <- summary(output)
+  
+  expect_equal(round(sum(summ$coefficients[,2]), 5), 0.22693)
+  expect_equal(round(sum(summ$coefficients[,4]), 5), 0.00084)
+  
+  p1 <- plot(output)
+  p2 <- plot(output, type = 'RM')
+  expect_equal(p1$get_xlim(),  p2$get_xlim()) # Make sure we plot the same range
+  expect_equal(as.numeric(p1$get_ylim()[[2]]), range(range(dataSPY[,1]^2),  range(output$varCondVariances)))
+  expect_equal(round(as.numeric(p1$get_ylim()[[2]]),4), c(0.0000, 17.9841))
+  expect_equal(as.numeric(p2$get_ylim()[[2]]), range(range(dataSPY[,2]),  range(output$RMCondVariances)))
+  expect_equal(round(as.numeric(p2$get_ylim()[[2]]),4), c(0.0186, 26.2201))
+  
+  pred <- predict(output, stepsAhead = 12)
+  expect_equal(as.numeric(round(pred, 5)), c(0.24265, 0.26215, 0.27462, 0.28815, 0.30235, 0.31691, 0.33162, 0.34633, 0.36090, 0.37527,
+                                             0.38937, 0.40315, 0.14614, 0.19149, 0.21304, 0.23387, 0.25402, 0.27349, 0.29232, 0.31052,
+                                             0.32812, 0.34514, 0.36159, 0.37749))
+  coeffs <- output$coefficients
+  uncondRM <- as.numeric(coeffs[4] / (1 - coeffs[5] - coeffs[6]))
+  uncondVar <- as.numeric((coeffs[1] + coeffs[2] * uncondRM) / (1 - coeffs[3]))
+  expect_equal(as.numeric(round(predict(output, stepsAhead = 400)[400,], 4)),
+               round(c(uncondVar, uncondRM), 4))
 })
