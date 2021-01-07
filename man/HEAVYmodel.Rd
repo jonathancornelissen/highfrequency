@@ -55,9 +55,10 @@ Note that we always demean the returns in the data input as we don't include a c
 logReturns <- 100 * makeReturns(SPYRM$CLOSE)[-1]
 
 # Combine both returns and realized measures into one xts
+# Due to return calculation, the first observation is missing
 dataSPY <- xts::xts(cbind(logReturns, SPYRM$BPV5[-1] * 10000), order.by = SPYRM$DT[-1])
 
-# Due to return calculation, the first observation is missing
+# Fit the HEAVY model
 fittedHEAVY <- HEAVYmodel(dataSPY)
 
 # Examine the estimated coefficients and robust standard errors
