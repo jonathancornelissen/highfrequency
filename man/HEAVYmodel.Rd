@@ -51,7 +51,7 @@ Note that we always demean the returns in the data input as we don't include a c
 }
 \examples{
 
-# Calculate annualized returns in percentages
+# Calculate returns in percentages
 logReturns <- 100 * makeReturns(SPYRM$CLOSE)[-1]
 
 # Combine both returns and realized measures into one xts

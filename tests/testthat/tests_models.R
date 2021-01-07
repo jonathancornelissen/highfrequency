@@ -87,5 +87,9 @@ test_that("HEAVYmodel",{
   expect_equal(as.numeric(round(pred, 5)), c(0.24265, 0.26215, 0.27462, 0.28815, 0.30235, 0.31691, 0.33162, 0.34633, 0.36090, 0.37527,
                                              0.38937, 0.40315, 0.14614, 0.19149, 0.21304, 0.23387, 0.25402, 0.27349, 0.29232, 0.31052,
                                              0.32812, 0.34514, 0.36159, 0.37749))
-  
+  coeffs <- output$coefficients
+  uncondRM <- as.numeric(coeffs[4] / (1 - coeffs[5] - coeffs[6]))
+  uncondVar <- as.numeric((coeffs[1] + coeffs[2] * uncondRM) / (1 - coeffs[3]))
+  expect_equal(as.numeric(round(predict(output, stepsAhead = 400)[400,], 4)),
+               round(c(uncondVar, uncondRM), 4))
 })
