@@ -19,10 +19,6 @@ test_that("leadLag", {
   
   
   expect_equal(ll$contrasts, expected)
-  ## Test that the parallelized code gives the same results.
-  ll2 <- leadLag(price1, price2, seq(-3,3), normalize = FALSE, parallelize = TRUE, nCores = 2)
-  expect_true(all.equal(ll,ll2))
-  
   
   ## Test that the contrasts are the same when using 10000 ms and 10 sec
   llMS <- leadLag(price1, price2, seq(-3,3) * 1000, resolution = "ms", normalize = FALSE)
