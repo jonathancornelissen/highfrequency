@@ -70,10 +70,6 @@ test_that("HEAVYmodel",{
   output <- HEAVYmodel(dataSPY)
   expect_equal(round(sum(output$coefficients), 3), 1.981)
   
-  summ <- summary(output)
-  
-  expect_equal(round(sum(summ$coefficients[,2]), 5), 0.22693)
-  expect_equal(round(sum(summ$coefficients[,4]), 5), 0.00084)
   
   p1 <- plot(output)
   p2 <- plot(output, type = 'RM')
