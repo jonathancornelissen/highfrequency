@@ -8,16 +8,14 @@ Function returns an \code{xts} or \code{data.table} object containing 23 liquidi
 
 Note that this assumes a regular time grid.}
 \usage{
-getLiquidityMeasures(tqData, win = 300, type = NULL)
+getLiquidityMeasures(tqData, win = 300)
 }
 \arguments{
 \item{tqData}{A \code{data.table} or \code{xts} object as in the \pkg{highfrequency} merged
-trades and quotes data (that is included).}
+trades and quotes data.}
 
 \item{win}{A windows length for the forward-prices used for \sQuote{realized}
 spread}
-
-\item{type}{Deprecated. Setting this parameter does nothing, except produce a warning not to do so.}
 }
 \value{
 A modified (enlarged) \code{xts} or \code{data.table} with the new measures.
@@ -31,6 +29,8 @@ Note that this assumes a regular time grid.
 }
 \details{
 NOTE: \code{xts} or \code{data.table} should only contain one day of observations
+Some markets have publish information about whether it was a buyer or a seller who initiated the trade. 
+This information can be passed in a column \code{DIRECTION} this column must only have 1 or -1 as values.
 
 The respective liquidity measures are defined as follows:
   \itemize{
@@ -182,7 +182,7 @@ The respective liquidity measures are defined as follows:
  
  \item{logQuotedSize: log quoted size}{
    \deqn{
-     \mbox{log quoted size}_t =  \log(\mbox{OFRSIZ}_{t})-\log(\mbox{BIDSIZ}_{t})
+     \mbox{log quoted size}_t =  \log(\mbox{OFRSIZ}_{t})+\log(\mbox{BIDSIZ}_{t})
    }
    
    (Hasbrouck and Seppi, 2001).

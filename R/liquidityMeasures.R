@@ -5,13 +5,16 @@
 #' Note that this assumes a regular time grid. 
 #'
 #' @param tqData A \code{data.table} or \code{xts} object as in the \pkg{highfrequency} merged
-#' trades and quotes data (that is included).
+#' trades and quotes data.
 #' @param win A windows length for the forward-prices used for \sQuote{realized}
 #' spread
-#' @param type Deprecated. Setting this parameter does nothing, except produce a warning not to do so.
 #' @return A modified (enlarged) \code{xts} or \code{data.table} with the new measures.
 #' 
-#' @details NOTE: \code{xts} or \code{data.table} should only contain one day of observations
+#' @details 
+#' 
+#' NOTE: \code{xts} or \code{data.table} should only contain one day of observations
+#' Some markets have publish information about whether it was a buyer or a seller who initiated the trade. 
+#' This information can be passed in a column \code{DIRECTION} this column must only have 1 or -1 as values.
 #' 
 #' The respective liquidity measures are defined as follows:
 #'   \itemize{
@@ -163,7 +166,7 @@
 #'  
 #'  \item{logQuotedSize: log quoted size}{
 #'    \deqn{
-#'      \mbox{log quoted size}_t =  \log(\mbox{OFRSIZ}_{t})-\log(\mbox{BIDSIZ}_{t})
+#'      \mbox{log quoted size}_t =  \log(\mbox{OFRSIZ}_{t})+\log(\mbox{BIDSIZ}_{t})
 #'    }
 #'    
 #'    (Hasbrouck and Seppi, 2001).
@@ -225,11 +228,9 @@
 #' res
 #' @importFrom data.table shift
 #' @export
-getLiquidityMeasures <- function(tqData, win = 300, type = NULL) {
-  if(!is.null(type)){
-    warning("type is deprecated and setting is does nothing")
-  }
-  BID <- PRICE <- OFR  <- SIZE <- OFRSIZ <- BIDSIZ <- NULL
+getLiquidityMeasures <- function(tqData, win = 300) {
+  
+  DIRECTION <- BID <- PRICE <- OFR  <- SIZE <- OFRSIZ <- BIDSIZ <- NULL
   ## All these are assigned to NULL
   midpoints <- direction <- effectiveSpread <- realizedSpread <- valueTrade <- signedValueTrade <- 
   depthImbalanceRatio <- depthImbalanceDifference <- proportionalEffectiveSpread <- proportionalRealizedSpread <- 
@@ -265,8 +266,12 @@ getLiquidityMeasures <- function(tqData, win = 300, type = NULL) {
   tqData[, BIDSIZ := as.numeric(as.character(BIDSIZ))]
   
   tqData[, midpoints := 0.5 * (BID + OFR)]
-
-  tqData[, direction := getTradeDirection(tqData)]
+  if('DIRECTION' %in% colnames(tqData)){
+    if(sort(unique(tqData$DIRECTION)) != c(-1,1)) {stop("DIRECTION provided, but is not -1 and 1")}
+    tqData[, direction := DIRECTION]
+  } else {
+    tqData[, direction := getTradeDirection(tqData)]
+  }
   tqData[, effectiveSpread := 2 * direction * (PRICE - midpoints)]
   
   tqData[, realizedSpread := 2 * direction * (PRICE - shift(midpoints, win, type = "lead"))]
