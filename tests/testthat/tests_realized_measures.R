@@ -197,8 +197,8 @@ test_that("rHYCov gives correct results", {
   
   hy <- rHYCov(rData = as.xts(sampleOneMinuteData)["2001-08-05"],
               period = 5, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)
-  expect_equal(hy, matrix(c(0.0003357899, 0.0001639014,
-                      0.0001639014, 0.0002582371), ncol = 2))
+  expect_equal(hy, matrix(c(0.0003355498, 0.0001639014,
+                            0.0001639014, 0.0002603934), ncol = 2))
   
 })
 

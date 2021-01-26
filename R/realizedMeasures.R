@@ -1200,7 +1200,7 @@ rCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeRet
 #' based on a 5-minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
 #' @param makeReturns boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.
 #' @param makePsd boolean, in case it is \code{TRUE}, the positive definite version of rHYCov is returned. \code{FALSE} by default.
-#'
+#' @param ... used internally. Do not set.
 #' @references Hayashi, T. and Yoshida, N. (2005). On covariance estimation of non-synchronously observed diffusion processes. \emph{Bernoulli}, 11, 359-379.
 #'
 #' @author Scott Payseur and Emil Sjoerup.
@@ -1211,79 +1211,127 @@ rCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeRet
 #'
 #' @keywords volatility
 #' @export
-rHYCov <- function(rData, cor = FALSE, period = 1, alignBy = "seconds", alignPeriod = 1, makeReturns = FALSE, makePsd = TRUE) {
+rHYCov <- function(rData, cor = FALSE, period = 1, alignBy = "seconds", alignPeriod = 1, makeReturns = FALSE, makePsd = TRUE, ...) {
 
-  if (isMultiXts(rData)) {
-    stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")
-  }
-
-  rData <- fastTickAgregation(rData, alignBy = "seconds", alignPeriod = 1)
-  rData <- rData[-dim(rData)[1], ]
-  aggrdata <- fastTickAgregation(rData, alignBy = alignBy, alignPeriod = alignPeriod)
-
-  if (makeReturns) {
-    rData <- makeReturns(rData)
-    aggrdata <- makeReturns(aggrdata)
-  }
-  if (is.null(dim(rData))) {
-    n <- 1
-  } else {
-    n <- dim(rData)[2]
-  }
-
-  if (n == 1) {
-    return(rCov(aggrdata))
-  }
-
-  if (n > 1) {
-
-    # rData  <- as.matrix(rData)
-    n <- dim(rData)[2]
-    cov <- matrix(rep(0, n * n), ncol = n)
-    diagonal <- c()
-    for (i in 1:n) {
-      diagonal[i] <- rCov(aggrdata[, i])
-    }
-    diag(cov) <- diagonal
-    alignPeriod <- getAlignPeriod(alignPeriod, alignBy)
-    for (i in 2:n) {
-      for (j in 1:(i - 1)) {
-        cov[i, j] <-
-          sum(pcovcc(
-            as.numeric(rData[,i]),
-            as.double(rep(0,length(rData[, j])/(period * alignPeriod) + 1)),
-            as.numeric(rData[,j]), #b
-            as.double(c(1:length(rData[, j]))), #a
-            as.double(rep(0, length(rData[, j])/(period * alignPeriod) + 1)), #a
-            as.double(c(1:length(rData[, j]))), #b
-            as.integer(length(rData[, j])), #na
-            as.integer(length(rData[, j])/(period*alignPeriod)),
-            as.integer(length(rData[, j])), #na
-            as.integer(period * alignPeriod)))
-        cov[j, i] <- cov[i, j]
-
-        # kernelEstimator(as.double(rData[, i]), as.double(rData[, j]), as.integer(length(rData[, i])),
-        #                 as.integer(kernelParam), as.integer(ifelse(kernelDOFadj, 1, 0)),
-        #                 as.integer(type), ab = double(kernelParam + 1),
-        #                 ab2 = double(kernelParam + 1))
-
-        # rc.hy( x=rData[[i]], y=rData[[j]], period = period,alignBy=alignBy,
-        #        alignPeriod = alignPeriod, cts = cts, makeReturns = makeReturns)
-      }
-    }
-
-    if (!cor){
-      if (makePsd) {
-        cov <- makePsd(cov)
-      }
-      return(cov)
+  opt <- list("INTERNALBOOLEAN" = FALSE)
+  op <- list(...)
+  opt[names(op)] <- op
+  
+  if (is.xts(rData) && checkMultiDays(rData)) {
+    if (is.null(dim(rData))) {
+      n <- 1
     } else {
-      sdmatrix <- sqrt(diag(diag(cov)))
-      rcor <- solve(sdmatrix) %*% cov %*% solve(sdmatrix)
-      if (makePsd) {
-        rcor <- makePsd(rcor)
+      n <- dim(rData)[2]
+    }
+    if (n == 1) {
+      result <- apply.daily(rData, rHYCov, cor = cor, alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = makeReturns, makePsd = makePsd)
+    }
+    if (n > 1) {
+      result <- applyGetList(rData, rHYCov, cor=cor, alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = makeReturns, makePsd = makePsd)
+      names(result) <- unique(as.Date(index(rData)))
+    }
+    return(result)
+  } else if (is.data.table(rData) & !opt$INTERNALBOOLEAN) {
+    DATE <- .N <- DT <- NULL
+    dates <- rData[, list(end = .N), by = list(DATE = as.Date(DT))][, `:=`(end = cumsum(end), DATE = as.character(DATE))][, start := shift(end, fill = 0) + 1]
+    res <- vector(mode = "list", length = nrow(dates))
+    names(res) <- as.character(dates$DATE)
+    starts <- dates$start
+    ends <- dates$end
+    dates <- dates$DATE
+    
+    for (i in 1:length(dates)) {
+      res[[dates[i]]] <- rHYCov(rData[starts[i]:ends[i], ], cor = cor, makeReturns = makeReturns, alignBy = alignBy, alignPeriod = alignPeriod, INTERNALBOOLEAN = TRUE)
+    }
+    
+    if(length(res[[1]]) == 1){ ## Univariate case
+      res <- data.table(DT = names(res), rHY = as.numeric(res))
+    } else if(length(res) == 1){ ## Single day multivariate case
+      res <- res[[1]]
+    }
+    
+    return(res)
+    
+  } else {
+    
+    if(is.xts(rData)){
+      if(makeReturns){      
+        rData <- fastTickAgregation(rData, alignBy = "seconds", alignPeriod = 1)
+        aggrdata <- fastTickAgregation(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      } else { 
+        rData <- fastTickAgregation_RETURNS(rData, alignBy = "seconds", alignPeriod = 1)
+        aggrdata <- fastTickAgregation_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
       }
-      return(rcor)
+      
+    } else if (is.data.table(rData)){
+      if(makeReturns){
+        rData <- fastTickAgregation_DATA.TABLE(rData, alignBy = "seconds", alignPeriod = 1)
+        aggrdata <- fastTickAgregation_DATA.TABLE(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      } else {
+        rData <- fastTickAgregation_DATA.TABLE_RETURNS(rData, alignBy = "seconds", alignPeriod = 1)
+        aggrdata <- fastTickAgregation_DATA.TABLE_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+        
+      }
+      rData <- as.matrix(rData[, !"DT"])
+      aggrdata <- as.matrix(aggrdata[, !"DT"])
+    }
+  
+    if (makeReturns) {
+      rData <- makeReturns(rData)
+      aggrdata <- makeReturns(aggrdata)
+    }
+    if (is.null(dim(rData))) {
+      n <- 1
+    } else {
+      n <- dim(rData)[2]
+    }
+  
+    if (n == 1) {
+      return(rCov(aggrdata))
+    }
+  
+    if (n > 1) {
+  
+      n <- dim(rData)[2]
+      cov <- matrix(rep(0, n * n), ncol = n)
+      diagonal <- c()
+      for (i in 1:n) {
+        diagonal[i] <- rCov(aggrdata[, i])
+      }
+      diag(cov) <- diagonal
+      alignPeriod <- getAlignPeriod(alignPeriod, alignBy)
+      for (i in 2:n) {
+        for (j in 1:(i - 1)) {
+          cov[i, j] <-
+            sum(pcovcc(
+              as.numeric(rData[,i]),
+              as.double(rep(0,length(rData[, j])/(period * alignPeriod) + 1)),
+              as.numeric(rData[,j]), #b
+              as.double(c(1:length(rData[, j]))), #a
+              as.double(rep(0, length(rData[, j])/(period * alignPeriod) + 1)), #a
+              as.double(c(1:length(rData[, j]))), #b
+              as.integer(length(rData[, j])), #na
+              as.integer(length(rData[, j])/(period*alignPeriod)),
+              as.integer(length(rData[, j])), #na
+              as.integer(period * alignPeriod)))
+          cov[j, i] <- cov[i, j]
+  
+        }
+      }
+  
+      if (!cor){
+        if (makePsd) {
+          cov <- makePsd(cov)
+        }
+        return(cov)
+      } else {
+        sdmatrix <- sqrt(diag(diag(cov)))
+        rcor <- solve(sdmatrix) %*% cov %*% solve(sdmatrix)
+        if (makePsd) {
+          rcor <- makePsd(rcor)
+        }
+        return(rcor)
+      }
     }
   }
 }

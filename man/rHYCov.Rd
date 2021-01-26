@@ -11,7 +11,8 @@ rHYCov(
   alignBy = "seconds",
   alignPeriod = 1,
   makeReturns = FALSE,
-  makePsd = TRUE
+  makePsd = TRUE,
+  ...
 )
 }
 \arguments{
@@ -29,6 +30,8 @@ based on a 5-minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "m
 \item{makeReturns}{boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.}
 
 \item{makePsd}{boolean, in case it is \code{TRUE}, the positive definite version of rHYCov is returned. \code{FALSE} by default.}
+
+\item{...}{used internally. Do not set.}
 }
 \description{
 Calculates the Hayashi-Yoshida Covariance estimator
