@@ -620,16 +620,17 @@ TSRV <- function(pData , K = 300 , J = 1) {
   nbarK <- (n - K + 1)/(K) # average number of obs in 1 K-grid
   nbarJ <- (n - J + 1)/(J)
   adj <- (1 - (nbarK/nbarJ))^-1 
-  logreturns_K = logreturns_J = c()
+  logreturns_K <- 0
+  logreturns_J <- 0
   for (k in 1:K) {
-    sel <- seq(k,n,K)  
-    logreturns_K <- c(logreturns_K, diff( logprices[sel]))
+    sel <- seq(k,n,K)
+    logreturns_K <- logreturns_K + sum(diff(logprices[sel])^2)
   }
   for (j in 1:J) {
     sel <-  seq(j,n,J)
-    logreturns_J <- c(logreturns_J, diff( logprices[sel]))
+    logreturns_J <- logreturns_J + sum(diff( logprices[sel])^2)
   }
-  TSRV <- adj * ( (1/K) * sum(logreturns_K^2) - ((nbarK/nbarJ) * (1/J) * sum(logreturns_J^2)))
+  TSRV <- adj * ( (1/K) * logreturns_K - ((nbarK/nbarJ) * (1/J) * logreturns_J))
   return(TSRV)
 }
 
