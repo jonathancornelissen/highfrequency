@@ -1853,7 +1853,7 @@ rOWCov <- function (rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, make
         outlyingness[i] = matrix(seasadjRselect[i,], ncol = N) %*% invMCDcov %*% matrix(seasadjRselect[i,],nrow=N)
       }
     } else {
-      print(c("MCD cannot be calculated")); stop();
+      stop("MCD cannot be calculated")
     }
     k <- qchisq(p = 1 - alpha, df = N)
     outlierindic <- outlyingness > k
