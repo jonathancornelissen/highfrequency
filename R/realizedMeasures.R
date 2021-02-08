@@ -2458,9 +2458,9 @@ RV <- function(rData) {
 #' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup.
 #'
 #' @examples
-#' tpv <- rTPQuar(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes",
+#' tpq <- rTPQuar(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes",
 #'               alignPeriod = 5, makeReturns = TRUE)
-#' tpv
+#' tpq
 #'
 #' @keywords highfrequency rTPQuar
 #' @export
@@ -2815,7 +2815,7 @@ rTSCov <- function (pData, cor = FALSE, K = 300, J = 1, KCov = NULL, JCov = NULL
       JVar <- rep(J,n)
     }
 
-    diagonal <- c()
+    diagonal <- numeric(n)
     for (i in 1:n) {
       diagonal[i] = TSRV(pData[[i]], K = KVar[i], J = JVar[i])
     }
@@ -3803,3 +3803,187 @@ ReMeDIAsymptoticVariance <- function(pData, kn, lags, phi, i){
 #### #'
 #### #'
 #### #'
+
+
+
+
+
+
+
+
+
+
+
+
+#' Beta adjusted covariance matrix
+#' @export
+rBAC <- function(pData, shares, outStanding, nonEquity, ETFNAME = "ETF", restricted = TRUE, 
+                 noise = NULL, B_low = 0, E_up = 0, returnL = FALSE, Lin = FALSE, L = 0, K = K, J = J){
+  V1 <- .SD <- NULL
+  
+  
+  if(!is.list(pData)){
+    stop("pData must be a list of data.tables or xts objects")
+  }
+  TSCOV <- sapply(pData, function(x) TSRV(as.xts(x), K = K, J = J))
+  browser()
+  
+  for (i in 1:length(pData)) {
+    setnames(pData[[i]], new= c("DT", names(pData[i])))
+  }
+  
+  pData <- Reduce(function(x,y) merge.data.table(x, y, all = TRUE, on = "DT"), pData)
+  setkey(pData, "DT")
+  
+  nComps <- dim(pData)[2] - 2 # Number of components in the ETF - 2 because of ETF data and DT
+  
+  W <- matrix(0, nrow = nComps, ncol = nComps^2)
+  Q <- matrix(0, nrow = nComps^2, ncol = nComps^2)
+  
+  shares <- shares / outStanding
+  setcolorder(pData, c("DT", ETFNAME))
+  missingPoints <- !is.na(pData) # Where the inputs are missing
+  
+  pData <- setnafill(copy(pData), type = "locf", cols = 2:ncol(pData))
+  pData <- setnafill(pData, type = "nocb")
+  for (j in 3:ncol(pData)) {
+    set(pData, j = j, value = pData[,j , with = FALSE] - nonEquity/outStanding)
+  }
+
+  returns <- pData[, lapply(.SD, function(x) makeReturns(x)), .SDcols = 2:ncol(pData)][-1,]
+  set(returns, j = "DT", value = pData$DT[-1])
+  setcolorder(returns, "DT")
+  shares <- c(0,0, shares)
+  meanWeights <- numeric(ncol(pData))
+  meanSquaredWeights <- numeric(ncol(pData))
+  assetWeights <- copy(pData)
+  for (j in 3:ncol(pData)) {
+    set(assetWeights, j = j, value = assetWeights[,j, with = FALSE] * shares[j])
+    meanWeights[j] <- sum(pData[missingPoints[,j], j, with = FALSE])/sum(missingPoints[,j])
+    meanSquaredWeights[j] <- sum(pData[missingPoints[,j], j, with = FALSE]^2)/sum(missingPoints[,j])
+  }
+  
+
+  meanWeights <- meanWeights[-c(1,2)]
+  meanSquaredWeights <- meanSquaredWeights[-c(1,2)]
+  shares <- shares[-c(1,2)]
+  
+  browser()
+  impliedBeta <- bacImpliedBeta(as.matrix(returns[,-c(1,2), with = FALSE]), missingPoints[-1, -c(1,2)], as.matrix(assetWeights[-1,-c(1,2), with = FALSE]))
+  impliedBeta <- colSums(impliedBeta)
+  RC <- rCov(pData, makeReturns = TRUE)
+  TSV <- rTSCov(pData, K = 2)
+  
+  foo <- rHYCov(as.xts(pData)[missingPoints[,2] | missingPoints[,3], c(1,2)], makeReturns = TRUE)
+  
+  foo[1,2]/foo[1,1]
+  
+  ## NBAC_Delta_NR function in the python code
+  if(!is.null(noise)){
+    
+    
+    
+    NS <- noise/pmax(1, colSums(missingPoints[, -c(1,2)]))
+    
+    for (i in 1:nComps){
+      W[i, ((i-1) * nComps + 1):(nComps * i)] <- assetWeights * exp(NS * 0.25)
+    }
+    
+    for (i in 1:nComps){
+      for (j in 1:nComps){
+        if(i == j & restricted){
+          Q[(i-1) * nComps + i, (i-1) * nComps + i] <- 1
+        } else if(j != i) {
+          Q[(i-1) * nComps + j, (j-1) * nComps + i] <- -0.5
+          Q[(i-1) * nComps + j, (i-1) * nComps + j] <- 0.5
+        }
+      }
+    }
+    
+    L = (diag(nComps^2) - Q) %*% t(W)
+    L = solve(diag(nComps) * sum((assetWeights * exp(NS * 0.5)))) - W %*% Q %*% t(W)
+    
+    if(returnL){
+      return(list("BAC" = L %*% impliedBeta - empiricalBeta + noise, "L" = L))
+    } else {
+      return(L %*% impliedBeta - empiricalBeta + noise)
+    }
+    
+  } else { #BAC_Delta_NR function in the python code
+    
+    for (i in 1:nComps){
+      W[i, ((i-1) * nComps + 1):(nComps * i)] <- assetWeights
+    }
+    
+    for (i in 1:nComps){
+      for (j in 1:nComps){
+        if(i == j & restricted){
+          Q[(i-1) * nComps + i, (i-1) * nComps + i] <- 1
+        } else if(j != i){
+          Q[(i-1) * nComps + j, (j-1) * nComps + i] <- -0.5
+          Q[(i-1) * nComps + j, (i-1) * nComps + j] <- 0.5
+        }
+      }
+    }
+    
+    L = (diag(nComps^2) - Q) %*% t(W)
+    L = solve(diag(nComps) * sum((assetWeights))) - W %*% Q %*% t(W)
+    
+    if(returnL){
+      return(list("BAC" = L %*% impliedBeta - empiricalBeta + noise, "L" = L))
+    } else {
+      return(L %*% impliedBeta - empiricalBeta + noise)
+    }
+    
+  }
+  
+  
+}
+
+
+
+bacImpliedBeta <- function(components, missings, componentWeights){
+  
+  beta <- matrix(0, ncol = ncol(components), nrow = ncol(components))
+  
+  for (k in 1:ncol(components)) {
+    
+    for (l in 1:ncol(components)) {
+      count <- 0
+      boolK <- FALSE # indicator whether a trade has happened
+      boolL <- FALSE # indicator whether a trade has happened
+      currentK <- 0
+      currentL <- 0
+      bayta <- 0 # AMAZIN'
+      for (i in 1:nrow(components)) {
+        currentWeight <- componentWeights[i, k]
+        count <- count + 1
+        
+        if(missings[i, k]){
+          boolK <- TRUE
+          currentK <- components[i, k]
+        }
+        
+        if(missings[i, l]){
+          boolL <- TRUE
+          currentL <- components[i, l]
+        }
+        
+        if(boolK && boolL){
+          bayta <- bayta + currentWeight / count * currentL * currentK
+          
+          boolK <- FALSE
+          boolL <- FALSE
+          count <- 0
+          currentK <- 0
+          currentL <- 0
+          
+        }
+        
+      }
+      beta[k, l] <- bayta
+    }
+    
+  }
+  return(beta)
+}

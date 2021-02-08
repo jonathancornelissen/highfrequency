@@ -42,8 +42,8 @@ colCumsum <- function(x) {
 }
 
 #' @keywords internal
-refreshTimeMathing <- function(x, idx) {
-    .Call(`_highfrequency_refreshTimeMathing`, x, idx)
+refreshTimeMatching <- function(x, idx) {
+    .Call(`_highfrequency_refreshTimeMatching`, x, idx)
 }
 
 #' @keywords internal
