@@ -7,8 +7,8 @@
 rKernelCov(
   rData,
   cor = FALSE,
-  alignBy = "seconds",
-  alignPeriod = 1,
+  alignBy = NULL,
+  alignPeriod = NULL,
   makeReturns = FALSE,
   kernelType = "rectangular",
   kernelParam = 1,

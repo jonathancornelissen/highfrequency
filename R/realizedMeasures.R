@@ -1392,7 +1392,7 @@ rHYCov <- function(rData, cor = FALSE, period = 1, alignBy = "seconds", alignPer
 #' 
 #' @keywords volatility
 #' @export
-rKernelCov <- function(rData, cor = FALSE,  alignBy = "seconds", alignPeriod = 1,
+rKernelCov <- function(rData, cor = FALSE,  alignBy = NULL, alignPeriod = NULL,
                        makeReturns = FALSE, kernelType = "rectangular", kernelParam = 1,
                        kernelDOFadj = TRUE) {
 
