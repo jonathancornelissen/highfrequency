@@ -1,5 +1,6 @@
-#include <Rcpp.h>
+#include <RcppArmadillo.h>
 using namespace Rcpp;
+using namespace arma;
 
 // [[Rcpp::export]]
 int nsmaller(IntegerVector times, IntegerVector lengths, int start, int end, int max) {
@@ -155,3 +156,98 @@ NumericVector pcovcc(NumericVector a, NumericVector ap, NumericVector b, Numeric
   return(ans);
 }
 
+
+//[[Rcpp::export]]
+arma::rowvec bacImpliedBetaCpp(const arma::mat& components, const arma::mat& missings, const arma::mat& componentWeights){
+  arma::mat beta = arma::zeros<arma::mat>(components.n_cols, components.n_cols);
+  // arma::mat cov = arma::zeros<arma::mat>(components.n_cols, components.n_cols);
+  
+  int count;
+  double currentK, currentL, currentWeight, bayta, tmp;
+  bool boolK, boolL; 
+  
+  for(arma::uword k = 0; k < components.n_cols; k++){
+    for(arma::uword l = 0; l < components.n_cols; l++){
+      count = 0;
+      boolK = false;
+      boolL = false;
+      currentK = 0.0;
+      currentL = 0.0;
+      bayta = 0.0;
+      tmp = 0.0;
+      currentWeight = 0.0;
+      
+      for(arma::uword i = 0; i < components.n_rows; i++){
+        currentWeight += componentWeights(i, k);
+        count += 1;
+        
+        if(missings(i, k)){
+          boolK = true;
+          currentK += components(i, k);
+        }
+        
+        if(missings(i, l)){
+          boolL = true;
+          currentL += components(i, l);
+        }
+        
+        if(boolK & boolL){
+          bayta += currentWeight / count * currentL * currentK;
+          // tmp += currentK * currentL;
+          boolK = false;
+          boolL = false;
+          count = 0;
+          currentK = 0.0;
+          currentL = 0.0;
+          currentWeight = 0.0;
+        }
+        // cov(k, l) = tmp;
+        beta(k, l) = bayta;
+      }
+      
+    }
+  }
+  
+  // return(Rcpp::List::create(Rcpp::Named("beta") = beta,
+                            // Rcpp::Named("cov") = cov));
+  return(sum(beta, 0));
+  
+}
+
+
+//[[Rcpp::export]]
+
+double bacHY(const arma::colvec& component, const arma::colvec& ETF, const arma::uvec& missingComponent, const arma::uvec& missingETF,
+             const double componentWeighting){
+  double res  = 0.0;
+  
+  for(uword i = 0; i < component.n_elem; i++){
+    
+    if(missingComponent[i]){
+      for(uword j = i; j < component.n_elem; j++){
+        if(missingETF[j]){
+          res += component[i] * componentWeighting * ETF[j];
+          break;
+        }
+      }
+      continue;
+    }
+    
+    
+    if(missingETF[i]){
+      for(uword j = i; j < component.n_elem; j++){
+        if(missingComponent[j]){
+          res += ETF[i] * component[j] * componentWeighting;
+          break;
+        }
+        
+      }
+    }
+    
+    
+    
+  }
+  
+
+  return res;  
+}
