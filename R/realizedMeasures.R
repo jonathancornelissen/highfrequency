@@ -3814,26 +3814,131 @@ ReMeDIAsymptoticVariance <- function(pData, kn, lags, phi, i){
 
 
 
-
-#' Beta adjusted covariance matrix
+#' rBAC
+#' 
+#' @description 
+#' The proposed Beta Adjusted Covariance (BAC) equals the pre-estimator plus a minimal adjustment matrix such that the covariance-implied stock-ETF beta equals a target beta.
+#' 
+#' 
+#' 
+#' @param pData a named list. Each list-item contains an \code{xts} or \code{data.table} object with the intraday price data of an ETF and it's component stocks. \code{xts} objects are turned into \code{data.table}s
+#' @param shares a \code{numeric} with length corresponding to the number of component stocks in the ETF. The entries are the stock holdings of the ETF in the corresponding stock.
+#' @param outStanding number of shares outstanding of the ETF
+#' @param nonEquity aggregated value of the additional components (like cash, money-market funds, bonds, etc.) of the ETF which are not included in the components in \code{pData}.
+#' @param ETFNAME a \code{character} denoting which entry in the \code{pData} list is the ETF. Default is \code{"ETF"}
+#' @param unrestricted a \code{logical} denoting whether to use the unrestricted estimator, which also affects the diagonal. Default is \code{FALSE}
+#' @param preEstimator a \code{function} which estimates the integrated covariance matrix. Default is \code{\link{rCov}}
+#' @param noiseRobustEstimator a \code{function} which estimates the integrated (co)variance and is robust to microstructure noise (only the diagonal will be estimated).
+#'  This function is only used when \code{noiseCorrection} is \code{TRUE}. Default is \code{\link{rTSCov}}
+#' @param noiseCorrection a \code{logical} which denotes whether to correct for microstructure noise by using the \code{noiseRobustEstimator} function. Default is \code{FALSE}
+#' @param returnL a \code{logical} which denotes whether to return the \code{L} matrix. Default is \code{FALSE}
+#' @param ... extra arguments passed to \code{preEstimator} and \code{noiseRobustEstimator}.
+#' 
+#' @examples
+#' \dontrun{
+#' # Since we don't have any data in this package that is of the required format we must simulate it.
+#' library(xts)
+#' library(highfrequency)
+#' # Set the seed for replication
+#' set.seed(123)
+#' iT <- 23400 # Number of observations
+#' # Simulate returns
+#' rets <- mvtnorm::rmvnorm(iT * 3 + 1, mean = rep(0,4), 
+#'                          sigma = matrix(c(0.1, -0.03 , 0.02, 0.04,
+#'                                           -0.03, 0.05, -0.03, 0.02,
+#'                                           0.02, -0.03, 0.05, -0.03,  
+#'                                           0.04, 0.02, -0.03, 0.08), ncol = 4))
+#' # We assume that the assets don't trade in a synchronous manner
+#' w1 <- rets[sort(sample(1:nrow(rets), size = nrow(rets) * 0.5)), 1]
+#' w2 <- rets[sort(sample(1:nrow(rets), size = nrow(rets) * 0.75)), 2]
+#' w3 <- rets[sort(sample(1:nrow(rets), size = nrow(rets) * 0.65)), 3]
+#' w4 <- rets[sort(sample(1:nrow(rets), size = nrow(rets) * 0.8)), 4]
+#' w5 <- rnorm(nrow(rets) * 0.9, mean = 0, sd = 0.005)
+#' timestamps1 <- seq(34200, 57600, length.out = length(w1))
+#' timestamps2 <- seq(34200, 57600, length.out = length(w2))
+#' timestamps3 <- seq(34200, 57600, length.out = length(w3))
+#' timestamps4 <- seq(34200, 57600, length.out = length(w4))
+#' timestamps4 <- seq(34200, 57600, length.out = length(w4))
+#' timestamps5 <- seq(34200, 57600, length.out = length(w5))
+#' 
+#' w1 <- xts(w1 * c(0,sqrt(diff(timestamps1) / (max(timestamps1) - min(timestamps1)))),
+#'           as.POSIXct(timestamps1, origin = "1970-01-01"), tz = "UTC")
+#' w2 <- xts(w2 * c(0,sqrt(diff(timestamps2) / (max(timestamps2) - min(timestamps2)))),
+#'           as.POSIXct(timestamps2, origin = "1970-01-01"), tz = "UTC")
+#' w3 <- xts(w3 * c(0,sqrt(diff(timestamps3) / (max(timestamps3) - min(timestamps3)))),
+#'           as.POSIXct(timestamps3, origin = "1970-01-01"), tz = "UTC")
+#' w4 <- xts(w4 * c(0,sqrt(diff(timestamps4) / (max(timestamps4) - min(timestamps4)))),
+#'           as.POSIXct(timestamps4, origin = "1970-01-01"), tz = "UTC")
+#' w5 <- xts(w5 * c(0,sqrt(diff(timestamps5) / (max(timestamps5) - min(timestamps5)))),
+#'           as.POSIXct(timestamps5, origin = "1970-01-01"), tz = "UTC")
+#' 
+#' p1  <- exp(cumsum(w1))
+#' p2  <- exp(cumsum(w2))
+#' p3  <- exp(cumsum(w3))
+#' p4  <- exp(cumsum(w4))
+#' 
+#' weights <- runif(4) * 1:4
+#' weights <- weights / sum(weights)
+#' p5 <- xts(rowSums(cbind(w1 * weights[1], w2 * weights[2], w3 * weights[3], w4 * weights[4]),
+#'                    na.rm = TRUE),
+#'                    index(cbind(p1, p2, p3, p4)))
+#' p5 <- xts(cumsum(rowSums(cbind(p5, w5), na.rm = TRUE)), index(cbind(p5, w5)))
+#' 
+#' p5 <- exp(p5[sort(sample(1:length(p5), size = nrow(rets) * 0.9))])
+#' 
+#' 
+#' BAC_Delta <- rBACov(pData = list(
+#'                      "ETF" = p5, "STOCK 1" = p1, "STOCK 2" = p2, "STOCK 3" = p3, "STOCK 4" = p4
+#'                    ), shares = 1:4, outStanding = 1, nonEquity = 0, ETFNAME = "ETF", 
+#'                    unrestricted = FALSE, preEstimator = rCov, noiseCorrection = FALSE, 
+#'                    returnL = FALSE, Lin = FALSE, L = 0, K = 2, J = 1)
+#' }
+#' @author Emil Sjoerup, (Kris Boudt and Kirill Dragun for the Python version)
+#' @importFrom xts is.xts
+#' @importFrom data.table as.data.table merge.data.table data.table setkey setcolorder copy
 #' @export
-rBAC <- function(pData, shares, outStanding, nonEquity, ETFNAME = "ETF", restricted = TRUE, 
-                 noise = NULL, B_low = 0, E_up = 0, returnL = FALSE, Lin = FALSE, L = 0, K = K, J = J){
-  V1 <- .SD <- NULL
+rBACov <- function(pData, shares, outStanding, nonEquity, ETFNAME = "ETF", unrestricted = TRUE,
+                 preEstimator = rCov, noiseRobustEstimator = rTSCov, noiseCorrection = FALSE, 
+                 returnL = FALSE, ...){
+  DT <- .SD <- NULL
   
-  
-  if(!is.list(pData)){
+  if(!is.list(pData) | is.data.table(pData)){
     stop("pData must be a list of data.tables or xts objects")
   }
-  TSCOV <- sapply(pData, function(x) TSRV(as.xts(x), K = K, J = J))
-  browser()
+  if(is.xts(pData[[1]])){
+    pData <- lapply(pData,
+                    function(x){
+                      dimnames(x) <- NULL ## Sometimes needed, don't know why, really
+                      x <- as.data.table(x)
+                      setnames(x, "index","DT")
+                      return(x)
+                    })
+  }
+  
+  
+  if(noiseCorrection && !is.function(noiseRobustEstimator)){
+    stop("noiseRobustEstimator must be a function when noiseCorrection is TRUE")
+  }
   
   for (i in 1:length(pData)) {
     setnames(pData[[i]], new= c("DT", names(pData[i])))
   }
-  
+  backup <- Reduce(function(x,y) merge.data.table(x, y, all = TRUE, on = "DT"), pData[which(names(pData) != ETFNAME)])
   pData <- Reduce(function(x,y) merge.data.table(x, y, all = TRUE, on = "DT"), pData)
   setkey(pData, "DT")
+  setkey(backup, "DT")
+  
+  timeZone <- format(pData$DT[1], format = "%Z")
+  tz <- NULL
+  if(is.null(timeZone) || timeZone == ""){
+    if(is.null(tz)){
+      tz <- "UTC"
+    }
+    if(!("POSIXct" %in% class(pData$DT))) pData[, DT := as.POSIXct(format(DT, digits = 20, nsmall = 20), tz = tz)]
+  } else {
+    tz <- timeZone
+  }
+  
   
   nComps <- dim(pData)[2] - 2 # Number of components in the ETF - 2 because of ETF data and DT
   
@@ -3842,56 +3947,82 @@ rBAC <- function(pData, shares, outStanding, nonEquity, ETFNAME = "ETF", restric
   
   shares <- shares / outStanding
   setcolorder(pData, c("DT", ETFNAME))
-  missingPoints <- !is.na(pData) # Where the inputs are missing
+  missingPoints <- !is.na(pData)[-1,] # Where the inputs aren't missing
+  
+  
+  RC2 <- matrix(0, ncol = ncol(backup) - 1, nrow = ncol(backup) - 1)
+  noiseRobust <- rep(0, ncol(backup) - 1)
+  for (i in 1:nComps) {
+    for (j in i:nComps) {
+      dat <- refreshTimeMatching(as.matrix(backup[, 1 + c(i, j), with = FALSE]), backup$DT)
+      
+      dat <- data.table(dat$data)[, DT := as.POSIXct(dat$indices, origin = "1970-01-01", tz = tz)]
+
+      setkey(dat, DT)
+      setcolorder(dat, "DT")
+      RC2[i, j] <- RC2[j, i] <- preEstimator(dat, makeReturns = TRUE)[1,2]
+      
+    }
+  }
+  
+  
+  
   
   pData <- setnafill(copy(pData), type = "locf", cols = 2:ncol(pData))
   pData <- setnafill(pData, type = "nocb")
   for (j in 3:ncol(pData)) {
     set(pData, j = j, value = pData[,j , with = FALSE] - nonEquity/outStanding)
   }
-
-  returns <- pData[, lapply(.SD, function(x) makeReturns(x)), .SDcols = 2:ncol(pData)][-1,]
+  
+  returns <- pData[, lapply(.SD, function(x) makeReturns(x)), .SDcols = 3:ncol(pData)][-1,]
+  etfReturns <- diff(pData[[2]])
   set(returns, j = "DT", value = pData$DT[-1])
   setcolorder(returns, "DT")
   shares <- c(0,0, shares)
   meanWeights <- numeric(ncol(pData))
   meanSquaredWeights <- numeric(ncol(pData))
-  assetWeights <- copy(pData)
+  assetWeights <- copy(pData)[-1, ]
   for (j in 3:ncol(pData)) {
     set(assetWeights, j = j, value = assetWeights[,j, with = FALSE] * shares[j])
-    meanWeights[j] <- sum(pData[missingPoints[,j], j, with = FALSE])/sum(missingPoints[,j])
-    meanSquaredWeights[j] <- sum(pData[missingPoints[,j], j, with = FALSE]^2)/sum(missingPoints[,j])
+    meanWeights[j] <- sum(assetWeights[missingPoints[,j], j, with = FALSE])/sum(missingPoints[,j])
+    meanSquaredWeights[j] <- sum(assetWeights[missingPoints[,j], j, with = FALSE]^2)/sum(missingPoints[,j])
   }
   
-
+  
+  if(noiseCorrection){
+    for (i in 1:nComps) {
+      noiseRobust[i] <- noiseRobustEstimator(pData[c(TRUE, missingPoints[, i + 2]), c(1,i + 2), with = FALSE], makeReturns = TRUE, ...)
+    }
+  }
+  
+  
   meanWeights <- meanWeights[-c(1,2)]
   meanSquaredWeights <- meanSquaredWeights[-c(1,2)]
   shares <- shares[-c(1,2)]
+  impliedBeta <- bacImpliedBetaCpp(as.matrix(returns[, -1, with = FALSE]), missingPoints[, -c(1,2)], as.matrix(assetWeights[, -c(1,2), with = FALSE]))
+  impliedBeta <- as.numeric(impliedBeta)
   
-  browser()
-  impliedBeta <- bacImpliedBeta(as.matrix(returns[,-c(1,2), with = FALSE]), missingPoints[-1, -c(1,2)], as.matrix(assetWeights[-1,-c(1,2), with = FALSE]))
-  impliedBeta <- colSums(impliedBeta)
-  RC <- rCov(pData, makeReturns = TRUE)
-  TSV <- rTSCov(pData, K = 2)
+  # impliedBeta <- colSums(impliedBeta[["beta"]])
   
-  foo <- rHYCov(as.xts(pData)[missingPoints[,2] | missingPoints[,3], c(1,2)], makeReturns = TRUE)
+  empiricalBeta <- numeric(ncol(returns) - 1)
+  weightings <- rep(1, ncol(returns) - 1)
   
-  foo[1,2]/foo[1,1]
+  for (i in 2:ncol(returns)) {
+    empiricalBeta[i-1] <- bacHY(as.matrix(returns[, i, with = FALSE]), as.matrix(etfReturns), missingPoints[,i+1], missingPoints[,2], weightings[i-1])
+  }
   
-  ## NBAC_Delta_NR function in the python code
-  if(!is.null(noise)){
-    
-    
-    
+  if(noiseCorrection){
+    noise <- diag(RC2) - noiseRobust
+    impliedBeta <- impliedBeta - noise * meanWeights
     NS <- noise/pmax(1, colSums(missingPoints[, -c(1,2)]))
     
     for (i in 1:nComps){
-      W[i, ((i-1) * nComps + 1):(nComps * i)] <- assetWeights * exp(NS * 0.25)
+      W[i, ((i-1) * nComps + 1):(nComps * i)] <- meanWeights * exp(NS * 0.25)
     }
     
     for (i in 1:nComps){
       for (j in 1:nComps){
-        if(i == j & restricted){
+        if(i == j & !unrestricted){ # If unrestricted is true, we change the main diagonal too
           Q[(i-1) * nComps + i, (i-1) * nComps + i] <- 1
         } else if(j != i) {
           Q[(i-1) * nComps + j, (j-1) * nComps + i] <- -0.5
@@ -3900,24 +4031,17 @@ rBAC <- function(pData, shares, outStanding, nonEquity, ETFNAME = "ETF", restric
       }
     }
     
-    L = (diag(nComps^2) - Q) %*% t(W)
-    L = solve(diag(nComps) * sum((assetWeights * exp(NS * 0.5)))) - W %*% Q %*% t(W)
+    L <- (diag(nComps^2) - Q) %*% t(W)
+    L <- L %*% (solve(diag(nComps) * sum(meanSquaredWeights * exp(NS * 0.5)) - W %*% Q %*% t(W)))
     
-    if(returnL){
-      return(list("BAC" = L %*% impliedBeta - empiricalBeta + noise, "L" = L))
-    } else {
-      return(L %*% impliedBeta - empiricalBeta + noise)
-    }
-    
-  } else { #BAC_Delta_NR function in the python code
-    
+  } else {
+    noise <- numeric(nComps)
     for (i in 1:nComps){
-      W[i, ((i-1) * nComps + 1):(nComps * i)] <- assetWeights
+      W[i, ((i-1) * nComps + 1):(nComps * i)] <- meanWeights
     }
-    
     for (i in 1:nComps){
       for (j in 1:nComps){
-        if(i == j & restricted){
+        if(i == j & !unrestricted){ # If unrestricted is true, we change the main diagonal too
           Q[(i-1) * nComps + i, (i-1) * nComps + i] <- 1
         } else if(j != i){
           Q[(i-1) * nComps + j, (j-1) * nComps + i] <- -0.5
@@ -3925,65 +4049,15 @@ rBAC <- function(pData, shares, outStanding, nonEquity, ETFNAME = "ETF", restric
         }
       }
     }
-    
-    L = (diag(nComps^2) - Q) %*% t(W)
-    L = solve(diag(nComps) * sum((assetWeights))) - W %*% Q %*% t(W)
-    
-    if(returnL){
-      return(list("BAC" = L %*% impliedBeta - empiricalBeta + noise, "L" = L))
-    } else {
-      return(L %*% impliedBeta - empiricalBeta + noise)
-    }
+    L <- (diag(nComps^2) - Q) %*% t(W)
+    L <- L %*% (solve(diag(nComps) * sum(meanSquaredWeights) - W %*% Q %*% t(W)))
     
   }
   
-  
-}
-
-
-
-bacImpliedBeta <- function(components, missings, componentWeights){
-  
-  beta <- matrix(0, ncol = ncol(components), nrow = ncol(components))
-  
-  for (k in 1:ncol(components)) {
-    
-    for (l in 1:ncol(components)) {
-      count <- 0
-      boolK <- FALSE # indicator whether a trade has happened
-      boolL <- FALSE # indicator whether a trade has happened
-      currentK <- 0
-      currentL <- 0
-      bayta <- 0 # AMAZIN'
-      for (i in 1:nrow(components)) {
-        currentWeight <- componentWeights[i, k]
-        count <- count + 1
-        
-        if(missings[i, k]){
-          boolK <- TRUE
-          currentK <- components[i, k]
-        }
-        
-        if(missings[i, l]){
-          boolL <- TRUE
-          currentL <- components[i, l]
-        }
-        
-        if(boolK && boolL){
-          bayta <- bayta + currentWeight / count * currentL * currentK
-          
-          boolK <- FALSE
-          boolL <- FALSE
-          count <- 0
-          currentK <- 0
-          currentL <- 0
-          
-        }
-        
-      }
-      beta[k, l] <- bayta
-    }
+  if(returnL){
+    return(list("BAC" = RC2 - (matrix(L %*% (impliedBeta - empiricalBeta), ncol = nComps) + diag(noise)), "L" = L))
+  } else {
+    return(RC2 - (matrix(L %*% (impliedBeta - empiricalBeta), ncol = nComps) + diag(noise)))
     
   }
-  return(beta)
 }
