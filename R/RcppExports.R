@@ -115,7 +115,7 @@ bacImpliedBetaCpp <- function(components, missings, componentWeights) {
     .Call(`_highfrequency_bacImpliedBetaCpp`, components, missings, componentWeights)
 }
 
-bacHY <- function(component, ETF, missingComponent, missingETF, componentWeighting) {
-    .Call(`_highfrequency_bacHY`, component, ETF, missingComponent, missingETF, componentWeighting)
+bacHY <- function(component, ETF, missingComponent, missingETF, componentWeightings) {
+    .Call(`_highfrequency_bacHY`, component, ETF, missingComponent, missingETF, componentWeightings)
 }
 

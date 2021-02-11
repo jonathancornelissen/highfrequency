@@ -376,8 +376,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // bacHY
-double bacHY(const arma::colvec& component, const arma::colvec& ETF, const arma::uvec& missingComponent, const arma::uvec& missingETF, const double componentWeighting);
-RcppExport SEXP _highfrequency_bacHY(SEXP componentSEXP, SEXP ETFSEXP, SEXP missingComponentSEXP, SEXP missingETFSEXP, SEXP componentWeightingSEXP) {
+double bacHY(const arma::colvec& component, const arma::colvec& ETF, const arma::uvec& missingComponent, const arma::uvec& missingETF, const arma::colvec& componentWeightings);
+RcppExport SEXP _highfrequency_bacHY(SEXP componentSEXP, SEXP ETFSEXP, SEXP missingComponentSEXP, SEXP missingETFSEXP, SEXP componentWeightingsSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -385,8 +385,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const arma::colvec& >::type ETF(ETFSEXP);
     Rcpp::traits::input_parameter< const arma::uvec& >::type missingComponent(missingComponentSEXP);
     Rcpp::traits::input_parameter< const arma::uvec& >::type missingETF(missingETFSEXP);
-    Rcpp::traits::input_parameter< const double >::type componentWeighting(componentWeightingSEXP);
-    rcpp_result_gen = Rcpp::wrap(bacHY(component, ETF, missingComponent, missingETF, componentWeighting));
+    Rcpp::traits::input_parameter< const arma::colvec& >::type componentWeightings(componentWeightingsSEXP);
+    rcpp_result_gen = Rcpp::wrap(bacHY(component, ETF, missingComponent, missingETF, componentWeightings));
     return rcpp_result_gen;
 END_RCPP
 }

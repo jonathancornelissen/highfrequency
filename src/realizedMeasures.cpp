@@ -163,7 +163,7 @@ arma::rowvec bacImpliedBetaCpp(const arma::mat& components, const arma::mat& mis
   // arma::mat cov = arma::zeros<arma::mat>(components.n_cols, components.n_cols);
   
   int count;
-  double currentK, currentL, currentWeight, bayta, tmp;
+  double currentK, currentL, currentWeight, bayta;//, tmp;
   bool boolK, boolL; 
   
   for(arma::uword k = 0; k < components.n_cols; k++){
@@ -174,7 +174,7 @@ arma::rowvec bacImpliedBetaCpp(const arma::mat& components, const arma::mat& mis
       currentK = 0.0;
       currentL = 0.0;
       bayta = 0.0;
-      tmp = 0.0;
+      //tmp = 0.0;
       currentWeight = 0.0;
       
       for(arma::uword i = 0; i < components.n_rows; i++){
@@ -218,7 +218,7 @@ arma::rowvec bacImpliedBetaCpp(const arma::mat& components, const arma::mat& mis
 //[[Rcpp::export]]
 
 double bacHY(const arma::colvec& component, const arma::colvec& ETF, const arma::uvec& missingComponent, const arma::uvec& missingETF,
-             const double componentWeighting){
+             const arma::colvec& componentWeightings){
   double res  = 0.0;
   
   for(uword i = 0; i < component.n_elem; i++){
@@ -226,7 +226,7 @@ double bacHY(const arma::colvec& component, const arma::colvec& ETF, const arma:
     if(missingComponent[i]){
       for(uword j = i; j < component.n_elem; j++){
         if(missingETF[j]){
-          res += component[i] * componentWeighting * ETF[j];
+          res += component[i] * componentWeightings[i] * ETF[j];
           break;
         }
       }
@@ -237,7 +237,7 @@ double bacHY(const arma::colvec& component, const arma::colvec& ETF, const arma:
     if(missingETF[i]){
       for(uword j = i; j < component.n_elem; j++){
         if(missingComponent[j]){
-          res += ETF[i] * component[j] * componentWeighting;
+          res += ETF[i] * component[j] * componentWeightings[j];
           break;
         }
         

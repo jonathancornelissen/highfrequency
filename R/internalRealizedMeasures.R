@@ -655,7 +655,7 @@ zgamma <- function (x, y, gamma_power) {
 
 
 #' @keywords internal
-cholCovrMRC <- function(returns, delta = 0.1, theta = 1){
+cholCovrMRCov <- function(returns, delta = 0.1, theta = 1){
   
   nObs <- nrow(returns) + 1 
   kn <- floor(theta * nObs ^(1/2 + delta))
@@ -665,7 +665,6 @@ cholCovrMRC <- function(returns, delta = 0.1, theta = 1){
   x <- (1:(kn-1)) / kn
   x[x > (1-x)] <- (1-x)[x > (1-x)]
   
-  psi1 <- kn * sum((gfunction((1:kn)/kn) - gfunction(((1:kn) - 1 )/kn))^2)
   
   psi2 <- mean(c(0,x,0)^2)
   #psi <- (t(returns) %*% returns) / (2 * nObs)
@@ -686,4 +685,6 @@ flat <- function(kn , err, errMax, size, tol ){
     return(NA)
   }
 }
+
+
 

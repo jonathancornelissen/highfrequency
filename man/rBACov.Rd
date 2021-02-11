@@ -11,6 +11,8 @@ rBACov(
   nonEquity,
   ETFNAME = "ETF",
   unrestricted = TRUE,
+  targetBeta = c("HY", "VAB", "expert"),
+  expertBeta = NULL,
   preEstimator = rCov,
   noiseRobustEstimator = rTSCov,
   noiseCorrection = FALSE,
@@ -25,11 +27,16 @@ rBACov(
 
 \item{outStanding}{number of shares outstanding of the ETF}
 
-\item{nonEquity}{aggregated value of the additional components (like cash, money-market funds, bonds, etc.), prices for which are not included in the components in \code{pData}.}
+\item{nonEquity}{aggregated value of the additional components (like cash, money-market funds, bonds, etc.) of the ETF which are not included in the components in \code{pData}.}
 
 \item{ETFNAME}{a \code{character} denoting which entry in the \code{pData} list is the ETF. Default is \code{"ETF"}}
 
 \item{unrestricted}{a \code{logical} denoting whether to use the unrestricted estimator, which also affects the diagonal. Default is \code{FALSE}}
+
+\item{targetBeta}{a \code{character}, one of \code{c("HY", "VAB", "expert")} (default) denoting which target beta to use, only the first entry will be used. A value \code{"HY"} means using the Hayashi-Yoshida estimator to estimate the
+empirical beta. A value of \code{"VAB"} denotes using the variance adjusted beta. A value of \code{"expert"} denotes using a user-supplied target beta, which can be supplied in the \code{expertBeta} argument.}
+
+\item{expertBeta}{a \code{numeric} containing the user supplied expert beta. The \code{expertBeta} must be of length equal to the number of assets in the ETF. Default is \code{NULL}}
 
 \item{preEstimator}{a \code{function} which estimates the integrated covariance matrix. Default is \code{\link{rCov}}}
 
@@ -43,10 +50,7 @@ This function is only used when \code{noiseCorrection} is \code{TRUE}. Default i
 \item{...}{extra arguments passed to \code{preEstimator} and \code{noiseRobustEstimator}.}
 }
 \description{
-Beta Adjusted Covariance (BAC) estimator.
-Exchange Traded Funds (ETFs) are often more liquid than many of their component stocks. 
-The BAC estimator exploits this feature to improve pre-estimators of the integrated covariance of the stocks included in the ETF. 
-The proposed Beta Adjusted Covariance equals the pre-estimator plus a minimal adjustment matrix such that the covariance-implied stock-ETF beta equals a target beta.
+The proposed Beta Adjusted Covariance (BAC) equals the pre-estimator plus a minimal adjustment matrix such that the covariance-implied stock-ETF beta equals a target beta.
 }
 \examples{
 \dontrun{
@@ -105,10 +109,9 @@ BAC_Delta <- rBACov(pData = list(
                      "ETF" = p5, "STOCK 1" = p1, "STOCK 2" = p2, "STOCK 3" = p3, "STOCK 4" = p4
                    ), shares = 1:4, outStanding = 1, nonEquity = 0, ETFNAME = "ETF", 
                    unrestricted = FALSE, preEstimator = rCov, noiseCorrection = FALSE, 
-                   returnL = FALSE, Lin = FALSE, L = 0, K = 2, J = 1)
+                   returnL = FALSE, K = 2, J = 1)
 }
-
 }
 \author{
-Emil Sjoerup, (Kris Boudt and Kirill V. Dragun for the Python version)
+Emil Sjoerup, (Kris Boudt and Kirill Dragun for the Python version)
 }
