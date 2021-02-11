@@ -2,85 +2,21 @@
 % Please edit documentation in R/realizedMeasures.R
 \name{rMRC}
 \alias{rMRC}
-\title{Modulated realized covariance}
+\title{DEPRECATED rMRC}
 \usage{
-rMRC(pData, pairwise = FALSE, makePsd = FALSE)
+rMRC(pData, pairwise = FALSE, makePsd = FALSE, theta = 0.8, ...)
 }
 \arguments{
-\item{pData}{a list. Each list-item contains an \code{xts} object with the intraday price data of a stock.}
+\item{pData}{DEPRECATED}
 
-\item{pairwise}{boolean, should be \code{TRUE} when refresh times are based on pairs of assets. \code{FALSE} by default.}
+\item{pairwise}{DEPRECATED}
 
-\item{makePsd}{boolean, in case it is \code{TRUE}, the positive definite version of rMRC is returned. \code{FALSE} by default.}
-}
-\value{
-A \eqn{d \times d} covariance matrix.
+\item{makePsd}{DEPRECATED}
+
+\item{theta}{DEPRECATED}
+
+\item{...}{DEPRECATED}
 }
 \description{
-Calculate univariate or multivariate pre-averaged estimator, as defined in Hautsch and Podolskij (2013).
+DEPRECATED USE \code{\link{rMRCov}}
 }
-\details{
-In practice, market microstructure noise leads to a departure from the pure semimartingale model. We consider the process \eqn{Y} in period \eqn{\tau}:
-    \deqn{
-      \mbox{Y}_{\tau} = X_{\tau} + \epsilon_{\tau},
-    }
-  where the observed \eqn{d} dimensional log-prices are the sum of underlying Brownian semimartingale process \eqn{X} and a noise term \eqn{\epsilon_{\tau}}.
-
-  \eqn{\epsilon_{\tau}} is an \emph{i.i.d.} process with \eqn{X}.
-
-  It is intuitive that under mean zero \emph{i.i.d.} microstructure noise some form of smoothing of the observed log-price should tend to diminish the impact of the noise.
-  Effectively, we are going to approximate a continuous function by an average of observations of \eqn{Y} in a neighborhood, the noise being averaged away.
-
-  Assume there is \eqn{N} equispaced returns in period \eqn{\tau} of a list (after refreshing data). 
-  Let \eqn{r_{\tau_i}} be a return (with \eqn{i=1, \ldots,N}) of an asset in period \eqn{\tau}. Assume there is \eqn{d} assets.
-
-  In order to define the univariate pre-averaging estimator, we first define the pre-averaged returns as
-  \deqn{
-    \bar{r}_{\tau_j}^{(k)}= \sum_{h=1}^{k_N-1}g\left(\frac{h}{k_N}\right)r_{\tau_{j+h}}^{(k)}
-  }
-  where g is a non-zero real-valued function \eqn{g:[0,1]} \eqn{\rightarrow} \eqn{R} given by \eqn{g(x)} = \eqn{\min(x,1-x)}. \eqn{k_N} is a sequence of integers satisfying  \eqn{\mbox{k}_{N} = \lfloor\theta N^{1/2}\rfloor}.
-  We use \eqn{\theta = 0.8} as recommended in Hautsch and Podolskij (2013). The pre-averaged returns are simply a weighted average over the returns in a local window.
-  This averaging diminishes the influence of the noise. The order of the window size \eqn{k_n} is chosen to lead to optimal convergence rates.
-  The pre-averaging estimator is then simply the analogue of the realized variance but based on pre-averaged returns and an additional term to remove bias due to noise
-  \deqn{
-    \hat{C}= \frac{N^{-1/2}}{\theta \psi_2}\sum_{i=0}^{N-k_N+1}  (\bar{r}_{\tau_i})^2-\frac{\psi_1^{k_N}N^{-1}}{2\theta^2\psi_2^{k_N}}\sum_{i=0}^{N}r_{\tau_i}^2
-  }
-  with
-  \deqn{
-    \psi_1^{k_N}= k_N \sum_{j=1}^{k_N}\left(g\left(\frac{j+1}{k_N}\right)-g\left(\frac{j}{k_N}\right)\right)^2,\quad
-  }
-  \deqn{
-    \psi_2^{k_N}= \frac{1}{k_N}\sum_{j=1}^{k_N-1}g^2\left(\frac{j}{k_N}\right).
-  }
-  \deqn{
-    \psi_2= \frac{1}{12}
-  }
-  The multivariate counterpart is very similar. The estimator is called the Modulated Realized Covariance (rMRC) and is defined as
-  \deqn{
-    \mbox{MRC}= \frac{N}{N-k_N+2}\frac{1}{\psi_2k_N}\sum_{i=0}^{N-k_N+1}\bar{\boldsymbol{r}}_{\tau_i}\cdot \bar{\boldsymbol{r}}'_{\tau_i} -\frac{\psi_1^{k_N}}{\theta^2\psi_2^{k_N}}\hat{\Psi}
-}
-where \eqn{\hat{\Psi}_N = \frac{1}{2N}\sum_{i=1}^N \boldsymbol{r}_{\tau_i}(\boldsymbol{r}_{\tau_i})'}. It is a bias correction to make it consistent.
-However, due to this correction, the estimator is not ensured PSD.
-An alternative is to slightly enlarge the bandwidth such that \eqn{\mbox{k}_{N} = \lfloor\theta N^{1/2+\delta}\rfloor}. \eqn{\delta = 0.1} results in a consistent estimate without the bias correction and a PSD estimate, in which case:
-  \deqn{
-    \mbox{MRC}^{\delta}= \frac{N}{N-k_N+2}\frac{1}{\psi_2k_N}\sum_{i=0}^{N-k_N+1}\bar{\boldsymbol{r}}_i\cdot \bar{\boldsymbol{r}}'_i
-}
-}
-\examples{
-\dontrun{
-library("xts")
-# Note that this ought to be tick-by-tick data and this example is only to show the usage.
-a <- list(as.xts(sampleOneMinuteData[as.Date(DT) == "2001-08-04", list(DT, MARKET)]),
-          as.xts(sampleOneMinuteData[as.Date(DT) == "2001-08-04", list(DT, STOCK)]))
-rMRC(a, pairwise = TRUE, makePsd = TRUE)
-
-}
-}
-\references{
-Hautsch, N., and Podolskij, M. (2013). Preaveraging-based estimation of quadratic variation in the presence of noise and jumps: theory, implementation, and empirical Evidence. \emph{Journal of Business & Economic Statistics}, 31, 165-183.
-}
-\author{
-Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup.
-}
-\keyword{highfrequency}
-\keyword{preaveraging}
