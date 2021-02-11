@@ -166,7 +166,7 @@ with \emph{i.i.d.} zero-mean error term \eqn{\varepsilon_i} and \eqn{c = -0.6351
 \code{periodicvol = "OLS"} employs ordinary-least-squares estimation and 
 \code{periodicvol = "TML"} truncated maximum-likelihood estimation (see Boudt et al., 2011, Section 2.2, for further details).
 
-\strong{Stochastic periodicity method (\code{"stochper"})}
+\strong{Stochastic periodicity method (\code{"stochPer"})}
 
 Parameters:
 \itemize{

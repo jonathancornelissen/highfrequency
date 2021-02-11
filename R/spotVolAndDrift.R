@@ -316,7 +316,7 @@ spotDrift <- function(data, method = "mean", alignBy = "minutes", alignPeriod = 
 #' \code{periodicvol = "OLS"} employs ordinary-least-squares estimation and 
 #' \code{periodicvol = "TML"} truncated maximum-likelihood estimation (see Boudt et al., 2011, Section 2.2, for further details).
 #' 
-#' \strong{Stochastic periodicity method (\code{"stochper"})}
+#' \strong{Stochastic periodicity method (\code{"stochPer"})}
 #' 
 #' Parameters:
 #' \itemize{
@@ -651,7 +651,14 @@ spotVol <- function(data, method = "detPer", alignBy = "minutes", alignPeriod = 
                       marketOpen = "09:30:00", marketClose = "16:00:00",
                       tz = "GMT", ...) {
   
-  PRICE = DATE = RETURN = DT = NULL
+  PRICE <- DATE <- RETURN <- NULL
+  
+  validOptions <- c("detPer", "stochPer", "kernel", "piecewise", "garch", "RM", "PARM")
+  method <- method[1]
+  if(!(method %in% validOptions)){
+    stop(paste("method not a valid option, valid options are:", validOptions))
+  }
+  
   
   if (!("PRICE" %in% colnames(data))) {
     if (dim(data)[2] == 1) {
@@ -698,7 +705,7 @@ spotVol <- function(data, method = "detPer", alignBy = "minutes", alignPeriod = 
   options <- list(...)
   out <- switch(method,
                 detPer = detPer(mR, rData = rData, options = options),
-                stochper = stochPer(mR, rData = rData, options = options),
+                stochPer = stochPer(mR, rData = rData, options = options),
                 kernel = kernelestim(mR, rData = rData, delta, options = options),
                 piecewise = piecewise(mR, rData = rData, options = options),
                 garch = garch_s(mR, rData = rData, options = options),
