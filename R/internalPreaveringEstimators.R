@@ -4,10 +4,6 @@ crv <- function(pData) {
   theta <- 0.8 ##recommendation by Hautsch and Podolskij
   kn <- floor(theta*sqrt(N))
 
-  ##psi:
-  psi1 <- 1
-  psi2 <- 1/12
-
   psi1kn <- kn * sum((gfunction((1:kn)/kn) - gfunction(( (1:kn) - 1 )/kn ) )^2)
 
   psi2kn <- 1 / kn * sum(gfunction((1:kn)/kn)^2)
