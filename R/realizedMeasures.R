@@ -4094,44 +4094,29 @@ rBACov <- function(pData, shares, outStanding, nonEquity, ETFNAME = "ETF",
     noise <- diag(RC2) - noiseRobust
     impliedBeta <- impliedBeta - noise * meanWeights
     NS <- noise/pmax(1, colSums(missingPoints[, -c(1,2)]))
-    
-    for (i in 1:nComps){
-      W[i, ((i-1) * nComps + 1):(nComps * i)] <- meanWeights * exp(NS * 0.25)
-    }
-    
-    for (i in 1:nComps){
-      for (j in 1:nComps){
-        if(i == j & !unrestricted){ # If unrestricted is true, we change the main diagonal too
-          Q[(i-1) * nComps + i, (i-1) * nComps + i] <- 1
-        } else if(j != i) {
-          Q[(i-1) * nComps + j, (j-1) * nComps + i] <- -0.5
-          Q[(i-1) * nComps + j, (i-1) * nComps + j] <- 0.5
-        }
-      }
-    }
-    
-    L <- (diag(nComps^2) - Q) %*% t(W)
-    L <- L %*% (solve(diag(nComps) * sum(meanSquaredWeights * exp(NS * 0.5)) - W %*% Q %*% t(W)))
-    
   } else {
+    NS <- 0
     noise <- numeric(nComps)
-    for (i in 1:nComps){
-      W[i, ((i-1) * nComps + 1):(nComps * i)] <- meanWeights
-    }
-    for (i in 1:nComps){
-      for (j in 1:nComps){
-        if(i == j & !unrestricted){ # If unrestricted is true, we change the main diagonal too
-          Q[(i-1) * nComps + i, (i-1) * nComps + i] <- 1
-        } else if(j != i){
-          Q[(i-1) * nComps + j, (j-1) * nComps + i] <- -0.5
-          Q[(i-1) * nComps + j, (i-1) * nComps + j] <- 0.5
-        }
+  }
+  for (i in 1:nComps){
+    # If noiseCorrection is not TRUE, NS = 0, thus exp(NS * .) = 1 and we can reuse noise and no noise code
+    W[i, ((i-1) * nComps + 1):(nComps * i)] <- meanWeights * exp(NS * 0.25) 
+  }
+    
+  for (i in 1:nComps){
+    for (j in 1:nComps){
+      if(i == j & !unrestricted){ # If unrestricted is true, we change the main diagonal too
+        Q[(i-1) * nComps + i, (i-1) * nComps + i] <- 1
+      } else if(j != i) {
+        Q[(i-1) * nComps + j, (j-1) * nComps + i] <- -0.5
+        Q[(i-1) * nComps + j, (i-1) * nComps + j] <- 0.5
       }
     }
-    L <- (diag(nComps^2) - Q) %*% t(W)
-    L <- L %*% (solve(diag(nComps) * sum(meanSquaredWeights) - W %*% Q %*% t(W)))
-    
   }
+  
+  L <- (diag(nComps^2) - Q) %*% t(W)
+  # If noiseCorrection is not TRUE, NS = 0, thus exp(NS * .) = 1 and we can reuse noise and no noise code
+  L <- L %*% (solve(diag(nComps) * sum(meanSquaredWeights * exp(NS * 0.5)) - W %*% Q %*% t(W)))
   
   if(returnL){
     return(list("BAC" = RC2 - (matrix(L %*% (impliedBeta - targetBeta), ncol = nComps) + diag(noise)), "L" = L))
