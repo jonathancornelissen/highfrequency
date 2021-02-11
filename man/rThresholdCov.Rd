@@ -9,7 +9,8 @@ rThresholdCov(
   cor = FALSE,
   alignBy = NULL,
   alignPeriod = NULL,
-  makeReturns = FALSE
+  makeReturns = FALSE,
+  ...
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ based on a 5-minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "m
 
 \item{makeReturns}{boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. 
 \code{FALSE} by default.}
+
+\item{...}{used internally, do not change.}
 }
 \value{
 in case the input is and contains data from one day, an \eqn{N \times N} matrix is returned. If the data is a univariate \code{xts} object with multiple days, an \code{xts} is returned.

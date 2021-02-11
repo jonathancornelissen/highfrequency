@@ -12,7 +12,8 @@ rKernelCov(
   makeReturns = FALSE,
   kernelType = "rectangular",
   kernelParam = 1,
-  kernelDOFadj = TRUE
+  kernelDOFadj = TRUE,
+  ...
 )
 }
 \arguments{
@@ -34,6 +35,8 @@ For example, to aggregate based on a 5-minute frequency, set \code{alignPeriod} 
 \item{kernelParam}{Kernel parameter.}
 
 \item{kernelDOFadj}{Kernel degree of freedom adjustment.}
+
+\item{...}{used internally, do not change.}
 }
 \value{
 in case the input is and contains data from one day, an \eqn{N} by \eqn{N} matrix is returned. 

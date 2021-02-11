@@ -33,9 +33,9 @@ Calculate the rTPQuar, defined in Andersen et al. (2012).
  }
 }
 \examples{
-tpv <- rTPQuar(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes",
+tpq <- rTPQuar(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes",
               alignPeriod = 5, makeReturns = TRUE)
-tpv
+tpq
 
 }
 \references{

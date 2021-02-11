@@ -6,8 +6,8 @@
 \usage{
 rCholCov(
   pData,
-  IVest = "rMRC",
-  COVest = "rMRC",
+  IVest = "rMRCov",
+  COVest = "rMRCov",
   criterion = "squared duration",
   ...
 )
@@ -16,9 +16,9 @@ rCholCov(
 \item{pData}{a list. Each list-item i contains an \code{xts} object with the intraday price data
 of stock \eqn{i} for day \eqn{t}. The order of the data does not matter as it will be sorted according to the criterion specified in the \code{criterion} argument}
 
-\item{IVest}{integrated variance estimator, default is \code{"rMRC"}. For a list of implemented estimators, use \code{listCholCovEstimators()}.}
+\item{IVest}{integrated variance estimator, default is \code{"rMRCov"}. For a list of implemented estimators, use \code{listCholCovEstimators()}.}
 
-\item{COVest}{covariance estimator, default is \code{"rMRC"}. For a list of implemented estimators, use \code{listCholCovEstimators()}.}
+\item{COVest}{covariance estimator, default is \code{"rMRCov"}. For a list of implemented estimators, use \code{listCholCovEstimators()}.}
 
 \item{criterion}{criterion to use for sorting the data according to liquidity. 
 Possible values are \code{"squared duration"}, \code{"duration"}, \code{"count"}, defaults to \code{"squared duration"}.}
@@ -35,7 +35,7 @@ This is done in order of liquidity, which means that the algorithm uses more dat
 }
 \details{
 Additional arguments for \code{IVest} and \code{COVest} should be passed in the ... argument.
-For the \code{rMRC} estimator, which is the default, the \code{theta} and \code{delta} parameters can be set. These default to 1 and 0.1 respectively.
+For the \code{rMRCov} estimator, which is the default, the \code{theta} and \code{delta} parameters can be set. These default to 1 and 0.1 respectively.
 
 The CholCov estimation algorithm is useful for estimating covariances of \eqn{d} series that are sampled asynchronously and with different liquidities.
 The CholCov estimation algorithm is as follows:

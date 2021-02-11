@@ -13,7 +13,8 @@ rTSCov(
   JCov = NULL,
   KVar = NULL,
   JVar = NULL,
-  makePsd = FALSE
+  makePsd = FALSE,
+  ...
 )
 }
 \arguments{
@@ -35,6 +36,8 @@ of stock \eqn{i} for day \eqn{t}.}
 \item{JVar}{vector of positive integers, for the diagonal variance elements the fast time scale returns are computed on prices that are \code{J} steps apart.}
 
 \item{makePsd}{boolean, in case it is \code{TRUE}, the positive definite version of \code{rTSCov} is returned. \code{FALSE} by default.}
+
+\item{...}{used internally, do not change.}
 }
 \value{
 in case the input is and contains data from one day, an N by N matrix is returned. If the data is a univariate \code{xts} object with multiple days, an \code{xts} is returned.
