@@ -1691,7 +1691,7 @@ quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
     qDataRaw <- exchangeHoursOnly(qDataRaw, marketOpen = marketOpen, marketClose = marketClose, tz = tz)
     REPORT[3] <- dim(qDataRaw)[1] 
     if("EX" %in% nm){
-      if(exchanges != "auto"){
+      if(all(exchanges != "auto")){
         qDataRaw <- qDataRaw[EX %in% exchanges]
       } else if (exchanges == "auto"){
         qDataRaw <- qDataRaw[, autoSelectExchangeQuotes(.SD, printExchange = printExchange), .SDcols = nm,by = list(SYMBOL, DATE = as.Date(DT, tz = tz))][, nm, with = FALSE]
@@ -2365,7 +2365,7 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
     tDataRaw <- exchangeHoursOnly(tDataRaw, marketOpen = marketOpen, marketClose = marketClose, tz = tz)
     REPORT[3] <- dim(tDataRaw)[1]
     if("EX" %in% nm){
-      if(exchanges != "auto"){
+      if(all(exchanges != "auto")){
         tDataRaw <- tDataRaw[EX %in% exchanges]
       } else if (exchanges == "auto"){
         tDataRaw <- tDataRaw[, autoSelectExchangeTrades(.SD, printExchange = printExchange), .SDcols = nm,by = list(SYMBOL, DATE = as.Date(DT, tz = tz))][, nm, with = FALSE]
