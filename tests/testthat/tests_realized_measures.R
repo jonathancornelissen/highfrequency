@@ -110,16 +110,16 @@ test_that("rMinRQ", {
   
 })
 
-##### rMRC #####  
-context("rMRC")
-test_that("rMRC", {
+##### rMRCov #####  
+context("rMRCov")
+test_that("rMRCov", {
   expect_equal({
-    formatC(sum(rMRC(list(as.xts(sampleOneMinuteData)["2001-08-04","MARKET"], as.xts(sampleOneMinuteData)["2001-08-04","STOCK"]), pairwise = TRUE, makePsd = TRUE)), digits = 5)
+    formatC(sum(rMRCov(list(as.xts(sampleOneMinuteData)["2001-08-04","MARKET"], as.xts(sampleOneMinuteData)["2001-08-04","STOCK"]), pairwise = TRUE, makePsd = TRUE)), digits = 5)
   },
   "0.00061674"
   )
   expect_equal({
-    formatC(sum(rMRC(list(as.xts(sampleOneMinuteData)["2001-08-04","MARKET"], as.xts(sampleOneMinuteData)["2001-08-04","STOCK"]), pairwise = FALSE, makePsd = TRUE)), digits = 5)
+    formatC(sum(rMRCov(list(as.xts(sampleOneMinuteData)["2001-08-04","MARKET"], as.xts(sampleOneMinuteData)["2001-08-04","STOCK"]), pairwise = FALSE, makePsd = TRUE)), digits = 5)
   },
   "0.00065676"
   )
@@ -197,8 +197,8 @@ test_that("rHYCov gives correct results", {
   
   hy <- rHYCov(rData = as.xts(sampleOneMinuteData)["2001-08-05"],
               period = 5, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)
-  expect_equal(hy, matrix(c(0.0003357899, 0.0001639014,
-                      0.0001639014, 0.0002582371), ncol = 2))
+  expect_equal(hy, matrix(c(0.0003355498, 0.0001639014,
+                            0.0001639014, 0.0002603934), ncol = 2))
   
 })
 
@@ -606,5 +606,129 @@ test_that("ReMeDI asymptotic variance gives same result as Merrick Li's code", {
   expected <- c(2.637164e-12, 1.613527e-12, 1.057763e-12, 6.532975e-13, 4.462853e-13, 3.568027e-13, 2.155630e-13, 
                 2.985189e-13, 1.176854e-13, 6.341883e-14, 7.769585e-16)
   expect_equal(avar$asympVar, expected)
+  
+})
+
+
+#### rBAC ####
+context("rBAC")
+test_that("rBAC returns correct values", {
+  set.seed(123)
+  iT <- 23400
+  
+  rets <- mvtnorm::rmvnorm(iT * 3 + 1, mean = rep(0,4), 
+                           sigma = matrix(c(0.1, -0.03 , 0.02, 0.04,
+                                            -0.03, 0.05, -0.03, 0.02,
+                                            0.02, -0.03, 0.05, -0.03,  
+                                            0.04, 0.02, -0.03, 0.08), ncol = 4))
+  w1 <- rets[sort(sample(1:nrow(rets), size = nrow(rets) * 0.5)), 1]
+  w2 <- rets[sort(sample(1:nrow(rets), size = nrow(rets) * 0.75)), 2]
+  w3 <- rets[sort(sample(1:nrow(rets), size = nrow(rets) * 0.65)), 3]
+  w4 <- rets[sort(sample(1:nrow(rets), size = nrow(rets) * 0.8)), 4]
+  w5 <- rnorm(nrow(rets) * 0.9, mean = 0, sd = 0.005)
+  
+  timestamps1 <- cumsum(abs(rnorm(length(w1) - 1)))
+  disturbance <- runif(1)
+  timestamps1 <- c(34200, 34200 + (timestamps1 - timestamps1[1] + disturbance)/(timestamps1[length(timestamps1)] + 2 * disturbance - timestamps1[1]) * (57600  - 34200))
+  
+  disturbance <- runif(1)
+  timestamps2 <- cumsum(abs(rnorm(length(w2) - 1)))
+  timestamps2 <- c(34200 ,34200 + (timestamps2 - timestamps2[1] + disturbance)/(timestamps2[length(timestamps2)] + 2 * disturbance- timestamps2[1]) * (57600  - 34200))
+  
+  disturbance <- runif(1)
+  timestamps3 <- cumsum(abs(rnorm(length(w3) - 1)))
+  timestamps3 <- c(34200, 34200 + (timestamps3 - timestamps3[1] + disturbance)/(timestamps3[length(timestamps3)] + 2 * disturbance - timestamps3[1]) * (57600  - 34200))
+  
+  disturbance <- runif(1)
+  timestamps4 <- cumsum(abs(rnorm(length(w4) - 1)))
+  timestamps4 <- c(34200, 34200 + (timestamps4 - timestamps4[1] + disturbance)/(timestamps4[length(timestamps4)] + 2 * disturbance - timestamps4[1]) * (57600  - 34200))
+  
+  disturbance <- runif(1)
+  timestamps5 <- cumsum(abs(rnorm(length(w5))))
+  timestamps5 <- 34200 + (timestamps5 - timestamps5[1] + disturbance)/(timestamps5[length(timestamps5)] + 2 * disturbance - timestamps5[1]) * (57600  - 34200)
+  
+  w1 <- xts(w1 * c(1,sqrt(diff(timestamps1) / (max(timestamps1) - min(timestamps1)))), as.POSIXct(timestamps1, origin = "1970-01-01"), tz = "UTC")
+  w2 <- xts(w2 * c(1,sqrt(diff(timestamps2) / (max(timestamps2) - min(timestamps2)))), as.POSIXct(timestamps2, origin = "1970-01-01"), tz = "UTC")
+  w3 <- xts(w3 * c(1,sqrt(diff(timestamps3) / (max(timestamps3) - min(timestamps3)))), as.POSIXct(timestamps3, origin = "1970-01-01"), tz = "UTC")
+  w4 <- xts(w4 * c(1,sqrt(diff(timestamps4) / (max(timestamps4) - min(timestamps4)))), as.POSIXct(timestamps4, origin = "1970-01-01"), tz = "UTC")
+  w5 <- xts(w5 * c(1,sqrt(diff(timestamps5) / (max(timestamps5) - min(timestamps5)))), as.POSIXct(timestamps5, origin = "1970-01-01"), tz = "UTC")
+  
+  
+  p1  <- cumsum(w1)
+  p2  <- cumsum(w2)
+  p3  <- cumsum(w3)
+  p4  <- cumsum(w4)
+  
+  
+  weights <- runif(4) * 1:4
+  weights <- weights / sum(weights)
+  p5 <- xts(rowSums(cbind(w1 * weights[1], w2 * weights[2], w3 * weights[3], w4 * weights[4]), na.rm = TRUE), index(cbind(p1, p2, p3, p4)))
+  p5 <- xts(cumsum(rowSums(cbind(p5, w5), na.rm = TRUE)), index(cbind(p5, w5)))
+  
+  p5 <- p5[sort(sample(1:length(p5), size = nrow(rets) * 0.9))]
+  p1 <- p1[-1]
+  p2 <- p2[-1]
+  p3 <- p3[-1]
+  p4 <- p4[-1]
+  p5 <- p5[-1]
+  
+  lDT <- lapply(list("ETF" = p5, "STOCK 1" = p1, "STOCK 2" = p2, "STOCK 3" = p3, "STOCK 4" = p4),
+         function(x){
+           x <- as.data.table(exp(x))
+           setnames(x, "index","DT")
+           return(x)
+         })
+  BAC <- rBACov(lDT, shares = 1:4, outStanding = 1, nonEquity = 0, ETFNAME = "ETF", unrestricted = FALSE,
+              preEstimator = rCov, noiseCorrection = FALSE, returnL = FALSE, K = 2, J = 1)
+  expect_equal(
+  matrix(c(0.098589281, -0.002606114, -0.006960383, -0.01323153, -0.002606114, 0.050470789, 
+           -0.005729020, -0.01868274, -0.006960383, -0.005729020, 0.050596758, -0.04860079, 
+           -0.013231527, -0.018682744, -0.048600791, 0.08091408), ncol = 4),
+  BAC
+  )
+  
+  
+  
+  
+  unrestrictedBAC <- rBACov(lDT, shares = 1:4, outStanding = 1, nonEquity = 0, ETFNAME = "ETF", unrestricted = TRUE, 
+                          preEstimator = rCov, noiseCorrection = FALSE, returnL = FALSE, K = 2, J = 1)
+
+  expect_equal(
+    matrix(c(0.095798183, -0.004477446, -0.008222493, -0.009909461, -0.004477446, 0.046707724, -0.008796183, -0.012393680, 
+             -0.008222493, -0.008796183, 0.032547848, -0.025785512, -0.009909461, -0.012393680, -0.025785512, 0.049417920), ncol = 4),
+    unrestrictedBAC
+  )
+  
+  
+  noisyBAC <- rBACov(lDT, shares = 1:4, outStanding = 1, nonEquity = 0, ETFNAME = "ETF", unrestricted = FALSE,
+                   preEstimator = rCov, noiseCorrection = TRUE, returnL = FALSE, K = 2, J = 1)
+  
+  expect_equal(
+  matrix(c(0.097813865, -0.002504853, -0.007216331, -0.01278663, -0.002504853, 0.051074266, -0.006576877, -0.01806634, -0.007216331, 
+           -0.006576877, 0.051487980, -0.04902462, -0.012786633, -0.018066344, -0.049024618, 0.08089841), ncol = 4),
+  noisyBAC
+  )
+  
+  unrestrictedNoisyBAC <- rBACov(lDT, shares = 1:4, outStanding = 1, nonEquity = 0, ETFNAME = "ETF", unrestricted = TRUE,
+                               preEstimator = rCov, noiseCorrection = TRUE, returnL = FALSE, K = 2, J = 1)
+  
+  expect_equal(
+    matrix(c(0.095077601, -0.004441949, -0.008181313, -0.009783992,
+    -0.004441949,  0.047229958, -0.009032561, -0.012416212,
+    -0.008181313, -0.009032561,  0.032806152, -0.025953141,
+    -0.009783992, -0.012416212, -0.025953141,  0.049586042), ncol = 4),
+    unrestrictedNoisyBAC
+  )
+  
+  varianceAdjustedBAC <- rBACov(lDT, shares = 1:4, outStanding = 1, nonEquity = 0, ETFNAME = "ETF", unrestricted = FALSE, targetBeta = "VAB",
+                      preEstimator = rCov, noiseCorrection = FALSE, returnL = FALSE, K = 2, J = 1)
+  expect_equal(
+  matrix(c(
+    0.09858928, -0.002640660, -0.008127390, -0.01333734,
+    -0.00264066,  0.050470789, -0.008125928, -0.01892530,
+    -0.00812739, -0.008125928,  0.050596758, -0.05311512,
+    -0.01333734, -0.018925299, -0.053115115,  0.08091408
+    ), ncol = 4),
+  varianceAdjustedBAC)
   
 })

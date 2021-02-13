@@ -10,7 +10,8 @@ rBPCov(
   alignBy = NULL,
   alignPeriod = NULL,
   makeReturns = FALSE,
-  makePsd = FALSE
+  makePsd = FALSE,
+  ...
 )
 }
 \arguments{
@@ -26,6 +27,8 @@ based on a 5-minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to
 \item{makeReturns}{boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.}
 
 \item{makePsd}{boolean, in case it is \code{TRUE}, the positive definite version of rBPCov is returned. \code{FALSE} by default.}
+
+\item{...}{used internally, do not change.}
 }
 \value{
 in case the input is and contains data from one day, an \eqn{N} by \eqn{N} matrix is returned. If the data is a univariate \code{xts} object with multiple days, an \code{xts} is returned.

@@ -16,7 +16,8 @@ rRTSCov(
   KVar = NULL,
   JVar = NULL,
   eta = 9,
-  makePsd = FALSE
+  makePsd = FALSE,
+  ...
 )
 }
 \arguments{
@@ -45,6 +46,8 @@ of stock \eqn{i} for day \eqn{t}.}
 
 \item{makePsd}{boolean, in case it is \code{TRUE}, the positive definite version of rRTSCov is returned. 
 \code{FALSE} by default.}
+
+\item{...}{used internally, do not change.}
 }
 \value{
 an \eqn{N \times N} matrix

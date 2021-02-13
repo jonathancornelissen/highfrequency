@@ -42,7 +42,7 @@ test_that("spotVol", {
                delta_c = c(-0.6, 2, 1, -3, 1),
                delta_s = c(0.7, -3, 1.4, -2, 1.7))
   expect_identical(
-    formatC(as.numeric(spotVol(sampleOneMinuteData[1:1173, list(DT, PRICE = MARKET)], method = "stochper", init = init, control = list(trace = as.integer(interactive())))$spot[1:10]), digits = 3),
+    formatC(as.numeric(spotVol(sampleOneMinuteData[1:1173, list(DT, PRICE = MARKET)], method = "stochPer", init = init, control = list(trace = as.integer(interactive())))$spot[1:10]), digits = 3),
     c("0.0016", "0.00161", "0.00163", "0.00164", "0.00167", "0.00169", "0.00171", "0.00174", "0.00176", "0.00178")
   )
   

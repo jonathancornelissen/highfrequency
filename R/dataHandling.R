@@ -1691,7 +1691,7 @@ quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
     qDataRaw <- exchangeHoursOnly(qDataRaw, marketOpen = marketOpen, marketClose = marketClose, tz = tz)
     REPORT[3] <- dim(qDataRaw)[1] 
     if("EX" %in% nm){
-      if(exchanges != "auto"){
+      if(all(exchanges != "auto")){
         qDataRaw <- qDataRaw[EX %in% exchanges]
       } else if (exchanges == "auto"){
         qDataRaw <- qDataRaw[, autoSelectExchangeQuotes(.SD, printExchange = printExchange), .SDcols = nm,by = list(SYMBOL, DATE = as.Date(DT, tz = tz))][, nm, with = FALSE]
@@ -2365,7 +2365,7 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
     tDataRaw <- exchangeHoursOnly(tDataRaw, marketOpen = marketOpen, marketClose = marketClose, tz = tz)
     REPORT[3] <- dim(tDataRaw)[1]
     if("EX" %in% nm){
-      if(exchanges != "auto"){
+      if(all(exchanges != "auto")){
         tDataRaw <- tDataRaw[EX %in% exchanges]
       } else if (exchanges == "auto"){
         tDataRaw <- tDataRaw[, autoSelectExchangeTrades(.SD, printExchange = printExchange), .SDcols = nm,by = list(SYMBOL, DATE = as.Date(DT, tz = tz))][, nm, with = FALSE]
@@ -2636,7 +2636,7 @@ refreshTime <- function (pData, sort = FALSE, criterion = "squared duration") {
     }
     
     
-    temp <- refreshTimeMathing(coredata(temp), index(temp))
+    temp <- refreshTimeMatching(coredata(temp), index(temp))
     temp <- xts(temp[[1]], order.by = as.POSIXct(temp[[2]], tz = tz_, origin = as.POSIXct("1970-01-01", tz = tz_)))
     names(temp) <- nameVec # Set names 
     return(temp)
@@ -2683,7 +2683,7 @@ refreshTime <- function (pData, sort = FALSE, criterion = "squared duration") {
     
     pData <- Reduce(function(x,y) merge.data.table(x, y, all = TRUE, on = "DT"), pData)
     
-    pData <- refreshTimeMathing(as.matrix(pData[,-"DT"]), pData$DT)
+    pData <- refreshTimeMatching(as.matrix(pData[,-"DT"]), pData$DT)
     pData <- data.table(pData[[2]], pData[[1]])
     colnames(pData) <- c("DT", names)
     pData[, DT := as.POSIXct(DT, origin = as.POSIXct("1970-01-01", tz = tz), tz = tz)]

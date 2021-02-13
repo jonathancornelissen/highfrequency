@@ -126,15 +126,15 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// refreshTimeMathing
-Rcpp::List refreshTimeMathing(const arma::mat& x, arma::vec& idx);
-RcppExport SEXP _highfrequency_refreshTimeMathing(SEXP xSEXP, SEXP idxSEXP) {
+// refreshTimeMatching
+Rcpp::List refreshTimeMatching(const arma::mat& x, arma::vec& idx);
+RcppExport SEXP _highfrequency_refreshTimeMatching(SEXP xSEXP, SEXP idxSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< const arma::mat& >::type x(xSEXP);
     Rcpp::traits::input_parameter< arma::vec& >::type idx(idxSEXP);
-    rcpp_result_gen = Rcpp::wrap(refreshTimeMathing(x, idx));
+    rcpp_result_gen = Rcpp::wrap(refreshTimeMatching(x, idx));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -362,6 +362,34 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// bacImpliedBetaCpp
+arma::rowvec bacImpliedBetaCpp(const arma::mat& components, const arma::mat& missings, const arma::mat& componentWeights);
+RcppExport SEXP _highfrequency_bacImpliedBetaCpp(SEXP componentsSEXP, SEXP missingsSEXP, SEXP componentWeightsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::mat& >::type components(componentsSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type missings(missingsSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type componentWeights(componentWeightsSEXP);
+    rcpp_result_gen = Rcpp::wrap(bacImpliedBetaCpp(components, missings, componentWeights));
+    return rcpp_result_gen;
+END_RCPP
+}
+// bacHY
+double bacHY(const arma::colvec& component, const arma::colvec& ETF, const arma::uvec& missingComponent, const arma::uvec& missingETF, const arma::colvec& componentWeightings);
+RcppExport SEXP _highfrequency_bacHY(SEXP componentSEXP, SEXP ETFSEXP, SEXP missingComponentSEXP, SEXP missingETFSEXP, SEXP componentWeightingsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::colvec& >::type component(componentSEXP);
+    Rcpp::traits::input_parameter< const arma::colvec& >::type ETF(ETFSEXP);
+    Rcpp::traits::input_parameter< const arma::uvec& >::type missingComponent(missingComponentSEXP);
+    Rcpp::traits::input_parameter< const arma::uvec& >::type missingETF(missingETFSEXP);
+    Rcpp::traits::input_parameter< const arma::colvec& >::type componentWeightings(componentWeightingsSEXP);
+    rcpp_result_gen = Rcpp::wrap(bacHY(component, ETF, missingComponent, missingETF, componentWeightings));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_highfrequency_har_agg", (DL_FUNC) &_highfrequency_har_agg, 3},
@@ -373,7 +401,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_highfrequency_DriftBurstLoopC", (DL_FUNC) &_highfrequency_DriftBurstLoopC, 8},
     {"_highfrequency_DriftBurstLoopCPAR", (DL_FUNC) &_highfrequency_DriftBurstLoopCPAR, 9},
     {"_highfrequency_colCumsum", (DL_FUNC) &_highfrequency_colCumsum, 1},
-    {"_highfrequency_refreshTimeMathing", (DL_FUNC) &_highfrequency_refreshTimeMathing, 2},
+    {"_highfrequency_refreshTimeMatching", (DL_FUNC) &_highfrequency_refreshTimeMatching, 2},
     {"_highfrequency_preAveragingReturnsInternal", (DL_FUNC) &_highfrequency_preAveragingReturnsInternal, 2},
     {"_highfrequency_findFirst", (DL_FUNC) &_highfrequency_findFirst, 2},
     {"_highfrequency_overlap", (DL_FUNC) &_highfrequency_overlap, 4},
@@ -390,6 +418,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_highfrequency_kernelEstimator", (DL_FUNC) &_highfrequency_kernelEstimator, 8},
     {"_highfrequency_rv", (DL_FUNC) &_highfrequency_rv, 7},
     {"_highfrequency_pcovcc", (DL_FUNC) &_highfrequency_pcovcc, 10},
+    {"_highfrequency_bacImpliedBetaCpp", (DL_FUNC) &_highfrequency_bacImpliedBetaCpp, 3},
+    {"_highfrequency_bacHY", (DL_FUNC) &_highfrequency_bacHY, 5},
     {NULL, NULL, 0}
 };
 

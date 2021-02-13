@@ -620,16 +620,17 @@ TSRV <- function(pData , K = 300 , J = 1) {
   nbarK <- (n - K + 1)/(K) # average number of obs in 1 K-grid
   nbarJ <- (n - J + 1)/(J)
   adj <- (1 - (nbarK/nbarJ))^-1 
-  logreturns_K = logreturns_J = c()
+  logreturns_K <- 0
+  logreturns_J <- 0
   for (k in 1:K) {
-    sel <- seq(k,n,K)  
-    logreturns_K <- c(logreturns_K, diff( logprices[sel]))
+    sel <- seq(k,n,K)
+    logreturns_K <- logreturns_K + sum(diff(logprices[sel])^2)
   }
   for (j in 1:J) {
     sel <-  seq(j,n,J)
-    logreturns_J <- c(logreturns_J, diff( logprices[sel]))
+    logreturns_J <- logreturns_J + sum(diff( logprices[sel])^2)
   }
-  TSRV <- adj * ( (1/K) * sum(logreturns_K^2) - ((nbarK/nbarJ) * (1/J) * sum(logreturns_J^2)))
+  TSRV <- adj * ( (1/K) * logreturns_K - ((nbarK/nbarJ) * (1/J) * logreturns_J))
   return(TSRV)
 }
 
@@ -654,7 +655,7 @@ zgamma <- function (x, y, gamma_power) {
 
 
 #' @keywords internal
-cholCovrMRC <- function(returns, delta = 0.1, theta = 1){
+cholCovrMRCov <- function(returns, delta = 0.1, theta = 1){
   
   nObs <- nrow(returns) + 1 
   kn <- floor(theta * nObs ^(1/2 + delta))
@@ -664,7 +665,6 @@ cholCovrMRC <- function(returns, delta = 0.1, theta = 1){
   x <- (1:(kn-1)) / kn
   x[x > (1-x)] <- (1-x)[x > (1-x)]
   
-  psi1 <- kn * sum((gfunction((1:kn)/kn) - gfunction(((1:kn) - 1 )/kn))^2)
   
   psi2 <- mean(c(0,x,0)^2)
   #psi <- (t(returns) %*% returns) / (2 * nObs)
@@ -685,4 +685,6 @@ flat <- function(kn , err, errMax, size, tol ){
     return(NA)
   }
 }
+
+
 

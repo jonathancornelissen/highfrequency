@@ -4,7 +4,7 @@
 \alias{rMedRV}
 \title{rMedRV}
 \usage{
-rMedRV(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE)
+rMedRV(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, ...)
 }
 \arguments{
 \item{rData}{an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days}
@@ -15,6 +15,8 @@ rMedRV(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE)
 based on a 5-minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.}
 
 \item{makeReturns}{boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.}
+
+\item{...}{used internally, do not change.}
 }
 \value{
 \itemize{

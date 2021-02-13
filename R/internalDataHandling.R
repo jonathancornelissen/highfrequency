@@ -170,9 +170,6 @@ fastTickAgregation_DATA.TABLE_RETURNS <- function(dat, alignBy = "minutes", alig
 
 
 
-# # Necessary for check-package not throwing errors
-# #' @keywords internal
-# ..keepCols <- NULL
 # Necessary for check-package not throwing errors
 #' @keywords internal
 `:=` <- function(...) {

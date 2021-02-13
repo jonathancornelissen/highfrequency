@@ -20,7 +20,7 @@ arma::mat colCumsum(const arma::mat& x) {
 
 //' @keywords internal
 // [[Rcpp::export]]
-Rcpp::List refreshTimeMathing(const arma::mat& x, arma::vec& idx) {
+Rcpp::List refreshTimeMatching(const arma::mat& x, arma::vec& idx) {
   
   const uword N = x.n_rows;
   const uword D = x.n_cols;

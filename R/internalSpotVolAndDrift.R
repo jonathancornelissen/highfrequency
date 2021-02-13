@@ -127,9 +127,10 @@ detPer <- function(mR, rData = NULL, options = list()) {
     }
   }
   if (cDays <= 50) {
-    print("Periodicity estimation requires at least 50 observations.\nPeriodic component set to unity")
-    estimperiodicvol = rep(1, M)
-  } else {
+    warning("Periodicity estimation is unstable when the sample data contains less than 50 days. The quality of results may vary")
+    # estimperiodicvol = rep(1, M)
+  } 
+  # else {
     mstdR <- mR/sqrt(as.numeric(estimdailyvol) * (1/M))
     selection <- c(1:M)[ (nrow(mR)-apply(mR,2,'countzeroes')) >=20]
     # preferably no na is between
@@ -158,7 +159,7 @@ detPer <- function(mR, rData = NULL, options = list()) {
     out <- list(spot = spot, daily = estimdailyvol, periodic = estimperiodicvol)
     class(out) <- "spotVol"
     return(out)
-  }
+  # }
 }
 
 # Stochastic periodicity model

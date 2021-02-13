@@ -42,8 +42,8 @@ colCumsum <- function(x) {
 }
 
 #' @keywords internal
-refreshTimeMathing <- function(x, idx) {
-    .Call(`_highfrequency_refreshTimeMathing`, x, idx)
+refreshTimeMatching <- function(x, idx) {
+    .Call(`_highfrequency_refreshTimeMatching`, x, idx)
 }
 
 #' @keywords internal
@@ -109,5 +109,13 @@ rv <- function(a, b, na, period, tmpa, tmpb, tmpna) {
 
 pcovcc <- function(a, ap, b, at, atp, bt, na, nap, nb, period) {
     .Call(`_highfrequency_pcovcc`, a, ap, b, at, atp, bt, na, nap, nb, period)
+}
+
+bacImpliedBetaCpp <- function(components, missings, componentWeights) {
+    .Call(`_highfrequency_bacImpliedBetaCpp`, components, missings, componentWeights)
+}
+
+bacHY <- function(component, ETF, missingComponent, missingETF, componentWeightings) {
+    .Call(`_highfrequency_bacHY`, component, ETF, missingComponent, missingETF, componentWeightings)
 }
 

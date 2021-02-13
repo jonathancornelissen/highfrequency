@@ -10,7 +10,8 @@ rAVGCov(
   alignBy = "minutes",
   alignPeriod = 5,
   k = 1,
-  makeReturns = FALSE
+  makeReturns = FALSE,
+  ...
 )
 }
 \arguments{
@@ -26,6 +27,8 @@ based on a 5-minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "m
 \item{k}{numeric denoting which horizon to use for the subsambles. This can be a fraction as long as \eqn{k} is a divisor of \code{alignPeriod} default is \code{1}.}
 
 \item{makeReturns}{boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.}
+
+\item{...}{used internally, do not change.}
 }
 \value{
 in case the input is and contains data from one day, an \eqn{N} by \eqn{N} matrix is returned. If the data is a univariate \code{xts} object with multiple days, an \code{xts} is returned.

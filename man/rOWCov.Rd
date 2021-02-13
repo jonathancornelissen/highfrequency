@@ -13,7 +13,8 @@ rOWCov(
   seasadjR = NULL,
   wFunction = "HR",
   alphaMCD = 0.75,
-  alpha = 0.001
+  alpha = 0.001,
+  ...
 )
 }
 \arguments{
@@ -49,6 +50,8 @@ the default is 0.75. See Boudt et al. (2008) or the \code{covMcd} function in th
 \item{alpha}{is a parameter between 0 and 0.5,
 that determines the rejection threshold value
 (see Boudt et al. (2008) for details).}
+
+\item{...}{used internally, do not change.}
 }
 \value{
 an \eqn{N \times N} matrix
