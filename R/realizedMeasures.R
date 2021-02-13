@@ -3856,26 +3856,73 @@ ReMeDIAsymptoticVariance <- function(pData, kn, lags, phi, i){
 
 
 
-#' rBAC
+#' rBACov
 #' 
 #' @description 
-#' The proposed Beta Adjusted Covariance (BAC) equals the pre-estimator plus a minimal adjustment matrix such that the covariance-implied stock-ETF beta equals a target beta.
+#' The Beta Adjusted Covariance (BAC) equals the pre-estimator plus a minimal adjustment matrix such that the covariance-implied stock-ETF beta equals a target beta.
 #' 
+#' The BAC estimator works by applying a minimum correction factor to a pre-estimated covariance matrix such that a target beta derived from the ETF is reached.
 #' 
+#' Let 
+#' \deqn{
+#'     \bar{\beta}
+#' } 
+#' denote the implied beta derived from the pre-estimator, and
+#' \deqn{
+#'     \beta_{\bullet}
+#' }
+#' denote the target beta, then the correction factor is calculated as:
+#' 
+#' \deqn{
+#'  L\left(\bar{\beta}-\beta_{\bullet}\right),
+#' }
+#'
+#' where
+#' \deqn{
+#'     L=\left(I_{d^{2}}-\frac{1}{2}{\cal Q}\right)\bar{W}^{\prime}\left(I_{d^{2}}\left(\sum_{k=1}^{d}\frac{\sum_{k=1}^{n_{k}}\left(w_{t_{m-1}^{k}}^{k}\right)^{2}}{n_{k}}\right)-\frac{\bar{W}{\cal Q}\bar{W}^{\prime}}{2}\right)^{-1},
+#' }
+#' where \eqn{d} is the number of assets in the ETF, and \eqn{n_{k}} is the number of trades in the \eqn{k}th asset, and
+#' \deqn{
+#'     \bar{W}^{k}=\left(0_{\left(k-1\right)d}^{\prime},\frac{1}{n_{1}}\sum_{m=1}^{n_{1}}w_{t_{m-1}^{1}}^{1},\dots,\frac{1}{n_{d}}\sum_{m=1}^{n_{d}}w_{t_{m-1}^{d}}^{d},0_{\left(d-k\right)d}^{\prime}\right),
+#' }
+#' where \eqn{w_{t_{m-1}^{k}}^{k}} is the weight of the \eqn{k}th asset in the ETF. 
+#' 
+#' and 
+#' \deqn{
+#'      {\cal Q}^{\left(i-1\right)d+j}
+#' } 
+#' is defined by the following two cases:
+#' 
+#' \eqn{
+#'     \left(0_{\left(i-1\right)d+j-1}^{\prime},1,0_{\left(d-i+1\right)d-j}^{\prime}\right)+\left(0_{\left(j-1\right)d+i-1}^{\prime},-1,0_{\left(d-j+1\right)d-i}^{\prime}\right) \quad \textrm{if }i\neq j;
+#' }
+#'  
+#' \eqn{
+#'     0_{d^{2}}^{\prime} \quad \textrm{otherwise}.
+#' }
+#' 
+#' \eqn{\bar{W}^k} has dimensions \eqn{d \times d^2} and \eqn{{\cal Q}^{\left(i-1\right)d+j}} has dimensions \eqn{d^2 \times d^2}.
+#' 
+#' The Beta-Adjusted Covariance is then 
+#' \deqn{
+#' \Sigma^{\textrm{BAC}} = \Sigma - L\left(\bar{\beta}-\beta_{\bullet}\right),
+#' }
+#' 
+#' where \eqn{\Sigma} is the pre-estimated covariance matrix.
 #' 
 #' @param pData a named list. Each list-item contains an \code{xts} or \code{data.table} object with the intraday price data of an ETF and it's component stocks. \code{xts} objects are turned into \code{data.table}s
 #' @param shares a \code{numeric} with length corresponding to the number of component stocks in the ETF. The entries are the stock holdings of the ETF in the corresponding stock.
 #' @param outStanding number of shares outstanding of the ETF
 #' @param nonEquity aggregated value of the additional components (like cash, money-market funds, bonds, etc.) of the ETF which are not included in the components in \code{pData}.
 #' @param ETFNAME a \code{character} denoting which entry in the \code{pData} list is the ETF. Default is \code{"ETF"}
-#' @param unrestricted a \code{logical} denoting whether to use the unrestricted estimator, which also affects the diagonal. Default is \code{FALSE}
+#' @param unrestricted a \code{logical} denoting whether to use the unrestricted estimator, which is an extension that also affects the diagonal. Default is \code{FALSE}
 #' @param targetBeta a \code{character}, one of \code{c("HY", "VAB", "expert")} (default) denoting which target beta to use, only the first entry will be used. A value \code{"HY"} means using the Hayashi-Yoshida estimator to estimate the
 #' empirical beta. A value of \code{"VAB"} denotes using the variance adjusted beta. A value of \code{"expert"} denotes using a user-supplied target beta, which can be supplied in the \code{expertBeta} argument.
 #' @param expertBeta a \code{numeric} containing the user supplied expert beta used when \code{targetBeta} is \code{"expert"}. The \code{expertBeta} must be of length equal to the number of assets in the ETF. Default is \code{NULL} 
 #' @param preEstimator a \code{function} which estimates the integrated covariance matrix. Default is \code{\link{rCov}}
 #' @param noiseRobustEstimator a \code{function} which estimates the integrated (co)variance and is robust to microstructure noise (only the diagonal will be estimated).
 #'  This function is only used when \code{noiseCorrection} is \code{TRUE}. Default is \code{\link{rTSCov}}
-#' @param noiseCorrection a \code{logical} which denotes whether to correct for microstructure noise by using the \code{noiseRobustEstimator} function. Default is \code{FALSE}
+#' @param noiseCorrection a \code{logical} which denotes whether to use the extension of the estimator which corrects for microstructure noise by using the \code{noiseRobustEstimator} function. Default is \code{FALSE}
 #' @param returnL a \code{logical} which denotes whether to return the \code{L} matrix. Default is \code{FALSE}
 #' @param ... extra arguments passed to \code{preEstimator} and \code{noiseRobustEstimator}.
 #' 
@@ -3907,15 +3954,15 @@ ReMeDIAsymptoticVariance <- function(pData, kn, lags, phi, i){
 #' timestamps5 <- seq(34200, 57600, length.out = length(w5))
 #' 
 #' w1 <- xts(w1 * c(0,sqrt(diff(timestamps1) / (max(timestamps1) - min(timestamps1)))),
-#'           as.POSIXct(timestamps1, origin = "1970-01-01"), tz = "UTC")
+#'           as.POSIXct(timestamps1, origin = "1970-01-01"), tzone = "UTC")
 #' w2 <- xts(w2 * c(0,sqrt(diff(timestamps2) / (max(timestamps2) - min(timestamps2)))),
-#'           as.POSIXct(timestamps2, origin = "1970-01-01"), tz = "UTC")
+#'           as.POSIXct(timestamps2, origin = "1970-01-01"), tzone = "UTC")
 #' w3 <- xts(w3 * c(0,sqrt(diff(timestamps3) / (max(timestamps3) - min(timestamps3)))),
-#'           as.POSIXct(timestamps3, origin = "1970-01-01"), tz = "UTC")
+#'           as.POSIXct(timestamps3, origin = "1970-01-01"), tzone = "UTC")
 #' w4 <- xts(w4 * c(0,sqrt(diff(timestamps4) / (max(timestamps4) - min(timestamps4)))),
-#'           as.POSIXct(timestamps4, origin = "1970-01-01"), tz = "UTC")
+#'           as.POSIXct(timestamps4, origin = "1970-01-01"), tzone = "UTC")
 #' w5 <- xts(w5 * c(0,sqrt(diff(timestamps5) / (max(timestamps5) - min(timestamps5)))),
-#'           as.POSIXct(timestamps5, origin = "1970-01-01"), tz = "UTC")
+#'           as.POSIXct(timestamps5, origin = "1970-01-01"), tzone = "UTC")
 #' 
 #' p1  <- exp(cumsum(w1))
 #' p2  <- exp(cumsum(w2))
@@ -3932,15 +3979,33 @@ ReMeDIAsymptoticVariance <- function(pData, kn, lags, phi, i){
 #' p5 <- exp(p5[sort(sample(1:length(p5), size = nrow(rets) * 0.9))])
 #' 
 #' 
-#' BAC_Delta <- rBACov(pData = list(
+#' BAC <- rBACov(pData = list(
 #'                      "ETF" = p5, "STOCK 1" = p1, "STOCK 2" = p2, "STOCK 3" = p3, "STOCK 4" = p4
 #'                    ), shares = 1:4, outStanding = 1, nonEquity = 0, ETFNAME = "ETF", 
 #'                    unrestricted = FALSE, preEstimator = rCov, noiseCorrection = FALSE, 
 #'                    returnL = FALSE, K = 2, J = 1)
+#' 
+#' # Noise robust version of the estimator
+#' noiseRobustBAC <- rBACov(pData = list(
+#'                      "ETF" = p5, "STOCK 1" = p1, "STOCK 2" = p2, "STOCK 3" = p3, "STOCK 4" = p4
+#'                    ), shares = 1:4, outStanding = 1, nonEquity = 0, ETFNAME = "ETF", 
+#'                    unrestricted = FALSE, preEstimator = rCov, noiseCorrection = TRUE, 
+#'                    noiseRobustEstimator = rHYCov, returnL = FALSE, K = 2, J = 1)
+#'
+#' # Use the Variance Adjusted Beta method
+#' # Also use a different pre-estimator.
+#' VABBAC <- rBACov(pData = list(
+#'                      "ETF" = p5, "STOCK 1" = p1, "STOCK 2" = p2, "STOCK 3" = p3, "STOCK 4" = p4
+#'                    ), shares = 1:4, outStanding = 1, nonEquity = 0, ETFNAME = "ETF", 
+#'                    unrestricted = FALSE, targetBeta = "VAB", preEstimator = rBPCov, 
+#'                    noiseCorrection = FALSE, returnL = FALSE, Lin = FALSE, L = 0, K = 2, J = 1)                    
+#'                    
 #' }
+#' 
+#' @references Boudt, K., Dragun, K., Omauri, S., and Vanduffel, S. (2021) Beta-Adjusted Covariance Estimation (working paper).
 #' @author Emil Sjoerup, (Kris Boudt and Kirill Dragun for the Python version)
 #' @importFrom xts is.xts
-#' @importFrom data.table as.data.table merge.data.table data.table setkey setcolorder copy
+#' @importFrom data.table as.data.table merge.data.table data.table setkey setcolorder copy is.data.table
 #' @export
 rBACov <- function(pData, shares, outStanding, nonEquity, ETFNAME = "ETF", 
                    unrestricted = TRUE, targetBeta = c("HY", "VAB", "expert"),
@@ -3954,7 +4019,7 @@ rBACov <- function(pData, shares, outStanding, nonEquity, ETFNAME = "ETF",
   if(is.xts(pData[[1]])){
     pData <- lapply(pData,
                     function(x){
-                      dimnames(x) <- NULL ## Sometimes needed, don't know why, really
+                      dimnames(x) <- NULL # This is needed due to a bug in data.table - see https://github.com/Rdatatable/data.table/issues/4897
                       x <- as.data.table(x)
                       setnames(x, "index","DT")
                       return(x)
