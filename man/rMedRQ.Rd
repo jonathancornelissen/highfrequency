@@ -2,44 +2,19 @@
 % Please edit documentation in R/realizedMeasures.R
 \name{rMedRQ}
 \alias{rMedRQ}
-\title{An estimator of integrated quarticity from applying the median operator on blocks of three returns}
+\title{DEPRECATED}
 \usage{
 rMedRQ(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE)
 }
 \arguments{
-\item{rData}{an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days.}
+\item{rData}{DEPRECATED}
 
-\item{alignBy}{character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"},\code{"hours"}.}
+\item{alignBy}{DEPRECATED}
 
-\item{alignPeriod}{positive numeric, indicating the number of periods to aggregate over. For example, to aggregate
-based on a 5-minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.}
+\item{alignPeriod}{DEPRECATED}
 
-\item{makeReturns}{boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.}
-}
-\value{
-\itemize{
-\item In case the input is an \code{xts} object with data from one day, a numeric of the same length as the number of assets.
-\item If the input data spans multiple days and is in \code{xts} format, an \code{xts} will be returned.
-\item If the input data is a \code{data.table} object, the function returns a \code{data.table} with the same column names as the input data, containing the date and the realized measures.
-}
+\item{makeReturns}{DEPRECATED}
 }
 \description{
-Calculate the rMedRQ, defined in Andersen et al. (2012). Assume there are \eqn{N} equispaced returns \eqn{r_{t,i}} in period \eqn{t}, \eqn{i=1, \ldots,N}. 
-Then, the rMedRQ is given by
-\deqn{
-  \mbox{rMedRQ}_{t}=\frac{3\pi N}{9\pi +72 - 52\sqrt{3}} \left(\frac{N}{N-2}\right) \sum_{i=2}^{N-1} \mbox{med}(|r_{t,i-1}|, |r_{t,i}|, |r_{t,i+1}|)^4.
+DEPRECATED
 }
-}
-\examples{
-rq <- rMedRQ(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes",
-            alignPeriod = 5, makeReturns = TRUE)
-rq
-}
-\references{
-Andersen, T. G., Dobrev, D., and Schaumburg, E. (2012). Jump-robust volatility estimation using nearest neighbor truncation. \emph{Journal of Econometrics}, 169, 75-93.
-}
-\author{
-Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup.
-}
-\keyword{highfrequency}
-\keyword{rMedRQ}

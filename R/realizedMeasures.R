@@ -1,3 +1,34 @@
+#' @title Estimators of the integrated covariance
+#' @description 
+#' This documentation page functions as a point of reference to quickly look up the estimators of the integrated covariance provided in the \pkg{highfrequency} package.
+#' 
+#' The implemented estimators are:
+#' 
+#' Realized Covariance \code{\link{rCov}}
+#' 
+#' Subsampled Realized Covariance \code{\link{rAVGCov}}
+#' 
+#' Modulated Realized Covariance \code{\link{rMRCov}}
+#' @export
+#' @aliases ICov
+ICov <- NULL
+
+
+#' @title Estimators of the integrated variance
+#' @description 
+#' This documentation page functions as a point of reference to quickly look up the estimators of the integrated covariance provided in the \pkg{highfrequency} package.
+#' 
+#' The implemented estimators are:
+#' 
+#' Realized Covariance \code{\link{rCov}}
+#' 
+#' Subsampled Realized Covariance \code{\link{rAVGCov}}
+#' 
+#' Modulated Realized Covariance \code{\link{rMRCov}}
+#' @export
+#' @aliases IVar
+IVar <- NULL
+
 
 #' Available kernels
 #'
@@ -43,6 +74,17 @@ listAvailableKernels <- function() {
     "TukeyHanning",
     "ModifiedTukeyHanning")
 }
+#' DEPRECATED  
+#' @param rData DEPRECATED
+#' @param alignBy DEPRECATED
+#' @param alignPeriod DEPRECATED
+#' @param makeReturns DEPRECATED
+#' @export
+rMedRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE){
+  .Deprecated(new = "rMedRQ has been renamed to rMedRQuar")
+  return(rMedRQuar(rData, alignBy = alignBy, alignPeriod = alignBy, makeReturns = makeReturns))
+}
+
 
 #' An estimator of integrated quarticity from applying the median operator on blocks of three returns
 #' @description 
@@ -68,7 +110,7 @@ listAvailableKernels <- function() {
 #' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup.
 #'
 #' @examples
-#' rq <- rMedRQ(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes",
+#' rq <- rMedRQuar(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes",
 #'             alignPeriod = 5, makeReturns = TRUE)
 #' rq
 #' @keywords highfrequency rMedRQ
@@ -76,11 +118,11 @@ listAvailableKernels <- function() {
 #' Andersen, T. G., Dobrev, D., and Schaumburg, E. (2012). Jump-robust volatility estimation using nearest neighbor truncation. \emph{Journal of Econometrics}, 169, 75-93.
 #' @importFrom zoo rollmedian
 #' @export
-rMedRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE) {
+rMedRQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE) {
 
   # self-reference for multi-day input
   if (is.xts(rData) && checkMultiDays(rData)) {
-    result <- apply.daily(rData, rMedRQ, alignBy, alignPeriod, makeReturns)
+    result <- apply.daily(rData, rMedRQuar, alignBy, alignPeriod, makeReturns)
     return(result)
   } else if (is.data.table(rData)){
     DATE <- .N <- DT <- NULL
@@ -108,11 +150,11 @@ rMedRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
     dates <- dates$DATE
     dat <- as.matrix(rData[, !"DT"])
     for (i in 1:length(dates)) {
-      res[[dates[i]]] <- rMedRQ(dat[starts[i]:ends[i],], makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
+      res[[dates[i]]] <- rMedRQuar(dat[starts[i]:ends[i],], makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
     }
 
 
-    res <- setDT(transpose(res))[, DT := dates]
+    res <- setDT(transpose(res))[, DT := as.Date(dates)]
     setcolorder(res, "DT")
     colnames(res) <- colnames(rData)
     return(res)
@@ -140,14 +182,27 @@ rMedRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
   }
 }
 
+
+#' DEPRECATED  
+#' @param rData DEPRECATED
+#' @param alignBy DEPRECATED
+#' @param alignPeriod DEPRECATED
+#' @param makeReturns DEPRECATED
+#' @export
+rMinRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE){
+  .Deprecated(new = "rMinRQ has been renamed to rMinRQuar")
+  return(rMinRQuar(rData, alignBy = alignBy, alignPeriod = alignBy, makeReturns = makeReturns))
+}
+
+
 #' An estimator of integrated quarticity from applying the minimum operator on blocks of two returns
 #' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 #' @description 
-#' Calculate the rMinRQ, defined in Andersen et al. (2012).
+#' Calculate the rMinRQuar, defined in Andersen et al. (2012).
 #' Assume there are \eqn{N} equispaced returns \eqn{r_{t,i}} in period \eqn{t}, \eqn{i=1, \ldots,N}.
-#' Then, the rMinRQ is given by
+#' Then, the rMinRQuar is given by
 #' \deqn{
-#'   \mbox{rMinRQ}_{t}=\frac{\pi N}{3 \pi - 8} \left(\frac{N}{N-1}\right) \sum_{i=1}^{N-1} \mbox{min}(|r_{t,i}| ,|r_{t,i+1}|)^4
+#'   \mbox{rMinRQuar}_{t}=\frac{\pi N}{3 \pi - 8} \left(\frac{N}{N-1}\right) \sum_{i=1}^{N-1} \mbox{min}(|r_{t,i}| ,|r_{t,i+1}|)^4
 #' }
 #' @param rData an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}.
@@ -163,18 +218,18 @@ rMedRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
 #' }
 #'
 #' @examples
-#' rq <- rMinRQ(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes",
+#' rq <- rMinRQuar(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes",
 #'             alignPeriod = 5, makeReturns = TRUE)
 #' rq
 #' @references
 #' Andersen, T. G., Dobrev, D., and Schaumburg, E. (2012). Jump-robust volatility estimation using nearest neighbor truncation. \emph{Journal of Econometrics}, 169, 75-93.
 #' @importFrom zoo rollapply
 #' @export
-rMinRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE) {
+rMinRQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE) {
 
   # self-reference for multi-day input
   if (is.xts(rData) && checkMultiDays(rData)) {
-    result <- apply.daily(rData, rMinRQ, alignBy, alignPeriod, makeReturns)
+    result <- apply.daily(rData, rMinRQuar, alignBy, alignPeriod, makeReturns)
     return(result)
   } else if (is.data.table(rData)){
     DATE <- .N <- DT <- NULL
@@ -195,9 +250,9 @@ rMinRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
     dates <- dates$DATE
     dat <- as.matrix(rData[, !"DT"])
     for (i in 1:length(dates)) {
-      res[[dates[i]]] <- rMinRQ(dat[starts[i]:ends[i], ], makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
+      res[[dates[i]]] <- rMinRQuar(dat[starts[i]:ends[i], ], makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
     }
-    res <- setDT(transpose(res))[, DT := dates]
+    res <- setDT(transpose(res))[, DT := as.Date(dates)]
     setcolorder(res, "DT")
     colnames(res) <- colnames(rData)
     return(res)
@@ -215,20 +270,32 @@ rMinRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
     q <- abs(as.matrix(rData))
     q <- rollApplyMinWrapper(q)
     N <- nrow(q) + 1
-    rMinRQ <- pi * N/(3 * pi - 8)*(N / (N - 1)) * colSums(q^4)
+    rMinRQuar <- pi * N/(3 * pi - 8)*(N / (N - 1)) * colSums(q^4)
 
-    return(rMinRQ)
+    return(rMinRQuar)
   }
 }
 
-#' rMinRV
+#' DEPRECATED  
+#' @param rData DEPRECATED
+#' @param alignBy DEPRECATED
+#' @param alignPeriod DEPRECATED
+#' @param makeReturns DEPRECATED
+#' @export
+rMinRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE){
+  .Deprecated(new = "rMinRV has been renamed to rMinRVar")
+  return(rMinRVar(rData, alignBy = alignBy, alignPeriod = alignBy, makeReturns = makeReturns))
+}
+
+
+#' rMinRVar
 #'
 #' @description 
-#' Calculate the rMinRV, defined in Andersen et al. (2009).
+#' Calculate the rMinRVar, defined in Andersen et al. (2009).
 #' Let \eqn{r_{t,i}} be a return (with \eqn{i=1,\ldots,M}) in period \eqn{t}.
-#' Then, the rMinRV is given by
+#' Then, the rMinRVar is given by
 #' \deqn{
-#' \mbox{rMinRV}_{t}=\frac{\pi}{\pi - 2}\left(\frac{M}{M-1}\right) \sum_{i=1}^{M-1} \mbox{min}(|r_{t,i}| ,|r_{t,i+1}|)^2
+#' \mbox{rMinRVar}_{t}=\frac{\pi}{\pi - 2}\left(\frac{M}{M-1}\right) \sum_{i=1}^{M-1} \mbox{min}(|r_{t,i}| ,|r_{t,i+1}|)^2
 #' }
 #'
 #' @param rData an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days.
@@ -252,17 +319,17 @@ rMinRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
 #' @author Jonathan Cornelissen, Kris Boudt, Emil Sjoerup.
 #'
 #' @examples
-#' minrv <- rMinRV(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes",
+#' minrv <- rMinRVar(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes",
 #'                alignPeriod = 5, makeReturns = TRUE)
 #' minrv
 #'
 #' @keywords volatility
 #' @export
-rMinRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, ...){
+rMinRVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, ...){
 
   # self-reference for multi-day input
   if (is.xts(rData) && checkMultiDays(rData)) {
-    result <- apply.daily(rData, rMinRV, alignBy, alignPeriod, makeReturns)
+    result <- apply.daily(rData, rMinRVar, alignBy, alignPeriod, makeReturns)
     return(result)
 
   } else if (is.data.table(rData)){
@@ -284,14 +351,14 @@ rMinRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
     dates <- dates$DATE
     dat <- as.matrix(rData[, !"DT"])
     for (i in 1:length(dates)) {
-      res[[dates[i]]] <- rMinRV(dat[starts[i]:ends[i], ], makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
+      res[[dates[i]]] <- rMinRVar(dat[starts[i]:ends[i], ], makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
     }
-    res <- setDT(transpose(res))[, DT := dates]
+    res <- setDT(transpose(res))[, DT := as.Date(dates)]
     setcolorder(res, "DT")
     colnames(res) <- colnames(rData)
 
     if(ncol(rData) == 2){ ## Univariate case
-      colnames(res) <- c("DT", "rMinRV")
+      colnames(res) <- c("DT", "rMinRVar")
     }
 
 
@@ -317,14 +384,29 @@ rMinRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
   }
 }
 
-#' rMedRV
+#' DEPRECATED  
+#' @param rData DEPRECATED
+#' @param alignBy DEPRECATED
+#' @param alignPeriod DEPRECATED
+#' @param makeReturns DEPRECATED
+#' @export
+rMedRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE){
+  .Deprecated(new = "rMedRV has been renamed to rMedRVar")
+  return(rMedRVar(rData, alignBy = alignBy, alignPeriod = alignBy, makeReturns = makeReturns))
+}
+
+
+
+
+
+#' rMedRVar
 #'
 #' @description
-#' Calculate the rMedRV, defined in Andersen et al. (2012). 
+#' Calculate the rMedRVar, defined in Andersen et al. (2012). 
 #' Let \eqn{r_{t,i}} be a return (with \eqn{i=1,\ldots,M}) in period \eqn{t}.
-#' Then, the rMedRV is given by
+#' Then, the rMedRVar is given by
 #' \deqn{
-#'  \mbox{rMedRV}_{t}=\frac{\pi}{6-4\sqrt{3}+\pi}\left(\frac{M}{M-2}\right) \sum_{i=2}^{M-1} \mbox{med}(|r_{t,i-1}|,|r_{t,i}|, |r_{t,i+1}|)^2
+#'  \mbox{rMedRVar}_{t}=\frac{\pi}{6-4\sqrt{3}+\pi}\left(\frac{M}{M-2}\right) \sum_{i=2}^{M-1} \mbox{med}(|r_{t,i-1}|,|r_{t,i}|, |r_{t,i+1}|)^2
 #' }
 #'
 #' @param rData an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days
@@ -335,11 +417,11 @@ rMinRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
 #' @param ... used internally, do not change.
 #' 
 #' @details
-#' The rMedRV belongs to the class of realized volatility measures in this package
+#' The rMedRVar belongs to the class of realized volatility measures in this package
 #' that use the series of high-frequency returns \eqn{r_{t,i}} of a day \eqn{t}
 #' to produce an ex post estimate of the realized volatility of that day \eqn{t}.
-#' rMedRV is designed to be robust to price jumps.
-#' The difference between RV and rMedRV is an estimate of the realized jump
+#' rMedRVar is designed to be robust to price jumps.
+#' The difference between RV and rMedRVar is an estimate of the realized jump
 #' variability. Disentangling the continuous and jump components in RV
 #' can lead to more precise volatility forecasts,
 #' as shown in Andersen et al. (2012)
@@ -357,17 +439,17 @@ rMinRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
 #' @author Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup.
 #'
 #' @examples
-#' medrv <- rMedRV(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes",
+#' medrv <- rMedRVar(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes",
 #'                alignPeriod = 5, makeReturns = TRUE)
 #' medrv
 #' @importFrom data.table setDT transpose setcolorder
 #' @keywords volatility
 #' @export
-rMedRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, ...){
+rMedRVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, ...){
 
   # self-reference for multi-day input
   if (is.xts(rData) && checkMultiDays(rData)) {
-    result <- apply.daily(rData, rMedRV, alignBy, alignPeriod, makeReturns)
+    result <- apply.daily(rData, rMedRVar, alignBy, alignPeriod, makeReturns)
     return(result)
   } else if (is.data.table(rData)){
     DATE <- .N <- DT <- NULL
@@ -388,13 +470,13 @@ rMedRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
     dates <- dates$DATE
     dat <- as.matrix(rData[, !"DT"])
     for (i in 1:length(dates)) {
-      res[[dates[i]]] <- rMedRV(dat[starts[i]:ends[i],], makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
+      res[[dates[i]]] <- rMedRVar(dat[starts[i]:ends[i],], makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
     }
 
-    res <- setDT(transpose(res))[, DT := dates]
+    res <- setDT(transpose(res))[, DT := as.Date(dates)]
     setcolorder(res, "DT")
     if(ncol(res) == 2){
-      colnames(res) <- c("DT", "rMedRV")
+      colnames(res) <- c("DT", "rMedRVar")
     } else {
       colnames(res) <- colnames(rData)
     }
@@ -422,6 +504,20 @@ rMedRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
     medrv <- (pi / (6 - 4 * sqrt(3) + pi)) * (N / (N - 2)) * colSums(q^2)
     return(medrv)
   }
+}
+
+#' DEPRECATED rMRC
+#' @description DEPRECATED USE \code{\link{rMRCov}}
+#'
+#' @param pData DEPRECATED
+#' @param pairwise DEPRECATED
+#' @param makePsd DEPRECATED
+#' @param theta DEPRECATED
+#' @param ... DEPRECATED
+#' @export
+rMRC <- function(pData, pairwise = FALSE, makePsd = FALSE, theta = 0.8, ...){
+  .Deprecated(new = "rMRC has been renamed to rMRCov")
+  return(rMRCov(pData = pData, pairwise = pairwise, makePsd = makePsd, theta = theta))
 }
 
 #' Modulated realized covariance
@@ -572,19 +668,7 @@ rMRCov <- function(pData, pairwise = FALSE, makePsd = FALSE, theta = 0.8, ...) {
   return(mrc)
 }
 
-#' DEPRECATED rMRC
-#' @description DEPRECATED USE \code{\link{rMRCov}}
-#'
-#' @param pData DEPRECATED
-#' @param pairwise DEPRECATED
-#' @param makePsd DEPRECATED
-#' @param theta DEPRECATED
-#' @param ... DEPRECATED
-#' 
-rMRC <- function(pData, pairwise = FALSE, makePsd = FALSE, theta = 0.8, ...){
-  .Deprecated(new = "rMRC has been renamed to rMRCov to clearly show the covariance part", msg = "rMRC")
-  invisible(NULL)
-}
+
 
 
 
@@ -833,7 +917,7 @@ rAVGCov <- function(rData, cor = FALSE, alignBy = "minutes", alignPeriod = 5, k 
 #' @param rData a \code{xts} object containing all returns in period t for one asset.
 #' @param rIndex a \code{xts} object containing return in period t for an index.
 #' @param RCOVestimator can be chosen among realized covariance estimators: \code{"rCov"}, \code{"rAVGCov"}, \code{"rBPCov"}, \code{"rHYCov"}, \code{"rKernelCov"}, \code{"rOWCov"}, \code{"rRTSCov"}, \code{"rThresholdCov"} and \code{"rTSCov"} \code{"rCov"} by default.
-#' @param RVestimator can be chosen among realized variance estimators: \code{"RV"}, \code{"rMinRV"} and \code{"rMedRV"}. \code{"RV"} by default. 
+#' @param RVestimator can be chosen among realized variance estimators: \code{"rRVar"}, \code{"rMinRVar"} and \code{"rMedRVar"}. \code{"rRVar"} by default. 
 #' In case of missing \code{RVestimator}, \code{RCOVestimator} function applying for \code{rIndex} will be used.
 #' @param makeReturns boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.
 #' 
@@ -861,14 +945,14 @@ rAVGCov <- function(rData, cor = FALSE, alignBy = "minutes", alignPeriod = 5, k 
 #' library("xts")
 #' a <- as.xts(sampleOneMinuteData[as.Date(DT) == "2001-08-04", list(DT, MARKET)])
 #' b <-  as.xts(sampleOneMinuteData[as.Date(DT) == "2001-08-04", list(DT, STOCK)])
-#' rBeta(a, b, RCOVestimator = "rBPCov", RVestimator = "rMinRV", makeReturns = TRUE)
+#' rBeta(a, b, RCOVestimator = "rBPCov", RVestimator = "rMinRVar", makeReturns = TRUE)
 #' }
 #'
 #' @keywords highfrequency rBeta
 #' @importFrom methods hasArg
 #' @importFrom utils data
 #' @export
-rBeta <- function(rData, rIndex, RCOVestimator = "rCov", RVestimator = "RV", makeReturns = FALSE) {
+rBeta <- function(rData, rIndex, RCOVestimator = "rCov", RVestimator = "rRVar", makeReturns = FALSE) {
   if (hasArg(data)) {
     rData <- data
   }
@@ -917,10 +1001,10 @@ rBeta <- function(rData, rIndex, RCOVestimator = "rCov", RVestimator = "RV", mak
 
         switch(RVestimator,
                rCov = rCov(rIndex ) ,
-               RV = RV(rIndex),
+               RV = rRVar(rIndex),
                BV = RBPVar(rIndex),
-               rMinRV = rMinRV(rIndex ),
-               rMedRV = rMedRV(rIndex ),
+               rMinRVar = rMinRVar(rIndex ),
+               rMedRVar = rMedRVar(rIndex ),
                rAVGCov = rAVGCov(rIndex ) ,
                rBPCov = rBPCov(rIndex ) ,
                rHYCov = rHYCov(rIndex ) ,
@@ -1203,7 +1287,7 @@ rCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeRet
     }
 
     if (n == 1) {
-      return(RV(rData))
+      return(rRVar(rData))
     } else {
       rData <- as.matrix(rData)
       covariance <- t(rData) %*% rData
@@ -1606,7 +1690,7 @@ rKurt <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
       res[[dates[i]]] <- rKurt(dat[starts[i]:ends[i], ], makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
     }
 
-    res <- setDT(transpose(res))[, DT := dates]
+    res <- setDT(transpose(res))[, DT := as.Date(dates)]
     setcolorder(res, "DT")
     if(ncol(res) == 2){
       colnames(res) <- c("DT", "rKurt")
@@ -1638,14 +1722,25 @@ rKurt <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
   }
 }
 
+#' DEPRECATED  
+#' @param rData DEPRECATED
+#' @param alignBy DEPRECATED
+#' @param alignPeriod DEPRECATED
+#' @param makeReturns DEPRECATED
+#' @export
+rMPV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE){
+  .Deprecated(new = "rMPV has been renamed to rMPVar")
+  return(rMPV(rData, alignBy = alignBy, alignPeriod = alignBy, makeReturns = makeReturns))
+}
+
 
 #' Realized multipower variation
 #'
-#' @description Calculate the Realized Multipower Variation rMPV, defined in Andersen et al. (2012).
+#' @description Calculate the Realized Multipower Variation rMPVar, defined in Andersen et al. (2012).
 #'
-#' Assume there are \eqn{N} equispaced returns \eqn{r_{t,i}} in period \eqn{t}, \eqn{i=1, \ldots,N}. Then, the rMPV is given by
+#' Assume there are \eqn{N} equispaced returns \eqn{r_{t,i}} in period \eqn{t}, \eqn{i=1, \ldots,N}. Then, the rMPVar is given by
 #'   \deqn{
-#'     \mbox{rMPV}_{N}(m,p)= d_{m,p} \frac{N^{p/2}}{N-m+1} \sum_{i=1}^{N-m+1}|r_{t,i}|^{p/m} \ldots |r_{t,i+m-1}|^{p/m}
+#'     \mbox{rMPVar}_{N}(m,p)= d_{m,p} \frac{N^{p/2}}{N-m+1} \sum_{i=1}^{N-m+1}|r_{t,i}|^{p/m} \ldots |r_{t,i+m-1}|^{p/m}
 #'   }
 #'
 #' in which
@@ -1676,16 +1771,16 @@ rKurt <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup.
 #'
 #' @examples
-#' mpv <- rMPV(sampleTData[, list(DT, PRICE)], m = 2, p = 3, alignBy = "minutes",
+#' mpv <- rMPVar(sampleTData[, list(DT, PRICE)], m = 2, p = 3, alignBy = "minutes",
 #'             alignPeriod = 5, makeReturns = TRUE)
 #' mpv
-#' @keywords highfrequency rMPV
+#' @keywords highfrequency rMPVar
 #' @export
-rMPV <- function(rData, m = 2, p = 2, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, ...) {
+rMPVar <- function(rData, m = 2, p = 2, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, ...) {
 
   # self-reference for multi-day input
   if (is.xts(rData) && checkMultiDays(rData)) {
-    result <- apply.daily(rData, rMPV, alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = makeReturns, m = m, p = p)
+    result <- apply.daily(rData, rMPVar, alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = makeReturns, m = m, p = p)
     return(result)
 
   } else if (is.data.table(rData)){
@@ -1706,9 +1801,9 @@ rMPV <- function(rData, m = 2, p = 2, alignBy = NULL, alignPeriod = NULL, makeRe
     dates <- dates$DATE
     dat <- as.matrix(rData[, !"DT"])
     for (i in 1:length(dates)) {
-      res[[dates[i]]] <- rMPV(dat[starts[i]:ends[i], ], m = m, p = p, makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
+      res[[dates[i]]] <- rMPVar(dat[starts[i]:ends[i], ], m = m, p = p, makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
     }
-    res <- setDT(transpose(res))[, DT := dates]
+    res <- setDT(transpose(res))[, DT := as.Date(dates)]
     setcolorder(res, "DT")
     if(ncol(res) == 2){
       colnames(res) <- c("DT", "MPV")
@@ -1740,8 +1835,8 @@ rMPV <- function(rData, m = 2, p = 2, alignBy = NULL, alignPeriod = NULL, makeRe
 
       dmp <- (2^((p/m)/2) * gamma((p/m + 1)/2) / gamma(1/2))^(-m)
 
-      rmpv <- dmp * N^(p/2) / (N - m + 1) * colSums(q^(p/m))
-      return(rmpv)
+      rMPVar <- dmp * N^(p/2) / (N - m + 1) * colSums(q^(p/m))
+      return(rMPVar)
     } else{
       warning("Please supply m>p/2 for the arguments m and p")
     }
@@ -1982,7 +2077,7 @@ rSkew <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
       res[[dates[i]]] <- rSkew(dat[starts[i]:ends[i],], makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
     }
 
-    res <- setDT(transpose(res))[, DT := dates]
+    res <- setDT(transpose(res))[, DT := as.Date(dates)]
     setcolorder(res, "DT")
     if(ncol(res) == 2){
       colnames(res) <- c("DT", "Skew")
@@ -2015,6 +2110,18 @@ rSkew <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
   }
 }
 
+#' DEPRECATED  
+#' @param rData DEPRECATED
+#' @param alignBy DEPRECATED
+#' @param alignPeriod DEPRECATED
+#' @param makeReturns DEPRECATED
+#' @export
+rSV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE){
+  .Deprecated(new = "rSV has been renamed to rSVar")
+  return(rSVar(rData, alignBy = alignBy, alignPeriod = alignBy, makeReturns = makeReturns))
+}
+
+
 #' Realized semivariance of highfrequency return series
 #' @description 
 #' Calculate the realized semivariances, defined in Barndorff-Nielsen et al. (2008).
@@ -2028,12 +2135,12 @@ rSkew <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #'
 #' Assume there are \eqn{N} equispaced returns \eqn{r_{t,i}} in period \eqn{t}, \eqn{i=1, \ldots,N}.
 #'
-#' Then, the \code{rSV} is given by
+#' Then, the \code{rSVar} is given by
 #' \deqn{
-#'   \mbox{rSVdownside}_{t}= \sum_{i=1}^{N} (r_{t,i})^2  \ \times \ I [ r_{t,i} < 0]
+#'   \mbox{rSVardownside}_{t}= \sum_{i=1}^{N} (r_{t,i})^2  \ \times \ I [ r_{t,i} < 0]
 #' }
 #'   \deqn{
-#'   \mbox{rSVupside}_{t}= \sum_{i=1}^{N} (r_{t,i})^2 \ \times \ I [ r_{t,i} > 0]
+#'   \mbox{rSVarupside}_{t}= \sum_{i=1}^{N} (r_{t,i})^2 \ \times \ I [ r_{t,i} > 0]
 #' }
 #' @param rData an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days.
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. 
@@ -2045,28 +2152,28 @@ rSkew <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #' @param ... used internally
 #' @return list with two entries, the realized positive and negative semivariances
 #' @examples
-#' sv <- rSV(sampleTData[, list(DT, PRICE)], alignBy = "minutes",
+#' sv <- rSVar(sampleTData[, list(DT, PRICE)], alignBy = "minutes",
 #'           alignPeriod = 5, makeReturns = TRUE)
 #' sv
 #' @references
 #' Barndorff-Nielsen, O. E., Kinnebrock, S., and Shephard N. (2010). \emph{Measuring downside risk: realised semivariance}. In: Volatility and Time Series Econometrics: Essays in Honor of Robert F. Engle,
 #' (Edited by Bollerslev, T., Russell, J., and Watson, M.), 117-136. Oxford University Press.
 #' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup.
-#' @keywords  highfrequency rSV
+#' @keywords  highfrequency rSVar
 #' @export
-rSV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, ...) {
+rSVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, ...) {
 
   # self-reference for multi-day input
   if (is.xts(rData) && checkMultiDays(rData)) {
     if(ncol(rData) == 1){
       result <- apply.daily(rData, function(x){
-        tmp <- rSV(x, alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = makeReturns)
+        tmp <- rSVar(x, alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = makeReturns)
         return(cbind(tmp[[1]], tmp[[2]]))
       })
       colnames(result) = c("downside", "upside")
     } else {
-      # ... is needed because applyGetList calls functions with ... if this argument is removed from rSV we will get an unused argument error
-      result <- applyGetList(rData, rSV, alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = makeReturns, ... = ...) 
+      # ... is needed because applyGetList calls functions with ... if this argument is removed from rSVar we will get an unused argument error
+      result <- applyGetList(rData, rSVar, alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = makeReturns, ... = ...) 
       names(result) <- unique(as.Date(index(rData)))
       ## Names
     }
@@ -2090,18 +2197,9 @@ rSV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, 
     dates <- dates$DATE
     dat <- as.matrix(rData[, !"DT"])
     for (i in 1:length(dates)) {
-      res[[dates[i]]] <- rSV(dat[starts[i]:ends[i],], makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
+      res[[dates[i]]] <- rSVar(dat[starts[i]:ends[i],], makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
     }
-    # res <- setDT(transpose(res))[, DT := dates]
-    # setcolorder(res, "DT")
-    # if(ncol(res) == 2){
-    #   colnames(res) <- c("DT", "SV")
-    # } else {
-    #   colnames(res) <- colnames(rData)
-    # }
-    #
-    # setkey(res, "DT")
-    # setcolorder(res, "DT")
+    
     return(res)
 
   } else {
@@ -2120,10 +2218,10 @@ rSV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, 
     q <- as.matrix(rData)
     select.down <- rData < 0
     select.up <- rData > 0
-    rSVd <- colSums((q * select.down)^2)
-    rSVu <- colSums((q * select.up)^2)
+    rSVard <- colSums((q * select.down)^2)
+    rSVaru <- colSums((q * select.up)^2)
 
-    out <- list(rSVdownside = rSVd, rSVupside = rSVu)
+    out <- list(rSVardownside = rSVard, rSVarupside = rSVaru)
     return(out)
   }
 }
@@ -2450,17 +2548,102 @@ rRTSCov <- function (pData, cor = FALSE, startIV = NULL, noisevar = NULL,
   }
 }
 
-#' An estimator of realized variance.
-#' @param rData a \code{xts} object containing all returns in period t for one asset.
-#' @param ... used internally, do not change.
-#' @return numeric
-#'
-#' @keywords highfrequency RV
+
+#' DEPRECATED
+#' DEPRECATED use \code{\link{rRVar}} instead
+#' @param rData DEPRECATED \code{\link{rRVar}} instead
 #' @export
-RV <- function(rData, ...) {
-  returns <- as.numeric(rData)
-  RV <- sum(returns^2)
-  return(RV)
+RV <- function(rData){
+  .Deprecated(new = "RV has been renamed to rRVar")
+  return(rRVar(rData))
+}
+
+
+#' An estimator of realized variance.
+#' 
+#' @description 
+#' Calculates the daily Realized Variance.
+#' Let \eqn{r_{t,i}} be an intraday return vector with \eqn{i=1,...,M} number of intraday returns.
+#'
+#' Then, the realized variance is given by
+#' \deqn{
+#'  \mbox{RVar}_{t}=\sum_{i=1}^{M}r_{t,i}^{2}
+#' }
+#' 
+#' @param rData an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days.
+#' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. 
+#' Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}.
+#' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. For example, to aggregate
+#' based on a 5-minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
+#' @param makeReturns boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.
+#' @param ... used internally, do not change.
+#' @return 
+#' \itemize{
+#' \item In case the input is an \code{xts} object with data from one day, a numeric of the same length as the number of assets.
+#' \item If the input data spans multiple days and is in \code{xts} format, an \code{xts} will be returned.
+#' \item If the input data is a \code{data.table} object, the function returns a \code{data.table} with the same column names as the input data, containing the date and the realized measures.
+#' }
+#' @examples 
+#' rv <- rRVar(sampleOneMinuteData, makeReturns = TRUE)
+#' plot(rv[, DT], rv[, MARKET], xlab = "Date", ylab = "Realized Variance", type = "l")
+#'
+#' @keywords highfrequency realized
+#' @export
+rRVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, ...) {
+  # self-reference for multi-day input
+  if (is.xts(rData) && checkMultiDays(rData)) {
+    result <- apply.daily(rData, rRVar, alignBy, alignPeriod, makeReturns)
+    return(result)
+  } else if (is.data.table(rData)){
+    DATE <- .N <- DT <- NULL
+    setcolorder(rData, "DT")
+    if(!is.null(alignBy) && !is.null(alignPeriod) && makeReturns) {
+      rData <- fastTickAgregation_DATA.TABLE(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+    }
+    
+    if(!is.null(alignBy) && !is.null(alignPeriod) && !makeReturns) {
+      rData <- fastTickAgregation_DATA.TABLE_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+    }
+    setkey(rData, "DT")
+    dates <- rData[, list(end = .N), by = list(DATE = as.Date(DT))][, `:=`(end = cumsum(end), DATE = as.character(DATE))][, start := shift(end, fill = 0) + 1]
+    res <- vector(mode = "list", length = nrow(dates))
+    names(res) <- as.character(dates$DATE)
+    starts <- dates$start
+    ends <- dates$end
+    dates <- dates$DATE
+    dat <- as.matrix(rData[, !"DT"])
+    for (i in 1:length(dates)) {
+      res[[dates[i]]] <- rRVar(dat[starts[i]:ends[i],], makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
+    }
+    
+    res <- setDT(transpose(res))[, DT := as.Date(dates)]
+    setcolorder(res, "DT")
+    if(ncol(res) == 2){
+      colnames(res) <- c("DT", "RVar")
+    } else {
+      colnames(res) <- colnames(rData)
+    }
+    
+    setkey(res, "DT")
+    return(res)
+    
+  } else {
+    ## DO data transformations
+    if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && makeReturns) {
+      rData <- fastTickAgregation(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+    }
+    if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && !makeReturns) {
+      rData <- fastTickAgregation_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+    }
+    if (makeReturns) {
+      rData <- makeReturns(rData)
+    }
+    
+    
+    q <- as.matrix(rData)
+    rv <- colSums(q^2)
+    return(rv)
+  }
 }
 
 
@@ -2525,7 +2708,7 @@ rTPQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FAL
     for (i in 1:length(dates)) {
       res[[dates[i]]] <- rTPQuar(dat[starts[i]:ends[i], ], makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
     }
-    res <- setDT(transpose(res))[, DT := dates]
+    res <- setDT(transpose(res))[, DT := as.Date(dates)]
     setcolorder(res, "DT")
     colnames(res) <- colnames(rData)
     return(res)
@@ -2611,7 +2794,7 @@ rQPVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
     for (i in 1:length(dates)) {
       res[[dates[i]]] <- rQPVar(dat[starts[i]:ends[i],], makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
     }
-    res <- setDT(transpose(res))[, DT := dates]
+    res <- setDT(transpose(res))[, DT := as.Date(dates)]
     setcolorder(res, "DT")
     colnames(res) <- colnames(rData)
     return(res)
@@ -2695,7 +2878,7 @@ rQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
     for (i in 1:length(dates)) {
       res[[dates[i]]] <- rQuar(dat[starts[i]:ends[i], ], makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
     }
-    res <- setDT(transpose(res))[, DT := dates]
+    res <- setDT(transpose(res))[, DT := as.Date(dates)]
     setcolorder(res, "DT")
     colnames(res) <- colnames(rData)
     return(res)
@@ -3133,9 +3316,9 @@ rCholCov <- function(pData, IVest = "rMRCov", COVest = "rMRCov", criterion = "sq
 #' # at 5 minutes.
 #'
 #' # Univariate:
-#' rSV = rSemiCov(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes",
+#' rSVar = rSemiCov(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes",
 #'                    alignPeriod = 5, makeReturns = TRUE)
-#' rSV
+#' rSVar
 #' \dontrun{
 #' library("xts")
 #' # Multivariate multi day:
@@ -4034,10 +4217,10 @@ rBACov <- function(pData, shares, outStanding, nonEquity, ETFNAME = "ETF",
   for (i in 1:length(pData)) {
     setnames(pData[[i]], new= c("DT", names(pData[i])))
   }
-  backup <- Reduce(function(x,y) merge.data.table(x, y, all = TRUE, on = "DT"), pData[which(names(pData) != ETFNAME)])
+  # backup <- Reduce(function(x,y) merge.data.table(x, y, all = TRUE, on = "DT"), pData[which(names(pData) != ETFNAME)])
   pData <- Reduce(function(x,y) merge.data.table(x, y, all = TRUE, on = "DT"), pData)
   setkey(pData, "DT")
-  setkey(backup, "DT")
+  # setkey(backup, "DT")
   
   timeZone <- format(pData$DT[1], format = "%Z")
   tz <- NULL
@@ -4061,21 +4244,24 @@ rBACov <- function(pData, shares, outStanding, nonEquity, ETFNAME = "ETF",
   missingPoints <- !is.na(pData)[-1,] # Where the inputs aren't missing
   
   
-  RC2 <- matrix(0, ncol = ncol(backup) - 1, nrow = ncol(backup) - 1)
-  noiseRobust <- rep(0, ncol(backup) - 1)
+  
+  
+  
+  ## We calculate the pre-estimator
+  RC2 <- matrix(0, ncol = ncol(pData) - 2, nrow = ncol(pData) - 2)
+  noiseRobust <- rep(0, ncol(pData) - 2)
   for (i in 1:nComps) {
     for (j in i:nComps) {
-      dat <- refreshTimeMatching(as.matrix(backup[, 1 + c(i, j), with = FALSE]), backup$DT)
+      dat <- refreshTimeMatching(as.matrix(pData[, 2 + c(i, j), with = FALSE]), pData$DT)
       
       dat <- data.table(dat$data)[, DT := as.POSIXct(dat$indices, origin = "1970-01-01", tz = tz)]
-
+      
       setkey(dat, DT)
       setcolorder(dat, "DT")
       RC2[i, j] <- RC2[j, i] <- preEstimator(dat, makeReturns = TRUE)[1,2]
       
     }
   }
-  
   
   
   pData <- setnafill(copy(pData), type = "locf", cols = 2:ncol(pData))

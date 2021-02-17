@@ -20,7 +20,7 @@ IVinference(
 
 \item{IVestimator}{can be chosen among integrated variance estimators: RV, BV, rMinRV or rMedRV. RV by default.}
 
-\item{IQestimator}{can be chosen among integrated quarticity estimators: rQuar, realized tri-power quarticity (TPQ), quad-power quarticity (QPQ), rMinRQ or rMedRQ. TPQ by default.}
+\item{IQestimator}{can be chosen among integrated quarticity estimators: rQuar, realized tri-power quarticity (TPQ), quad-power quarticity (QPQ), rMinRQuar or rMedRQuar. TPQ by default.}
 
 \item{confidence}{confidence level set by users. 0.95 by default.}
 

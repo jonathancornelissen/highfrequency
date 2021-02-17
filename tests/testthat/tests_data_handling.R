@@ -28,7 +28,7 @@ test_that("quotesCleanup", {
 context("aggregatePrice")
 test_that("aggregatePrice", {
   expect_equal(
-    formatC(sum(head(aggregatePrice(sampleTData[, ], alignBy = "secs", alignPeriod = 30))$PRICE), digits = 10),
+    formatC(sum(head(aggregatePrice(sampleTData, alignBy = "secs", alignPeriod = 30))$PRICE), digits = 10),
     "     950.73"
   )
 })

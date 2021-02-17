@@ -188,10 +188,9 @@ AJjumpTest <- function(pData, p = 4 , k = 2, alignBy = NULL, alignPeriod = NULL,
   ## AJ test: 
   AJtest <- (S-k^(p/2-1))/sqrt(calculateV(rse, p, k, N))
 
-  out <- {}
-  out$ztest <- AJtest
-  out$critical.value <- qnorm(c(1- alpha, alpha))
-  out$pvalue <- 2 * pnorm(-abs(AJtest))
+  out <- list("ztest" = AJtest,
+              "critical.value" = qnorm(c(1- alpha, alpha)),
+                "pvalue" = 2 * pnorm(-abs(AJtest)))
   return(out)
 }
 
@@ -202,9 +201,9 @@ AJjumpTest <- function(pData, p = 4 , k = 2, alignBy = NULL, alignPeriod = NULL,
 #' 
 #' @param rData either an \code{xts} or a \code{data.table} containing the log-returns or prices of a single asset, possibly over multiple days-
 #' @param IVestimator can be chosen among jump robust integrated variance estimators: 
-#' \code{\link{rBPCov}}, \code{\link{rMinRV}}, \code{\link{rMedRV}} and corrected threshold bipower variation (\code{\link{rThresholdCov}}). 
+#' \code{\link{rBPCov}}, \code{\link{rMinRVar}}, \code{\link{rMedRVar}} and corrected threshold bipower variation (\code{\link{rThresholdCov}}). 
 #' If \code{\link{rThresholdCov}} is chosen, an argument of \code{startV}, start point of auxiliary estimators in threshold estimation can be included. \code{\link{rBPCov}} by default.
-#' @param IQestimator can be chosen among jump robust integrated quarticity estimators: \code{\link{rTPQuar}}, \code{\link{rQPVar}}, \code{\link{rMinRQ}} and \code{\link{rMedRQ}}. 
+#' @param IQestimator can be chosen among jump robust integrated quarticity estimators: \code{\link{rTPQuar}}, \code{\link{rQPVar}}, \code{\link{rMinRQuar}} and \code{\link{rMedRQuar}}. 
 #' \code{\link{rTPQuar}} by default.
 #' @param type a method of BNS testing: can be linear or ratio. Linear by default.
 #' @param logTransform boolean, should be \code{TRUE} when \code{QVestimator} and \code{IVestimator} are in logarithm form. \code{FALSE} by default.
@@ -282,16 +281,11 @@ BNSjumpTest <- function (rData, IVestimator = "BV", IQestimator = "TP", type = "
                     return(cbind(tmp[[1]], tmp[[2]][1], tmp[[2]][2], tmp[[3]]))
                   })
     
-    # browser()
     colnames(result) <- c("ztest", "lower", "upper", "p-value")
     
     universalThreshold <- 2 * pnorm(-sqrt(log(ndays(result$ztest) * 2)))
     result$universalThresholdLower <- qnorm(universalThreshold)
     result$universalThresholdUpper <- -qnorm(universalThreshold)
-    
-    # p.adjust(as.numeric(result$`p-value`), "fdr")
-    # qnorm(p.adjust(as.numeric(result$`p-value`), "fdr"))
-    # result$ztest
     
     return(result)
   } else if (is.data.table(rData)){
@@ -330,17 +324,17 @@ BNSjumpTest <- function (rData, IVestimator = "BV", IQestimator = "TP", type = "
       rData <- makeReturns(rData)
     }
     N <- length(rData)
-    hatQV <- RV(rData)
+    hatQV <- rRVar(rData)
     hatIV <- hatIV(rData, IVestimator)
     theta <- tt(IVestimator)
     hatIQ <- hatIQ(rData, IQestimator)
     if (type == "linear") {
       if (logTransform) {
-        hatQV <- log(RV(rData))
+        hatQV <- log(rRVar(rData))
         hatIV <- log(hatIV(rData, IVestimator))
       }
       if (!logTransform) {
-        hatQV <- RV(rData)
+        hatQV <- rRVar(rData)
         hatIV <- hatIV(rData, IVestimator)
       }
       if (max) {
@@ -363,7 +357,8 @@ BNSjumpTest <- function (rData, IVestimator = "BV", IQestimator = "TP", type = "
       if (!max) {
         product <- hatIQ(rData, IQestimator)/hatIV(rData, IVestimator)^2
       }
-      a <- sqrt(N) * (1 - hatIV(rData, IVestimator, N)/RV(rData))/sqrt((theta - 2) * product)
+      
+      a <- sqrt(N) * (1 - hatIV(rData, IVestimator, N)/rRVar(rData))/sqrt((theta - 2) * product)
       out <- list()
       out$ztest <- a
       out$critical.value <- qnorm(c(1- alpha, alpha))
@@ -495,7 +490,8 @@ JOjumpTest <- function(pData, power = 4, alignBy = NULL, alignPeriod = NULL, alp
     r  <- as.zoo(makeReturns(pData))
     N  <- length(pData) - 1
     bv <- RBPVar(r)
-    rv <- RV(r)
+    rv <- rRVar(r)
+    rv <- rv[[length(rv)]]
   
     SwV <- 2 * sum(R-r, na.rm = TRUE)
     mu1 <- 2^(6/2) * gamma(1/2*(6+1)) / gamma(1/2)
@@ -519,7 +515,7 @@ JOjumpTest <- function(pData, power = 4, alignBy = NULL, alignPeriod = NULL, alp
       
       q <- abs(rollApplyProdWrapper(r, 6))
       mu2 <- 2^((6/6)/2)*gamma(1/2*(6/6+1))/gamma(1/2)
-      av <- mu1/9 * N^3*(mu2)^(-6)/(N-6-1)*sum(q^(6/6),na.rm= TRUE)   ##check formula
+      av <- mu1/9 * N^3*(mu2)^(-6)/(N-6-1)*sum(q,na.rm= TRUE)   ##check formula
       JOtest <- N*bv/sqrt(av)*(1- rv/SwV)
   
       out                <- {}

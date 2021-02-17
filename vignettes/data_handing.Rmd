@@ -56,7 +56,7 @@ As a last step for cleaning tick data on trades it is advised to check whether c
 
 ## Cleaning tick data on quotes
 
-The highfrequency function also brings a similarly-named function for cleaning quotes data, quotesCleanup. Here, the cleaning steps are
+The highfrequency package also brings a similarly-named function for cleaning quotes data, quotesCleanup. Here, the cleaning steps are
 
 - removing quotes with zero price,
 - selecting a single exchange,

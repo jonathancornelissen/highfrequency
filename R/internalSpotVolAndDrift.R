@@ -972,9 +972,9 @@ realizedMeasureSpotVol <- function(mR, rData, options = list()){
       for (i in 1:D) {
         sigma2hat[i, j] <- switch(op$RM,
                             bipower = RBPVar(mR[i,(j-lookBackPeriod+1):j]),
-                            rv = RV(mR[i,(j-lookBackPeriod+1):j]),
-                            medrv = rMedRV(mR[i,(j-lookBackPeriod+1):j]),
-                            minrv = rMinRV(matrix(mR[i,(j-lookBackPeriod+1):j], ncol = 1))
+                            rv = rRVar(mR[i,(j-lookBackPeriod+1):j]),
+                            medrv = rMedRVar(mR[i,(j-lookBackPeriod+1):j]),
+                            minrv = rMinRVar(matrix(mR[i,(j-lookBackPeriod+1):j], ncol = 1))
           
         )
       }
@@ -987,9 +987,9 @@ realizedMeasureSpotVol <- function(mR, rData, options = list()){
       for (i in 1:D) {
         sigma2hat[i, j] <- switch(op$RM,
                                     bipower = RBPVar(mR[i,(j-lookBackPeriod+1):(j-1)]),
-                                    rv = RV(mR[i,(j-lookBackPeriod+1):(j-1)]),
-                                    medrv = rMedRV(mR[i,(j-lookBackPeriod+1):(j-1)]),
-                                    minrv = rMinRV(matrix(mR[i,(j-lookBackPeriod+1):(j-1)], ncol = 1))
+                                    rv = rRVar(mR[i,(j-lookBackPeriod+1):(j-1)]),
+                                    medrv = rMedRVar(mR[i,(j-lookBackPeriod+1):(j-1)]),
+                                    minrv = rMinRVar(matrix(mR[i,(j-lookBackPeriod+1):(j-1)], ncol = 1))
                                     
         )
       }

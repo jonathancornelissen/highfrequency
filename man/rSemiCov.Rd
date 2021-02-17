@@ -59,9 +59,9 @@ In the case that cor is \code{TRUE}, the mixed matrix will be an \eqn{N \times N
 # at 5 minutes.
 
 # Univariate:
-rSV = rSemiCov(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes",
+rSVar = rSemiCov(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes",
                    alignPeriod = 5, makeReturns = TRUE)
-rSV
+rSVar
 \dontrun{
 library("xts")
 # Multivariate multi day:
