@@ -17,6 +17,10 @@ tradeIntensityProcessCpp <- function(time, bandwidth) {
     .Call(`_highfrequency_tradeIntensityProcessCpp`, time, bandwidth)
 }
 
+medianCase <- function(x) {
+    .Call(`_highfrequency_medianCase`, x)
+}
+
 AsymptoticVarianceC <- function(vIn, iLag) {
     .Call(`_highfrequency_AsymptoticVarianceC`, vIn, iLag)
 }

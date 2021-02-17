@@ -54,6 +54,17 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// medianCase
+double medianCase(Rcpp::NumericVector x);
+RcppExport SEXP _highfrequency_medianCase(SEXP xSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type x(xSEXP);
+    rcpp_result_gen = Rcpp::wrap(medianCase(x));
+    return rcpp_result_gen;
+END_RCPP
+}
 // AsymptoticVarianceC
 double AsymptoticVarianceC(const arma::colvec& vIn, int iLag);
 RcppExport SEXP _highfrequency_AsymptoticVarianceC(SEXP vInSEXP, SEXP iLagSEXP) {
@@ -396,6 +407,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_highfrequency_calcRecVarEq", (DL_FUNC) &_highfrequency_calcRecVarEq, 2},
     {"_highfrequency_quadraticKernel", (DL_FUNC) &_highfrequency_quadraticKernel, 1},
     {"_highfrequency_tradeIntensityProcessCpp", (DL_FUNC) &_highfrequency_tradeIntensityProcessCpp, 2},
+    {"_highfrequency_medianCase", (DL_FUNC) &_highfrequency_medianCase, 1},
     {"_highfrequency_AsymptoticVarianceC", (DL_FUNC) &_highfrequency_AsymptoticVarianceC, 2},
     {"_highfrequency_AutomaticLagSelectionC", (DL_FUNC) &_highfrequency_AutomaticLagSelectionC, 2},
     {"_highfrequency_DriftBurstLoopC", (DL_FUNC) &_highfrequency_DriftBurstLoopC, 8},

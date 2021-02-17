@@ -4,7 +4,14 @@
 \alias{plotTQData}
 \title{Plot Trade and Quote data}
 \usage{
-plotTQData(tData, qData = NULL, xLim = NULL, ...)
+plotTQData(
+  tData,
+  qData = NULL,
+  xLim = NULL,
+  tradeCol = "black",
+  quoteCol = "darkgray",
+  ...
+)
 }
 \arguments{
 \item{tData}{cleaned trades data}
@@ -13,10 +20,14 @@ plotTQData(tData, qData = NULL, xLim = NULL, ...)
 
 \item{xLim}{timestamps for the start and the end of the plots.}
 
+\item{tradeCol}{color in which to paint the trade crosses.}
+
+\item{quoteCol}{color in which to fill out the bid-offer spread.}
+
 \item{...}{passed to \code{plot} and \code{points}.}
 }
 \description{
-Plot trade and quote data, trades are marked by black crosses, and quotes are plotted as dark grey boxes denoting the bid-offer spread for all the quotes.
+Plot trade and quote data, trades are marked by crosses, and quotes are plotted as boxes denoting the bid-offer spread for all the quotes.
 }
 \examples{
 cleanedQuotes = quotesCleanup(qDataRaw = sampleQDataRaw, report = FALSE, printExchange = FALSE)

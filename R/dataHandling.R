@@ -871,8 +871,7 @@ autoSelectExchangeQuotes <- function(qData, printExchange = TRUE) {
     stop("Please provide only one symbol at a time.")
   }
   
-  qData[, SUMVOL := sum(BIDSIZ + OFRSIZ), by = "EX"]
-  qData <- qData[SUMVOL == max(SUMVOL)][, -c("SUMVOL")]
+  qData <- qData[EX == qData[, list(SUMVOL = sum(BIDSIZ + OFRSIZ)), by = "EX"][SUMVOL == max(SUMVOL), EX]]
   
   if (printExchange) {
     exch <- unique(qData$EX)
@@ -939,43 +938,34 @@ exchangeHoursOnly <- function(data, marketOpen = "09:30:00", marketClose = "16:0
   } else {
     tz <- timeZone
   }
-  setkey(data, "DT") # The below code MAY fail with data with unordered DT column. Also setkey inceases speed of grouping
-  data[, DATE := as.Date(floor(as.numeric(DT, tz = tz) / 86400), origin = "1970-01-01", tz = tz)]
-  dates <- unique(data[,DATE])
-  # data <- data[DT >= ymd_hms(paste(as.Date(data$DT), dayBegin), tz = tzone(data$DT))]
-  # data <- data[DT <= ymd_hms(paste(as.Date(data$DT), dayEnd), tz = tzone(data$DT))]
-  # 
-  # days <- 0
-  # if(grepl('+', marketClose)){
-  #   re <- regexpr('[+][[:digit:]]+', marketClose)
-  #   days <- substr(marketClose, re[1], re[1] + attr(re, 'match.length'))
-  #   days <- as.numeric(days)
-  # }
-  marketOpenNumeric <- as.numeric(as.POSIXct(paste(dates, marketOpen), format = "%Y-%m-%d %H:%M:%OS", tz = tz), tz = tz)
-  marketCloseNumeric <- as.numeric(as.POSIXct(paste(dates, marketClose), format = "%Y-%m-%d %H:%M:%OS", tz = tz), tz =tz)
+  setkey(data, DT) # The below code MAY fail with data with unordered DT column. Also setkey inceases speed of grouping
+  
+  obsPerDay <- data[, .N, by = list(DATE = as.Date(floor(as.numeric(DT, tz = tz) / 86400), origin = "1970-01-01", tz = tz))] # Dates and observations per day
+  
+  marketOpenNumeric <- as.numeric(as.POSIXct(paste(obsPerDay[[1]], marketOpen), format = "%Y-%m-%d %H:%M:%OS", tz = tz), tz = tz)
+  marketCloseNumeric <- as.numeric(as.POSIXct(paste(obsPerDay[[1]], marketClose), format = "%Y-%m-%d %H:%M:%OS", tz = tz), tz =tz)
   # marketCloseNumeric <- marketCloseNumeric + days * 86400 # 60 * 60 * 24
-  obsPerDay <- data[, .N, by = DATE][,N]
   
   ## Here we make sure that we can correctly handle times that happen before midnight in the corrected timestamps from the flag if statements
-  if(length(marketOpenNumeric) != length(obsPerDay)){
-    if(length(marketOpenNumeric) < length(obsPerDay)){ ## Here we add entries
-      marketOpenNumeric <- rep(marketOpenNumeric, length(obsPerDay))[1:length(obsPerDay)]
-      marketCloseNumeric <- rep(marketCloseNumeric, length(obsPerDay))[1:length(obsPerDay)]
-    } else {
-      stop("unknown error occured in aggregatePrice")
+  if(length(marketOpenNumeric) != nrow(obsPerDay)){
+    if(length(marketOpenNumeric) < nrow(obsPerDay)){ ## Here we add entries
+      marketOpenNumeric <- rep(marketOpenNumeric, nrow(obsPerDay))[1:nrow(obsPerDay)]
+      marketCloseNumeric <- rep(marketCloseNumeric, nrow(obsPerDay))[1:nrow(obsPerDay)]
+    } else { ## This shouldn't be possible but we check so we can make an error
+      stop("unknown error occured in exchangeHoursOnly")
     }
     
   }
   
   # Subset observations that does not fall between their respective market opening and market closing times.
-  data <- data[between(DT, rep(marketOpenNumeric, obsPerDay), rep(marketCloseNumeric, obsPerDay))]
-  data <- data[, nm, with = FALSE]
+  data <- data[between(DT, rep(marketOpenNumeric, obsPerDay[[2]]), rep(marketCloseNumeric, obsPerDay[[2]])), nm, with = FALSE]
   if (inputWasXts) {
     return(xts(as.matrix(data[, -c("DT")]), order.by = data$DT, tzone = tzone(data$DT)))
   } else {
     return(data[])
   }
 }
+
 
 
 
@@ -1274,13 +1264,12 @@ mergeQuotesSameTimestamp <- function(qData, selection = "median") {
   # keep summed size columns
   keepCols <- colnames(qData)[!(colnames(qData) %in% c("DT", "SYMBOL","BID", "OFR","BIDSIZ", "OFRSIZ"))]
   keptData <- qData[, lapply(.SD, last), by = list(DT, SYMBOL)][, keepCols, with = FALSE]
-  qData_size <- qData[, lapply(.SD, sum), by = list(DT, SYMBOL), .SDcols = c("BIDSIZ", "OFRSIZ")]
   if (selection == "median") {
-    qData <- qData[, lapply(.SD, median), by = list(DT, SYMBOL), .SDcols = c("BID", "OFR")]
-    
+    qData <- qData[, list(BID = median(BID), OFR = median(OFR), OFRSIZ = sum(OFRSIZ), BIDSIZ = sum(BIDSIZ)), by = list(DT, SYMBOL)]
   }
   
   if (selection == "max.volume") {
+    qData_size <- qData[, lapply(.SD, sum), by = list(DT, SYMBOL), .SDcols = c("BIDSIZ", "OFRSIZ")]
     qData <- qData[, MAXBID := max(BIDSIZ), by = list(DT, SYMBOL)][, MAXOFR := max(OFRSIZ), by = list(DT, SYMBOL)][
       , BIDSIZ := fifelse(BIDSIZ == MAXBID, 1, 0)][
       , OFRSIZ := fifelse(OFRSIZ == MAXOFR, 1, 0)][
@@ -1288,17 +1277,21 @@ mergeQuotesSameTimestamp <- function(qData, selection = "median") {
       , OFR := OFR * OFRSIZ][
       , BID := max(BID), by = list(DT,SYMBOL)][, OFR := max(OFR), by = list(DT, SYMBOL)][, -c("MAXBID", "MAXOFR", "BIDSIZ", "OFRSIZ")][
       , lapply(.SD, unique), by = list(DT, SYMBOL), .SDcols = c("BID", "OFR")]
+    qData <- merge(qData, qData_size, by = c("DT", "SYMBOL"))
   }
   if (selection == "weighted.average") {
+    qData_size <- qData[, lapply(.SD, sum), by = list(DT, SYMBOL), .SDcols = c("BIDSIZ", "OFRSIZ")]
     qData[, `:=`(BIDSIZ = as.numeric(BIDSIZ), OFRSIZ = as.numeric(OFRSIZ))]
     qData <- qData[, `:=` (BIDSIZ = BIDSIZ / sum(BIDSIZ), OFRSIZ = OFRSIZ / sum(OFRSIZ)), by = list(DT, SYMBOL)][
       , `:=` (BID = sum(BID * BIDSIZ), OFR = sum(OFR * OFRSIZ)), by = list(DT, SYMBOL)][
         , -c("BIDSIZ", "OFRSIZ")][
         , lapply(.SD, unique), by = list(DT, SYMBOL), .SDcols = c("BID", "OFR")]
+    qData <- merge(qData, qData_size, by = c("DT", "SYMBOL"))
   }
-  qData <- cbind(qData, keptData)
-  qData <- merge(qData, qData_size, by = c("DT", "SYMBOL"))
   
+  
+  qData <- cbind(qData, keptData)
+  setkey(qData, DT, SYMBOL)
   if (inputWasXts) {
     return(xts(as.matrix(qData[, -c("DT")]), order.by = qData$DT))
   } else {
@@ -1359,33 +1352,32 @@ mergeTradesSameTimestamp <- function(tData, selection = "median") {
   }
   
   keepCols <- colnames(tData)[!(colnames(tData) %in% c("DT", "SYMBOL", "PRICE", "SIZE"))]
-  keptData <- tData[, lapply(.SD, last), by = list(DT, SYMBOL)][, keepCols, with = FALSE]
   if (selection == "median") {
-    tData[, `:=` (PRICE = median(PRICE), NUMTRADES = .N), by = list(DT, SYMBOL)]
-    #If there is more than one observation at median price, take the average volume.
-    tData[, SIZE := as.numeric(as.character(SIZE))]
-    tData[, SIZE := sum(SIZE), by = list(DT, SYMBOL)]
-    tData <- unique(tData[, c("DT", "SYMBOL", "PRICE", "SIZE", "NUMTRADES")])
+    keptData <- tData[, lapply(.SD, last), by = list(DT, SYMBOL)][, keepCols, with = FALSE]
+    tData <- tData[, list(PRICE = median(PRICE), NUMTRADES = .N, SIZE = sum(SIZE)), by = list(DT, SYMBOL)]
+    tData <- cbind(tData, keptData)
   }
   
   if (selection == "max.volume") {
+    keptData <- tData[, lapply(.SD, last), by = list(DT, SYMBOL)][, keepCols, with = FALSE]
     tData[, SIZE := as.numeric(as.character(SIZE))]
     tData <- tData[, `:=` (MAXSIZE = max(SIZE), NUMTRADES = .N), by = list(DT, SYMBOL)]
     tData[, SIZE := fifelse(SIZE == MAXSIZE, 1, 0)]
     tData[, PRICE := PRICE * SIZE]
     tData[, PRICE := max(PRICE), by = "DT"]
     tData[, SIZE := MAXSIZE]
-    tData[, -c("MAXSIZE")]
-    tData <- unique(tData[, c("DT", "SYMBOL", "PRICE", "SIZE", "NUMTRADES")])
+    tData <- tData[, -c("MAXSIZE")][, lapply(.SD, last), by = list(DT, SYMBOL), .SDcols = c("PRICE", "SIZE", "NUMTRADES")]
+    tData <- cbind(tData, keptData)
   }
   if (selection == "weighted.average") {
+    keptData <- tData[, lapply(.SD, last), by = list(DT, SYMBOL)][, keepCols, with = FALSE]
     tData[, SIZE := as.numeric(as.character(SIZE))]
     tData <- tData[, `:=` (SIZE_WEIGHT = SIZE / sum(SIZE), NUMTRADES = .N), by = list(DT, SYMBOL)]
     tData[, `:=` (PRICE = sum(PRICE * SIZE_WEIGHT)), by = list(DT, SYMBOL)]
-    tData[, SIZE := sum(SIZE), by = list(DT, SYMBOL)]
-    tData <- unique(tData[, c("DT", "SYMBOL", "PRICE", "SIZE", "NUMTRADES")])
+    tData <- tData[, SIZE := sum(SIZE), by = list(DT, SYMBOL)][, lapply(.SD, last), by = list(DT, SYMBOL), .SDcols = c("PRICE", "SIZE", "NUMTRADES")]
+    tData <- cbind(tData, keptData)
   }
-  tData <- cbind(tData, keptData)
+    
   if (inputWasXts) {
     return(xts(as.matrix(tData[, -c("DT")]), order.by = tData$DT))
   } else {
@@ -1560,7 +1552,7 @@ noZeroQuotes <- function(qData) {
 #' @keywords cleaning
 #' @export
 quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges = "auto", qDataRaw = NULL, report = TRUE, 
-                          selection = "median", maxi = 50, window = 50, type = "advanced", marketOpen = "09:30:00", 
+                          selection = "median", maxi = 50, window = 50, type = "standard", marketOpen = "09:30:00", 
                           marketClose = "16:00:00", rmoutliersmaxi = 10, printExchange = TRUE, saveAsXTS = FALSE, tz = NULL) {
   
   .SD <- BID <- OFR <- DT <- SPREAD <- SPREAD_MEDIAN <- EX <- DATE <- BIDSIZ <- OFRSIZ <- TIME_M <- SYMBOL <- NULL
@@ -1672,7 +1664,6 @@ quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
     } else {
       tz <- timeZone
     }
-    
     REPORT <- c(initialObservations = 0,
                 removedFromZeroQuotes = 0, 
                 removedOutsideExchangeHours = 0,
@@ -1685,6 +1676,7 @@ quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
     
     nm <- toupper(colnames(qDataRaw))
     
+    setkey(qDataRaw, DT, SYMBOL)
     REPORT[1] <- dim(qDataRaw)[1] 
     qDataRaw <- qDataRaw[BID != 0 & OFR != 0]
     REPORT[2] <- dim(qDataRaw)[1] 
@@ -1692,13 +1684,13 @@ quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
     REPORT[3] <- dim(qDataRaw)[1] 
     if("EX" %in% nm){
       if(all(exchanges != "auto")){
-        qDataRaw <- qDataRaw[EX %in% exchanges]
+        qDataRaw <- qDataRaw[EX %chin% exchanges]
       } else if (exchanges == "auto"){
         qDataRaw <- qDataRaw[, autoSelectExchangeQuotes(.SD, printExchange = printExchange), .SDcols = nm,by = list(SYMBOL, DATE = as.Date(DT, tz = tz))][, nm, with = FALSE]
       }
     }
     REPORT[4] <- dim(qDataRaw)[1]
-    qDataRaw[OFR > BID, `:=`(SPREAD = OFR - BID, DATE = as.Date(DT, tz = tz))][, SPREAD_MEDIAN := median(SPREAD), by = "DATE"]
+    qDataRaw <- qDataRaw[OFR>BID, list(DT, SPREAD = OFR - BID,  SPREAD_MEDIAN = median(OFR-BID), OFR, BID, BIDSIZ, OFRSIZ),by = list(DATE = as.Date(DT, tz = tz), SYMBOL)]
     REPORT[5] <- dim(qDataRaw)[1] 
     qDataRaw <- qDataRaw[SPREAD < (SPREAD_MEDIAN * maxi)][, -c("SPREAD","SPREAD_MEDIAN")]
     REPORT[6] <- dim(qDataRaw)[1]
@@ -1768,7 +1760,7 @@ rmLargeSpread <- function(qData, maxi = 50, tz = NULL) {
   
   qData <- qData[, DATE := as.Date(DT, tz = tz)][
     , SPREAD := OFR - BID][
-    , SPREAD_MEDIAN := median(SPREAD), by = "DATE"][SPREAD < (SPREAD_MEDIAN * maxi)]
+    , SPREAD_MEDIAN := medianCase(SPREAD), by = "DATE"][SPREAD < (SPREAD_MEDIAN * maxi)]
   
   if (inputWasXts) {
     return(xts(as.matrix(qData[, -c("DT", "DATE", "SPREAD", "SPREAD_MEDIAN")]), order.by = qData$DT))
@@ -1963,7 +1955,7 @@ rmTradeOutliersUsingQuotes <- function(tData, qData, lagQuotes = 0, BFM = FALSE,
 #' @importFrom data.table as.data.table is.data.table setnames
 #' @importFrom xts is.xts as.xts
 #' @export
-rmOutliersQuotes <- function (qData, maxi = 10, window = 50, type = "advanced", tz = NULL) {
+rmOutliersQuotes <- function (qData, maxi = 10, window = 50, type = "standard", tz = NULL) {
   # NOTE: Median Absolute deviation chosen contrary to Barndorff-Nielsen et al.
   # Setting those variables equal NULL is for suppressing NOTES in devtools::check
   # References inside data.table-operations throw "no visible binding for global variable ..." error
@@ -2128,6 +2120,7 @@ tradesCondition <- function(tData, validConds = c('', '@', 'E', '@E', 'F', 'FI',
 #' @return \code{xts} or \code{data.table} object depending on input.
 #' 
 #' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
+#' @importFrom data.table %chin%
 #' @keywords cleaning
 #' @export
 selectExchange <- function(data, exch = "N") { 
@@ -2146,7 +2139,7 @@ selectExchange <- function(data, exch = "N") {
     if (!("DT" %in% colnames(data))) {
       stop("Data.table neeeds DT column.")
     }
-    return(data[EX %in% exch])
+    return(data[EX %chin% exch])
   }
 }
 
@@ -2235,7 +2228,7 @@ selectExchange <- function(data, exch = "N") {
 #' Brownlees, C.T. and Gallo, G.M. (2006). Financial econometric analysis at ultra-high frequency: Data handling concerns. \emph{Computational Statistics & Data Analysis}, 51, 2232-2245.
 #' 
 #' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup
-#' @importFrom data.table fread
+#' @importFrom data.table fread %chin%
 #' @importFrom utils unzip
 #' @keywords cleaning
 #' @export
@@ -2366,7 +2359,7 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
     REPORT[3] <- dim(tDataRaw)[1]
     if("EX" %in% nm){
       if(all(exchanges != "auto")){
-        tDataRaw <- tDataRaw[EX %in% exchanges]
+        tDataRaw <- tDataRaw[EX %chin% exchanges]
       } else if (exchanges == "auto"){
         tDataRaw <- tDataRaw[, autoSelectExchangeTrades(.SD, printExchange = printExchange), .SDcols = nm,by = list(SYMBOL, DATE = as.Date(DT, tz = tz))][, nm, with = FALSE]
       }
