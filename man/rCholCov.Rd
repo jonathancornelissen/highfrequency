@@ -82,6 +82,9 @@ The CholCov estimation algorithm is as follows:
 \references{
 Boudt, K., Laurent, S., Lunde, A., Quaedvlieg, R., and Sauri, O. (2017). Positive semidefinite integrated covariance estimation, factorizations and asynchronicity. \emph{Journal of Econometrics}, 196, 347-367.
 }
+\seealso{
+\code{\link{ICov}} for a list of implemented estimators of the integrated covariance.
+}
 \author{
 Emil Sjoerup
 }

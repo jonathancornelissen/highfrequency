@@ -38,10 +38,12 @@ Then, the rMinRVar is given by
 minrv <- rMinRVar(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes",
                alignPeriod = 5, makeReturns = TRUE)
 minrv
-
 }
 \references{
 Andersen, T. G., Dobrev, D., and Schaumburg, E. (2012). Jump-robust volatility estimation using nearest neighbor truncation. \emph{Journal of Econometrics}, 169, 75-93.
+}
+\seealso{
+\code{\link{IVar}} for a list of implemented estimators of the integrated variance.
 }
 \author{
 Jonathan Cornelissen, Kris Boudt, Emil Sjoerup.

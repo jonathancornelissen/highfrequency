@@ -69,7 +69,6 @@ rvKernel
 # Multivariate:
 rcKernel <- rKernelCov(rData = sampleOneMinuteData, makeReturns = TRUE)
 rcKernel
-
 }
 \references{
 Barndorff-Nielsen, O. E., Hansen, P. R., Lunde, A., and Shephard, N. (2008). Designing realized kernels to measure the ex post variation of equity prices in the presence of noise. \emph{Econometrica}, 76, 1481-1536.
@@ -77,6 +76,9 @@ Barndorff-Nielsen, O. E., Hansen, P. R., Lunde, A., and Shephard, N. (2008). Des
 Hansen, P. and Lunde, A. (2006). Realized variance and market microstructure noise. \emph{Journal of Business and Economic Statistics}, 24, 127-218.
 
 Zhou., B. (1996). High-frequency data and volatility in foreign-exchange rates. \emph{Journal of Business & Economic Statistics}, 14, 45-52.
+}
+\seealso{
+\code{\link{ICov}} for a list of implemented estimators of the integrated covariance.
 }
 \author{
 Scott Payseur, Onno Kleen, and Emil Sjoerup.

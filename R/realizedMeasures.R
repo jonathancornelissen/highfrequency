@@ -4,31 +4,60 @@
 #' 
 #' The implemented estimators are:
 #' 
-#' Realized Covariance \code{\link{rCov}}
+#' Realized covariance \code{\link{rCov}}
+#'
+#' Realized bipower covariance \code{\link{rBPCov}}
+#'
+#' Hayashi-Yoshida realized covariance \code{\link{rHYCov}}
 #' 
-#' Subsampled Realized Covariance \code{\link{rAVGCov}}
+#' Realized kernel covariance \code{\link{rKernelCov}}
+#'
+#' Realized outlyingness-weighted covariance \code{\link{rOWCov}}
 #' 
-#' Modulated Realized Covariance \code{\link{rMRCov}}
-#' @export
+#' Realized threshold covariance \code{\link{rThresholdCov}}
+#' 
+#' Realized two-scale covariance \code{\link{rTSCov}}
+#' 
+#' Robust realized two-scale covariance \code{\link{rRTSCov}}
+#' 
+#' Subsampled realized covariance \code{\link{rAVGCov}}
+#' 
+#' Realized semi-covariance \code{\link{rSemiCov}}
+#' 
+#' Modulated Realized covariance \code{\link{rMRCov}}
+#' 
+#' Realized Cholesky covariance \code{\link{rCholCov}}
+#' 
+#' Beta-adjusted realized covariance \code{\link{rBACov}}
+#' 
+#' @seealso \code{\link{IVar}} for a list of implemented estimators of the integrated variance.
 #' @aliases ICov
-ICov <- NULL
-
+#' @name ICov
+NULL
 
 #' @title Estimators of the integrated variance
 #' @description 
-#' This documentation page functions as a point of reference to quickly look up the estimators of the integrated covariance provided in the \pkg{highfrequency} package.
+#' This documentation page functions as a point of reference to quickly look up the estimators of the integrated variance provided in the \pkg{highfrequency} package.
 #' 
 #' The implemented estimators are:
+#' Realized Variance \code{\link{rRVar}}
 #' 
-#' Realized Covariance \code{\link{rCov}}
+#' Median realized variance \code{\link{rMedVar}}
 #' 
-#' Subsampled Realized Covariance \code{\link{rAVGCov}}
+#' Minimum realized variance \code{\link{rMinVar}}
 #' 
-#' Modulated Realized Covariance \code{\link{rMRCov}}
-#' @export
+#' Realized quadpower variance \code{\link{rQPVar}}
+#' 
+#' Realized multipower variance \code{\link{rMPVar}}
+#' 
+#' Realized semivariance \code{\link{rSVar}} 
+#' 
+#' Note that almost all estimators in the list in \code{\link{ICov}} also work yield estimates of the integrated variance on the diagonals.
+#' 
+#' @seealso \code{\link{ICov}} for a list of implemented estimators of the integrated covariance.
 #' @aliases IVar
-IVar <- NULL
-
+#' @name IVar
+NULL
 
 #' Available kernels
 #'
@@ -322,7 +351,7 @@ rMinRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
 #' minrv <- rMinRVar(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes",
 #'                alignPeriod = 5, makeReturns = TRUE)
 #' minrv
-#'
+#' @seealso \code{\link{IVar}} for a list of implemented estimators of the integrated variance.
 #' @keywords volatility
 #' @export
 rMinRVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, ...){
@@ -442,6 +471,7 @@ rMedRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
 #' medrv <- rMedRVar(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes",
 #'                alignPeriod = 5, makeReturns = TRUE)
 #' medrv
+#' @seealso \code{\link{IVar}} for a list of implemented estimators of the integrated variance.
 #' @importFrom data.table setDT transpose setcolorder
 #' @keywords volatility
 #' @export
@@ -598,6 +628,7 @@ rMRC <- function(pData, pairwise = FALSE, makePsd = FALSE, theta = 0.8, ...){
 #' rMRCov(a, pairwise = TRUE, makePsd = TRUE)
 #'
 #' }
+#' @seealso \code{\link{ICov}} for a list of implemented estimators of the integrated covariance.
 #' @keywords highfrequency preaveraging
 #' @export
 rMRCov <- function(pData, pairwise = FALSE, makePsd = FALSE, theta = 0.8, ...) {
@@ -735,7 +766,7 @@ rMRCov <- function(pData, pairwise = FALSE, makePsd = FALSE, theta = 0.8, ...) {
 #' # Multivariate subsampled realized variance
 #' rvAvgCovSub <- rAVGCov(rData = sampleOneMinuteData[1:391], makeReturns = TRUE)
 #' rvAvgCovSub
-#' 
+#' @seealso \code{\link{ICov}} for a list of implemented estimators of the integrated covariance.
 #' @importFrom data.table data.table
 #' @keywords volatility
 #' @export
@@ -1076,7 +1107,7 @@ rBeta <- function(rData, rIndex, RCOVestimator = "rCov", RVestimator = "rRVar", 
 #' # Multivariate:
 #' rbpc <- rBPCov(rData = sampleOneMinuteData, makeReturns = TRUE, makePsd = TRUE)
 #' rbpc
-#'
+#' @seealso \code{\link{ICov}} for a list of implemented estimators of the integrated covariance.
 #' @keywords volatility
 #' @export
 rBPCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, makePsd = FALSE, ...) {
@@ -1223,6 +1254,7 @@ rBPCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeR
 #' # Multivariate:
 #' rc = rCov(rData = sampleOneMinuteData, makeReturns = TRUE)
 #' rc
+#' @seealso \code{\link{ICov}} for a list of implemented estimators of the integrated covariance.
 #' @keywords volatility
 #' @export
 rCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, ...) {
@@ -1328,7 +1360,7 @@ rCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeRet
 #' library("xts")
 #' hy <- rHYCov(rData = as.xts(sampleOneMinuteData)["2001-08-05"],
 #'              period = 5, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)
-#'
+#' @seealso \code{\link{ICov}} for a list of implemented estimators of the integrated covariance.
 #' @keywords volatility
 #' @export
 rHYCov <- function(rData, cor = FALSE, period = 1, alignBy = "seconds", alignPeriod = 1, makeReturns = FALSE, makePsd = TRUE, ...) {
@@ -1510,7 +1542,7 @@ rHYCov <- function(rData, cor = FALSE, period = 1, alignBy = "seconds", alignPer
 #' # Multivariate:
 #' rcKernel <- rKernelCov(rData = sampleOneMinuteData, makeReturns = TRUE)
 #' rcKernel
-#' 
+#' @seealso \code{\link{ICov}} for a list of implemented estimators of the integrated covariance.
 #' @keywords volatility
 #' @export
 rKernelCov <- function(rData, cor = FALSE,  alignBy = NULL, alignPeriod = NULL,
@@ -1780,6 +1812,7 @@ rMPV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE)
 #' mpv <- rMPVar(sampleTData[, list(DT, PRICE)], m = 2, p = 3, alignBy = "minutes",
 #'             alignPeriod = 5, makeReturns = TRUE)
 #' mpv
+#' @seealso \code{\link{IVar}} for a list of implemented estimators of the integrated variance.
 #' @keywords highfrequency rMPVar
 #' @export
 rMPVar <- function(rData, m = 2, p = 2, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, ...) {
@@ -1927,7 +1960,7 @@ rMPVar <- function(rData, m = 2, p = 2, alignBy = NULL, alignPeriod = NULL, make
 #'                makeReturns = TRUE)
 #' rowc
 #' }
-#'
+#' @seealso \code{\link{ICov}} for a list of implemented estimators of the integrated covariance.
 #' @keywords volatility
 #' @export
 rOWCov <- function (rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, seasadjR = NULL,
@@ -2161,6 +2194,7 @@ rSV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE){
 #' sv <- rSVar(sampleTData[, list(DT, PRICE)], alignBy = "minutes",
 #'           alignPeriod = 5, makeReturns = TRUE)
 #' sv
+#' @seealso \code{\link{IVar}} for a list of implemented estimators of the integrated variance.
 #' @references
 #' Barndorff-Nielsen, O. E., Kinnebrock, S., and Shephard N. (2010). \emph{Measuring downside risk: realised semivariance}. In: Volatility and Time Series Econometrics: Essays in Honor of Robert F. Engle,
 #' (Edited by Bollerslev, T., Russell, J., and Watson, M.), 117-136. Oxford University Press.
@@ -2285,7 +2319,7 @@ rSVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #' rcThreshold <- rThresholdCov(dat, alignBy = "minutes", alignPeriod = 1, makeReturns = TRUE)
 #' rcThreshold
 #' }
-#'
+#' @seealso \code{\link{ICov}} for a list of implemented estimators of the integrated covariance.
 #' @keywords volatility
 #' @export
 rThresholdCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, ...) {
@@ -2467,7 +2501,7 @@ rThresholdCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL
 #' # Note: List of prices as input
 #' rcRTS
 #' }
-#'
+#' @seealso \code{\link{ICov}} for a list of implemented estimators of the integrated covariance.
 #' @keywords volatility
 #' @export
 rRTSCov <- function (pData, cor = FALSE, startIV = NULL, noisevar = NULL,
@@ -2592,7 +2626,7 @@ RV <- function(rData){
 #' @examples 
 #' rv <- rRVar(sampleOneMinuteData, makeReturns = TRUE)
 #' plot(rv[, DT], rv[, MARKET], xlab = "Date", ylab = "Realized Variance", type = "l")
-#'
+#' @seealso \code{\link{IVar}} for a list of implemented estimators of the integrated variance.
 #' @keywords highfrequency realized
 #' @export
 rRVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, ...) {
@@ -2771,7 +2805,7 @@ rTPQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FAL
 #' qpv <- rQPVar(rData= sampleTData[, list(DT, PRICE)], alignBy= "minutes",
 #'               alignPeriod =5, makeReturns= TRUE)
 #' qpv
-#'
+#' @seealso \code{\link{IVar}} for a list of implemented estimators of the integrated variance.
 #' @keywords highfrequency rQPVar
 #' @export
 rQPVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, ...) {
@@ -2993,7 +3027,7 @@ rQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #' # Note: List of prices as input
 #' rcovts
 #' }
-#'
+#' @seealso \code{\link{ICov}} for a list of implemented estimators of the integrated covariance.
 #' @keywords volatility
 #' @importFrom data.table is.data.table
 #' @importFrom xts as.xts
@@ -3144,15 +3178,16 @@ rTSCov <- function (pData, cor = FALSE, K = 300, J = 1, KCov = NULL, JCov = NULL
 #' @references
 #' Boudt, K., Laurent, S., Lunde, A., Quaedvlieg, R., and Sauri, O. (2017). Positive semidefinite integrated covariance estimation, factorizations and asynchronicity. \emph{Journal of Econometrics}, 196, 347-367.
 #' @author Emil Sjoerup
-#'
+#' @seealso \code{\link{ICov}} for a list of implemented estimators of the integrated covariance.
 #' @importFrom xts xts
 #' @importFrom zoo coredata
 #' @export
 rCholCov <- function(pData, IVest = "rMRCov", COVest = "rMRCov", criterion = "squared duration", ...){
 
-  if (!is.list(pData)) {
-    stop("pData must be a list of atleast length one")
-  }
+  if (!is.list(pData)){
+    pData <- list(pData)
+  } 
+  
   if (!all(as.logical(lapply(pData, is.xts)))) {
     stop("All the series in pData must be xts objects")
   }
@@ -3340,7 +3375,7 @@ rCholCov <- function(pData, IVest = "rMRCov", COVest = "rMRCov", criterion = "sq
 #' addLegend(lty = 1) # Add legend so we can distinguish the series.
 #' }
 #' @author Emil Sjoerup.
-#'
+#' @seealso \code{\link{ICov}} for a list of implemented estimators of the integrated covariance.
 #' @references
 #' Bollerslev, T., Li, J., Patton, A. J., and Quaedvlieg, R. (2020). Realized semicovariances. \emph{Econometrica}, 88, 1515-1551.
 #' @keywords volatility
@@ -4190,7 +4225,7 @@ ReMeDIAsymptoticVariance <- function(pData, kn, lags, phi, i){
 #'                    noiseCorrection = FALSE, returnL = FALSE, Lin = FALSE, L = 0, K = 2, J = 1)                    
 #'                    
 #' }
-#' 
+#' @seealso \code{\link{ICov}} for a list of implemented estimators of the integrated covariance.
 #' @references Boudt, K., Dragun, K., Omauri, S., and Vanduffel, S. (2021) Beta-Adjusted Covariance Estimation (working paper).
 #' @author Emil Sjoerup, (Kris Boudt and Kirill Dragun for the Python version)
 #' @importFrom xts is.xts

@@ -52,6 +52,9 @@ sv
 Barndorff-Nielsen, O. E., Kinnebrock, S., and Shephard N. (2010). \emph{Measuring downside risk: realised semivariance}. In: Volatility and Time Series Econometrics: Essays in Honor of Robert F. Engle,
 (Edited by Bollerslev, T., Russell, J., and Watson, M.), 117-136. Oxford University Press.
 }
+\seealso{
+\code{\link{IVar}} for a list of implemented estimators of the integrated variance.
+}
 \author{
 Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup.
 }

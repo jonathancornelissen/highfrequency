@@ -80,6 +80,9 @@ addLegend(lty = 1) # Add legend so we can distinguish the series.
 \references{
 Bollerslev, T., Li, J., Patton, A. J., and Quaedvlieg, R. (2020). Realized semicovariances. \emph{Econometrica}, 88, 1515-1551.
 }
+\seealso{
+\code{\link{ICov}} for a list of implemented estimators of the integrated covariance.
+}
 \author{
 Emil Sjoerup.
 }

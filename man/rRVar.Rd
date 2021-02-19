@@ -38,7 +38,9 @@ Then, the realized variance is given by
 \examples{
 rv <- rRVar(sampleOneMinuteData, makeReturns = TRUE)
 plot(rv[, DT], rv[, MARKET], xlab = "Date", ylab = "Realized Variance", type = "l")
-
+}
+\seealso{
+\code{\link{IVar}} for a list of implemented estimators of the integrated variance.
 }
 \keyword{highfrequency}
 \keyword{realized}

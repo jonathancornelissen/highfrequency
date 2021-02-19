@@ -176,10 +176,12 @@ VABBAC <- rBACov(pData = list(
                    noiseCorrection = FALSE, returnL = FALSE, Lin = FALSE, L = 0, K = 2, J = 1)                    
                    
 }
-
 }
 \references{
 Boudt, K., Dragun, K., Omauri, S., and Vanduffel, S. (2021) Beta-Adjusted Covariance Estimation (working paper).
+}
+\seealso{
+\code{\link{ICov}} for a list of implemented estimators of the integrated covariance.
 }
 \author{
 Emil Sjoerup, (Kris Boudt and Kirill Dragun for the Python version)

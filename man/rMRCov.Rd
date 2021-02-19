@@ -89,6 +89,9 @@ rMRCov(a, pairwise = TRUE, makePsd = TRUE)
 \references{
 Hautsch, N., and Podolskij, M. (2013). Preaveraging-based estimation of quadratic variation in the presence of noise and jumps: theory, implementation, and empirical Evidence. \emph{Journal of Business & Economic Statistics}, 31, 165-183.
 }
+\seealso{
+\code{\link{ICov}} for a list of implemented estimators of the integrated covariance.
+}
 \author{
 Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup.
 }

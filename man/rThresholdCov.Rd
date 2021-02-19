@@ -64,7 +64,6 @@ dat <- exp(cumsum(xts(dat, timestamps)))
 rcThreshold <- rThresholdCov(dat, alignBy = "minutes", alignPeriod = 1, makeReturns = TRUE)
 rcThreshold
 }
-
 }
 \references{
 Barndorff-Nielsen, O. and Shephard, N. (2004). Measuring the impact of jumps in multivariate price processes using bipower covariation. Discussion paper, Nuffield College, Oxford University.
@@ -72,6 +71,9 @@ Barndorff-Nielsen, O. and Shephard, N. (2004). Measuring the impact of jumps in 
 Jacod, J. and Todorov, V. (2009). Testing for common arrival of jumps in discretely-observed multidimensional processes. \emph{Annals of Statistics}, 37, 1792-1838.
 
 Mancini, C. and Gobbi, F. (2012). Identifying the Brownian covariation from the co-jumps given discrete observations. \emph{Econometric Theory}, 28, 249-273.
+}
+\seealso{
+\code{\link{ICov}} for a list of implemented estimators of the integrated covariance.
 }
 \author{
 Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup.

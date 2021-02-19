@@ -70,12 +70,14 @@ rvAvgSub
 # Multivariate subsampled realized variance
 rvAvgCovSub <- rAVGCov(rData = sampleOneMinuteData[1:391], makeReturns = TRUE)
 rvAvgCovSub
-
 }
 \references{
 Liu, L. Y., Patton, A. J., Sheppard, K. (2015). Does anything beat 5-minute RV? A comparison of realized measures across multiple asset classes. \emph{Journal of Econometrics}, 187, 293-311.
 
 Zhang, L., Mykland, P. A. , and Ait-Sahalia, Y. (2005). A tale of two time scales: Determining integrated volatility with noisy high-frequency data. \emph{Journal of the American Statistical Association}, 100, 1394-1411.
+}
+\seealso{
+\code{\link{ICov}} for a list of implemented estimators of the integrated covariance.
 }
 \author{
 Scott Payseur, Onno Kleen, and Emil Sjoerup.
