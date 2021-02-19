@@ -3172,7 +3172,7 @@ rCholCov <- function(pData, IVest = "rMRCov", COVest = "rMRCov", criterion = "sq
 
 
   options <- list(...)
-  op <- list("delta" = 0.1, "theta" = 1, "alignBy" = "minutes", "alignPeriod" = 5, "kernelType" = "rectangular", "kernelParam" = 1, "kernelDOFadj" = TRUE,
+  op <- list("delta" = 0.1, "theta" = 1, "alignBy" = NULL, "alignPeriod" = NULL, "kernelType" = "rectangular", "kernelParam" = 1, "kernelDOFadj" = TRUE,
              "startIV" = NULL, "noisevar" = NULL, "K" = 300, "J" = 1, "KCov" = NULL, "JCov" = NULL, "KVar" = NULL, "JVar" = NULL, "eta" = 9, "makePsd" = FALSE, "k" = 1)
   op[names(options)] <- options
   delta <- op[["delta"]]
@@ -3234,7 +3234,7 @@ rCholCov <- function(pData, IVest = "rMRCov", COVest = "rMRCov", criterion = "sq
                    rRTSCov = rRTSCov(exp(cumsum(cbind(returns[,l], f[,m]))), cor = FALSE, startIV = startIV, noisevar = noisevar, K = K, J = J,
                                      KCov = KCov, JCov=JCov, KVar=KVar, JVar = JVar, eta = eta, makePsd = makePsd ),
                    rThresholdCov = rThresholdCov(exp(cumsum(cbind(returns[,l], f[,m]))), alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = TRUE),
-                   rSemiCov = rSemiCov(exp(cumsum(cbind(returns[,l], f[,m]))), alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = TRUE)
+                   rSemiCov = rSemiCov(exp(cumsum(cbind(returns[,l], f[,m]))), alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = TRUE)[["rCov"]]
                    )
 
 
@@ -3262,7 +3262,7 @@ rCholCov <- function(pData, IVest = "rMRCov", COVest = "rMRCov", criterion = "sq
                        rRTSCov =       rRTSCov(xts(exp(cumsum(f[,d])), order.by = index(returns)), cor = FALSE, startIV = startIV, noisevar = noisevar, K = K, J = J,
                                                KCov = KCov, JCov=JCov, KVar=KVar, JVar = JVar, eta = eta, makePsd = makePsd ),
                        rThresholdCov = rThresholdCov(xts(exp(cumsum(f[,d])), order.by = index(returns)), alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = TRUE),
-                       rSemiCov = rSemiCov(xts(exp(cumsum(f[,d])), order.by = index(returns)), alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = TRUE)
+                       rSemiCov = rSemiCov(xts(exp(cumsum(f[,d])), order.by = index(returns)), alignBy = alignBy, alignPeriod = alignPeriod, makeReturns = TRUE)[["rCov"]]
                        )
     }
 
