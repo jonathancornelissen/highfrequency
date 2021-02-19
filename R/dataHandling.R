@@ -1040,13 +1040,8 @@ exchangeHoursOnly <- function(data, marketOpen = "09:30:00", marketClose = "16:0
 #' @export
 makeReturns <- function(ts) {
   inputWasXts <- is.xts(ts)
-  l <- dim(ts)[1]
-  if(is.null(l)) { ## Special case for ts is numeric vector
-    l <- length(ts)
-    D <- 1
-  } else {
-    D <- dim(ts)[2]
-  }
+  l <- NROW(ts) # allows for numeric()s
+  D <- NCOL(ts) # allows for numeric()s
   
   col_names <- colnames(ts)
   x <- log(matrix(as.numeric(ts), nrow = l))
@@ -2586,8 +2581,8 @@ refreshTime <- function (pData, sort = FALSE, criterion = "squared duration") {
     if(any(as.logical(lapply(pData, function(x) length(unique(floor(as.numeric(x$DT)/ 86400))) > 1)))){
       stop("All the series in pData must contain data for a single day")
     }
-    if(!all(sapply(pData, function(x) c("DT", "PRICE") %in% colnames(x)))){
-      stop("DT and PRICE must be present in the data")
+    if(!all(sapply(pData, function(x) any(colnames(x) == "DT") && ncol(x) == 2))){
+      stop("DT must be present in all the data.tables in the input, and they should have two columns")
     }
   }
   if((sort && is.null(names(pData)))){
@@ -2660,25 +2655,44 @@ refreshTime <- function (pData, sort = FALSE, criterion = "squared duration") {
     } else {
       vec <- 2:(length(pData) + 1)
     }
-    
     names <- names(pData)
-    pData <- lapply(pData, copy)
     
-    for (i in 1:length(pData)) {
-      pData[[i]][,DT := as.numeric(DT, tz = tz)]
-      setkey(pData[[i]], "DT")
+    ## Check if all the column names are the same, e.g. all data.tables in the list
+    ## has colnames c("DT", "PRICE") then when we merge, we will get a single column
+    ## data.table - which we can't have! We just append a character.
+    if(length(unique(unlist(lapply(pData, names)))) == 2){ 
       
-      # if(flag)  setnames(pData[[i]],  c("DT", paste0(colnames(pData[[i]])[-1] , i)))
+      pData <- lapply(pData, copy) #unfortunately we need to copy all the data.tables here
+      for (i in 1:length(pData)) {
+        setnames(pData[[i]], new = c("DT", paste(names(pData[[i]])[2], i))) 
+      }
     }
-    # mergeOverload <- function(x,y) merge.data.table(x, y, all = TRUE, on = "DT")
     
-    # pData <- Reduce(mergeOverload, pData)
-    
+    # # May not be needed
+    # # 
+    # for (i in 1:length(pData)) {
+    #   pData[[i]][,DT := as.numeric(DT, tz = tz)]
+    #   # set(pData[[i]], j = "DT",  value= as.numeric(pData[[i]]$DT, tz = tz))
+    #   setkey(pData[[i]], "DT")
+    # 
+    #   # if(flag)  setnames(pData[[i]],  c("DT", paste0(colnames(pData[[i]])[-1] , i)))
+    # }
+    # # # mergeOverload <- function(x,y) merge.data.table(x, y, all = TRUE, on = "DT")
+    # # 
+    # # # pData <- Reduce(mergeOverload, pData)
+    # # 
     pData <- Reduce(function(x,y) merge.data.table(x, y, all = TRUE, on = "DT"), pData)
     
-    pData <- refreshTimeMatching(as.matrix(pData[,-"DT"]), pData$DT)
+    # For if the copying is needed
+    # pData <- refreshTimeMatching(as.matrix(pData[,-"DT"]), pData$DT)
+    
+    pData <- refreshTimeMatching(as.matrix(pData[,-"DT"]), as.numeric(pData$DT, tz = tz))
     pData <- data.table(pData[[2]], pData[[1]])
-    colnames(pData) <- c("DT", names)
+    if(is.null(names)){
+      setnames(pData, new = c("DT", paste0("V", 1:(ncol(pData)-1))))
+    } else {
+      setnames(pData, new =  c("DT", names))
+    }
     pData[, DT := as.POSIXct(DT, origin = as.POSIXct("1970-01-01", tz = tz), tz = tz)]
     if(sort) setcolorder(pData, c(1, vec))
     
