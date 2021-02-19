@@ -78,6 +78,12 @@ a <- list(as.xts(sampleOneMinuteData[as.Date(DT) == "2001-08-04", list(DT, MARKE
           as.xts(sampleOneMinuteData[as.Date(DT) == "2001-08-04", list(DT, STOCK)]))
 rMRCov(a, pairwise = TRUE, makePsd = TRUE)
 
+
+# We can also add use data.tables and use a named list to convey asset names
+a <- list(foo = sampleOneMinuteData[as.Date(DT) == "2001-08-04", list(DT, MARKET)],
+          bar = sampleOneMinuteData[as.Date(DT) == "2001-08-04", list(DT, STOCK)])
+rMRCov(a, pairwise = TRUE, makePsd = TRUE)
+
 }
 }
 \references{

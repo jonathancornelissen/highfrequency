@@ -591,6 +591,12 @@ rMRC <- function(pData, pairwise = FALSE, makePsd = FALSE, theta = 0.8, ...){
 #'           as.xts(sampleOneMinuteData[as.Date(DT) == "2001-08-04", list(DT, STOCK)]))
 #' rMRCov(a, pairwise = TRUE, makePsd = TRUE)
 #'
+#'
+#' # We can also add use data.tables and use a named list to convey asset names
+#' a <- list(foo = sampleOneMinuteData[as.Date(DT) == "2001-08-04", list(DT, MARKET)],
+#'           bar = sampleOneMinuteData[as.Date(DT) == "2001-08-04", list(DT, STOCK)])
+#' rMRCov(a, pairwise = TRUE, makePsd = TRUE)
+#'
 #' }
 #' @keywords highfrequency preaveraging
 #' @export
@@ -598,10 +604,10 @@ rMRCov <- function(pData, pairwise = FALSE, makePsd = FALSE, theta = 0.8, ...) {
 
   if (!is.list(pData) | is.data.table(pData)) {
     n <- 1
-    
   } else {
     n <- length(pData)
   }
+  nm <- names(pData)
   if (n == 1) {
     if (isMultiXts(pData)) {
       stop("This function does not support having an xts object of multiple days as input. Please provide a timeseries of one day as input")
@@ -623,16 +629,17 @@ rMRCov <- function(pData, pairwise = FALSE, makePsd = FALSE, theta = 0.8, ...) {
     }
 
     if (pairwise) {
-      cov <- matrix(rep(0, n * n), ncol = n, dimnames = list(colnames(pData), colnames(pData)))
+      
+      cov <- matrix(rep(0, n * n), ncol = n, dimnames = list(nm, nm))
       diagonal <- numeric(n)
       for (i in 1:n) {
-        diagonal[i] <- crv(pData[[i]])
+        diagonal[i] <- crv(pData[[i]], theta = theta)
       }
       diag(cov) <- diagonal
 
       for (i in 2:n) {
         for (j in 1:(i - 1)) {
-          cov[i, j] = cov[j, i] = preavbi(pData[[i]], pData[[j]])
+          cov[i, j] = cov[j, i] = preavbi(pData[[i]], pData[[j]], theta = theta)
         }
       }
 
@@ -654,9 +661,8 @@ rMRCov <- function(pData, pairwise = FALSE, makePsd = FALSE, theta = 0.8, ...) {
         x <- x[, DT := NULL]
         x <- as.matrix(x)
       }
-
-      preavreturn <- as.matrix(hatreturn(x, kn), ncol = ncol(x))
-      S <- rCov(preavreturn)
+      preavreturn <- matrix(hatreturn(x, kn), ncol = ncol(x), dimnames = list(NULL, nm))
+      S <- t(preavreturn) %*% preavreturn
 
       mrc <- N / (N - kn + 2) * 1/(psi2 * kn) * S
 
