@@ -42,9 +42,9 @@ NULL
 #' The implemented estimators are:
 #' Realized Variance \code{\link{rRVar}}
 #' 
-#' Median realized variance \code{\link{rMedVar}}
+#' Median realized variance \code{\link{rMedRVar}}
 #' 
-#' Minimum realized variance \code{\link{rMinVar}}
+#' Minimum realized variance \code{\link{rMinRVar}}
 #' 
 #' Realized quadpower variance \code{\link{rQPVar}}
 #' 
