@@ -361,10 +361,19 @@ test_that("refreshTime", {
   
   expect_equal(RT, expected)
   
+  
+  ## Make sure we take copies in the refreshTime() function when we make changes to colnames by reference.
+  ## If the copies are disabled in the code these tests fail.
+  expect_equal(colnames(aDT), c("DT", "PRICE"))
+  expect_equal(colnames(bDT), c("DT", "PRICE"))
+  expect_equal(colnames(cDT), c("DT", "PRICE"))
+  
   expect_equal(refreshTime(list("a" = aDT, "b" = bDT, "c" = cDT), sort = TRUE, criterion = "squared duration"), 
                expected[, names(expected)[c(1, sqDur + 1)], with = FALSE])
   expect_equal(refreshTime(list("a" = aDT, "b" = bDT, "c" = cDT), sort = TRUE, criterion = "duration"),
                expected[, names(expected)[c(1, dur + 1)], with = FALSE])
+  
+  
   
 })
 
