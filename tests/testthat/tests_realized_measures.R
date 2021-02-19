@@ -484,7 +484,7 @@ test_that("rCholCov", {
                                             -0.5, 3, -0.4, 0.7,
                                             0.7, -0.4, 2, 0.6,  
                                             0.8, 0.7, 0.6, 4), ncol = 4))
-  
+  ## YES, I do realize this is not the correct way to construct these returns - doesn't matter it's just for a test
   w1 <- rets[,1]
   w2 <- rets[sort(sample(1:nrow(rets), size = nrow(rets) * 0.75)), 2]
   w3 <- rets[sort(sample(1:nrow(rets), size = nrow(rets) * 0.65)), 3]
