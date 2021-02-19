@@ -330,9 +330,9 @@ test_that("refreshTime", {
   ta = start + c(1, 2, 4, 5, 9, 14)
   tb = start + c(1, 3, 6, 7, 8, 9, 10, 11, 15)
   tc = start + c(1, 2, 3, 5, 7, 8, 10, 13)
-  a = as.xts(1:length(ta), order.by = ta) 
+  a = as.xts(1:length(ta), order.by = ta)
   b = as.xts(1:length(tb), order.by = tb)
-  c = as.xts(1:length(tc), order.by = tc) 
+  c = as.xts(1:length(tc), order.by = tc)
   #Calculate the synchronized timeseries: 
   expected <- xts(matrix(c(1,1,1, 2,2,3, 4,3,4, 5,6,6, 6,8,8), ncol = 3, byrow = TRUE), order.by = start + c(1,3,6,9,14))
   colnames(expected) <- c("a", "b", "c")
