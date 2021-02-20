@@ -4,7 +4,14 @@
 \alias{rMRCov}
 \title{Modulated realized covariance}
 \usage{
-rMRCov(pData, pairwise = FALSE, makePsd = FALSE, theta = 0.8, ...)
+rMRCov(
+  pData,
+  pairwise = FALSE,
+  makePsd = FALSE,
+  theta = 0.8,
+  crossAssetNoiseCorrection = FALSE,
+  ...
+)
 }
 \arguments{
 \item{pData}{a list. Each list-item contains an \code{xts} or \code{data.table} object with the intraday price data of a stock.}
@@ -13,7 +20,10 @@ rMRCov(pData, pairwise = FALSE, makePsd = FALSE, theta = 0.8, ...)
 
 \item{makePsd}{boolean, in case it is \code{TRUE}, the positive definite version of rMRCov is returned. \code{FALSE} by default.}
 
-\item{theta}{a \code{numeric} controlling the preaveragin horizon. Detaults to \code{0.8} as recommended by Hautsch and Podolskij (2013)}
+\item{theta}{a \code{numeric} controlling the preaveraging horizon. Detaults to \code{0.8} as recommended by Hautsch and Podolskij (2013)}
+
+\item{crossAssetNoiseCorrection}{a \code{logical} denoting whether to apply the bias correction term on the off-diagonals (covariance) terms. 
+We set this to \code{FALSE} by default as noise is typically seen as independent across assets.}
 
 \item{...}{used internally, do not change.}
 }

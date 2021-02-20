@@ -557,7 +557,9 @@ rMRC <- function(pData, pairwise = FALSE, makePsd = FALSE, theta = 0.8, ...){
 #' @param pData a list. Each list-item contains an \code{xts} or \code{data.table} object with the intraday price data of a stock.
 #' @param pairwise boolean, should be \code{TRUE} when refresh times are based on pairs of assets. \code{FALSE} by default.
 #' @param makePsd boolean, in case it is \code{TRUE}, the positive definite version of rMRCov is returned. \code{FALSE} by default.
-#' @param theta a \code{numeric} controlling the preaveragin horizon. Detaults to \code{0.8} as recommended by Hautsch and Podolskij (2013)
+#' @param theta a \code{numeric} controlling the preaveraging horizon. Detaults to \code{0.8} as recommended by Hautsch and Podolskij (2013)
+#' @param crossAssetNoiseCorrection a \code{logical} denoting whether to apply the bias correction term on the off-diagonals (covariance) terms. 
+#' We set this to \code{FALSE} by default as noise is typically seen as independent across assets.
 #' @param ... used internally, do not change.
 #' 
 #' @return A \eqn{d \times d} covariance matrix.
@@ -631,7 +633,7 @@ rMRC <- function(pData, pairwise = FALSE, makePsd = FALSE, theta = 0.8, ...){
 #' @seealso \code{\link{ICov}} for a list of implemented estimators of the integrated covariance.
 #' @keywords highfrequency preaveraging
 #' @export
-rMRCov <- function(pData, pairwise = FALSE, makePsd = FALSE, theta = 0.8, ...) {
+rMRCov <- function(pData, pairwise = FALSE, makePsd = FALSE, theta = 0.8, crossAssetNoiseCorrection = FALSE, ...){
 
   if (!is.list(pData) | is.data.table(pData)) {
     n <- 1
@@ -670,7 +672,7 @@ rMRCov <- function(pData, pairwise = FALSE, makePsd = FALSE, theta = 0.8, ...) {
 
       for (i in 2:n) {
         for (j in 1:(i - 1)) {
-          cov[i, j] = cov[j, i] = preavbi(pData[[i]], pData[[j]], theta = theta)
+          cov[i, j] = cov[j, i] = preavbi(pData[[i]], pData[[j]], theta = theta, crossAssetNoiseCorrection = crossAssetNoiseCorrection)
         }
       }
 
@@ -694,8 +696,15 @@ rMRCov <- function(pData, pairwise = FALSE, makePsd = FALSE, theta = 0.8, ...) {
       }
       preavreturn <- matrix(hatreturn(x, kn), ncol = ncol(x), dimnames = list(NULL, nm))
       S <- t(preavreturn) %*% preavreturn
-
-      mrc <- N / (N - kn + 2) * 1/(psi2 * kn) * S
+      
+      psi1kn <- kn * sum((gfunction((1:kn)/kn) - gfunction(( (1:kn) - 1 )/kn ) )^2)
+      psi2kn <- 1 / kn * sum(gfunction((1:kn)/kn)^2)
+      
+      if(crossAssetNoiseCorrection){
+        mrc <- N / (N - kn + 2) * 1/(psi2 * kn) * S - psi1kn  *(1/N) / (2 * theta^2 * psi2kn) *   1/(2 * N) * t(makeReturns(x)) %*% makeReturns(x)
+      } else { ## Here we only correct the diagonals for noise
+        mrc <- N / (N - kn + 2) * 1/(psi2 * kn) * S - psi1kn  *(1/N) / (2 * theta^2 * psi2kn) *   1/(2 * N) * diag(t(makeReturns(x)) %*% makeReturns(x))
+      }
 
       if (makePsd) {
         mrc <- makePsd(mrc)

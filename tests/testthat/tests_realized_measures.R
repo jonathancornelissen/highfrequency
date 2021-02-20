@@ -121,7 +121,7 @@ test_that("rMRCov", {
   expect_equal({
     formatC(sum(rMRCov(list(as.xts(sampleOneMinuteData)["2001-08-04","MARKET"], as.xts(sampleOneMinuteData)["2001-08-04","STOCK"]), pairwise = FALSE, makePsd = TRUE)), digits = 5)
   },
-  "0.00065676"
+  "0.00065673"
   )
   
   
