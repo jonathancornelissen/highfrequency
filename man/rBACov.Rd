@@ -23,7 +23,7 @@ rBACov(
 \arguments{
 \item{pData}{a named list. Each list-item contains an \code{xts} or \code{data.table} object with the intraday price data of an ETF and it's component stocks. \code{xts} objects are turned into \code{data.table}s}
 
-\item{shares}{a \code{numeric} with length corresponding to the number of component stocks in the ETF. The entries are the stock holdings of the ETF in the corresponding stock.}
+\item{shares}{a \code{numeric} with length corresponding to the number of component stocks in the ETF. The entries are the stock holdings of the ETF in the corresponding stock. The order of these entries should correspond to the order the stocks are listed in the \code{list} passed in the \code{pData} argument.}
 
 \item{outStanding}{number of shares outstanding of the ETF}
 
