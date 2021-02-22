@@ -7,7 +7,7 @@
 rBACov(
   pData,
   shares,
-  outStanding,
+  outstanding,
   nonEquity,
   ETFNAME = "ETF",
   unrestricted = TRUE,
@@ -25,7 +25,7 @@ rBACov(
 
 \item{shares}{a \code{numeric} with length corresponding to the number of component stocks in the ETF. The entries are the stock holdings of the ETF in the corresponding stock. The order of these entries should correspond to the order the stocks are listed in the \code{list} passed in the \code{pData} argument.}
 
-\item{outStanding}{number of shares outstanding of the ETF}
+\item{outstanding}{number of shares outstanding of the ETF}
 
 \item{nonEquity}{aggregated value of the additional components (like cash, money-market funds, bonds, etc.) of the ETF which are not included in the components in \code{pData}.}
 
@@ -156,14 +156,14 @@ p5 <- exp(p5[sort(sample(1:length(p5), size = nrow(rets) * 0.9))])
 
 BAC <- rBACov(pData = list(
                      "ETF" = p5, "STOCK 1" = p1, "STOCK 2" = p2, "STOCK 3" = p3, "STOCK 4" = p4
-                   ), shares = 1:4, outStanding = 1, nonEquity = 0, ETFNAME = "ETF", 
+                   ), shares = 1:4, outstanding = 1, nonEquity = 0, ETFNAME = "ETF", 
                    unrestricted = FALSE, preEstimator = rCov, noiseCorrection = FALSE, 
                    returnL = FALSE, K = 2, J = 1)
 
 # Noise robust version of the estimator
 noiseRobustBAC <- rBACov(pData = list(
                      "ETF" = p5, "STOCK 1" = p1, "STOCK 2" = p2, "STOCK 3" = p3, "STOCK 4" = p4
-                   ), shares = 1:4, outStanding = 1, nonEquity = 0, ETFNAME = "ETF", 
+                   ), shares = 1:4, outstanding = 1, nonEquity = 0, ETFNAME = "ETF", 
                    unrestricted = FALSE, preEstimator = rCov, noiseCorrection = TRUE, 
                    noiseRobustEstimator = rHYCov, returnL = FALSE, K = 2, J = 1)
 
@@ -171,7 +171,7 @@ noiseRobustBAC <- rBACov(pData = list(
 # Also use a different pre-estimator.
 VABBAC <- rBACov(pData = list(
                      "ETF" = p5, "STOCK 1" = p1, "STOCK 2" = p2, "STOCK 3" = p3, "STOCK 4" = p4
-                   ), shares = 1:4, outStanding = 1, nonEquity = 0, ETFNAME = "ETF", 
+                   ), shares = 1:4, outstanding = 1, nonEquity = 0, ETFNAME = "ETF", 
                    unrestricted = FALSE, targetBeta = "VAB", preEstimator = rBPCov, 
                    noiseCorrection = FALSE, returnL = FALSE, Lin = FALSE, L = 0, K = 2, J = 1)                    
                    

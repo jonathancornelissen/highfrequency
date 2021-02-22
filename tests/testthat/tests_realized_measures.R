@@ -678,49 +678,55 @@ test_that("rBACov returns correct values", {
            setnames(x, "index","DT")
            return(x)
          })
-  BAC <- rBACov(lDT, shares = 1:4, outStanding = 1, nonEquity = 0, ETFNAME = "ETF", unrestricted = FALSE,
+  BAC <- rBACov(lDT, shares = 1:4, outstanding = 1, nonEquity = 0, ETFNAME = "ETF", unrestricted = FALSE,
               preEstimator = rCov, noiseCorrection = FALSE, returnL = FALSE, K = 2, J = 1)
   expect_equal(
   matrix(c(0.098589281, -0.002606114, -0.006960383, -0.01323153, -0.002606114, 0.050470789, 
            -0.005729020, -0.01868274, -0.006960383, -0.005729020, 0.050596758, -0.04860079, 
-           -0.013231527, -0.018682744, -0.048600791, 0.08091408), ncol = 4),
+           -0.013231527, -0.018682744, -0.048600791, 0.08091408), ncol = 4, dimnames = list(c("STOCK 1", "STOCK 2", "STOCK 3", "STOCK 4"), 
+                                                                                            c("STOCK 1", "STOCK 2", "STOCK 3", "STOCK 4"))),
   BAC
   )
   
   
   
   
-  unrestrictedBAC <- rBACov(lDT, shares = 1:4, outStanding = 1, nonEquity = 0, ETFNAME = "ETF", unrestricted = TRUE, 
+  unrestrictedBAC <- rBACov(lDT, shares = 1:4, outstanding = 1, nonEquity = 0, ETFNAME = "ETF", unrestricted = TRUE, 
                           preEstimator = rCov, noiseCorrection = FALSE, returnL = FALSE, K = 2, J = 1)
 
   expect_equal(
     matrix(c(0.095798183, -0.004477446, -0.008222493, -0.009909461, -0.004477446, 0.046707724, -0.008796183, -0.012393680, 
-             -0.008222493, -0.008796183, 0.032547848, -0.025785512, -0.009909461, -0.012393680, -0.025785512, 0.049417920), ncol = 4),
+             -0.008222493, -0.008796183, 0.032547848, -0.025785512, -0.009909461, -0.012393680, -0.025785512, 0.049417920), ncol = 4,
+           dimnames = list(c("STOCK 1", "STOCK 2", "STOCK 3", "STOCK 4"), 
+                           c("STOCK 1", "STOCK 2", "STOCK 3", "STOCK 4"))),
     unrestrictedBAC
   )
   
   
-  noisyBAC <- rBACov(lDT, shares = 1:4, outStanding = 1, nonEquity = 0, ETFNAME = "ETF", unrestricted = FALSE,
+  noisyBAC <- rBACov(lDT, shares = 1:4, outstanding = 1, nonEquity = 0, ETFNAME = "ETF", unrestricted = FALSE,
                    preEstimator = rCov, noiseCorrection = TRUE, returnL = FALSE, K = 2, J = 1)
   
   expect_equal(
   matrix(c(0.097813865, -0.002504853, -0.007216331, -0.01278663, -0.002504853, 0.051074266, -0.006576877, -0.01806634, -0.007216331, 
-           -0.006576877, 0.051487980, -0.04902462, -0.012786633, -0.018066344, -0.049024618, 0.08089841), ncol = 4),
+           -0.006576877, 0.051487980, -0.04902462, -0.012786633, -0.018066344, -0.049024618, 0.08089841), ncol = 4,
+         dimnames = list(c("STOCK 1", "STOCK 2", "STOCK 3", "STOCK 4"), 
+                         c("STOCK 1", "STOCK 2", "STOCK 3", "STOCK 4"))),
   noisyBAC
   )
   
-  unrestrictedNoisyBAC <- rBACov(lDT, shares = 1:4, outStanding = 1, nonEquity = 0, ETFNAME = "ETF", unrestricted = TRUE,
+  unrestrictedNoisyBAC <- rBACov(lDT, shares = 1:4, outstanding = 1, nonEquity = 0, ETFNAME = "ETF", unrestricted = TRUE,
                                preEstimator = rCov, noiseCorrection = TRUE, returnL = FALSE, K = 2, J = 1)
   
   expect_equal(
     matrix(c(0.095077601, -0.004441949, -0.008181313, -0.009783992,
     -0.004441949,  0.047229958, -0.009032561, -0.012416212,
     -0.008181313, -0.009032561,  0.032806152, -0.025953141,
-    -0.009783992, -0.012416212, -0.025953141,  0.049586042), ncol = 4),
+    -0.009783992, -0.012416212, -0.025953141,  0.049586042), ncol = 4, dimnames = list(c("STOCK 1", "STOCK 2", "STOCK 3", "STOCK 4"), 
+                                                                                       c("STOCK 1", "STOCK 2", "STOCK 3", "STOCK 4"))),
     unrestrictedNoisyBAC
   )
   
-  varianceAdjustedBAC <- rBACov(lDT, shares = 1:4, outStanding = 1, nonEquity = 0, ETFNAME = "ETF", unrestricted = FALSE, targetBeta = "VAB",
+  varianceAdjustedBAC <- rBACov(lDT, shares = 1:4, outstanding = 1, nonEquity = 0, ETFNAME = "ETF", unrestricted = FALSE, targetBeta = "VAB",
                       preEstimator = rCov, noiseCorrection = FALSE, returnL = FALSE, K = 2, J = 1)
   expect_equal(
   matrix(c(
@@ -728,7 +734,8 @@ test_that("rBACov returns correct values", {
     -0.00264066,  0.050470789, -0.008125928, -0.01892530,
     -0.00812739, -0.008125928,  0.050596758, -0.05311512,
     -0.01333734, -0.018925299, -0.053115115,  0.08091408
-    ), ncol = 4),
+    ), ncol = 4, dimnames = list(c("STOCK 1", "STOCK 2", "STOCK 3", "STOCK 4"), 
+                                 c("STOCK 1", "STOCK 2", "STOCK 3", "STOCK 4"))),
   varianceAdjustedBAC)
   
 })

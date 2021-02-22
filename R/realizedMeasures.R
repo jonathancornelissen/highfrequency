@@ -4145,7 +4145,7 @@ ReMeDIAsymptoticVariance <- function(pData, kn, lags, phi, i){
 #' 
 #' @param pData a named list. Each list-item contains an \code{xts} or \code{data.table} object with the intraday price data of an ETF and it's component stocks. \code{xts} objects are turned into \code{data.table}s
 #' @param shares a \code{numeric} with length corresponding to the number of component stocks in the ETF. The entries are the stock holdings of the ETF in the corresponding stock. The order of these entries should correspond to the order the stocks are listed in the \code{list} passed in the \code{pData} argument.
-#' @param outStanding number of shares outstanding of the ETF
+#' @param outstanding number of shares outstanding of the ETF
 #' @param nonEquity aggregated value of the additional components (like cash, money-market funds, bonds, etc.) of the ETF which are not included in the components in \code{pData}.
 #' @param ETFNAME a \code{character} denoting which entry in the \code{pData} list is the ETF. Default is \code{"ETF"}
 #' @param unrestricted a \code{logical} denoting whether to use the unrestricted estimator, which is an extension that also affects the diagonal. Default is \code{FALSE}
@@ -4214,14 +4214,14 @@ ReMeDIAsymptoticVariance <- function(pData, kn, lags, phi, i){
 #' 
 #' BAC <- rBACov(pData = list(
 #'                      "ETF" = p5, "STOCK 1" = p1, "STOCK 2" = p2, "STOCK 3" = p3, "STOCK 4" = p4
-#'                    ), shares = 1:4, outStanding = 1, nonEquity = 0, ETFNAME = "ETF", 
+#'                    ), shares = 1:4, outstanding = 1, nonEquity = 0, ETFNAME = "ETF", 
 #'                    unrestricted = FALSE, preEstimator = rCov, noiseCorrection = FALSE, 
 #'                    returnL = FALSE, K = 2, J = 1)
 #' 
 #' # Noise robust version of the estimator
 #' noiseRobustBAC <- rBACov(pData = list(
 #'                      "ETF" = p5, "STOCK 1" = p1, "STOCK 2" = p2, "STOCK 3" = p3, "STOCK 4" = p4
-#'                    ), shares = 1:4, outStanding = 1, nonEquity = 0, ETFNAME = "ETF", 
+#'                    ), shares = 1:4, outstanding = 1, nonEquity = 0, ETFNAME = "ETF", 
 #'                    unrestricted = FALSE, preEstimator = rCov, noiseCorrection = TRUE, 
 #'                    noiseRobustEstimator = rHYCov, returnL = FALSE, K = 2, J = 1)
 #'
@@ -4229,7 +4229,7 @@ ReMeDIAsymptoticVariance <- function(pData, kn, lags, phi, i){
 #' # Also use a different pre-estimator.
 #' VABBAC <- rBACov(pData = list(
 #'                      "ETF" = p5, "STOCK 1" = p1, "STOCK 2" = p2, "STOCK 3" = p3, "STOCK 4" = p4
-#'                    ), shares = 1:4, outStanding = 1, nonEquity = 0, ETFNAME = "ETF", 
+#'                    ), shares = 1:4, outstanding = 1, nonEquity = 0, ETFNAME = "ETF", 
 #'                    unrestricted = FALSE, targetBeta = "VAB", preEstimator = rBPCov, 
 #'                    noiseCorrection = FALSE, returnL = FALSE, Lin = FALSE, L = 0, K = 2, J = 1)                    
 #'                    
@@ -4240,7 +4240,7 @@ ReMeDIAsymptoticVariance <- function(pData, kn, lags, phi, i){
 #' @importFrom xts is.xts
 #' @importFrom data.table as.data.table merge.data.table data.table setkey setcolorder copy is.data.table
 #' @export
-rBACov <- function(pData, shares, outStanding, nonEquity, ETFNAME = "ETF", 
+rBACov <- function(pData, shares, outstanding, nonEquity, ETFNAME = "ETF", 
                    unrestricted = TRUE, targetBeta = c("HY", "VAB", "expert"),
                    expertBeta = NULL, preEstimator = rCov, noiseRobustEstimator = rTSCov, noiseCorrection = FALSE, 
                  returnL = FALSE, ...){
@@ -4249,6 +4249,7 @@ rBACov <- function(pData, shares, outStanding, nonEquity, ETFNAME = "ETF",
   if(!is.list(pData) | is.data.table(pData)){
     stop("pData must be a list of data.tables or xts objects")
   }
+  
   if(is.xts(pData[[1]])){
     pData <- lapply(pData,
                     function(x){
@@ -4263,9 +4264,12 @@ rBACov <- function(pData, shares, outStanding, nonEquity, ETFNAME = "ETF",
   if(noiseCorrection && !is.function(noiseRobustEstimator)){
     stop("noiseRobustEstimator must be a function when noiseCorrection is TRUE")
   }
-  
+  nm <- names(pData)
+  if(!any(ETFNAME == nm)){
+    stop("ETFNAME must be present in the pData list")
+  }
   for (i in 1:length(pData)) {
-    setnames(pData[[i]], new= c("DT", names(pData[i])))
+    setnames(pData[[i]], new= c("DT", nm[i]))
   }
   # backup <- Reduce(function(x,y) merge.data.table(x, y, all = TRUE, on = "DT"), pData[which(names(pData) != ETFNAME)])
   pData <- Reduce(function(x,y) merge.data.table(x, y, all = TRUE, on = "DT"), pData)
@@ -4289,16 +4293,15 @@ rBACov <- function(pData, shares, outStanding, nonEquity, ETFNAME = "ETF",
   W <- matrix(0, nrow = nComps, ncol = nComps^2)
   Q <- matrix(0, nrow = nComps^2, ncol = nComps^2)
   
-  shares <- shares / outStanding
+  shares <- shares / outstanding
   setcolorder(pData, c("DT", ETFNAME))
   missingPoints <- !is.na(pData)[-1,] # Where the inputs aren't missing
   
   
   
   
-  
   ## We calculate the pre-estimator
-  RC2 <- matrix(0, ncol = ncol(pData) - 2, nrow = ncol(pData) - 2)
+  RC2 <- matrix(0, ncol = ncol(pData) - 2, nrow = ncol(pData) - 2, dimnames = list(nm[-1], nm[-1]))
   noiseRobust <- rep(0, ncol(pData) - 2)
   for (i in 1:nComps) {
     for (j in i:nComps) {
@@ -4316,13 +4319,13 @@ rBACov <- function(pData, shares, outStanding, nonEquity, ETFNAME = "ETF",
   
   pData <- setnafill(copy(pData), type = "locf", cols = 2:ncol(pData))
   pData <- setnafill(pData, type = "nocb")
-  set(pData, j = ETFNAME, value = pData[,ETFNAME , with = FALSE] - nonEquity/outStanding)
+  set(pData, j = ETFNAME, value = pData[,ETFNAME , with = FALSE] - nonEquity/outstanding)
   
   returns <- pData[, lapply(.SD, function(x) makeReturns(x)), .SDcols = 3:ncol(pData)][-1,]
   etfReturns <- diff(pData[[2]])
   set(returns, j = "DT", value = pData$DT[-1])
   setcolorder(returns, "DT")
-  shares <- c(0,0, shares) / outStanding
+  shares <- c(0,0, shares) / outstanding
   meanWeights <- numeric(ncol(pData))
   meanSquaredWeights <- numeric(ncol(pData))
   assetWeights <- copy(pData)
@@ -4367,7 +4370,7 @@ rBACov <- function(pData, shares, outStanding, nonEquity, ETFNAME = "ETF",
     
     sqw <- 0
     aw <- targetBeta <- numeric(ncol(returns) - 1)
-    ETFLogReturns <- as.matrix(diff(log(pData[[ETFNAME]])))
+    # ETFLogReturns <- as.matrix(diff(log(pData[[ETFNAME]])))
     
     logw <- 1/(pData[1:(.N-1),ETFNAME, with =FALSE])^2
     for (i in 2:ncol(returns)) {
@@ -4418,7 +4421,7 @@ rBACov <- function(pData, shares, outStanding, nonEquity, ETFNAME = "ETF",
   L <- (diag(nComps^2) - Q) %*% t(W)
   # If noiseCorrection is not TRUE, NS = 0, thus exp(NS * .) = 1 and we can reuse noise and no noise code
   L <- L %*% (solve(diag(nComps) * sum(meanSquaredWeights * exp(NS * 0.5)) - W %*% Q %*% t(W)))
-  
+
   if(returnL){
     return(list("BAC" = RC2 - (matrix(L %*% (impliedBeta - targetBeta), ncol = nComps) + diag(noise)), "L" = L))
   } else {
