@@ -1455,7 +1455,7 @@ rHYCov <- function(rData, cor = FALSE, period = 1, alignBy = "seconds", alignPer
   
       n <- dim(rData)[2]
       cov <- matrix(rep(0, n * n), ncol = n)
-      diagonal <- c()
+      diagonal <- numeric(n)
       for (i in 1:n) {
         diagonal[i] <- rCov(aggrdata[, i])
       }
@@ -2393,10 +2393,10 @@ rThresholdCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL
     }
 
     rData <- as.matrix(rData)
-    n <- dim(rData)[1]				                  # number of observations
+    n <- dim(rData)[1] # number of observations
     delta <- 1 / n
-    rbpvars <- apply(rData, 2,FUN = RBPVar)		      # bipower variation per stock
-    thresholds <- 3 * sqrt(rbpvars) * (delta^(0.49))	  # treshold per stock
+    rbpvars <- apply(rData, 2,FUN = RBPVar) # bipower variation per stock
+    thresholds <- 3 * sqrt(rbpvars) * (delta^(0.49)) # treshold per stock
     tresmatrix <- matrix(rep(thresholds, n), ncol = length(thresholds), nrow = n, byrow = TRUE)
     condition <- abs(rData) > tresmatrix
     rData[condition] <- 0
@@ -4421,7 +4421,6 @@ rBACov <- function(pData, shares, outstanding, nonEquity, ETFNAME = "ETF",
   L <- (diag(nComps^2) - Q) %*% t(W)
   # If noiseCorrection is not TRUE, NS = 0, thus exp(NS * .) = 1 and we can reuse noise and no noise code
   L <- L %*% (solve(diag(nComps) * sum(meanSquaredWeights * exp(NS * 0.5)) - W %*% Q %*% t(W)))
-
   if(returnL){
     return(list("BAC" = RC2 - (matrix(L %*% (impliedBeta - targetBeta), ncol = nComps) + diag(noise)), "L" = L))
   } else {
