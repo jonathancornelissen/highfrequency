@@ -422,3 +422,12 @@ BFMalgorithm <- function(tData, qData, backwardsWindow, forwardsWindow, plot, tz
   return(list("tqData" = tqData, "forwardMatched" = cbind(forwardsMatches, whichForwards), 
               "backwardsMatched" = cbind(backwardsMatches, whichBackwards), "unmatched" = remaining))
 }
+
+
+seqInclEnds <- function(start, end, by){
+  val <- seq(1, end, by = by)
+  if(end %% by){
+    val <- c(val, end)
+  }
+  return(val)
+}

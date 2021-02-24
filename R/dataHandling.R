@@ -239,7 +239,7 @@ aggregatePrice <- function(pData, alignBy = "minutes", alignPeriod = 1, marketOp
   ## checking
   nm <- toupper(colnames(pData))
   pData <- checkColumnNames(pData)
-  .N <- .I <- N <- DATE <- DT <- FIRST_DT <- DT_ROUND <- LAST_DT <- SYMBOL <- PRICE <- NULL
+  .SD <- .N <- .I <- N <- DATE <- DT <- FIRST_DT <- DT_ROUND <- LAST_DT <- SYMBOL <- PRICE <- NULL
 
 
   if (alignBy == "milliseconds") {
@@ -259,6 +259,7 @@ aggregatePrice <- function(pData, alignBy = "minutes", alignPeriod = 1, marketOp
   if(! (alignBy %in% c("milliseconds", "secs", "seconds", "mins", "minutes", "hours", "ticks"))){
     stop("alignBy not valid value. Valid values are: \"milliseconds\", \"secs\", \"seconds\", \"mins\", \"minutes\", \"hours\", and \"ticks\".")
   }
+  
 
   inputWasXts <- FALSE
   if (!is.data.table(pData)) {
@@ -280,6 +281,21 @@ aggregatePrice <- function(pData, alignBy = "minutes", alignPeriod = 1, marketOp
   if (!("SYMBOL" %in% nm)) {
     pData[, SYMBOL := "UKNOWN"]
   }
+  
+  
+  if(alignBy == "ticks"){ ## Special case for alignBy = "ticks"
+    if(alignPeriod == 1) return(pData[])
+    if(alignPeriod < 1 | alignPeriod%%1 != 0){
+      stop("When alignBy is `ticks`, must be a positive integer valued numeric")
+    }
+    # if(length(unique(as.Date(pData[,DT]))) > 1){
+    #   stop("Multiday support for aggregatePrice with alignBy = \"ticks\" is not implemented yet.")
+    # }
+    return(pData[seqInclEnds(1, .N, alignPeriod), .SD, by = list(DATE = as.Date(DT)), .SDcols = 1:ncol(pData)][])
+  }
+  
+  
+  
   
   timeZone <- format(pData$DT[1], format = "%Z")
   if(is.null(timeZone) || timeZone == ""){
@@ -334,20 +350,7 @@ aggregatePrice <- function(pData, alignBy = "minutes", alignPeriod = 1, marketOp
 
   }
 
-  if(alignBy == "ticks"){ ## Special case for alignBy = "ticks"
-    if(alignPeriod < 1 | alignPeriod%%1 != 0){
-      stop("When alignBy is `ticks`, must be a positive integer valued numeric")
-    }
-    if(length(unique(as.Date(pData[,DT]))) > 1){
-      stop("Multiday support for aggregatePrice with alignBy = \"ticks\" is not implemented yet.")
-    }
-    idx <- seq(1, nrow(pData), by = alignPeriod)
-    if(alignPeriod %% nrow(pData) != 0){
-      idx <- c(idx, nrow(pData))
-    }
-    pData <- pData[idx,]
-    return(pData[])
-  }
+  
 
   # Find the first observation per day.
   pData[, FIRST_DT := min(DT), by = list(SYMBOL, DATE)]
