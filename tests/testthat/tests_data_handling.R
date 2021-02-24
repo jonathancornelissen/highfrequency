@@ -430,3 +430,17 @@ test_that("Backwards-forwards matching algorithm produces correct result", {
   expect_equal(dim(bfmMatched), c(19887, 18))
 })
 
+
+
+context("seqInclEnds")
+test_that("seqInclEnds gives expected result", {
+  
+  target <- c(1,5,9,10)
+  expect_equal(target, seqInclEnds(1, 10, 4))
+  
+  target <- c(1, 4, 7, 10)
+  expect_equal(target, seqInclEnds(1, 10, 3))
+  
+  
+  
+})

@@ -426,7 +426,7 @@ BFMalgorithm <- function(tData, qData, backwardsWindow, forwardsWindow, plot, tz
 
 seqInclEnds <- function(start, end, by){
   val <- seq(1, end, by = by)
-  if(end %% by){
+  if(val[length(val)] != end){
     val <- c(val, end)
   }
   return(val)
