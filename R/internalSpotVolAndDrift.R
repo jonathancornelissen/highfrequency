@@ -100,7 +100,7 @@ print.spotDrift <- function(x, ...){
 #' @keywords internal
 detPer <- function(mR, rData = NULL, options = list()) {
   # default options, replace if user-specified
-  op <- list(dailyvol = "bipower", periodicvol = "TML", dummies = FALSE,
+  op <- list(dailyVol = "bipower", periodicVol = "TML", dummies = FALSE,
              P1 = 5, P2 = 5)
   op[names(options)] <- options
 
@@ -108,18 +108,18 @@ detPer <- function(mR, rData = NULL, options = list()) {
   M <- ncol(mR)
   if (cDays == 1 & is.null(rData)) {
     mR <- as.numeric(mR)
-    estimdailyvol <- switch(op$dailyvol,
+    estimdailyvol <- switch(op$dailyVol,
                             bipower = rBPCov(mR),
                             medrv = rMedRV(mR),
                             rv = rCov(mR))
   } else {
     if (is.null(rData)) {
-      estimdailyvol <- switch(op$dailyvol,
+      estimdailyvol <- switch(op$dailyVol,
                               bipower = apply(mR, 1, "rBPCov"),
                               medrv = apply(mR, 1, "rMedRV"),
                               rv = apply(mR, 1, "rCov"))
     } else {
-      estimdailyvol <- switch(op$dailyvol,
+      estimdailyvol <- switch(op$dailyVol,
                               bipower = apply.daily(rData, rBPCov),
                               medrv = apply.daily(rData, rMedRV),
                               rv = apply.daily(rData, rCov))
@@ -136,14 +136,14 @@ detPer <- function(mR, rData = NULL, options = list()) {
     # preferably no na is between
     selection <- c( min(selection) : max(selection) )
     mstdR <- mstdR[,selection]
-    estimperiodicvol_temp <- diurnal(stddata = mstdR, method = op$periodicvol,
+    estimperiodicvol_temp <- diurnal(stddata = mstdR, method = op$periodicVol,
                                      dummies = op$dummies, P1 = op$P1,
                                      P2 = op$P2)[[1]]
     estimperiodicvol <- rep(1,M)
     estimperiodicvol[selection] <- estimperiodicvol_temp
     mfilteredR <- mR/matrix(rep(estimperiodicvol, cDays), byrow = T,
                             nrow = cDays)
-    estimdailyvol <- switch(op$dailyvol,
+    estimdailyvol <- switch(op$dailyVol,
                             bipower = apply(mfilteredR, 1, "rBPCov"),
                             medrv = apply(mfilteredR, 1, "rMedRV"),
                             rv = apply(mfilteredR, 1, "rCov"))
@@ -443,7 +443,7 @@ ISE <- function(h, x, delta = 300, type = "gaussian") {
 #' @keywords internal
 piecewise <- function(mR, rData = NULL, options = list()) {
   # default options, replace if user-specified
-  op <- list(type = "MDa", m = 40, n = 20, alpha = 0.005, volest = "bipower",
+  op <- list(type = "MDa", m = 40, n = 20, alpha = 0.005, volEst = "bipower",
              online = TRUE)
   op[names(options)] <- options
 
@@ -460,7 +460,7 @@ piecewise <- function(mR, rData = NULL, options = list()) {
         lastchange = 1
       }
       lastchange <- cp[lastchange]
-      spot[i] = switch(op$volest,
+      spot[i] = switch(op$volEst,
                        bipower = sqrt((1/(i - lastchange + 1)) *
                                         (rBPCov(vR[(lastchange + 1):i]))),
                        medrv = sqrt((1/(i - lastchange + 1)) *
@@ -473,7 +473,7 @@ piecewise <- function(mR, rData = NULL, options = list()) {
       from <- cp[max(which(cp < i))]
       to <- min(c(N*D, cp[which(cp >= i)]))
       len <- to - from
-      spot[i] <- switch(op$volest,
+      spot[i] <- switch(op$volEst,
                         bipower = sqrt((1/len)*(rBPCov(vR[from:to]))),
                         medrv = sqrt((1/len)*(rMedRV(vR[from:to]))),
                         rv = sqrt((1/len)*(rCov(vR[from:to]))),
