@@ -234,6 +234,9 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
     RM1 <- data[,1]
     if (type %in% jumpModels) {
       RM2 <- data[,2]
+      if(type == "HARCJ" && jumpTest == "ABDJumptest" && inputType != "RM"){
+        RM3 <- data[,3]
+      }
     }
     if (type == "HARQ") {
       RM3 <- data[,2]
@@ -358,7 +361,7 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
 
   if (type == "HARCJ") {
     # Are the jumps significant? if not set to zero:
-    if (jumpTest == "ABDJumptest" ) {
+    if (jumpTest == "ABDJumptest") {
       
       if(inputType != "RM"){
         TQ <- apply.daily(data, rTPQuar) 
