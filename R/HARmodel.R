@@ -234,7 +234,7 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
     RM1 <- data[,1]
     if (type %in% jumpModels) {
       RM2 <- data[,2]
-      if(type == "HARCJ" && jumpTest == "ABDJumptest" && inputType != "RM"){
+      if(type == "HARCJ" && jumpTest == "ABDJumptest"){
         RM3 <- data[,3]
       }
     }
