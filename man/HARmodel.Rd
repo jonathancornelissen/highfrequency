@@ -152,7 +152,8 @@ x
 predict(x)
 
 # Example 6: HARCJ with pre-computed test-statistics
-testStats <- sqrt(390) * (SPYRM$RV1 - SPYRM$BPV1)/sqrt((pi^2/4+pi-3 - 2) * SPYRM$medRQ1) ## BNSJumptest
+## BNSJumptest manually calculated.
+testStats <- sqrt(390) * (SPYRM$RV1 - SPYRM$BPV1)/sqrt((pi^2/4+pi-3 - 2) * SPYRM$medRQ1)
 model <- HARmodel(cbind(as.xts(SPYRM[, list(DT, RV5, BPV5)]), testStats), type = "HARCJ")
 
 
