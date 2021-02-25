@@ -4215,14 +4215,14 @@ ReMeDIAsymptoticVariance <- function(pData, kn, lags, phi, i){
 #' BAC <- rBACov(pData = list(
 #'                      "ETF" = p5, "STOCK 1" = p1, "STOCK 2" = p2, "STOCK 3" = p3, "STOCK 4" = p4
 #'                    ), shares = 1:4, outstanding = 1, nonEquity = 0, ETFNAME = "ETF", 
-#'                    unrestricted = FALSE, preEstimator = rCov, noiseCorrection = FALSE, 
+#'                    unrestricted = FALSE, preEstimator = "rCov", noiseCorrection = FALSE, 
 #'                    returnL = FALSE, K = 2, J = 1)
 #' 
 #' # Noise robust version of the estimator
 #' noiseRobustBAC <- rBACov(pData = list(
 #'                      "ETF" = p5, "STOCK 1" = p1, "STOCK 2" = p2, "STOCK 3" = p3, "STOCK 4" = p4
 #'                    ), shares = 1:4, outstanding = 1, nonEquity = 0, ETFNAME = "ETF", 
-#'                    unrestricted = FALSE, preEstimator = rCov, noiseCorrection = TRUE, 
+#'                    unrestricted = FALSE, preEstimator = "rCov", noiseCorrection = TRUE, 
 #'                    noiseRobustEstimator = rHYCov, returnL = FALSE, K = 2, J = 1)
 #'
 #' # Use the Variance Adjusted Beta method
@@ -4230,7 +4230,7 @@ ReMeDIAsymptoticVariance <- function(pData, kn, lags, phi, i){
 #' VABBAC <- rBACov(pData = list(
 #'                      "ETF" = p5, "STOCK 1" = p1, "STOCK 2" = p2, "STOCK 3" = p3, "STOCK 4" = p4
 #'                    ), shares = 1:4, outstanding = 1, nonEquity = 0, ETFNAME = "ETF", 
-#'                    unrestricted = FALSE, targetBeta = "VAB", preEstimator = rBPCov, 
+#'                    unrestricted = FALSE, targetBeta = "VAB", preEstimator = "rHYov", 
 #'                    noiseCorrection = FALSE, returnL = FALSE, Lin = FALSE, L = 0, K = 2, J = 1)                    
 #'                    
 #' }
@@ -4242,7 +4242,7 @@ ReMeDIAsymptoticVariance <- function(pData, kn, lags, phi, i){
 #' @export
 rBACov <- function(pData, shares, outstanding, nonEquity, ETFNAME = "ETF", 
                    unrestricted = TRUE, targetBeta = c("HY", "VAB", "expert"),
-                   expertBeta = NULL, preEstimator = rCov, noiseRobustEstimator = rTSCov, noiseCorrection = FALSE, 
+                   expertBeta = NULL, preEstimator = "rCov", noiseRobustEstimator = rTSCov, noiseCorrection = FALSE, 
                  returnL = FALSE, ...){
   .N <- DT <- .SD <- NULL
   
@@ -4297,11 +4297,16 @@ rBACov <- function(pData, shares, outstanding, nonEquity, ETFNAME = "ETF",
   setcolorder(pData, c("DT", ETFNAME))
   missingPoints <- !is.na(pData)[-1,] # Where the inputs aren't missing
   
-  
-  
-  
+  PE <- switch(preEstimator,
+               "rCov" = rCov,
+               "rHYCov" = rHYCov)
+  if(is.null(PE)){
+    ## IF another estimator gets added, we should add them in this list
+    stop("preEstimator not implemented, please choose among `rCov` and `rHYCov`")
+  }
   ## We calculate the pre-estimator
   RC2 <- matrix(0, ncol = ncol(pData) - 2, nrow = ncol(pData) - 2, dimnames = list(nm[-1], nm[-1]))
+  if(noiseCorrection) RC <- RC2
   noiseRobust <- rep(0, ncol(pData) - 2)
   for (i in 1:nComps) {
     for (j in i:nComps) {
@@ -4311,11 +4316,11 @@ rBACov <- function(pData, shares, outstanding, nonEquity, ETFNAME = "ETF",
       
       setkey(dat, DT)
       setcolorder(dat, "DT")
-      RC2[i, j] <- RC2[j, i] <- preEstimator(dat, makeReturns = TRUE)[1,2]
+      RC2[i, j] <- RC2[j, i] <- PE(dat, makeReturns = TRUE)[1,2]
       
     }
+    if(noiseCorrection) RC[i, i] <- rCov(pData[c(FALSE, missingPoints[, 2+i]), c(1, 2 + i), with = FALSE], makeReturns = TRUE)[[2]]
   }
-  
   
   pData <- setnafill(copy(pData), type = "locf", cols = 2:ncol(pData))
   pData <- setnafill(pData, type = "nocb")
@@ -4346,9 +4351,14 @@ rBACov <- function(pData, shares, outstanding, nonEquity, ETFNAME = "ETF",
   meanWeights <- meanWeights[-c(1,2)]
   meanSquaredWeights <- meanSquaredWeights[-c(1,2)]
   shares <- shares[-c(1,2)]
-  impliedBeta <- bacImpliedBetaCpp(as.matrix(returns[, -1, with = FALSE]), missingPoints[, -c(1,2)], as.matrix(assetWeights[-1, -c(1,2), with = FALSE]))
+  if(preEstimator == "rCov"){
+    impliedBeta <- bacImpliedBetaCpp(as.matrix(returns[, -1, with = FALSE]), missingPoints[, -c(1,2)], as.matrix(assetWeights[-1, -c(1,2), with = FALSE]))
+  } else if(preEstimator == "rHYCov"){
+    impliedBeta <- bacImpliedBetaHYCpp(as.matrix(returns[, -1, with = FALSE]), missingPoints[, -c(1,2)], as.matrix(assetWeights[-1, -c(1,2), with = FALSE]))
+    RC2[] <- impliedBeta[["cov"]]
+    impliedBeta <- impliedBeta[["impliedBeta"]]
+  }
   impliedBeta <- as.numeric(impliedBeta)
-  # impliedBeta <- colSums(impliedBeta[["beta"]])
   
   if(targetBeta == "HY"){
     targetBeta <- numeric(ncol(returns) - 1)
@@ -4380,9 +4390,9 @@ rBACov <- function(pData, shares, outstanding, nonEquity, ETFNAME = "ETF",
       aw[i-1] <- mean(tw[[1]])
       sqw <- sqw + mean(tw[[1]]^2)
     }
-    noisyETF <- preEstimator(pData[, c(1,2), with = FALSE], makeReturns = TRUE, ...)
+    noisyETF <- PE(pData[, c(1,2), with = FALSE], makeReturns = TRUE, ...)
     noiseFreeETF <- noiseRobustEstimator(pData[, c(1,2), with = FALSE], makeReturns = TRUE, ...)
-    etfNoise <- noisyETF[[length(noisyETF)]] - noiseFreeETF[[length(noiseFreeETF)]]
+    etfNoise <- pmax(noisyETF[[length(noisyETF)]] - noiseFreeETF[[length(noiseFreeETF)]], 0)
     
     targetBeta <- tempBeta + aw/sqw * (sum(diff(log(pData[[ETFNAME]]))[missingPoints[,2]]^2) - etfNoise - sum(targetBeta))
     
@@ -4395,7 +4405,7 @@ rBACov <- function(pData, shares, outstanding, nonEquity, ETFNAME = "ETF",
   }
   
   if(noiseCorrection){
-    noise <- diag(RC2) - noiseRobust
+    noise <- pmax(diag(RC) - noiseRobust,0)
     impliedBeta <- impliedBeta - noise * meanWeights
     NS <- noise/pmax(1, colSums(missingPoints[, -c(1,2)]))
   } else {
@@ -4417,7 +4427,6 @@ rBACov <- function(pData, shares, outstanding, nonEquity, ETFNAME = "ETF",
       }
     }
   }
-  
   L <- (diag(nComps^2) - Q) %*% t(W)
   # If noiseCorrection is not TRUE, NS = 0, thus exp(NS * .) = 1 and we can reuse noise and no noise code
   L <- L %*% (solve(diag(nComps) * sum(meanSquaredWeights * exp(NS * 0.5)) - W %*% Q %*% t(W)))
@@ -4428,3 +4437,4 @@ rBACov <- function(pData, shares, outstanding, nonEquity, ETFNAME = "ETF",
     
   }
 }
+

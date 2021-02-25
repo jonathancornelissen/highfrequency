@@ -679,7 +679,7 @@ test_that("rBACov returns correct values", {
            return(x)
          })
   BAC <- rBACov(lDT, shares = 1:4, outstanding = 1, nonEquity = 0, ETFNAME = "ETF", unrestricted = FALSE,
-              preEstimator = rCov, noiseCorrection = FALSE, returnL = FALSE, K = 2, J = 1)
+              preEstimator = "rCov", noiseCorrection = FALSE, returnL = FALSE, K = 2, J = 1)
   expect_equal(
   matrix(c(0.098589281, -0.002606114, -0.006960383, -0.01323153, -0.002606114, 0.050470789, 
            -0.005729020, -0.01868274, -0.006960383, -0.005729020, 0.050596758, -0.04860079, 
@@ -692,7 +692,7 @@ test_that("rBACov returns correct values", {
   
   
   unrestrictedBAC <- rBACov(lDT, shares = 1:4, outstanding = 1, nonEquity = 0, ETFNAME = "ETF", unrestricted = TRUE, 
-                          preEstimator = rCov, noiseCorrection = FALSE, returnL = FALSE, K = 2, J = 1)
+                          preEstimator = "rCov", noiseCorrection = FALSE, returnL = FALSE, K = 2, J = 1)
 
   expect_equal(
     matrix(c(0.095798183, -0.004477446, -0.008222493, -0.009909461, -0.004477446, 0.046707724, -0.008796183, -0.012393680, 
@@ -704,30 +704,32 @@ test_that("rBACov returns correct values", {
   
   
   noisyBAC <- rBACov(lDT, shares = 1:4, outstanding = 1, nonEquity = 0, ETFNAME = "ETF", unrestricted = FALSE,
-                   preEstimator = rCov, noiseCorrection = TRUE, returnL = FALSE, K = 2, J = 1)
-  
+                   preEstimator = "rCov", noiseCorrection = TRUE, returnL = FALSE, K = 2, J = 1)
+   
   expect_equal(
-  matrix(c(0.097813865, -0.002504853, -0.007216331, -0.01278663, -0.002504853, 0.051074266, -0.006576877, -0.01806634, -0.007216331, 
-           -0.006576877, 0.051487980, -0.04902462, -0.012786633, -0.018066344, -0.049024618, 0.08089841), ncol = 4,
+  matrix(c(0.097813865, -0.002561477, -0.006875550, -0.01314578,
+           -0.002561477,  0.050470789, -0.005747408, -0.01867366,
+           -0.006875550, -0.005747408,  0.050596758, -0.04861247,
+           -0.013145784, -0.018673661, -0.048612469,  0.08089841), ncol = 4,
          dimnames = list(c("STOCK 1", "STOCK 2", "STOCK 3", "STOCK 4"), 
                          c("STOCK 1", "STOCK 2", "STOCK 3", "STOCK 4"))),
   noisyBAC
   )
   
   unrestrictedNoisyBAC <- rBACov(lDT, shares = 1:4, outstanding = 1, nonEquity = 0, ETFNAME = "ETF", unrestricted = TRUE,
-                               preEstimator = rCov, noiseCorrection = TRUE, returnL = FALSE, K = 2, J = 1)
+                               preEstimator = "rCov", noiseCorrection = TRUE, returnL = FALSE, K = 2, J = 1)
   
   expect_equal(
-    matrix(c(0.095077601, -0.004441949, -0.008181313, -0.009783992,
-    -0.004441949,  0.047229958, -0.009032561, -0.012416212,
-    -0.008181313, -0.009032561,  0.032806152, -0.025953141,
-    -0.009783992, -0.012416212, -0.025953141,  0.049586042), ncol = 4, dimnames = list(c("STOCK 1", "STOCK 2", "STOCK 3", "STOCK 4"), 
+    matrix(c(0.095064006, -0.004436407, -0.008136801, -0.009833758,
+             -0.004436407,  0.046704739, -0.008802415, -0.012395926,
+             -0.008136801, -0.008802415,  0.032534836, -0.025790203,
+             -0.009833758, -0.012395926, -0.025790203,  0.049403869), ncol = 4, dimnames = list(c("STOCK 1", "STOCK 2", "STOCK 3", "STOCK 4"), 
                                                                                        c("STOCK 1", "STOCK 2", "STOCK 3", "STOCK 4"))),
     unrestrictedNoisyBAC
   )
   
   varianceAdjustedBAC <- rBACov(lDT, shares = 1:4, outstanding = 1, nonEquity = 0, ETFNAME = "ETF", unrestricted = FALSE, targetBeta = "VAB",
-                      preEstimator = rCov, noiseCorrection = FALSE, returnL = FALSE, K = 2, J = 1)
+                      preEstimator = "rCov", noiseCorrection = FALSE, returnL = FALSE, K = 2, J = 1)
   expect_equal(
   matrix(c(
     0.09858928, -0.002640660, -0.008127390, -0.01333734,

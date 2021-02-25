@@ -373,6 +373,19 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// bacImpliedBetaHYCpp
+Rcpp::List bacImpliedBetaHYCpp(arma::mat& components, const arma::mat& missings, arma::mat& componentWeights);
+RcppExport SEXP _highfrequency_bacImpliedBetaHYCpp(SEXP componentsSEXP, SEXP missingsSEXP, SEXP componentWeightsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat& >::type components(componentsSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type missings(missingsSEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type componentWeights(componentWeightsSEXP);
+    rcpp_result_gen = Rcpp::wrap(bacImpliedBetaHYCpp(components, missings, componentWeights));
+    return rcpp_result_gen;
+END_RCPP
+}
 // bacImpliedBetaCpp
 arma::rowvec bacImpliedBetaCpp(const arma::mat& components, const arma::mat& missings, const arma::mat& componentWeights);
 RcppExport SEXP _highfrequency_bacImpliedBetaCpp(SEXP componentsSEXP, SEXP missingsSEXP, SEXP componentWeightsSEXP) {
@@ -430,6 +443,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_highfrequency_kernelEstimator", (DL_FUNC) &_highfrequency_kernelEstimator, 8},
     {"_highfrequency_rv", (DL_FUNC) &_highfrequency_rv, 7},
     {"_highfrequency_pcovcc", (DL_FUNC) &_highfrequency_pcovcc, 10},
+    {"_highfrequency_bacImpliedBetaHYCpp", (DL_FUNC) &_highfrequency_bacImpliedBetaHYCpp, 3},
     {"_highfrequency_bacImpliedBetaCpp", (DL_FUNC) &_highfrequency_bacImpliedBetaCpp, 3},
     {"_highfrequency_bacHY", (DL_FUNC) &_highfrequency_bacHY, 5},
     {NULL, NULL, 0}

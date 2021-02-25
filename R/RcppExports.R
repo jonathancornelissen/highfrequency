@@ -115,6 +115,10 @@ pcovcc <- function(a, ap, b, at, atp, bt, na, nap, nb, period) {
     .Call(`_highfrequency_pcovcc`, a, ap, b, at, atp, bt, na, nap, nb, period)
 }
 
+bacImpliedBetaHYCpp <- function(components, missings, componentWeights) {
+    .Call(`_highfrequency_bacImpliedBetaHYCpp`, components, missings, componentWeights)
+}
+
 bacImpliedBetaCpp <- function(components, missings, componentWeights) {
     .Call(`_highfrequency_bacImpliedBetaCpp`, components, missings, componentWeights)
 }

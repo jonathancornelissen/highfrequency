@@ -157,6 +157,61 @@ NumericVector pcovcc(NumericVector a, NumericVector ap, NumericVector b, Numeric
 }
 
 
+
+arma::mat backfill(const arma::mat& arr, const arma::mat& missings){
+  arma::mat res = arr;
+  double fill = 0.0;
+  for(arma::uword j = 0; j < arr.n_cols; j++){
+    fill = 0.0;
+    for(arma::uword i = arr.n_rows - 1; i > 0; i--){ // why should this not be i>=0?
+      if(missings(i,j)){
+        fill = arr(i,j);
+      }
+      res(i,j) = fill;
+    }
+  }
+  return(res);
+}
+
+//[[Rcpp::export]]
+Rcpp::List bacImpliedBetaHYCpp(arma::mat& components, const arma::mat& missings, arma::mat& componentWeights){
+  arma::mat impliedBeta = arma::zeros<arma::mat>(components.n_cols, components.n_cols);
+  arma::mat cov = arma::zeros<arma::mat>(components.n_cols, components.n_cols);
+  components = backfill(components, missings);
+  componentWeights = backfill(componentWeights, missings);
+  // components.rows(0,3).print();
+  // components.rows(components.n_rows-4,components.n_rows-1).print();
+  // componentWeights.rows(0,3).print();
+  // componentWeights.rows(componentWeights.n_rows-4,componentWeights.n_rows-1).print();
+  double tmp = 0.0;
+  
+  // components.brief_print();componentWeights
+  // componentWeights.brief_print();
+  for(arma::uword k = 0; k < components.n_cols; k++){
+    for(arma::uword l = 0; l < components.n_cols; l++){
+      double beta = 0.0;
+      double __sum = 0.0;
+      for(arma::uword i = 0; i < components.n_rows; i++){
+        if(missings(i,k) || missings(i,l)){
+          tmp = components(i,k) * components(i,l);
+          __sum += tmp;
+          beta += (tmp * componentWeights(i,k));
+        }
+      }
+      // Rcout<<__sum<<endl;
+      impliedBeta(k, l) = beta;
+      cov(k, l) = __sum;
+    }
+  }
+  
+  Rcpp::List out = Rcpp::List::create(Rcpp::Named("impliedBeta") = sum(impliedBeta,0),
+                     Rcpp::Named("cov") = cov);
+  return(out);
+  // return(impliedBeta);
+}
+
+
+
 //[[Rcpp::export]]
 arma::rowvec bacImpliedBetaCpp(const arma::mat& components, const arma::mat& missings, const arma::mat& componentWeights){
   arma::mat beta = arma::zeros<arma::mat>(components.n_cols, components.n_cols);
