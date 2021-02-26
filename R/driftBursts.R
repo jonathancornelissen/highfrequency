@@ -49,7 +49,8 @@
 #' of \code{-1} denotes using an automatic lag selection algorithm for each iteration. Default is \code{-1L}
 #' @param meanBandwidth An \code{integer} denoting the bandwidth for the left-sided exponential kernel for the mean. Default is \code{300L}
 #' @param varianceBandwidth An \code{integer} denoting the bandwidth for the left-sided exponential kernel for the variance. Default is \code{900L}
-#' @param parallelize A \code{logical} to determine whether to parallelize the underlying C++ code (Using OpenMP). Default is \code{FALSE}
+#' @param parallelize A \code{logical} to determine whether to parallelize the underlying C++ code (Using OpenMP). Default is \code{FALSE}. 
+#' Note that the parallelized code is not interruptable, while the non-parallel code is interruptable and it's checked every 100 iterations.
 #' @param nCores An \code{integer} denoting the number of cores to use for calculating the code when parallelized. 
 #' If this argument is not provided, sequential evaluation will be used even though \code{parallelize} is TRUE. Default is \code{NA}
 #' @param warnings A \code{logical} denoting whether warnings should be shown. Default is \code{TRUE}
@@ -115,6 +116,7 @@ driftBursts <- function(pData, testTimes = seq(34260, 57600, 60),
                        varianceBandwidth = 900L, #sessionStart = 34200, sessionEnd = 57600,
                        parallelize = FALSE, nCores = NA, warnings = TRUE){
   PRICE <- DT <- NULL
+  tic <- Sys.time()
   # Checks on inputs
   if (meanBandwidth < 0 | meanBandwidth %% 1 != 0) {
     stop("meanBandwidth must be a positive integer")
@@ -260,7 +262,7 @@ driftBursts <- function(pData, testTimes = seq(34260, 57600, 60),
   }
   
   lInfo = list("varianceBandwidth" = varianceBandwidth, "meanBandwidth" = meanBandwidth,"preAverage" = preAverage,
-               "nObs" = iT, "testTimes" = tt, "padding" = c(pad, removedFromEnd))#, "sessionStart" = sessionStart, "sessionEnd" = sessionEnd)
+               "nObs" = iT, "testTimes" = tt, "padding" = c(pad, removedFromEnd), "elapsedTime" = Sys.time() - tic)#, "sessionStart" = sessionStart, "sessionEnd" = sessionEnd)
   lDriftBursts[["info"]] = lInfo
   #replace NANs with 0's
   NANS = is.nan(lDriftBursts[["sigma"]])
@@ -317,7 +319,7 @@ plot.DBH <- function(x, ...){
   leg.y      <- opt$leg.y
   timestamps <- opt$timestamps
   tstat      <- x$tStat
-  sigma      <- x$sigma
+  sigma      <- sqrt(x$sigma)
   mu         <- x$mu
   startpar   <- par(no.readonly = TRUE)
   testTimes  <- x$info$testTimes
@@ -482,6 +484,7 @@ print.DBH = function(x, ...){
   cat("\nMax absolute value of test statistic:", round(max(abs(x$tStat)), digits=5))
   cat("\nMean test statistic:                 ", round(mean(x$tStat), digits = 5))
   cat("\nVariance of test statistic:          ", round(varDB, digits = 5))
+  cat("\nSeconds elapsed:                     ", round(as.numeric(x$info$elapsedTime, units = "secs"), digits = 5))
   cat("\n-----------------------------------------------\n")
   
 }
