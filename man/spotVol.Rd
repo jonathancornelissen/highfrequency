@@ -256,22 +256,22 @@ with \eqn{n_1 = 2n / (N+1)} and \eqn{n_2 = 6n^2 / (N+1) / (N+2)}.
 
 Parameters:
 \itemize{
-\item{\code{type}}{String specifying the type of kernel to be used. Options
+\item{\code{type}}{ String specifying the type of kernel to be used. Options
 include \code{"gaussian", "epanechnikov", "beta"}. Default = \code{"gaussian"}.}
-\item{\code{h}}{Scalar or vector specifying bandwidth(s) to be used in kernel.
+\item{\code{h}}{ Scalar or vector specifying bandwidth(s) to be used in kernel.
 If \code{h} is a scalar, it will be assumed equal throughout the sample. If
 it is a vector, it should contain bandwidths for each day. If left empty,
 it will be estimated. Default = \code{NULL}.}
-\item{\code{est}}{String specifying the bandwidth estimation method. Possible
+\item{\code{est}}{ String specifying the bandwidth estimation method. Possible
 values include \code{"cv", "quarticity"}. Method \code{"cv"} equals
 cross-validation, which chooses the bandwidth that minimizes the Integrated
 Square Error. \code{"quarticity"} multiplies the simple plug-in estimator
 by a factor based on the daily quarticity of the returns. \code{est} is
 obsolete if \code{h} has already been specified by the user.
 \code{"cv"} by default.}
-\item{\code{lower}}{Lower bound to be used in bandwidth optimization routine,
+\item{\code{lower}}{ Lower bound to be used in bandwidth optimization routine,
 when using cross-validation method. Default is \eqn{0.1n^{-0.2}}.}
-\item{\code{upper}}{Upper bound to be used in bandwidth optimization routine,
+\item{\code{upper}}{ Upper bound to be used in bandwidth optimization routine,
 when using cross-validation method. Default is \eqn{n^{-0.2}}.}
 }
 
