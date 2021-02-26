@@ -29,8 +29,7 @@ plotTQData <- function(tData, qData = NULL, xLim = NULL, tradeCol = "black", quo
   } else {
     qData <- checkColumnNames(qData)
   }
-  
-  if(is.null(xLim)) xLim <- range(c(tData$DT, qData$DT))
+  if(is.null(xLim)) xLim <- range(tData$DT, qData$DT)
   
   yLim <- range(c(tData[DT %between% xLim]$PRICE, qData[DT %between% xLim & BID!=0 & OFR != 0, list(BID, OFR)]))
   qData <- copy(qData)
