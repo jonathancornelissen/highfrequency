@@ -2,20 +2,15 @@
 % Please edit documentation in R/realizedMeasures.R
 \name{RV}
 \alias{RV}
-\title{An estimator of realized variance.}
+\title{DEPRECATED
+DEPRECATED use \code{\link{rRVar}} instead}
 \usage{
-RV(rData, ...)
+RV(rData)
 }
 \arguments{
-\item{rData}{a \code{xts} object containing all returns in period t for one asset.}
-
-\item{...}{used internally, do not change.}
-}
-\value{
-numeric
+\item{rData}{DEPRECATED \code{\link{rRVar}} instead}
 }
 \description{
-An estimator of realized variance.
+DEPRECATED
+DEPRECATED use \code{\link{rRVar}} instead
 }
-\keyword{RV}
-\keyword{highfrequency}

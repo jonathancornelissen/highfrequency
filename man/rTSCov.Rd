@@ -106,7 +106,6 @@ rcovts <- rTSCov(pData = list(price1, price2))
 # Note: List of prices as input
 rcovts
 }
-
 }
 \references{
 Harris, F., McInish, T., Shoesmith, G., and Wood, R. (1995). Cointegration, error correction, and price discovery on informationally linked security markets. \emph{Journal of Financial and Quantitative Analysis}, 30, 563-581.
@@ -114,6 +113,9 @@ Harris, F., McInish, T., Shoesmith, G., and Wood, R. (1995). Cointegration, erro
 Zhang, L., Mykland, P. A., and Ait-Sahalia, Y. (2005). A tale of two time scales: Determining integrated volatility with noisy high-frequency data. \emph{Journal of the American Statistical Association}, 100, 1394-1411.
 
 Zhang, L. (2011). Estimating covariation: Epps effect, microstructure noise. \emph{Journal of Econometrics}, 160, 33-47.
+}
+\seealso{
+\code{\link{ICov}} for a list of implemented estimators of the integrated covariance.
 }
 \author{
 Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup.

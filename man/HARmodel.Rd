@@ -55,7 +55,8 @@ Other valid options for type are \code{"HARJ"}, \code{"HARCJ"}, \code{"HARQ"}, \
 \item{inputType}{a string denoting if the input data consists of realized measures or high-frequency returns. 
 Default "RM" is the only way to denote realized measures and everything else denotes returns.}
 
-\item{jumpTest}{the function name of a function used to test whether the test statistic which determines whether the jump variability is significant that day. By default \code{jumpTest = "ABDJumptest"}, hence using the test statistic in Equation or Equation (18) of Andersen et al. (2007).}
+\item{jumpTest}{the function name of a function used to test whether the test statistic which determines whether the jump variability is significant that day. By default \code{jumpTest = "ABDJumptest"}, hence using the test statistic in Equation or Equation (18) of Andersen et al. (2007).
+It is also possible to provide pre-computed test statistics for jump tests by setting \code{jumpTest} to \code{"testStat"}. These test statistics should still be passed as the third column.}
 
 \item{alpha}{a real indicating the confidence level used in testing for jumps. By default \code{alpha = 0.05}.}
 
@@ -149,6 +150,12 @@ class(x)
 x
 # plot(x)
 predict(x)
+
+# Example 6: HARCJ with pre-computed test-statistics
+## BNSJumptest manually calculated.
+testStats <- sqrt(390) * (SPYRM$RV1 - SPYRM$BPV1)/sqrt((pi^2/4+pi-3 - 2) * SPYRM$medRQ1)
+model <- HARmodel(cbind(as.xts(SPYRM[, list(DT, RV5, BPV5)]), testStats), type = "HARCJ")
+
 
 }
 \references{

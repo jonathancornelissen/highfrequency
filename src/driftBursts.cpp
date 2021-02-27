@@ -128,7 +128,9 @@ Rcpp::List DriftBurstLoopC(const arma::colvec& vPreAveraged, const arma::colvec&
       vSigma[i] = AsymptoticVarianceC((vWvar(span(0,iIdx)) % vPreAveraged(span(0,iIdx))), iAcLag);
       
     }
-    
+    if(i % 100 == 0){
+      Rcpp::checkUserInterrupt();
+    }
     
   }
   // Calculate the test statistic and create a nice named list containing the estimates, which we will return.

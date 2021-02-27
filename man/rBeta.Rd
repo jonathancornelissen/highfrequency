@@ -8,7 +8,7 @@ rBeta(
   rData,
   rIndex,
   RCOVestimator = "rCov",
-  RVestimator = "RV",
+  RVestimator = "rRVar",
   makeReturns = FALSE
 )
 }
@@ -19,7 +19,7 @@ rBeta(
 
 \item{RCOVestimator}{can be chosen among realized covariance estimators: \code{"rCov"}, \code{"rAVGCov"}, \code{"rBPCov"}, \code{"rHYCov"}, \code{"rKernelCov"}, \code{"rOWCov"}, \code{"rRTSCov"}, \code{"rThresholdCov"} and \code{"rTSCov"} \code{"rCov"} by default.}
 
-\item{RVestimator}{can be chosen among realized variance estimators: \code{"RV"}, \code{"rMinRV"} and \code{"rMedRV"}. \code{"RV"} by default. 
+\item{RVestimator}{can be chosen among realized variance estimators: \code{"rRVar"}, \code{"rMinRVar"} and \code{"rMedRVar"}. \code{"rRVar"} by default. 
 In case of missing \code{RVestimator}, \code{RCOVestimator} function applying for \code{rIndex} will be used.}
 
 \item{makeReturns}{boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.}
@@ -58,7 +58,7 @@ Note: The function does not support to calculate betas across multiple days.
 library("xts")
 a <- as.xts(sampleOneMinuteData[as.Date(DT) == "2001-08-04", list(DT, MARKET)])
 b <-  as.xts(sampleOneMinuteData[as.Date(DT) == "2001-08-04", list(DT, STOCK)])
-rBeta(a, b, RCOVestimator = "rBPCov", RVestimator = "rMinRV", makeReturns = TRUE)
+rBeta(a, b, RCOVestimator = "rBPCov", RVestimator = "rMinRVar", makeReturns = TRUE)
 }
 
 }

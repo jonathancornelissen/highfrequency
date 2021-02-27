@@ -59,9 +59,9 @@ In the case that cor is \code{TRUE}, the mixed matrix will be an \eqn{N \times N
 # at 5 minutes.
 
 # Univariate:
-rSV = rSemiCov(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes",
+rSVar = rSemiCov(rData = sampleTData[, list(DT, PRICE)], alignBy = "minutes",
                    alignPeriod = 5, makeReturns = TRUE)
-rSV
+rSVar
 \dontrun{
 library("xts")
 # Multivariate multi day:
@@ -79,6 +79,9 @@ addLegend(lty = 1) # Add legend so we can distinguish the series.
 }
 \references{
 Bollerslev, T., Li, J., Patton, A. J., and Quaedvlieg, R. (2020). Realized semicovariances. \emph{Econometrica}, 88, 1515-1551.
+}
+\seealso{
+\code{\link{ICov}} for a list of implemented estimators of the integrated covariance.
 }
 \author{
 Emil Sjoerup.

@@ -17,6 +17,10 @@ tradeIntensityProcessCpp <- function(time, bandwidth) {
     .Call(`_highfrequency_tradeIntensityProcessCpp`, time, bandwidth)
 }
 
+medianCase <- function(x) {
+    .Call(`_highfrequency_medianCase`, x)
+}
+
 AsymptoticVarianceC <- function(vIn, iLag) {
     .Call(`_highfrequency_AsymptoticVarianceC`, vIn, iLag)
 }
@@ -109,6 +113,10 @@ rv <- function(a, b, na, period, tmpa, tmpb, tmpna) {
 
 pcovcc <- function(a, ap, b, at, atp, bt, na, nap, nb, period) {
     .Call(`_highfrequency_pcovcc`, a, ap, b, at, atp, bt, na, nap, nb, period)
+}
+
+bacImpliedBetaHYCpp <- function(components, missings, componentWeights) {
+    .Call(`_highfrequency_bacImpliedBetaHYCpp`, components, missings, componentWeights)
 }
 
 bacImpliedBetaCpp <- function(components, missings, componentWeights) {

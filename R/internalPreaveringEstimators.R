@@ -1,11 +1,12 @@
 #' @keywords internal
-crv <- function(pData) {
+crv <- function(pData, theta = 0.8) {
   N <- nrow(pData)
-  theta <- 0.8 ##recommendation by Hautsch and Podolskij
+  if(is.data.table(pData)){
+    pData <- pData[[2]]
+  }
   kn <- floor(theta*sqrt(N))
 
   psi1kn <- kn * sum((gfunction((1:kn)/kn) - gfunction(( (1:kn) - 1 )/kn ) )^2)
-
   psi2kn <- 1 / kn * sum(gfunction((1:kn)/kn)^2)
 
   r1 <- hatreturn(pData,kn=kn)
@@ -43,28 +44,30 @@ gfunction <- function(x) {
 }
 
 #' @keywords internal
-preavbi <- function(pData1, pData2) {
+preavbi <- function(pData1, pData2, theta = 0.8, crossAssetNoiseCorrection = FALSE) {
   x <- refreshTime(list(pData1, pData2))
+  if(is.data.table(x)){
+    x <- as.matrix(x[, -"DT"])
+  }
   newprice1 <- x[, 1]
   newprice2 <- x[, 2]
 
   N <- nrow(x)
-  theta <- 0.8 ##recommendation by Hautsch and Podolskij
   kn <- floor(theta * sqrt(N))
 
   ##psi:
-  psi1 <- 1
   psi2 <- 1/12
-
-  psi1kn <- kn* sum((gfunction((1:kn)/kn) - gfunction(((1:kn) - 1 )/kn))^2)
-
-  psi2kn <- 1 / kn * sum(gfunction((1:kn) / kn)^2)
-
+  
   r1 <- hatreturn(newprice1, kn = kn)
   r2 <- hatreturn(newprice2, kn = kn)
-
-  mrc <- N / (N - kn + 2) * 1 / (psi2 * kn) * (sum(r1 * r2, na.rm = TRUE))
-
+  if(crossAssetNoiseCorrection){ ## Correct the off-diagonals for noise
+    psi1kn <- kn * sum((gfunction((1:kn)/kn) - gfunction(( (1:kn) - 1 )/kn ) )^2)
+    psi2kn <- 1 / kn * sum(gfunction((1:kn)/kn)^2)
+    mrc <- N / (N - kn + 2) * 1 / (psi2 * kn) * (sum(r1 * r2, na.rm = TRUE))  - psi1kn  *(1/N) / (2 * theta^2 * psi2kn) *   1/(2 * N) * sum(makeReturns(newprice1) * makeReturns(newprice2), na.rm = TRUE)
+  } else { ## Here we don't correct for noise.
+    mrc <- N / (N - kn + 2) * 1 / (psi2 * kn) * (sum(r1 * r2, na.rm = TRUE))
+  }
+  
   return(mrc)
 }
 

@@ -100,10 +100,12 @@ rowc <- rOWCov(rData = as.xts(sampleOneMinuteData[as.Date(DT) == "2001-08-04",])
                makeReturns = TRUE)
 rowc
 }
-
 }
 \references{
 Boudt, K., Croux, C., and Laurent, S. (2008). Outlyingness weighted covariation. \emph{Journal of Financial Econometrics}, 9, 657–684.
+}
+\seealso{
+\code{\link{ICov}} for a list of implemented estimators of the integrated covariance.
 }
 \author{
 Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup.

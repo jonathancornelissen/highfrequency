@@ -33,7 +33,8 @@ of \code{-1} denotes using an automatic lag selection algorithm for each iterati
 
 \item{varianceBandwidth}{An \code{integer} denoting the bandwidth for the left-sided exponential kernel for the variance. Default is \code{900L}}
 
-\item{parallelize}{A \code{logical} to determine whether to parallelize the underlying C++ code (Using OpenMP). Default is \code{FALSE}}
+\item{parallelize}{A \code{logical} to determine whether to parallelize the underlying C++ code (Using OpenMP). Default is \code{FALSE}. 
+Note that the parallelized code is not interruptable, while the non-parallel code is interruptable and it's checked every 100 iterations.}
 
 \item{nCores}{An \code{integer} denoting the number of cores to use for calculating the code when parallelized. 
 If this argument is not provided, sequential evaluation will be used even though \code{parallelize} is TRUE. Default is \code{NA}}

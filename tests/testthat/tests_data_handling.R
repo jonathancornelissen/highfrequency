@@ -28,7 +28,7 @@ test_that("quotesCleanup", {
 context("aggregatePrice")
 test_that("aggregatePrice", {
   expect_equal(
-    formatC(sum(head(aggregatePrice(sampleTData[, ], alignBy = "secs", alignPeriod = 30))$PRICE), digits = 10),
+    formatC(sum(head(aggregatePrice(sampleTData, alignBy = "secs", alignPeriod = 30))$PRICE), digits = 10),
     "     950.73"
   )
 })
@@ -330,9 +330,9 @@ test_that("refreshTime", {
   ta = start + c(1, 2, 4, 5, 9, 14)
   tb = start + c(1, 3, 6, 7, 8, 9, 10, 11, 15)
   tc = start + c(1, 2, 3, 5, 7, 8, 10, 13)
-  a = as.xts(1:length(ta), order.by = ta) 
+  a = as.xts(1:length(ta), order.by = ta)
   b = as.xts(1:length(tb), order.by = tb)
-  c = as.xts(1:length(tc), order.by = tc) 
+  c = as.xts(1:length(tc), order.by = tc)
   #Calculate the synchronized timeseries: 
   expected <- xts(matrix(c(1,1,1, 2,2,3, 4,3,4, 5,6,6, 6,8,8), ncol = 3, byrow = TRUE), order.by = start + c(1,3,6,9,14))
   colnames(expected) <- c("a", "b", "c")
@@ -361,10 +361,19 @@ test_that("refreshTime", {
   
   expect_equal(RT, expected)
   
+  
+  ## Make sure we take copies in the refreshTime() function when we make changes to colnames by reference.
+  ## If the copies are disabled in the code these tests fail.
+  expect_equal(colnames(aDT), c("DT", "PRICE"))
+  expect_equal(colnames(bDT), c("DT", "PRICE"))
+  expect_equal(colnames(cDT), c("DT", "PRICE"))
+  
   expect_equal(refreshTime(list("a" = aDT, "b" = bDT, "c" = cDT), sort = TRUE, criterion = "squared duration"), 
                expected[, names(expected)[c(1, sqDur + 1)], with = FALSE])
   expect_equal(refreshTime(list("a" = aDT, "b" = bDT, "c" = cDT), sort = TRUE, criterion = "duration"),
                expected[, names(expected)[c(1, dur + 1)], with = FALSE])
+  
+  
   
 })
 
@@ -421,3 +430,17 @@ test_that("Backwards-forwards matching algorithm produces correct result", {
   expect_equal(dim(bfmMatched), c(19887, 18))
 })
 
+
+
+context("seqInclEnds")
+test_that("seqInclEnds gives expected result", {
+  
+  target <- c(1,5,9,10)
+  expect_equal(target, seqInclEnds(1, 10, 4))
+  
+  target <- c(1, 4, 7, 10)
+  expect_equal(target, seqInclEnds(1, 10, 3))
+  
+  
+  
+})

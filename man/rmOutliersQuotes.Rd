@@ -4,7 +4,7 @@
 \alias{rmOutliersQuotes}
 \title{Remove outliers in quotes}
 \usage{
-rmOutliersQuotes(qData, maxi = 10, window = 50, type = "advanced", tz = NULL)
+rmOutliersQuotes(qData, maxi = 10, window = 50, type = "standard", tz = NULL)
 }
 \arguments{
 \item{qData}{a \code{data.table} or \code{xts} object at least containing the columns \code{"BID"} and \code{"OFR"}.}

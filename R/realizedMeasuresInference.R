@@ -7,26 +7,28 @@
 ## hatIV
 #' @keywords internal
 hatIV <- function(rData, IVestimator, startV = NULL) {
-  switch(IVestimator,
-         RV = RV(rData),
+  IV <- switch(IVestimator,
+         rRVar = rRVar(rData),
          BV = RBPVar(rData),
-         rMinRV = rMinRV(rData),
-         rMedRV = rMedRV(rData),
+         rMinRVar = rMinRVar(rData),
+         rMedRVar = rMedRVar(rData),
          ROWvar = rOWCov(rData),
          CTBV = ctBV(rData, startV = startV))
+  return(as.numeric(IV))
 }
 
 ### IVinference help functions:
 ##IQ estimator:
 #' @keywords internal
 hatIQ <- function (rData, IQestimator) {
-  switch(IQestimator,
+  IQ <- switch(IQestimator,
          rQuar = rQuar(rData),
          QP = rQPVar(rData),
          TP = rTPQuar(rData),
-         rMinRQ = rMinRQ(rData),
-         rMedRQ = rMedRQ(rData),
+         rMinRQuar = rMinRQuar(rData),
+         rMedRQuar = rMedRQuar(rData),
          CTTPV = ctTPV(rData))
+  return(as.numeric(IQ))
 }
 
 
@@ -40,8 +42,8 @@ IV <- function(IVestimator, iq) {
          RV = sqrt(2 * iq), 
          BV = sqrt(2.61 * iq),
          TV = sqrt(3.06 * iq), 
-         rMinRV = sqrt(3.81 * iq), 
-         rMedRV = sqrt(2.96 * iq))
+         rMinRVar = sqrt(3.81 * iq), 
+         rMedRVar = sqrt(2.96 * iq))
 }
 
 #' Function returns the value, the standard error and the confidence band of the integrated variance (IV) estimator. 
@@ -74,7 +76,7 @@ IV <- function(IVestimator, iq) {
 #' 
 #' @param rData \code{xts} object containing all returns in period t for one asset.
 #' @param IVestimator can be chosen among integrated variance estimators: RV, BV, rMinRV or rMedRV. RV by default.
-#' @param IQestimator can be chosen among integrated quarticity estimators: rQuar, realized tri-power quarticity (TPQ), quad-power quarticity (QPQ), rMinRQ or rMedRQ. TPQ by default.
+#' @param IQestimator can be chosen among integrated quarticity estimators: rQuar, realized tri-power quarticity (TPQ), quad-power quarticity (QPQ), rMinRQuar or rMedRQuar. TPQ by default.
 #' @param confidence confidence level set by users. 0.95 by default. 
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".
 #' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
@@ -127,7 +129,6 @@ IVinference <- function(rData, IVestimator = "RV", IQestimator = "rQuar", confid
     
     N <- length(rData)
     p <- as.numeric(confidence)
-    
     iq <- hatIQ(rData,IQestimator)
     iv <- IV(IVestimator, iq)
     
@@ -153,8 +154,8 @@ IVinference <- function(rData, IVestimator = "RV", IQestimator = "rQuar", confid
 tt <- function(IVestimator, ...) {
   switch(IVestimator,
          BV = pi^2/4+pi-3,
-         rMinRV = 3.81,
-         rMedRV = 2.96,
+         rMinRVar = 3.81,
+         rMedRVar = 2.96,
          CTBV = pi^2/4+pi-3,
          ROWVar = thetaROWVar(...))
 }

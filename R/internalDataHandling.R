@@ -251,6 +251,11 @@ checktData <- function(tData) {
     if (typeof(tData$PRICE) != "double") {
       stop("Column PRICE should be of type double.")
     }
+    if("SIZE" %chin% colnames(tData)){
+      if (typeof(tData$SIZE) != "integer" & typeof(tData$SIZE) != "double") {
+        stop("Column SIZE should be of type integer or double (after cleaning).")
+      }
+    }
   }
 }
 
@@ -287,7 +292,6 @@ checkqData <- function(qData) {
 #' @importFrom RcppRoll roll_median
 #' @keywords internal
 rollingMedianInclEnds <- function(x, weights, window, direction = "center") {
-  
   length_median_vec <- length(x)
   median_vec <- rep(NA, times = length_median_vec)
   halfwindow <- window / 2
@@ -405,8 +409,7 @@ BFMalgorithm <- function(tData, qData, backwardsWindow, forwardsWindow, plot, tz
   }
   
   tqData[c(whichBackwards, whichForwards), `:=`(DT = DT - c(na.omit(backwardsMatches), na.omit(forwardsMatches)))]
-  tqData[c(whichBackwards, whichForwards), `:=`(BID = NA)]
-  tqData[c(whichBackwards, whichForwards), `:=`(OFR = NA)]
+  tqData[c(whichBackwards, whichForwards), `:=`(BID = NA, OFR = NA)]
   
   
   
@@ -418,4 +421,13 @@ BFMalgorithm <- function(tData, qData, backwardsWindow, forwardsWindow, plot, tz
   
   return(list("tqData" = tqData, "forwardMatched" = cbind(forwardsMatches, whichForwards), 
               "backwardsMatched" = cbind(backwardsMatches, whichBackwards), "unmatched" = remaining))
+}
+
+
+seqInclEnds <- function(start, end, by){
+  val <- seq(1, end, by = by)
+  if(val[length(val)] != end){
+    val <- c(val, end)
+  }
+  return(val)
 }

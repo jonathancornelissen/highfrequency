@@ -28,84 +28,84 @@ setnames(returnDatDT, old = "index", new = "DT")
 
 
 
-##### rMedRV #####
-context("rMedRV")
-test_that("rMedRV", {
+##### rMedRVar #####
+context("rMedRVar")
+test_that("rMedRVar", {
   expect_equal(
-    as.numeric(colSums(rMedRV(sampleOneMinuteData, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)[,!"DT"])),
+    as.numeric(colSums(rMedRVar(sampleOneMinuteData, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)[,!"DT"])),
     c(0.003387052289,0.001451676499)
   )
   
-  expect_equal(lapply(rMedRV(returnDat), sum), list("PRICE1" = 3.022290125, "PRICE2" = 3.003088657, "PRICE3" = 3.013543419))
-  expect_equal(lapply(rMedRV(returnDat), sum), lapply(rMedRV(dat, makeReturns = TRUE), sum))
+  expect_equal(lapply(rMedRVar(returnDat), sum), list("PRICE1" = 3.022290125, "PRICE2" = 3.003088657, "PRICE3" = 3.013543419))
+  expect_equal(lapply(rMedRVar(returnDat), sum), lapply(rMedRVar(dat, makeReturns = TRUE), sum))
   
-  expect_equal(matrix(rMedRV(returnDat), ncol = 3), matrix(as.matrix(rMedRV(returnDatDT)[,-1]), ncol = 3))
-  expect_equal(matrix(rMedRV(dat, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE), ncol = 3),
-               matrix(as.matrix(rMedRV(datDT, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)[, -1]), ncol = 3))
+  expect_equal(matrix(rMedRVar(returnDat), ncol = 3), matrix(as.matrix(rMedRVar(returnDatDT)[,-1]), ncol = 3))
+  expect_equal(matrix(rMedRVar(dat, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE), ncol = 3),
+               matrix(as.matrix(rMedRVar(datDT, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)[, -1]), ncol = 3))
   
-  expect_equal(matrix(as.matrix(rMedRV(sampleOneMinuteData, makeReturns = TRUE)[,-1]), ncol = 2),
-               matrix(rMedRV(as.xts(sampleOneMinuteData), makeReturns = TRUE), ncol = 2))
+  expect_equal(matrix(as.matrix(rMedRVar(sampleOneMinuteData, makeReturns = TRUE)[,-1]), ncol = 2),
+               matrix(rMedRVar(as.xts(sampleOneMinuteData), makeReturns = TRUE), ncol = 2))
 
 })
-##### rMedRQ ##### 
-context("rMedRQ")
+##### rMedRQuar ##### 
+context("rMedRQuar")
 test_that("", {
   expect_equal(
-    as.numeric(rMedRQ(as.xts(sampleTData[, list(DT, PRICE)]),alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE) * 1000000),
+    as.numeric(rMedRQuar(as.xts(sampleTData[, list(DT, PRICE)]),alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE) * 1000000),
     c(0.010922500356, 0.003618836787)
   )
-  expect_true(all.equal(rMedRQ(returnDatDT, alignBy = "minutes", alignPeriod = 5, makeReturns = FALSE), rMedRQ(datDT, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)))
-  expect_true(all.equal(rMedRQ(dat, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE) , rMedRQ(returnDat, alignBy = "minutes", alignPeriod = 5, makeReturns = FALSE)))
-  expect_equal(lapply(rMedRQ(returnDat), sum), list("PRICE1" = 3.06573359, "PRICE2" = 3.010144579, "PRICE3" = 3.030828633))
-  expect_equal(lapply(rMedRQ(returnDat), sum), lapply(rMedRQ(dat, makeReturns = TRUE), sum))
+  expect_true(all.equal(rMedRQuar(returnDatDT, alignBy = "minutes", alignPeriod = 5, makeReturns = FALSE), rMedRQuar(datDT, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)))
+  expect_true(all.equal(rMedRQuar(dat, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE) , rMedRQuar(returnDat, alignBy = "minutes", alignPeriod = 5, makeReturns = FALSE)))
+  expect_equal(lapply(rMedRQuar(returnDat), sum), list("PRICE1" = 3.06573359, "PRICE2" = 3.010144579, "PRICE3" = 3.030828633))
+  expect_equal(lapply(rMedRQuar(returnDat), sum), lapply(rMedRQuar(dat, makeReturns = TRUE), sum))
   
-  expect_equal(matrix(rMedRQ(returnDat), ncol = 3), matrix(as.matrix(rMedRQ(returnDatDT)[,-1]), ncol = 3))
-  expect_equal(matrix(rMedRQ(dat, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE), ncol = 3),
-               matrix(as.matrix(rMedRQ(datDT, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)[, -1]), ncol = 3))
+  expect_equal(matrix(rMedRQuar(returnDat), ncol = 3), matrix(as.matrix(rMedRQuar(returnDatDT)[,-1]), ncol = 3))
+  expect_equal(matrix(rMedRQuar(dat, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE), ncol = 3),
+               matrix(as.matrix(rMedRQuar(datDT, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)[, -1]), ncol = 3))
   
-  expect_equal(matrix(as.matrix(rMedRQ(sampleOneMinuteData, makeReturns = TRUE)[,-1]), ncol = 2),
-               matrix(rMedRQ(as.xts(sampleOneMinuteData), makeReturns = TRUE), ncol = 2))
+  expect_equal(matrix(as.matrix(rMedRQuar(sampleOneMinuteData, makeReturns = TRUE)[,-1]), ncol = 2),
+               matrix(rMedRQuar(as.xts(sampleOneMinuteData), makeReturns = TRUE), ncol = 2))
   
   
 })
-##### rMinRV ##### 
-context("rMinRV")
-test_that("rMinRV", {  
+##### rMinRVar ##### 
+context("rMinRVar")
+test_that("rMinRVar", {  
   expect_equal(
-    as.numeric(colSums(rMinRV(sampleOneMinuteData, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)[, !"DT"])),
+    as.numeric(colSums(rMinRVar(sampleOneMinuteData, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)[, !"DT"])),
     c(0.003344205602,0.001438168861)
   )
   
-  expect_equal(lapply(rMinRV(returnDat), sum), list("PRICE1" = 3.027820575, "PRICE2" = 2.99975133, "PRICE3" = 3.001113006))
-  expect_equal(lapply(rMinRV(returnDat), sum), lapply(rMinRV(dat, makeReturns = TRUE), sum))
+  expect_equal(lapply(rMinRVar(returnDat), sum), list("PRICE1" = 3.027820575, "PRICE2" = 2.99975133, "PRICE3" = 3.001113006))
+  expect_equal(lapply(rMinRVar(returnDat), sum), lapply(rMinRVar(dat, makeReturns = TRUE), sum))
   
-  expect_equal(matrix(rMinRV(returnDat), ncol = 3), matrix(as.matrix(rMinRV(returnDatDT)[,-1]), ncol = 3))
-  expect_equal(matrix(rMinRV(dat, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE), ncol = 3),
-               matrix(as.matrix(rMinRV(datDT, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)[, -1]), ncol = 3))
+  expect_equal(matrix(rMinRVar(returnDat), ncol = 3), matrix(as.matrix(rMinRVar(returnDatDT)[,-1]), ncol = 3))
+  expect_equal(matrix(rMinRVar(dat, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE), ncol = 3),
+               matrix(as.matrix(rMinRVar(datDT, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)[, -1]), ncol = 3))
   
-  expect_equal(matrix(as.matrix(rMinRV(sampleOneMinuteData, makeReturns = TRUE)[,-1]), ncol = 2),
-               matrix(rMinRV(as.xts(sampleOneMinuteData), makeReturns = TRUE), ncol = 2))
+  expect_equal(matrix(as.matrix(rMinRVar(sampleOneMinuteData, makeReturns = TRUE)[,-1]), ncol = 2),
+               matrix(rMinRVar(as.xts(sampleOneMinuteData), makeReturns = TRUE), ncol = 2))
   
   
   
   
 })
-##### rMinRQ ##### 
-context("rMinRQ")
-test_that("rMinRQ", {
+##### rMinRQuar ##### 
+context("rMinRQuar")
+test_that("rMinRQuar", {
   expect_equal(
-    as.numeric(rMinRQ(as.xts(sampleTData[, list(DT, PRICE)]), alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE) * 1000000),
+    as.numeric(rMinRQuar(as.xts(sampleTData[, list(DT, PRICE)]), alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE) * 1000000),
     c(0.011852089820, 0.002546123569)
   )
-  expect_equal(lapply(rMinRQ(returnDat), sum), list("PRICE1" = 3.0696895, "PRICE2" = 2.977093559, "PRICE3" = 3.01211734))
-  expect_equal(lapply(rMinRQ(returnDat), sum), lapply(rMinRQ(dat, makeReturns = TRUE), sum))
+  expect_equal(lapply(rMinRQuar(returnDat), sum), list("PRICE1" = 3.0696895, "PRICE2" = 2.977093559, "PRICE3" = 3.01211734))
+  expect_equal(lapply(rMinRQuar(returnDat), sum), lapply(rMinRQuar(dat, makeReturns = TRUE), sum))
   
-  expect_equal(matrix(rMinRQ(returnDat), ncol = 3), matrix(as.matrix(rMinRQ(returnDatDT)[,-1]), ncol = 3))
-  expect_equal(matrix(rMinRQ(dat, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE), ncol = 3),
-               matrix(as.matrix(rMinRQ(datDT, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)[, -1]), ncol = 3))
+  expect_equal(matrix(rMinRQuar(returnDat), ncol = 3), matrix(as.matrix(rMinRQuar(returnDatDT)[,-1]), ncol = 3))
+  expect_equal(matrix(rMinRQuar(dat, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE), ncol = 3),
+               matrix(as.matrix(rMinRQuar(datDT, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)[, -1]), ncol = 3))
   
-  expect_equal(matrix(as.matrix(rMinRQ(sampleOneMinuteData, makeReturns = TRUE)[,-1]), ncol = 2),
-               matrix(rMinRQ(as.xts(sampleOneMinuteData), makeReturns = TRUE), ncol = 2))
+  expect_equal(matrix(as.matrix(rMinRQuar(sampleOneMinuteData, makeReturns = TRUE)[,-1]), ncol = 2),
+               matrix(rMinRQuar(as.xts(sampleOneMinuteData), makeReturns = TRUE), ncol = 2))
   
   
 })
@@ -121,7 +121,7 @@ test_that("rMRCov", {
   expect_equal({
     formatC(sum(rMRCov(list(as.xts(sampleOneMinuteData)["2001-08-04","MARKET"], as.xts(sampleOneMinuteData)["2001-08-04","STOCK"]), pairwise = FALSE, makePsd = TRUE)), digits = 5)
   },
-  "0.00065676"
+  "0.00065673"
   )
   
   
@@ -133,14 +133,14 @@ test_that("rBeta", {
   expect_equal({
     a <- as.xts(sampleOneMinuteData)["2001-08-04",1]
     b <- as.xts(sampleOneMinuteData)["2001-08-04",2]
-    formatC(rBeta(a,b, RCOVestimator = "rBPCov", RVestimator = "rMinRV", makeReturns = TRUE), digits = 5)
+    formatC(rBeta(a,b, RCOVestimator = "rBPCov", RVestimator = "rMinRVar", makeReturns = TRUE), digits = 5)
   },
   c(MARKET = "0.97877")
   )
   expect_equal({
     a <- as.xts(sampleOneMinuteData)["2001-08-04",1]
     b <- as.xts(sampleOneMinuteData)["2001-08-04",2]
-    formatC(rBeta(a,b, RCOVestimator = "rOWCov", RVestimator = "rMedRV", makeReturns = TRUE), digits = 5)},
+    formatC(rBeta(a,b, RCOVestimator = "rOWCov", RVestimator = "rMedRVar", makeReturns = TRUE), digits = 5)},
     c("1.0577")
   )
 })
@@ -191,7 +191,7 @@ test_that("rCov", {
   expect_equal(rCov(sampleOneMinuteData, makeReturns = TRUE), rCov(as.xts(sampleOneMinuteData), makeReturns = TRUE))
 })
 
-##### rKurt ##### 
+##### rHYCov ##### 
 context("rHYCov")
 test_that("rHYCov gives correct results", {
   
@@ -223,23 +223,23 @@ test_that("rKurt", {
   
 })
 
-##### rMPV ##### 
-context("rMPV")
-test_that("rMPV", {
+##### rMPVar ##### 
+context("rMPVar")
+test_that("rMPVar", {
   expect_equal(
-    as.numeric(rMPV(as.xts(sampleTData[, list(DT, PRICE)]), alignBy ="minutes", alignPeriod = 5, makeReturns = TRUE)),
+    as.numeric(rMPVar(as.xts(sampleTData[, list(DT, PRICE)]), alignBy ="minutes", alignPeriod = 5, makeReturns = TRUE)),
     c(9.393123822e-05, 5.623885699e-05)
   )
   
-  expect_equal(lapply(rMPV(returnDat), sum), list("PRICE1" = 3.016532757, "PRICE2" = 3.004313242, "PRICE3" = 3.002691466))
-  expect_equal(lapply(rMPV(returnDat), sum), lapply(rMPV(dat, makeReturns = TRUE), sum))
+  expect_equal(lapply(rMPVar(returnDat), sum), list("PRICE1" = 3.016532757, "PRICE2" = 3.004313242, "PRICE3" = 3.002691466))
+  expect_equal(lapply(rMPVar(returnDat), sum), lapply(rMPVar(dat, makeReturns = TRUE), sum))
   
-  expect_equal(matrix(rMPV(returnDat), ncol = 3), matrix(as.matrix(rMPV(returnDatDT)[,-1]), ncol = 3))
-  expect_equal(matrix(rMPV(dat, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE), ncol = 3),
-               matrix(as.matrix(rMPV(datDT, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)[, -1]), ncol = 3))
+  expect_equal(matrix(rMPVar(returnDat), ncol = 3), matrix(as.matrix(rMPVar(returnDatDT)[,-1]), ncol = 3))
+  expect_equal(matrix(rMPVar(dat, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE), ncol = 3),
+               matrix(as.matrix(rMPVar(datDT, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)[, -1]), ncol = 3))
   
-  expect_equal(matrix(as.matrix(rMPV(sampleOneMinuteData, makeReturns = TRUE)[,-1]), ncol = 2),
-               matrix(rMPV(as.xts(sampleOneMinuteData), makeReturns = TRUE), ncol = 2))
+  expect_equal(matrix(as.matrix(rMPVar(sampleOneMinuteData, makeReturns = TRUE)[,-1]), ncol = 2),
+               matrix(rMPVar(as.xts(sampleOneMinuteData), makeReturns = TRUE), ncol = 2))
   
 })
 ##### rOWCov ##### 
@@ -311,19 +311,19 @@ test_that("rSkew", {
   expect_equal(matrix(as.matrix(rSkew(sampleOneMinuteData, makeReturns = TRUE)[,-1]), ncol = 2),
                matrix(rSkew(as.xts(sampleOneMinuteData), makeReturns = TRUE), ncol = 2))
 })
-##### rSV ##### 
-context("rSV")
-test_that("rSV", {
+##### rSVar ##### 
+context("rSVar")
+test_that("rSVar", {
   expect_equal(
-    sum(rSV(as.xts(sampleTData[, list(DT, PRICE)]), alignBy ="minutes", alignPeriod = 5, makeReturns = TRUE)),
+    sum(rSVar(as.xts(sampleTData[, list(DT, PRICE)]), alignBy ="minutes", alignPeriod = 5, makeReturns = TRUE)),
     0.000166891
   )
-  expect_equal(lapply(rSV(returnDat), function(x) lapply(x, sum))[[1]], list("rSVdownside" = 1.501497027, "rSVupside" = 1.50206646))
-  expect_equal(rSV(returnDat), rSV(dat, makeReturns = TRUE))
+  expect_equal(lapply(rSVar(returnDat), function(x) lapply(x, sum))[[1]], list("rSVardownside" = 1.501497027, "rSVarupside" = 1.50206646))
+  expect_equal(rSVar(returnDat), rSVar(dat, makeReturns = TRUE))
   
-  expect_equal(rSV(returnDat), rSV(returnDatDT))
-  expect_true(all.equal(rSV(dat, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE),
-               rSV(datDT, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE), check.attributes = FALSE))
+  expect_equal(rSVar(returnDat), rSVar(returnDatDT))
+  expect_true(all.equal(rSVar(dat, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE),
+               rSVar(datDT, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE), check.attributes = FALSE))
 
   
 })
@@ -388,11 +388,11 @@ test_that("rTSCov multivariate", {
     "1.6068"
   )
 })
-##### RV  #####
-context("RV")
-test_that("RV", {
+##### rRVar  #####
+context("rRVar")
+test_that("rRVar", {
   expect_equal(
-    formatC(RV(makeReturns(as.xts(sampleTData[as.Date(DT) == "2018-01-02", list(DT, PRICE)]))), digits = 5),
+    formatC(as.numeric(rRVar(makeReturns(as.xts(sampleTData[as.Date(DT) == "2018-01-02", list(DT, PRICE)])))), digits = 5),
     "0.0001032"
   )
 })
@@ -441,7 +441,7 @@ test_that("rQuar", {
 context("ivInference")
 test_that("ivInference", {
   expect_equal(
-    formatC(IVinference(as.xts(sampleTData[, list(DT, PRICE)]), IVestimator= "rMinRV", IQestimator = "rMedRQ", 
+    formatC(IVinference(as.xts(sampleTData[, list(DT, PRICE)]), IVestimator= "rMinRVar", IQestimator = "rMedRQuar", 
                         confidence = 0.95, makeReturns = TRUE)[[1]]$cb * 10000, digits = 5),
     c("0.84827", "1.0328")
   )
@@ -484,7 +484,7 @@ test_that("rCholCov", {
                                             -0.5, 3, -0.4, 0.7,
                                             0.7, -0.4, 2, 0.6,  
                                             0.8, 0.7, 0.6, 4), ncol = 4))
-  
+  ## YES, I do realize this is not the correct way to construct these returns - doesn't matter it's just for a test
   w1 <- rets[,1]
   w2 <- rets[sort(sample(1:nrow(rets), size = nrow(rets) * 0.75)), 2]
   w3 <- rets[sort(sample(1:nrow(rets), size = nrow(rets) * 0.65)), 3]
@@ -610,9 +610,9 @@ test_that("ReMeDI asymptotic variance gives same result as Merrick Li's code", {
 })
 
 
-#### rBAC ####
-context("rBAC")
-test_that("rBAC returns correct values", {
+#### rBACov ####
+context("rBACov")
+test_that("rBACov returns correct values", {
   set.seed(123)
   iT <- 23400
   
@@ -678,57 +678,66 @@ test_that("rBAC returns correct values", {
            setnames(x, "index","DT")
            return(x)
          })
-  BAC <- rBACov(lDT, shares = 1:4, outStanding = 1, nonEquity = 0, ETFNAME = "ETF", unrestricted = FALSE,
-              preEstimator = rCov, noiseCorrection = FALSE, returnL = FALSE, K = 2, J = 1)
+  BAC <- rBACov(lDT, shares = 1:4, outstanding = 1, nonEquity = 0, ETFNAME = "ETF", unrestricted = FALSE,
+              preEstimator = "rCov", noiseCorrection = FALSE, returnL = FALSE, K = 2, J = 1)
   expect_equal(
   matrix(c(0.098589281, -0.002606114, -0.006960383, -0.01323153, -0.002606114, 0.050470789, 
            -0.005729020, -0.01868274, -0.006960383, -0.005729020, 0.050596758, -0.04860079, 
-           -0.013231527, -0.018682744, -0.048600791, 0.08091408), ncol = 4),
+           -0.013231527, -0.018682744, -0.048600791, 0.08091408), ncol = 4, dimnames = list(c("STOCK 1", "STOCK 2", "STOCK 3", "STOCK 4"), 
+                                                                                            c("STOCK 1", "STOCK 2", "STOCK 3", "STOCK 4"))),
   BAC
   )
   
   
   
   
-  unrestrictedBAC <- rBACov(lDT, shares = 1:4, outStanding = 1, nonEquity = 0, ETFNAME = "ETF", unrestricted = TRUE, 
-                          preEstimator = rCov, noiseCorrection = FALSE, returnL = FALSE, K = 2, J = 1)
+  unrestrictedBAC <- rBACov(lDT, shares = 1:4, outstanding = 1, nonEquity = 0, ETFNAME = "ETF", unrestricted = TRUE, 
+                          preEstimator = "rCov", noiseCorrection = FALSE, returnL = FALSE, K = 2, J = 1)
 
   expect_equal(
     matrix(c(0.095798183, -0.004477446, -0.008222493, -0.009909461, -0.004477446, 0.046707724, -0.008796183, -0.012393680, 
-             -0.008222493, -0.008796183, 0.032547848, -0.025785512, -0.009909461, -0.012393680, -0.025785512, 0.049417920), ncol = 4),
+             -0.008222493, -0.008796183, 0.032547848, -0.025785512, -0.009909461, -0.012393680, -0.025785512, 0.049417920), ncol = 4,
+           dimnames = list(c("STOCK 1", "STOCK 2", "STOCK 3", "STOCK 4"), 
+                           c("STOCK 1", "STOCK 2", "STOCK 3", "STOCK 4"))),
     unrestrictedBAC
   )
   
   
-  noisyBAC <- rBACov(lDT, shares = 1:4, outStanding = 1, nonEquity = 0, ETFNAME = "ETF", unrestricted = FALSE,
-                   preEstimator = rCov, noiseCorrection = TRUE, returnL = FALSE, K = 2, J = 1)
-  
+  noisyBAC <- rBACov(lDT, shares = 1:4, outstanding = 1, nonEquity = 0, ETFNAME = "ETF", unrestricted = FALSE,
+                   preEstimator = "rCov", noiseCorrection = TRUE, returnL = FALSE, K = 2, J = 1)
+   
   expect_equal(
-  matrix(c(0.097813865, -0.002504853, -0.007216331, -0.01278663, -0.002504853, 0.051074266, -0.006576877, -0.01806634, -0.007216331, 
-           -0.006576877, 0.051487980, -0.04902462, -0.012786633, -0.018066344, -0.049024618, 0.08089841), ncol = 4),
+  matrix(c(0.097813865, -0.002561477, -0.006875550, -0.01314578,
+           -0.002561477,  0.050470789, -0.005747408, -0.01867366,
+           -0.006875550, -0.005747408,  0.050596758, -0.04861247,
+           -0.013145784, -0.018673661, -0.048612469,  0.08089841), ncol = 4,
+         dimnames = list(c("STOCK 1", "STOCK 2", "STOCK 3", "STOCK 4"), 
+                         c("STOCK 1", "STOCK 2", "STOCK 3", "STOCK 4"))),
   noisyBAC
   )
   
-  unrestrictedNoisyBAC <- rBACov(lDT, shares = 1:4, outStanding = 1, nonEquity = 0, ETFNAME = "ETF", unrestricted = TRUE,
-                               preEstimator = rCov, noiseCorrection = TRUE, returnL = FALSE, K = 2, J = 1)
+  unrestrictedNoisyBAC <- rBACov(lDT, shares = 1:4, outstanding = 1, nonEquity = 0, ETFNAME = "ETF", unrestricted = TRUE,
+                               preEstimator = "rCov", noiseCorrection = TRUE, returnL = FALSE, K = 2, J = 1)
   
   expect_equal(
-    matrix(c(0.095077601, -0.004441949, -0.008181313, -0.009783992,
-    -0.004441949,  0.047229958, -0.009032561, -0.012416212,
-    -0.008181313, -0.009032561,  0.032806152, -0.025953141,
-    -0.009783992, -0.012416212, -0.025953141,  0.049586042), ncol = 4),
+    matrix(c(0.095064006, -0.004436407, -0.008136801, -0.009833758,
+             -0.004436407,  0.046704739, -0.008802415, -0.012395926,
+             -0.008136801, -0.008802415,  0.032534836, -0.025790203,
+             -0.009833758, -0.012395926, -0.025790203,  0.049403869), ncol = 4, dimnames = list(c("STOCK 1", "STOCK 2", "STOCK 3", "STOCK 4"), 
+                                                                                       c("STOCK 1", "STOCK 2", "STOCK 3", "STOCK 4"))),
     unrestrictedNoisyBAC
   )
   
-  varianceAdjustedBAC <- rBACov(lDT, shares = 1:4, outStanding = 1, nonEquity = 0, ETFNAME = "ETF", unrestricted = FALSE, targetBeta = "VAB",
-                      preEstimator = rCov, noiseCorrection = FALSE, returnL = FALSE, K = 2, J = 1)
+  varianceAdjustedBAC <- rBACov(lDT, shares = 1:4, outstanding = 1, nonEquity = 0, ETFNAME = "ETF", unrestricted = FALSE, targetBeta = "VAB",
+                      preEstimator = "rCov", noiseCorrection = FALSE, returnL = FALSE, K = 2, J = 1)
   expect_equal(
   matrix(c(
     0.09858928, -0.002640660, -0.008127390, -0.01333734,
     -0.00264066,  0.050470789, -0.008125928, -0.01892530,
     -0.00812739, -0.008125928,  0.050596758, -0.05311512,
     -0.01333734, -0.018925299, -0.053115115,  0.08091408
-    ), ncol = 4),
+    ), ncol = 4, dimnames = list(c("STOCK 1", "STOCK 2", "STOCK 3", "STOCK 4"), 
+                                 c("STOCK 1", "STOCK 2", "STOCK 3", "STOCK 4"))),
   varianceAdjustedBAC)
   
 })

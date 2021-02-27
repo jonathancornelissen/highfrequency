@@ -13,7 +13,7 @@ quotesCleanup(
   selection = "median",
   maxi = 50,
   window = 50,
-  type = "advanced",
+  type = "standard",
   marketOpen = "09:30:00",
   marketClose = "16:00:00",
   rmoutliersmaxi = 10,

@@ -40,10 +40,12 @@ Calculates the Hayashi-Yoshida Covariance estimator
 library("xts")
 hy <- rHYCov(rData = as.xts(sampleOneMinuteData)["2001-08-05"],
              period = 5, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)
-
 }
 \references{
 Hayashi, T. and Yoshida, N. (2005). On covariance estimation of non-synchronously observed diffusion processes. \emph{Bernoulli}, 11, 359-379.
+}
+\seealso{
+\code{\link{ICov}} for a list of implemented estimators of the integrated covariance.
 }
 \author{
 Scott Payseur and Emil Sjoerup.

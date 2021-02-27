@@ -264,9 +264,9 @@ spotDrift <- function(data, method = "mean", alignBy = "minutes", alignPeriod = 
 #'
 #' Parameters:
 #' \itemize{
-#' \item \code{dailyvol} A string specifying the estimation method for the daily component \eqn{s_t}.
+#' \item \code{dailyVol} A string specifying the estimation method for the daily component \eqn{s_t}.
 #' Possible values are \code{"bipower", "rv", "medrv"}. \code{"bipower"} by default.
-#' \item \code{periodicvol} A string specifying the estimation method for the component of intraday volatility,
+#' \item \code{periodicVol} A string specifying the estimation method for the component of intraday volatility,
 #' that depends in a deterministic way on the intraday time at which the return is observed.
 #' Possible values are \code{"SD", "WSD", "TML", "OLS"}. See Boudt et al. (2011) for details. Default = \code{"TML"}.
 #' \item \code{P1} A positive integer corresponding to the number of cosine terms used in the flexible Fourier
@@ -286,7 +286,7 @@ spotDrift <- function(data, method = "mean", alignBy = "minutes", alignPeriod = 
 #' 
 #' Let there be \eqn{T} days of \eqn{N} equally-spaced log-returns \eqn{r_{i,t}}, 
 #' \eqn{i = 1, \dots, N} and \eqn{i = 1, \dots, T}.
-#' In case of \code{method = "detper"}, the returns are modeled as
+#' In case of \code{method = "detPer"}, the returns are modeled as
 #' \deqn{
 #' r_{i,t} = f_i s_t u_{i,t}
 #' }
@@ -298,23 +298,23 @@ spotDrift <- function(data, method = "mean", alignBy = "minutes", alignPeriod = 
 #' and Andersen and Bollerslev (1997). The jump robust versions by Boudt et al.
 #' (2011) have also been implemented.
 #' 
-#' If \code{periodicvol = "SD"}, we have
+#' If \code{periodicVol = "SD"}, we have
 #' \deqn{
 #' \hat f_i^{SD} = \frac{SD_i}{\sqrt{\frac{1}{\lfloor{\lambda / \Delta}\rfloor} \sum_{j = 1}^N SD_j^2}}
 #' }
 #' with \eqn{\Delta = 1 / N}, cross-daily averages \eqn{SD_i = \sqrt{1/T \sum_{i = t}^T r_{i,t}^2}}, 
 #' and \eqn{\lambda} being the length of the intraday time intervals.
 #' 
-#' If \code{periodicvol = "WSD"}, we have another nonparametric estimator that is robust to jumps in contrast to
-#' \code{periodicvol = "SD"}. The definition of this estimator can be found in Boudt et al. (2011, Eqs. 2.9-2.12).
+#' If \code{periodicVol = "WSD"}, we have another nonparametric estimator that is robust to jumps in contrast to
+#' \code{periodicVol = "SD"}. The definition of this estimator can be found in Boudt et al. (2011, Eqs. 2.9-2.12).
 #' 
-#' The estimates when \code{periodicvol = "OLS"} and \code{periodicvol = "TML"} are based on the regression equation
+#' The estimates when \code{periodicVol = "OLS"} and \code{periodicVol = "TML"} are based on the regression equation
 #' \deqn{
 #' \log \left| 1/T \sum_{t = 1}^T r_{i,t} \right| - c = \log f_i + \varepsilon_i
 #' }
 #' with \emph{i.i.d.} zero-mean error term \eqn{\varepsilon_i} and \eqn{c = -0.63518}. 
-#' \code{periodicvol = "OLS"} employs ordinary-least-squares estimation and 
-#' \code{periodicvol = "TML"} truncated maximum-likelihood estimation (see Boudt et al., 2011, Section 2.2, for further details).
+#' \code{periodicVol = "OLS"} employs ordinary-least-squares estimation and 
+#' \code{periodicVol = "TML"} truncated maximum-likelihood estimation (see Boudt et al., 2011, Section 2.2, for further details).
 #' 
 #' \strong{Stochastic periodicity method (\code{"stochPer"})}
 #' 
@@ -406,22 +406,22 @@ spotDrift <- function(data, method = "mean", alignBy = "minutes", alignPeriod = 
 #'
 #' Parameters:
 #' \itemize{
-#' \item{\code{type}}{String specifying the type of kernel to be used. Options
+#' \item{\code{type}}{ String specifying the type of kernel to be used. Options
 #' include \code{"gaussian", "epanechnikov", "beta"}. Default = \code{"gaussian"}.}
-#' \item{\code{h}}{Scalar or vector specifying bandwidth(s) to be used in kernel.
+#' \item{\code{h}}{ Scalar or vector specifying bandwidth(s) to be used in kernel.
 #' If \code{h} is a scalar, it will be assumed equal throughout the sample. If
 #' it is a vector, it should contain bandwidths for each day. If left empty,
 #' it will be estimated. Default = \code{NULL}.}
-#' \item{\code{est}}{String specifying the bandwidth estimation method. Possible
+#' \item{\code{est}}{ String specifying the bandwidth estimation method. Possible
 #' values include \code{"cv", "quarticity"}. Method \code{"cv"} equals
 #' cross-validation, which chooses the bandwidth that minimizes the Integrated
 #' Square Error. \code{"quarticity"} multiplies the simple plug-in estimator
 #' by a factor based on the daily quarticity of the returns. \code{est} is
 #' obsolete if \code{h} has already been specified by the user.
 #' \code{"cv"} by default.}
-#' \item{\code{lower}}{Lower bound to be used in bandwidth optimization routine,
+#' \item{\code{lower}}{ Lower bound to be used in bandwidth optimization routine,
 #' when using cross-validation method. Default is \eqn{0.1n^{-0.2}}.}
-#' \item{\code{upper}}{Upper bound to be used in bandwidth optimization routine,
+#' \item{\code{upper}}{ Upper bound to be used in bandwidth optimization routine,
 #' when using cross-validation method. Default is \eqn{n^{-0.2}}.}
 #' }
 #'
@@ -473,7 +473,7 @@ spotDrift <- function(data, method = "mean", alignBy = "minutes", alignPeriod = 
 #' will be executed many times (roughly equal to the total number of
 #' observations), so it is advised to use a small value for \code{alpha}, to
 #' avoid a lot of false positives. Default = \code{0.005}.}
-#' \item{\code{volest} string specifying the realized volatility estimator to be
+#' \item{\code{volEst} string specifying the realized volatility estimator to be
 #' used in local windows. Possible values are \code{"bipower", "rv", "medrv"}.
 #' Default = \code{"bipower"}.}
 #' \item{\code{online} boolean indicating whether estimations at a certain point
@@ -597,25 +597,24 @@ spotDrift <- function(data, method = "mean", alignBy = "minutes", alignPeriod = 
 #'              delta_c = c(0.25, -0.05, -0.2, 0.13, 0.02),
 #'              delta_s = c(-1.2, 0.11, 0.26, -0.03, 0.08))
 #'
-#' # Next method will take around 360 iterations
-#' vol1 <- spotVol(sampleOneMinuteData[, list(DT, PRICE = MARKET)], method = "stochper", init = init)
-#' plot(as.numeric(vol1$spot[1:780]), type="l")
-#' legend("topright", c("stochper"), col = c("black"), lty=1)}
+#' # Next method will take around 370 iterations
+#' vol1 <- spotVol(sampleOneMinuteData[, list(DT, PRICE = MARKET)], method = "stochPer", init = init)
+#' plot(vol1$spot[1:780])
+#' legend("topright", c("stochPer"), col = c("black"), lty=1)}
 #'
 #' # Various kernel estimates
 #' \dontrun{
-#' h1 <- bw.nrd0((1:nrow(sampleOneMinuteData[, list(DT, PRICE = MARKET)]))*(5*60))
+#' h1 <- bw.nrd0((1:nrow(sampleOneMinuteData[, list(DT, PRICE = MARKET)]))*60)
 #' vol2 <- spotVol(sampleOneMinuteData[, list(DT, PRICE = MARKET)],
 #'                 method = "kernel", h = h1)
 #' vol3 <- spotVol(sampleOneMinuteData[, list(DT, PRICE = MARKET)], 
 #'                 method = "kernel", est = "quarticity")
 #' vol4 <- spotVol(sampleOneMinuteData[, list(DT, PRICE = MARKET)],
 #'                 method = "kernel", est = "cv")
-#' plot(vol2, length = 2880)
-#' lines(as.numeric(t(vol3$spot))[1:2880], col = "red")
-#' lines(as.numeric(t(vol4$spot))[1:2880], col = "blue")
-#' legend("topright", c("h = simple estimate", "h = quarticity corrected",
-#'                      "h = crossvalidated"), col = c("black", "red", "blue"), lty=1)}
+#' plot(cbind(vol2$spot, vol3$spot, vol4$spot))
+#' xts::addLegend("topright", c("h = simple estimate", "h = quarticity corrected",
+#'                      "h = crossvalidated"), col = 1:3, lty=1)
+#'}
 #'
 #' # Piecewise constant volatility
 #' \dontrun{
@@ -626,12 +625,21 @@ spotDrift <- function(data, method = "mean", alignBy = "minutes", alignPeriod = 
 #' # Compare regular GARCH(1,1) model to eGARCH, both with external regressors
 #' \dontrun{
 #' vol6 <- spotVol(sampleOneMinuteData[, list(DT, PRICE = MARKET)], method = "garch", model = "sGARCH")
-#' vol7 <- spotVol(sampleOneMinuteData[, list(DT, PRICE = STOCK)], method = "garch", model = "eGARCH")
+#' vol7 <- spotVol(sampleOneMinuteData[, list(DT, PRICE = MARKET)], method = "garch", model = "eGARCH")
 #' plot(as.numeric(t(vol6$spot)), type = "l")
 #' lines(as.numeric(t(vol7$spot)), col = "red")
 #' legend("topleft", c("GARCH", "eGARCH"), col = c("black", "red"), lty = 1)
 #' }
 #' 
+#' \dontrun{
+#' # Compare realized measure spot vol estimation to pre-averaged version
+#' vol8 <- spotVol(sampleTDataEurope[, list(DT, PRICE)], method = "RM", marketOpen = "09:00:00",
+#'                 marketClose = "17:30:00", tz = "UTC", alignPeriod = 1, alignBy = "mins",
+#'                 lookBackPeriod = 10)
+#' vol9 <- spotVol(sampleTDataEurope[, list(DT, PRICE)], method = "PARM", marketOpen = "09:00:00",
+#'                 marketClose = "17:30:00", tz = "UTC", lookBackPeriod = 10)
+#' plot(zoo::na.locf(cbind(vol8$spot, vol9$spot)))
+#' }
 #' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
 #'
 #' @references 
@@ -651,12 +659,12 @@ spotVol <- function(data, method = "detPer", alignBy = "minutes", alignPeriod = 
                       marketOpen = "09:30:00", marketClose = "16:00:00",
                       tz = "GMT", ...) {
   
-  PRICE <- DATE <- RETURN <- NULL
+  DT <- PRICE <- DATE <- RETURN <- NULL
   
   validOptions <- c("detPer", "stochPer", "kernel", "piecewise", "garch", "RM", "PARM")
   method <- method[1]
   if(!(method %in% validOptions)){
-    stop(paste("method not a valid option, valid options are:", validOptions))
+    stop(c("method not a valid option, valid options are: ", paste(validOptions, collapse = ", ")))
   }
   
   
@@ -678,19 +686,23 @@ spotVol <- function(data, method = "detPer", alignBy = "minutes", alignPeriod = 
       stop("Input has to be data.table or xts.")
     }
   } else {
+    data <- copy(data)
     if (!("DT" %in% colnames(data))) {
       stop("Data.table needs DT column containing the time-stamps of the trades.") # added the timestamp comment for verbosity.
     }
   }
   
   if( method != "PARM"){
-    
-    datad <- aggregatePrice(data[, DATE := ""], alignBy = alignBy, alignPeriod = alignPeriod , marketOpen = marketOpen,
-                            marketClose = marketClose, tz = tz, fill = TRUE) # The allocation of date let's aggregatePrice return the date so we don't have to calculate it multiple times.
+    if(!is.null(alignPeriod) && !is.null(alignBy)){
+      datad <- aggregatePrice(data, alignBy = alignBy, alignPeriod = alignPeriod , marketOpen = marketOpen,
+                              marketClose = marketClose, tz = tz, fill = TRUE) # The allocation of date let's aggregatePrice return the date so we don't have to calculate it multiple times.
+    } else {
+      datad <- copy(data)
+    }
     setkeyv(datad, "DT")
-    datad <- datad[, RETURN := log(PRICE) - shift(log(PRICE), type = "lag"), by = "DATE"][!is.na(RETURN)]
+    datad <- datad[, RETURN := log(PRICE) - shift(log(PRICE), type = "lag"), by = list(DATE = as.Date(DT))][!is.na(RETURN)]
     rData <- xts(datad$RETURN, order.by = datad$DT)
-    datad <- split(datad, by = "DATE")
+    datad <- split(datad[, DATE := as.Date(DT)], by = "DATE")
     mR <- matrix(unlist(lapply(datad, FUN = function(x) as.numeric(x$RETURN))), ncol = length(datad[[1]]$RETURN), byrow = TRUE)
     
     if (method == "kernel") {

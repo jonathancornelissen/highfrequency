@@ -54,6 +54,9 @@ rv
 rc = rCov(rData = sampleOneMinuteData, makeReturns = TRUE)
 rc
 }
+\seealso{
+\code{\link{ICov}} for a list of implemented estimators of the integrated covariance.
+}
 \author{
 Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup.
 }

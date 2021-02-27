@@ -82,6 +82,7 @@ harInsanityFilter <- function(fittedValues, lower, upper, replacement) {
 #' @param inputType a string denoting if the input data consists of realized measures or high-frequency returns. 
 #' Default "RM" is the only way to denote realized measures and everything else denotes returns.
 #' @param jumpTest the function name of a function used to test whether the test statistic which determines whether the jump variability is significant that day. By default \code{jumpTest = "ABDJumptest"}, hence using the test statistic in Equation or Equation (18) of Andersen et al. (2007).
+#' It is also possible to provide pre-computed test statistics for jump tests by setting \code{jumpTest} to \code{"testStat"}. These test statistics should still be passed as the third column.
 #' @param alpha a real indicating the confidence level used in testing for jumps. By default \code{alpha = 0.05}.
 #' @param h an integer indicating the number over how many days the dependent variable should be aggregated.
 #' By default, \code{h = 1}, i.e. no aggregation takes place, you just model the daily realized volatility.
@@ -173,6 +174,12 @@ harInsanityFilter <- function(fittedValues, lower, upper, replacement) {
 #' x
 #' # plot(x)
 #' predict(x)
+#' 
+#' # Example 6: HARCJ with pre-computed test-statistics
+#' ## BNSJumptest manually calculated.
+#' testStats <- sqrt(390) * (SPYRM$RV1 - SPYRM$BPV1)/sqrt((pi^2/4+pi-3 - 2) * SPYRM$medRQ1)
+#' model <- HARmodel(cbind(as.xts(SPYRM[, list(DT, RV5, BPV5)]), testStats), type = "HARCJ")
+#' 
 #'
 #' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
 #' @import RcppArmadillo
@@ -238,7 +245,7 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
     if (type == "HARQ") {
       RM3 <- data[,2]
     }
-    if (type %in% c("HARQJ", "CHARQ")) {
+    if (type %in% c("HARQJ", "CHARQ", "HARCJ")) {
       RM2 <- data[, 2]
       RM3 <- data[, 3]
     }
@@ -358,7 +365,7 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
 
   if (type == "HARCJ") {
     # Are the jumps significant? if not set to zero:
-    if (jumpTest == "ABDJumptest" ) {
+    if (jumpTest == "ABDJumptest") {
       
       if(inputType != "RM"){
         TQ <- apply.daily(data, rTPQuar) 
@@ -368,6 +375,8 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
       
       J <- J[,1]
       teststats <- ABDJumptest(RV=RM1,BPV=RM2,TQ=TQ )
+    } else if(jumpTest == "testStats") {
+      teststats <- RM3
     } else {
       jtest <- match.fun(jumpTest)
       teststats <- jtest(data,...)

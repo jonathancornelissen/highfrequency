@@ -7,13 +7,13 @@
 rBACov(
   pData,
   shares,
-  outStanding,
+  outstanding,
   nonEquity,
   ETFNAME = "ETF",
   unrestricted = TRUE,
   targetBeta = c("HY", "VAB", "expert"),
   expertBeta = NULL,
-  preEstimator = rCov,
+  preEstimator = "rCov",
   noiseRobustEstimator = rTSCov,
   noiseCorrection = FALSE,
   returnL = FALSE,
@@ -23,9 +23,9 @@ rBACov(
 \arguments{
 \item{pData}{a named list. Each list-item contains an \code{xts} or \code{data.table} object with the intraday price data of an ETF and it's component stocks. \code{xts} objects are turned into \code{data.table}s}
 
-\item{shares}{a \code{numeric} with length corresponding to the number of component stocks in the ETF. The entries are the stock holdings of the ETF in the corresponding stock.}
+\item{shares}{a \code{numeric} with length corresponding to the number of component stocks in the ETF. The entries are the stock holdings of the ETF in the corresponding stock. The order of these entries should correspond to the order the stocks are listed in the \code{list} passed in the \code{pData} argument.}
 
-\item{outStanding}{number of shares outstanding of the ETF}
+\item{outstanding}{number of shares outstanding of the ETF}
 
 \item{nonEquity}{aggregated value of the additional components (like cash, money-market funds, bonds, etc.) of the ETF which are not included in the components in \code{pData}.}
 
@@ -156,30 +156,32 @@ p5 <- exp(p5[sort(sample(1:length(p5), size = nrow(rets) * 0.9))])
 
 BAC <- rBACov(pData = list(
                      "ETF" = p5, "STOCK 1" = p1, "STOCK 2" = p2, "STOCK 3" = p3, "STOCK 4" = p4
-                   ), shares = 1:4, outStanding = 1, nonEquity = 0, ETFNAME = "ETF", 
-                   unrestricted = FALSE, preEstimator = rCov, noiseCorrection = FALSE, 
+                   ), shares = 1:4, outstanding = 1, nonEquity = 0, ETFNAME = "ETF", 
+                   unrestricted = FALSE, preEstimator = "rCov", noiseCorrection = FALSE, 
                    returnL = FALSE, K = 2, J = 1)
 
 # Noise robust version of the estimator
 noiseRobustBAC <- rBACov(pData = list(
                      "ETF" = p5, "STOCK 1" = p1, "STOCK 2" = p2, "STOCK 3" = p3, "STOCK 4" = p4
-                   ), shares = 1:4, outStanding = 1, nonEquity = 0, ETFNAME = "ETF", 
-                   unrestricted = FALSE, preEstimator = rCov, noiseCorrection = TRUE, 
+                   ), shares = 1:4, outstanding = 1, nonEquity = 0, ETFNAME = "ETF", 
+                   unrestricted = FALSE, preEstimator = "rCov", noiseCorrection = TRUE, 
                    noiseRobustEstimator = rHYCov, returnL = FALSE, K = 2, J = 1)
 
 # Use the Variance Adjusted Beta method
 # Also use a different pre-estimator.
 VABBAC <- rBACov(pData = list(
                      "ETF" = p5, "STOCK 1" = p1, "STOCK 2" = p2, "STOCK 3" = p3, "STOCK 4" = p4
-                   ), shares = 1:4, outStanding = 1, nonEquity = 0, ETFNAME = "ETF", 
-                   unrestricted = FALSE, targetBeta = "VAB", preEstimator = rBPCov, 
+                   ), shares = 1:4, outstanding = 1, nonEquity = 0, ETFNAME = "ETF", 
+                   unrestricted = FALSE, targetBeta = "VAB", preEstimator = "rHYov", 
                    noiseCorrection = FALSE, returnL = FALSE, Lin = FALSE, L = 0, K = 2, J = 1)                    
                    
 }
-
 }
 \references{
 Boudt, K., Dragun, K., Omauri, S., and Vanduffel, S. (2021) Beta-Adjusted Covariance Estimation (working paper).
+}
+\seealso{
+\code{\link{ICov}} for a list of implemented estimators of the integrated covariance.
 }
 \author{
 Emil Sjoerup, (Kris Boudt and Kirill Dragun for the Python version)
