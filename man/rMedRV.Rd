@@ -7,14 +7,14 @@
 rMedRV(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE)
 }
 \arguments{
-\item{rData}{DEPRECATED}
+\item{rData}{DEPRECATED USE \code{\link{rMedRVar}}}
 
-\item{alignBy}{DEPRECATED}
+\item{alignBy}{DEPRECATED USE \code{\link{rMedRVar}}}
 
-\item{alignPeriod}{DEPRECATED}
+\item{alignPeriod}{DEPRECATED USE \code{\link{rMedRVar}}}
 
-\item{makeReturns}{DEPRECATED}
+\item{makeReturns}{DEPRECATED USE \code{\link{rMedRVar}}}
 }
 \description{
-DEPRECATED
+DEPRECATED USE \code{\link{rMedRVar}}
 }

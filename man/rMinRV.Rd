@@ -7,14 +7,14 @@
 rMinRV(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE)
 }
 \arguments{
-\item{rData}{DEPRECATED}
+\item{rData}{DEPRECATED USE \code{\link{rMinRVar}}}
 
-\item{alignBy}{DEPRECATED}
+\item{alignBy}{DEPRECATED USE \code{\link{rMinRVar}}}
 
-\item{alignPeriod}{DEPRECATED}
+\item{alignPeriod}{DEPRECATED USE \code{\link{rMinRVar}}}
 
-\item{makeReturns}{DEPRECATED}
+\item{makeReturns}{DEPRECATED USE \code{\link{rMinRVar}}}
 }
 \description{
-DEPRECATED
+DEPRECATED USE \code{\link{rMinRVar}}
 }

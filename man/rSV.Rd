@@ -7,14 +7,14 @@
 rSV(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE)
 }
 \arguments{
-\item{rData}{DEPRECATED}
+\item{rData}{DEPRECATED USE \code{\link{rSVar}}}
 
-\item{alignBy}{DEPRECATED}
+\item{alignBy}{DEPRECATED USE \code{\link{rSVar}}}
 
-\item{alignPeriod}{DEPRECATED}
+\item{alignPeriod}{DEPRECATED USE \code{\link{rSVar}}}
 
-\item{makeReturns}{DEPRECATED}
+\item{makeReturns}{DEPRECATED USE \code{\link{rSVar}}}
 }
 \description{
-DEPRECATED
+DEPRECATED USE \code{\link{rSVar}}
 }

@@ -16,5 +16,5 @@ rMPV(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE)
 \item{makeReturns}{DEPRECATED}
 }
 \description{
-DEPRECATED
+DEPRECATED USE \code{\link{rMPVar}}
 }
