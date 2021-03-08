@@ -380,17 +380,17 @@ test_that("refreshTime", {
 
 library(data.table)
 
-context("makeRMFormat")
-test_that("makeRMFormat",{
+context("spreadPrices and gatherPrices")
+test_that("spreadPrices",{
   set.seed(1)
   PRICE <- DT <- .N <- NULL
   data1 <- copy(sampleTData)[,  `:=`(PRICE = PRICE * runif(.N, min = 0.99, max = 1.01),
                                                  DT = DT + runif(.N, 0.01, 0.02))]
   data2 <- copy(sampleTData)[, SYMBOL := 'XYZ']
   
-  dat <- rbind(data1, data2)
-  setkey(dat, "DT")
-  dat <- makeRMFormat(dat)
+  dat1 <- rbind(data1, data2)
+  setkey(dat1, "DT")
+  dat <- spreadPrices(dat1)
   
   res <- rCov(dat, alignBy = 'minutes', alignPeriod = 5, makeReturns = TRUE, cor = TRUE)
   target <- list("2018-01-02" = matrix(c(1, 0.05400510115,
@@ -399,7 +399,19 @@ test_that("makeRMFormat",{
                                          0.171321754, 1), ncol = 2)
                  )
   expect_equal(res, target)
+})
+test_that("gatherPrices and spreadPrices back and forth",{
+  set.seed(1)
+  PRICE <- DT <- .N <- NULL
+  data1 <- copy(sampleTData)[,  `:=`(PRICE = PRICE * runif(.N, min = 0.99, max = 1.01),
+                                     DT = DT + runif(.N, 0.01, 0.02))]
+  data2 <- copy(sampleTData)[, SYMBOL := 'XYZ']
   
+  dat1 <- rbind(data1, data2)[, list(DT, SYMBOL, PRICE)]
+  setkeyv(dat1, c("DT", "SYMBOL"))
+  dat <- spreadPrices(dat1)
+  expect_equal(dat1, gatherPrices(dat))
+  expect_equal(spreadPrices(gatherPrices(dat)), dat)
   
 })
 
