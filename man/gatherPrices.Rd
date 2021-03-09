@@ -10,7 +10,7 @@ gatherPrices(data)
 \item{data}{An \code{xts} or a \code{data.table} object with at least \code{"DT"} and d columns with price data with their names corresponding to the respective symbols.}
 }
 \value{
-
+a \code{data.table} with columns \code{DT}, \code{SYMBOL}, and \code{PRICE}
 }
 \description{
 Convenience function to gather data from one \code{xts} or \code{data.table} 

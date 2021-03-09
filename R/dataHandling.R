@@ -3047,7 +3047,7 @@ spreadPrices <- function(data){
 #' 
 #' @param data An \code{xts} or a \code{data.table} object with at least \code{"DT"} and d columns with price data with their names corresponding to the respective symbols.
 #' 
-#' @return 
+#' @return a \code{data.table} with columns \code{DT}, \code{SYMBOL}, and \code{PRICE}
 #' 
 #' @examples
 #' \dontrun{
@@ -3088,7 +3088,7 @@ gatherPrices <- function(data){
   setnames(data, old = c("variable", "value"), new = c("SYMBOL", "PRICE"))
   
   if (inputWasXts) {
-    collected <- as.xts(data)
+    data <- as.xts(data)
     storage.mode(data) <- 'numeric'
     return(data)
   } else {
