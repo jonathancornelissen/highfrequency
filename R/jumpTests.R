@@ -537,7 +537,7 @@ JOjumpTest <- function(pData, power = 4, alignBy = NULL, alignPeriod = NULL, alp
 #' 
 #' See \code{\link{spotVol}} and \code{\link{spotDrift}} for Estimators for \eqn{\sigma(t)} and \eqn{\mu(t)}, respectively.
 #' 
-#' @param pData \code{xts}or data.table of the price data in levels. This data can (and should in some cases) be tick-level data. The data can span more than one day.
+#' @param pData \code{xts} or \code{data.table} of the price data in levels. This data can (and should in some cases) be tick-level data. The data can span more than one day. Should only contain a sinlge \code{SYMBOL}
 #' @param volEstimator character denoting which volatility estimator to use for the tests. See \code{\link{spotVol}}. Default = \code{"RM"} denoting realized measures.
 #' @param driftEstimator character denoting which drift estimator to use for the tests. See \code{\link{spotDrift}}. Default = \code{"none"} denoting no drift estimation.
 #' @param alpha numeric of length one determining what confidence level to use when constructing the critical values.
