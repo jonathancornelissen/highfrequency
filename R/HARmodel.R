@@ -255,7 +255,11 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
   
   
   # Get the matrix for estimation of linear model:
-  maxp <- max(periods,periodsJ,periodsQ) # Max number of aggregation levels
+  # This looks weird, but we need to make sure that we don't consider periodsJ in maxp when type == "HAR"
+  # and in other similar cases.
+  maxp <- max(
+    c(periods,periodsJ[type %in% jumpModels],periodsQ[type %in% quarticityModels])
+              ) # Max number of aggregation levels
 
   if (!is.null(leverage)) {
     maxp <- max(maxp,leverage)
@@ -300,7 +304,7 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
 
   if (!is.null(leverage)) {
     if (sum(data < 0) == 0) {
-      warning("You cannot use leverage variables in the model in case your input consists of Realized Measures")
+      stop("You cannot use leverage variables in the model in case your input consists of Realized Measures")
     }
 
     # Get close-to-close returns
@@ -308,7 +312,7 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
     # Get the rmins:
     rmintemp <- pmin(e,0)
     # Aggregate everything:
-    rmin <- as.data.frame(har_agg(rmintemp, leverage, length(leverage))[(maxp:(n-h)), ,drop = FALSE])
+    rmin <- har_agg(rmintemp, leverage, length(leverage))[(maxp:(n-h)),]
     colnames(rmin) <- paste0("Rmin", leverage)
     # Select:
     #rmin <- rmin[(maxp:(n-h)),]
