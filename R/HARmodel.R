@@ -935,13 +935,13 @@ predict.HARmodel <- function(object, ... ){
 #' Printing method for \code{HARmodel} objects
 #' @param x object of type \code{HARmodel}
 #' @param ... extra options
-#' @details The printing method has the extra option \code{digits} which can be used to set the number of digits for printing
+#' @details The printing method has the extra option \code{digits} which can be used to set the number of digits for printing pass \code{lag} to determine the maximum order of the Newey West estimator. Default is \code{22}
 #' @importFrom stats coef
 #' @importFrom sandwich NeweyWest
 #' @export
 print.HARmodel <- function(x, ...){
   options <- list(...)
-  opt <- list(digits = max(3, getOption("digits") - 3))
+  opt <- list(digits = max(3, getOption("digits") - 3), lag = 22)
   opt[names(options)] <- options
   digits <- opt$digits
   formula <- getHarmodelformula(x); modeldescription = formula[[1]]; betas = formula[[2]];
@@ -950,7 +950,7 @@ print.HARmodel <- function(x, ...){
       "\n\n", sep = "")
 
   coefs <- coef(x);
-  x$NeweyWestSE <- sandwich::NeweyWest(x)
+  x$NeweyWestSE <- sandwich::NeweyWest(x, lag = opt$lag)
   NeweyWestSE <- x$NeweyWestSE
   names(coefs) <- c("beta0",betas)
   colnames(NeweyWestSE) <- rownames(NeweyWestSE) <- c("beta0",betas)
@@ -958,7 +958,7 @@ print.HARmodel <- function(x, ...){
     cat("Coefficients:\n")
     print.default(format(coefs, digits = digits), print.gap = 2,quote = FALSE);
     cat("Newey-West Standard Errors:\n");
-    print.default(format(diag(NeweyWestSE), digits = digits), print.gap = 2,quote = FALSE);
+    print.default(format(sqrt(diag(NeweyWestSE)), digits = digits), print.gap = 2,quote = FALSE);
     cat("\n\n");
     Rs <- summary(x)[c("r.squared", "adj.r.squared")]
     zz <- c(Rs$r.squared,Rs$adj.r.squared);
@@ -972,14 +972,16 @@ print.HARmodel <- function(x, ...){
 
 #' Summary for \code{HARmodel} objects
 #' @param object An object of class \code{HARmodel}
-#' @param ... unused - do not set.
+#' @param ... pass \code{lag} to determine the maximum order of the Newey West estimator. Default is \code{22}
 #' @return A modified \code{summary.lm}
 #' @importFrom stats summary.lm pt
 #' @importFrom sandwich NeweyWest
 #' @export
 summary.HARmodel <- function(object, ...){
+  op <- list(lag = 22)
+  op[names(options)] <- list(...)
   dd <- summary.lm(object)
-  dd$coefficients[,"Std. Error"] <- sqrt(diag(NeweyWest(object, lag = 22)))
+  dd$coefficients[,"Std. Error"] <- sqrt(diag(NeweyWest(object, lag = op$lag)))
   dd$coefficients[,"t value"] <- dd$coefficients[,"Estimate"] / dd$coefficients[,"Std. Error"]
   dd$coefficients[,"Pr(>|t|)"] <- 2 * pt(abs(dd$coefficients[, "t value"]), object$df.residual, lower.tail = FALSE)
   formula <- getHarmodelformula(object)

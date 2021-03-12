@@ -9,7 +9,7 @@
 \arguments{
 \item{object}{An object of class \code{HARmodel}}
 
-\item{...}{unused - do not set.}
+\item{...}{pass \code{lag} to determine the maximum order of the Newey West estimator. Default is \code{22}}
 }
 \value{
 A modified \code{summary.lm}
