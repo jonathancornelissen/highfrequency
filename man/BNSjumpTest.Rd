@@ -83,8 +83,8 @@ Since the realized volatility converges to the sum of integrated variance and ju
 it follows that the difference between \code{RV} and the \code{IVestimator} captures the jump part only, and this observation underlines the BNS test for jumps (Theodosiou and Zikes, 2009).
 }
 \examples{
-bns <- BNSjumpTest(sampleTData[, list(DT, PRICE)], IVestimator= "rMinRV",
-                   IQestimator = "rMedRQ", type= "linear", makeReturns = TRUE)
+bns <- BNSjumpTest(sampleTData[, list(DT, PRICE)], IVestimator= "rMinRVar",
+                   IQestimator = "rMedRQuar", type= "linear", makeReturns = TRUE)
 bns
 
 }

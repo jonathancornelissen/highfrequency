@@ -261,8 +261,8 @@ AJjumpTest <- function(pData, p = 4 , k = 2, alignBy = NULL, alignPeriod = NULL,
 #' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup.
 #' 
 #' @examples 
-#' bns <- BNSjumpTest(sampleTData[, list(DT, PRICE)], IVestimator= "rMinRV",
-#'                    IQestimator = "rMedRQ", type= "linear", makeReturns = TRUE)
+#' bns <- BNSjumpTest(sampleTData[, list(DT, PRICE)], IVestimator= "rMinRVar",
+#'                    IQestimator = "rMedRQuar", type= "linear", makeReturns = TRUE)
 #' bns
 #' 
 #' @keywords highfrequency BNSjumpTest
@@ -324,23 +324,20 @@ BNSjumpTest <- function (rData, IVestimator = "BV", IQestimator = "TP", type = "
       rData <- makeReturns(rData)
     }
     N <- length(rData)
-    hatQV <- rRVar(rData)
-    hatIV <- hatIV(rData, IVestimator)
     theta <- tt(IVestimator)
-    hatIQ <- hatIQ(rData, IQestimator)
     if (type == "linear") {
       if (logTransform) {
         hatQV <- log(rRVar(rData))
         hatIV <- log(hatIV(rData, IVestimator))
       }
-      if (!logTransform) {
+      else {
         hatQV <- rRVar(rData)
         hatIV <- hatIV(rData, IVestimator)
       }
       if (max) {
         product <- max(1, hatIQ(rData, IQestimator)/hatIV(rData, IVestimator)^2)
       }
-      if (!max) {
+      else {
         product <- hatIQ(rData, IQestimator)
       }
       a <- sqrt(N) * (hatQV - hatIV)/sqrt((theta - 2) * product)
@@ -354,7 +351,7 @@ BNSjumpTest <- function (rData, IVestimator = "BV", IQestimator = "TP", type = "
       if (max) {
         product <- max(1, hatIQ(rData, IQestimator)/hatIV(rData, IVestimator)^2)
       }
-      if (!max) {
+      else {
         product <- hatIQ(rData, IQestimator)/hatIV(rData, IVestimator)^2
       }
       
