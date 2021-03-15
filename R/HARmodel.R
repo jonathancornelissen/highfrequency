@@ -342,10 +342,7 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
     if(!is.null(externalRegressor)){
       type <- paste0(type, "-X")
     }
-    
-    
     model$RVest <- RVest[1]
-
   } #End HAR-RV if cond
 
   if (type == "HARJ") {
@@ -360,7 +357,6 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
     }
     x <- cbind(x, rmin)
     model <- estimhar(y = y, x = x, externalRegressor = externalRegressor)
-    model$fitted.values <- harInsanityFilter(fittedValues = model$fitted.values, lower = min(RM1), upper = max(RM1), replacement = mean(RM1))
     if(!is.null(externalRegressor)){
       type <- paste0(type, "-X")
     }
@@ -414,7 +410,6 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
     model$RVest <- RVest
     model$jumpTest <- jumpTest
     model$alpha_jumps <- alpha
-    model$fitted.values <- harInsanityFilter(fittedValues = model$fitted.values, lower = min(RM1), upper = max(RM1), replacement = mean(RM1))
     if(!is.null(externalRegressor)){
       type <- paste0(type, "-X")
     }
@@ -436,7 +431,6 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
     }
     x1 <- cbind(x1,rmin)
     model <- estimhar(y = y, x = x1, externalRegressor = externalRegressor)
-    model$fitted.values <- harInsanityFilter(fittedValues = model$fitted.values, lower = min(RM1), upper = max(RM1), replacement = mean(RM1))
     model$RVest <- RVest[1]
     if(!is.null(externalRegressor)){
       type <- paste0(type, "-X")
@@ -461,7 +455,6 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
     }
     x1 <- cbind(x1,rmin);
     model <-  estimhar(y = y, x = x1, externalRegressor = externalRegressor)
-    model$fitted.values <- harInsanityFilter(fittedValues = model$fitted.values, lower = min(RM1), upper = max(RM1), replacement = mean(RM1))
     model$RVest <- RVest[1]
     if(!is.null(externalRegressor)){
       type <- paste0(type, "-X")
@@ -495,7 +488,6 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
     }
     x2 <- cbind(x2,rmin)
     model <- estimhar(y = y, x = x2, externalRegressor = externalRegressor)
-    model$fitted.values <- harInsanityFilter(fittedValues = model$fitted.values, lower = min(RM1), upper = max(RM1), replacement = mean(RM1))
     model$RVest <- RVest[1]
     if(!is.null(externalRegressor)){
       type <- paste0(type, "-X")
@@ -503,9 +495,8 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
   } #End CHAR-RVQ if cond
   
   
-  if(!is.null(externalRegressor)){
-    model$fitted.values <- harInsanityFilter(fittedValues = model$fitted.values, lower = min(RM1), upper = max(RM1), replacement = mean(RM1))
-  }
+  model$fitted.values <- harInsanityFilter(fittedValues = model$fitted.values, lower = min(y), upper = max(y), replacement = mean(y))
+  model$residuals <- model$model[, "y"] - model$fitted.values
   
   model$dates <- alldates[(maxp+h):n]
   model$type <- type
