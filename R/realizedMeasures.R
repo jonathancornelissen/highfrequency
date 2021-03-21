@@ -103,11 +103,12 @@ listAvailableKernels <- function() {
     "TukeyHanning",
     "ModifiedTukeyHanning")
 }
-#' DEPRECATED  
-#' @param rData DEPRECATED
-#' @param alignBy DEPRECATED
-#' @param alignPeriod DEPRECATED
-#' @param makeReturns DEPRECATED
+#' DEPRECATED
+#' @description DEPRECATED USE \code{\link{rMedRQuar}}
+#' @param rData DEPRECATED USE \code{\link{rMedRQuar}}
+#' @param alignBy DEPRECATED USE \code{\link{rMedRQuar}}
+#' @param alignPeriod DEPRECATED USE \code{\link{rMedRQuar}}
+#' @param makeReturns DEPRECATED USE \code{\link{rMedRQuar}}
 #' @export
 rMedRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE){
   .Deprecated(new = "rMedRQ has been renamed to rMedRQuar")
@@ -212,11 +213,12 @@ rMedRQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = F
 }
 
 
-#' DEPRECATED  
-#' @param rData DEPRECATED
-#' @param alignBy DEPRECATED
-#' @param alignPeriod DEPRECATED
-#' @param makeReturns DEPRECATED
+#' DEPRECATED
+#' @description DEPRECATED USE \code{\link{rMinRQuar}}
+#' @param rData DEPRECATED USE \code{\link{rMinRQuar}}
+#' @param alignBy DEPRECATED USE \code{\link{rMinRQuar}}
+#' @param alignPeriod DEPRECATED USE \code{\link{rMinRQuar}}
+#' @param makeReturns DEPRECATED USE \code{\link{rMinRQuar}}
 #' @export
 rMinRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE){
   .Deprecated(new = "rMinRQ has been renamed to rMinRQuar")
@@ -305,11 +307,12 @@ rMinRQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = F
   }
 }
 
-#' DEPRECATED  
-#' @param rData DEPRECATED
-#' @param alignBy DEPRECATED
-#' @param alignPeriod DEPRECATED
-#' @param makeReturns DEPRECATED
+#' DEPRECATED
+#' @description DEPRECATED USE \code{\link{rMinRVar}} 
+#' @param rData DEPRECATED USE \code{\link{rMinRVar}} 
+#' @param alignBy DEPRECATED USE \code{\link{rMinRVar}} 
+#' @param alignPeriod DEPRECATED USE \code{\link{rMinRVar}} 
+#' @param makeReturns DEPRECATED USE \code{\link{rMinRVar}} 
 #' @export
 rMinRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE){
   .Deprecated(new = "rMinRV has been renamed to rMinRVar")
@@ -413,11 +416,12 @@ rMinRVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FA
   }
 }
 
-#' DEPRECATED  
-#' @param rData DEPRECATED
-#' @param alignBy DEPRECATED
-#' @param alignPeriod DEPRECATED
-#' @param makeReturns DEPRECATED
+#' DEPRECATED
+#' @description DEPRECATED USE \code{\link{rMedRVar}}
+#' @param rData DEPRECATED USE \code{\link{rMedRVar}}
+#' @param alignBy DEPRECATED USE \code{\link{rMedRVar}}
+#' @param alignPeriod DEPRECATED USE \code{\link{rMedRVar}}
+#' @param makeReturns DEPRECATED USE \code{\link{rMedRVar}}
 #' @export
 rMedRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE){
   .Deprecated(new = "rMedRV has been renamed to rMedRVar")
@@ -539,11 +543,11 @@ rMedRVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FA
 #' DEPRECATED rMRC
 #' @description DEPRECATED USE \code{\link{rMRCov}}
 #'
-#' @param pData DEPRECATED
-#' @param pairwise DEPRECATED
-#' @param makePsd DEPRECATED
-#' @param theta DEPRECATED
-#' @param ... DEPRECATED
+#' @param pData DEPRECATED USE \code{\link{rMRCov}}
+#' @param pairwise DEPRECATED USE \code{\link{rMRCov}}
+#' @param makePsd DEPRECATED USE \code{\link{rMRCov}}
+#' @param theta DEPRECATED USE \code{\link{rMRCov}}
+#' @param ... DEPRECATED USE \code{\link{rMRCov}}
 #' @export
 rMRC <- function(pData, pairwise = FALSE, makePsd = FALSE, theta = 0.8, ...){
   .Deprecated(new = "rMRC has been renamed to rMRCov")
@@ -1769,7 +1773,8 @@ rKurt <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
   }
 }
 
-#' DEPRECATED  
+#' DEPRECATED
+#' @description DEPRECATED USE \code{\link{rMPVar}}
 #' @param rData DEPRECATED
 #' @param alignBy DEPRECATED
 #' @param alignPeriod DEPRECATED
@@ -2158,11 +2163,12 @@ rSkew <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
   }
 }
 
-#' DEPRECATED  
-#' @param rData DEPRECATED
-#' @param alignBy DEPRECATED
-#' @param alignPeriod DEPRECATED
-#' @param makeReturns DEPRECATED
+#' DEPRECATED
+#' @description DEPRECATED USE \code{\link{rSVar}}
+#' @param rData DEPRECATED USE \code{\link{rSVar}}
+#' @param alignBy DEPRECATED USE \code{\link{rSVar}}
+#' @param alignPeriod DEPRECATED USE \code{\link{rSVar}}
+#' @param makeReturns DEPRECATED USE \code{\link{rSVar}}
 #' @export
 rSV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE){
   .Deprecated(new = "rSV has been renamed to rSVar")
@@ -2599,8 +2605,8 @@ rRTSCov <- function (pData, cor = FALSE, startIV = NULL, noisevar = NULL,
 
 
 #' DEPRECATED
-#' DEPRECATED use \code{\link{rRVar}} instead
-#' @param rData DEPRECATED \code{\link{rRVar}} instead
+#' DEPRECATED USE \code{\link{rRVar}}
+#' @param rData DEPRECATED USE \code{\link{rRVar}}
 #' @export
 RV <- function(rData){
   .Deprecated(new = "RV has been renamed to rRVar")
@@ -3535,7 +3541,7 @@ listCholCovEstimators <- function(){
 ReMeDI <- function(pData, kn = 1, lags = 1, knEqual = FALSE,
                    #correctTime = FALSE, jumpsIndex = NULL,
                    makeCorrelation = FALSE){
-  time <- DT <- PRICE <- NULL
+  DT <- PRICE <- NULL #time <-
   # Check input
 
   if(!is.logical(knEqual)){

@@ -15,5 +15,5 @@
 Printing method for \code{HARmodel} objects
 }
 \details{
-The printing method has the extra option \code{digits} which can be used to set the number of digits for printing
+The printing method has the extra option \code{digits} which can be used to set the number of digits for printing pass \code{lag} to determine the maximum order of the Newey West estimator. Default is \code{22}
 }

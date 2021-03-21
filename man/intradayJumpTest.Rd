@@ -18,7 +18,7 @@ intradayJumpTest(
 )
 }
 \arguments{
-\item{pData}{\code{xts}or data.table of the price data in levels. This data can (and should in some cases) be tick-level data. The data can span more than one day.}
+\item{pData}{\code{xts} or \code{data.table} of the price data in levels. This data can (and should in some cases) be tick-level data. The data can span more than one day. Should only contain a sinlge \code{SYMBOL}}
 
 \item{volEstimator}{character denoting which volatility estimator to use for the tests. See \code{\link{spotVol}}. Default = \code{"RM"} denoting realized measures.}
 

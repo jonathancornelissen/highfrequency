@@ -3,14 +3,14 @@
 \name{RV}
 \alias{RV}
 \title{DEPRECATED
-DEPRECATED use \code{\link{rRVar}} instead}
+DEPRECATED USE \code{\link{rRVar}}}
 \usage{
 RV(rData)
 }
 \arguments{
-\item{rData}{DEPRECATED \code{\link{rRVar}} instead}
+\item{rData}{DEPRECATED USE \code{\link{rRVar}}}
 }
 \description{
 DEPRECATED
-DEPRECATED use \code{\link{rRVar}} instead
+DEPRECATED USE \code{\link{rRVar}}
 }

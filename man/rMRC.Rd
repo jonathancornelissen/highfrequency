@@ -7,15 +7,15 @@
 rMRC(pData, pairwise = FALSE, makePsd = FALSE, theta = 0.8, ...)
 }
 \arguments{
-\item{pData}{DEPRECATED}
+\item{pData}{DEPRECATED USE \code{\link{rMRCov}}}
 
-\item{pairwise}{DEPRECATED}
+\item{pairwise}{DEPRECATED USE \code{\link{rMRCov}}}
 
-\item{makePsd}{DEPRECATED}
+\item{makePsd}{DEPRECATED USE \code{\link{rMRCov}}}
 
-\item{theta}{DEPRECATED}
+\item{theta}{DEPRECATED USE \code{\link{rMRCov}}}
 
-\item{...}{DEPRECATED}
+\item{...}{DEPRECATED USE \code{\link{rMRCov}}}
 }
 \description{
 DEPRECATED USE \code{\link{rMRCov}}

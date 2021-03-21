@@ -26,7 +26,7 @@ tradesAfterFirstCleaning <- tradesCleanup(tDataRaw = sampleTDataRaw,
 sampleTData <- tradesCleanupUsingQuotes(
   tData = tradesAfterFirstCleaning,
   qData = sampleQData,
-  lagQuotes = 0)[, c("DT", "SYMBOL", "PRICE", "SIZE")]
+  lagQuotes = 0)[, c("DT", "EX", "SYMBOL", "PRICE", "SIZE")]
 # Only some columns are included. These are the ones that were historically included.
 }
 

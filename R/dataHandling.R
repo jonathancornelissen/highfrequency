@@ -1688,7 +1688,7 @@ quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
       }
     }
     REPORT[4] <- dim(qDataRaw)[1]
-    qDataRaw <- qDataRaw[OFR>BID, list(DT, SPREAD = OFR - BID,  SPREAD_MEDIAN = median(OFR-BID), OFR, BID, BIDSIZ, OFRSIZ),by = list(DATE = as.Date(DT, tz = tz), SYMBOL)]
+    qDataRaw <- qDataRaw[OFR>BID, list(DT, SPREAD = OFR - BID,  SPREAD_MEDIAN = median(OFR-BID), OFR, BID, BIDSIZ, OFRSIZ,EX),by = list(DATE = as.Date(DT, tz = tz), SYMBOL)]
     REPORT[5] <- dim(qDataRaw)[1] 
     qDataRaw <- qDataRaw[SPREAD < (SPREAD_MEDIAN * maxi)][, -c("SPREAD","SPREAD_MEDIAN")]
     REPORT[6] <- dim(qDataRaw)[1]
@@ -2953,6 +2953,14 @@ makeOHLCV <- function(pData, alignBy = "minutes", alignPeriod = 5, tz = NULL){
   }
 }
 
+#' DEPRECATED 
+#' use \code{\link{spreadPrices}}
+#' @param data DEPRECATED
+#' @export
+makeRMFormat <- function(data){
+  .Deprecated(new = "makeRMFormat has been renamed to spreadPrices")
+  return(spreadPrices(data))
+}
 
 
 
@@ -2961,14 +2969,15 @@ makeOHLCV <- function(pData, alignBy = "minutes", alignPeriod = 5, tz = NULL){
 #' 
 #' Convenience function to split data from one \code{xts} or \code{data.table} 
 #' with at least \code{"DT"}, \code{"SYMBOL"}, and \code{"PRICE"} columns to a format 
-#' that can be used in the functions for calculation of realized measures.
+#' that can be used in the functions for calculation of realized measures. 
+#' This is the opposite of \code{\link{gatherPrices}}.
 #' 
 #' @param data An \code{xts} or a \code{data.table} object with at least \code{"DT"}, 
 #' \code{"SYMBOL"}, and \code{"PRICE"} columns. This data should already be cleaned.
 #' 
 #' @return An \code{xts} or a \code{data.table} object with columns \code{"DT"} and 
 #' a column named after each unique entrance in the \code{"SYMBOL"} column of the input. 
-#' These columns contain the price of the associated symbol. 
+#' These columns contain the price of the associated symbol. We drop all other columns, e.g. \code{SIZE}. 
 #' 
 #' @examples
 #' \dontrun{
@@ -2979,20 +2988,21 @@ makeOHLCV <- function(pData, alignBy = "minutes", alignPeriod = 5, tz = NULL){
 #' 
 #' dat <- rbind(data1, data2)
 #' setkey(dat, "DT")
-#' dat <- makeRMFormat(dat)
+#' dat <- spreadPrices(dat)
 #' 
 #' rCov(dat, alignBy = 'minutes', alignPeriod = 5, makeReturns = TRUE, cor = TRUE) 
 #' }
+#' @seealso \code{\link{gatherPrices}}
 #' @author Emil Sjoerup.
 #' @importFrom data.table merge.data.table setkey
 #' @importFrom xts is.xts
 #' @export
-makeRMFormat <- function(data){
+spreadPrices <- function(data){
   SYMBOL <- PRICE <- DT <- NULL
   if(any(!(c("SYMBOL", "PRICE") %in% colnames(data)))){
     stop(paste("Could not find column(s)", 
-               c("SYMBOL", "PRICE")[!(c("SYMBOL", "PRICE") %in% colnames(data))]), 
-         "these columns must be present")
+               paste(c("SYMBOL", "PRICE")[!(c("SYMBOL", "PRICE") %in% colnames(data))], collapse = ", ")), 
+         "in data, these columns must be present")
   }
   inputWasXts <- FALSE
   if (!is.data.table(data)) {
@@ -3011,7 +3021,7 @@ makeRMFormat <- function(data){
   splitted <- split(data[,list(DT, PRICE, SYMBOL)], by = 'SYMBOL')
   
   collected <- Reduce(function(x,y) merge.data.table(x,y, by = "DT", all = TRUE), lapply(splitted, function(x){
-    name <- x[1, SYMBOL]
+    name <- as.character(x[1, SYMBOL])
     x <- x[, list(DT,PRICE)]
     setnames(x, old = "PRICE", new = name)
     return(x)
@@ -3028,3 +3038,61 @@ makeRMFormat <- function(data){
   
 }
 
+
+#' Make TAQ format
+#' 
+#' Convenience function to gather data from one \code{xts} or \code{data.table} 
+#' with at least \code{"DT"}, and d columns containing price data to a \code{"DT"}, \code{"SYMBOL"}, and \code{"PRICE"}
+#' column. This function the opposite of \code{\link{spreadPrices}}.
+#' 
+#' @param data An \code{xts} or a \code{data.table} object with at least \code{"DT"} and d columns with price data with their names corresponding to the respective symbols.
+#' 
+#' @return a \code{data.table} with columns \code{DT}, \code{SYMBOL}, and \code{PRICE}
+#' 
+#' @examples
+#' \dontrun{
+#' library(data.table)
+#' data1 <- copy(sampleTData)[,  `:=`(PRICE = PRICE * runif(.N, min = 0.99, max = 1.01),
+#'                                                DT = DT + runif(.N, 0.01, 0.02))]
+#' data2 <- copy(sampleTData)[, SYMBOL := 'XYZ']
+#' dat1 <- rbind(data1[, list(DT, SYMBOL, PRICE)], data2[, list(DT, SYMBOL, PRICE)])
+#' setkeyv(dat1, c("DT", "SYMBOL"))
+#' dat1
+#' dat <- spreadPrices(dat1) # Easy to use for realized measures
+#' dat
+#' dat <- gatherPrices(dat)
+#' dat
+#' all.equal(dat1, dat) # We have changed to RM format and back.
+#' }
+#' @seealso \code{\link{spreadPrices}}
+#' @author Emil Sjoerup
+#' @importFrom data.table melt
+#' @export
+gatherPrices <- function(data){
+  
+  inputWasXts <- FALSE
+  if (!is.data.table(data)) {
+    if (is.xts(data)) {
+      data <- as.data.table(data)
+      data <- setnames(data , old = "index", new = "DT")
+      inputWasXts <- TRUE
+    } else {
+      stop("Input has to be data.table or xts.")
+    }
+  } else {
+    if (!("DT" %in% colnames(data))) {
+      stop("Data.table neeeds DT column.")
+    }
+  }
+  data <- melt(data, 1, na.rm = TRUE, variable.factor = FALSE)
+  setnames(data, old = c("variable", "value"), new = c("SYMBOL", "PRICE"))
+  
+  if (inputWasXts) {
+    data <- as.xts(data)
+    storage.mode(data) <- 'numeric'
+    return(data)
+  } else {
+    setkeyv(data, c("DT", "SYMBOL"))
+    return(data[])
+  }
+}

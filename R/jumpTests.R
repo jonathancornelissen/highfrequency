@@ -261,8 +261,8 @@ AJjumpTest <- function(pData, p = 4 , k = 2, alignBy = NULL, alignPeriod = NULL,
 #' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup.
 #' 
 #' @examples 
-#' bns <- BNSjumpTest(sampleTData[, list(DT, PRICE)], IVestimator= "rMinRV",
-#'                    IQestimator = "rMedRQ", type= "linear", makeReturns = TRUE)
+#' bns <- BNSjumpTest(sampleTData[, list(DT, PRICE)], IVestimator= "rMinRVar",
+#'                    IQestimator = "rMedRQuar", type= "linear", makeReturns = TRUE)
 #' bns
 #' 
 #' @keywords highfrequency BNSjumpTest
@@ -324,23 +324,20 @@ BNSjumpTest <- function (rData, IVestimator = "BV", IQestimator = "TP", type = "
       rData <- makeReturns(rData)
     }
     N <- length(rData)
-    hatQV <- rRVar(rData)
-    hatIV <- hatIV(rData, IVestimator)
     theta <- tt(IVestimator)
-    hatIQ <- hatIQ(rData, IQestimator)
     if (type == "linear") {
       if (logTransform) {
         hatQV <- log(rRVar(rData))
         hatIV <- log(hatIV(rData, IVestimator))
       }
-      if (!logTransform) {
+      else {
         hatQV <- rRVar(rData)
         hatIV <- hatIV(rData, IVestimator)
       }
       if (max) {
         product <- max(1, hatIQ(rData, IQestimator)/hatIV(rData, IVestimator)^2)
       }
-      if (!max) {
+      else {
         product <- hatIQ(rData, IQestimator)
       }
       a <- sqrt(N) * (hatQV - hatIV)/sqrt((theta - 2) * product)
@@ -354,7 +351,7 @@ BNSjumpTest <- function (rData, IVestimator = "BV", IQestimator = "TP", type = "
       if (max) {
         product <- max(1, hatIQ(rData, IQestimator)/hatIV(rData, IVestimator)^2)
       }
-      if (!max) {
+      else {
         product <- hatIQ(rData, IQestimator)/hatIV(rData, IVestimator)^2
       }
       
@@ -537,7 +534,7 @@ JOjumpTest <- function(pData, power = 4, alignBy = NULL, alignPeriod = NULL, alp
 #' 
 #' See \code{\link{spotVol}} and \code{\link{spotDrift}} for Estimators for \eqn{\sigma(t)} and \eqn{\mu(t)}, respectively.
 #' 
-#' @param pData \code{xts}or data.table of the price data in levels. This data can (and should in some cases) be tick-level data. The data can span more than one day.
+#' @param pData \code{xts} or \code{data.table} of the price data in levels. This data can (and should in some cases) be tick-level data. The data can span more than one day. Should only contain a sinlge \code{SYMBOL}
 #' @param volEstimator character denoting which volatility estimator to use for the tests. See \code{\link{spotVol}}. Default = \code{"RM"} denoting realized measures.
 #' @param driftEstimator character denoting which drift estimator to use for the tests. See \code{\link{spotDrift}}. Default = \code{"none"} denoting no drift estimation.
 #' @param alpha numeric of length one determining what confidence level to use when constructing the critical values.
@@ -587,7 +584,7 @@ JOjumpTest <- function(pData, power = 4, alignBy = NULL, alignPeriod = NULL, alp
 intradayJumpTest <- function(pData, volEstimator = "RM", driftEstimator = "none", alpha = 0.95, alignBy = "minutes", alignPeriod = 5,
                              marketOpen = "09:30:00", marketClose = "16:00:00", tz = NULL, ...){
 
-  PRICE = DATE = RETURN = DT = NULL
+  .N <- PRICE <- DATE <- RETURN <- DT <- NULL
   
   if (!("PRICE" %in% colnames(pData))) {
     if (dim(pData)[2] == 1) {
@@ -612,11 +609,21 @@ intradayJumpTest <- function(pData, volEstimator = "RM", driftEstimator = "none"
     }
   }
   
-  D <- ndays(pData)
-  isMultiDay <- FALSE
-  if (D > 1) {
-    isMultiDay <- TRUE
-  } 
+  timeZone <- format(pData$DT[1], format = "%Z")
+  if(is.null(timeZone) || timeZone == ""){
+    if(is.null(tz)){
+      tz <- "UTC"
+    }
+    if(!("POSIXct" %in% class(pData$DT))){
+      pData[, DT := as.POSIXct(format(DT, digits = 20, nsmall = 20), tz = tz)]
+    }
+  } else {
+    tz <- timeZone
+  }
+  dates <- pData[, last(DATE), by =list(DATE = as.Date(DT, tz = tz))][[1]]
+  D <- length(dates)
+  
+  
   
   vol <- spotVol(pData, method = volEstimator, alignBy = alignBy, alignPeriod = alignPeriod, marketOpen = marketOpen, marketClose = marketClose, tz = tz, ...)
 
@@ -647,13 +654,8 @@ intradayJumpTest <- function(pData, volEstimator = "RM", driftEstimator = "none"
     options <- list(...)
     op[names(options)] <- options
     
-    if (isMultiDay) {
-      dates <- NULL 
-      if(is.data.table(pData)){
-        dates <- unique(as.Date(pData$DT, tz = tz))
-      } else {
-        dates <- unique(as.Date(index(pData), tz = tz))
-      }
+    if (D > 1) { ##TODO: see if this can be simplified
+
       
       preAveragedReturns <- testingIndices <- c()
       
@@ -667,7 +669,7 @@ intradayJumpTest <- function(pData, volEstimator = "RM", driftEstimator = "none"
         preAveragedReturns <- c(preAveragedReturns, c(as.numeric(hatreturn(as.xts(pData[as.Date(pData$DT, tz = tz) == dates[d]])$PRICE, vol$kn[d])), rep(NA, vol$kn[d] - 2)))
       }
       
-      returns <- pData[, RETURN := preAveragedReturns][testingIndices, "RETURN"]
+      returns <- pData[, RETURN := preAveragedReturns][testingIndices, ]
       
     } else {
       testingIndices <- seq(op$lookBackPeriod - 2 + vol$kn +1, nObs-vol$kn, by = vol$kn)
@@ -700,7 +702,13 @@ intradayJumpTest <- function(pData, volEstimator = "RM", driftEstimator = "none"
   tests[is.infinite(tests)] <- NA
   # Calculating the critical value of the test.
   const <- 0.7978846 # = sqrt(2/pi)
-  n <- nrow(returns) / D
+  
+  n <- returns[, .N, by = as.Date(DT, tz = tz)]
+  ..names.. <- n[[1]]
+  n <- n[[2]]
+  names(n) <- ..names..
+  
+  
   Cn <- sqrt(2 * log(n))/const - (log(pi) + log( log(n) ))/(2 * const*sqrt((2 * log(n))))
   Sn <- 1/sqrt(const * 2 * log(n))
   betastar <- -log(-log(1-alpha))
@@ -714,7 +722,7 @@ intradayJumpTest <- function(pData, volEstimator = "RM", driftEstimator = "none"
   
   
   out <- list("ztest" = tests, "vol" = vol,  "drift" = drift, "criticalValue" = criticalValue, 
-              "pData" = pData, "prices" = prices, "isMultiDay" = isMultiDay)
+              "pData" = pData, "prices" = prices, "isMultiDay" = D > 1)
   class(out) <- c( "intradayJumpTest", "list")
   
   # testingTimes <- trimws(gsub("1970-01-01", "", index(vol$spot)))
@@ -821,7 +829,7 @@ plot.intradayJumpTest <- function(x, ...){
       # 
       
       
-      shade <- abs( x$ztest[dates[d]] ) > x$criticalValue
+      shade <- abs( x$ztest[dates[d]] ) > x$criticalValue[d]
       shade <- cbind(upper = shade * as.numeric(max(thisDat, na.rm = TRUE) +1e5), 
                      lower = shade * as.numeric(min(thisDat, na.rm = TRUE)) -1e5)
       colnames(shade) <- c("upper", "lower")
