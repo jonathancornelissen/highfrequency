@@ -47,38 +47,38 @@ test_that("selectExchange and data cleaning functions", {
   
   expect_equal(
     dim(rmTradeOutliersUsingQuotes(selectExchange(sampleTDataRaw, "P"), selectExchange(sampleQDataRaw, "N"), lagQuotes = 2)),
-    c(5502, 22)
+    c(5502, 12)
   )
   
   expect_equal(
     dim(rmLargeSpread(selectExchange(sampleQDataRaw, "N"))),
-    c(94422, 13)
+    c(94422, 7)
   )
   
   expect_equal(
     dim(mergeQuotesSameTimestamp(selectExchange(sampleQDataRaw, "N"), selection = "max.volume")),
-    c(46566, 13)
+    c(46566, 7)
   )
   
   expect_equal(
     dim(mergeQuotesSameTimestamp(selectExchange(sampleQDataRaw, "N"), selection = "weighted.average")),
-    c(46566, 13)
+    c(46566, 7)
   )
   
   expect_equal(
     dim(noZeroQuotes(selectExchange(sampleQDataRaw, "N"))),
-    c(94422, 13)
+    c(94422, 7)
   )
   
   
   expect_equal(
   dim(tradesCleanupUsingQuotes(tData = sampleTDataRaw, qData = sampleQData, lagQuotes = 2)),
-  c(72035, 23)
+  c(72035, 13)
   )
   
   expect_equal(
   dim(tradesCleanup(tDataRaw = sampleTDataRaw, exchanges = "N", report = FALSE)),
-  c(6140, 12)
+  c(6140, 8)
   )
 })
 
@@ -91,7 +91,7 @@ test_that("tradesCleanup gives same data as the shipped data", {
       tData = tradesCleanup(tDataRaw = sampleTDataRaw, exchanges = "N", report = FALSE),
       qData = quotesCleanup(qDataRaw = sampleQDataRaw, exchanges = "N", type = "standard", report = FALSE),
       lagQuotes = 0
-    )[, c("DT", "SYMBOL", "PRICE", "SIZE")]
+    )[, c("DT", "EX", "SYMBOL", "PRICE", "SIZE")]
   
   setkey(cleaned, SYMBOL, DT)
   expect_equal(cleaned, sampleTData)
@@ -139,7 +139,7 @@ test_that("tradesCleanup on-disk functionality", {
       tData = tradesCleanup(tDataRaw = sampleTDataRaw[as.Date(DT) == "2018-01-02"], exchanges = "N", report = FALSE),
       qData = quotesCleanup(qDataRaw = sampleQDataRaw[as.Date(DT) == "2018-01-02"], exchanges = "N", type = "standard", report = FALSE),
       lagQuotes = 0
-    )[, c("DT", "SYMBOL", "PRICE", "SIZE")]
+    )[, c("DT", "EX", "SYMBOL", "PRICE", "SIZE")]
   
   
   sampleTDataDay2 <-
@@ -147,12 +147,12 @@ test_that("tradesCleanup on-disk functionality", {
       tData = tradesCleanup(tDataRaw = sampleTDataRaw[as.Date(DT) == "2018-01-03"], exchanges = "N", report = FALSE),
       qData = quotesCleanup(qDataRaw = sampleQDataRaw[as.Date(DT) == "2018-01-03"], exchanges = "N", type = "standard", report = FALSE),
       lagQuotes = 0
-    )[, c("DT", "SYMBOL", "PRICE", "SIZE")]
+    )[, c("DT", "EX","SYMBOL", "PRICE", "SIZE")]
   
   
   
-  onDiskDay1 <- onDiskDay1[as.Date(DT, tz = "EST") == "2018-01-02",c("DT", "SYMBOL", "PRICE", "SIZE")][, DT := DT - 18000]
-  onDiskDay2 <- onDiskDay2[as.Date(DT, tz = "EST") == "2018-01-03",c("DT", "SYMBOL", "PRICE", "SIZE")][, DT := DT - 18000]
+  onDiskDay1 <- onDiskDay1[as.Date(DT, tz = "EST") == "2018-01-02",c("DT", "EX","SYMBOL", "PRICE", "SIZE")][, DT := DT - 18000]
+  onDiskDay2 <- onDiskDay2[as.Date(DT, tz = "EST") == "2018-01-03",c("DT", "EX","SYMBOL", "PRICE", "SIZE")][, DT := DT - 18000]
   setkey(onDiskDay1, SYMBOL, DT)
   setkey(onDiskDay2, SYMBOL, DT)
   expect_equal(onDiskDay1[,-"DT"], sampleTDataDay1[,-"DT"])
@@ -439,7 +439,7 @@ test_that("Backwards-forwards matching algorithm produces correct result", {
                                   qData = quotesCleanup(qDataRaw = sampleQDataRaw, type = 'standard', report = FALSE, exchanges = 'N'), 
                                   BFM = TRUE, lagQuotes = 0)
   
-  expect_equal(dim(bfmMatched), c(19887, 18))
+  expect_equal(dim(bfmMatched), c(19887, 14))
 })
 
 

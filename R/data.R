@@ -37,7 +37,7 @@
 #' sampleTData <- tradesCleanupUsingQuotes(
 #'   tData = tradesAfterFirstCleaning,
 #'   qData = sampleQData,
-#'   lagQuotes = 0)[, c("DT", "SYMBOL", "PRICE", "SIZE")]
+#'   lagQuotes = 0)[, c("DT", "EX", "SYMBOL", "PRICE", "SIZE")]
 #' # Only some columns are included. These are the ones that were historically included.
 #' }
 #'
@@ -76,3 +76,13 @@
 #' @format A \code{data.table} object
 #' @keywords datasets
 "SPYRM"
+
+
+
+
+#' Multivariate tick by tick data
+#' @description Cleaned Tick by tick data for a sector ETF, called \code{ETF} and two stock components of that ETF,
+#' these stocks are named \code{AAA} and \code{BBB}.
+#' @format A \code{data.table} object
+#' @keywords datasets
+"sampleMultiTradeData"
