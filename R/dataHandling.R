@@ -1688,7 +1688,7 @@ quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
       }
     }
     REPORT[4] <- dim(qDataRaw)[1]
-    qDataRaw <- qDataRaw[OFR>BID, list(DT, SPREAD = OFR - BID,  SPREAD_MEDIAN = median(OFR-BID), OFR, BID, BIDSIZ, OFRSIZ),by = list(DATE = as.Date(DT, tz = tz), SYMBOL)]
+    qDataRaw <- qDataRaw[OFR>BID, list(DT, SPREAD = OFR - BID,  SPREAD_MEDIAN = median(OFR-BID), OFR, BID, BIDSIZ, OFRSIZ,EX),by = list(DATE = as.Date(DT, tz = tz), SYMBOL)]
     REPORT[5] <- dim(qDataRaw)[1] 
     qDataRaw <- qDataRaw[SPREAD < (SPREAD_MEDIAN * maxi)][, -c("SPREAD","SPREAD_MEDIAN")]
     REPORT[6] <- dim(qDataRaw)[1]
