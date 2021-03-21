@@ -8,6 +8,7 @@
 #' @param xLim timestamps for the start and the end of the plots.
 #' @param tradeCol color in which to paint the trade crosses.
 #' @param quoteCol color in which to fill out the bid-offer spread.
+#' @param format format string to pass to \code{axis.POSIXct} when creating the timestamps on the x axis.
 #' @param ... passed to \code{plot} and \code{points}.
 #' 
 #' @examples 
@@ -22,7 +23,7 @@
 #' @importFrom data.table %between%
 #' @importFrom graphics rect
 #' @export
-plotTQData <- function(tData, qData = NULL, xLim = NULL, tradeCol = "black", quoteCol = "darkgray", ...){
+plotTQData <- function(tData, qData = NULL, xLim = NULL, tradeCol = "black", quoteCol = "darkgray", format = "%H:%M:%S",...){
   DT_END <- BID <- OFR <- DT <- NULL
   if(is.null(qData)){
     qData <- copy(tData)
@@ -42,5 +43,5 @@ plotTQData <- function(tData, qData = NULL, xLim = NULL, tradeCol = "black", quo
   rect(qData$DT, qData$OFR, qData$DT_END, qData$BID, border = quoteCol, col = quoteCol)
   
   points(tData$DT, tData$PRICE, ylab = "price", pch = "x", xaxs = "i", ylim = yLim, col = tradeCol, ...)
-  axis.POSIXct(1, x = seq(xLim[1], xLim[2], length.out = 7))
+  axis.POSIXct(1, x = seq(xLim[1], xLim[2], length.out = 7), format = format)
 }
