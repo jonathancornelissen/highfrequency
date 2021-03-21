@@ -573,7 +573,7 @@ plot.HARmodel <- function(x, ...){
 predict.HARmodel <- function(object, ... ){
   options <- list(...)
   #### List of standard options
-  opt <- list(newdata = NULL, warnings = TRUE, backtransform = NULL)
+  opt <- list(newdata = NULL, warnings = TRUE, backtransform = "simple")
   #### Override standard options where user passed new options
   opt[names(options)] <- options
   newdata <- opt$newdata
