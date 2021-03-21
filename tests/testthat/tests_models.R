@@ -59,6 +59,8 @@ test_that("HARModel",{
   model <- HARmodel(as.xts(SPYRM[1:1000 , list(DT, RV5)]))
   expect_equal(predict(model), sum(coefficients(model) * tail(cbind(1, model$model[,-1]),1)))
   
+  model <- HARmodel(as.xts(SPYRM[1:1000 , list(DT, RV5)]), transform = "sqrt")
+  expect_equal(predict(model, backtransform = "simple"), (sum(coefficients(model) * tail(cbind(1, model$model[,-1]),1))^2))
 
   testStats <- sqrt(390) * (SPYRM$RV1 - SPYRM$BPV1)/sqrt((pi^2/4+pi-3 - 2) * SPYRM$medRQ1) ## BNSJumptest
   model <- HARmodel(cbind(as.xts(SPYRM[, list(DT, RV5, BPV5)]), testStats), type = "HARCJ")
