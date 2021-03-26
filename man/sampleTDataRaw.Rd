@@ -11,6 +11,6 @@ A data.table object.
 sampleTDataRaw
 }
 \description{
-An imaginary \code{data.table} object containing the raw trades for stock XXX for 2 days, in the typical NYSE TAQ database format.
+An imaginary \code{data.table} object containing the raw trades the pseudonymized stock XXX for 2 days, in the typical NYSE TAQ database format.
 }
 \keyword{datasets}

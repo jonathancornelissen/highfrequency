@@ -11,6 +11,6 @@ data.table object
 sampleQDataRaw
 }
 \description{
-A \code{data.table} object containing the raw quotes for stock XXX for 2 days, in the typical NYSE TAQ database format.
+A \code{data.table} object containing the raw quotes the pseudonymized stock XXX for 2 days, in the typical NYSE TAQ database format.
 }
 \keyword{datasets}
