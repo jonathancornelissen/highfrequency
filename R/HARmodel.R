@@ -495,7 +495,7 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
   } #End CHAR-RVQ if cond
   
   
-  model$fitted.values <- harInsanityFilter(fittedValues = model$fitted.values, lower = min(y), upper = max(y), replacement = mean(y))
+  model$fitted.values <- harInsanityFilter(fittedValues = model$fitted.values, lower = min(y, 0), upper = max(y), replacement = mean(y))
   model$residuals <- model$model[, "y"] - model$fitted.values
   
   model$dates <- alldates[(maxp+h):n]
