@@ -554,10 +554,7 @@ JOjumpTest <- function(pData, power = 4, alignBy = NULL, alignPeriod = NULL, alp
 #' The null hypothesis of the tests in this function is that there are no jumps in the price series
 #' 
 #' @references 
-#' 
 #' Christensen, K., Oomen, R. C. A., Podolskij, M. (2014): Fact or Friction: Jumps at ultra high frequency. \emph{Journal of Financial Economics}, 144, 576-599
-#' 
-#' 
 #' 
 #' @examples 
 #' \dontrun{
@@ -695,7 +692,7 @@ intradayJumpTest <- function(pData, volEstimator = "RM", driftEstimator = "none"
     drift <- 0
   }
   
-  vol$spot <- sqrt(vol$spot^2  * 1/(op$lookBackPeriod-2))
+  vol$spot <- sqrt((vol$spot^2)/(op$lookBackPeriod-2))
   
   tests <- (returns$RETURN - drift)/(vol$spot)
   
