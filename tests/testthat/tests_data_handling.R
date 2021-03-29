@@ -237,6 +237,16 @@ test_that("aggregatePrice edge cases", {
   expect_equal(output, target)
 })
 
+test_that("aggregatePrice filling different number of symbols over multiple days", {
+  foo <- rbind(sampleMultiTradeData, sampleMultiTradeData[SYMBOL != "ETF", list(DT = DT + 86400, SYMBOL, PRICE, SIZE)])
+  res <- aggregatePrice(foo, fill = TRUE, alignBy = "seconds")
+  expect_equal(nrow(res), 5 * 23401)
+  expect_equal(res[SYMBOL == "AAA" & as.Date(DT) == "2014-09-17"]$PRICE,
+               res[SYMBOL == "AAA" & as.Date(DT) == "2014-09-18"]$PRICE)
+  
+  
+})
+
 
 context("aggregatePrice milliseconds vs seconds")
 test_that("aggregatePrice milliseconds vs seconds", {

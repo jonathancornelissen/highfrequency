@@ -239,7 +239,7 @@ aggregatePrice <- function(pData, alignBy = "minutes", alignPeriod = 1, marketOp
   ## checking
   nm <- toupper(colnames(pData))
   pData <- checkColumnNames(pData)
-  .SD <- .N <- .I <- N <- DATE <- DT <- FIRST_DT <- DT_ROUND <- LAST_DT <- SYMBOL <- PRICE <- NULL
+  i.DATE <- .SD <- .N <- .I <- N <- DATE <- DT <- FIRST_DT <- DT_ROUND <- LAST_DT <- SYMBOL <- PRICE <- NULL
 
 
   if (alignBy == "milliseconds") {
@@ -308,49 +308,42 @@ aggregatePrice <- function(pData, alignBy = "minutes", alignPeriod = 1, marketOp
   } else {
     tz <- timeZone
   }
-  setkey(pData, DT) # The below code MAY fail with data with unordered DT column. Also setkey inceases speed of grouping
+  setkeyv(pData, c("DT", "SYMBOL")) # The below code MAY fail with data with unordered DT column. Also setkey inceases speed of grouping
   ## Checking ends
   # Convert DT to numeric. This is much faster than dealing with the strings (POSIXct)
   pData[, DT := as.numeric(DT, tz = tz)]
   # Calculate the date in the data
-  pData[, DATE := as.Date(floor(as.numeric(DT, tz = tz) / 86400), origin = "1970-01-01", tz = tz)]
+  pData[, DATE := as.Date(floor(DT / 86400), origin = "1970-01-01", tz = tz)]
   # extract a vector of dates
-  dates <- unique(pData[,DATE])
-  ## Find the opening times of each of the days as numerics.
-  marketOpenNumeric <- as.numeric(as.POSIXct(paste(dates, marketOpen), format = "%Y-%m-%d %H:%M:%OS", tz = tz), tz = tz)
-  marketCloseNumeric <- as.numeric(as.POSIXct(paste(dates, marketClose), format = "%Y-%m-%d %H:%M:%OS", tz = tz), tz =tz)
-  # Find observations per day
-  obsPerDay <- pData[, .N, by = DATE][,N]
-
-  ## Here we make sure that we can correctly handle times that happen before midnight in the corrected timestamps from the flag if statements
-  if(length(marketOpenNumeric) != length(obsPerDay)){
-    if(length(marketOpenNumeric) < length(obsPerDay)){ ## Here we add entries
-      marketOpenNumeric <- rep(marketOpenNumeric, length(obsPerDay))[1:length(obsPerDay)]
-      marketCloseNumeric <- rep(marketCloseNumeric, length(obsPerDay))[1:length(obsPerDay)]
-    } else {
-      stop("unknown error occured in aggregatePrice")
-    }
-
-  }
-
-  # Subset observations that does not fall between their respective market opening and market closing times.
-  pData <- pData[between(DT, rep(marketOpenNumeric, obsPerDay), rep(marketCloseNumeric, obsPerDay))]
-  # Find observations per day again
-  obsPerDay <- pData[, .N, by = DATE][,N]
-
-  ## Here (AGAIN!) we make sure that we can correctly handle if we deleted a day in the subsetting step above
-  if(length(marketOpenNumeric) != length(obsPerDay)){
-    if(length(marketOpenNumeric) > length(obsPerDay)){ ## Here we delete entries
-      marketOpenNumeric <- rep(marketOpenNumeric, length(obsPerDay))[1:length(obsPerDay)]
-      marketCloseNumeric <- rep(marketCloseNumeric, length(obsPerDay))[1:length(obsPerDay)]
-    } else {
-      stop("unknown error occured in aggregatePrice")
-    }
-
-
-  }
-
+  obsPerDay <- pData[, .N, by = list(DATE, SYMBOL)]
   
+  ## Find the opening times of each of the days as numerics.
+  marketOpenNumeric <- as.numeric(as.POSIXct(paste(obsPerDay$DATE, marketOpen), format = "%Y-%m-%d %H:%M:%OS", tz = tz), tz = tz)
+  marketCloseNumeric <- as.numeric(as.POSIXct(paste(obsPerDay$DATE, marketClose), format = "%Y-%m-%d %H:%M:%OS", tz = tz), tz =tz)
+  
+  ## Here we make sure that we can correctly handle times that happen before midnight in the corrected timestamps from the flag if statements
+  if(NROW(marketOpenNumeric) != NROW(obsPerDay)){
+    if(NROW(marketOpenNumeric) < NROW(obsPerDay)){ ## Here we add entries
+      marketOpenNumeric <- rep(marketOpenNumeric, NROW(obsPerDay))[1:NROW(obsPerDay)]
+      marketCloseNumeric <- rep(marketCloseNumeric, NROW(obsPerDay))[1:NROW(obsPerDay)]
+    } else {
+      stop("unknown error occured in aggregatePrice")
+    }
+
+  }
+  # Subset observations that does not fall between their respective market opening and market closing times.
+  pData <- pData[between(DT, rep(marketOpenNumeric, obsPerDay$N), rep(marketCloseNumeric, obsPerDay$N))]
+  obsPerDay <- pData[, .N, by = list(DATE, SYMBOL)]
+  ## Here (AGAIN!) we make sure that we can correctly handle if we deleted a day in the subsetting step above
+  if(NROW(marketOpenNumeric) != NROW(obsPerDay)){
+    if(NROW(marketOpenNumeric) > NROW(obsPerDay)){ ## Here we delete entries
+      marketOpenNumeric <- rep(marketOpenNumeric, NROW(obsPerDay))[1:NROW(obsPerDay)]
+      marketCloseNumeric <- rep(marketCloseNumeric, NROW(obsPerDay))[1:NROW(obsPerDay)]
+    } else {
+      stop("unknown error occured in aggregatePrice")
+    }
+  }
+
 
   # Find the first observation per day.
   pData[, FIRST_DT := min(DT), by = list(SYMBOL, DATE)]
@@ -366,6 +359,7 @@ aggregatePrice <- function(pData, alignBy = "minutes", alignPeriod = 1, marketOp
   pData_open[, DT := floor(DT/86400) * 86400 + marketOpenNumeric %% 86400]
 
   # Take the last observation of each group of LAST_DT
+
   pData <- pData[pData[DT == LAST_DT, .I[.N], by = list(SYMBOL, DT_ROUND)]$V1][, DT := DT_ROUND] ## Make sure we only take the last observation
 
   # due to rounding there may be an observation that is refered to the opening time
@@ -376,10 +370,21 @@ aggregatePrice <- function(pData, alignBy = "minutes", alignPeriod = 1, marketOp
 
   if (fill) {
     # Construct timestamps that go from marketOpenNumeric to marketClose numeric each day with step of scaleFactor e.g. 1 min (60)
-    dt_full_index <- data.table(DT = as.numeric(mSeq(marketOpenNumeric, marketCloseNumeric, as.double(scaleFactor))))
-    setkey(dt_full_index, DT)
-    # Merge the construct the NA.LOCF filled in data.
-    pData <- unique(pData[dt_full_index, roll = TRUE, on = "DT"])
+    symbs <- pData[, list(SYMBOL = unique(SYMBOL)), by = DATE]
+    if(NROW(symbs) > NROW(obsPerDay)){ # One or more dates contain multiple symbols
+      setkeyv(pData,c("DT", "SYMBOL"))
+      pData <- pData[, lapply(.SD, nafill, type = "locf"), by = list(i.DATE, SYMBOL), .SDcols = setdiff(colnames(pData), c("i.DATE", "SYMBOL"))]
+    } else {
+    dt_full_index <- data.table(DT = as.numeric(mSeq(marketOpenNumeric, marketCloseNumeric, as.double(scaleFactor))),
+                                SYMBOL = rep(obsPerDay$SYMBOL, (marketCloseNumeric-marketOpenNumeric)/as.double(scaleFactor) + 1))
+    
+    setkey(dt_full_index, "DT")
+
+    setkey(pData, DT)
+
+    pData <- unique(pData[dt_full_index, roll = TRUE, on = list(SYMBOL, DT)])
+      
+    }
   }
   pData[, DT := as.POSIXct(DT, origin = as.POSIXct("1970-01-01", tz = "UTC"), tz = tz)]
   pData <- pData[, nm, with = FALSE]
@@ -488,18 +493,18 @@ aggregateQuotes <- function(qData, alignBy = "minutes", alignPeriod = 5, marketO
   # Calculate the date in the data
   qData[, DATE := as.Date(floor(as.numeric(DT, tz = tz) / 86400), origin = "1970-01-01", tz = tz)]
   # extract a vector of dates
-  dates <- unique(qData[,DATE])
+  obsPerDay <- qData[, .N, by = list(DATE, SYMBOL)]
+  
   ## Find the opening times of each of the days as numerics.
-  marketOpenNumeric <- as.numeric(as.POSIXct(paste(dates, marketOpen), format = "%Y-%m-%d %H:%M:%OS", tz = tz), tz = tz) 
-  marketCloseNumeric <- as.numeric(as.POSIXct(paste(dates, marketClose), format = "%Y-%m-%d %H:%M:%OS", tz = tz), tz =tz)
-  # Find observations per day
-  obsPerDay <- qData[, .N, by = DATE][,N]
+  marketOpenNumeric <- as.numeric(as.POSIXct(paste(obsPerDay$DATE, marketOpen), format = "%Y-%m-%d %H:%M:%OS", tz = tz), tz = tz)
+  marketCloseNumeric <- as.numeric(as.POSIXct(paste(obsPerDay$DATE, marketClose), format = "%Y-%m-%d %H:%M:%OS", tz = tz), tz =tz)
+  
   
   ## Here we make sure that we can correctly handle times that happen before midnight in the corrected timestamps from the flag if statements
-  if(length(marketOpenNumeric) != length(obsPerDay)){
-    if(length(marketOpenNumeric) < length(obsPerDay)){ ## Here we add entries
-      marketOpenNumeric <- rep(marketOpenNumeric, length(obsPerDay))[1:length(obsPerDay)]
-      marketCloseNumeric <- rep(marketCloseNumeric, length(obsPerDay))[1:length(obsPerDay)]
+  if(NROW(marketOpenNumeric) != NROW(obsPerDay)){
+    if(NROW(marketOpenNumeric) < NROW(obsPerDay)){ ## Here we add entries
+      marketOpenNumeric <- rep(marketOpenNumeric, NROW(obsPerDay$N))[1:NROW(obsPerDay)]
+      marketCloseNumeric <- rep(marketCloseNumeric, NROW(obsPerDay$N))[1:NROW(obsPerDay)]
     } else {
       stop("unknown error occured in aggregateQuotes")
     }
@@ -507,15 +512,13 @@ aggregateQuotes <- function(qData, alignBy = "minutes", alignPeriod = 5, marketO
   }
   
   # Subset observations that does not fall between their respective market opening and market closing times.
-  qData <- qData[between(DT, rep(marketOpenNumeric, obsPerDay), rep(marketCloseNumeric, obsPerDay))]
-  # Find observations per day again
-  obsPerDay <- qData[, .N, by = DATE][,N]
-  
+  qData <- qData[between(DT, rep(marketOpenNumeric, obsPerDay$N), rep(marketCloseNumeric, obsPerDay$N))]
+  obsPerDay <- qData[, .N, by = list(DATE, SYMBOL)]
   ## Here (AGAIN!) we make sure that we can correctly handle if we deleted a day in the subsetting step above
-  if(length(marketOpenNumeric) != length(obsPerDay)){
-    if(length(marketOpenNumeric) > length(obsPerDay)){ ## Here we delete entries
-      marketOpenNumeric <- rep(marketOpenNumeric, length(obsPerDay))[1:length(obsPerDay)]
-      marketCloseNumeric <- rep(marketCloseNumeric, length(obsPerDay))[1:length(obsPerDay)]
+  if(NROW(marketOpenNumeric) != NROW(obsPerDay)){
+    if(NROW(marketOpenNumeric) > NROW(obsPerDay)){ ## Here we delete entries
+      marketOpenNumeric <- rep(marketOpenNumeric, NROW(obsPerDay$N))[1:NROW(obsPerDay)]
+      marketCloseNumeric <- rep(marketCloseNumeric, NROW(obsPerDay$N))[1:NROW(obsPerDay)]
     } else {
       stop("unknown error occured in aggregateQuotes")
     }
@@ -657,20 +660,19 @@ aggregateTrades <- function(tData, alignBy = "minutes", alignPeriod = 5, marketO
   # Convert DT to numeric. This is much faster than dealing with the strings (POSIXct)
   tData[, DT := as.numeric(DT, tz = tz)]
   # Calculate the date in the data
-  tData[, DATE := as.Date(floor(as.numeric(DT, tz = tz) / 86400), origin = "1970-01-01", tz = tz)]
+  tData[, DATE := as.Date(floor(DT / 86400), origin = "1970-01-01", tz = tz)]
   # extract a vector of dates
-  dates <- unique(tData[,DATE])
+  obsPerDay <- tData[, .N, by = list(DATE, SYMBOL)]
+  
   ## Find the opening times of each of the days as numerics.
-  marketOpenNumeric <- as.numeric(as.POSIXct(paste(dates, marketOpen), format = "%Y-%m-%d %H:%M:%OS", tz = tz), tz = tz) 
-  marketCloseNumeric <- as.numeric(as.POSIXct(paste(dates, marketClose), format = "%Y-%m-%d %H:%M:%OS", tz = tz), tz =tz)
-  # Find observations per day
-  obsPerDay <- tData[, .N, by = DATE][,N]
+  marketOpenNumeric <- as.numeric(as.POSIXct(paste(obsPerDay$DATE, marketOpen), format = "%Y-%m-%d %H:%M:%OS", tz = tz), tz = tz) 
+  marketCloseNumeric <- as.numeric(as.POSIXct(paste(obsPerDay$DATE, marketClose), format = "%Y-%m-%d %H:%M:%OS", tz = tz), tz =tz)
   
   ## Here we make sure that we can correctly handle times that happen before midnight in the corrected timestamps from the flag if statements
-  if(length(marketOpenNumeric) != length(obsPerDay)){
-    if(length(marketOpenNumeric) < length(obsPerDay)){ ## Here we add entries
-      marketOpenNumeric <- rep(marketOpenNumeric, length(obsPerDay))[1:length(obsPerDay)]
-      marketCloseNumeric <- rep(marketCloseNumeric, length(obsPerDay))[1:length(obsPerDay)]
+  if(NROW(marketOpenNumeric) != NROW(obsPerDay)){
+    if(NROW(marketOpenNumeric) < NROW(obsPerDay)){ ## Here we add entries
+      marketOpenNumeric <- rep(marketOpenNumeric, NROW(obsPerDay))[1:NROW(obsPerDay)]
+      marketCloseNumeric <- rep(marketCloseNumeric, NROW(obsPerDay))[1:NROW(obsPerDay)]
     } else {
       stop("unknown error occured in aggregateTrades")
     }
@@ -678,15 +680,15 @@ aggregateTrades <- function(tData, alignBy = "minutes", alignPeriod = 5, marketO
   }
   
   # Subset observations that does not fall between their respective market opening and market closing times.
-  tData <- tData[between(DT, rep(marketOpenNumeric, obsPerDay), rep(marketCloseNumeric, obsPerDay))]
+  tData <- tData[between(DT, rep(marketOpenNumeric, obsPerDay$N), rep(marketCloseNumeric, obsPerDay$N))]
   # Find observations per day again
-  obsPerDay <- tData[, .N, by = DATE][,N]
+  obsPerDay <- tData[, .N, by = list(DATE, SYMBOL)]
   
   ## Here (AGAIN!) we make sure that we can correctly handle if we deleted a day in the subsetting step above
-  if(length(marketOpenNumeric) != length(obsPerDay)){
-    if(length(marketOpenNumeric) > length(obsPerDay)){ ## Here we delete entries
-      marketOpenNumeric <- rep(marketOpenNumeric, length(obsPerDay))[1:length(obsPerDay)]
-      marketCloseNumeric <- rep(marketCloseNumeric, length(obsPerDay))[1:length(obsPerDay)]
+  if(NROW(marketOpenNumeric) != NROW(obsPerDay)){
+    if(NROW(marketOpenNumeric) > NROW(obsPerDay)){ ## Here we delete entries
+      marketOpenNumeric <- rep(marketOpenNumeric, NROW(obsPerDay))[1:NROW(obsPerDay)]
+      marketCloseNumeric <- rep(marketCloseNumeric, NROW(obsPerDay))[1:NROW(obsPerDay)]
     } else {
       stop("unknown error occured in aggregateTrades")
     }
@@ -2233,7 +2235,7 @@ selectExchange <- function(data, exch = "N") {
 tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges = "auto", tDataRaw = NULL, report = TRUE, selection = "median",
                           validConds = c('', '@', 'E', '@E', 'F', 'FI', '@F', '@FI', 'I', '@I'), marketOpen = "09:30:00", 
                           marketClose = "16:00:00", printExchange = TRUE, saveAsXTS = FALSE, tz = NULL) {
-  .SD <- CORR <- SIZE <- SYMBOL <- PRICE <- EX <- COND <- DT <- DATE <- TIME_M <- NULL
+  .SD <- CORR <- SIZE <- SYMBOL <- PRICE <- EX <- COND <- DT <- DATE <- TIME_M <- SYM_SUFFIX<- NULL
   
   if (is.null(tDataRaw)) {
 
@@ -2297,7 +2299,10 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
     nm <- toupper(colnames(tDataRaw))
     if(!"DT" %in% nm && c("DATE", "TIME_M") %in% nm){
       tDataRaw[, `:=`(DT = as.POSIXct(paste(DATE, TIME_M), tz = "UTC", format = "%Y%m%d %H:%M:%OS"),
-                      DATE = NULL, TIME_M = NULL, SYM_SUFFIX = NULL)]
+                      DATE = NULL, TIME_M = NULL)]
+      if("SYM_SUFFIX" %in% nm){
+        tDataRaw[, SYM_SUFFIX := NULL]
+      }
     }
     
     
