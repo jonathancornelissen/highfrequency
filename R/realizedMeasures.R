@@ -1631,22 +1631,30 @@ rKernelCov <- function(rData, cor = FALSE,  alignBy = NULL, alignPeriod = NULL,
       n <- dim(rData)[2]
     }
     type <- kernelCharToInt(kernelType)
+    
     if (n == 1) {
-      return(kernelEstimator(as.double(rData),
+      ans <- kernelEstimator(as.double(rData),
                              as.double(rData),
-                             as.integer(length(rData)),
+                             as.integer(NROW(rData)),
                              as.integer(kernelParam),
                              as.integer(ifelse(kernelDOFadj, 1, 0)),
                              as.integer(type),
                              ab = double(kernelParam + 1),
-                             ab2 = double(kernelParam + 1)))
+                             ab2 = double(kernelParam + 1))
+      
+      if(!is.na(ans) && !is.null(ans) && ans<0){
+        warning("rKernelCov produced negative variance, try to change the kernelParam argument")
+      }
+      
+      return(ans)
+      
     }
 
     if (n > 1) {
       cov <- matrix(rep(0, n * n), ncol = n, dimnames = list(colnames(rData), colnames(rData)))
       diagonal <- numeric(n)
       for (i in 1:n) {
-        diagonal[i] <- kernelEstimator(as.double(rData[, i]), as.double(rData[, i]), as.integer(length(rData[, i])),
+        diagonal[i] <- kernelEstimator(as.double(rData[, i]), as.double(rData[, i]), as.integer(NROW(rData[, i])),
                                        as.integer(kernelParam), as.integer(ifelse(kernelDOFadj, 1, 0)),
                                        as.integer(type), ab = double(kernelParam + 1),
                                        ab2 = double(kernelParam + 1))
@@ -1655,7 +1663,7 @@ rKernelCov <- function(rData, cor = FALSE,  alignBy = NULL, alignPeriod = NULL,
 
       for (i in 2:n) {
         for (j in 1:(i - 1)) {
-          cov[i, j] = cov[j, i] = kernelEstimator(as.double(rData[, i]), as.double(rData[, j]), as.integer(length(rData[, i])),
+          cov[i, j] = cov[j, i] = kernelEstimator(as.double(rData[, i]), as.double(rData[, j]), as.integer(NROW(rData[, i])),
                                                   as.integer(kernelParam), as.integer(ifelse(kernelDOFadj, 1, 0)),
                                                   as.integer(type), ab = double(kernelParam + 1),
                                                   ab2 = double(kernelParam + 1))
