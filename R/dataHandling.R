@@ -1547,7 +1547,7 @@ noZeroQuotes <- function(qData) {
 #' # In case you have more data it is advised to use the on-disk functionality
 #' # via "dataSource" and "dataDestination" arguments
 #' 
-#' @importFrom data.table fread
+#' @importFrom data.table fread setnames `%chin%`
 #' @importFrom utils unzip
 #' @keywords cleaning
 #' @export
@@ -1555,7 +1555,7 @@ quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
                           selection = "median", maxi = 50, window = 50, type = "standard", marketOpen = "09:30:00", 
                           marketClose = "16:00:00", rmoutliersmaxi = 10, printExchange = TRUE, saveAsXTS = FALSE, tz = NULL) {
   
-  .SD <- BID <- OFR <- DT <- SPREAD <- SPREAD_MEDIAN <- EX <- DATE <- BIDSIZ <- OFRSIZ <- TIME_M <- SYMBOL <- NULL
+  .SD <- BID <- OFR <- DT <- SPREAD <- SPREAD_MEDIAN <- EX <- DATE <- BIDSIZ <- OFRSIZ <- TIME_M <- SYMBOL <- SYM_SUFFIX <- NULL
 
   
   if (is.null(qDataRaw)) {
@@ -1624,14 +1624,18 @@ quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
   
   if (!is.null(qDataRaw)) {
     
+    qDataRaw <- checkColumnNames(qDataRaw)
     nm <- toupper(colnames(qDataRaw))
     if(!"DT" %in% nm && c("DATE", "TIME_M") %in% nm){
       qDataRaw[, `:=`(DT = as.POSIXct(paste(DATE, TIME_M), tz = "UTC", format = "%Y%m%d %H:%M:%OS"),
-                      DATE = NULL, TIME_M = NULL, SYM_SUFFIX = NULL)]
+                      DATE = NULL, TIME_M = NULL)]
+      }
+    if("SYM_SUFFIX" %in% nm){
+      qDataRaw[, `:=`(SYMBOL = fifelse(SYM_SUFFIX == "", yes = SYMBOL, no = paste0(SYMBOL, "_", SYM_SUFFIX)), SYM_SUFFIX = NULL)]
     }
+  
     
     
-    qDataRaw <- checkColumnNames(qDataRaw)
     checkqData(qDataRaw)
     
     inputWasXts <- FALSE
@@ -2235,7 +2239,7 @@ selectExchange <- function(data, exch = "N") {
 tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges = "auto", tDataRaw = NULL, report = TRUE, selection = "median",
                           validConds = c('', '@', 'E', '@E', 'F', 'FI', '@F', '@FI', 'I', '@I'), marketOpen = "09:30:00", 
                           marketClose = "16:00:00", printExchange = TRUE, saveAsXTS = FALSE, tz = NULL) {
-  .SD <- CORR <- SIZE <- SYMBOL <- PRICE <- EX <- COND <- DT <- DATE <- TIME_M <- SYM_SUFFIX<- NULL
+  .SD <- CORR <- SIZE <- SYMBOL <- PRICE <- EX <- DT <- DATE <- TIME_M <- SYM_SUFFIX<- NULL
   
   if (is.null(tDataRaw)) {
 
@@ -2268,7 +2272,7 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
         readdata <- try(readdata[, DT := as.POSIXct(DT, tz = tz, format = "%Y-%m-%dT%H:%M:%OS")])
       } else {
         readdata <- try(readdata[, `:=`(DT = as.POSIXct(paste(DATE, TIME_M), tz = "UTC", format = "%Y%m%d %H:%M:%OS"),
-                                      DATE = NULL, TIME_M = NULL, SYM_SUFFIX = NULL)], silent = TRUE)
+                                      DATE = NULL, TIME_M = NULL)], silent = TRUE)
       }
       
       if(inherits(readdata, "try-error")){
@@ -2296,18 +2300,18 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
   
   if (!is.null(tDataRaw)) {
     
+    tDataRaw <- checkColumnNames(tDataRaw)
     nm <- toupper(colnames(tDataRaw))
+    
     if(!"DT" %in% nm && c("DATE", "TIME_M") %in% nm){
       tDataRaw[, `:=`(DT = as.POSIXct(paste(DATE, TIME_M), tz = "UTC", format = "%Y%m%d %H:%M:%OS"),
                       DATE = NULL, TIME_M = NULL)]
-      if("SYM_SUFFIX" %in% nm){
-        tDataRaw[, SYM_SUFFIX := NULL]
-      }
+    }
+    if("SYM_SUFFIX" %in% nm){
+      tDataRaw[, `:=`(SYMBOL = fifelse(SYM_SUFFIX == "", yes = SYMBOL, no = paste0(SYMBOL, "_", SYM_SUFFIX)), SYM_SUFFIX = NULL)]
     }
     
     
-    
-    tDataRaw <- checkColumnNames(tDataRaw)
     checktData(tDataRaw)
     
     inputWasXts <- FALSE
