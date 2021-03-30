@@ -9,7 +9,8 @@ rBeta(
   rIndex,
   RCOVestimator = "rCov",
   RVestimator = "rRVar",
-  makeReturns = FALSE
+  makeReturns = FALSE,
+  ...
 )
 }
 \arguments{
@@ -23,6 +24,8 @@ rBeta(
 In case of missing \code{RVestimator}, \code{RCOVestimator} function applying for \code{rIndex} will be used.}
 
 \item{makeReturns}{boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.}
+
+\item{...}{arguments passed to \code{RCOVestimator} and \code{RVestimator}}
 }
 \value{
 numeric

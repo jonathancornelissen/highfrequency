@@ -970,7 +970,7 @@ rAVGCov <- function(rData, cor = FALSE, alignBy = "minutes", alignPeriod = 5, k 
 #' @param RVestimator can be chosen among realized variance estimators: \code{"rRVar"}, \code{"rMinRVar"} and \code{"rMedRVar"}. \code{"rRVar"} by default. 
 #' In case of missing \code{RVestimator}, \code{RCOVestimator} function applying for \code{rIndex} will be used.
 #' @param makeReturns boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.
-#' 
+#' @param ... arguments passed to \code{RCOVestimator} and \code{RVestimator}
 #' @return numeric
 #'
 #' @details
@@ -1002,7 +1002,7 @@ rAVGCov <- function(rData, cor = FALSE, alignBy = "minutes", alignPeriod = 5, k 
 #' @importFrom methods hasArg
 #' @importFrom utils data
 #' @export
-rBeta <- function(rData, rIndex, RCOVestimator = "rCov", RVestimator = "rRVar", makeReturns = FALSE) {
+rBeta <- function(rData, rIndex, RCOVestimator = "rCov", RVestimator = "rRVar", makeReturns = FALSE, ...) {
   if (hasArg(data)) {
     rData <- data
   }
@@ -1031,15 +1031,15 @@ rBeta <- function(rData, rIndex, RCOVestimator = "rCov", RVestimator = "rRVar", 
     rcovfun <- function(rData, rIndex, RCOVestimator) {
 
       switch(RCOVestimator,
-             rCov = rCov(cbind(rData,rIndex) ),
-             rAVGCov = rAVGCov(list(rData, rIndex) ),
-             rBPCov = rBPCov(cbind(rData, rIndex) ),
-             rHYCov = rHYCov(list(rData, rIndex) ),
-             rKernelCov = rKernelCov(list(rData, rIndex) ),
-             rOWCov = rOWCov(cbind(rData, rIndex) ),
-             rRTSCov = rRTSCov(list(rData, rIndex)),
-             rThresholdCov = rThresholdCov(cbind(rData, rIndex) ),
-             rTSCov = rTSCov(list(rData, rIndex)))
+             rCov = rCov(cbind(rData,rIndex) ,...),
+             rAVGCov = rAVGCov(cbind(rData, rIndex) ,...),
+             rBPCov = rBPCov(cbind(rData, rIndex) ,...),
+             rHYCov = rHYCov(cbind(rData, rIndex) ,...),
+             rKernelCov = rKernelCov(cbind(rData, rIndex) ,...),
+             rOWCov = rOWCov(cbind(rData, rIndex) ,...),
+             rRTSCov = rRTSCov(list(rData, rIndex),...),
+             rThresholdCov = rThresholdCov(cbind(rData, rIndex) ,...),
+             rTSCov = rTSCov(list(rData, rIndex),...))
     }
 
     rcov <- rcovfun(rData,rIndex,RCOVestimator)
@@ -1050,19 +1050,20 @@ rBeta <- function(rData, rIndex, RCOVestimator = "rCov", RVestimator = "rRVar", 
       rvfun <- function(rIndex, RVestimator) {
 
         switch(RVestimator,
-               rCov = rCov(rIndex ) ,
-               RV = rRVar(rIndex),
-               BV = RBPVar(rIndex),
-               rMinRVar = rMinRVar(rIndex ),
-               rMedRVar = rMedRVar(rIndex ),
-               rAVGCov = rAVGCov(rIndex ) ,
-               rBPCov = rBPCov(rIndex ) ,
-               rHYCov = rHYCov(rIndex ) ,
-               rKernelCov = rKernelCov(rIndex ) ,
-               rOWCov = rOWCov(rIndex ) ,
-               rRTSCov = rRTSCov(rIndex) ,
-               rThresholdCov = rThresholdCov(rIndex ) ,
-               rTSCov = rTSCov(rIndex))
+               rCov = rCov(rIndex ,...) ,
+               RV = rRVar(rIndex,...),
+               BV = RBPVar(rIndex,...),
+               rMinRVar = rMinRVar(rIndex,... ),
+               rMedRVar = rMedRVar(rIndex ,...),
+               rAVGCov = rAVGCov(rIndex ,...) ,
+               rBPCov = rBPCov(rIndex ,...) ,
+               rHYCov = rHYCov(rIndex ,...) ,
+               rKernelCov = rKernelCov(rIndex,... ) ,
+               rOWCov = rOWCov(rIndex ,...) ,
+               rRTSCov = rRTSCov(rIndex,...) ,
+               rThresholdCov = rThresholdCov(rIndex,... ) ,
+               rTSCov = rTSCov(rIndex,...),
+               rRVar = rRVar(rIndex,...))
       }
       rv <- rvfun(rIndex,RVestimator)
       rbeta <- rcov[1,2] / rv
@@ -1439,6 +1440,8 @@ rHYCov <- function(rData, cor = FALSE, period = 1, alignBy = "seconds", alignPer
       }
       rData <- as.matrix(rData[, !"DT"])
       aggrdata <- as.matrix(aggrdata[, !"DT"])
+    } else {
+      stop("rHYCov only accepts xts and data.table objects")
     }
   
     if (makeReturns) {
@@ -2535,7 +2538,7 @@ rRTSCov <- function (pData, cor = FALSE, startIV = NULL, noisevar = NULL,
   }
 
   if (n == 1) {
-    if (nrow(pData) < (10 * K) ) {
+    if (NROW(pData) < (10 * K) ) {
       stop("Two time scale estimator uses returns based on prices that are K ticks aways.
            Please provide a timeseries of at least 10*K" )
     }
@@ -2546,7 +2549,7 @@ rRTSCov <- function (pData, cor = FALSE, startIV = NULL, noisevar = NULL,
                  K = K, J = J, eta = eta))
   }
   if (n > 1) {
-    if (nrow(pData[[1]]) < (10*K)) {
+    if (NROW(pData[[1]]) < (10*K)) {
       stop("Two time scale estimator uses returns based on prices that are K ticks aways.
            Please provide a timeseries of at least 10*K" )
     }
@@ -3063,7 +3066,7 @@ rTSCov <- function (pData, cor = FALSE, K = 300, J = 1, KCov = NULL, JCov = NULL
     }
   }
   if (n == 1) {
-    if (nrow(pData) < (10 * K)) {
+    if (NROW(pData) < (10 * K)) {
       stop("Two time scale estimator uses returns based on prices that are K ticks aways.
            Please provide a timeseries of at least 10 * K." )
     }
@@ -3073,7 +3076,7 @@ rTSCov <- function (pData, cor = FALSE, K = 300, J = 1, KCov = NULL, JCov = NULL
     return(TSRV(pData, K = K, J = J))
   }
   if (n > 1) {
-    if (nrow(pData[[1]]) < (10 * K)) {
+    if (NROW(pData[[1]]) < (10 * K)) {
       stop("Two time scale estimator uses returns based on prices that are K ticks aways.
            Please provide a timeseries of at least 10*K" )
     }
