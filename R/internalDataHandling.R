@@ -243,8 +243,8 @@ checktData <- function(tData) {
   if (!any(colnames(tData) == "PRICE")) {
     stop("The argument tData should have a column containing the PRICE. Could not find that column.")
   }
-  if (!any(colnames(tData) == "SYMBOL")) {
-    warning("The argument tData should have a column containing SYMBOL. Could not find that column.")
+  if (!any(c("SYMBOL", "SYM_ROOT") %chin% colnames(tData))) {
+    warning("The argument tData should have a column containing SYMBOL (or SYM_ROOT). Could not find that column.")
   }
   
   if (is.data.table(tData)) {
@@ -272,8 +272,8 @@ checkqData <- function(qData) {
   if (!any(colnames(qData) == "OFR")) {
     stop("The argument qData should have a column containing the ASK / OFR. Could not find that column.")
   }
-  if (!any(colnames(qData) == "SYMBOL")) {
-    warning("The argument qData should have a column containing SYMBOL. Could not find that column.")
+  if (!any(c("SYMBOL", "SYM_ROOT") %chin% colnames(qData))) {
+    warning("The argument tData should have a column containing SYMBOL (or SYM_ROOT). Could not find that column.")
   }
   if (is.data.table(qData)) {
     if (typeof(qData$BID) != "double") {

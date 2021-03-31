@@ -1626,6 +1626,7 @@ quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
     
     qDataRaw <- checkColumnNames(qDataRaw)
     nm <- toupper(colnames(qDataRaw))
+    checkqData(qDataRaw)
     if(!"DT" %in% nm && c("DATE", "TIME_M") %in% nm){
       qDataRaw[, `:=`(DT = as.POSIXct(paste(DATE, TIME_M), tz = "UTC", format = "%Y%m%d %H:%M:%OS"),
                       DATE = NULL, TIME_M = NULL)]
@@ -1634,10 +1635,6 @@ quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
       qDataRaw[, `:=`(SYMBOL = fifelse(SYM_SUFFIX == "", yes = SYMBOL, no = paste0(SYMBOL, "_", SYM_SUFFIX)), SYM_SUFFIX = NULL)]
     }
   
-    
-    
-    checkqData(qDataRaw)
-    
     inputWasXts <- FALSE
     if (!is.data.table(qDataRaw)) {
       if (is.xts(qDataRaw)) {
@@ -2303,6 +2300,7 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
     tDataRaw <- checkColumnNames(tDataRaw)
     nm <- toupper(colnames(tDataRaw))
     
+    checktData(tDataRaw)
     if(!"DT" %in% nm && c("DATE", "TIME_M") %in% nm){
       tDataRaw[, `:=`(DT = as.POSIXct(paste(DATE, TIME_M), tz = "UTC", format = "%Y%m%d %H:%M:%OS"),
                       DATE = NULL, TIME_M = NULL)]
@@ -2312,7 +2310,6 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
     }
     
     
-    checktData(tDataRaw)
     
     inputWasXts <- FALSE
     if (!is.data.table(tDataRaw)) {
