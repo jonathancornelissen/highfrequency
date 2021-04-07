@@ -10,6 +10,7 @@ hatIV <- function(rData, IVestimator, startV = NULL) {
   IV <- switch(IVestimator,
          rRVar = rRVar(rData),
          BV = RBPVar(rData),
+         rBPVar = rBPCov(rData),
          rMinRVar = rMinRVar(rData),
          rMedRVar = rMedRVar(rData),
          ROWvar = rOWCov(rData),
@@ -23,8 +24,8 @@ hatIV <- function(rData, IVestimator, startV = NULL) {
 hatIQ <- function (rData, IQestimator) {
   IQ <- switch(IQestimator,
          rQuar = rQuar(rData),
-         QP = rQPVar(rData),
          TP = rTPQuar(rData),
+         rTPQuar = rTPQuar(rData),
          rMinRQuar = rMinRQuar(rData),
          rMedRQuar = rMedRQuar(rData),
          CTTPV = ctTPV(rData))

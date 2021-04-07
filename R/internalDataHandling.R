@@ -222,6 +222,7 @@ checkColumnNames <- function(data) {
     setnames(data, "ASKSIZE", "OFRSIZ", skip_absent = TRUE)
     # Adjust Bid size col naming:    
     setnames(data, "ASKSIZ", "OFRSIZ", skip_absent = TRUE)
+    setnames(data, "OFRSIZE", "OFRSIZ", skip_absent = TRUE)
     
     setnames(data, "TR_SCOND", "COND", skip_absent = TRUE)
     setnames(data, "CR", "CORR", skip_absent = TRUE)

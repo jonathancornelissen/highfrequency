@@ -2088,7 +2088,7 @@ tradesCondition <- function(tData, validConds = c('', '@', 'E', '@E', 'F', 'FI',
   tData[is.na(COND), COND := ""]
   
   # setnafill(tData, type = "const", fill = "", cols = "COND") ## For when characters become supported :)
-  tData <- tData[trimws(COND) %in% validConds]
+  tData <- tData[gsub("\\s", "", COND) %in% validConds]
   
   if (inputWasXts) {
     return(xts(as.matrix(tData), order.by = tData$DT))
