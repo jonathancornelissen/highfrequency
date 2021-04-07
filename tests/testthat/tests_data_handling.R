@@ -29,7 +29,7 @@ context("aggregatePrice")
 test_that("aggregatePrice", {
   expect_equal(
     formatC(sum(head(aggregatePrice(sampleTData, alignBy = "secs", alignPeriod = 30))$PRICE), digits = 10),
-    "     950.73"
+    "     950.79"
   )
 })
 
@@ -78,7 +78,7 @@ test_that("selectExchange and data cleaning functions", {
   
   expect_equal(
   dim(tradesCleanup(tDataRaw = sampleTDataRaw, exchanges = "N", report = FALSE)),
-  c(6140, 8)
+  c(7168, 8)
   )
 })
 
@@ -303,13 +303,13 @@ context("business time aggregation")
 test_that("business time aggregation",{
   skip_if_not(capabilities('long.double'), 'Skip tests when long double is not available')
   pData <- sampleTData
-  agged1 <- businessTimeAggregation(pData, measure = "intensity", obs = 390, bandwidth = 0.075)
-  expect_equal(nrow(agged1$pData), 780) # We return the correct number of observations
+  agged1 <- suppressWarnings(businessTimeAggregation(pData, measure = "intensity", obs = 390, bandwidth = 0.075))
+  expect_equal(nrow(agged1$pData), 779) # We return the correct number of observations
   
   
   expect_warning(businessTimeAggregation(pData, measure = "volume", obs = 390), "smaller")
   agged2 <- suppressWarnings(businessTimeAggregation(pData, measure = "volume", obs = 390))
-  expect_equal(nrow(agged2$pData), 748)
+  expect_equal(nrow(agged2$pData), 755)
   
   agged3 <- suppressWarnings(businessTimeAggregation(pData, measure = "vol", obs = 39, method = "PARM", RM = "rv", lookBackPeriod = 5))
   expect_equal(nrow(agged3$pData), 76)
@@ -403,10 +403,10 @@ test_that("spreadPrices",{
   dat <- spreadPrices(dat1)
   
   res <- rCov(dat, alignBy = 'minutes', alignPeriod = 5, makeReturns = TRUE, cor = TRUE)
-  target <- list("2018-01-02" = matrix(c(1, 0.05400510115,
-                                         0.05400510115, 1), ncol = 2),
-                 "2018-01-03" = matrix(c(1, 0.171321754,
-                                         0.171321754, 1), ncol = 2)
+  target <- list("2018-01-02" = matrix(c(1, 0.1936498028,
+                                         0.1936498028, 1), ncol = 2),
+                 "2018-01-03" = matrix(c(1, 0.1590385524,
+                                         0.1590385524, 1), ncol = 2)
                  )
   expect_equal(res, target)
 })
@@ -449,7 +449,7 @@ test_that("Backwards-forwards matching algorithm produces correct result", {
                                   qData = quotesCleanup(qDataRaw = sampleQDataRaw, type = 'standard', report = FALSE, exchanges = 'N'), 
                                   BFM = TRUE, lagQuotes = 0)
   
-  expect_equal(dim(bfmMatched), c(19887, 14))
+  expect_equal(dim(bfmMatched), c(19888, 14))
 })
 
 

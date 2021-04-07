@@ -52,7 +52,7 @@ context("rMedRQuar")
 test_that("", {
   expect_equal(
     as.numeric(rMedRQuar(as.xts(sampleTData[, list(DT, PRICE)]),alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE) * 1000000),
-    c(0.010922500356, 0.003618836787)
+    c(0.015057721369, 0.003094834848)
   )
   expect_true(all.equal(rMedRQuar(returnDatDT, alignBy = "minutes", alignPeriod = 5, makeReturns = FALSE), rMedRQuar(datDT, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)))
   expect_true(all.equal(rMedRQuar(dat, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE) , rMedRQuar(returnDat, alignBy = "minutes", alignPeriod = 5, makeReturns = FALSE)))
@@ -95,7 +95,7 @@ context("rMinRQuar")
 test_that("rMinRQuar", {
   expect_equal(
     as.numeric(rMinRQuar(as.xts(sampleTData[, list(DT, PRICE)]), alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE) * 1000000),
-    c(0.011852089820, 0.002546123569)
+    c(0.016174147040, 0.002659484761)
   )
   expect_equal(lapply(rMinRQuar(returnDat), sum), list("PRICE1" = 3.0696895, "PRICE2" = 2.977093559, "PRICE3" = 3.01211734))
   expect_equal(lapply(rMinRQuar(returnDat), sum), lapply(rMinRQuar(dat, makeReturns = TRUE), sum))
@@ -228,7 +228,7 @@ context("rMPVar")
 test_that("rMPVar", {
   expect_equal(
     as.numeric(rMPVar(as.xts(sampleTData[, list(DT, PRICE)]), alignBy ="minutes", alignPeriod = 5, makeReturns = TRUE)),
-    c(9.393123822e-05, 5.623885699e-05)
+    c(9.352083621e-05, 5.789397118e-05)
   )
   
   expect_equal(lapply(rMPVar(returnDat), sum), list("PRICE1" = 3.016532757, "PRICE2" = 3.004313242, "PRICE3" = 3.002691466))
@@ -259,7 +259,7 @@ context("rRTSCov")
 test_that("rRTSCov", {
   expect_equal(
     as.numeric(rRTSCov(pData = as.xts(sampleTData[as.Date(DT) == "2018-01-02", list(DT, PRICE)])) * 10000),
-    0.3681962867
+    0.4500523428
   )
   expect_equal(
     formatC(sum(rRTSCov(pData = list(dat["1970-01-01",1], dat["1970-01-01",2])), digits = 5)),
@@ -272,7 +272,7 @@ context("rKernelCov")
 test_that("rKernelCov", {
   expect_equal(
     as.numeric(rKernelCov(rData = as.xts(sampleTData[, list(DT, PRICE)]), alignBy = "minutes",  alignPeriod = 5, makeReturns = TRUE)),
-    c(1.253773e-04, 6.087867e-05)
+    c(1.313672470e-04,  6.263569337e-05)
   )
   expect_equal(
     formatC(sum(rKernelCov(rData = cbind(returnDat["1970-01-01",1], returnDat["1970-01-01",2]), alignBy = "minutes", alignPeriod = 5, makeReturns = FALSE)), digits = 5),
@@ -316,7 +316,7 @@ context("rSVar")
 test_that("rSVar", {
   expect_equal(
     sum(rSVar(as.xts(sampleTData[, list(DT, PRICE)]), alignBy ="minutes", alignPeriod = 5, makeReturns = TRUE)),
-    0.000166891
+    0.0001657447672
   )
   expect_equal(lapply(rSVar(returnDat), function(x) lapply(x, sum))[[1]], list("rSVardownside" = 1.501497027, "rSVarupside" = 1.50206646))
   expect_equal(rSVar(returnDat), rSVar(dat, makeReturns = TRUE))
@@ -358,7 +358,7 @@ context("rTPQuar")
 test_that("rTPQuar", {
   expect_equal(
     as.numeric(rTPQuar(as.xts(sampleTData[, list(DT, PRICE)]),alignBy ="minutes", alignPeriod = 5, makeReturns = TRUE) * 1000000),
-    c(0.013510877, 0.002967281)
+    c(0.014641358869, 0.003225971764)
   )
   expect_equal(lapply(rTPQuar(returnDat), sum), list("PRICE1" = 3.023117658, "PRICE2" = 3.003898984, "PRICE3" = 2.966162109))
   expect_equal(lapply(rTPQuar(returnDat), sum), lapply(rTPQuar(dat, makeReturns = TRUE), sum))
@@ -377,7 +377,7 @@ context("rTSCov")
 test_that("rTSCov univariate", {
   expect_equal(
     as.numeric(rTSCov(pData = as.xts(sampleTData[as.Date(DT) == "2018-01-02", list(DT, PRICE)]))),
-    0.0001097988
+    0.0001157509218
   )
 })
 ##### rTSCov multivariate ##### 
@@ -393,7 +393,7 @@ context("rRVar")
 test_that("rRVar", {
   expect_equal(
     formatC(as.numeric(rRVar(makeReturns(as.xts(sampleTData[as.Date(DT) == "2018-01-02", list(DT, PRICE)])))), digits = 5),
-    "0.0001032"
+    "0.0001086"
   )
 })
 
@@ -443,7 +443,7 @@ test_that("ivInference", {
   expect_equal(
     formatC(IVinference(as.xts(sampleTData[, list(DT, PRICE)]), IVestimator= "rMinRVar", IQestimator = "rMedRQuar", 
                         confidence = 0.95, makeReturns = TRUE)[[1]]$cb * 10000, digits = 5),
-    c("0.84827", "1.0328")
+    c("0.93557", "1.1201")
   )
 })
 
@@ -580,7 +580,7 @@ test_that("ReMeDI lag choosing algorithm chooses the correct values", {
 
   # optimalKn <- knChooseReMeDI(sampleTData, correctTime = FALSE, jumpsIndex = NULL, knMax = 10, tol = 0.05, size = 3, lower = 1, upper = 10, plot = FALSE)##Changed due to correctTime bug
   optimalKn <- knChooseReMeDI(sampleTData, knMax = 10, tol = 0.05, size = 3, lower = 1, upper = 10, plot = FALSE)
-  expect_equal(optimalKn, 1L)
+  expect_equal(optimalKn, 5L)
 
   
   

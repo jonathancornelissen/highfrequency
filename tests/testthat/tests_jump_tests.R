@@ -5,7 +5,7 @@ context("AJjumpTest unit test")
 test_that("AJjumpTest unit test",{
   expect_equal(
     as.numeric(AJjumpTest(as.xts(sampleTData[,list(DT, PRICE)]), p = 2, k = 3, alignBy = "seconds", alignPeriod = 5, makeReturns = TRUE)[,1]),
-    c(-1.1620534373, -0.1330522019)
+    c(-0.63154307241, -0.03660544638)
   )
 })
 
@@ -30,7 +30,7 @@ context("BNSjumpTest")
 test_that("BNSjumpTest", {
   expect_equal(
     as.numeric(BNSjumpTest(as.xts(sampleTData[, list(DT, PRICE)]), IVestimator= "rMinRVar", IQestimator = "rMedRQuar", type= "linear", makeReturns = TRUE)[, "p.value"]),
-    c(1.794624516e-02, 2.913249385e-05)
+    c(1.322998188e-01, 2.816329921e-05)
   )
 })
 
@@ -61,8 +61,8 @@ test_that("FoF test",{
   FoFtest <- intradayJumpTest(pData = dat, volEstimator = "PARM", driftEstimator = "none", alpha = 0.95, RM = "bipower", 
                               theta = 1, lookBackPeriod = 50, marketOpen = "9:30:00", marketClose = "16:00:00", tz = "GMT")
   
-  expect_equal(sum(FoFtest$ztest), -17.62862858)
-  expect_equal(sum(FoFtest$vol$spot), 0.03685386024)
+  expect_equal(sum(FoFtest$ztest), -0.7087878823)
+  expect_equal(sum(FoFtest$vol$spot), 0.03742987532)
   expect_equal(sum(FoFtest$drift), 0)
   
 })

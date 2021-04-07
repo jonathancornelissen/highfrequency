@@ -9,7 +9,7 @@ test_that("matchTradesQuotes & getTradeDirection quotes", {
   sum(directions)
 expect_equal(
   sum(directions), 
-  -1412
+  -1572
 )})
 
 context("getLiquidityMeasures")
@@ -30,17 +30,35 @@ test_that("testing getLiquidityMeasures",{
                #   "quotedSpread" = 8.047506e-02, "proportionalQuotedSpread" = 4.212890e-04, "logQuotedSpread" = 4.212890e-04, "logQuotedSize" = 1.514534e+00,
                #   "quotedSlope" = 2.969190e-02, "logQSlope" = 1.553795e-04, "midQuoteSquaredReturn" = 5.981065e-08,  "midQuoteAbsReturn" = 1.300114e-04,
                #   "signedTradeSize" = -4.193749e+01)
-               c("midpoints" = 1.568660851e+02, "direction" = -1.739413681e-01, "effectiveSpread" = 2.085700326e-02, 
-                 "realizedSpread" = -2.111404110e-02, "valueTrade" = 2.715119360e+04, "signedValueTrade" = -3.843162486e+03,
-                 "depthImbalanceDifference" = 2.044038195e-03, "depthImbalanceRatio" = -3.216294609e-01,
-                 "proportionalEffectiveSpread" = 1.326840320e-04,  "proportionalRealizedSpread" = -1.318068210e-04,
-                 "priceImpact" = 2.124058219e-02,  "proportionalPriceImpact" = 1.338690288e-04,
-                 "halfTradedSpread" = 1.042850163e-02,  "proportionalHalfTradedSpread" = 6.634201601e-05,
-                 "squaredLogReturn" = 2.829216378e-08,  "absLogReturn" = 1.087853666e-04,  "quotedSpread" = 4.498941368e-02,
-                 "proportionalQuotedSpread" = 2.863292509e-04,  "logQuotedSpread" = 2.863292594e-04,  "logQuotedSize" = 3.507993108e+00,
-                 "quotedSlope" = 1.848731511e-02,  "logQSlope" = 1.176115204e-04,  "midQuoteSquaredReturn" = 2.179025826e-08,
-                 "midQuoteAbsReturn" = 9.503283753e-05,  "signedTradeSize" = -2.456156352e+01)
-               )
-  
+               #   
+               #   
+               
+               c("midpoints" = 1.568751203e+02,
+               "direction" = -1.646205357e-01,
+               "effectiveSpread" = 2.116099330e-02,
+               "realizedSpread" = -1.730314502e-02,
+               "valueTrade" = 2.587442590e+04,
+               "signedValueTrade" = -3.525860704e+03,
+               "depthImbalanceDifference" = 2.679893658e-03,
+               "depthImbalanceRatio" = -3.060161477e-01,
+               "proportionalEffectiveSpread" = 1.346079032e-04,
+               "proportionalRealizedSpread" = -1.082144587e-04,
+               "priceImpact" = 1.944379732e-02,
+               "proportionalPriceImpact" = 1.227587276e-04,
+               "halfTradedSpread" = 1.058049665e-02,
+               "proportionalHalfTradedSpread" = 6.730395161e-05,
+               "squaredLogReturn" = 2.510765091e-08,
+               "absLogReturn" = 1.014482187e-04,
+               "quotedSpread" = 4.554896763e-02,
+               "proportionalQuotedSpread" = 2.898679017e-04,
+               "logQuotedSpread" = 2.898679107e-04 ,
+               "logQuotedSize" = 3.406315538e+00,
+               "quotedSlope" = 1.939226740e-02,
+               "logQSlope" = 1.233647337e-04,
+               "midQuoteSquaredReturn" = 1.752787460e-08,
+               "midQuoteAbsReturn" = 8.566642940e-05 ,
+               "signedTradeSize" = -2.252273996e+01))
+               
+                  
   
 })
