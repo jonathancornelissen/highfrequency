@@ -1,11 +1,11 @@
 #' Aggregate a time series
 #' 
-#' @description Aggregate a time series as \code{xts} object. 
+#' @description Aggregate a time series as \code{xts} or \code{data.table} object. 
 #' It can handle irregularly spaced time series and returns a regularly spaced one.
 #' Use univariate time series as input for this function and check out \code{\link{aggregateTrades}}
 #' and \code{\link{aggregateQuotes}} to aggregate Trade or Quote data objects.
 #' 
-#' @param ts \code{xts} object to aggregate.
+#' @param ts \code{xts} or \code{data.table} object to aggregate.
 #' @param FUN function to apply over each interval. By default, previous tick aggregation is done. 
 #' Alternatively one can set e.g. FUN = "mean".
 #' In case weights are supplied, this argument is ignored and a weighted average is taken.
@@ -19,6 +19,7 @@
 #' By default, an NA is returned in case an interval is empty, except when the user opts
 #' for previous tick aggregation, by setting \code{FUN = "previoustick"} (default).
 #' @param tz character denoting which timezone the output should be in. Defaults to \code{NULL}
+#' @param ... extra parameters passed on to \code{FUN}
 #' @details The time stamps of the new time series are the closing times and/or days of the intervals. 
 #' For example, for a weekly aggregation the new time stamp is the last day in that particular week (namely Sunday).
 #' 
@@ -61,135 +62,10 @@
 #' @importFrom xts period.apply tzone	
 #' @export
 aggregateTS <- function (ts, FUN = "previoustick", alignBy = "minutes", alignPeriod = 1, weights = NULL, dropna = FALSE, tz = NULL) {
-  
-  makethispartbetter <- ((!is.null(weights))| alignBy=="days"| alignBy=="weeks" | (FUN!="previoustick") | dropna)
-  if(length(alignPeriod) > 1){
-    alignPeriod <- alignPeriod[1]
-    warning("alignPeriod must be of length one. Longer object provided. Using only first entry.")
-  }
-  
-  if (FUN == "previoustick") {
-    FUN <- previoustick 
-  } else {
-    FUN <- match.fun(FUN)
-  }
-  
-  if(is.null(tz)){
-    tz <- tzone(ts)
-  }
-  
-  if(alignBy == "ticks"){ ## Special case for alignBy = "ticks"
-    if(alignPeriod < 1 | alignPeriod%%1 != 0){
-      stop("When alignBy is `ticks`, must be a positive integer valued numeric")
-    }
-    idx <- seq(1, nrow(ts), by = alignPeriod)
-    if(alignPeriod %% nrow(ts) != 0){
-      idx <- c(idx, nrow(ts))
-    }
-    ts <- ts[idx,]
-    return(ts)
-  }
-  
-  if (makethispartbetter)  {
-    
-    if (is.null(weights)) {
-      ep <- endpoints(ts, alignBy, alignPeriod)
-      if (dim(ts)[2] == 1) { 
-        ts2 <- period.apply(ts, ep, FUN) 
-      }
-      if (dim(ts)[2] > 1) {  
-        ts2 <- xts(apply(ts, 2, FUN = periodApply2, FUN2 = FUN, INDEX = ep), order.by = index(ts)[ep],)
-      }
-    } else {
-      tsb <- cbind(ts, weights)
-      ep  <- endpoints(tsb, alignBy, alignPeriod)
-      ts2 <- period.apply(tsb, ep, FUN = match.fun(weightedaverage))
-    }
-    if (alignBy == "minutes" | alignBy == "mins" | alignBy == "secs" | alignBy == "seconds") {
-      if (alignBy == "minutes" | alignBy == "mins") {
-        secs = alignPeriod * 60
-      }
-      if (alignBy == "secs" | alignBy == "seconds") {
-        secs <- alignPeriod
-      }
-      a <- index(ts2) + (secs - as.numeric(index(ts2)) %% secs)
-      ts3 <- xts(ts2, a, tzone = tz)
-    }
-    if (alignBy == "hours") {
-      secs = 3600
-      a <- index(ts2) + (secs - as.numeric(index(ts2)) %% secs)
-      ts3 <- xts(ts2, a, tzone = tz)
-    }
-    if (alignBy == "days") {
-      secs = 24 * 3600
-      a   <- index(ts2) + (secs - as.numeric(index(ts2)) %% secs) - (24 * 3600)
-      ts3 <- xts(ts2, a, tzone = tz)
-    }
-    if (alignBy == "weeks") {
-      secs = 24 * 3600 * 7
-      a <- (index(ts2) + (secs - (index(ts2) + (3L * 86400L)) %% secs)) - 
-        (24 * 3600)
-      ts3 <- xts(ts2, a, tzone = tz)
-    }
-    
-    if (!dropna) {
-      if (alignBy != "weeks" & alignBy != "days") {
-        if (alignBy == "secs" | alignBy == "seconds") {
-          tby <- "s"
-        }
-        if (alignBy == "mins" | alignBy == "minutes") {
-          tby <- "min"
-        }
-        if (alignBy == "hours") {
-          tby <- "h"
-        }
-        by <- paste(alignPeriod, tby, sep = " ")
-        allindex <- as.POSIXct(seq(start(ts3), end(ts3), by = by))
-        xx <- xts(rep("1", length(allindex)), order.by = allindex)
-        ts3 <- merge(ts3, xx)[, (1:dim(ts)[2])]
-      }
-    }
-    
-    ts3 <- xts(ts3, as.POSIXct(index(ts3)), tzone = tz)
-    return(ts3)
-  }
-  
-  if(!makethispartbetter){
-    if (alignBy == "secs" | alignBy == "seconds") { 
-      secs <- alignPeriod 
-      tby <- paste(alignPeriod, "sec", sep = " ")
-    }
-    if (alignBy == "mins" | alignBy == "minutes") { 
-      secs <- 60*alignPeriod
-      tby = paste(60*alignPeriod,"sec",sep=" ")
-    }
-    if (alignBy == "hours") { 
-      secs <- 3600 * alignPeriod 
-      tby <- paste(3600 * alignPeriod, "sec", sep=" ")
-    }
-    
-    FUN <- match.fun(FUN)
-    
-    g <- base::seq(start(ts), end(ts), by = tby)
-    rawg <- as.numeric(as.POSIXct(g, tz = "GMT"))
-    newg <- rawg + (secs - rawg %% secs)
-    
-    if(as.numeric(end(ts)) == newg[length(newg)-1]){
-      newg  <- newg[-length(newg)]
-    }
-    
-    
-    g <- as.POSIXct(newg, origin = "1970-01-01", tz = "GMT")
-    firstObs <- ts[1,]
-    ts <- na.locf(merge(ts, zoo(NULL, g)))[as.POSIXct(g, tz = tz)]
-    if(index(ts[1]) > index(firstObs)){
-      index(firstObs) <- index(ts[1]) - secs
-      ts <- c(firstObs, ts)
-    }
-    
-    ts <- ts[!duplicated(index(ts), fromLast = TRUE)]
-    
-    return(ts) 
+  if(is.xts(ts)){
+    return(internalAggregateTSXTS(ts, FUN = FUN, alignBy = alignBy, alignPeriod = alignPeriod, weights = weights, dropna = dropna, tz = tz))
+  } else if(is.data.table(ts)){
+    return(internalAggregateTSDT(ts, FUN = FUN, alignBy = alignBy, alignPeriod = alignPeriod, weights = weights, dropna = dropna, tz = tz))
   }
 }
 
@@ -239,7 +115,7 @@ aggregatePrice <- function(pData, alignBy = "minutes", alignPeriod = 1, marketOp
   ## checking
   nm <- toupper(colnames(pData))
   pData <- checkColumnNames(pData)
-  i.DATE <- .SD <- .N <- .I <- N <- DATE <- DT <- FIRST_DT <- DT_ROUND <- LAST_DT <- SYMBOL <- PRICE <- NULL
+  i.DATE <- .SD <- .N <- .I <- DATE <- DT <- FIRST_DT <- DT_ROUND <- LAST_DT <- SYMBOL <- PRICE <- NULL
 
 
   if (alignBy == "milliseconds") {

@@ -432,3 +432,233 @@ seqInclEnds <- function(start, end, by){
   }
   return(val)
 }
+
+
+
+internalAggregateTSXTS <- function(ts, FUN = "previoustick", alignBy = "minutes", alignPeriod = 1, weights = NULL, dropna = FALSE, tz = NULL, ...){
+  makethispartbetter <- ((!is.null(weights))| alignBy=="days"| alignBy=="weeks" | (FUN!="previoustick") | dropna)
+  if(length(alignPeriod) > 1){
+    alignPeriod <- alignPeriod[1]
+    warning("alignPeriod must be of length one. Longer object provided. Using only first entry.")
+  }
+  
+  if (FUN == "previoustick") {
+    FUN <- previoustick 
+  } else {
+    FUN <- match.fun(FUN)
+  }
+  
+  if(is.null(tz)){
+    tz <- tzone(ts)
+  }
+  
+  if(alignBy == "ticks"){ ## Special case for alignBy = "ticks"
+    if(alignPeriod < 1 | alignPeriod%%1 != 0){
+      stop("When alignBy is `ticks`, must be a positive integer valued numeric")
+    }
+    idx <- seq(1, nrow(ts), by = alignPeriod)
+    if(alignPeriod %% nrow(ts) != 0){
+      idx <- c(idx, nrow(ts))
+    }
+    ts <- ts[idx,]
+    return(ts)
+  }
+  
+  if (makethispartbetter)  {
+    
+    if (is.null(weights)) {
+      ep <- endpoints(ts, alignBy, alignPeriod)
+      if (dim(ts)[2] == 1) { 
+        ts2 <- period.apply(ts, ep, FUN, ...) 
+      }
+      if (dim(ts)[2] > 1) {  
+        ts2 <- xts(apply(ts, 2, FUN = periodApply2, FUN2 = FUN, INDEX = ep, ...), order.by = index(ts)[ep],)
+      }
+    } else {
+      tsb <- cbind(ts, weights)
+      ep  <- endpoints(tsb, alignBy, alignPeriod)
+      ts2 <- period.apply(tsb, ep, FUN = match.fun(weightedaverage), ...)
+    }
+    if (alignBy == "minutes" | alignBy == "mins" | alignBy == "secs" | alignBy == "seconds") {
+      if (alignBy == "minutes" | alignBy == "mins") {
+        secs = alignPeriod * 60
+      }
+      if (alignBy == "secs" | alignBy == "seconds") {
+        secs <- alignPeriod
+      }
+      a <- index(ts2) + (secs - as.numeric(index(ts2)) %% secs)
+      ts3 <- xts(ts2, a, tzone = tz)
+    }
+    if (alignBy == "hours") {
+      secs = 3600
+      a <- index(ts2) + (secs - as.numeric(index(ts2)) %% secs)
+      ts3 <- xts(ts2, a, tzone = tz)
+    }
+    if (alignBy == "days") {
+      secs = 24 * 3600
+      a   <- index(ts2) + (secs - as.numeric(index(ts2)) %% secs) - (24 * 3600)
+      ts3 <- xts(ts2, a, tzone = tz)
+    }
+    if (alignBy == "weeks") {
+      secs = 24 * 3600 * 7
+      a <- (index(ts2) + (secs - (index(ts2) + (3L * 86400L)) %% secs)) - 
+        (24 * 3600)
+      ts3 <- xts(ts2, a, tzone = tz)
+    }
+    
+    if (!dropna) {
+      if (alignBy != "weeks" & alignBy != "days") {
+        if (alignBy == "secs" | alignBy == "seconds") {
+          tby <- "s"
+        }
+        if (alignBy == "mins" | alignBy == "minutes") {
+          tby <- "min"
+        }
+        if (alignBy == "hours") {
+          tby <- "h"
+        }
+        by <- paste(alignPeriod, tby, sep = " ")
+        allindex <- as.POSIXct(seq(start(ts3), end(ts3), by = by))
+        xx <- xts(rep("1", length(allindex)), order.by = allindex)
+        ts3 <- merge(ts3, xx)[, (1:dim(ts)[2])]
+      }
+    }
+    
+    ts3 <- xts(ts3, as.POSIXct(index(ts3)), tzone = tz)
+    return(ts3)
+  }
+  
+  if(!makethispartbetter){
+    if (alignBy == "secs" | alignBy == "seconds") { 
+      secs <- alignPeriod 
+      tby <- paste(alignPeriod, "sec", sep = " ")
+    }
+    if (alignBy == "mins" | alignBy == "minutes") { 
+      secs <- 60*alignPeriod
+      tby = paste(60*alignPeriod,"sec",sep=" ")
+    }
+    if (alignBy == "hours") { 
+      secs <- 3600 * alignPeriod 
+      tby <- paste(3600 * alignPeriod, "sec", sep=" ")
+    }
+    
+    g <- base::seq(start(ts), end(ts), by = tby)
+    rawg <- as.numeric(as.POSIXct(g, tz = "GMT"))
+    newg <- rawg + (secs - rawg %% secs)
+    
+    if(as.numeric(end(ts)) == newg[length(newg)-1]){
+      newg  <- newg[-length(newg)]
+    }
+    
+    
+    g <- as.POSIXct(newg, origin = "1970-01-01", tz = "GMT")
+    firstObs <- ts[1,]
+    ts <- na.locf(merge(ts, zoo(NULL, g)))[as.POSIXct(g, tz = tz)]
+    if(index(ts[1]) > index(firstObs)){
+      index(firstObs) <- index(ts[1]) - secs
+      ts <- c(firstObs, ts)
+    }
+    
+    ts <- ts[!duplicated(index(ts), fromLast = TRUE)]
+    
+    return(ts) 
+    }
+}
+
+
+internalAggregateTSDT <- function(ts, FUN = "previoustick", alignBy = "minutes", alignPeriod = 1, weights = NULL, dropna = FALSE, tz = NULL, ...){
+  i.DATE <- .SD <- .N <- .I <- N <- DATE <- DT <- FIRST_DT <- DT_ROUND <- LAST_DT <- SYMBOL <- PRICE <- NULL
+  if (alignBy == "milliseconds") {
+    alignBy <- "secs"
+    alignPeriod <- alignPeriod / 1000
+  }
+  if(alignBy == "secs" | alignBy == "seconds"){
+    scaleFactor <- alignPeriod
+  }
+  if(alignBy == "mins" | alignBy == "minutes"){
+    scaleFactor <- alignPeriod * 60
+  }
+  if(alignBy == "hours"){
+    scaleFactor <- alignPeriod * 60 * 60
+  }
+  
+  if(! (alignBy %in% c("milliseconds", "secs", "seconds", "mins", "minutes", "hours", "ticks"))){
+    stop("alignBy not valid value. Valid values are: \"milliseconds\", \"secs\", \"seconds\", \"mins\", \"minutes\", \"hours\", and \"ticks\".")
+  }
+  
+  if (!("DT" %in% colnames(ts))) {
+    stop("Data.table neeeds DT column (date-time).")
+  }
+
+  if(alignBy == "ticks"){ ## Special case for alignBy = "ticks"
+    if(alignPeriod == 1) return(ts[])
+    
+    if(FUN != "previoustick") stop("Only previoustick function is supported when alignBy is `ticks`")
+    
+    if(alignPeriod < 1 | alignPeriod%%1 != 0){
+      stop("When alignBy is `ticks`, must be a positive integer valued numeric")
+    }
+    # if(length(unique(as.Date(pData[,DT]))) > 1){
+    #   stop("Multiday support for aggregatePrice with alignBy = \"ticks\" is not implemented yet.")
+    # }
+    return(ts[seqInclEnds(1, .N, alignPeriod), .SD, by = list(DATE = as.Date(DT)), .SDcols = 1:ncol(ts)][])
+  }
+  
+  timeZone <- format(ts$DT[1], format = "%Z")
+  if(is.null(timeZone) || timeZone == ""){
+    if(is.null(tz)){
+      tz <- "UTC"
+    }
+    if(!("POSIXct" %in% class(ts$DT))){
+      ts[, DT := as.POSIXct(format(DT, digits = 20, nsmall = 20), tz = tz)]
+    }
+  } else {
+    tz <- timeZone
+  }
+  setkeyv(ts, c("DT")) # The below code MAY fail with data with unordered DT column. Also setkey inceases speed of grouping
+  ## Checking ends
+  # Convert DT to numeric. This is much faster than dealing with the strings (POSIXct)
+  ts[, DT := as.numeric(DT, tz = tz)]
+  # Calculate the date in the data
+  ts[, DATE := as.Date(floor(DT / 86400), origin = "1970-01-01", tz = tz)]
+  
+  # Find the first observation per day.
+  ts[, FIRST_DT := min(DT), by = list(DATE)]
+  # Use Dirks answer here: https://stackoverflow.com/a/42498175 to round the timestamps to the latest scaleFactor
+  ts[, DT_ROUND := fifelse(DT == FIRST_DT,
+                              floor(DT/scaleFactor) * scaleFactor,
+                              ceiling(DT/scaleFactor) * scaleFactor)]
+  
+  ts[, LAST_DT := max(DT), by = list(DT_ROUND)]
+  
+  if(FUN == "previoustick"){
+    startsAndEnds <- ts[, list(START = first(DT_ROUND), END = last(DT_ROUND)), by = DATE]
+    dt_full_index <- data.table(DT_ROUND = as.numeric(mSeq(startsAndEnds[["START"]], startsAndEnds[["END"]], as.double(scaleFactor))))
+    
+    setkey(dt_full_index, "DT_ROUND")
+    
+    setkey(ts, DT)
+    
+    ts <- unique(ts[dt_full_index, roll = TRUE, on = "DT_ROUND"])
+    
+  }
+  
+  FUN <- match.fun(FUN)
+  if(!is.null(weights)){
+    if(NROW(weights) != NROW(ts) & NROW(weights) != 1){
+      stop("number of observbations in weights must match number of observations in ts")
+    }
+    for (col in setdiff(colnames(ts), c("DT", "DT_ROUND", "FIRST_DT", "LAST_DT", "DATE"))) {
+      set(ts, j = col, value = ts[[col]] * weights)
+    }
+  }
+  ts <- ts[, lapply(.SD, FUN, ...), by = list(DT_ROUND), .SDcols = setdiff(colnames(ts), c("DT", "DT_ROUND", "FIRST_DT", "LAST_DT", "DATE"))]
+  
+  
+  setnames(ts, "DT_ROUND", "DT")
+  set(ts, j = "DT", value = as.POSIXct(ts$DT, tz = tz, origin = "1970-01-01"))
+  
+  
+  return(ts[])
+  
+}

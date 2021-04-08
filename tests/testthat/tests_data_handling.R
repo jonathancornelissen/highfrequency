@@ -183,8 +183,13 @@ test_that("tradesCleanup on-disk functionality", {
 #   lines(old, col = "red", lwd = 1)
 # })
 
-
-
+context("aggregateTS xts vs data.table for previoustick")
+test_that("aggregateTS xts vs data.table for previoustick", {
+  res_DT <- aggregateTS(sampleTData[, list(DT, PRICE)])
+  expect_true(all.equal(as.xts(res_DT) , c(aggregateTS(as.xts(sampleTData[as.Date(DT) == "2018-01-02", list(DT, PRICE)])),
+                                         aggregateTS(as.xts(sampleTData[as.Date(DT) == "2018-01-03", list(DT, PRICE)]))))
+  )
+})
 
 context("aggregateTS edge cases")
 test_that("aggregateTS edge cases", {
