@@ -22,8 +22,8 @@ observations are allowed. They will be aggregated to the level specified by
 parameters \code{alignBy} and \code{alignPeriod}.}
 
 \item{method}{specifies which method will be used to estimate the spot
-volatility. Options include \code{"detPer"} and \code{"stochper"}.
-See `Details'.}
+volatility. Valid options are \code{"detPer"}, \code{"stochPer"} \code{"kernel"} \code{"piecewise"} \code{"garch"}, \code{"RM"} ,\code{"PARM"}
+See `Details' below for explanation and parameters to use in each of the methods.}
 
 \item{alignBy}{string indicating the time scale in which \code{alignPeriod} is expressed.
 Possible values are: \code{"secs", "seconds", "mins", "minutes", "hours"}.}

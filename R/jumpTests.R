@@ -549,6 +549,7 @@ JOjumpTest <- function(pData, power = 4, alignBy = NULL, alignPeriod = NULL, alp
 #' specified by \code{tz}. By default, \code{marketClose = "16:00:00"}.
 #' @param tz fallback time zone used in case we we are unable to identify the timezone of the data, by default: \code{tz = NULL}. We attempt to extract the timezone from the DT column (or index) of the data, which may fail. 
 #' In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}
+#' @param n number of observation to use in the calculation of the critical values of the test statistic. If this is left as \code{NULL} we fall back to the total number of observations in the sample.
 #' @param ... extra arguments passed on to \code{\link{spotVol}} for the volatility estimation, and to \code{\link{spotDrift}}.
 #' 
 #' The null hypothesis of the tests in this function is that there are no jumps in the price series
@@ -579,7 +580,7 @@ JOjumpTest <- function(pData, power = 4, alignBy = NULL, alignPeriod = NULL, alp
 #' @export
 
 intradayJumpTest <- function(pData, volEstimator = "RM", driftEstimator = "none", alpha = 0.95, alignBy = "minutes", alignPeriod = 5,
-                             marketOpen = "09:30:00", marketClose = "16:00:00", tz = NULL, ...){
+                             marketOpen = "09:30:00", marketClose = "16:00:00", tz = NULL, n = NULL, ...){
 
   .N <- PRICE <- DATE <- RETURN <- DT <- NULL
   
@@ -700,11 +701,10 @@ intradayJumpTest <- function(pData, volEstimator = "RM", driftEstimator = "none"
   # Calculating the critical value of the test.
   const <- 0.7978846 # = sqrt(2/pi)
   
-  n <- returns[, .N, by = as.Date(DT, tz = tz)]
-  ..names.. <- n[[1]]
-  n <- n[[2]]
-  names(n) <- ..names..
   
+  
+
+  if(is.null(n)){n <- NROW(pData)}
   
   Cn <- sqrt(2 * log(n))/const - (log(pi) + log( log(n) ))/(2 * const*sqrt((2 * log(n))))
   Sn <- 1/sqrt(const * 2 * log(n))

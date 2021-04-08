@@ -14,6 +14,7 @@ intradayJumpTest(
   marketOpen = "09:30:00",
   marketClose = "16:00:00",
   tz = NULL,
+  n = NULL,
   ...
 )
 }
@@ -41,6 +42,8 @@ specified by \code{tz}. By default, \code{marketClose = "16:00:00"}.}
 
 \item{tz}{fallback time zone used in case we we are unable to identify the timezone of the data, by default: \code{tz = NULL}. We attempt to extract the timezone from the DT column (or index) of the data, which may fail. 
 In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}}
+
+\item{n}{number of observation to use in the calculation of the critical values of the test statistic. If this is left as \code{NULL} we fall back to the total number of observations in the sample.}
 
 \item{...}{extra arguments passed on to \code{\link{spotVol}} for the volatility estimation, and to \code{\link{spotDrift}}.
 
