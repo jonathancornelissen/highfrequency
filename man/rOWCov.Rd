@@ -25,7 +25,7 @@ return series over period \eqn{t}, with \eqn{M} observations during \eqn{t}.}
 \code{FALSE} by default.}
 
 \item{alignBy}{character, indicating the time scale in which \code{alignPeriod} is expressed. 
-Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}.}
+Possible values are: \code{"ticks"}, \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}}
 
 \item{alignPeriod}{positive numeric, indicating the number of periods to aggregate over. For example, to aggregate
 based on a 5-minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.}

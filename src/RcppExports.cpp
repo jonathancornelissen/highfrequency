@@ -258,6 +258,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// tickGrouping_RETURNS
+arma::vec tickGrouping_RETURNS(const int end, const int size);
+RcppExport SEXP _highfrequency_tickGrouping_RETURNS(SEXP endSEXP, SEXP sizeSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const int >::type end(endSEXP);
+    Rcpp::traits::input_parameter< const int >::type size(sizeSEXP);
+    rcpp_result_gen = Rcpp::wrap(tickGrouping_RETURNS(end, size));
+    return rcpp_result_gen;
+END_RCPP
+}
 // leadLagCpp
 arma::vec leadLagCpp(const arma::vec& x, const arma::vec& timestampsX, const arma::vec& y, const arma::vec& timestampsY, const arma::vec lags, const bool normalize);
 RcppExport SEXP _highfrequency_leadLagCpp(SEXP xSEXP, SEXP timestampsXSEXP, SEXP ySEXP, SEXP timestampsYSEXP, SEXP lagsSEXP, SEXP normalizeSEXP) {
@@ -436,6 +448,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_highfrequency_rollApplyMinWrapper", (DL_FUNC) &_highfrequency_rollApplyMinWrapper, 1},
     {"_highfrequency_rollApplyMedianWrapper", (DL_FUNC) &_highfrequency_rollApplyMedianWrapper, 1},
     {"_highfrequency_rollApplyProdWrapper", (DL_FUNC) &_highfrequency_rollApplyProdWrapper, 2},
+    {"_highfrequency_tickGrouping_RETURNS", (DL_FUNC) &_highfrequency_tickGrouping_RETURNS, 2},
     {"_highfrequency_leadLagCpp", (DL_FUNC) &_highfrequency_leadLagCpp, 6},
     {"_highfrequency_leadLagCppPAR", (DL_FUNC) &_highfrequency_leadLagCppPAR, 7},
     {"_highfrequency_nsmaller", (DL_FUNC) &_highfrequency_nsmaller, 5},

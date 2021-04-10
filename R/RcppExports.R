@@ -87,6 +87,10 @@ rollApplyProdWrapper <- function(x, m) {
     .Call(`_highfrequency_rollApplyProdWrapper`, x, m)
 }
 
+tickGrouping_RETURNS <- function(end, size) {
+    .Call(`_highfrequency_tickGrouping_RETURNS`, end, size)
+}
+
 leadLagCpp <- function(x, timestampsX, y, timestampsY, lags, normalize) {
     .Call(`_highfrequency_leadLagCpp`, x, timestampsX, y, timestampsY, lags, normalize)
 }

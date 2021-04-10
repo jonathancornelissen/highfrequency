@@ -3,15 +3,15 @@
 #' @keywords internal
 fastTickAgregation <- function (ts, alignBy = "minutes", alignPeriod = 1, tz = "GMT") {
   
-  if (alignBy == "secs" | alignBy == "seconds") {
+  if(alignBy == "ticks"){
+    return(na.locf(ts)[seqInclEnds(1, length(ts), alignPeriod)])
+  } else  if (alignBy == "secs" | alignBy == "seconds") {
     secs <- alignPeriod
     tby <- paste(alignPeriod, "sec", sep = " ")
-  } 
-  if (alignBy == "mins" | alignBy == "minutes") {
+  } else  if (alignBy == "mins" | alignBy == "minutes") {
     secs <- 60 * alignPeriod
     tby <- paste(60 * alignPeriod, "sec", sep = " ")
-  } 
-  if (alignBy == "hours"){
+  } else if (alignBy == "hours"){
     secs <- 3600 * alignPeriod
     tby <- paste(3600 * alignPeriod, "sec", sep = " ")
   }
@@ -36,7 +36,7 @@ fastTickAgregation <- function (ts, alignBy = "minutes", alignPeriod = 1, tz = "
 #' @importFrom data.table rbindlist setkey nafill set
 #' @keywords internal
 fastTickAgregation_DATA.TABLE <- function(dat, alignBy = "minutes", alignPeriod = 1, tz = "GMT"){
-  MAXDT <- .SD <- firstDT <- DT <- PRICE <- DATE <- NULL
+  .N <- MAXDT <- .SD <- firstDT <- DT <- DATE <- NULL
   if (alignBy == "secs" | alignBy == "seconds") {
     secs <- alignPeriod
   } 
@@ -59,6 +59,17 @@ fastTickAgregation_DATA.TABLE <- function(dat, alignBy = "minutes", alignPeriod 
   ## These are used to make sure we dont have na's back and forth and to recude the chance we erroneously produce NA's
   dat <- dat[, lapply(.SD, nafill, type = "locf"), .SDcols = colnames(dat), by = list(DATE = as.Date(DT, tz = tz))]
   dat <- dat[, lapply(.SD, nafill, type = "nocb"), by = DATE]
+  
+  if(alignBy == "ticks"){ ## Special case for alignBy = "ticks"
+    if(alignPeriod == 1) return(dat[,!"DATE"])
+    if(alignPeriod < 1 | alignPeriod%%1 != 0){
+      stop("When alignBy is `ticks`, must be a positive integer valued numeric")
+    }
+    # if(length(unique(as.Date(pData[,DT]))) > 1){
+    #   stop("Multiday support for aggregatePrice with alignBy = \"ticks\" is not implemented yet.")
+    # }
+    return(dat[seqInclEnds(1, .N, alignPeriod), .SD, by = list(DATE = as.Date(DT)), .SDcols = 1:ncol(dat)][,!"DATE"])
+  }
   g <- dat[, list(DT = seq(first(DT), last(DT), by = secs, tz = tz), MAXDT = max(DT)), by = DATE]
   g$DT <- g$DT + (secs - as.numeric(g$DT, tz = tz) %% secs)
   out <- dat[g, roll = TRUE, on = "DT"][DT < MAXDT + secs]
@@ -107,12 +118,18 @@ fastTickAgregation_RETURNS <- function (ts, alignBy = "minutes", alignPeriod = 1
     secs <- 3600 * alignPeriod
     tby <- paste(3600 * alignPeriod, "sec", sep = " ")
   }
-  g <- base::seq(start(ts), end(ts), by = tby)
-  rawg <- as.numeric(as.POSIXct(g, tz = tz))
-  newg <- rawg + (secs - rawg %% secs)
+  if(alignBy != "ticks"){
+    g <- base::seq(start(ts), end(ts), by = tby)
+    rawg <- as.numeric(as.POSIXct(g, tz = tz))
+    newg <- rawg + (secs - rawg %% secs)
+  } else {
+    newg <- index(ts)[seqInclEnds(1, length(ts), alignPeriod)]
+  }
+  
   if(as.numeric(end(ts)) == newg[length(newg)-1]){
     newg  <- newg[-length(newg)]
   }
+  
   
   firstObs <- ts[1,]
   firstObs[] <- 0 ## We should have 0 return! We use [] to not just overwrite it as a numeric with 0
@@ -131,7 +148,7 @@ fastTickAgregation_RETURNS <- function (ts, alignBy = "minutes", alignPeriod = 1
 #' @importFrom data.table rbindlist setkey nafill set
 #' @keywords internal
 fastTickAgregation_DATA.TABLE_RETURNS <- function(dat, alignBy = "minutes", alignPeriod = 1, tz = "GMT"){
-  DT_ROUND <- FIRST_DT <- .SD <- FIRST_DT <- DT <- DATE <- NULL
+  ....GRP.... <- .N <- DT_ROUND <- FIRST_DT <- .SD <- FIRST_DT <- DT <- DATE <- NULL
   if (alignBy == "secs" | alignBy == "seconds") {
     secs <- alignPeriod
   } 
@@ -154,8 +171,20 @@ fastTickAgregation_DATA.TABLE_RETURNS <- function(dat, alignBy = "minutes", alig
   ## These are used to make sure we dont have na's back and forth and to recude the chance we erroneously produce NA's
   dat <- dat[, lapply(.SD, nafill, type = "locf"), .SDcols = colnames(dat), by = list(DATE = as.Date(DT, tz = tz))]
   dat <- dat[, lapply(.SD, nafill, type = "nocb"), by = DATE]
+  if(alignBy == "ticks"){ ## Special case for alignBy = "ticks"
+    if(alignPeriod == 1) return(dat[,!"DATE"])
+    if(alignPeriod < 1 | alignPeriod%%1 != 0){
+      stop("When alignBy is `ticks`, must be a positive integer valued numeric")
+    }
+    dat[, ....GRP.... := tickGrouping_RETURNS(.N, alignPeriod), by = list(DATE = as.Date(DT))]
+    dat <- dat[, lapply(.SD, sum), by = list(DATE = as.Date(DT), ....GRP....), .SDcols = 1:ncol(dat)][, !c("DATE", "....GRP....")]
+    return(dat[])
+  }
+  
   dat[, DT := as.numeric(DT, tz = tz)]
   dat[, FIRST_DT := min(DT), by = "DATE"]
+  
+  
   dat[, DT_ROUND := fifelse(DT == FIRST_DT,
                               floor(DT/secs) * secs,
                               ceiling(DT/secs) * secs)]
