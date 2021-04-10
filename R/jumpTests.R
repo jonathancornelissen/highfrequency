@@ -63,7 +63,7 @@ ABDJumptest <- function(RV, BPV, TQ) { # Compute jump detection stat mentioned i
 #' @param p can be chosen among 2 or 3 or 4. The author suggests 4. 4 by default.
 #' @param k can be chosen among 2 or 3 or 4. The author suggests 2. 2 by default.
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. 
-#' Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}.
+#' Possible values are: \code{"ticks"}, \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
 #' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. For example, to aggregate
 #' based on a 5 minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
@@ -209,7 +209,7 @@ AJjumpTest <- function(pData, p = 4 , k = 2, alignBy = NULL, alignPeriod = NULL,
 #' @param logTransform boolean, should be \code{TRUE} when \code{QVestimator} and \code{IVestimator} are in logarithm form. \code{FALSE} by default.
 #' @param max boolean, should be \code{TRUE} when max adjustment in SE. \code{FALSE} by default.
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. 
-#' Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}.
+#' Possible values are: \code{"ticks"}, \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
 #' To aggregate based on a 5 minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. For example, to aggregate
 #' based on a 5 minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
@@ -403,8 +403,8 @@ BNSjumpTest <- function (rData, IVestimator = "BV", IQestimator = "TP", type = "
 #'  
 #' @param pData a zoo/xts object containing all prices in period t for one asset.
 #' @param power can be chosen among 4 or 6. 4 by default.
-#' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: "secs", "seconds", "mins", "minutes","hours".
-#' To aggregate based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
+#' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. 
+#' Possible values are: \code{"ticks"}, \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
 #' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
 #' @param alpha numeric of length one with the significance level to use for the jump test(s). Defaults to 0.975.
@@ -538,8 +538,8 @@ JOjumpTest <- function(pData, power = 4, alignBy = NULL, alignPeriod = NULL, alp
 #' @param volEstimator character denoting which volatility estimator to use for the tests. See \code{\link{spotVol}}. Default = \code{"RM"} denoting realized measures.
 #' @param driftEstimator character denoting which drift estimator to use for the tests. See \code{\link{spotDrift}}. Default = \code{"none"} denoting no drift estimation.
 #' @param alpha numeric of length one determining what confidence level to use when constructing the critical values.
-#' @param alignBy string indicating the time scale in which \code{alignPeriod} is expressed.
-#' Possible values are: \code{"secs", "seconds", "mins", "minutes", "hours"}.
+#' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. 
+#' Possible values are: \code{"ticks"}, \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
 #' based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
 #' \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
@@ -562,7 +562,7 @@ JOjumpTest <- function(pData, power = 4, alignBy = NULL, alignPeriod = NULL, alp
 #' # We can easily make a Lee-Mykland jump test.
 #' LMtest <- intradayJumpTest(pData = sampleTData[, list(DT, PRICE)], 
 #'                            volEstimator = "RM", driftEstimator = "none",
-#'                            RM = "bipower", lookBackPeriod = 20,
+#'                            RM = "rBPCov", lookBackPeriod = 20,
 #'                            alignBy = "minutes", alignPeriod = 5, marketOpen = "09:30:00", 
 #'                            marketClose = "16:00:00")
 #' plot(LMtest)
@@ -570,7 +570,7 @@ JOjumpTest <- function(pData, power = 4, alignBy = NULL, alignPeriod = NULL, alp
 #' # We can just as easily use the pre-averaged version from the "Fact or Friction" paper
 #' FoFtest <- intradayJumpTest(pData = sampleTData[, list(DT, PRICE)], 
 #'                             volEstimator = "PARM", driftEstimator = "none",
-#'                             RM = "bipower", lookBackPeriod = 20, theta = 1.2,
+#'                             RM = "rBPCov", lookBackPeriod = 20, theta = 1.2,
 #'                             marketOpen = "09:30:00", marketClose = "16:00:00")
 #' plot(FoFtest)
 #' 
@@ -627,12 +627,12 @@ intradayJumpTest <- function(pData, volEstimator = "RM", driftEstimator = "none"
 
   if (volEstimator == "RM") {
     
-    op <- list(RM = "bipower", lookBackPeriod = 10)
+    op <- list(RM = "rBPCov", lookBackPeriod = 10)
     options <- list(...)
     op[names(options)] <- options
     
     #vol$spot <- lag(vol$spot)
-    # if(op$RM == "bipower"){
+    # if(op$RM == "rBPCov"){
     #   vol$spot <- sqrt((vol$spot^2  / (pi/2))) 
     # }
     
@@ -648,7 +648,7 @@ intradayJumpTest <- function(pData, volEstimator = "RM", driftEstimator = "none"
   } else { # volEstimator == "PARM" i.e. we have pre-averaged realized measures
     nObs <- length(pData$PRICE)
     
-    op <- list(RM = "bipower", lookBackPeriod = 50)
+    op <- list(RM = "rBPCov", lookBackPeriod = 50)
     options <- list(...)
     op[names(options)] <- options
     

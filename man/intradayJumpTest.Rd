@@ -27,8 +27,8 @@ intradayJumpTest(
 
 \item{alpha}{numeric of length one determining what confidence level to use when constructing the critical values.}
 
-\item{alignBy}{string indicating the time scale in which \code{alignPeriod} is expressed.
-Possible values are: \code{"secs", "seconds", "mins", "minutes", "hours"}.}
+\item{alignBy}{character, indicating the time scale in which \code{alignPeriod} is expressed. 
+Possible values are: \code{"ticks"}, \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}}
 
 \item{alignPeriod}{positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
 based on a 5 minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to "minutes".
@@ -61,7 +61,7 @@ See \code{\link{spotVol}} and \code{\link{spotDrift}} for Estimators for \eqn{\s
 # We can easily make a Lee-Mykland jump test.
 LMtest <- intradayJumpTest(pData = sampleTData[, list(DT, PRICE)], 
                            volEstimator = "RM", driftEstimator = "none",
-                           RM = "bipower", lookBackPeriod = 20,
+                           RM = "rBPCov", lookBackPeriod = 20,
                            alignBy = "minutes", alignPeriod = 5, marketOpen = "09:30:00", 
                            marketClose = "16:00:00")
 plot(LMtest)
@@ -69,7 +69,7 @@ plot(LMtest)
 # We can just as easily use the pre-averaged version from the "Fact or Friction" paper
 FoFtest <- intradayJumpTest(pData = sampleTData[, list(DT, PRICE)], 
                             volEstimator = "PARM", driftEstimator = "none",
-                            RM = "bipower", lookBackPeriod = 20, theta = 1.2,
+                            RM = "rBPCov", lookBackPeriod = 20, theta = 1.2,
                             marketOpen = "09:30:00", marketClose = "16:00:00")
 plot(FoFtest)
 

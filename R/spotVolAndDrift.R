@@ -5,9 +5,8 @@
 #' @param method Which method to be used to estimate the spot-drift. Currently, three methods are available, 
 #' rolling mean and median as well as the kernel method of Christensen et al. (2018).
 #' The kernel is a left hand exponential kernel that will weigh newer observations more heavily than older observations.
-#' @param alignBy What time-frame should the estimator be applied? Accepted inputs are \code{"milliseconds"}, \code{"seconds"} and \code{"secs"} for seconds,
-#'  \code{"minutes"} and \code{"mins"} for minutes, and \code{"hours"} for hours.
-#' Standard is minutes
+#' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. 
+#' Possible values are: \code{"ticks"}, \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
 #' @param alignPeriod How often should the estimation take place? If \code{alignPeriod} is 5 the estimation will be done every fifth unit of \code{alignBy}.
 #' @param marketOpen Opening time of the market, standard is "09:30:00".
 #' @param marketClose Closing time of the market, standard is "16:00:00".
@@ -186,8 +185,8 @@ spotDrift <- function(data, method = "mean", alignBy = "minutes", alignPeriod = 
 #' @param method specifies which method will be used to estimate the spot
 #' volatility. Valid options are \code{"detPer"}, \code{"stochPer"} \code{"kernel"} \code{"piecewise"} \code{"garch"}, \code{"RM"} ,\code{"PARM"}
 #' See `Details' below for explanation and parameters to use in each of the methods.
-#' @param alignBy string indicating the time scale in which \code{alignPeriod} is expressed.
-#' Possible values are: \code{"secs", "seconds", "mins", "minutes", "hours"}.
+#' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. 
+#' Possible values are: \code{"ticks"}, \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
 #' @param alignPeriod positive integer, indicating the number of periods to aggregate
 #' over. For example, to aggregate an \code{xts} object to the 5-minute frequency, set
 #' \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
@@ -551,7 +550,7 @@ spotDrift <- function(data, method = "mean", alignBy = "minutes", alignPeriod = 
 #' Parameters:
 #' \itemize{
 #' \item{\code{RM} string denoting which realized measure to use to estimate the local volatility. 
-#' Possible values are: \code{"rBPCov", "rMedRVar", "rMinRVar", "rCov", "rRVar}.
+#' Possible values are: \code{"rBPCov", "rMedRVar", "rMinRVar", "rCov", "rRVar"}.
 #' Default = \code{"rBPCov"}}.
 #' \item{\code{lookBackPeriod} positive integer denoting the amount of sub-sampled returns to use 
 #' for the estimation of the local volatility. Default is \code{10}.}

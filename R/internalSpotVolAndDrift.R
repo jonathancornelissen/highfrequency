@@ -100,7 +100,7 @@ print.spotDrift <- function(x, ...){
 #' @keywords internal
 detPer <- function(mR, rData = NULL, options = list()) {
   # default options, replace if user-specified
-  op <- list(dailyVol = "bipower", periodicVol = "TML", dummies = FALSE,
+  op <- list(dailyVol = "rBPCov", periodicVol = "TML", dummies = FALSE,
              P1 = 5, P2 = 5)
   op[names(options)] <- options
 
@@ -128,8 +128,12 @@ detPer <- function(mR, rData = NULL, options = list()) {
                               rv = apply(mR, 1, "rCov"))
     } else {
       estimdailyvol <- switch(op$dailyVol,
+                              rBPCov = apply.daily(rData, rBPCov),
                               bipower = apply.daily(rData, rBPCov),
-                              medrv = apply.daily(rData, rMedRV),
+                              rMedRVar = apply.daily(rData, rMedRVar),
+                              medrv = apply.daily(rData, rMedRVar),
+                              rRVar = apply.daily(rData, rCov),
+                              rCov = apply.daily(rData, rCov),
                               rv = apply.daily(rData, rCov))
       dates = time(estimdailyvol)
     }
@@ -455,7 +459,7 @@ ISE <- function(h, x, delta = 300, type = "gaussian") {
 #' @keywords internal
 piecewise <- function(mR, rData = NULL, options = list()) {
   # default options, replace if user-specified
-  op <- list(type = "MDa", m = 40, n = 20, alpha = 0.005, volEst = "bipower",
+  op <- list(type = "MDa", m = 40, n = 20, alpha = 0.005, volEst = "rBPCov",
              online = TRUE)
   op[names(options)] <- options
 
@@ -943,26 +947,6 @@ finternal <- function(y) {
 center <- function() {
   return(integrate(finternal, -Inf, Inf)$value)
 }
-
-# # modified version of 'aggregatePrice' from highfrequency package
-# aggregatePrice <- function (ts, FUN = "previoustick", on = "minutes", k = 1, marketOpen = "09:30:00", marketClose = "16:00:00", tz = "GMT") {
-#   ts2 = aggregateTS(ts, FUN = FUN, on, k)
-#   date = strsplit(as.character(index(ts)), " ")[[1]][1]
-#
-#   #open
-#   a = as.POSIXct(paste(date, marketOpen), tz = tz)
-#   b = as.xts(matrix(as.numeric(ts[1]),nrow=1), a)
-#   ts3 = c(b, ts2)
-#
-#   #close
-#   aa = as.POSIXct(paste(date, marketClose), tz = tz)
-#   condition = index(ts3) < aa
-#   ts3 = ts3[condition]
-#   bb = as.xts(matrix(as.numeric(last(ts)),nrow=1), aa)
-#   ts3 = c(ts3, bb)
-#
-#   return(ts3)
-# }
 
 
 #' @keywords internal
