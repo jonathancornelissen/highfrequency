@@ -1467,7 +1467,7 @@ quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
         readdata <- try(readdata[, DT := as.POSIXct(DT, tz = tz, format = "%Y-%m-%dT%H:%M:%OS")])
       } else {
         readdata <- try(copy(readdata)[,`:=`(DT = as.POSIXct(paste(DATE, TIME_M), tz = "UTC", format = "%Y%m%d %H:%M:%OS"),
-                                      DATE = NULL, TIME_M = NULL, SYM_SUFFIX = NULL)], silent = TRUE)
+                                      DATE = NULL, TIME_M = NULL)], silent = TRUE)
       }
       
       if(inherits(readdata, "try-error")){
@@ -1508,7 +1508,7 @@ quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
                       DATE = NULL, TIME_M = NULL)]
       }
     if("SYM_SUFFIX" %in% nm){
-      qDataRaw[, `:=`(SYMBOL = fifelse(SYM_SUFFIX == "", yes = SYMBOL, no = paste0(SYMBOL, "_", SYM_SUFFIX)), SYM_SUFFIX = NULL)]
+      qDataRaw[, `:=`(SYMBOL = fifelse(SYM_SUFFIX == "" | is.na(SYM_SUFFIX), yes = SYMBOL, no = paste0(SYMBOL, "_", SYM_SUFFIX)), SYM_SUFFIX = NULL)]
     }
   
     inputWasXts <- FALSE
@@ -2182,7 +2182,7 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
                       DATE = NULL, TIME_M = NULL)]
     }
     if("SYM_SUFFIX" %in% nm){
-      tDataRaw[, `:=`(SYMBOL = fifelse(SYM_SUFFIX == "", yes = SYMBOL, no = paste0(SYMBOL, "_", SYM_SUFFIX)), SYM_SUFFIX = NULL)]
+      tDataRaw[, `:=`(SYMBOL = fifelse(SYM_SUFFIX == "" | is.na(SYM_SUFFIX), yes = SYMBOL, no = paste0(SYMBOL, "_", SYM_SUFFIX)), SYM_SUFFIX = NULL)]
     }
     
     
