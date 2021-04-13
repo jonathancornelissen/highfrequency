@@ -61,11 +61,11 @@
 #' @importFrom stats start end
 #' @importFrom xts period.apply tzone	
 #' @export
-aggregateTS <- function (ts, FUN = "previoustick", alignBy = "minutes", alignPeriod = 1, weights = NULL, dropna = FALSE, tz = NULL) {
+aggregateTS <- function (ts, FUN = "previoustick", alignBy = "minutes", alignPeriod = 1, weights = NULL, dropna = FALSE, tz = NULL, ...) {
   if(is.xts(ts)){
-    return(internalAggregateTSXTS(ts, FUN = FUN, alignBy = alignBy, alignPeriod = alignPeriod, weights = weights, dropna = dropna, tz = tz))
+    return(internalAggregateTSXTS(ts, FUN = FUN, alignBy = alignBy, alignPeriod = alignPeriod, weights = weights, dropna = dropna, tz = tz, ...))
   } else if(is.data.table(ts)){
-    return(internalAggregateTSDT(ts, FUN = FUN, alignBy = alignBy, alignPeriod = alignPeriod, weights = weights, dropna = dropna, tz = tz))
+    return(internalAggregateTSDT(ts, FUN = FUN, alignBy = alignBy, alignPeriod = alignPeriod, weights = weights, dropna = dropna, tz = tz, ...))
   }
 }
 

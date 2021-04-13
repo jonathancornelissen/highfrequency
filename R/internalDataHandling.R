@@ -596,7 +596,7 @@ internalAggregateTSXTS <- function(ts, FUN = "previoustick", alignBy = "minutes"
 
 
 internalAggregateTSDT <- function(ts, FUN = "previoustick", alignBy = "minutes", alignPeriod = 1, weights = NULL, dropna = FALSE, tz = NULL, ...){
-  i.DATE <- .SD <- .N <- .I <- N <- DATE <- DT <- FIRST_DT <- DT_ROUND <- LAST_DT <- SYMBOL <- PRICE <- NULL
+  .SD <- .N <- .I <- N <- DATE <- DT <- FIRST_DT <- DT_ROUND <- LAST_DT <- SYMBOL <- PRICE <- NULL
   if (alignBy == "milliseconds") {
     alignBy <- "secs"
     alignPeriod <- alignPeriod / 1000

@@ -11,7 +11,8 @@ aggregateTS(
   alignPeriod = 1,
   weights = NULL,
   dropna = FALSE,
-  tz = NULL
+  tz = NULL,
+  ...
 )
 }
 \arguments{
