@@ -475,7 +475,7 @@ aggregateQuotes <- function(qData, alignBy = "minutes", alignPeriod = 5, marketO
 #' @export
 aggregateTrades <- function(tData, alignBy = "minutes", alignPeriod = 5, marketOpen = "09:30:00", marketClose = "16:00:00", tz = NULL) {
   .I <- .N <- N <- DATE <- SIZE <- DT <- FIRST_DT <- DT_ROUND <- LAST_DT <- SYMBOL <- PRICE <- VWPRICE <- SIZETPRICE <- SIZESUM <- NULL
-  nm <- toupper(colnames(tData))
+  nm <- c(toupper(colnames(tData)), "VWPRICE")
   if (!("SYMBOL" %in% nm)) {
     if(is.data.table(tData)){
       tData[, SYMBOL := "UKNOWN"]
@@ -1460,13 +1460,13 @@ quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
       if(inherits(readdata, "try-error")){
         stop(paste("Error encountered while opening data, error message is:",readdata))
       }
-      
+      if(is.null(tz)) tz <- "UTC"
       if(colnames(readdata)[1] == "index"){ # The data was saved from an xts object
         readdata <- try(readdata[, DT := as.POSIXct(index, tz = tz, format = "%Y-%m-%dT%H:%M:%OS")])
       } else if ("DT" %in% colnames(readdata)){
         readdata <- try(readdata[, DT := as.POSIXct(DT, tz = tz, format = "%Y-%m-%dT%H:%M:%OS")])
       } else {
-        readdata <- try(copy(readdata)[,`:=`(DT = as.POSIXct(paste(DATE, TIME_M), tz = "UTC", format = "%Y%m%d %H:%M:%OS"),
+        readdata <- try(copy(readdata)[,`:=`(DT = as.POSIXct(paste(DATE, TIME_M), tz = tz, format = "%Y%m%d %H:%M:%OS"),
                                       DATE = NULL, TIME_M = NULL)], silent = TRUE)
       }
       
@@ -1504,7 +1504,8 @@ quotesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
     nm <- toupper(colnames(qDataRaw))
     checkqData(qDataRaw)
     if(!"DT" %in% nm && c("DATE", "TIME_M") %in% nm){
-      qDataRaw[, `:=`(DT = as.POSIXct(paste(DATE, TIME_M), tz = "UTC", format = "%Y%m%d %H:%M:%OS"),
+      if(is.null(tz)) tz <- "UTC"
+      qDataRaw[, `:=`(DT = as.POSIXct(paste(DATE, TIME_M), tz = tz, format = "%Y%m%d %H:%M:%OS"),
                       DATE = NULL, TIME_M = NULL)]
       }
     if("SYM_SUFFIX" %in% nm){
@@ -2139,12 +2140,13 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
       if(inherits(readdata, "try-error")){
         stop(paste("Error encountered while opening data, error message is:",readdata))
       }
+      if(is.null(tz)) tz <- "UTC"
       if(colnames(readdata)[1] == "index"){ # The data was saved from an xts object
         readdata <- try(readdata[, DT := as.POSIXct(index, tz = tz, format = "%Y-%m-%dT%H:%M:%OS")])
       } else if ("DT" %in% colnames(readdata)){
         readdata <- try(readdata[, DT := as.POSIXct(DT, tz = tz, format = "%Y-%m-%dT%H:%M:%OS")])
       } else {
-        readdata <- try(readdata[, `:=`(DT = as.POSIXct(paste(DATE, TIME_M), tz = "UTC", format = "%Y%m%d %H:%M:%OS"),
+        readdata <- try(readdata[, `:=`(DT = as.POSIXct(paste(DATE, TIME_M), tz = tz, format = "%Y%m%d %H:%M:%OS"),
                                       DATE = NULL, TIME_M = NULL)], silent = TRUE)
       }
       
@@ -2178,7 +2180,8 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
     
     checktData(tDataRaw)
     if(!"DT" %in% nm && c("DATE", "TIME_M") %in% nm){
-      tDataRaw[, `:=`(DT = as.POSIXct(paste(DATE, TIME_M), tz = "UTC", format = "%Y%m%d %H:%M:%OS"),
+      if(is.null(tz)) tz <- "UTC"
+      tDataRaw[, `:=`(DT = as.POSIXct(paste(DATE, TIME_M), tz = tz, format = "%Y%m%d %H:%M:%OS"),
                       DATE = NULL, TIME_M = NULL)]
     }
     if("SYM_SUFFIX" %in% nm){

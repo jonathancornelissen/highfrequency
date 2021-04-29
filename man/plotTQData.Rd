@@ -11,6 +11,7 @@ plotTQData(
   tradeCol = "black",
   quoteCol = "darkgray",
   format = "\%H:\%M:\%S",
+  axisCol = "black",
   ...
 )
 }
@@ -26,6 +27,8 @@ plotTQData(
 \item{quoteCol}{color in which to fill out the bid-offer spread.}
 
 \item{format}{format string to pass to \code{axis.POSIXct} when creating the timestamps on the x axis.}
+
+\item{axisCol}{string to denote which color to use for the x axis}
 
 \item{...}{passed to \code{plot} and \code{points}.}
 }

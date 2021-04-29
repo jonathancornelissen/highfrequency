@@ -22,7 +22,7 @@
 #' Sample of cleaned trades for stock XXX for 2 days
 #' 
 #' @description A \code{data.table} object containing the trades for the pseudonymized stock XXX for 2 days, in the typical NYSE TAQ database format.
-#' This is the cleaned version of the data sample \code{\link{sampleTDataRaw}}, using \code{tradesCleanup}.
+#' This is the cleaned version of the data sample \code{\link{sampleTDataRaw}}, using \code{\link{tradesCleanupUsingQuotes}}.
 #' 
 #' @docType data
 #' @examples 
