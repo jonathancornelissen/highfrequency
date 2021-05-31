@@ -1695,6 +1695,7 @@ rmNegativeSpread <- function(qData) {
 #' @param qData a \code{data.table} or \code{xts} object containing the time series data with at least the columns \code{"BID"} and \code{"OFR"}, containing the bid and ask prices.
 #' @param lagQuotes numeric, number of seconds the quotes are registered faster than
 #' the trades (should be round and positive). Default is 0. For older datasets, i.e. before 2010, it may be a good idea to set this to e.g. 2. See Vergote (2005)
+#' @param nSpreads numeric of length 1 denotes how far above the offer and below bid we allow outliers to be. Trades are filtered out if they are MORE THAN nSpread * spread above (below) the offer (bid)
 #' @param BFM a logical determining whether to conduct 'Backwards - Forwards matching' of trades and quotes.
 #' The algorithm tries to match trades that fall outside the bid - ask and first tries to match a small window forwards and if this fails, it tries to match backwards in a bigger window.
 #' The small window is a tolerance for inaccuracies in the timestamps of bids and asks. The backwards window allow for matching of late reported trades, i.e. block trades.
@@ -1719,9 +1720,15 @@ rmNegativeSpread <- function(qData) {
 #' @keywords cleaning
 #' @importFrom data.table setkey set
 #' @export
-rmTradeOutliersUsingQuotes <- function(tData, qData, lagQuotes = 0, BFM = FALSE, backwardsWindow = 3600, forwardsWindow = 0.5, plot = FALSE, ...) {
+rmTradeOutliersUsingQuotes <- function(tData, qData, lagQuotes = 0, nSpreads = 1,  BFM = FALSE, backwardsWindow = 3600, forwardsWindow = 0.5, plot = FALSE, ...) {
   if(length(lagQuotes) != 1){
     lagQuotes <- lagQuotes[1]
+  }
+  if(length(nSpreads) != 1){
+    nSpreads <- nSpreads[1]
+  }
+  if(!is.numeric(nSpreads)){
+    stop("nSpreads must be a numeric value of length 1")
   }
   DATE <- SIZE <- SYMBOL <- PRICE <- DT <- SPREAD <- BID <- OFR <- NULL
   tData <- checkColumnNames(tData)
@@ -1766,7 +1773,7 @@ rmTradeOutliersUsingQuotes <- function(tData, qData, lagQuotes = 0, BFM = FALSE,
   tqData <- matchTradesQuotes(tData, qData, lagQuotes = lagQuotes, BFM = BFM, backwardsWindow = backwardsWindow, forwardsWindow = forwardsWindow, plot = plot, ... = ...)
   
   if(!BFM){
-    tData <- tqData[, SPREAD := OFR - BID][PRICE <= OFR + SPREAD & PRICE >= BID - SPREAD]
+    tData <- tqData[, SPREAD := OFR - BID][PRICE <= OFR + nSpreads * SPREAD & PRICE >= BID - nSpreads * SPREAD]
   
     if (inputWasXts) {
       return(xts(as.matrix(tData[, -c("DT", "SPREAD")]), order.by = tData$DT))
@@ -2300,6 +2307,7 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
 #' \code{from}, \code{to}, \code{dataSource}, \code{dataDestination} will be ignored (only advisable for small chunks of data).
 #' @param lagQuotes numeric, number of seconds the quotes are registered faster than
 #' the trades (should be round and positive). Default is 0. For older datasets, i.e. before 2010, it may be a good idea to set this to, e.g., 2 (see, Vergote, 2005).
+#' @param nSpreads numeric of length 1 denotes how far above the offer and below bid we allow outliers to be. Trades are filtered out if they are MORE THAN nSpread * spread above (below) the offer (bid)
 #' @param BFM a logical determining whether to conduct "Backwards - Forwards matching" of trades and quotes.
 #' The algorithm tries to match trades that fall outside the bid - ask and first tries to match a small window forwards and if this fails, it tries to match backwards in a bigger window.
 #' The small window is a tolerance for inaccuracies in the timestamps of bids and asks. The backwards window allow for matching of late reported trades, i.e. block trades.
@@ -2337,7 +2345,7 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
 #' # via the "tradeDataSource", "quoteDataSource", and "dataDestination" arguments
 #' @keywords cleaning
 #' @export
-tradesCleanupUsingQuotes <- function(tradeDataSource = NULL, quoteDataSource = NULL, dataDestination = NULL, tData = NULL, qData = NULL, lagQuotes = 0,
+tradesCleanupUsingQuotes <- function(tradeDataSource = NULL, quoteDataSource = NULL, dataDestination = NULL, tData = NULL, qData = NULL, lagQuotes = 0, nSpreads = 1, 
                                      BFM = FALSE, backwardsWindow = 3600, forwardsWindow = 0.5, plot = FALSE) {
   
   if (is.null(dataDestination) && !is.null(tradeDataSource)) {
@@ -2350,7 +2358,7 @@ tradesCleanupUsingQuotes <- function(tradeDataSource = NULL, quoteDataSource = N
     qData <- checkColumnNames(qData)
     
     #1 cleaning procedure that needs cleaned trades and quotes
-    tData <- rmTradeOutliersUsingQuotes(tData, qData, lagQuotes = lagQuotes, BFM = BFM, backwardsWindow = backwardsWindow, forwardsWindow = forwardsWindow, plot = plot, onlyTQ = TRUE)
+    tData <- rmTradeOutliersUsingQuotes(tData, qData, lagQuotes = lagQuotes, nSpreads = nSpreads, BFM = BFM, backwardsWindow = backwardsWindow, forwardsWindow = forwardsWindow, plot = plot, onlyTQ = TRUE)
     return(tData)
   } else {
     
@@ -2396,7 +2404,7 @@ tradesCleanupUsingQuotes <- function(tradeDataSource = NULL, quoteDataSource = N
       
       tData <- try(readRDS(tradeFile))
       qData <- try(readRDS(quoteFile))
-      saveRDS(rmTradeOutliersUsingQuotes(tData, qData, lagQuotes = lagQuotes, BFM = BFM,
+      saveRDS(rmTradeOutliersUsingQuotes(tData, qData, lagQuotes = lagQuotes, nSpreads = nSpreads, BFM = BFM,
                                          backwardsWindow = backwardsWindow, forwardsWindow = forwardsWindow, plot = FALSE, onlyTQ = TRUE), 
               file = paste0(dataDestination, "/", gsub(".rds", "tradescleanedbyquotes.rds", basename(tradeFile))))
       

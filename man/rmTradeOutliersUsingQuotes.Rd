@@ -8,6 +8,7 @@ rmTradeOutliersUsingQuotes(
   tData,
   qData,
   lagQuotes = 0,
+  nSpreads = 1,
   BFM = FALSE,
   backwardsWindow = 3600,
   forwardsWindow = 0.5,
@@ -22,6 +23,8 @@ rmTradeOutliersUsingQuotes(
 
 \item{lagQuotes}{numeric, number of seconds the quotes are registered faster than
 the trades (should be round and positive). Default is 0. For older datasets, i.e. before 2010, it may be a good idea to set this to e.g. 2. See Vergote (2005)}
+
+\item{nSpreads}{numeric of length 1 denotes how far above the offer and below bid we allow outliers to be. Trades are filtered out if they are MORE THAN nSpread * spread above (below) the offer (bid)}
 
 \item{BFM}{a logical determining whether to conduct 'Backwards - Forwards matching' of trades and quotes.
 The algorithm tries to match trades that fall outside the bid - ask and first tries to match a small window forwards and if this fails, it tries to match backwards in a bigger window.
