@@ -107,6 +107,8 @@ harInsanityFilter <- function(fittedValues, lower, upper, replacement) {
 #' 
 #' For other specifications, please refer to the cited papers.
 #'
+#' The standard errors reporting in the \code{print} and \code{summary} methods are Newey-West standard errors calculated with the \pkg{sandwich} package.
+#'
 #' @references 
 #' Andersen, T. G., Bollerslev, T., and Diebold, F. (2007). Roughing it up: Including jump components in the measurement, modelling and forecasting of return volatility. \emph{The Review of Economics and Statistics}, 89, 701-720.
 #' 
@@ -347,7 +349,7 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
 
   if (type == "HARJ") {
     if (!is.null(transform) && transform == "log") {
-      J <- J + 1
+      J <- J + 1 # will be transformed below in x <- Ftransform(x)
     }
     J <- J[(maxp:(n-h)),,drop = FALSE]
     x <- cbind(x1,J)         # bind jumps to RV data
@@ -439,7 +441,7 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
 
   if (type == "HARQJ") {
     if (!is.null(transform) && transform == "log") {
-      J <- J + 1
+      J <- log(J + 1)
     }
     J <- J[(maxp:(n-h)),, drop = FALSE]
     if (!is.null(transform)) {
@@ -506,6 +508,7 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
   model$inputType <- inputType
   model$h <- h
   model$leverage <- leverage
+  model$maxp <- maxp
   class(model) <- c("HARmodel", "lm")
   return (model)
 }
@@ -932,7 +935,7 @@ predict.HARmodel <- function(object, ... ){
 #' @export
 print.HARmodel <- function(x, ...){
   options <- list(...)
-  opt <- list(digits = max(3, getOption("digits") - 3), lag = 22)
+  opt <- list(digits = max(3, getOption("digits") - 3), lag = x$maxp)
   opt[names(options)] <- options
   digits <- opt$digits
   formula <- getHarmodelformula(x); modeldescription = formula[[1]]; betas = formula[[2]];
