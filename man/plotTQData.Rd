@@ -26,7 +26,8 @@ plotTQData(
 
 \item{quoteCol}{color in which to fill out the bid-offer spread.}
 
-\item{format}{format string to pass to \code{axis.POSIXct} when creating the timestamps on the x axis.}
+\item{format}{format string to pass to \code{axis.POSIXct} when creating the timestamps on the x axis.
+If you are plotting a very short time interval, use \code{"\%H:\%M:\%OS"} to get fractional seconds on the time axis.}
 
 \item{axisCol}{string to denote which color to use for the x axis}
 
