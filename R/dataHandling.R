@@ -2354,9 +2354,6 @@ tradesCleanupUsingQuotes <- function(tradeDataSource = NULL, quoteDataSource = N
   }
   
   if ((!is.null(tData)) & (!is.null(qData))) {
-    tData <- checkColumnNames(tData)
-    qData <- checkColumnNames(qData)
-    
     #1 cleaning procedure that needs cleaned trades and quotes
     tData <- rmTradeOutliersUsingQuotes(tData, qData, lagQuotes = lagQuotes, nSpreads = nSpreads, BFM = BFM, backwardsWindow = backwardsWindow, forwardsWindow = forwardsWindow, plot = plot, onlyTQ = TRUE)
     return(tData)
