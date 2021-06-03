@@ -218,7 +218,7 @@ checkColumnNames <- function(data) {
     colnames(data) <-  toupper(colnames(data)) # Make sure we have upper case column names
     # Change column names to previous RTAQ format! 
     # Adjust Ask col naming:    
-    try((colnames(data)[xtsAttributes(data)[['Ask']]] = 'OFR'))
+    try((colnames(data)[xtsAttributes(data)[['ASK']]] = 'OFR'))
     # Adjust SYMBOL col naming:    
     try((colnames(data)[xtsAttributes(data)[['SYM_ROOT']]] = 'SYMBOL'))
     # Adjust Ask size col naming:
@@ -299,7 +299,7 @@ checkqData <- function(qData) {
   if (!any(colnames(qData) == "BID")) {
     stop("The argument qData should have a column containing the BID. Could not find that column.")
   }
-  if (!any(colnames(qData) == "OFR")) {
+  if (!any(colnames(qData) %chin% c("OFR", "ASK"))) {
     stop("The argument qData should have a column containing the ASK / OFR. Could not find that column.")
   }
   if (!any(c("SYMBOL", "SYM_ROOT") %chin% colnames(qData))) {
