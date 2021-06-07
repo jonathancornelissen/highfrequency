@@ -3543,7 +3543,7 @@ listCholCovEstimators <- function(){
 #' @param makeCorrelation logical indicating whether to transform the autocovariances into autocorrelations. 
 #' The estimate of variance is imprecise and thus, constructing the correlation like this may show correlations that fall outside \eqn{(-1,1)}.
 #'
-#' @references Li, M. and Linton, O. (2019). A ReMeDI for microstructure noise. Cambridge Working Papers in Economics 1908.
+#' @references Li, M. and Linton, O. (2021). A ReMeDI for microstructure noise. Econometrica, forthcoming
 #' @keywords microstructure noise autocovariance autocorrelation
 #' @note We Thank Merrick Li for contributing his Matlab code for this estimator.
 #' @examples
