@@ -110,21 +110,21 @@ double kernelEstimator(NumericVector a, NumericVector b, int na, int q, int adj,
   return(ans);
 }
 
-// [[Rcpp::export]]
-double rv(NumericVector a, NumericVector b, int na, int period, NumericVector tmpa,  NumericVector tmpb, int tmpna) {
-  int j, k;
-  
-  double ans = 0;
-  
-  for (j = 0; j <= na-1; j++) {
-    tmpa[j / period] += a[j];
-    tmpb[j / period] += b[j];
-  }
-  for(k = 0; k < tmpna; k++) {
-    ans += tmpa[k] * tmpb[k];
-  }
-  return(ans);
-}
+// // [[Rcpp::export]]
+// double rv(NumericVector a, NumericVector b, int na, int period, NumericVector tmpa,  NumericVector tmpb, int tmpna) {
+//   int j, k;
+//   
+//   double ans = 0;
+//   
+//   for (j = 0; j <= na-1; j++) {
+//     tmpa[j / period] += a[j];
+//     tmpb[j / period] += b[j];
+//   }
+//   for(k = 0; k < tmpna; k++) {
+//     ans += tmpa[k] * tmpb[k];
+//   }
+//   return(ans);
+// }
 
 // [[Rcpp::export]]
 NumericVector pcovcc(NumericVector a, NumericVector ap, NumericVector b, NumericVector at, NumericVector atp, NumericVector bt, int na, int nap, int nb, int period) {

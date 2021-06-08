@@ -1638,7 +1638,7 @@ rmLargeSpread <- function(qData, maxi = 50, tz = NULL) {
   
   qData <- qData[, DATE := as.Date(DT, tz = tz)][
     , SPREAD := OFR - BID][
-    , SPREAD_MEDIAN := medianCase(SPREAD), by = "DATE"][SPREAD < (SPREAD_MEDIAN * maxi)]
+    , SPREAD_MEDIAN := median(SPREAD), by = "DATE"][SPREAD < (SPREAD_MEDIAN * maxi)]
   
   if (inputWasXts) {
     return(xts(as.matrix(qData[, -c("DT", "DATE", "SPREAD", "SPREAD_MEDIAN")]), order.by = qData$DT))

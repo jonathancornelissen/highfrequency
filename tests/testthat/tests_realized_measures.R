@@ -265,6 +265,12 @@ test_that("rRTSCov", {
     formatC(sum(rRTSCov(pData = list(dat["1970-01-01",1], dat["1970-01-01",2])), digits = 5)),
     "6.597"
   )
+  
+  foo <- spreadPrices(sampleMultiTradeData)[is.na(BBB), !"BBB"]
+  
+  expect_equal(sum(rRTSCov(pData = list(as.xts(foo[!is.na(ETF), list(DT,ETF)]), as.xts(foo[!is.na(AAA), list(DT,AAA)])), eta = 3)),
+               0.0008762014)
+  
 })
 
 ##### rKernelCov ##### 

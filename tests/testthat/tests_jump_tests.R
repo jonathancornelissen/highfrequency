@@ -32,6 +32,15 @@ test_that("BNSjumpTest", {
     as.numeric(BNSjumpTest(as.xts(sampleTData[, list(DT, PRICE)]), IVestimator= "rMinRVar", IQestimator = "rMedRQuar", type= "linear", makeReturns = TRUE)[, "p.value"]),
     c(1.322998188e-01, 2.816329921e-05)
   )
+  expect_equal(
+    as.numeric(BNSjumpTest(as.xts(sampleTData[, list(DT, PRICE)]), IVestimator= "rOWCov", IQestimator = "rMedRQuar", makeReturns = TRUE, type ="linear")[, "p.value"]),
+    c(0,0) # Test statistic of 50+ - very zero
+  )
+  expect_equal(
+    sum(as.numeric(BNSjumpTest(as.xts(sampleTData[, list(DT, PRICE)]), IVestimator= "CTBV", IQestimator = "CTTPV", makeReturns = TRUE, type ="ratio")[, "p.value"])),
+    0
+  )
+  
 })
 
 context("intradayJumpTest")

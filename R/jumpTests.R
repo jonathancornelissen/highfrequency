@@ -201,7 +201,7 @@ AJjumpTest <- function(pData, p = 4 , k = 2, alignBy = NULL, alignPeriod = NULL,
 #' 
 #' @param rData either an \code{xts} or a \code{data.table} containing the log-returns or prices of a single asset, possibly over multiple days-
 #' @param IVestimator can be chosen among jump robust integrated variance estimators: 
-#' \code{\link{rBPCov}}, \code{\link{rMinRVar}}, \code{\link{rMedRVar}} and corrected threshold bipower variation (\code{\link{rThresholdCov}}). 
+#' \code{\link{rBPCov}}, \code{\link{rMinRVar}}, \code{\link{rMedRVar}}, \code{\link{rOWCov}} and corrected threshold bipower variation (\code{\link{rThresholdCov}}). 
 #' If \code{\link{rThresholdCov}} is chosen, an argument of \code{startV}, start point of auxiliary estimators in threshold estimation can be included. \code{\link{rBPCov}} by default.
 #' @param IQestimator can be chosen among jump robust integrated quarticity estimators: \code{\link{rTPQuar}}, \code{\link{rQPVar}}, \code{\link{rMinRQuar}} and \code{\link{rMedRQuar}}. 
 #' \code{\link{rTPQuar}} by default.

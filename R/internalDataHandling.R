@@ -485,10 +485,7 @@ internalAggregateTSXTS <- function(ts, FUN = "previoustick", alignBy = "minutes"
     if(alignPeriod < 1 | alignPeriod%%1 != 0){
       stop("When alignBy is `ticks`, must be a positive integer valued numeric")
     }
-    idx <- seq(1, nrow(ts), by = alignPeriod)
-    if(alignPeriod %% nrow(ts) != 0){
-      idx <- c(idx, nrow(ts))
-    }
+    idx <- seqInclEnds(1, NROW(ts), alignPeriod)
     ts <- ts[idx,]
     return(ts)
   }

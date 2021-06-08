@@ -13,7 +13,7 @@ hatIV <- function(rData, IVestimator, startV = NULL) {
          rBPVar = rBPCov(rData),
          rMinRVar = rMinRVar(rData),
          rMedRVar = rMedRVar(rData),
-         ROWvar = rOWCov(rData),
+         rOWCov = rOWCov(rData),
          CTBV = ctBV(rData, startV = startV))
   return(as.numeric(IV))
 }
@@ -29,6 +29,7 @@ hatIQ <- function (rData, IQestimator) {
          rMinRQuar = rMinRQuar(rData),
          rMedRQuar = rMedRQuar(rData),
          CTTPV = ctTPV(rData))
+  
   return(as.numeric(IQ))
 }
 
@@ -158,6 +159,6 @@ tt <- function(IVestimator, ...) {
          rMinRVar = 3.81,
          rMedRVar = 2.96,
          CTBV = pi^2/4+pi-3,
-         ROWVar = thetaROWVar(...))
+         rOWCov = thetaROWVar(...))
 }
 

@@ -399,7 +399,7 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
     Cmatrix <- Cmatrix[(maxp:(n-h)), ]
     Jmatrix <- Jmatrix[(maxp:(n-h)), ]
     if (!is.null(transform) && transform=="log") {
-      Jmatrix <- Jmatrix + 1
+      Jmatrix <- Jmatrix + 1 # Will be transformed later
     }
 
     x <- cbind(Cmatrix, Jmatrix)              # bind jumps to RV data

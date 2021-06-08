@@ -207,6 +207,29 @@ test_that("aggregateTS edge cases", {
 })
 
 
+
+test_that("aggregateTS tick returns behave correctly",{
+  
+  ## Test using every second tick as well as two prime numbers since it's cheap and the primes should give the best coverage.
+  DT <- aggregateTS(sampleTData[, list(DT, PRICE)], alignBy = "ticks", alignPeriod = 2)
+  XTS <- aggregateTS(as.xts(sampleTData[, list(DT, PRICE)]), alignBy = "ticks", alignPeriod = 2)
+  expect_equal(as.numeric(DT$PRICE), as.numeric(XTS))
+  expect_true(all.equal(NROW(DT), NROW(XTS)))
+  
+  DT <- aggregateTS(sampleTData[, list(DT, PRICE)], alignBy = "ticks", alignPeriod = 3)
+  XTS <- aggregateTS(as.xts(sampleTData[, list(DT, PRICE)]), alignBy = "ticks", alignPeriod = 3)
+  expect_equal(as.numeric(DT$PRICE), as.numeric(XTS))
+  expect_true(all.equal(NROW(DT), NROW(XTS)))
+
+  DT <- aggregateTS(sampleTData[, list(DT, PRICE)], alignBy = "ticks", alignPeriod = 11)
+  XTS <- aggregateTS(as.xts(sampleTData[, list(DT, PRICE)]), alignBy = "ticks", alignPeriod = 11)
+  expect_equal(as.numeric(DT$PRICE), as.numeric(XTS))
+  expect_true(all.equal(NROW(DT), NROW(XTS)))
+  
+  
+})
+
+
 context("aggregatePrice time zones")
 test_that("aggregatePrice time zones", {
   dat <- data.table(DT = as.POSIXct(c(34150, 34201, 34201, 34500, 34500 + 1e-6, 34799, 34799, 34801, 34803, 35099), origin = "1970-01-01", tz = "EST"), PRICE = 0:9)

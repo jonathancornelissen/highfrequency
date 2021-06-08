@@ -85,7 +85,14 @@ price1 <- dat[,1]
 price2 <- dat[,2]
 ll <- leadLag(price1, price2, seq(-10,10), normalize = FALSE)
 plot(ll)
+ 
 }
+
+# Spread prices
+spread <- spreadPrices(sampleMultiTradeData[SYMBOL \%in\% c("ETF", "AAA")])
+llEmpirical <- leadLag(spread[!is.na(AAA), list(DT, PRICE = AAA)], 
+                       spread[!is.na(ETF), list(DT, PRICE = ETF)], seq(-15,15))
+plot(llEmpirical)
 
 }
 \references{
