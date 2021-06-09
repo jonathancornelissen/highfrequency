@@ -76,6 +76,20 @@ test_that("FoF test",{
   
 })
 
+
+test_that("multiple intradayJumpTest", {
+  jumpTest <- intradayJumpTest(pData = sampleOneMinuteData[, list(DT, PRICE = MARKET)], volEstimator = "RM", driftEstimator = "none", alpha = 0.95, RM = "bipower", 
+                               lookBackPeriod = 10, dontIncludeLast = TRUE, on = "minutes", k = 5,
+                               marketOpen = "9:30:00", marketClose = "16:00:00", tz = "GMT")
+  
+  p1 <- plot(jumpTest)
+  expect_equal(p1$get_xlim(), c(999509400, 999532800))
+  
+  expect_true(jumpTest$isMultiDay)
+  
+})
+
+
 test_that("rank jump test", {
   expect_error(rankJumpTest(marketPrice = as.xts(sampleOneMinuteData)[,1], stockPrices = list(as.xts(sampleOneMinuteData)[,2])), "Singular value decomposition cannot be calculated")
   rjt <- rankJumpTest(marketPrice = as.xts(sampleOneMinuteData)[,1], stockPrices = list(as.xts(sampleOneMinuteData)[,2], as.xts(sampleOneMinuteData)[,2] * 1.05))
