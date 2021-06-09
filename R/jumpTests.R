@@ -826,7 +826,7 @@ plot.intradayJumpTest <- function(x, ...){
       # 
       
       
-      shade <- abs( x$ztest[dates[d]] ) > x$criticalValue[d]
+      shade <- abs( x$ztest[dates[d]] ) > x$criticalValue
       shade <- cbind(upper = shade * as.numeric(max(thisDat, na.rm = TRUE) +1e5), 
                      lower = shade * as.numeric(min(thisDat, na.rm = TRUE)) -1e5)
       colnames(shade) <- c("upper", "lower")
