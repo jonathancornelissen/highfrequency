@@ -72,9 +72,6 @@ test_that("HARModel",{
   x <- HARmodel(dat, periods = c(1,3), RVest = c("rCov"), type="HAR", inputType = "returns", leverage = c(1,3))
   expect_equal(sum(coef(x)), 0.5175878)
   
-  
-  
-  
 })
 
 context("HEAVYmodel")
