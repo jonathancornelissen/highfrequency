@@ -747,4 +747,17 @@ test_that("rBACov returns correct values", {
                                  c("STOCK 1", "STOCK 2", "STOCK 3", "STOCK 4"))),
   varianceAdjustedBAC)
   
+  
+  bachy <- rBACov(lDT, shares = 1:4, outstanding = 1, nonEquity = 0, ETFNAME = "ETF", unrestricted = FALSE, targetBeta = "VAB",
+         preEstimator = "rHYCov", noiseCorrection = FALSE, returnL = FALSE, K = 2, J = 1)
+  
+  expect_equal(
+   matrix(c(0.09858928144971504, -0.0020233069260868, -0.00828194003776822, -0.0136038269799748, -0.00202330692608680, 0.0504707888931908, -0.00817577069472840,
+     -0.0189714896369624, -0.00828194003776822, -0.0081757706947284, 0.05059675814898044, -0.0530529319960292, -0.01360382697997483, -0.0189714896369624,
+     -0.05305293199602916, 0.0809140841505641), ncol = 4, dimnames = list(c("STOCK 1", "STOCK 2", "STOCK 3", "STOCK 4"), 
+                                                                          c("STOCK 1", "STOCK 2", "STOCK 3", "STOCK 4"))),
+   bachy
+  )
+  
+  
 })

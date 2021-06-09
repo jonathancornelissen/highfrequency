@@ -1053,12 +1053,14 @@ rankJumpTest <- function(marketPrice, stockPrices, alpha = c(5,3), coarseFreq = 
   }
   
   jumps <- t(jumps) # Transpose here so we don't have to transpose every time in the loop.
-  
-  if(dim(jumps) == c(1,1)){
+  if(all(dim(jumps) == c(1,1))){
     stop("Singular value decomposition cannot be calculated")
   }
   # Set nu and nv because we need full SVD (see https://stackoverflow.com/questions/41972419/different-svd-result-in-rank-and-matlab)
   decomp <- svd(jumps, nu = nrow(jumps), nv = ncol(jumps))
+  if(all(dim(decomp$u) == c(1,1))){
+    stop("Singular value decomposition cannot be calculated")
+  }
   U2 <- decomp$u[, (rank+1):ncol(decomp$u)]
   V2 <- decomp$v[, (rank+1):ncol(decomp$v)]
   
