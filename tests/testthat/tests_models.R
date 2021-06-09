@@ -71,6 +71,10 @@ test_that("HARModel",{
   x <- HARmodel(dat, periods = c(1,3), RVest = c("rCov"), type="HAR", inputType = "returns", leverage = c(1,3))
   expect_equal(sum(coef(x)), 0.5175878)
   
+  
+  expect_output(print(x), NULL)
+  
+  
 })
 
 context("HEAVYmodel")
@@ -100,4 +104,8 @@ test_that("HEAVYmodel",{
   uncondVar <- as.numeric((coeffs[1] + coeffs[2] * uncondRM) / (1 - coeffs[3]))
   expect_equal(as.numeric(round(predict(output, stepsAhead = 400)[400,], 4)),
                round(c(uncondVar, uncondRM), 4))
+  
+  
+  expect_output(print(output), NULL)
+  
 })
