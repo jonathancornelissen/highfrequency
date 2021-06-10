@@ -1317,7 +1317,7 @@ rCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeRet
     for (i in 1:length(dates)) {
       res[[dates[i]]] <- rCov(dat[starts[i]:ends[i], ], cor = cor, makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
     }
-
+  
     if(length(res[[1]]) == 1){ ## Univariate case
       res <- data.table(DT = names(res), RV = as.numeric(res))
     } else if(length(res) == 1){ ## Single day multivariate case

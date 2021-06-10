@@ -189,6 +189,15 @@ test_that("rCov", {
                rCov(datDT, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE))
   
   expect_equal(rCov(sampleOneMinuteData, makeReturns = TRUE), rCov(as.xts(sampleOneMinuteData), makeReturns = TRUE))
+  
+  expect_equal(lapply(rCov(returnDat, alignBy = "ticks", alignPeriod = 5, makeReturns = FALSE), sum), 
+               list("1970-01-01" = 2.96428172300159, "1970-01-02" = 2.97075659500349, "1970-01-03" = 3.01890683034766))
+  
+  expect_equal(rCov(returnDat, alignBy = "ticks", alignPeriod = 5, makeReturns = FALSE),
+               rCov(returnDatDT, alignBy = "ticks", alignPeriod = 5, makeReturns = FALSE))
+  
+  
+  
 })
 
 ##### rHYCov ##### 

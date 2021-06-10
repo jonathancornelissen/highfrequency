@@ -105,43 +105,45 @@ fastTickAgregation_DATA.TABLE <- function(dat, alignBy = "minutes", alignPeriod 
 #' @importFrom stats start end
 #' @keywords internal
 fastTickAgregation_RETURNS <- function (ts, alignBy = "minutes", alignPeriod = 1, tz = "GMT") {
-  
-  if (alignBy == "secs" | alignBy == "seconds") {
-    secs <- alignPeriod
-    tby <- paste(alignPeriod, "sec", sep = " ")
-  } 
-  if (alignBy == "mins" | alignBy == "minutes") {
-    secs <- 60 * alignPeriod
-    tby <- paste(60 * alignPeriod, "sec", sep = " ")
-  } 
-  if (alignBy == "hours"){
-    secs <- 3600 * alignPeriod
-    tby <- paste(3600 * alignPeriod, "sec", sep = " ")
-  }
-  if(alignBy != "ticks"){
-    g <- base::seq(start(ts), end(ts), by = tby)
-    rawg <- as.numeric(as.POSIXct(g, tz = tz))
-    newg <- rawg + (secs - rawg %% secs)
-  } else {
-    newg <- index(ts)[seqInclEnds(1, length(ts), alignPeriod)]
-  }
-  
-  if(as.numeric(end(ts)) == newg[length(newg)-1]){
-    newg  <- newg[-length(newg)]
-  }
-  
-  
-  firstObs <- ts[1,]
-  firstObs[] <- 0 ## We should have 0 return! We use [] to not just overwrite it as a numeric with 0
-  ts <- period.apply(ts, INDEX = merge.data.table(data.table(DT = index(ts), 1:nrow(ts)), data.table(DT = newg), by = "DT")$V2, 
-                     FUN = colSums, na.rm = TRUE)
-  ts <- na.locf(ts)
-  if(index(ts[1]) > index(firstObs)){
-    index(firstObs) <- index(ts[1]) - secs
-    ts <- c(firstObs, ts)
-  }
-  
-  return(ts)
+  agged <- fastTickAgregation_DATA.TABLE_RETURNS(as.data.table(ts)[, DT := index][, !"index"], alignBy = alignBy, alignPeriod = alignPeriod, tz = tz)
+  return(as.xts(agged))
+  # 
+  # 
+  # if (alignBy == "secs" | alignBy == "seconds") {
+  #   secs <- alignPeriod
+  #   tby <- paste(alignPeriod, "sec", sep = " ")
+  # } 
+  # if (alignBy == "mins" | alignBy == "minutes") {
+  #   secs <- 60 * alignPeriod
+  #   tby <- paste(60 * alignPeriod, "sec", sep = " ")
+  # } 
+  # if (alignBy == "hours"){
+  #   secs <- 3600 * alignPeriod
+  #   tby <- paste(3600 * alignPeriod, "sec", sep = " ")
+  # }
+  # if(alignBy != "ticks"){
+  #   g <- base::seq(start(ts), end(ts), by = tby)
+  #   rawg <- as.numeric(as.POSIXct(g, tz = tz))
+  #   newg <- rawg + (secs - rawg %% secs)
+  # } else {
+  #   newg <- index(ts)[seqInclEnds(1, NROW(ts), alignPeriod)]
+  # }
+  # if(as.numeric(end(ts)) == newg[length(newg)-1]){
+  #   newg  <- newg[-length(newg)]
+  # }
+  # 
+  # 
+  # firstObs <- ts[1,]
+  # firstObs[] <- 0 ## We should have 0 return! We use [] to not just overwrite it as a numeric with 0
+  # ts <- period.apply(ts, INDEX = merge.data.table(data.table(DT = index(ts), 1:nrow(ts)), data.table(DT = newg), by = "DT")$V2, 
+  #                    FUN = colSums, na.rm = TRUE)
+  # ts <- na.locf(ts)
+  # if(index(ts[1]) > index(firstObs)){
+  #   index(firstObs) <- index(ts[1]) - secs
+  #   ts <- c(firstObs, ts)
+  # }
+  # 
+  # return(ts)
 }
 
 
@@ -177,7 +179,12 @@ fastTickAgregation_DATA.TABLE_RETURNS <- function(dat, alignBy = "minutes", alig
       stop("When alignBy is `ticks`, must be a positive integer valued numeric")
     }
     dat[, ....GRP.... := tickGrouping_RETURNS(.N, alignPeriod), by = list(DATE = as.Date(DT))]
-    dat <- dat[, lapply(.SD, sum), by = list(DATE = as.Date(DT), ....GRP....), .SDcols = 1:ncol(dat)][, !c("DATE", "....GRP....")]
+    
+    expr <- setdiff(colnames(dat), c("DT","DATE", "....GRP...."))
+    expr <- paste0(sprintf("%s = sum(%s)", expr, expr), collapse = ", ")
+    expr <- sprintf("dat[, list(DT = DT[.N], %s), by = list(DATE = DATE, ....GRP....)]", expr)
+    dat <- eval(parse(text = expr))[, !c("DATE", "....GRP....")]
+    
     return(dat[])
   }
   
