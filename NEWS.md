@@ -12,7 +12,7 @@ Changes in version 0.9.0
  
  - Add ICov and IVar documentation pages that work as lists of implemented estimators of the integrated covariance and the integrated variance, respectively.
  
- - More or less complete of HEAVY model and related functions
+ - More or less complete rework of HEAVY model and related functions
  
  - Fix bug in HARCJ model, thanks to @SKMASON (Zhixi Shao) for reporting the bug and providing pointers for the fix.
  
