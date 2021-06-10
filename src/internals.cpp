@@ -220,11 +220,11 @@ arma::mat rollApplyProdWrapper(const arma::mat& x, int m){
 
 //[[Rcpp::export]]
 arma::vec tickGrouping_RETURNS(const int end, const int size){
-  arma::vec out(end);
-  int grp = 0;
+  arma::vec out = arma::zeros<vec>(end);
+  int grp = 1;
   int cnt = 0;
   
-  for (int i = 0; i < end; i ++){
+  for (int i = size; i < end; i ++){
     out(i) = grp;
     cnt += 1;
     if(cnt == size){
