@@ -1,6 +1,6 @@
 Package: highfrequency
 Version: 0.9.0
-Date: 2021-06-10
+Date: 2021-06-11
 Title: Tools for Highfrequency Data Analysis
 Authors@R: 
     c(person(given = "Kris",
