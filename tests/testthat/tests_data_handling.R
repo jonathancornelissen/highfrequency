@@ -364,13 +364,13 @@ test_that("refreshTime", {
   
   # Unit test for the refreshTime algorithm based on Kris' example in http://past.rinfinance.com/agenda/2015/workshop/KrisBoudt.pdf
   #suppose irregular timepoints: 
-  start = as.POSIXct("2010-01-01 09:30:00", tz = "GMT") 
-  ta = start + c(1, 2, 4, 5, 9, 14)
-  tb = start + c(1, 3, 6, 7, 8, 9, 10, 11, 15)
-  tc = start + c(1, 2, 3, 5, 7, 8, 10, 13)
-  a = as.xts(1:length(ta), order.by = ta)
-  b = as.xts(1:length(tb), order.by = tb)
-  c = as.xts(1:length(tc), order.by = tc)
+  start <- as.POSIXct("2010-01-01 09:30:00", tz = "GMT") 
+  ta <- start + c(1, 2, 4, 5, 9, 14)
+  tb <- start + c(1, 3, 6, 7, 8, 9, 10, 11, 15)
+  tc <- start + c(1, 2, 3, 5, 7, 8, 10, 13)
+  a <- as.xts(1:length(ta), order.by = ta)
+  b <- as.xts(1:length(tb), order.by = tb)
+  c <- as.xts(1:length(tc), order.by = tc)
   #Calculate the synchronized timeseries: 
   expected <- xts(matrix(c(1,1,1, 2,2,3, 4,3,4, 5,6,6, 6,8,8), ncol = 3, byrow = TRUE), order.by = start + c(1,3,6,9,14))
   colnames(expected) <- c("a", "b", "c")
