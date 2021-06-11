@@ -12,6 +12,8 @@ Changes in version 0.9.0
  
  - Add ICov and IVar documentation pages that work as lists of implemented estimators of the integrated covariance and the integrated variance, respectively.
  
+ - Deprecated loads of realized measure estimators and added new versions, so we have a higher degree of uniformity in function names.
+ 
  - More or less complete rework of HEAVY model and related functions
  
  - Fix bug in HARCJ model, thanks to @SKMASON (Zhixi Shao) for reporting the bug and providing pointers for the fix.
