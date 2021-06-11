@@ -105,6 +105,7 @@ fastTickAgregation_DATA.TABLE <- function(dat, alignBy = "minutes", alignPeriod 
 #' @importFrom stats start end
 #' @keywords internal
 fastTickAgregation_RETURNS <- function (ts, alignBy = "minutes", alignPeriod = 1, tz = "GMT") {
+  DT <- NULL
   agged <- fastTickAgregation_DATA.TABLE_RETURNS(as.data.table(ts)[, DT := index][, !"index"], alignBy = alignBy, alignPeriod = alignPeriod, tz = tz)
   return(as.xts(agged))
   # 
