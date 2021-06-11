@@ -22,9 +22,8 @@ spotDrift(
 rolling mean and median as well as the kernel method of Christensen et al. (2018).
 The kernel is a left hand exponential kernel that will weigh newer observations more heavily than older observations.}
 
-\item{alignBy}{What time-frame should the estimator be applied? Accepted inputs are \code{"milliseconds"}, \code{"seconds"} and \code{"secs"} for seconds,
- \code{"minutes"} and \code{"mins"} for minutes, and \code{"hours"} for hours.
-Standard is minutes}
+\item{alignBy}{character, indicating the time scale in which \code{alignPeriod} is expressed. 
+Possible values are: \code{"ticks"}, \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}}
 
 \item{alignPeriod}{How often should the estimation take place? If \code{alignPeriod} is 5 the estimation will be done every fifth unit of \code{alignBy}.}
 

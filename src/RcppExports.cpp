@@ -54,17 +54,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// medianCase
-double medianCase(Rcpp::NumericVector x);
-RcppExport SEXP _highfrequency_medianCase(SEXP xSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< Rcpp::NumericVector >::type x(xSEXP);
-    rcpp_result_gen = Rcpp::wrap(medianCase(x));
-    return rcpp_result_gen;
-END_RCPP
-}
 // AsymptoticVarianceC
 double AsymptoticVarianceC(const arma::colvec& vIn, int iLag);
 RcppExport SEXP _highfrequency_AsymptoticVarianceC(SEXP vInSEXP, SEXP iLagSEXP) {
@@ -258,6 +247,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// tickGrouping_RETURNS
+arma::vec tickGrouping_RETURNS(const int end, const int size);
+RcppExport SEXP _highfrequency_tickGrouping_RETURNS(SEXP endSEXP, SEXP sizeSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const int >::type end(endSEXP);
+    Rcpp::traits::input_parameter< const int >::type size(sizeSEXP);
+    rcpp_result_gen = Rcpp::wrap(tickGrouping_RETURNS(end, size));
+    return rcpp_result_gen;
+END_RCPP
+}
 // leadLagCpp
 arma::vec leadLagCpp(const arma::vec& x, const arma::vec& timestampsX, const arma::vec& y, const arma::vec& timestampsY, const arma::vec lags, const bool normalize);
 RcppExport SEXP _highfrequency_leadLagCpp(SEXP xSEXP, SEXP timestampsXSEXP, SEXP ySEXP, SEXP timestampsYSEXP, SEXP lagsSEXP, SEXP normalizeSEXP) {
@@ -336,23 +337,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// rv
-double rv(NumericVector a, NumericVector b, int na, int period, NumericVector tmpa, NumericVector tmpb, int tmpna);
-RcppExport SEXP _highfrequency_rv(SEXP aSEXP, SEXP bSEXP, SEXP naSEXP, SEXP periodSEXP, SEXP tmpaSEXP, SEXP tmpbSEXP, SEXP tmpnaSEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type a(aSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type b(bSEXP);
-    Rcpp::traits::input_parameter< int >::type na(naSEXP);
-    Rcpp::traits::input_parameter< int >::type period(periodSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type tmpa(tmpaSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type tmpb(tmpbSEXP);
-    Rcpp::traits::input_parameter< int >::type tmpna(tmpnaSEXP);
-    rcpp_result_gen = Rcpp::wrap(rv(a, b, na, period, tmpa, tmpb, tmpna));
-    return rcpp_result_gen;
-END_RCPP
-}
 // pcovcc
 NumericVector pcovcc(NumericVector a, NumericVector ap, NumericVector b, NumericVector at, NumericVector atp, NumericVector bt, int na, int nap, int nb, int period);
 RcppExport SEXP _highfrequency_pcovcc(SEXP aSEXP, SEXP apSEXP, SEXP bSEXP, SEXP atSEXP, SEXP atpSEXP, SEXP btSEXP, SEXP naSEXP, SEXP napSEXP, SEXP nbSEXP, SEXP periodSEXP) {
@@ -420,7 +404,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_highfrequency_calcRecVarEq", (DL_FUNC) &_highfrequency_calcRecVarEq, 2},
     {"_highfrequency_quadraticKernel", (DL_FUNC) &_highfrequency_quadraticKernel, 1},
     {"_highfrequency_tradeIntensityProcessCpp", (DL_FUNC) &_highfrequency_tradeIntensityProcessCpp, 2},
-    {"_highfrequency_medianCase", (DL_FUNC) &_highfrequency_medianCase, 1},
     {"_highfrequency_AsymptoticVarianceC", (DL_FUNC) &_highfrequency_AsymptoticVarianceC, 2},
     {"_highfrequency_AutomaticLagSelectionC", (DL_FUNC) &_highfrequency_AutomaticLagSelectionC, 2},
     {"_highfrequency_DriftBurstLoopC", (DL_FUNC) &_highfrequency_DriftBurstLoopC, 8},
@@ -436,12 +419,12 @@ static const R_CallMethodDef CallEntries[] = {
     {"_highfrequency_rollApplyMinWrapper", (DL_FUNC) &_highfrequency_rollApplyMinWrapper, 1},
     {"_highfrequency_rollApplyMedianWrapper", (DL_FUNC) &_highfrequency_rollApplyMedianWrapper, 1},
     {"_highfrequency_rollApplyProdWrapper", (DL_FUNC) &_highfrequency_rollApplyProdWrapper, 2},
+    {"_highfrequency_tickGrouping_RETURNS", (DL_FUNC) &_highfrequency_tickGrouping_RETURNS, 2},
     {"_highfrequency_leadLagCpp", (DL_FUNC) &_highfrequency_leadLagCpp, 6},
     {"_highfrequency_leadLagCppPAR", (DL_FUNC) &_highfrequency_leadLagCppPAR, 7},
     {"_highfrequency_nsmaller", (DL_FUNC) &_highfrequency_nsmaller, 5},
     {"_highfrequency_KK", (DL_FUNC) &_highfrequency_KK, 2},
     {"_highfrequency_kernelEstimator", (DL_FUNC) &_highfrequency_kernelEstimator, 8},
-    {"_highfrequency_rv", (DL_FUNC) &_highfrequency_rv, 7},
     {"_highfrequency_pcovcc", (DL_FUNC) &_highfrequency_pcovcc, 10},
     {"_highfrequency_bacImpliedBetaHYCpp", (DL_FUNC) &_highfrequency_bacImpliedBetaHYCpp, 3},
     {"_highfrequency_bacImpliedBetaCpp", (DL_FUNC) &_highfrequency_bacImpliedBetaCpp, 3},

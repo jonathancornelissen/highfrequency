@@ -93,6 +93,8 @@ which is estimated by ordinary least squares under the assumption that at time \
 the conditional mean of  \eqn{\varepsilon_{t+1}} is equal to zero.
 
 For other specifications, please refer to the cited papers.
+
+The standard errors reporting in the \code{print} and \code{summary} methods are Newey-West standard errors calculated with the \pkg{sandwich} package.
 }
 \examples{
 # Example 1: HAR

@@ -2,6 +2,8 @@ Changes in version 0.9.0
 
  - Fix typo where in spotVol, the stochastic periodicity was erroneously written as stochper instead of stochPer.
  
+ - Better consistency with the choices in spot* functions
+ 
  - Add warning instead of print in detPer in spotVol. The periodic component is no longer set to 1 either, just warned that results may be weird.
  
  - Implement Beta-Adjusted realized covariance estimation in the rBACov function
@@ -10,9 +12,15 @@ Changes in version 0.9.0
  
  - Add ICov and IVar documentation pages that work as lists of implemented estimators of the integrated covariance and the integrated variance, respectively.
  
+ - Deprecated loads of realized measure estimators and added new versions, so we have a higher degree of uniformity in function names.
+ 
+ - More or less complete rework of HEAVY model and related functions
+ 
  - Fix bug in HARCJ model, thanks to @SKMASON (Zhixi Shao) for reporting the bug and providing pointers for the fix.
  
  - Better formatting of NEWS.md
+ 
+ - aggregateTS now accept both data.table and xts objects
  
 
 Changes in version 0.8.0

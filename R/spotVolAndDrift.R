@@ -5,9 +5,8 @@
 #' @param method Which method to be used to estimate the spot-drift. Currently, three methods are available, 
 #' rolling mean and median as well as the kernel method of Christensen et al. (2018).
 #' The kernel is a left hand exponential kernel that will weigh newer observations more heavily than older observations.
-#' @param alignBy What time-frame should the estimator be applied? Accepted inputs are \code{"milliseconds"}, \code{"seconds"} and \code{"secs"} for seconds,
-#'  \code{"minutes"} and \code{"mins"} for minutes, and \code{"hours"} for hours.
-#' Standard is minutes
+#' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. 
+#' Possible values are: \code{"ticks"}, \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
 #' @param alignPeriod How often should the estimation take place? If \code{alignPeriod} is 5 the estimation will be done every fifth unit of \code{alignBy}.
 #' @param marketOpen Opening time of the market, standard is "09:30:00".
 #' @param marketClose Closing time of the market, standard is "16:00:00".
@@ -184,10 +183,10 @@ spotDrift <- function(data, method = "mean", alignBy = "minutes", alignPeriod = 
 #' parameters \code{alignBy} and \code{alignPeriod}.
 #'
 #' @param method specifies which method will be used to estimate the spot
-#' volatility. Options include \code{"detPer"} and \code{"stochper"}.
-#' See `Details'.
-#' @param alignBy string indicating the time scale in which \code{alignPeriod} is expressed.
-#' Possible values are: \code{"secs", "seconds", "mins", "minutes", "hours"}.
+#' volatility. Valid options are \code{"detPer"}, \code{"stochPer"} \code{"kernel"} \code{"piecewise"} \code{"garch"}, \code{"RM"} ,\code{"PARM"}
+#' See `Details' below for explanation and parameters to use in each of the methods.
+#' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. 
+#' Possible values are: \code{"ticks"}, \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
 #' @param alignPeriod positive integer, indicating the number of periods to aggregate
 #' over. For example, to aggregate an \code{xts} object to the 5-minute frequency, set
 #' \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
@@ -265,7 +264,7 @@ spotDrift <- function(data, method = "mean", alignBy = "minutes", alignPeriod = 
 #' Parameters:
 #' \itemize{
 #' \item \code{dailyVol} A string specifying the estimation method for the daily component \eqn{s_t}.
-#' Possible values are \code{"bipower", "rv", "medrv"}. \code{"bipower"} by default.
+#' Possible values are \code{"rBPCov", "rRVar", "rMedRVar"}. \code{"rBPCov"} by default.
 #' \item \code{periodicVol} A string specifying the estimation method for the component of intraday volatility,
 #' that depends in a deterministic way on the intraday time at which the return is observed.
 #' Possible values are \code{"SD", "WSD", "TML", "OLS"}. See Boudt et al. (2011) for details. Default = \code{"TML"}.
@@ -474,8 +473,8 @@ spotDrift <- function(data, method = "mean", alignBy = "minutes", alignPeriod = 
 #' observations), so it is advised to use a small value for \code{alpha}, to
 #' avoid a lot of false positives. Default = \code{0.005}.}
 #' \item{\code{volEst} string specifying the realized volatility estimator to be
-#' used in local windows. Possible values are \code{"bipower", "rv", "medrv"}.
-#' Default = \code{"bipower"}.}
+#' used in local windows. Possible values are \code{"rBPCov", "rRVar", "rMedRVar"}.
+#' Default = \code{"rBPCov"}.}
 #' \item{\code{online} boolean indicating whether estimations at a certain point
 #' \eqn{t} should be done online (using only information available at
 #' \eqn{t-1}), or ex post (using all observations between two change points).
@@ -551,8 +550,8 @@ spotDrift <- function(data, method = "mean", alignBy = "minutes", alignPeriod = 
 #' Parameters:
 #' \itemize{
 #' \item{\code{RM} string denoting which realized measure to use to estimate the local volatility. 
-#' Possible values are: \code{"bipower", "medrv", "minrv", "rv"}.
-#' Default = \code{"bipower"}}.
+#' Possible values are: \code{"rBPCov", "rMedRVar", "rMinRVar", "rCov", "rRVar"}.
+#' Default = \code{"rBPCov"}}.
 #' \item{\code{lookBackPeriod} positive integer denoting the amount of sub-sampled returns to use 
 #' for the estimation of the local volatility. Default is \code{10}.}
 #' \item{\code{dontIncludeLast} logical indicating whether to omit the last return in the calculation of the local volatility.
@@ -578,7 +577,7 @@ spotDrift <- function(data, method = "mean", alignBy = "minutes", alignPeriod = 
 #' Parameters:
 #' \itemize{
 #' \item{\code{RM} String denoting which realized measure to use to estimate the local volatility.
-#'  Possible values are: \code{"bipower", "medrv", "minrv", and "rv"}. Default = \code{"bipower"}}.
+#'  Possible values are: \code{"rBPCov", "rMedRVar", "rMinRVar", "rCov", and "rRVar"}. Default = \code{"rBPCov"}}.
 #' \item{\code{lookBackPeriod} positive integer denoting the amount of sub-sampled returns to use for the estimation of the local volatility. Default = 50.}
 #' }
 #' 

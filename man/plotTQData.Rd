@@ -11,6 +11,7 @@ plotTQData(
   tradeCol = "black",
   quoteCol = "darkgray",
   format = "\%H:\%M:\%S",
+  axisCol = "black",
   ...
 )
 }
@@ -25,7 +26,10 @@ plotTQData(
 
 \item{quoteCol}{color in which to fill out the bid-offer spread.}
 
-\item{format}{format string to pass to \code{axis.POSIXct} when creating the timestamps on the x axis.}
+\item{format}{format string to pass to \code{axis.POSIXct} when creating the timestamps on the x axis.
+If you are plotting a very short time interval, use \code{"\%H:\%M:\%OS"} to get fractional seconds on the time axis.}
+
+\item{axisCol}{string to denote which color to use for the x axis}
 
 \item{...}{passed to \code{plot} and \code{points}.}
 }
@@ -33,6 +37,7 @@ plotTQData(
 Plot trade and quote data, trades are marked by crosses, and quotes are plotted as boxes denoting the bid-offer spread for all the quotes.
 }
 \examples{
+\dontrun{
 cleanedQuotes = quotesCleanup(qDataRaw = sampleQDataRaw, report = FALSE, printExchange = FALSE)
 cleanedTrades <- tradesCleanupUsingQuotes(
         tData = tradesCleanup(tDataRaw = sampleTDataRaw, report = FALSE, printExchange = FALSE),
@@ -41,4 +46,5 @@ cleanedTrades <- tradesCleanupUsingQuotes(
 xLim <- range(as.POSIXct(c("2018-01-03 15:30:00", "2018-01-03 16:00:00"), tz = "EST"))
 plotTQData(cleanedTrades, cleanedQuotes, xLim = xLim, 
            main = "Raw trade and quote data from NYSE TAQ")
+}
 }

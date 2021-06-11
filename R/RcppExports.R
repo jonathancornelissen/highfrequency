@@ -17,10 +17,6 @@ tradeIntensityProcessCpp <- function(time, bandwidth) {
     .Call(`_highfrequency_tradeIntensityProcessCpp`, time, bandwidth)
 }
 
-medianCase <- function(x) {
-    .Call(`_highfrequency_medianCase`, x)
-}
-
 AsymptoticVarianceC <- function(vIn, iLag) {
     .Call(`_highfrequency_AsymptoticVarianceC`, vIn, iLag)
 }
@@ -87,6 +83,10 @@ rollApplyProdWrapper <- function(x, m) {
     .Call(`_highfrequency_rollApplyProdWrapper`, x, m)
 }
 
+tickGrouping_RETURNS <- function(end, size) {
+    .Call(`_highfrequency_tickGrouping_RETURNS`, end, size)
+}
+
 leadLagCpp <- function(x, timestampsX, y, timestampsY, lags, normalize) {
     .Call(`_highfrequency_leadLagCpp`, x, timestampsX, y, timestampsY, lags, normalize)
 }
@@ -105,10 +105,6 @@ KK <- function(x, type) {
 
 kernelEstimator <- function(a, b, na, q, adj, type, ab, ab2) {
     .Call(`_highfrequency_kernelEstimator`, a, b, na, q, adj, type, ab, ab2)
-}
-
-rv <- function(a, b, na, period, tmpa, tmpb, tmpna) {
-    .Call(`_highfrequency_rv`, a, b, na, period, tmpa, tmpb, tmpna)
 }
 
 pcovcc <- function(a, ap, b, at, atp, bt, na, nap, nb, period) {

@@ -1,6 +1,6 @@
-library(highfrequency)
-library(testthat)
-
+library("highfrequency")
+library("testthat")
+library("xts")
 
 context("spotDrift")
 test_that("spotDrift",{
@@ -8,15 +8,20 @@ test_that("spotDrift",{
   kerneldrift <- spotDrift(as.xts(price), method = "driftKernel", alignBy = "minutes", alignPeriod = 1)
   expect_equal(
     sum(kerneldrift$mu),
-    0.2335009566
+    0.231997434
   )
   
   dat <- data.table::copy(sampleTData)
   dat[, SYMBOL := NULL]
+  dat[, EX := NULL]
   meandrift <- spotDrift(data = dat, alignPeriod = 1, tz = "EST")
   expect_identical(formatC(meandrift$mu[1:10], digits = 5),
-    c("    NA", "    NA", "    NA", "    NA", "0.00044115", "0.00049179", "0.00060476", "0.00046592", "0.00045243", "-5.0368e-05")
+    c("    NA", "    NA", "    NA", "    NA", "0.00044115", "0.00049179", "0.00057949", "0.00046592", "0.00045243", "5.0356e-05")
   )
+  
+  mediandrift <- spotDrift(data = dat, alignPeriod = 1, tz = "EST")
+  expect_equal(dim(meandrift$mu), dim(mediandrift$mu))
+  
   
   expect_identical(
     {dat <- data.table::copy(sampleTData)
@@ -45,6 +50,20 @@ test_that("spotVol", {
     formatC(as.numeric(spotVol(sampleOneMinuteData[1:1173, list(DT, PRICE = MARKET)], method = "stochPer", init = init, control = list(trace = as.integer(interactive())))$spot[1:10]), digits = 3),
     c("0.0016", "0.00161", "0.00163", "0.00164", "0.00167", "0.00169", "0.00171", "0.00174", "0.00176", "0.00178")
   )
+  
+  
+  expect_warning(
+    spot <- spotVol(sampleOneMinuteData[, list(DT, PRICE = MARKET)], method = "detPer", control = list(trace = as.integer(interactive()))),
+    "Periodicity estimation is unstable when the sample data contains less than 50 days. The quality of results may vary"
+  )
+  p1 <- plot(spot$periodic)
+  expect_equal(p1$get_xlim(), c(996917700, 996940800))
+  expect_equal(as.numeric(p1$get_ylim()[[2]]), c(0.710298272355463, 1.618458734575640))
+  
+  
+
+  spot <- spotVol(sampleOneMinuteData[, list(DT, PRICE = MARKET)], method = "kernel", est = "quarticity", control = list(trace = as.integer(interactive())))
+  expect_equal(sum(spot$spot), 1.51315943739956)
   
 
 })

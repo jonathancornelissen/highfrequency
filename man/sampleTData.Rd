@@ -11,8 +11,8 @@ A data.table object.
 sampleTData
 }
 \description{
-A \code{data.table} object containing the trades for the imaginary stock XXX for 2 days, in the typical NYSE TAQ database format.
-This is the cleaned version of the data sample \code{\link{sampleTDataRaw}}, using \code{tradesCleanup}.
+A \code{data.table} object containing the trades for the pseudonymized stock XXX for 2 days, in the typical NYSE TAQ database format.
+This is the cleaned version of the data sample \code{\link{sampleTDataRaw}}, using \code{\link{tradesCleanupUsingQuotes}}.
 }
 \examples{
 \dontrun{
@@ -28,6 +28,22 @@ sampleTData <- tradesCleanupUsingQuotes(
   qData = sampleQData,
   lagQuotes = 0)[, c("DT", "EX", "SYMBOL", "PRICE", "SIZE")]
 # Only some columns are included. These are the ones that were historically included.
+
+# For most applications, we recommend aggregating the data at a high frequency
+# For example, every second.
+aggregated <- aggregatePrice(sampleTData[, list(DT, PRICE)],
+              alignBy = "seconds", alignPeriod = 1)
+acf(diff(aggregated[as.Date(DT) == "2018-01-02", PRICE]))
+acf(diff(aggregated[as.Date(DT) == "2018-01-03", PRICE]))
+
+signature <- function(x, q){
+res <- x[, (rCov(diff(log(PRICE), lag = q, differences = 1))/q), by = as.Date(DT)]
+return(res[[2]])
+}
+rvAgg <- matrix(nrow = 100, ncol = 2)
+for(i in 1:100) rvAgg[i, ] <- signature(aggregated, i)
+plot(rvAgg[,1], type = "l")
+plot(rvAgg[,2], type = "l")
 }
 
 }

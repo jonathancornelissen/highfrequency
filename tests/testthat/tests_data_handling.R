@@ -29,7 +29,7 @@ context("aggregatePrice")
 test_that("aggregatePrice", {
   expect_equal(
     formatC(sum(head(aggregatePrice(sampleTData, alignBy = "secs", alignPeriod = 30))$PRICE), digits = 10),
-    "     950.73"
+    "     950.79"
   )
 })
 
@@ -78,7 +78,7 @@ test_that("selectExchange and data cleaning functions", {
   
   expect_equal(
   dim(tradesCleanup(tDataRaw = sampleTDataRaw, exchanges = "N", report = FALSE)),
-  c(6140, 8)
+  c(7168, 8)
   )
 })
 
@@ -183,8 +183,13 @@ test_that("tradesCleanup on-disk functionality", {
 #   lines(old, col = "red", lwd = 1)
 # })
 
-
-
+context("aggregateTS xts vs data.table for previoustick")
+test_that("aggregateTS xts vs data.table for previoustick", {
+  res_DT <- aggregateTS(sampleTData[, list(DT, PRICE)])
+  expect_true(all.equal(as.xts(res_DT) , c(aggregateTS(as.xts(sampleTData[as.Date(DT) == "2018-01-02", list(DT, PRICE)])),
+                                         aggregateTS(as.xts(sampleTData[as.Date(DT) == "2018-01-03", list(DT, PRICE)]))))
+  )
+})
 
 context("aggregateTS edge cases")
 test_that("aggregateTS edge cases", {
@@ -199,6 +204,29 @@ test_that("aggregateTS edge cases", {
     # The last one will have an extra minute in this case!
   )
 
+})
+
+
+
+test_that("aggregateTS tick returns behave correctly",{
+  
+  ## Test using every second tick as well as two prime numbers since it's cheap and the primes should give the best coverage.
+  DT <- aggregateTS(sampleTData[, list(DT, PRICE)], alignBy = "ticks", alignPeriod = 2)
+  XTS <- aggregateTS(as.xts(sampleTData[, list(DT, PRICE)]), alignBy = "ticks", alignPeriod = 2)
+  expect_equal(as.numeric(DT$PRICE), as.numeric(XTS))
+  expect_true(all.equal(NROW(DT), NROW(XTS)))
+  
+  DT <- aggregateTS(sampleTData[, list(DT, PRICE)], alignBy = "ticks", alignPeriod = 3)
+  XTS <- aggregateTS(as.xts(sampleTData[, list(DT, PRICE)]), alignBy = "ticks", alignPeriod = 3)
+  expect_equal(as.numeric(DT$PRICE), as.numeric(XTS))
+  expect_true(all.equal(NROW(DT), NROW(XTS)))
+
+  DT <- aggregateTS(sampleTData[, list(DT, PRICE)], alignBy = "ticks", alignPeriod = 11)
+  XTS <- aggregateTS(as.xts(sampleTData[, list(DT, PRICE)]), alignBy = "ticks", alignPeriod = 11)
+  expect_equal(as.numeric(DT$PRICE), as.numeric(XTS))
+  expect_true(all.equal(NROW(DT), NROW(XTS)))
+  
+  
 })
 
 
@@ -235,6 +263,16 @@ test_that("aggregatePrice edge cases", {
   output <- aggregatePrice(dat, alignBy = "minutes", alignPeriod = 5, marketOpen = "09:30:00", marketClose = "16:00:00", fill = FALSE)
   target <- data.table(DT = as.POSIXct(c(34200, 34500, 34800, 35100), origin = "1970-01-01", tz = "UTC"), PRICE = c(1,3,6,9))
   expect_equal(output, target)
+})
+
+test_that("aggregatePrice filling different number of symbols over multiple days", {
+  foo <- rbind(sampleMultiTradeData, sampleMultiTradeData[SYMBOL != "ETF", list(DT = DT + 86400, SYMBOL, PRICE, SIZE)])
+  res <- aggregatePrice(foo, fill = TRUE, alignBy = "seconds")
+  expect_equal(nrow(res), 5 * 23401)
+  expect_equal(res[SYMBOL == "AAA" & as.Date(DT) == "2014-09-17"]$PRICE,
+               res[SYMBOL == "AAA" & as.Date(DT) == "2014-09-18"]$PRICE)
+  
+  
 })
 
 
@@ -293,13 +331,13 @@ context("business time aggregation")
 test_that("business time aggregation",{
   skip_if_not(capabilities('long.double'), 'Skip tests when long double is not available')
   pData <- sampleTData
-  agged1 <- businessTimeAggregation(pData, measure = "intensity", obs = 390, bandwidth = 0.075)
-  expect_equal(nrow(agged1$pData), 780) # We return the correct number of observations
+  agged1 <- suppressWarnings(businessTimeAggregation(pData, measure = "intensity", obs = 390, bandwidth = 0.075))
+  expect_equal(nrow(agged1$pData), 779) # We return the correct number of observations
   
   
   expect_warning(businessTimeAggregation(pData, measure = "volume", obs = 390), "smaller")
   agged2 <- suppressWarnings(businessTimeAggregation(pData, measure = "volume", obs = 390))
-  expect_equal(nrow(agged2$pData), 748)
+  expect_equal(nrow(agged2$pData), 755)
   
   agged3 <- suppressWarnings(businessTimeAggregation(pData, measure = "vol", obs = 39, method = "PARM", RM = "rv", lookBackPeriod = 5))
   expect_equal(nrow(agged3$pData), 76)
@@ -326,13 +364,13 @@ test_that("refreshTime", {
   
   # Unit test for the refreshTime algorithm based on Kris' example in http://past.rinfinance.com/agenda/2015/workshop/KrisBoudt.pdf
   #suppose irregular timepoints: 
-  start = as.POSIXct("2010-01-01 09:30:00", tz = "GMT") 
-  ta = start + c(1, 2, 4, 5, 9, 14)
-  tb = start + c(1, 3, 6, 7, 8, 9, 10, 11, 15)
-  tc = start + c(1, 2, 3, 5, 7, 8, 10, 13)
-  a = as.xts(1:length(ta), order.by = ta)
-  b = as.xts(1:length(tb), order.by = tb)
-  c = as.xts(1:length(tc), order.by = tc)
+  start <- as.POSIXct("2010-01-01 09:30:00", tz = "GMT") 
+  ta <- start + c(1, 2, 4, 5, 9, 14)
+  tb <- start + c(1, 3, 6, 7, 8, 9, 10, 11, 15)
+  tc <- start + c(1, 2, 3, 5, 7, 8, 10, 13)
+  a <- as.xts(1:length(ta), order.by = ta)
+  b <- as.xts(1:length(tb), order.by = tb)
+  c <- as.xts(1:length(tc), order.by = tc)
   #Calculate the synchronized timeseries: 
   expected <- xts(matrix(c(1,1,1, 2,2,3, 4,3,4, 5,6,6, 6,8,8), ncol = 3, byrow = TRUE), order.by = start + c(1,3,6,9,14))
   colnames(expected) <- c("a", "b", "c")
@@ -393,10 +431,10 @@ test_that("spreadPrices",{
   dat <- spreadPrices(dat1)
   
   res <- rCov(dat, alignBy = 'minutes', alignPeriod = 5, makeReturns = TRUE, cor = TRUE)
-  target <- list("2018-01-02" = matrix(c(1, 0.05400510115,
-                                         0.05400510115, 1), ncol = 2),
-                 "2018-01-03" = matrix(c(1, 0.171321754,
-                                         0.171321754, 1), ncol = 2)
+  target <- list("2018-01-02" = matrix(c(1, 0.1936498028,
+                                         0.1936498028, 1), ncol = 2),
+                 "2018-01-03" = matrix(c(1, 0.1590385524,
+                                         0.1590385524, 1), ncol = 2)
                  )
   expect_equal(res, target)
 })
@@ -439,7 +477,7 @@ test_that("Backwards-forwards matching algorithm produces correct result", {
                                   qData = quotesCleanup(qDataRaw = sampleQDataRaw, type = 'standard', report = FALSE, exchanges = 'N'), 
                                   BFM = TRUE, lagQuotes = 0)
   
-  expect_equal(dim(bfmMatched), c(19887, 14))
+  expect_equal(dim(bfmMatched), c(19888, 14))
 })
 
 

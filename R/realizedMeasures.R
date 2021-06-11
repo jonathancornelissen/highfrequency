@@ -125,7 +125,8 @@ rMedRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
 #' }
 #'   
 #' @param rData an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days.
-#' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"},\code{"hours"}.
+#' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. 
+#' Possible values are: \code{"ticks"}, \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. For example, to aggregate
 #' based on a 5-minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
 #' @param makeReturns boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.
@@ -236,7 +237,8 @@ rMinRQ <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
 #'   \mbox{rMinRQuar}_{t}=\frac{\pi N}{3 \pi - 8} \left(\frac{N}{N-1}\right) \sum_{i=1}^{N-1} \mbox{min}(|r_{t,i}| ,|r_{t,i+1}|)^4
 #' }
 #' @param rData an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days
-#' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}.
+#' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. 
+#' Possible values are: \code{"ticks"}, \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. For example, to aggregate
 #' based on a 5-minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
 #' @param makeReturns boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.
@@ -332,7 +334,7 @@ rMinRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
 #'
 #' @param rData an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days.
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. 
-#' Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}.
+#' Possible values are: \code{"ticks"}, \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. For example, to aggregate
 #' based on a 5-minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
 #' @param makeReturns boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.
@@ -443,7 +445,8 @@ rMedRV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
 #' }
 #'
 #' @param rData an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days
-#' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}.
+#' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. 
+#' Possible values are: \code{"ticks"}, \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. For example, to aggregate
 #' based on a 5-minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
 #' @param makeReturns boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.
@@ -731,7 +734,8 @@ rMRCov <- function(pData, pairwise = FALSE, makePsd = FALSE, theta = 0.8, crossA
 #'
 #' @param rData an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days.
 #' @param cor boolean, in case it is \code{TRUE}, and the input data is multivariate, the correlation is returned instead of the covariance matrix. \code{FALSE} by default.
-#' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
+#' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. 
+#' Possible values are: \code{"ticks"}, \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. For example, to aggregate
 #' based on a 5-minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
 #' @param k numeric denoting which horizon to use for the subsambles. This can be a fraction as long as \eqn{k} is a divisor of \code{alignPeriod} default is \code{1}.
@@ -970,7 +974,7 @@ rAVGCov <- function(rData, cor = FALSE, alignBy = "minutes", alignPeriod = 5, k 
 #' @param RVestimator can be chosen among realized variance estimators: \code{"rRVar"}, \code{"rMinRVar"} and \code{"rMedRVar"}. \code{"rRVar"} by default. 
 #' In case of missing \code{RVestimator}, \code{RCOVestimator} function applying for \code{rIndex} will be used.
 #' @param makeReturns boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.
-#' 
+#' @param ... arguments passed to \code{RCOVestimator} and \code{RVestimator}
 #' @return numeric
 #'
 #' @details
@@ -1002,7 +1006,7 @@ rAVGCov <- function(rData, cor = FALSE, alignBy = "minutes", alignPeriod = 5, k 
 #' @importFrom methods hasArg
 #' @importFrom utils data
 #' @export
-rBeta <- function(rData, rIndex, RCOVestimator = "rCov", RVestimator = "rRVar", makeReturns = FALSE) {
+rBeta <- function(rData, rIndex, RCOVestimator = "rCov", RVestimator = "rRVar", makeReturns = FALSE, ...) {
   if (hasArg(data)) {
     rData <- data
   }
@@ -1031,15 +1035,15 @@ rBeta <- function(rData, rIndex, RCOVestimator = "rCov", RVestimator = "rRVar", 
     rcovfun <- function(rData, rIndex, RCOVestimator) {
 
       switch(RCOVestimator,
-             rCov = rCov(cbind(rData,rIndex) ),
-             rAVGCov = rAVGCov(list(rData, rIndex) ),
-             rBPCov = rBPCov(cbind(rData, rIndex) ),
-             rHYCov = rHYCov(list(rData, rIndex) ),
-             rKernelCov = rKernelCov(list(rData, rIndex) ),
-             rOWCov = rOWCov(cbind(rData, rIndex) ),
-             rRTSCov = rRTSCov(list(rData, rIndex)),
-             rThresholdCov = rThresholdCov(cbind(rData, rIndex) ),
-             rTSCov = rTSCov(list(rData, rIndex)))
+             rCov = rCov(cbind(rData,rIndex) ,...),
+             rAVGCov = rAVGCov(cbind(rData, rIndex) ,...),
+             rBPCov = rBPCov(cbind(rData, rIndex) ,...),
+             rHYCov = rHYCov(cbind(rData, rIndex) ,...),
+             rKernelCov = rKernelCov(cbind(rData, rIndex) ,...),
+             rOWCov = rOWCov(cbind(rData, rIndex) ,...),
+             rRTSCov = rRTSCov(list(rData, rIndex),...),
+             rThresholdCov = rThresholdCov(cbind(rData, rIndex) ,...),
+             rTSCov = rTSCov(list(rData, rIndex),...))
     }
 
     rcov <- rcovfun(rData,rIndex,RCOVestimator)
@@ -1050,19 +1054,20 @@ rBeta <- function(rData, rIndex, RCOVestimator = "rCov", RVestimator = "rRVar", 
       rvfun <- function(rIndex, RVestimator) {
 
         switch(RVestimator,
-               rCov = rCov(rIndex ) ,
-               RV = rRVar(rIndex),
-               BV = RBPVar(rIndex),
-               rMinRVar = rMinRVar(rIndex ),
-               rMedRVar = rMedRVar(rIndex ),
-               rAVGCov = rAVGCov(rIndex ) ,
-               rBPCov = rBPCov(rIndex ) ,
-               rHYCov = rHYCov(rIndex ) ,
-               rKernelCov = rKernelCov(rIndex ) ,
-               rOWCov = rOWCov(rIndex ) ,
-               rRTSCov = rRTSCov(rIndex) ,
-               rThresholdCov = rThresholdCov(rIndex ) ,
-               rTSCov = rTSCov(rIndex))
+               rCov = rCov(rIndex ,...) ,
+               RV = rRVar(rIndex,...),
+               BV = RBPVar(rIndex,...),
+               rMinRVar = rMinRVar(rIndex,... ),
+               rMedRVar = rMedRVar(rIndex ,...),
+               rAVGCov = rAVGCov(rIndex ,...) ,
+               rBPCov = rBPCov(rIndex ,...) ,
+               rHYCov = rHYCov(rIndex ,...) ,
+               rKernelCov = rKernelCov(rIndex,... ) ,
+               rOWCov = rOWCov(rIndex ,...) ,
+               rRTSCov = rRTSCov(rIndex,...) ,
+               rThresholdCov = rThresholdCov(rIndex,... ) ,
+               rTSCov = rTSCov(rIndex,...),
+               rRVar = rRVar(rIndex,...))
       }
       rv <- rvfun(rIndex,RVestimator)
       rbeta <- rcov[1,2] / rv
@@ -1095,7 +1100,8 @@ rBeta <- function(rData, rIndex, RCOVestimator = "rCov", RVestimator = "rRVar", 
 #'
 #' @param rData an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days
 #' @param cor boolean, in case it is \code{TRUE}, and the input data is multivariate, the correlation is returned instead of the covariance matrix. \code{FALSE} by default.
-#' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
+#' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. 
+#' Possible values are: \code{"ticks"}, \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. E.g. to aggregate
 #' based on a 5-minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
 #' @param makeReturns boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.
@@ -1246,7 +1252,7 @@ rBPCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeR
 #' @param rData an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days.
 #' @param cor boolean, in case it is \code{TRUE}, and the input data is multivariate, the correlation is returned instead of the covariance matrix. \code{FALSE} by default.
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. 
-#' Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
+#' Possible values are: \code{"ticks"}, \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. For example, to aggregate
 #' based on a 5-minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
 #' @param makeReturns boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.
@@ -1311,7 +1317,7 @@ rCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeRet
     for (i in 1:length(dates)) {
       res[[dates[i]]] <- rCov(dat[starts[i]:ends[i], ], cor = cor, makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
     }
-
+  
     if(length(res[[1]]) == 1){ ## Univariate case
       res <- data.table(DT = names(res), RV = as.numeric(res))
     } else if(length(res) == 1){ ## Single day multivariate case
@@ -1360,7 +1366,8 @@ rCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeRet
 #' @param rData an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days.
 #' @param cor boolean, in case it is \code{TRUE}, and the input data is multivariate, the correlation is returned instead of the covariance matrix. \code{FALSE} by default.
 #' @param period Sampling period
-#' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
+#' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. 
+#' Possible values are: \code{"ticks"}, \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. For example, to aggregate
 #' based on a 5-minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
 #' @param makeReturns boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.
@@ -1439,6 +1446,8 @@ rHYCov <- function(rData, cor = FALSE, period = 1, alignBy = "seconds", alignPer
       }
       rData <- as.matrix(rData[, !"DT"])
       aggrdata <- as.matrix(aggrdata[, !"DT"])
+    } else {
+      stop("rHYCov only accepts xts and data.table objects")
     }
   
     if (makeReturns) {
@@ -1510,7 +1519,7 @@ rHYCov <- function(rData, cor = FALSE, period = 1, alignBy = "seconds", alignPer
 #' @param cor boolean, in case it is \code{TRUE}, and the input data is multivariate, the correlation is returned instead of the covariance matrix. 
 #' \code{FALSE} by default.
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. 
-#' Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}.
+#' Possible values are: \code{"ticks"}, \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. 
 #' For example, to aggregate based on a 5-minute frequency, set \code{alignPeriod} to 5 and \code{alignBy} to \code{"minutes"}.
 #' @param makeReturns boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.
@@ -1628,22 +1637,30 @@ rKernelCov <- function(rData, cor = FALSE,  alignBy = NULL, alignPeriod = NULL,
       n <- dim(rData)[2]
     }
     type <- kernelCharToInt(kernelType)
+    
     if (n == 1) {
-      return(kernelEstimator(as.double(rData),
+      ans <- kernelEstimator(as.double(rData),
                              as.double(rData),
-                             as.integer(length(rData)),
+                             as.integer(NROW(rData)),
                              as.integer(kernelParam),
                              as.integer(ifelse(kernelDOFadj, 1, 0)),
                              as.integer(type),
                              ab = double(kernelParam + 1),
-                             ab2 = double(kernelParam + 1)))
+                             ab2 = double(kernelParam + 1))
+      
+      if(!is.na(ans) && !is.null(ans) && ans<0){
+        warning("rKernelCov produced negative variance, try to change the kernelParam argument")
+      }
+      
+      return(ans)
+      
     }
 
     if (n > 1) {
       cov <- matrix(rep(0, n * n), ncol = n, dimnames = list(colnames(rData), colnames(rData)))
       diagonal <- numeric(n)
       for (i in 1:n) {
-        diagonal[i] <- kernelEstimator(as.double(rData[, i]), as.double(rData[, i]), as.integer(length(rData[, i])),
+        diagonal[i] <- kernelEstimator(as.double(rData[, i]), as.double(rData[, i]), as.integer(NROW(rData[, i])),
                                        as.integer(kernelParam), as.integer(ifelse(kernelDOFadj, 1, 0)),
                                        as.integer(type), ab = double(kernelParam + 1),
                                        ab2 = double(kernelParam + 1))
@@ -1652,7 +1669,7 @@ rKernelCov <- function(rData, cor = FALSE,  alignBy = NULL, alignPeriod = NULL,
 
       for (i in 2:n) {
         for (j in 1:(i - 1)) {
-          cov[i, j] = cov[j, i] = kernelEstimator(as.double(rData[, i]), as.double(rData[, j]), as.integer(length(rData[, i])),
+          cov[i, j] = cov[j, i] = kernelEstimator(as.double(rData[, i]), as.double(rData[, j]), as.integer(NROW(rData[, i])),
                                                   as.integer(kernelParam), as.integer(ifelse(kernelDOFadj, 1, 0)),
                                                   as.integer(type), ab = double(kernelParam + 1),
                                                   ab2 = double(kernelParam + 1))
@@ -1687,7 +1704,7 @@ rKernelCov <- function(rData, cor = FALSE,  alignBy = NULL, alignPeriod = NULL,
 #'
 #' @param rData an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days.
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. 
-#' Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}.
+#' Possible values are: \code{"ticks"}, \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. For example, to aggregate
 #' based on a 5-minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
 #' @param makeReturns boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.
@@ -1809,7 +1826,7 @@ rMPV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE)
 #' @param m the window size of return blocks. 2 by default.
 #' @param p the power of the variation. 2 by default.
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. 
-#' Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
+#' Possible values are: \code{"ticks"}, \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. For example, to aggregate
 #' based on a 5-minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
 #' @param makeReturns boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.
@@ -1921,7 +1938,7 @@ rMPVar <- function(rData, m = 2, p = 2, alignBy = NULL, alignPeriod = NULL, make
 #' @param cor boolean, in case it is \code{TRUE}, and the input data is multivariate, the correlation is returned instead of the covariance matrix. 
 #' \code{FALSE} by default.
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. 
-#' Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}.
+#' Possible values are: \code{"ticks"}, \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. For example, to aggregate
 #' based on a 5-minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
 #' @param makeReturns boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.
@@ -2079,7 +2096,7 @@ rOWCov <- function (rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, make
 #'
 #' @param rData an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days.
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. 
-#' Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}.
+#' Possible values are: \code{"ticks"}, \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. For example, to aggregate
 #' based on a 5-minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
 #' @param makeReturns boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.
@@ -2198,7 +2215,7 @@ rSV <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE){
 #' }
 #' @param rData an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days.
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. 
-#' Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}.
+#' Possible values are: \code{"ticks"}, \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. For example to aggregate.
 #' based on a 5-minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
 #' @param makeReturns boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. 
@@ -2301,7 +2318,7 @@ rSVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #' @param rData an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days.
 #' @param cor boolean, in case it is \code{TRUE}, and the input data is multivariate, the correlation is returned instead of the covariance matrix. \code{FALSE} by default.
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. 
-#' Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}.
+#' Possible values are: \code{"ticks"}, \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. For example, to aggregate
 #' based on a 5-minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
 #' @param makeReturns boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. 
@@ -2535,7 +2552,7 @@ rRTSCov <- function (pData, cor = FALSE, startIV = NULL, noisevar = NULL,
   }
 
   if (n == 1) {
-    if (nrow(pData) < (10 * K) ) {
+    if (NROW(pData) < (10 * K) ) {
       stop("Two time scale estimator uses returns based on prices that are K ticks aways.
            Please provide a timeseries of at least 10*K" )
     }
@@ -2546,7 +2563,7 @@ rRTSCov <- function (pData, cor = FALSE, startIV = NULL, noisevar = NULL,
                  K = K, J = J, eta = eta))
   }
   if (n > 1) {
-    if (nrow(pData[[1]]) < (10*K)) {
+    if (NROW(pData[[1]]) < (10*K)) {
       stop("Two time scale estimator uses returns based on prices that are K ticks aways.
            Please provide a timeseries of at least 10*K" )
     }
@@ -2627,7 +2644,7 @@ RV <- function(rData){
 #' 
 #' @param rData an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days.
 #' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. 
-#' Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}.
+#' Possible values are: \code{"ticks"}, \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. For example, to aggregate
 #' based on a 5-minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
 #' @param makeReturns boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.
@@ -2798,8 +2815,8 @@ rTPQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FAL
 #'  }
 #'
 #' @param rData an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days
-#' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
-#'
+#' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. 
+#' Possible values are: \code{"ticks"}, \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. For example, to aggregate
 #' based on a 5-minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
 #' @param makeReturns boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.
@@ -2885,8 +2902,8 @@ rQPVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
 #'  }
 #'
 #' @param rData an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days.
-#' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
-#'
+#' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. 
+#' Possible values are: \code{"ticks"}, \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. For example, to aggregate
 #' based on a 5-minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
 #' @param makeReturns boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.
@@ -3063,7 +3080,7 @@ rTSCov <- function (pData, cor = FALSE, K = 300, J = 1, KCov = NULL, JCov = NULL
     }
   }
   if (n == 1) {
-    if (nrow(pData) < (10 * K)) {
+    if (NROW(pData) < (10 * K)) {
       stop("Two time scale estimator uses returns based on prices that are K ticks aways.
            Please provide a timeseries of at least 10 * K." )
     }
@@ -3073,7 +3090,7 @@ rTSCov <- function (pData, cor = FALSE, K = 300, J = 1, KCov = NULL, JCov = NULL
     return(TSRV(pData, K = K, J = J))
   }
   if (n > 1) {
-    if (nrow(pData[[1]]) < (10 * K)) {
+    if (NROW(pData[[1]]) < (10 * K)) {
       stop("Two time scale estimator uses returns based on prices that are K ticks aways.
            Please provide a timeseries of at least 10*K" )
     }
@@ -3356,7 +3373,8 @@ rCholCov <- function(pData, IVest = "rMRCov", COVest = "rMRCov", criterion = "sq
 #'
 #' @param rData an \code{xts} or \code{data.table} object containing returns or prices, possibly for multiple assets over multiple days.
 #' @param cor boolean, in case it is \code{TRUE}, and the input data is multivariate, the correlation is returned instead of the covariance matrix. \code{FALSE} by default.
-#' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. Possible values are: \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
+#' @param alignBy character, indicating the time scale in which \code{alignPeriod} is expressed. 
+#' Possible values are: \code{"ticks"}, \code{"secs"}, \code{"seconds"}, \code{"mins"}, \code{"minutes"}, \code{"hours"}
 #' @param alignPeriod positive numeric, indicating the number of periods to aggregate over. For example, to aggregate
 #' based on a 5-minute frequency, set \code{alignPeriod = 5} and \code{alignBy = "minutes"}.
 #' @param makeReturns boolean, should be \code{TRUE} when \code{rData} contains prices instead of returns. \code{FALSE} by default.
@@ -3525,7 +3543,7 @@ listCholCovEstimators <- function(){
 #' @param makeCorrelation logical indicating whether to transform the autocovariances into autocorrelations. 
 #' The estimate of variance is imprecise and thus, constructing the correlation like this may show correlations that fall outside \eqn{(-1,1)}.
 #'
-#' @references Li, M. and Linton, O. (2019). A ReMeDI for microstructure noise. Cambridge Working Papers in Economics 1908.
+#' @references Li, M. and Linton, O. (2021). A ReMeDI for microstructure noise. Econometrica, forthcoming
 #' @keywords microstructure noise autocovariance autocorrelation
 #' @note We Thank Merrick Li for contributing his Matlab code for this estimator.
 #' @examples

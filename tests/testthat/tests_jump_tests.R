@@ -5,7 +5,7 @@ context("AJjumpTest unit test")
 test_that("AJjumpTest unit test",{
   expect_equal(
     as.numeric(AJjumpTest(as.xts(sampleTData[,list(DT, PRICE)]), p = 2, k = 3, alignBy = "seconds", alignPeriod = 5, makeReturns = TRUE)[,1]),
-    c(-1.1620534373, -0.1330522019)
+    c(-0.63154307241, -0.03660544638)
   )
 })
 
@@ -30,8 +30,17 @@ context("BNSjumpTest")
 test_that("BNSjumpTest", {
   expect_equal(
     as.numeric(BNSjumpTest(as.xts(sampleTData[, list(DT, PRICE)]), IVestimator= "rMinRVar", IQestimator = "rMedRQuar", type= "linear", makeReturns = TRUE)[, "p.value"]),
-    c(1.794624516e-02, 2.913249385e-05)
+    c(1.322998188e-01, 2.816329921e-05)
   )
+  expect_equal(
+    as.numeric(BNSjumpTest(as.xts(sampleTData[, list(DT, PRICE)]), IVestimator= "rOWCov", IQestimator = "rMedRQuar", makeReturns = TRUE, type ="linear")[, "p.value"]),
+    c(0,0) # Test statistic of 50+ - very zero
+  )
+  expect_equal(
+    sum(as.numeric(BNSjumpTest(as.xts(sampleTData[, list(DT, PRICE)]), IVestimator= "CTBV", IQestimator = "CTTPV", makeReturns = TRUE, type ="ratio")[, "p.value"])),
+    0
+  )
+  
 })
 
 context("intradayJumpTest")
@@ -61,9 +70,30 @@ test_that("FoF test",{
   FoFtest <- intradayJumpTest(pData = dat, volEstimator = "PARM", driftEstimator = "none", alpha = 0.95, RM = "bipower", 
                               theta = 1, lookBackPeriod = 50, marketOpen = "9:30:00", marketClose = "16:00:00", tz = "GMT")
   
-  expect_equal(sum(FoFtest$ztest), -17.62862858)
-  expect_equal(sum(FoFtest$vol$spot), 0.03685386024)
+  expect_equal(sum(FoFtest$ztest), -0.7087878823)
+  expect_equal(sum(FoFtest$vol$spot), 0.03742987532)
   expect_equal(sum(FoFtest$drift), 0)
   
 })
 
+
+test_that("multiple intradayJumpTest", {
+  jumpTest <- intradayJumpTest(pData = sampleOneMinuteData[, list(DT, PRICE = MARKET)], volEstimator = "RM", driftEstimator = "none", alpha = 0.95, RM = "bipower", 
+                               lookBackPeriod = 10, dontIncludeLast = TRUE, on = "minutes", k = 5,
+                               marketOpen = "9:30:00", marketClose = "16:00:00", tz = "GMT")
+  
+  p1 <- plot(jumpTest)
+  expect_equal(p1$get_xlim(), c(999509400, 999532800))
+  
+  expect_true(jumpTest$isMultiDay)
+  
+})
+
+
+test_that("rank jump test", {
+  expect_error(rankJumpTest(marketPrice = as.xts(sampleOneMinuteData)[,1], stockPrices = list(as.xts(sampleOneMinuteData)[,2])), "Singular value decomposition cannot be calculated")
+  rjt <- rankJumpTest(marketPrice = as.xts(sampleOneMinuteData)[,1], stockPrices = list(as.xts(sampleOneMinuteData)[,2], as.xts(sampleOneMinuteData)[,2] * 1.05))
+  
+  expect_equal(rjt$jumpIndices, c(124, 448, 1284, 1537))
+  
+})

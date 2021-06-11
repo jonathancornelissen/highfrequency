@@ -9,9 +9,12 @@
 #' @param tradeCol color in which to paint the trade crosses.
 #' @param quoteCol color in which to fill out the bid-offer spread.
 #' @param format format string to pass to \code{axis.POSIXct} when creating the timestamps on the x axis.
+#' If you are plotting a very short time interval, use \code{"\%H:\%M:\%OS"} to get fractional seconds on the time axis.
+#' @param axisCol string to denote which color to use for the x axis
 #' @param ... passed to \code{plot} and \code{points}.
 #' 
-#' @examples 
+#' @examples
+#' \dontrun{
 #' cleanedQuotes = quotesCleanup(qDataRaw = sampleQDataRaw, report = FALSE, printExchange = FALSE)
 #' cleanedTrades <- tradesCleanupUsingQuotes(
 #'         tData = tradesCleanup(tDataRaw = sampleTDataRaw, report = FALSE, printExchange = FALSE),
@@ -20,10 +23,11 @@
 #' xLim <- range(as.POSIXct(c("2018-01-03 15:30:00", "2018-01-03 16:00:00"), tz = "EST"))
 #' plotTQData(cleanedTrades, cleanedQuotes, xLim = xLim, 
 #'            main = "Raw trade and quote data from NYSE TAQ")
+#' }
 #' @importFrom data.table %between%
 #' @importFrom graphics rect
 #' @export
-plotTQData <- function(tData, qData = NULL, xLim = NULL, tradeCol = "black", quoteCol = "darkgray", format = "%H:%M:%S",...){
+plotTQData <- function(tData, qData = NULL, xLim = NULL, tradeCol = "black", quoteCol = "darkgray", format = "%H:%M:%S", axisCol = "black", ...){
   DT_END <- BID <- OFR <- DT <- NULL
   if(is.null(qData)){
     qData <- copy(tData)
@@ -38,10 +42,10 @@ plotTQData <- function(tData, qData = NULL, xLim = NULL, tradeCol = "black", quo
   
   qData[, DT_END := shift(DT, type = 'lead')]
   qData <- qData[DT %between% xLim]
-  plot(0, 0, col = "white", ylim = yLim, xlim = xLim, xaxs = "i", lwd = 1, xaxt = "n", ...)
+  plot(0, 0, col = "white", ylim = yLim, xlim = xLim, xaxs = "i", lwd = 1, xaxt = "n", col.lab = axisCol, ...)
   rect(qData$DT, qData$BID, qData$DT_END, qData$OFR, border = quoteCol, col = quoteCol)
   rect(qData$DT, qData$OFR, qData$DT_END, qData$BID, border = quoteCol, col = quoteCol)
-  
+  tData <- tData[DT %between% xLim]
   points(tData$DT, tData$PRICE, ylab = "price", pch = "x", xaxs = "i", ylim = yLim, col = tradeCol, ...)
-  axis.POSIXct(1, x = seq(xLim[1], xLim[2], length.out = 7), format = format)
+  axis.POSIXct(1, x = seq(xLim[1], xLim[2], length.out = 7), format = format, col = axisCol, col.axis = axisCol)
 }

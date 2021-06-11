@@ -223,11 +223,12 @@ predict.HEAVYmodel <- function(object, stepsAhead = 10, ...) {
 #' @export
 print.HEAVYmodel <- function(x, digits = max(3, getOption("digits") - 3), ...) {
   cat("")
-  print(summary(x)$coefficients)
-  cat(" \n")
+  summ <- summary(x)
+  print(summ$coefficients)
+  cat("\n")
   cat(paste0("The log-likelihoods are: \n",
-             "Variance equation: ", sprintf("%.3f", x$llh[1]), "\n", 
-             "RM equation:", sprintf("%.3f", x$llh[2])), "\n")
+             "Variance equation: ", sprintf("%.3f", summ$llhVar), "\n", 
+             "RM equation:", sprintf("%.3f", summ$llhRM)), "\n")
 }
 
 #' @export
@@ -239,7 +240,19 @@ summary.HEAVYmodel <- function(object, ...) {
           `t value` = object$coefficients / object$se,
           `Pr(>|t|)` = 2 * pnorm(abs(object$coefficients / object$se), 
                               lower.tail = FALSE))
+  
+  ans$llhVar <- object$llh[1]
+  ans$llhRM <- object$llh[2]
+  
   class(ans) <- "summary.heavy"
   ans
 }
-
+#' @export
+print.summary.heavy <- function(x, ...){
+  cat("")
+  print(x$coefficients)
+  cat("\n")
+  cat(paste0("The log-likelihoods are: \n",
+             "Variance equation: ", sprintf("%.3f", x$llhVar), "\n", 
+             "RM equation:", sprintf("%.3f", x$llhRM)), "\n")
+}

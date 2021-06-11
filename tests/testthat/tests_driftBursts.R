@@ -24,12 +24,15 @@ test_that("DBH sim test", {
   DBH2 <- driftBursts(as.xts(dat), testtimes, preAverage = 1, ACLag = -1, meanBandwidth = meanBandwidth, varianceBandwidth = 5*meanBandwidth, parallelize = FALSE)
   
   expect_equal(as.numeric(DBH$tStat), as.numeric(DBH2$tStat))
-  expect_equal(mean(DBH$tStat), 0.34463614)
-  expect_equal(mean(DBH$sigma), 2.054827e-05)
+  expect_equal(mean(DBH$tStat), 0.344636145)
+  expect_equal(mean(DBH$sigma), 2.0548273e-05)
   expect_equal(mean(DBH$mu), 8.359077e-05)
   expect_equal(as.numeric(var(DBH$tStat)),0.774545510068)
   
   expect_equal(lapply(getCriticalValues(DBH, 0.99), round, digits = 4), list(normalizedQuantile = 3.9557, quantile = 4.1752))
   
+  expect_output(print(DBH), regexp = NULL)
   
+  
+
 })

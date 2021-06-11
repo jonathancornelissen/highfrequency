@@ -100,7 +100,7 @@ print.spotDrift <- function(x, ...){
 #' @keywords internal
 detPer <- function(mR, rData = NULL, options = list()) {
   # default options, replace if user-specified
-  op <- list(dailyVol = "bipower", periodicVol = "TML", dummies = FALSE,
+  op <- list(dailyVol = "rBPCov", periodicVol = "TML", dummies = FALSE,
              P1 = 5, P2 = 5)
   op[names(options)] <- options
 
@@ -110,18 +110,30 @@ detPer <- function(mR, rData = NULL, options = list()) {
     mR <- as.numeric(mR)
     estimdailyvol <- switch(op$dailyVol,
                             bipower = rBPCov(mR),
-                            medrv = rMedRV(mR),
+                            rBPCov = rBPCov(mR),
+                            rMedRVar = rMedRVar(mR),
+                            medrv = rMedRVar(mR),
+                            rCov = rCov(mR),
+                            rRVar = rCov(mR),
                             rv = rCov(mR))
   } else {
     if (is.null(rData)) {
       estimdailyvol <- switch(op$dailyVol,
+                              rBPCov = apply(mR, 1, "rBPCov"),
                               bipower = apply(mR, 1, "rBPCov"),
-                              medrv = apply(mR, 1, "rMedRV"),
+                              rMedRVar = apply(mR, 1, "rMedRVar"),
+                              medrv = apply(mR, 1, "rMedRVar"),
+                              rCov = apply(mR, 1, "rCov"),
+                              rRVar = apply(mR, 1, "rCov"),
                               rv = apply(mR, 1, "rCov"))
     } else {
       estimdailyvol <- switch(op$dailyVol,
+                              rBPCov = apply.daily(rData, rBPCov),
                               bipower = apply.daily(rData, rBPCov),
-                              medrv = apply.daily(rData, rMedRV),
+                              rMedRVar = apply.daily(rData, rMedRVar),
+                              medrv = apply.daily(rData, rMedRVar),
+                              rRVar = apply.daily(rData, rCov),
+                              rCov = apply.daily(rData, rCov),
                               rv = apply.daily(rData, rCov))
       dates = time(estimdailyvol)
     }
@@ -144,8 +156,12 @@ detPer <- function(mR, rData = NULL, options = list()) {
     mfilteredR <- mR/matrix(rep(estimperiodicvol, cDays), byrow = T,
                             nrow = cDays)
     estimdailyvol <- switch(op$dailyVol,
+                            rBPCov = apply(mfilteredR, 1, "rBPCov"),
                             bipower = apply(mfilteredR, 1, "rBPCov"),
-                            medrv = apply(mfilteredR, 1, "rMedRV"),
+                            rMedRVar = apply(mfilteredR, 1, "rMedRVar"),
+                            medrv = apply(mfilteredR, 1, "rMedRVar"),
+                            rRVar = apply(mfilteredR, 1, "rCov"),
+                            rCov = apply(mfilteredR, 1, "rCov"),
                             rv = apply(mfilteredR, 1, "rCov"))
     spot <- rep(sqrt(as.numeric(estimdailyvol) * (1/M)), each = M) *
       rep(estimperiodicvol, cDays)
@@ -443,7 +459,7 @@ ISE <- function(h, x, delta = 300, type = "gaussian") {
 #' @keywords internal
 piecewise <- function(mR, rData = NULL, options = list()) {
   # default options, replace if user-specified
-  op <- list(type = "MDa", m = 40, n = 20, alpha = 0.005, volEst = "bipower",
+  op <- list(type = "MDa", m = 40, n = 20, alpha = 0.005, volEst = "rBPCov",
              online = TRUE)
   op[names(options)] <- options
 
@@ -461,10 +477,18 @@ piecewise <- function(mR, rData = NULL, options = list()) {
       }
       lastchange <- cp[lastchange]
       spot[i] = switch(op$volEst,
+                       rBPCov = sqrt((1/(i - lastchange + 1)) *
+                                    (rBPCov(vR[(lastchange + 1):i]))),
                        bipower = sqrt((1/(i - lastchange + 1)) *
                                         (rBPCov(vR[(lastchange + 1):i]))),
+                       rMedRVar= sqrt((1/(i - lastchange + 1)) *
+                                        (rMedRV(vR[(lastchange+1):i]))),
                        medrv = sqrt((1/(i - lastchange + 1)) *
                                       (rMedRV(vR[(lastchange+1):i]))),
+                       rCov = sqrt((1/(i - lastchange + 1)) *
+                                    (rCov(vR[(lastchange + 1):i]))),
+                       rRVar = sqrt((1/(i - lastchange + 1)) *
+                                           (rCov(vR[(lastchange + 1):i]))),
                        rv = sqrt((1/(i - lastchange + 1)) *
                                    (rCov(vR[(lastchange + 1):i]))),
                        sd = sd(vR[(lastchange + 1):i]),
@@ -474,8 +498,12 @@ piecewise <- function(mR, rData = NULL, options = list()) {
       to <- min(c(N*D, cp[which(cp >= i)]))
       len <- to - from
       spot[i] <- switch(op$volEst,
+                        rBPCov = sqrt((1/len)*(rBPCov(vR[from:to]))),
                         bipower = sqrt((1/len)*(rBPCov(vR[from:to]))),
+                        rMedRV= sqrt((1/len)*(rMedRV(vR[from:to]))),
                         medrv = sqrt((1/len)*(rMedRV(vR[from:to]))),
+                        rCov= sqrt((1/len)*(rCov(vR[from:to]))), 
+                        rRVar= sqrt((1/len)*(rCov(vR[from:to]))),
                         rv = sqrt((1/len)*(rCov(vR[from:to]))),
                         sd = sd(vR[from:to]),
                         tau = robustbase::scaleTau2(vR[from:to]))
@@ -920,32 +948,12 @@ center <- function() {
   return(integrate(finternal, -Inf, Inf)$value)
 }
 
-# # modified version of 'aggregatePrice' from highfrequency package
-# aggregatePrice <- function (ts, FUN = "previoustick", on = "minutes", k = 1, marketOpen = "09:30:00", marketClose = "16:00:00", tz = "GMT") {
-#   ts2 = aggregateTS(ts, FUN = FUN, on, k)
-#   date = strsplit(as.character(index(ts)), " ")[[1]][1]
-#
-#   #open
-#   a = as.POSIXct(paste(date, marketOpen), tz = tz)
-#   b = as.xts(matrix(as.numeric(ts[1]),nrow=1), a)
-#   ts3 = c(b, ts2)
-#
-#   #close
-#   aa = as.POSIXct(paste(date, marketClose), tz = tz)
-#   condition = index(ts3) < aa
-#   ts3 = ts3[condition]
-#   bb = as.xts(matrix(as.numeric(last(ts)),nrow=1), aa)
-#   ts3 = c(ts3, bb)
-#
-#   return(ts3)
-# }
-
 
 #' @keywords internal
 realizedMeasureSpotVol <- function(mR, rData, options = list()){
   
   # Make sure there are sensible standard inputs
-  op <- list(RM = "bipower", lookBackPeriod = 10L, dontIncludeLast = FALSE)
+  op <- list(RM = "rBPCov", lookBackPeriod = 10L, dontIncludeLast = FALSE)
   # replace standards with user supplied inputs
   op[names(options)] <- options
   D <- nrow(mR)
@@ -955,12 +963,12 @@ realizedMeasureSpotVol <- function(mR, rData, options = list()){
     stop("lookBackPeriod must be a positive integer greater than 0.")
   }
   
-  if((op$RM == "bipower" | op$RM == "minrv") && lookBackPeriod <= 1){
+  if((op$RM == "bipower" | op$RM == "minrv" | op$RM == "rBPCov" | op$RM == "rMinRVar") && lookBackPeriod <= 1){
     stop(paste("When RM is", op$RM, "lookBackPeriod must be atleast 2\n"))
   }
   
-  if(op$RM == "medrv" && lookBackPeriod <= 2){
-    stop("When RM is medrv, lookBackPeriod must be atleast 3\n")
+  if((op$RM == "medrv" && lookBackPeriod <= 2) || op$RM == "rMedRVar" && lookBackPeriod <= 2){
+    stop("When RM is rMedRVar, lookBackPeriod must be atleast 3\n")
   }
   
   
@@ -971,12 +979,16 @@ realizedMeasureSpotVol <- function(mR, rData, options = list()){
     for (j in idx) {
       for (i in 1:D) {
         sigma2hat[i, j] <- switch(op$RM,
-                            bipower = RBPVar(mR[i,(j-lookBackPeriod+1):j]),
-                            rv = rRVar(mR[i,(j-lookBackPeriod+1):j]),
-                            medrv = rMedRVar(mR[i,(j-lookBackPeriod+1):j]),
-                            minrv = rMinRVar(matrix(mR[i,(j-lookBackPeriod+1):j], ncol = 1))
-          
-        )
+                                  bipower = RBPVar(mR[i,(j-lookBackPeriod+1):j]),
+                                  rv = rRVar(mR[i,(j-lookBackPeriod+1):j]),
+                                  medrv = rMedRVar(mR[i,(j-lookBackPeriod+1):j]),
+                                  minrv = rMinRVar(matrix(mR[i,(j-lookBackPeriod+1):j], ncol = 1)),
+                                  rBPCov = RBPVar(mR[i,(j-lookBackPeriod+1):j]),
+                                  rRVar = rRVar(mR[i,(j-lookBackPeriod+1):j]),
+                                  rCov = rRVar(mR[i,(j-lookBackPeriod+1):j]),
+                                  rMedRVar = rMedRVar(mR[i,(j-lookBackPeriod+1):j]),
+                                  rMinRVar = rMinRVar(matrix(mR[i,(j-lookBackPeriod+1):j], ncol = 1))
+                              )
       }
       
     }
@@ -986,12 +998,16 @@ realizedMeasureSpotVol <- function(mR, rData, options = list()){
     for (j in idx) {
       for (i in 1:D) {
         sigma2hat[i, j] <- switch(op$RM,
-                                    bipower = RBPVar(mR[i,(j-lookBackPeriod+1):(j-1)]),
-                                    rv = rRVar(mR[i,(j-lookBackPeriod+1):(j-1)]),
-                                    medrv = rMedRVar(mR[i,(j-lookBackPeriod+1):(j-1)]),
-                                    minrv = rMinRVar(matrix(mR[i,(j-lookBackPeriod+1):(j-1)], ncol = 1))
-                                    
-        )
+                                  bipower = RBPVar(mR[i,(j-lookBackPeriod+1):(j-1)]),
+                                  rv = rRVar(mR[i,(j-lookBackPeriod+1):(j-1)]),
+                                  medrv = rMedRVar(mR[i,(j-lookBackPeriod+1):(j-1)]),
+                                  minrv = rMinRVar(matrix(mR[i,(j-lookBackPeriod+1):(j-1)], ncol = 1)),
+                                  rBPCov = RBPVar(mR[i,(j-lookBackPeriod+1):(j-1)]),
+                                  rRVar = rRVar(mR[i,(j-lookBackPeriod+1):(j-1)]),
+                                  rCov = rRVar(mR[i,(j-lookBackPeriod+1):(j-1)]),
+                                  rMedRVar = rMedRVar(mR[i,(j-lookBackPeriod+1):(j-1)]),
+                                  rMinRVar = rMinRVar(matrix(mR[i,(j-lookBackPeriod+1):(j-1)], ncol = 1))
+                                  )
       }
       
     }
@@ -1048,7 +1064,7 @@ preAveragedRealizedMeasureSpotVol <- function(data, options = list()) {
     
   } else {
     # Make sure there are sensible standard inputs
-    op <- list(RM = "bipower", lookBackPeriod = 50, dontIncludeLast = FALSE, theta = 0.5)
+    op <- list(RM = "rBPCov", lookBackPeriod = 50, dontIncludeLast = FALSE, theta = 0.5)
     # replace standards with user supplied inputs
     op[names(options)] <- options
     M <- op$lookBackPeriod
@@ -1064,10 +1080,10 @@ preAveragedRealizedMeasureSpotVol <- function(data, options = list()) {
     kn <- round(theta * sqrt(nObs))
     kn <- kn + kn%%2
     idx <- NULL
-    if(op$RM != "rv"){
-      idx <- spot <- seq(M - 2 + kn + 1, nObs - kn, by = kn) # initialize indices to loop over and the container to have the post estimates.
-    } else {
+    if(op$RM == "rv" | op$RM == "rRVar"){
       idx <- spot <- seq(M - 2 + 1, nObs - kn, by = kn) # Here we have one more estimate than the other cases.
+    } else {
+      idx <- spot <- seq(M - 2 + kn + 1, nObs - kn, by = kn) # initialize indices to loop over and the container to have the post estimates.
     }
     # Measuring jump variation during the entire day.
     preAveragedReturns <- hatreturn(as.xts(data)[,"PRICE"], kn) 
@@ -1077,21 +1093,19 @@ preAveragedRealizedMeasureSpotVol <- function(data, options = list()) {
     ind <- 1
     for (i in idx) {
       
-      
-      
-      if( op$RM == "bipower" ){    
+      if( op$RM == "bipower" | op$RM == "rBPCov" ){    
         
         spot[ind] <- pi/2 * sum(abs(preAveragedReturns[(i - M + 2):(i-1)]) * abs(preAveragedReturns[(i-M+2-kn):(i-1-kn)]))
         
-      } else if( op$RM == "medrv" ){
+      } else if( op$RM == "medrv" |  op$RM == "rMedRVar"){
         
         spot[ind] <- (pi / (6 - 4 * sqrt(3) + pi)) * sum(apply(cbind(preAveragedReturns[(i-M+2-kn):(i-1-kn)] , preAveragedReturns[(i-M+2):(i-1)] , preAveragedReturns[(i-M+2+kn):(i-1+kn)]), 1, median) ^2)
         
-      } else if( op$RM == "minrv"){
+      } else if( op$RM == "minrv"| op$RM == "rMinRVar"){
         
         spot[ind] <- 2.751938 * sum(pmin(preAveragedReturns[(i - M + 2):(i-1)], preAveragedReturns[(i-M+2-kn):(i-1-kn)]) ^2)
         
-      } else if( op$RM == "rv"){
+      } else if( op$RM == "rv" | op$RM == "rRVar"){
         
         spot[ind] <- sum(preAveragedReturns[(i - M + 2):(i-1)] ^ 2)
         

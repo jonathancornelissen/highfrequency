@@ -11,11 +11,12 @@ aggregateTS(
   alignPeriod = 1,
   weights = NULL,
   dropna = FALSE,
-  tz = NULL
+  tz = NULL,
+  ...
 )
 }
 \arguments{
-\item{ts}{\code{xts} object to aggregate.}
+\item{ts}{\code{xts} or \code{data.table} object to aggregate.}
 
 \item{FUN}{function to apply over each interval. By default, previous tick aggregation is done. 
 Alternatively one can set e.g. FUN = "mean".
@@ -35,12 +36,14 @@ By default, an NA is returned in case an interval is empty, except when the user
 for previous tick aggregation, by setting \code{FUN = "previoustick"} (default).}
 
 \item{tz}{character denoting which timezone the output should be in. Defaults to \code{NULL}}
+
+\item{...}{extra parameters passed on to \code{FUN}}
 }
 \value{
 An \code{xts} object containing the aggregated time series.
 }
 \description{
-Aggregate a time series as \code{xts} object. 
+Aggregate a time series as \code{xts} or \code{data.table} object. 
 It can handle irregularly spaced time series and returns a regularly spaced one.
 Use univariate time series as input for this function and check out \code{\link{aggregateTrades}}
 and \code{\link{aggregateQuotes}} to aggregate Trade or Quote data objects.
