@@ -7,7 +7,8 @@ for (date in unique(as.character(as.Date(index(rets))))) {
 }
 
 
-context("HARmodel")
+
+# HARmodel ----------------------------------------------------------------
 test_that("HARModel",{
   
   expect_equal(
@@ -74,7 +75,9 @@ test_that("HARModel",{
   
 })
 
-context("HEAVYmodel")
+
+# HEAVYmodel --------------------------------------------------------------
+
 test_that("HEAVYmodel",{
   
   logReturns <- 100 * makeReturns(SPYRM$CLOSE)[-1]

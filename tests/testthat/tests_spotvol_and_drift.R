@@ -2,7 +2,8 @@ library("highfrequency")
 library("testthat")
 library("xts")
 
-context("spotDrift")
+
+# spotDrift ---------------------------------------------------------------
 test_that("spotDrift",{
   price <- sampleTData[as.Date(DT) == "2018-01-03", list(DT, PRICE)]
   kerneldrift <- spotDrift(as.xts(price), method = "driftKernel", alignBy = "minutes", alignPeriod = 1)
@@ -36,7 +37,8 @@ test_that("spotDrift",{
 })
 
 
-context("spotVol")
+
+# spotVol -----------------------------------------------------------------
 test_that("spotVol", {
   # expect_identical(
   #   formatC(as.numeric(spotVol(sampleOneMinuteData[, list(DT, PRICE = MARKET)])), digits = 3),
