@@ -698,18 +698,27 @@ intradayJumpTest <- function(pData, volEstimator = "RM", driftEstimator = "none"
   tests <- (returns$RETURN - drift)/(vol$spot)
   
   tests[is.infinite(tests)] <- NA
-  # Calculating the critical value of the test.
-  const <- 0.7978846 # = sqrt(2/pi)
   
+  ## Calculating the critical value of the test.
   
-  
-
   if(is.null(n)){n <- NROW(pData)}
   
-  Cn <- sqrt(2 * log(n))/const - (log(pi) + log( log(n) ))/(2 * const*sqrt((2 * log(n))))
-  Sn <- 1/sqrt(const * 2 * log(n))
-  betastar <- -log(-log(1-alpha))
+  # const <- 0.7978846 # = sqrt(2/pi)
+  # Cn <- sqrt(2 * log(n))/const - (log(pi) + log( log(n) ))/(2 * const*sqrt((2 * log(n))))
+  # Sn <- 1/sqrt(const * 2 * log(n))
+  ## Lee-Mykland (Thm 1) proposes a normally distributed test statistic with mean = 0 and variance = 1/c^2 under the null. 
+  ## The constant comes from the fact that their spot volatility is calculated using the bipower variation (Barndorff-Nielsen and Shephard, 2004). 
+  ## The definition in Lee-Mykland (Eq. 8) lacks the constant in the definition. 
+  ## Our generalized test statistic L is standard normally distributed N(0,1). We want it to work for different spotvol estimators. 
+  ## Therefore we can remove the constant from the threshold. 
+  Cn <- sqrt(2 * log(n)) - (log(pi) + log(log(n))) / (2 * sqrt(2 * log(n)))
+  Sn <- 1 / sqrt(2 * log(n))
+  # normalized: threshold if we rescale L with Cn and Sn (like in Lee & Mykland, Eq. 12)
+  betastar <- -log(-log(1-alpha)) # # betastar # for alpha = 0.01 4.600149 (example on Lee & Mykland, 2008, pp. 2543)
+  # raw: threshold if we do not rescale the L statistic with Cn and Sn, but we rescale the threshold directly (Sn and Cn to other side of the equation)
   criticalValue <- Cn + Sn * betastar
+  # for n = 78, alpha = 0.01, criticalValue = 4.067058 
+  
   
   if (dataWasXts) {
     pData <- as.xts(pData[ , list(DT, PRICE)], tz = tz)
