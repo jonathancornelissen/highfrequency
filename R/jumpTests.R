@@ -693,7 +693,9 @@ intradayJumpTest <- function(pData, volEstimator = "RM", driftEstimator = "none"
     drift <- 0
   }
   
-  vol$spot <- sqrt((vol$spot^2)/(op$lookBackPeriod-2))
+  if (volEstimator == "RM") { # we only define "op" if "volEstimator == "RM", see earlier in this function. 
+    vol$spot <- sqrt((vol$spot^2)/(op$lookBackPeriod-2))
+  }
   
   tests <- (returns$RETURN - drift)/(vol$spot)
   
