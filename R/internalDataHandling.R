@@ -37,6 +37,7 @@ fastTickAgregation <- function (ts, alignBy = "minutes", alignPeriod = 1, tz = "
 #' @keywords internal
 fastTickAgregation_DATA.TABLE <- function(dat, alignBy = "minutes", alignPeriod = 1, tz = "GMT"){
   .N <- MAXDT <- .SD <- firstDT <- DT <- DATE <- NULL
+  dat <- copy(dat)
   if (alignBy == "secs" | alignBy == "seconds") {
     secs <- alignPeriod
   } 
@@ -602,6 +603,8 @@ internalAggregateTSXTS <- function(ts, FUN = "previoustick", alignBy = "minutes"
 
 internalAggregateTSDT <- function(ts, FUN = "previoustick", alignBy = "minutes", alignPeriod = 1, weights = NULL, dropna = FALSE, tz = NULL, ...){
   .SD <- .N <- .I <- N <- DATE <- DT <- FIRST_DT <- DT_ROUND <- LAST_DT <- SYMBOL <- PRICE <- NULL
+  
+  ts <- copy(ts)
   if (alignBy == "milliseconds") {
     alignBy <- "secs"
     alignPeriod <- alignPeriod / 1000
