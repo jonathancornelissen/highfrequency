@@ -2713,9 +2713,12 @@ businessTimeAggregation <- function(pData, measure = "volume", obs = 390, bandwi
       
       intensityProcess <- as.numeric(pData$SIZE)
       intensityProcess <- intensityProcess/sum(intensityProcess) * obs
-      idx <- which(diff(floor(cumsum(intensityProcess))) >= 1)
-      pData <- pData[idx, ]
-      if(length(idx) < obs){
+      GRP <- cumsum(diff(floor(cumsum(intensityProcess))))
+      
+      pData[, GRP := c(ifelse(intensityProcess[1] > 1, -1, GRP[1]), GRP)]
+      pData <- pData[, list(DT = last(DT), PRICE = last(PRICE), SIZE = sum(SIZE)), by = GRP][,!"GRP"]
+
+      if(NROW(pData) < obs){
         warning(paste("The measure mandated sampling the same point twice, at least once, returning series that is smaller than obs on", date, "\n"))
       }
     }

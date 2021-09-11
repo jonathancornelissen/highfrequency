@@ -73,8 +73,8 @@ test_that("FoF test",{
   FoFtest <- intradayJumpTest(pData = dat, volEstimator = "PARM", driftEstimator = "none", alpha = 0.95, RM = "bipower", 
                               theta = 1, lookBackPeriod = 50, marketOpen = "9:30:00", marketClose = "16:00:00", tz = "GMT")
   
-  expect_equal(sum(FoFtest$ztest), -0.7087878823)
-  expect_equal(sum(FoFtest$vol$spot), 0.03742987532)
+  expect_equal(sum(FoFtest$ztest), -0.10230471)
+  expect_equal(sum(FoFtest$vol$spot), 0.25932179)
   expect_equal(sum(FoFtest$drift), 0)
   
 })

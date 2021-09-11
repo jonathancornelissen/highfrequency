@@ -351,7 +351,7 @@ test_that("business time aggregation",{
   
   expect_warning(businessTimeAggregation(pData, measure = "volume", obs = 390), "smaller")
   agged2 <- suppressWarnings(businessTimeAggregation(pData, measure = "volume", obs = 390))
-  expect_equal(nrow(agged2$pData), 755)
+  expect_equal(nrow(agged2$pData), 756)
   
   agged3 <- suppressWarnings(businessTimeAggregation(pData, measure = "vol", obs = 39, method = "PARM", RM = "rv", lookBackPeriod = 5))
   expect_equal(nrow(agged3$pData), 76)
