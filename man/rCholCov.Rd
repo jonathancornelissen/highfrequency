@@ -13,7 +13,7 @@ rCholCov(
 )
 }
 \arguments{
-\item{pData}{a list. Each list-item i contains an \code{xts} object with the intraday price data
+\item{pData}{a list. Each list-item i contains an \code{xts} object with the intraday price data (in levels)
 of stock \eqn{i} for day \eqn{t}. The order of the data does not matter as it will be sorted according to the criterion specified in the \code{criterion} argument}
 
 \item{IVest}{integrated variance estimator, default is \code{"rMRCov"}. For a list of implemented estimators, use \code{listCholCovEstimators()}.}

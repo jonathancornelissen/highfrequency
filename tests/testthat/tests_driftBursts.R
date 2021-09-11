@@ -1,7 +1,8 @@
 library("testthat")
 library("data.table")
 library("xts")
-context("DBH C++ error tests")
+
+# DBH C++ error tests -----------------------------------------------------
 test_that("DBH C++ error tests",{
   #these functions have broken before, hopefully they won't break again.
   expect_equal(highfrequency:::AsymptoticVarianceC(c(1:3), 3), NaN) 
@@ -10,7 +11,8 @@ test_that("DBH C++ error tests",{
 }
 )
 
-context("DBH test")
+
+# DBH tests ---------------------------------------------------------------
 test_that("DBH sim test", {
   set.seed(123)
   iT <- 23400

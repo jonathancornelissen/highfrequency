@@ -121,3 +121,11 @@ where
 \note{
 We Thank Merrick Li for contributing his Matlab code for this estimator.
 }
+\examples{
+kn <- knChooseReMeDI(sampleTDataEurope[, list(DT, PRICE)])
+
+remedi <- ReMeDI(sampleTDataEurope[, list(DT, PRICE)], kn = kn, lags = 0:15)
+
+asympVar <- ReMeDIAsymptoticVariance(sampleTDataEurope[, list(DT, PRICE)], 
+                                     kn = kn, lags = 0:15, phi = 0.9, i = 2)
+}

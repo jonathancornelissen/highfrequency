@@ -3151,7 +3151,7 @@ rTSCov <- function (pData, cor = FALSE, K = 300, J = 1, KCov = NULL, JCov = NULL
 #' Positive semi-definite covariance estimation using the CholCov algorithm.
 #' The algorithm estimates the integrated covariance matrix by sequentially adding series and using `refreshTime` to synchronize the observations.
 #' This is done in order of liquidity, which means that the algorithm uses more data points than most other estimation techniques.
-#' @param pData a list. Each list-item i contains an \code{xts} object with the intraday price data
+#' @param pData a list. Each list-item i contains an \code{xts} object with the intraday price data (in levels)
 #' of stock \eqn{i} for day \eqn{t}. The order of the data does not matter as it will be sorted according to the criterion specified in the \code{criterion} argument
 #' @param IVest integrated variance estimator, default is \code{"rMRCov"}. For a list of implemented estimators, use \code{listCholCovEstimators()}.
 #' @param COVest covariance estimator, default is \code{"rMRCov"}. For a list of implemented estimators, use \code{listCholCovEstimators()}.
@@ -3276,12 +3276,11 @@ rCholCov <- function(pData, IVest = "rMRCov", COVest = "rMRCov", criterion = "sq
   G <- matrix(0, D, D)
   Ltemp <- L <- diag(1,D,D)
 
-  #G[1,1] <- rCov(exp(pData[[vec[1]]]), makeReturns = TRUE)
 
     for (d in 1:D) {
 
       dat <- refreshTime(lapply(vec[1:d], function(x) pData[[x]]))
-      returns <- diff(dat)[-1,]
+      returns <- diff(log(dat))[-1,]
       f <- matrix(0, nrow(returns), d)
       f[,1] <- returns[,1]
       if(d>1){ # We shouldn't do this on the first pass.
@@ -3890,6 +3889,13 @@ knChooseReMeDI <- function(pData, knEqual = FALSE,
 #' @param i tuning parameter i
 #' @note We Thank Merrick Li for contributing his Matlab code for this estimator.
 #' @return a list with components \code{ReMeDI} and \code{asympVar} containing the ReMeDI estimation and it's asymptotic variance respectively
+#' @examples 
+#' kn <- knChooseReMeDI(sampleTDataEurope[, list(DT, PRICE)])
+#' 
+#' remedi <- ReMeDI(sampleTDataEurope[, list(DT, PRICE)], kn = kn, lags = 0:15)
+#' 
+#' asympVar <- ReMeDIAsymptoticVariance(sampleTDataEurope[, list(DT, PRICE)], 
+#'                                      kn = kn, lags = 0:15, phi = 0.9, i = 2)
 #' @export
 ReMeDIAsymptoticVariance <- function(pData, kn, lags, phi, i){
   PRICE <- DT <- NULL
@@ -3968,10 +3974,10 @@ ReMeDIAsymptoticVariance <- function(pData, kn, lags, phi, i){
 
   asympVar <- (S1 + S2 + S3)/N
   asympVar <- pmax(-asympVar, asympVar)
-  return(list("ReMeDI" = Rj, "asympVar" = asympVar))
+  out <- list("ReMeDI" = Rj, "asympVar" = asympVar, "lags" = lags)
+  class(out) <- "asympVarReMeDI"
+  return(out)
 }
-
-
 
 #### #'
 #### #' #' Autocorrelation of noise estimation

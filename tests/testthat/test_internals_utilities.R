@@ -1,5 +1,7 @@
 library(testthat)
 set.seed(1)
+
+# colCumsum ---------------------------------------------------------------
 test_that("colCumsum works correctly", {
   
   x <- matrix(rnorm(100), nrow = 10, ncol = 10)
@@ -7,11 +9,13 @@ test_that("colCumsum works correctly", {
   
 })
 
+# tickGrouping_RETURNS ----------------------------------------------------
 test_that("tickGrouping_RETURNS works correctly", {
   expect_equal(as.numeric(tickGrouping_RETURNS(100, 3)), c(rep(0:32, each = 3), 33))
 })
 
 
+# KK(.) -------------------------------------------------------------------
 test_that("KK cpp function works correctly", {
   
   x <- 1.5

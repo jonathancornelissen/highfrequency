@@ -10,7 +10,8 @@ dat <- cbind(rnorm(11701) * sqrt(1/11701), rnorm(11701) * sqrt(1/11701))
 dat <- exp(cumsum(xts(dat, timestamps)))
 price1 <- dat[,1]
 price2 <- dat[,2]
-context("leadLag")
+
+# leadLag -----------------------------------------------------------------
 test_that("leadLag", {
   # skip_on_os("solaris")
   ## Test that the contrasts are as expected

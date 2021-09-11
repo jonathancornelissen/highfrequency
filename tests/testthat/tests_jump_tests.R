@@ -1,7 +1,8 @@
 library(testthat)
 library(highfrequency)
 library(xts)
-context("AJjumpTest unit test")
+
+# AJjumpTest ----------------------------------------------------
 test_that("AJjumpTest unit test",{
   expect_equal(
     as.numeric(AJjumpTest(as.xts(sampleTData[,list(DT, PRICE)]), p = 2, k = 3, alignBy = "seconds", alignPeriod = 5, makeReturns = TRUE)[,1]),
@@ -10,7 +11,8 @@ test_that("AJjumpTest unit test",{
 })
 
 
-context("JO jump test unit test")
+
+# JO jump test ------------------------------------------------------------
 test_that("JO jump test unit test",{
   expect_equal(
     as.numeric(JOjumpTest(as.xts(sampleOneMinuteData)[,1], power = 6)$ztest),
@@ -26,7 +28,8 @@ test_that("JO jump test unit test",{
   )
 })
 
-context("BNSjumpTest")
+
+# BNSjumpTest -------------------------------------------------------------
 test_that("BNSjumpTest", {
   expect_equal(
     as.numeric(BNSjumpTest(as.xts(sampleTData[, list(DT, PRICE)]), IVestimator= "rMinRVar", IQestimator = "rMedRQuar", type= "linear", makeReturns = TRUE)[, "p.value"]),
@@ -43,7 +46,7 @@ test_that("BNSjumpTest", {
   
 })
 
-context("intradayJumpTest")
+# intradayJumpTest --------------------------------------------------------
 test_that("LM test",{
   ## Extract the prices and set the time-zone to the local time-zone
   library(xts)
@@ -90,6 +93,7 @@ test_that("multiple intradayJumpTest", {
 })
 
 
+# Rank jump test ----------------------------------------------------------
 test_that("rank jump test", {
   expect_error(rankJumpTest(marketPrice = as.xts(sampleOneMinuteData)[,1], stockPrices = list(as.xts(sampleOneMinuteData)[,2])), "Singular value decomposition cannot be calculated")
   rjt <- rankJumpTest(marketPrice = as.xts(sampleOneMinuteData)[,1], stockPrices = list(as.xts(sampleOneMinuteData)[,2], as.xts(sampleOneMinuteData)[,2] * 1.05))
