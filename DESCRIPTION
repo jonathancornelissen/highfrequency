@@ -2,16 +2,29 @@ Package: highfrequency
 Version: 0.9.1
 Date: 2021-10-24
 Title: Tools for Highfrequency Data Analysis
-Authors@R: c(
-    person("Kris", "Boudt", , "r@onnokleen.de", role = c("aut", "cre"),
-           comment = c(ORCID = "0000-0002-1000-5142")),
-    person("Jonathan", "Cornelissen", role = "aut"),
-    person("Scott", "Payseur", , "Scott.Payseur@gmail.com", role = "aut"),
-    person("Giang", "Nguyen", role = "ctb"),
-    person("Onno", "Kleen", role = "aut",
-           comment = c(ORCID = "0000-0003-4731-4640")),
-    person("Emil", "Sjoerup", role = "aut")
-  )
+Authors@R: 
+    c(person(given = "Kris",
+             family = "Boudt",
+             role = c("aut", "cre"),
+             email = "kris.boudt@ugent.be",
+             comment = c(ORCID = "0000-0002-1000-5142")),
+      person(given = "Jonathan",
+             family = "Cornelissen",
+             role = "aut"),
+      person(given = "Scott",
+             family = "Payseur",
+             role = "aut",
+             email = "Scott.Payseur@gmail.com"),
+      person(given = "Giang",
+             family = "Nguyen",
+             role = "ctb"),
+      person(given = "Onno",
+             family = "Kleen",
+             role = "aut",
+             comment = c(ORCID = "0000-0003-4731-4640")),
+      person(given = "Emil",
+             family = "Sjoerup",
+             role = "aut"))
 Description: Provide functionality to manage, clean and match highfrequency
     trades and quotes data, calculate various liquidity measures, estimate and
     forecast volatility, detect price jumps and investigate microstructure noise and intraday
