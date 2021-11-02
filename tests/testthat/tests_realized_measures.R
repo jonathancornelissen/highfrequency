@@ -493,14 +493,12 @@ test_that("rCholCov", {
   p3  <- xts(cumsum(w3) * c(0,sqrt(diff(timestamps3) / (max(timestamps3) - min(timestamps3)))), as.POSIXct(timestamps3, origin = "1970-01-01", tz = "UTC"), tz = "UTC")
   p4  <- xts(cumsum(w4) * c(0,sqrt(diff(timestamps4) / (max(timestamps4) - min(timestamps4)))), as.POSIXct(timestamps4, origin = "1970-01-01", tz = "UTC"), tz = "UTC")
   
-  rCC <- rCholCov(list("market" = p1, "stock1" = p2, "stock2" =p3 , "stock3" = p4))
+  rCC <- rCholCov(list("market" = exp(p1), "stock1" = exp(p2), "stock2" = exp(p3) , "stock3" = exp(p4)))
   
   expect_equal(colnames(rCC$CholCov) , c("market", "stock3", "stock1", "stock2"))
   expect_equal(round(as.numeric(rCC$CholCov), 6) , round(c(0.9719097, 0.7821389, -0.3605819,  0.5238333, 0.7821389, 4.5218663,  0.5850890,
                                                            0.3575620, -0.3605819, 0.5850890,  2.4545129, -0.4106370, 0.5238333, 0.3575620,
                                                            -0.4106370,  1.6889769) , 6))
-  
-  
   
   expect_equal(colnames(rCC$L), colnames(rCC$G))
   
@@ -543,8 +541,6 @@ test_that("rSemiCov", {
 
 ##### ReMeDI #####
 test_that("ReMeDI Estimation matches expected output", { # We thank Merrick li for contributing Matlab code.
-  # print("Make sure to implement tests for correctTime = TRUE") ## When it becomes relevant.
-  #remed <- ReMeDI(sampleTData, correctTime = FALSE, lags = 0:25, kn = 2) ##Changed due to correctTime bug
   remed <- ReMeDI(sampleTData[, list(DT, PRICE = log(PRICE))], lags = 0:25, kn = 2)
 
   expected <- c(5.391986e-10,  3.873739e-09,  4.261547e-09,  3.118519e-09,  1.538245e-09,  6.805792e-10, -3.835125e-10, -2.232302e-10, -1.157490e-10, -1.110401e-09, -1.934303e-09,
@@ -568,13 +564,9 @@ test_that("ReMeDI Estimation matches expected output", { # We thank Merrick li f
 
 test_that("ReMeDI lag choosing algorithm chooses the correct values", {
 
-  # optimalKn <- knChooseReMeDI(sampleTData, correctTime = FALSE, jumpsIndex = NULL, knMax = 10, tol = 0.05, size = 3, lower = 1, upper = 10, plot = FALSE)##Changed due to correctTime bug
   optimalKn <- knChooseReMeDI(sampleTData, knMax = 10, tol = 0.05, size = 3, lower = 1, upper = 10, plot = FALSE)
   expect_equal(optimalKn, 5L)
-
   
-  
-  # optimalKn <- knChooseReMeDI(dat, correctTime = FALSE, jumpsIndex = NULL, knMax = 10, tol = 0.05, size = 3, lower = 3, upper = 5, plot = FALSE) ##Changed due to correctTime bug
   optimalKn <- knChooseReMeDI(sampleTData[as.Date(DT) == "2018-01-02"], knMax = 10, tol = 0.05, size = 3, lower = 3, upper = 5, plot = FALSE)
   expect_equal(optimalKn, 5L)
 

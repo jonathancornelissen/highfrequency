@@ -1,7 +1,7 @@
 #' @importFrom zoo zoo na.locf `index<-`
 #' @importFrom stats start end
 #' @keywords internal
-fastTickAgregation <- function (ts, alignBy = "minutes", alignPeriod = 1, tz = "GMT") {
+fastTickAggregation <- function (ts, alignBy = "minutes", alignPeriod = 1, tz = "GMT") {
   
   if(alignBy == "ticks"){
     return(na.locf(ts)[seqInclEnds(1, length(ts), alignPeriod)])
@@ -35,7 +35,7 @@ fastTickAgregation <- function (ts, alignBy = "minutes", alignPeriod = 1, tz = "
 
 #' @importFrom data.table rbindlist setkey nafill set
 #' @keywords internal
-fastTickAgregation_DATA.TABLE <- function(dat, alignBy = "minutes", alignPeriod = 1, tz = "GMT"){
+fastTickAggregation_DATA.TABLE <- function(dat, alignBy = "minutes", alignPeriod = 1, tz = "GMT"){
   .N <- MAXDT <- .SD <- firstDT <- DT <- DATE <- NULL
   dat <- copy(dat)
   if (alignBy == "secs" | alignBy == "seconds") {
@@ -105,9 +105,9 @@ fastTickAgregation_DATA.TABLE <- function(dat, alignBy = "minutes", alignPeriod 
 #' @importFrom zoo zoo na.locf `index<-`
 #' @importFrom stats start end
 #' @keywords internal
-fastTickAgregation_RETURNS <- function (ts, alignBy = "minutes", alignPeriod = 1, tz = "GMT") {
+fastTickAggregation_RETURNS <- function (ts, alignBy = "minutes", alignPeriod = 1, tz = "GMT") {
   DT <- NULL
-  agged <- fastTickAgregation_DATA.TABLE_RETURNS(as.data.table(ts)[, DT := index][, !"index"], alignBy = alignBy, alignPeriod = alignPeriod, tz = tz)
+  agged <- fastTickAggregation_DATA.TABLE_RETURNS(as.data.table(ts)[, DT := index][, !"index"], alignBy = alignBy, alignPeriod = alignPeriod, tz = tz)
   return(as.xts(agged))
   # 
   # 
@@ -151,7 +151,7 @@ fastTickAgregation_RETURNS <- function (ts, alignBy = "minutes", alignPeriod = 1
 
 #' @importFrom data.table rbindlist setkey nafill set
 #' @keywords internal
-fastTickAgregation_DATA.TABLE_RETURNS <- function(dat, alignBy = "minutes", alignPeriod = 1, tz = "GMT"){
+fastTickAggregation_DATA.TABLE_RETURNS <- function(dat, alignBy = "minutes", alignPeriod = 1, tz = "GMT"){
   ....GRP.... <- .N <- DT_ROUND <- FIRST_DT <- .SD <- FIRST_DT <- DT <- DATE <- NULL
   if (alignBy == "secs" | alignBy == "seconds") {
     secs <- alignPeriod

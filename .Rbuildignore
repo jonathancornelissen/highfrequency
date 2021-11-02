@@ -20,3 +20,13 @@ GSoC playground.R
 ^article$
 ^Wrapup*
 highfrequency.pdf
+examples$
+Figure_1.pdf
+Figure_2.pdf
+Figure_3.pdf
+Figure_4.pdf
+Figure_5.pdf
+Figure_6.pdf
+Figure_7.pdf
+Figure_8.pdf
+output_vignette.txt
