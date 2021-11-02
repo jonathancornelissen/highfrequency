@@ -159,11 +159,11 @@ rMedRQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = F
     DATE <- .N <- DT <- NULL
     setcolorder(rData, "DT")
     if(!is.null(alignBy) && !is.null(alignPeriod) && makeReturns) {
-      rData <- fastTickAgregation_DATA.TABLE(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation_DATA.TABLE(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
 
     if(!is.null(alignBy) && !is.null(alignPeriod) && !makeReturns) {
-      rData <- fastTickAgregation_DATA.TABLE_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation_DATA.TABLE_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     # dates <- as.character(unique(as.Date(rData$DT)))
     # res <- vector(mode = "list", length = length(dates))
@@ -193,10 +193,10 @@ rMedRQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = F
   } else {
     ## DO data transformations
     if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && makeReturns) {
-      rData <- fastTickAgregation(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && !makeReturns) {
-      rData <- fastTickAgregation_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     if (makeReturns) {
       rData <- makeReturns(rData)
@@ -268,11 +268,11 @@ rMinRQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = F
     DATE <- .N <- DT <- NULL
     setcolorder(rData, "DT")
     if(!is.null(alignBy) && !is.null(alignPeriod) && makeReturns) {
-      rData <- fastTickAgregation_DATA.TABLE(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation_DATA.TABLE(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
 
     if(!is.null(alignBy) && !is.null(alignPeriod) && !makeReturns) {
-      rData <- fastTickAgregation_DATA.TABLE_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation_DATA.TABLE_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     setkey(rData, "DT")
     dates <- rData[, list(end = .N), by = list(DATE = as.Date(DT))][, `:=`(end = cumsum(end), DATE = as.character(DATE))][, start := shift(end, fill = 0) + 1]
@@ -292,10 +292,10 @@ rMinRQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = F
   } else {
     ## DO data transformations
     if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && makeReturns) {
-      rData <- fastTickAgregation(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && !makeReturns) {
-      rData <- fastTickAgregation_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     if (makeReturns) {
       rData <- makeReturns(rData)
@@ -370,11 +370,11 @@ rMinRVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FA
     DATE <- .N <- DT <- NULL
     setcolorder(rData, "DT")
     if(!is.null(alignBy) && !is.null(alignPeriod) && makeReturns) {
-      rData <- fastTickAgregation_DATA.TABLE(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation_DATA.TABLE(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
 
     if(!is.null(alignBy) && !is.null(alignPeriod) && !makeReturns) {
-      rData <- fastTickAgregation_DATA.TABLE_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation_DATA.TABLE_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     setkey(rData, "DT")
     dates <- rData[, list(end = .N), by = list(DATE = as.Date(DT))][, `:=`(end = cumsum(end), DATE = as.character(DATE))][, start := shift(end, fill = 0) + 1]
@@ -400,10 +400,10 @@ rMinRVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FA
   } else {
     ## DO data transformations
     if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && makeReturns) {
-      rData <- fastTickAgregation(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && !makeReturns) {
-      rData <- fastTickAgregation_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     if (makeReturns) {
       rData <- makeReturns(rData)
@@ -492,11 +492,11 @@ rMedRVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FA
     DATE <- .N <- DT <- NULL
     setcolorder(rData, "DT")
     if(!is.null(alignBy) && !is.null(alignPeriod) && makeReturns) {
-      rData <- fastTickAgregation_DATA.TABLE(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation_DATA.TABLE(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
 
     if(!is.null(alignBy) && !is.null(alignPeriod) && !makeReturns) {
-      rData <- fastTickAgregation_DATA.TABLE_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation_DATA.TABLE_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     setkey(rData, "DT")
     dates <- rData[, list(end = .N), by = list(DATE = as.Date(DT))][, `:=`(end = cumsum(end), DATE = as.character(DATE))][, start := shift(end, fill = 0) + 1]
@@ -524,10 +524,10 @@ rMedRVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FA
   } else {
     ## DO data transformations
     if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && makeReturns) {
-      rData <- fastTickAgregation(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && !makeReturns) {
-      rData <- fastTickAgregation_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     if (makeReturns) {
       rData <- makeReturns(rData)
@@ -1148,11 +1148,11 @@ rBPCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeR
   } else if (is.data.table(rData)){
     DATE <- .N <- DT <- NULL
     if(!is.null(alignBy) && !is.null(alignPeriod) && makeReturns) {
-      rData <- fastTickAgregation_DATA.TABLE(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation_DATA.TABLE(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
 
     if(!is.null(alignBy) && !is.null(alignPeriod) && !makeReturns) {
-      rData <- fastTickAgregation_DATA.TABLE_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation_DATA.TABLE_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     setkey(rData, "DT")
     dates <- rData[, list(end = .N), by = list(DATE = as.Date(DT))][, `:=`(end = cumsum(end), DATE = as.character(DATE))][, start := shift(end, fill = 0) + 1]
@@ -1179,10 +1179,10 @@ rBPCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeR
   } else { #single day code
     ## DO data transformations
     if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && makeReturns) {
-      rData <- fastTickAgregation(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && !makeReturns) {
-      rData <- fastTickAgregation_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     if (makeReturns) {
       rData <- makeReturns(rData)
@@ -1297,11 +1297,11 @@ rCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeRet
   } else if (is.data.table(rData)){
     DATE <- .N <- DT <- NULL
     if(!is.null(alignBy) && !is.null(alignPeriod) && makeReturns) {
-      rData <- fastTickAgregation_DATA.TABLE(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation_DATA.TABLE(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
 
     if(!is.null(alignBy) && !is.null(alignPeriod) && !makeReturns) {
-      rData <- fastTickAgregation_DATA.TABLE_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation_DATA.TABLE_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
 
 
@@ -1329,10 +1329,10 @@ rCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeRet
   } else {
     ## DO data transformations
     if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && makeReturns) {
-      rData <- fastTickAgregation(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && !makeReturns) {
-      rData <- fastTickAgregation_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     if (makeReturns) {
       rData <- makeReturns(rData)
@@ -1428,20 +1428,20 @@ rHYCov <- function(rData, cor = FALSE, period = 1, alignBy = "seconds", alignPer
     
     if(is.xts(rData)){
       if(makeReturns){      
-        rData <- fastTickAgregation(rData, alignBy = "seconds", alignPeriod = 1)
-        aggrdata <- fastTickAgregation(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+        rData <- fastTickAggregation(rData, alignBy = "seconds", alignPeriod = 1)
+        aggrdata <- fastTickAggregation(rData, alignBy = alignBy, alignPeriod = alignPeriod)
       } else { 
-        rData <- fastTickAgregation_RETURNS(rData, alignBy = "seconds", alignPeriod = 1)
-        aggrdata <- fastTickAgregation_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+        rData <- fastTickAggregation_RETURNS(rData, alignBy = "seconds", alignPeriod = 1)
+        aggrdata <- fastTickAggregation_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
       }
       
     } else if (is.data.table(rData)){
       if(makeReturns){
-        rData <- fastTickAgregation_DATA.TABLE(rData, alignBy = "seconds", alignPeriod = 1)
-        aggrdata <- fastTickAgregation_DATA.TABLE(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+        rData <- fastTickAggregation_DATA.TABLE(rData, alignBy = "seconds", alignPeriod = 1)
+        aggrdata <- fastTickAggregation_DATA.TABLE(rData, alignBy = alignBy, alignPeriod = alignPeriod)
       } else {
-        rData <- fastTickAgregation_DATA.TABLE_RETURNS(rData, alignBy = "seconds", alignPeriod = 1)
-        aggrdata <- fastTickAgregation_DATA.TABLE_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+        rData <- fastTickAggregation_DATA.TABLE_RETURNS(rData, alignBy = "seconds", alignPeriod = 1)
+        aggrdata <- fastTickAggregation_DATA.TABLE_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
         
       }
       rData <- as.matrix(rData[, !"DT"])
@@ -1590,11 +1590,11 @@ rKernelCov <- function(rData, cor = FALSE,  alignBy = NULL, alignPeriod = NULL,
   } else if (is.data.table(rData)){
     DATE <- .N <- DT <- NULL
     if (!is.null(alignBy) && !is.null(alignPeriod) && makeReturns) {
-      rData <- fastTickAgregation_DATA.TABLE(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation_DATA.TABLE(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
 
     if(!is.null(alignBy) && !is.null(alignPeriod) && !makeReturns) {
-      rData <- fastTickAgregation_DATA.TABLE_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation_DATA.TABLE_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     setcolorder(rData, "DT")
     setkey(rData, "DT")
@@ -1622,10 +1622,10 @@ rKernelCov <- function(rData, cor = FALSE,  alignBy = NULL, alignPeriod = NULL,
     # # Aggregate:
     ## DO data transformations
     if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && makeReturns) {
-      rData <- fastTickAgregation(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && !makeReturns) {
-      rData <- fastTickAgregation_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     if (makeReturns) {
       rData <- makeReturns(rData)
@@ -1739,11 +1739,11 @@ rKurt <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
     DATE <- .N <- DT <- NULL
     setcolorder(rData, "DT")
     if(!is.null(alignBy) && !is.null(alignPeriod) && makeReturns) {
-      rData <- fastTickAgregation_DATA.TABLE(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation_DATA.TABLE(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
 
     if(!is.null(alignBy) && !is.null(alignPeriod) && !makeReturns) {
-      rData <- fastTickAgregation_DATA.TABLE_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation_DATA.TABLE_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
 
     setkey(rData, DT)
@@ -1771,10 +1771,10 @@ rKurt <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
   } else {
     ## DO data transformations
     if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && makeReturns) {
-      rData <- fastTickAgregation(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && !makeReturns) {
-      rData <- fastTickAgregation_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     if (makeReturns) {
       rData <- makeReturns(rData)
@@ -1856,11 +1856,11 @@ rMPVar <- function(rData, m = 2, p = 2, alignBy = NULL, alignPeriod = NULL, make
   } else if (is.data.table(rData)){
     DATE <- .N <- DT <- NULL
     if(!is.null(alignBy) && !is.null(alignPeriod) && makeReturns) {
-      rData <- fastTickAgregation_DATA.TABLE(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation_DATA.TABLE(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
 
     if(!is.null(alignBy) && !is.null(alignPeriod) && !makeReturns) {
-      rData <- fastTickAgregation_DATA.TABLE_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation_DATA.TABLE_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     setkey(rData, "DT")
     dates <- rData[, list(end = .N), by = list(DATE = as.Date(DT))][, `:=`(end = cumsum(end), DATE = as.character(DATE))][, start := shift(end, fill = 0) + 1]
@@ -1885,10 +1885,10 @@ rMPVar <- function(rData, m = 2, p = 2, alignBy = NULL, alignPeriod = NULL, make
   } else {
     ## DO data transformations
     if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && makeReturns) {
-      rData <- fastTickAgregation(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && !makeReturns) {
-      rData <- fastTickAgregation_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     if (makeReturns) {
       rData <- makeReturns(rData)
@@ -2006,8 +2006,8 @@ rOWCov <- function (rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, make
 
   # Aggregate:
   if ((!is.null(alignBy))&&(!is.null(alignPeriod))) {
-    rData <- fastTickAgregation(rData, alignBy = alignBy, alignPeriod = alignPeriod)
-    seasadjR <- fastTickAgregation(seasadjR, alignBy = alignBy, alignPeriod = alignPeriod)
+    rData <- fastTickAggregation(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+    seasadjR <- fastTickAggregation(seasadjR, alignBy = alignBy, alignPeriod = alignPeriod)
   }
   if (makeReturns) {
     rData <- makeReturns(rData)
@@ -2128,11 +2128,11 @@ rSkew <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
   } else if (is.data.table(rData)){
     DATE <- .N <- DT <- NULL
     if(!is.null(alignBy) && !is.null(alignPeriod) && makeReturns) {
-      rData <- fastTickAgregation_DATA.TABLE(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation_DATA.TABLE(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
 
     if(!is.null(alignBy) && !is.null(alignPeriod) && !makeReturns) {
-      rData <- fastTickAgregation_DATA.TABLE_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation_DATA.TABLE_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     setkey(rData, "DT")
     setcolorder(rData, "DT")
@@ -2161,10 +2161,10 @@ rSkew <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
   } else {
     ## DO data transformations
     if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && makeReturns) {
-      rData <- fastTickAgregation(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && !makeReturns) {
-      rData <- fastTickAgregation_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     if (makeReturns) {
       rData <- makeReturns(rData)
@@ -2254,11 +2254,11 @@ rSVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
     DATE <- .N <- DT <- NULL
     setcolorder(rData, "DT")
     if(!is.null(alignBy) && !is.null(alignPeriod) && makeReturns) {
-      rData <- fastTickAgregation_DATA.TABLE(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation_DATA.TABLE(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
 
     if(!is.null(alignBy) && !is.null(alignPeriod) && !makeReturns) {
-      rData <- fastTickAgregation_DATA.TABLE_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation_DATA.TABLE_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     setkey(rData, "DT")
     dates <- rData[, list(end = .N), by = list(DATE = as.Date(DT))][, `:=`(end = cumsum(end), DATE = as.character(DATE))][, start := shift(end, fill = 0) + 1]
@@ -2278,10 +2278,10 @@ rSVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 
     ## DO data transformations
     if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && makeReturns) {
-      rData <- fastTickAgregation(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && !makeReturns) {
-      rData <- fastTickAgregation_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     if (makeReturns) {
       rData <- makeReturns(rData)
@@ -2376,11 +2376,11 @@ rThresholdCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL
   }  else if (is.data.table(rData)){
     DATE <- .N <- DT <- NULL
     if(!is.null(alignBy) && !is.null(alignPeriod) && makeReturns) {
-      rData <- fastTickAgregation_DATA.TABLE(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation_DATA.TABLE(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
 
     if(!is.null(alignBy) && !is.null(alignPeriod) && !makeReturns) {
-      rData <- fastTickAgregation_DATA.TABLE_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation_DATA.TABLE_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
 
     setkey(rData, "DT")
@@ -2406,10 +2406,10 @@ rThresholdCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL
   } else { #single day code
     ## DO data transformations
     if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && makeReturns) {
-      rData <- fastTickAgregation(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && !makeReturns) {
-      rData <- fastTickAgregation_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     if (makeReturns) {
       rData <- makeReturns(rData)
@@ -2670,11 +2670,11 @@ rRVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
     DATE <- .N <- DT <- NULL
     setcolorder(rData, "DT")
     if(!is.null(alignBy) && !is.null(alignPeriod) && makeReturns) {
-      rData <- fastTickAgregation_DATA.TABLE(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation_DATA.TABLE(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     
     if(!is.null(alignBy) && !is.null(alignPeriod) && !makeReturns) {
-      rData <- fastTickAgregation_DATA.TABLE_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation_DATA.TABLE_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     setkey(rData, "DT")
     dates <- rData[, list(end = .N), by = list(DATE = as.Date(DT))][, `:=`(end = cumsum(end), DATE = as.character(DATE))][, start := shift(end, fill = 0) + 1]
@@ -2702,10 +2702,10 @@ rRVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
   } else {
     ## DO data transformations
     if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && makeReturns) {
-      rData <- fastTickAgregation(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && !makeReturns) {
-      rData <- fastTickAgregation_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     if (makeReturns) {
       rData <- makeReturns(rData)
@@ -2763,11 +2763,11 @@ rTPQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FAL
   } else if (is.data.table(rData)){
     DATE <- .N <- DT <- NULL
     if(!is.null(alignBy) && !is.null(alignPeriod) && makeReturns) {
-      rData <- fastTickAgregation_DATA.TABLE(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation_DATA.TABLE(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
 
     if(!is.null(alignBy) && !is.null(alignPeriod) && !makeReturns) {
-      rData <- fastTickAgregation_DATA.TABLE_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation_DATA.TABLE_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     setkey(rData, "DT")
     dates <- rData[, list(end = .N), by = list(DATE = as.Date(DT))][, `:=`(end = cumsum(end), DATE = as.character(DATE))][, start := shift(end, fill = 0) + 1]
@@ -2788,10 +2788,10 @@ rTPQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FAL
   } else {
     ## DO data transformations
     if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && makeReturns) {
-      rData <- fastTickAgregation(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && !makeReturns) {
-      rData <- fastTickAgregation_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     if (makeReturns) {
       rData <- makeReturns(rData)
@@ -2849,11 +2849,11 @@ rQPVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
   } else if (is.data.table(rData)){
     DATE <- .N <- DT <- NULL
     if(!is.null(alignBy) && !is.null(alignPeriod) && makeReturns) {
-      rData <- fastTickAgregation_DATA.TABLE(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation_DATA.TABLE(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
 
     if (!is.null(alignBy) && !is.null(alignPeriod) && !makeReturns) {
-      rData <- fastTickAgregation_DATA.TABLE_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation_DATA.TABLE_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     setkey(rData, "DT")
     dates <- rData[, list(end = .N), by = list(DATE = as.Date(DT))][, `:=`(end = cumsum(end), DATE = as.character(DATE))][, start := shift(end, fill = 0) + 1]
@@ -2874,10 +2874,10 @@ rQPVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALS
   } else {
     ## Do data transformations
     if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && makeReturns) {
-      rData <- fastTickAgregation(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && !makeReturns) {
-      rData <- fastTickAgregation_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     if (makeReturns) {
       rData <- makeReturns(rData)
@@ -2933,11 +2933,11 @@ rQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
   }  else if (is.data.table(rData)){
     DATE <- .N <- DT <- NULL
     if(!is.null(alignBy) && !is.null(alignPeriod) && makeReturns) {
-      rData <- fastTickAgregation_DATA.TABLE(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation_DATA.TABLE(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
 
     if(!is.null(alignBy) && !is.null(alignPeriod) && !makeReturns) {
-      rData <- fastTickAgregation_DATA.TABLE_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation_DATA.TABLE_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     setkey(rData, "DT")
     dates <- rData[, list(end = .N), by = list(DATE = as.Date(DT))][, `:=`(end = cumsum(end), DATE = as.character(DATE))][, start := shift(end, fill = 0) + 1]
@@ -2958,10 +2958,10 @@ rQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
   } else {
     ## DO data transformations
     if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && makeReturns) {
-      rData <- fastTickAgregation(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && !makeReturns) {
-      rData <- fastTickAgregation_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     if (makeReturns) {
       rData <- makeReturns(rData)
@@ -3426,11 +3426,11 @@ rSemiCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, mak
   }  else if (is.data.table(rData)){
     DATE <- .N <- DT <- NULL
     if(!is.null(alignBy) && !is.null(alignPeriod) && makeReturns) {
-      rData <- fastTickAgregation_DATA.TABLE(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation_DATA.TABLE(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
 
     if(!is.null(alignBy) && !is.null(alignPeriod) && !makeReturns) {
-      rData <- fastTickAgregation_DATA.TABLE_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation_DATA.TABLE_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
 
     setkey(rData, "DT")
@@ -3451,10 +3451,10 @@ rSemiCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, mak
 
     ## DO data transformations
     if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && makeReturns) {
-      rData <- fastTickAgregation(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && !makeReturns) {
-      rData <- fastTickAgregation_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     if (makeReturns) {
       rData <- makeReturns(rData)
@@ -3538,7 +3538,6 @@ listCholCovEstimators <- function(){
 #' @param pData \code{xts} or \code{data.table} containing the log-prices of the asset
 #' @param kn numeric of length 1 determining the tuning parameter kn this controls the lengths of the non-overlapping interval in the ReMeDI estimation
 #' @param lags numeric containing integer values indicating the lags for which to estimate the (co)variance
-#' @param knEqual Use an altered version of the ReMeDI estimator, where we instead use equal kn, instead of kn and 2*kn for the windows. See Figure 1 of paper in reference section.
 #' @param makeCorrelation logical indicating whether to transform the autocovariances into autocorrelations. 
 #' The estimate of variance is imprecise and thus, constructing the correlation like this may show correlations that fall outside \eqn{(-1,1)}.
 #'
@@ -3555,15 +3554,9 @@ listCholCovEstimators <- function(){
 #' remed <- ReMeDI(sampleTData[as.Date(DT) == "2018-01-02", ], kn = optimalKn, lags = 1:8)
 #' @author Emil Sjoerup.
 #' @export
-ReMeDI <- function(pData, kn = 1, lags = 1, knEqual = FALSE,
-                   #correctTime = FALSE, jumpsIndex = NULL,
-                   makeCorrelation = FALSE){
+ReMeDI <- function(pData, kn = 1, lags = 1, makeCorrelation = FALSE) {
   DT <- PRICE <- NULL #time <-
   # Check input
-
-  if(!is.logical(knEqual)){
-    stop("knEqual must be logical")
-  }
 
   if(is.data.table(pData)){ # We have a data.table
 
@@ -3571,20 +3564,9 @@ ReMeDI <- function(pData, kn = 1, lags = 1, knEqual = FALSE,
       stop("ReMeDI with data.table input requires a PRICE column")
     }
 
-    # if(correctTime){
-    #   if(!("DT" %in% colnames(pData))){
-    #     stop("ReMeDI with correctTime set to TRUE needs a DT (date-time) column when the input is a data.table")
-    #   } else {
-    #     time <- as.numeric(pData[, DT])
-    #   }
-    # }
-
     prices <- as.numeric(pData[, PRICE])
 
   } else if( is.xts(pData) ) { # We have an xts object
-    # if(correctTime){
-    #   time <- as.numeric(index(pData))
-    # }
     if(ncol(pData) != 1){
       if(!("PRICE" %in% colnames(pData))){
         stop("ReMeDI with data.table input requires a PRICE column")
@@ -3597,120 +3579,38 @@ ReMeDI <- function(pData, kn = 1, lags = 1, knEqual = FALSE,
     stop("Error in ReMeDI: pData must be an xts or a data.table")
   }
 
-  # correctJumps <- FALSE
-  #
-  # if(is.numeric(jumpsIndex)){
-  #   if(!all(jumpsIndex %% 1 == 0)){
-  #     stop("Error in ReMeDI: jumpsIndex must be a numeric of integer values")
-  #   }
-  #   correctJumps <- TRUE
-  # }
-
   if (!all(lags %% 1 == 0 )) {
     stop("lags must be contain integer values")
   }
 
   res <- numeric(length(lags))
   nObs <- length(prices)
-
-  kn <- c(-kn, 2 * kn)
+  
   resIDX <- 1
-
   if (makeCorrelation) {
-    lags <- c(0, lags) # We make sure we have 0 lag first in the series (we remove it later again)
+    lags <- c(0, lags)
   }
-
-  foo <- FALSE
-  if(knEqual){
-    foo <- TRUE
-  }
-
+  
   for (lag in lags) {
-
-    # thisLag <- c(lag, 0)
-    #remedi <- (kn[2] + 1):(nObs - lag + kn[1])
-    #idx <- 1
     remedi <- 0
-    # for(i in 1:(nObs - 3 * (-kn[1]) - lag)){
-    #   remedi <- remedi + ((prices[i + 2 * (-kn[1])] - prices[i]) * (prices[i + 3 * (-kn[1]) + lag] - prices[i + 2 * (-kn[1]) + lag]))
-    # }
-    # browser()
-
-    idx <- seq_len((nObs - (3-foo) * (-kn[1]) - lag))
-    remedi <- sum((prices[idx + (2-foo) * (-kn[1])] - prices[idx]) * (prices[idx + (3-foo) * (-kn[1]) + lag] - prices[idx + (2-foo) * (-kn[1]) + lag]))
-
-    # ## Use the time corrections Muzafer provided
-    # if(correctTime){
-    #
-    #  ## We need to make corrections in the code for time adjustment when this is ready.
-      # for (i in (kn[2] + 1):(nObs - lag + kn[1])) { # Calculate ReMeDI
-      #   remedi[idx] <- prod(prices[i + thisLag] - prices[i + thisLag - kn])
-      #   idx <- idx + 1
-      # }
-
-
-
-
-    #
-    #   timeIDX <- sweep(matrix(rep((kn[2] + 1):(nObs - lag + kn[1]), 4), ncol = 4),2, c(thisLag , thisLag - kn), FUN = "+")
-    #
-    #   ## Follow up with muzafer whether this is correct
-    #   timeCorrection <- (time[timeIDX[,3]] - time[timeIDX[,1]]) * (time[timeIDX[,2]] - time[timeIDX[,4]])
-    #
-    #   remedi <- remedi * timeCorrection
-    #
-    # }
-    #
-    #
-    # ## Use the jump correction Muzafer provided
-    # if(correctJumps){
-    #   jumpIDX <- matrix(0, nrow = length(jumpsIndex), ncol = 3 + (thisLag[1] != 0))
-    #
-    #   for (i in 1:length(jumpsIndex)) {
-    #     if(thisLag[1] != 0){
-    #       jumpIDX[i,] <- c(jumpsIndex[i] - sum(abs(kn)) - thisLag[1], jumpsIndex[i] - rep(kn[2], 1 + sum(thisLag != 0)) - thisLag, jumpsIndex[i] )
-    #     } else {
-    #       jumpIDX[i,] <- c(jumpsIndex[i] - sum(abs(kn)) - thisLag[1], jumpsIndex[i] - kn[2] - thisLag[1], jumpsIndex[i])
-    #     }
-    #
-    #     remedi <- remedi[-as.numeric(jumpIDX)]
-    #   }
-    #
-    #
-    # }
-    #
-    #
-
-    res[resIDX] <- -remedi/(nObs - (3-foo) * (-kn[1]) - lag)
-
-    resIDX <- resIDX +1
+    idx <- seq(2*kn+1, (nObs - kn - lag))
+    
+    remedi <- sum(
+      (prices[idx + lag] - prices[idx + lag +  kn ])*
+        (prices[idx] - prices[idx - 2  * kn] ) )   
+    res[resIDX] <-  remedi  
+    
+    resIDX <- resIDX + 1
+    
   }
-
-
-  if(makeCorrelation){
-    res <- res[-1]/res[1] # We transform the autocovariances into autocorrelations (and remove the 0-lag we added earlier)
+  
+  res <- res /  nObs
+  
+  if (makeCorrelation) {
+    res <- res[-1]/res[1]
   }
-
   return(res)
 }
-
-## For when correcTime is solved:
-# #' @examples
-# #' optimalKn <- knChooseReMeDI(sampleTData, correctTime = FALSE,
-# #'                             jumpsIndex = NULL, knMax = 10, tol = 0.05,
-# #'                             size = 3, lower = 2, upper = 5, plot = TRUE)
-# #' optimalKn
-# #' \dontrun{
-# #' # We can also have a much larger search-space
-# #' optimalKn <- knChooseReMeDI(sampleTData, correctTime = FALSE,
-# #'                             jumpsIndex = NULL, knMax = 50, tol = 0.05,
-# #'                             size = 3, lower = 2, upper = 5, plot = TRUE)
-# #' optimalKn
-# #' }
-# #' @param correctTime logical indicating whether to use the time-adjusted ReMeDI measure, default is FALSE
-# #' @param jumpsIndex Indices of jump(s) detected
-
-
 
 #' ReMeDI tuning parameter
 #' @description 
@@ -3721,8 +3621,6 @@ ReMeDI <- function(pData, kn = 1, lags = 1, knEqual = FALSE,
 #' }
 #' is perceived to be zero. The tuning parameter \code{tol} can be set to choose the tolerance of the perception of 'close to zero', a higher tolerance will lead to a higher optimal value.
 #' @param pData \code{xts} or \code{data.table} containing the log-prices of the asset.
-#' @param knEqual Use an altered version of the ReMeDI estimator, where we instead use equal \code{kn}, instead of \code{kn} and \code{2*kn} for the windows. 
-#' See Figure 1 of paper in reference section.
 #' @param knMax max value of \code{kn} to be considered.
 #' @param tol tolerance for the minimizing value. If \code{tol} is high, the algorithm will choose a lower optimal value.
 #' @param size size of the local window.
@@ -3749,16 +3647,11 @@ ReMeDI <- function(pData, kn = 1, lags = 1, knEqual = FALSE,
 #' @references Li, M. and Linton, O. (2019). A ReMeDI for microstructure noise. Cambridge Working Papers in Economics 1908.
 #' @return integer containing the optimal kn
 #' @export
-knChooseReMeDI <- function(pData, knEqual = FALSE,
-                           #correctTime = FALSE, jumpsIndex = NULL,
-                           knMax = 10, tol = 0.05, size = 3, lower = 2, upper = 5, plot = FALSE){
+knChooseReMeDI <- function(pData, knMax = 10, tol = 0.05, size = 3, lower = 2, upper = 5, plot = FALSE){
 
   kn <- 1:(knMax + size +1)
-  err <- vapply(kn, ReMeDI, FUN.VALUE = numeric(4), pData = pData,
-                #correctTime = correctTime, jumpsIndex = jumpsIndex, ## For when correctTime is fixed
-                lags = 0:3, knEqual = knEqual)
-  err <- (err[1,] - err[2,] - err[3,] + err[4,] - ReMeDI(pData, kn = 1, lags = 0, knEqual = knEqual ))^2
-          #                                               , correctTime = correctTime, jumpsIndex = jumpsIndex) ## For when correctTime is fixed
+  err <- vapply(kn, ReMeDI, FUN.VALUE = numeric(4), pData = pData, lags = 0:3)
+  err <- (err[1,] - err[2,] - err[3,] + err[4,] - ReMeDI(pData, kn = 1, lags = 0))^2
 
 
   if(plot){
@@ -3906,14 +3799,6 @@ ReMeDIAsymptoticVariance <- function(pData, kn, lags, phi, i){
       stop("ReMeDI with data.table input requires a PRICE column")
     }
 
-    # if(correctTime){
-    #   if(!("DT" %in% colnames(pData))){
-    #     stop("ReMeDI with correctTime set to TRUE needs a DT (date-time) column when the input is a data.table")
-    #   } else {
-    #     time <- as.numeric(pData[, DT])
-    #   }
-    # }
-
     prices <- as.numeric(pData[, PRICE])
     timestamps <- as.numeric(pData[, DT])
   } else if( is.xts(pData) ) { # We have an xts object
@@ -3969,7 +3854,7 @@ ReMeDIAsymptoticVariance <- function(pData, kn, lags, phi, i){
     }
 
   }
-  Rj <- Rj/(N - 3 * kn - lags)
+  Rj <- Rj / N
   S3 <- Rj^3 * U1 - 2 * Rj * U2
 
   asympVar <- (S1 + S2 + S3)/N

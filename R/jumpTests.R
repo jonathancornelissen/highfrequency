@@ -143,9 +143,9 @@ AJjumpTest <- function(pData, p = 4 , k = 2, alignBy = NULL, alignPeriod = NULL,
     
   } else {
     if(is.data.table(pData)){
-      pData <- fastTickAgregation_DATA.TABLE(pData, alignBy = "seconds", alignPeriod = 1)
+      pData <- fastTickAggregation_DATA.TABLE(pData, alignBy = "seconds", alignPeriod = 1)
     } else {
-      pData <- fastTickAgregation(pData, alignBy = "seconds", alignPeriod = 1)
+      pData <- fastTickAggregation(pData, alignBy = "seconds", alignPeriod = 1)
     }
   }
 
@@ -291,11 +291,11 @@ BNSjumpTest <- function (rData, IVestimator = "BV", IQestimator = "TP", type = "
   } else if (is.data.table(rData)){
     DATE <- .N <- DT <- NULL
     if(!is.null(alignBy) && !is.null(alignPeriod) && makeReturns) {
-      rData <- fastTickAgregation_DATA.TABLE(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation_DATA.TABLE(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     
     if(!is.null(alignBy) && !is.null(alignPeriod) && !makeReturns) {
-      rData <- fastTickAgregation_DATA.TABLE_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation_DATA.TABLE_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     
     setkey(rData, "DT")
@@ -315,10 +315,10 @@ BNSjumpTest <- function (rData, IVestimator = "BV", IQestimator = "TP", type = "
     
   } else {
     if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && makeReturns) {
-      rData <- fastTickAgregation(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     if ((!is.null(alignBy)) && (!is.null(alignPeriod)) && !makeReturns) {
-      rData <- fastTickAgregation_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation_RETURNS(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     if (makeReturns) {
       rData <- makeReturns(rData)
@@ -462,7 +462,7 @@ JOjumpTest <- function(pData, power = 4, alignBy = NULL, alignPeriod = NULL, alp
   } else if (is.data.table(pData)){
     DATE <- .N <- DT <- NULL
     if((!is.null(alignBy)) && (!is.null(alignPeriod))) {
-      pData <- fastTickAgregation_DATA.TABLE(pData, alignBy = alignBy, alignPeriod = alignPeriod)
+      pData <- fastTickAggregation_DATA.TABLE(pData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     setkey(pData, "DT")
     dates <- pData[, list(end = .N), by = list(DATE = as.Date(DT))][, `:=`(end = cumsum(end), DATE = as.character(DATE))][, start := shift(end, fill = 0) + 1]
@@ -480,7 +480,7 @@ JOjumpTest <- function(pData, power = 4, alignBy = NULL, alignPeriod = NULL, alp
     
   } else {
     if ((!is.null(alignBy)) && (!is.null(alignPeriod))) {
-      pData <- fastTickAgregation(pData, alignBy = alignBy, alignPeriod = alignPeriod)
+      pData <- fastTickAggregation(pData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     
     R  <- as.zoo(simre(pData))

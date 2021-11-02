@@ -1,3 +1,7 @@
+Changes in version 0.9.1
+
+ - Bug fix in ReMeDI estimator
+
 Changes in version 0.9.0
 
  - Fix typo where in spotVol, the stochastic periodicity was erroneously written as stochper instead of stochPer.

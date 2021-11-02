@@ -4,7 +4,7 @@
 \alias{ReMeDI}
 \title{ReMeDI}
 \usage{
-ReMeDI(pData, kn = 1, lags = 1, knEqual = FALSE, makeCorrelation = FALSE)
+ReMeDI(pData, kn = 1, lags = 1, makeCorrelation = FALSE)
 }
 \arguments{
 \item{pData}{\code{xts} or \code{data.table} containing the log-prices of the asset}
@@ -12,8 +12,6 @@ ReMeDI(pData, kn = 1, lags = 1, knEqual = FALSE, makeCorrelation = FALSE)
 \item{kn}{numeric of length 1 determining the tuning parameter kn this controls the lengths of the non-overlapping interval in the ReMeDI estimation}
 
 \item{lags}{numeric containing integer values indicating the lags for which to estimate the (co)variance}
-
-\item{knEqual}{Use an altered version of the ReMeDI estimator, where we instead use equal kn, instead of kn and 2*kn for the windows. See Figure 1 of paper in reference section.}
 
 \item{makeCorrelation}{logical indicating whether to transform the autocovariances into autocorrelations. 
 The estimate of variance is imprecise and thus, constructing the correlation like this may show correlations that fall outside \eqn{(-1,1)}.}

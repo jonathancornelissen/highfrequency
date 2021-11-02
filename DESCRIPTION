@@ -1,6 +1,6 @@
 Package: highfrequency
-Version: 0.9.0
-Date: 2021-06-11
+Version: 0.9.1
+Date: 2021-10-24
 Title: Tools for Highfrequency Data Analysis
 Authors@R: 
     c(person(given = "Kris",
@@ -63,5 +63,5 @@ Suggests:
     testthat,
     knitr,
     rmarkdown
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 VignetteBuilder: knitr

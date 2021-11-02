@@ -122,7 +122,7 @@ IVinference <- function(rData, IVestimator = "RV", IQestimator = "rQuar", confid
     return(result)
   } else {
     if((!is.null(alignBy)) && (!is.null(alignPeriod))){
-      rData <- fastTickAgregation(rData, alignBy = alignBy, alignPeriod = alignPeriod)
+      rData <- fastTickAggregation(rData, alignBy = alignBy, alignPeriod = alignPeriod)
     }
     
     if (makeReturns) { 
