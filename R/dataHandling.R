@@ -1272,6 +1272,7 @@ mergeTradesSameTimestamp <- function(tData, selection = "median") {
 #' 
 #' @author Jonathan Cornelissen and Kris Boudt.
 #' @keywords cleaning
+#' @export
 noZeroPrices <- function(tData) {
   PRICE <- NULL
   tData <- checkColumnNames(tData)

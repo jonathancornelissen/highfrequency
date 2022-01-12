@@ -1,3 +1,7 @@
+Changes in version 0.9.2
+
+ - Export noZeroPrices
+ 
 Changes in version 0.9.1
 
  - Bug fix in ReMeDI estimator
