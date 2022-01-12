@@ -106,15 +106,18 @@ where \eqn{\Sigma} is the pre-estimated covariance matrix.
 # Since we don't have any data in this package that is of the required format we must simulate it.
 library(xts)
 library(highfrequency)
+# The mvtnorm package is needed for this example
+# Please install this package before running this example
+library("mvtnorm")
 # Set the seed for replication
 set.seed(123)
 iT <- 23400 # Number of observations
 # Simulate returns
-rets <- mvtnorm::rmvnorm(iT * 3 + 1, mean = rep(0,4), 
-                         sigma = matrix(c(0.1, -0.03 , 0.02, 0.04,
-                                          -0.03, 0.05, -0.03, 0.02,
-                                          0.02, -0.03, 0.05, -0.03,  
-                                          0.04, 0.02, -0.03, 0.08), ncol = 4))
+rets <- rmvnorm(iT * 3 + 1, mean = rep(0,4), 
+                sigma = matrix(c(0.1, -0.03 , 0.02, 0.04,
+                                -0.03, 0.05, -0.03, 0.02,
+                                 0.02, -0.03, 0.05, -0.03,  
+                                 0.04, 0.02, -0.03, 0.08), ncol = 4))
 # We assume that the assets don't trade in a synchronous manner
 w1 <- rets[sort(sample(1:nrow(rets), size = nrow(rets) * 0.5)), 1]
 w2 <- rets[sort(sample(1:nrow(rets), size = nrow(rets) * 0.75)), 2]
