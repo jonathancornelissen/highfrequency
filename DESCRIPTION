@@ -3,7 +3,7 @@ Version: 0.9.2
 Date: 2022-01-12
 Title: Tools for Highfrequency Data Analysis
 Authors@R: c(
-    person("Kris", "Boudt", , "r@onnokleen.de", role = c("aut", "cre"),
+    person("Kris", "Boudt", , "kris.boudt@ugent.be", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-1000-5142")),
     person("Jonathan", "Cornelissen", role = "aut"),
     person("Scott", "Payseur", , "Scott.Payseur@gmail.com", role = "aut"),
