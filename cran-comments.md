@@ -1,11 +1,13 @@
 ## Test environments
 * local OS X install, R 4.1.1
-* ubuntu 14.04 (on travis-ci), R 3.6.1
-* windows via rhub
+* linux and windows server via devtools::check_rhub()
+* windows via devtools::check_win_devel()
 
 ## R CMD check results
 
-0 errors | 0 warnings | 1 notes
+0 errors | 0 warnings | 0 notes
+
+For some platforms we might get a note regarding the size of the package such as
 
 * checking installed package size ... NOTE
   installed size is  7.2Mb
@@ -13,10 +15,3 @@
     data   6.3Mb
     
 The installed size is necessary due to the use of highfrequency intraday data.
-
-On windows maybe:
-
-Check: package dependencies, Result: NOTE
-  Package in Depends/Imports which should probably only be in LinkingTo: 'RcppArmadillo'
-
-It is actually necessary this way.

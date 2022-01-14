@@ -5,6 +5,10 @@
 
 ## Highfrequency financial data in R
 
+A detailed overview of the functionality of this package can be found in our vignette:
+
+Boudt, Kris and Kleen, Onno and Sjørup, Emil, Analyzing intraday financial data in R: The highfrequency package. Available at SSRN:  (http://dx.doi.org/10.2139/ssrn.3917548)
+
 The package is still under development and is distributed without warranty.
 
 Thanks to report bugs or make suggestions to <kris.boudt@ugent.be>.
@@ -21,16 +25,6 @@ Development version:
 library(devtools)
 install_github("https://github.com/jonathancornelissen/highfrequency")
 ```
-
-## Example
-```r
-library(highfrequency)
-# Print raw quotes data to console
-sampleQDataRaw
-# Cleanup quotes leaves 46566 out of 464221 observations.
-quotesCleanup(qDataRaw = sampleQDataRaw, exchanges = "N")
-```
-
 ## Special thanks
 
 We would like to thank [Brian Peterson](https://github.com/braverock), [Chris Blakely](https://github.com/clisztian), [Dirk Eddelbuettel](https://github.com/eddelbuettel), [Eric Zivot](https://faculty.washington.edu/ezivot/) and Maarten Schermer. 

@@ -184,10 +184,9 @@ harInsanityFilter <- function(fittedValues, lower, upper, replacement) {
 #' 
 #'
 #' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
-#' @import RcppArmadillo
 #' @export
 HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), periodsQ = c(1),
-                     leverage=NULL, RVest = c("rCov","rBPCov", "rQuar"), type = "HAR", inputType = "RM",
+                     leverage = NULL, RVest = c("rCov","rBPCov", "rQuar"), type = "HAR", inputType = "RM",
                      jumpTest = "ABDJumptest", alpha = 0.05, h = 1, transform = NULL, externalRegressor = NULL, periodsExternal = c(1), ...){
 
   nperiods <- length(periods) # Number of periods to aggregate over
