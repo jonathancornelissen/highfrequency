@@ -12,8 +12,8 @@ arma::vec leadLagCpp(const arma::vec& x, const arma::vec& timestampsX, const arm
                      const bool normalize) {
   
   // Initialize our variables
-  int k, midPointBackup, midPoint, j0, j1;
-  double factorX, factorY, returns;
+  int midPointBackup, midPoint, j0, j1;
+  double k, factorX, factorY, returns;
   const double maxTSY = timestampsY(timestampsY.n_elem - 1);
   const double minTSY = timestampsY[0];
   arma::uword nTests = lags.n_elem;
@@ -97,8 +97,8 @@ arma::vec leadLagCppPAR(const arma::vec& x, const arma::vec& timestampsX, const 
 #ifdef _OPENMP
 omp_set_num_threads(iCores);
   // Initialize our variables
-  int k, midPointBackup, midPoint, j0, j1;
-  double factorX, factorY, returns;
+  int midPointBackup, midPoint, j0, j1;
+  double k, factorX, factorY, returns;
   const double maxTSY = timestampsY(timestampsY.n_elem - 1);
   const double minTSY = timestampsY[0];
   arma::uword nTests = lags.n_elem;
