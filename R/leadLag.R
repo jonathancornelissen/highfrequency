@@ -72,7 +72,7 @@ leadLag <- function(price1 = NULL, price2 = NULL, lags = NULL, resolution = "sec
   if(!all(class(price1) == class(price2))){
     stop("price1 and price2 must be of same class")
   }
-  
+
   if(parallelize && is.numeric(nCores) && (nCores %% 1) == 0 && nCores < 1){
     parallelize <- FALSE
     warning("nCores is not an integer valued numeric greater than 0. Using non-parallelized code")
@@ -114,6 +114,10 @@ leadLag <- function(price1 = NULL, price2 = NULL, lags = NULL, resolution = "sec
       x <- as.numeric(price1)
       y <- as.numeric(price2)
     }
+  }
+  
+  if(anyNA(x) || anyNA(y) || anyNA(timestampsX) || anyNA(timestampsY)){
+    stop(paste0("lead-lag function does not support NAs in prices or timestamps please take measures to remove these"))
   }
   
   

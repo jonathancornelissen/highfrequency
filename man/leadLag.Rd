@@ -21,7 +21,7 @@ use a column DT to denote the date-time in POSIXct format, and a column PRICE to
 \item{price2}{\code{xts} or \code{data.table} containing prices in levels, in case of data.table,
 use a column DT to denote the date-time in POSIXct format, and a column PRICE to denote the price}
 
-\item{lags}{a numeric denoting which lags (in units of \code{resolution}) should be tested as leading or lagging}
+\item{lags}{a numeric denoting which lags (in integer units of \code{resolution}) should be tested as leading or lagging}
 
 \item{resolution}{the resolution at which the lags is measured. 
 The default is "seconds", use this argument to gain 1000 times resolution by setting it to either "ms", "milliseconds", or "milli-seconds".}
