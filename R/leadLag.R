@@ -121,29 +121,16 @@ leadLag <- function(price1 = NULL, price2 = NULL, lags = NULL, resolution = "sec
   }
   
   
-  # When y is longer than x, it is often faster to swap the variables than run with a longer y than x.
-  isSwapped <- FALSE
-  if(length(x) < length(y)){
-    tmp <- x
-    x <- y
-    y <- tmp
-    tmp <- timestampsX
-    timestampsX <- timestampsY
-    timestampsY <- tmp
-    isSwapped <- TRUE
-  }
-
   # Convert timestamps to denote time after open (denoted by first trade in either asset)
   origin <- min(timestampsY[1], timestampsX[1])
   timestampsX <- timestampsX - origin
   timestampsY <- timestampsY - origin
   
   
-  # (1 + -2 * isSwapped) is 1 if isSwapped is FALSE, and -1 if isSwapped is TRUE
   if(parallelize){
-    contrasts <- as.numeric(leadLagCppPAR(x, timestampsX, y, timestampsY, lags * (1 + -2 * isSwapped), normalize, nCores))    
+    contrasts <- as.numeric(leadLagCppPAR(x, timestampsX, y, timestampsY, lags, normalize, nCores))    
   } else {
-    contrasts <- as.numeric(leadLagCpp(x, timestampsX, y, timestampsY, lags * (1 + -2 * isSwapped), normalize))
+    contrasts <- as.numeric(leadLagCpp(x, timestampsX, y, timestampsY, lags, normalize))
   }
   
   
