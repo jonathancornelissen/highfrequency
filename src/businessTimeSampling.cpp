@@ -24,7 +24,7 @@ arma::vec tradeIntensityProcessCpp(arma::vec& time, const double bandwidth) {
 
     if(time[i] <= bandwidth){
       tradeIntensityProcess[i] = scalingFactor * sum(quadraticKernel((time[i] - time) / bandwidth) + quadraticKernel((time[i] + time) / bandwidth));
-    } else if((time[i] > bandwidth) & (time[i] < (1 - bandwidth))){
+    } else if((time[i] > bandwidth) && (time[i] < (1 - bandwidth))){
       tradeIntensityProcess[i] = scalingFactor * sum(quadraticKernel((time[i] - time) / bandwidth));
     } else {
       tradeIntensityProcess[i] = scalingFactor * sum(quadraticKernel((time[i] - time) / bandwidth) + quadraticKernel((time[i] + time - 2.0) / bandwidth));

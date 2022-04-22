@@ -1,4 +1,9 @@
-Changes in version 0.9.2
+Changes in version 0.9.3
+
+ - HEAVY model test less strict
+ - Corrected bitwise '&' with boolean operand
+ 
+ Changes in version 0.9.2
 
  - Export noZeroPrices
  
