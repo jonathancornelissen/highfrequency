@@ -344,7 +344,7 @@ piecewise constant over local windows. Robust two-sample tests are applied to
 detect changes in variability between subsequent windows. The spot volatility
 can then be estimated by evaluating regular realized volatility estimators
 within each local window.
-\code{"MDa", "MDb", "DM"} refer to different test statistics, see Section 2.2 in Fried (2012).
+\code{"MDa", "MDb"} refer to different test statistics, see Section 2.2 in Fried (2012).
 
 Along with the spot volatility estimates, this method will return the
 detected change points in the volatility level. When plotting a

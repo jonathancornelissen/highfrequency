@@ -185,6 +185,7 @@ detPer <- function(mR, rData = NULL, options = list()) {
 #' @keywords internal
 stochPer <- function(mR, rData = NULL, options = list()) {
   #require(FKF)
+  if (!requireNamespace("FKF", quietly = TRUE)) stop("Please install the FKF package to use this function.")
   # default options, replace if user-specified
   op <- list(init = list(), P1 = 5, P2 = 5, control = list(trace=1, maxit=500))
   op[names(options)] <- options
@@ -472,7 +473,6 @@ piecewise <- function(mR, rData = NULL, options = list()) {
     if (op$online) {
       if (i > op$n) {
         lastchange <- max(which(cp + op$n < i))
-      } else {
         lastchange = 1
       }
       lastchange <- cp[lastchange]
@@ -536,8 +536,7 @@ changePoints <- function(vR, type = "MDa", alpha = 0.005, m = 40, n = 20) {
       testperiod <- logR[(t - n + 1):t]
       if(switch(type,
                 MDa = MDtest(reference, testperiod, type = type, alpha = alpha),
-                MDb = MDtest(reference, testperiod, type = type, alpha = alpha),
-                DM  = DMtest(reference, testperiod, alpha = alpha))) {
+                MDb = MDtest(reference, testperiod, type = type, alpha = alpha))) {
         points <- c(points, t - n)
         np <- np + 1
         cat(paste("Change detected at observation", points[np], "...\n"))
@@ -567,10 +566,30 @@ DMtest <- function(x, y, alpha = 0.005) {
   test <- sqrt((m*n)/(m + n))*2*fmedvalue*delta1
   return(abs(test) > qnorm(1-alpha/2))
 }
+#' # See Fried (2012)
+#' # Returns TRUE if H0 is rejected
+#' # importFrom stats density
+#' # keywords internal
+#' DMtest <- function(x, y, alpha = 0.005) {
+#'   m <- length(x)
+#'   n <- length(y)
+#'   xmed <- median(x)
+#'   ymed <- median(y)
+#'   xcor <- x - xmed
+#'   ycor <- y - ymed
+#'   delta1 <- ymed - xmed
+#'   out <- density(c(xcor, ycor), kernel = "epanechnikov")
+#'   fmed <- as.numeric(BMS::quantile.density(out, probs = 0.5))
+#'   fmedvalue <- (out$y[max(which(out$x < fmed))] +
+#'                   out$y[max(which(out$x < fmed))+1])/2
+#'   test <- sqrt((m*n)/(m + n))*2*fmedvalue*delta1
+#'   return(abs(test) > qnorm(1-alpha/2))
+#' }
 
 # Median difference test
 # See Fried (2012)
 # Returns TRUE if H0 is rejected
+#' @importFrom stats density
 #' @keywords internal
 MDtest <- function(x, y, alpha = 0.005, type = "MDa") {
   m <- length(x)
