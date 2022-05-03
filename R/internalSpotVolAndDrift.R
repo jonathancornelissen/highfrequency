@@ -546,26 +546,7 @@ changePoints <- function(vR, type = "MDa", alpha = 0.005, m = 40, n = 20) {
   return(points)
 }
 
-# Difference of medians test
-# See Fried (2012)
-# Returns TRUE if H0 is rejected
-#' @importFrom stats density
-#' @keywords internal
-DMtest <- function(x, y, alpha = 0.005) {
-  m <- length(x)
-  n <- length(y)
-  xmed <- median(x)
-  ymed <- median(y)
-  xcor <- x - xmed
-  ycor <- y - ymed
-  delta1 <- ymed - xmed
-  out <- density(c(xcor, ycor), kernel = "epanechnikov")
-  fmed <- as.numeric(BMS::quantile.density(out, probs = 0.5))
-  fmedvalue <- (out$y[max(which(out$x < fmed))] +
-                  out$y[max(which(out$x < fmed))+1])/2
-  test <- sqrt((m*n)/(m + n))*2*fmedvalue*delta1
-  return(abs(test) > qnorm(1-alpha/2))
-}
+#' # Difference of medians test
 #' # See Fried (2012)
 #' # Returns TRUE if H0 is rejected
 #' # importFrom stats density
