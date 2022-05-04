@@ -18,11 +18,7 @@ test_that("leadLag", {
   ll <- leadLag(price1, price2, seq(-3,3), normalize = FALSE)
   expected <- c(0.002859176333, 0.006440878454, 0.005419688578, 0.001021189876, 0.002162166165, 0.003172115215, 0.009944935852)
   
-  
-  ll_swapped <- leadLag(price2, price1, seq(-3,3), normalize = FALSE)
-  expect_equal(ll$contrasts, expected)
-  
-  
+
   ## Test that the contrasts are the same when using 10000 ms and 10 sec
   llMS <- leadLag(price1, price2, seq(-3,3) * 1000, resolution = "ms", normalize = FALSE)
   
@@ -31,7 +27,7 @@ test_that("leadLag", {
   
   foo <- spreadPrices(sampleMultiTradeData[SYMBOL %in% c("ETF", "AAA")])
   llEmpirical <- leadLag(foo[!is.na(AAA), list(DT, PRICE = AAA)], foo[!is.na(ETF), list(DT, PRICE = ETF)], seq(-5,5))
-  expect_equal(llEmpirical$`lead-lag-ratio`, 0.9525131289)
+  expect_equal(llEmpirical$`lead-lag-ratio`, 0.9616925169)
   
 })
 
