@@ -5,6 +5,9 @@ library("xts")
 
 # spotDrift ---------------------------------------------------------------
 test_that("spotDrift",{
+  
+  skip_if(!requireNamespace("FKF", quietly = TRUE))
+  
   price <- sampleTData[as.Date(DT) == "2018-01-03", list(DT, PRICE)]
   kerneldrift <- spotDrift(as.xts(price), method = "driftKernel", alignBy = "minutes", alignPeriod = 1)
   expect_equal(
@@ -40,6 +43,9 @@ test_that("spotDrift",{
 
 # spotVol -----------------------------------------------------------------
 test_that("spotVol", {
+  
+  skip_if(!requireNamespace("FKF", quietly = TRUE))
+  
   # expect_identical(
   #   formatC(as.numeric(spotVol(sampleOneMinuteData[, list(DT, PRICE = MARKET)])), digits = 3),
   #   c("0.004", "0.00373", "0.00348", "0.00325", "0.00306", "0.00288", "0.00274", "0.00262", "0.00251", "0.00241")

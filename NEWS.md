@@ -1,9 +1,14 @@
+Changes in version 0.9.4
+
+ - Fixing reverse dependency issues w.r.t. FKF
+ - Removed option based on BMS package because it got removed from CRAN
+
 Changes in version 0.9.3
 
  - HEAVY model test less strict
  - Corrected bitwise '&' with boolean operand
  
- Changes in version 0.9.2
+Changes in version 0.9.2
 
  - Export noZeroPrices
  
