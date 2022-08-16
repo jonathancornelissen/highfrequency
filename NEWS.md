@@ -1,3 +1,7 @@
+Changes in version 0.9.5
+
+ - Fixing KaTeX note
+ 
 Changes in version 0.9.4
 
  - Fixing reverse dependency issues w.r.t. FKF

@@ -3180,7 +3180,7 @@ rTSCov <- function (pData, cor = FALSE, K = 300, J = 1, KCov = NULL, JCov = NULL
 #'     
 #'     Apply refresh-time on \eqn{{b} = \{1,2\}} to obtain the grid \eqn{\tau^{b}}. 
 #'     
-#'     Estimate \eqn{\hat{h}^{b}_{21}} as the realized beta between \eqn{f_{\tau^{b}_j}^{(1)}} and \eqn{\hat{u}_{\tau^{b}_j}^{(2)}$. Set $\hat{h}_{21}=\hat{h}^{b}_{21}}.
+#'     Estimate \eqn{\hat{h}^{b}_{21}} as the realized beta between \eqn{f_{\tau^{b}_j}^{(1)}} and \eqn{\hat{u}_{\tau^{b}_j}^{(2)}}. Set \eqn{\hat{h}_{21}=\hat{h}^{b}_{21}}.
 #'     
 #'     Estimate \eqn{\hat{g}_{22}} using an IV estimator on  \eqn{f_{\tau^{b}_j}^{(2)}= \hat{u}_{\tau^{b}_j}^{(2)}-\hat{h}_{21}f_{\tau^{b}_j}^{(1)}}. 
 #'     

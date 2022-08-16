@@ -58,7 +58,7 @@ double KK(double x, int type) {
     if (thex > .5) {
       return( 2*(1-thex)*(1-thex)*(1-thex));
     }  else {
-      return(1- 6 * pow(thex, 2.0) +6 * pow(thex, 3.0));
+      return(1 - 6 * pow(thex, 2.0) + 6 * pow(thex, 3.0));
     }
     break;
     
