@@ -15,3 +15,10 @@ For some platforms we might get a note regarding the size of the package such as
     data   6.3Mb
     
 The installed size is necessary due to the use of highfrequency intraday data.
+
+Sometimes there might be notes about misspelled words but our names are spelled like this.
+
+Possibly misspelled words in DESCRIPTION:
+  Boudt (20:8)
+  Kleen (20:15)
+  Sjoerup (20:26)

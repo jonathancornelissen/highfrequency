@@ -1,9 +1,9 @@
 #' @title Compute Liquidity Measure
 #' 
+#' @description 
 #' Function returns an \code{xts} or \code{data.table} object containing 23 liquidity measures. Please see details below.
 #'
 #' Note that this assumes a regular time grid. 
-#'
 #' @param tqData A \code{data.table} or \code{xts} object as in the \pkg{highfrequency} merged
 #' trades and quotes data.
 #' @param win A windows length for the forward-prices used for \sQuote{realized}

@@ -1,6 +1,6 @@
 Package: highfrequency
-Version: 0.9.4
-Date: 2022-05-03
+Version: 0.9.5
+Date: 2022-08-17
 Title: Tools for Highfrequency Data Analysis
 Authors@R: c(
     person("Kris", "Boudt", , "kris.boudt@ugent.be", role = c("aut", "cre"),
@@ -15,11 +15,14 @@ Authors@R: c(
 Description: Provide functionality to manage, clean and match highfrequency
     trades and quotes data, calculate various liquidity measures, estimate and
     forecast volatility, detect price jumps and investigate microstructure noise and intraday
-    periodicity.
+    periodicity. A detailed vignette can be found in the paper 
+    "Analyzing intraday financial data in R: The highfrequency package" 
+    by Boudt, Kleen, and Sjoerup (2022, <doi:10.2139/ssrn.3917548>).
 License: GPL (>= 2)
 Encoding: UTF-8
 LazyData: true
 URL: https://github.com/jonathancornelissen/highfrequency
+BugReports: https://github.com/jonathancornelissen/highfrequency/issues
 Depends:
     R (>= 3.5.0)
 Imports:
@@ -48,4 +51,4 @@ Suggests:
     testthat,
     knitr,
     rmarkdown
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.1
