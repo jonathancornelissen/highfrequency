@@ -21,7 +21,6 @@ The \pkg{highfrequency} package provides numerous tools for analyzing high-frequ
 Useful links:
 \itemize{
   \item \url{https://github.com/jonathancornelissen/highfrequency}
-  \item \url{https://ssrn.com/abstract=3917548}
   \item Report bugs at \url{https://github.com/jonathancornelissen/highfrequency/issues}
 }
 
