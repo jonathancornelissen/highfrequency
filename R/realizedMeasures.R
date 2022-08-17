@@ -3145,8 +3145,6 @@ rTSCov <- function (pData, cor = FALSE, K = 300, J = 1, KCov = NULL, JCov = NULL
 
 
 #' @title CholCov estimator
-#' 
-#' 
 #' @description
 #' Positive semi-definite covariance estimation using the CholCov algorithm.
 #' The algorithm estimates the integrated covariance matrix by sequentially adding series and using `refreshTime` to synchronize the observations.

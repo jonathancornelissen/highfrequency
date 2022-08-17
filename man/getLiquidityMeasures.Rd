@@ -2,11 +2,7 @@
 % Please edit documentation in R/liquidityMeasures.R
 \name{getLiquidityMeasures}
 \alias{getLiquidityMeasures}
-\title{Compute Liquidity Measure
-
-Function returns an \code{xts} or \code{data.table} object containing 23 liquidity measures. Please see details below.
-
-Note that this assumes a regular time grid.}
+\title{Compute Liquidity Measure}
 \usage{
 getLiquidityMeasures(tqData, win = 300)
 }
@@ -21,8 +17,6 @@ spread}
 A modified (enlarged) \code{xts} or \code{data.table} with the new measures.
 }
 \description{
-Compute Liquidity Measure
-
 Function returns an \code{xts} or \code{data.table} object containing 23 liquidity measures. Please see details below.
 
 Note that this assumes a regular time grid.
