@@ -1,6 +1,6 @@
 Package: highfrequency
-Version: 0.9.5
-Date: 2022-08-17
+Version: 1.0.0
+Date: 2022-10-26
 Title: Tools for Highfrequency Data Analysis
 Authors@R: c(
     person("Kris", "Boudt", , "kris.boudt@ugent.be", role = c("aut", "cre"),
@@ -16,8 +16,10 @@ Description: Provide functionality to manage, clean and match highfrequency
     trades and quotes data, calculate various liquidity measures, estimate and
     forecast volatility, detect price jumps and investigate microstructure noise and intraday
     periodicity. A detailed vignette can be found in the paper 
-    "Analyzing intraday financial data in R: The highfrequency package" 
-    by Boudt, Kleen, and Sjoerup (2022, <doi:10.2139/ssrn.3917548>).
+    "Analyzing Intraday Financial Data in R: The highfrequency Package" 
+    by Boudt, Kleen, and Sjoerup (2022, <doi:10.18637/jss.v104.i08>). 
+    The DOI in the CITATION is for a new Journal of Statistical Software publication that will be registered after publication on CRAN.
+    A working paper version can be found on SSRN: <doi:10.2139/ssrn.3917548>.
 License: GPL (>= 2)
 Encoding: UTF-8
 LazyData: true
