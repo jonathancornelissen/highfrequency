@@ -1,3 +1,7 @@
+## highfrequency 1.0.0
+
+- Updated citation as a paper on our package will be published in the Journal of Statistical Software
+
 ## highfrequency 0.9.5
 
 - Fixing KaTeX note
