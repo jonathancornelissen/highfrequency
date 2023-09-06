@@ -1,18 +1,17 @@
 
 citHeader("To cite highfrequency in publications use:")
 
-citEntry(entry = "Article",
+bibentry(bibtype = "Article",
   title        = "Analyzing Intraday Financial Data in R: The highfrequency Package",
-  author       = personList(as.person("Kris Boudt"), 
-                            as.person("Onno Kleen"),
-                            as.person("Emil Sj{\\o}rup")),
+  author       = c("Kris Boudt", 
+                   "Onno Kleen",
+                   "Emil Sj{\\o}rup"),
   journal      = "Journal of Statistical Software",
   year         = "2022",
   volume       = "104",
   number       = "8",
   pages        = "1--36",
   doi          = "10.18637/jss.v104.i08",
-
   textVersion  =
   paste("Kris Boudt, Onno Kleen, Emil Sjørup (2022).",
         "Analyzing Intraday Financial Data in R: The highfrequency Package.",

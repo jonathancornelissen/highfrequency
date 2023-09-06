@@ -267,7 +267,9 @@ getLiquidityMeasures <- function(tqData, win = 300) {
   
   tqData[, midpoints := 0.5 * (BID + OFR)]
   if('DIRECTION' %in% colnames(tqData)){
-    if(sort(unique(tqData$DIRECTION)) != c(-1,1)) {stop("DIRECTION provided, but is not -1 and 1")}
+    if (any(!(tqData$DIRECTION %in% c(-1,1)))) {
+      stop("DIRECTION provided, but is not -1 and 1")
+    }
     tqData[, direction := DIRECTION]
   } else {
     tqData[, direction := getTradeDirection(tqData)]

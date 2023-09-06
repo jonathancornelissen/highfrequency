@@ -105,6 +105,11 @@ detPer <- function(mR, rData = NULL, options = list()) {
   op[names(options)] <- options
 
   cDays <- nrow(mR)
+  
+  if (cDays < 20) {
+    stop("There need to be at least 20 days to calculate the deterministic periodicity.")
+  }
+  
   M <- ncol(mR)
   if (cDays == 1 & is.null(rData)) {
     mR <- as.numeric(mR)
@@ -144,7 +149,12 @@ detPer <- function(mR, rData = NULL, options = list()) {
   } 
   # else {
     mstdR <- mR/sqrt(as.numeric(estimdailyvol) * (1/M))
-    selection <- c(1:M)[ (nrow(mR)-apply(mR,2,'countzeroes')) >=20]
+    selection <- c(1:M)[ (nrow(mR)-apply(mR,2,'countzeroes')) >= 20]
+    
+    if (length(selection) == 0) {
+      stop("Too many zero returns at the same point in time. Try to add more days to your data set.")
+    }
+    
     # preferably no na is between
     selection <- c( min(selection) : max(selection) )
     mstdR <- mstdR[,selection]

@@ -408,9 +408,8 @@ rMinRVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FA
     if (makeReturns) {
       rData <- makeReturns(rData)
     }
-    q <- abs(rData)#as.zoo(abs(as.nueric(rData))) #absolute value
+    q <- abs(as.matrix(rData))#as.zoo(abs(as.nueric(rData))) #absolute value
     q <- rollApplyMinWrapper(q)
-    # q <- rollapply(q, width = 2, FUN = min, by = 1, align = "left", by.column = TRUE, fill = NULL)
     N <- dim(q)[1] + 1 #number of obs because of fill = NULL
     colnames(q) <- names(rData)
     minrv <- (pi/(pi - 2)) * (N/(N - 1)) * colSums(q^2, na.rm = TRUE)
@@ -1873,6 +1872,7 @@ rMPVar <- function(rData, m = 2, p = 2, alignBy = NULL, alignPeriod = NULL, make
     for (i in 1:length(dates)) {
       res[[dates[i]]] <- rMPVar(dat[starts[i]:ends[i], ], m = m, p = p, makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
     }
+    
     res <- setDT(transpose(res))[, DT := as.Date(dates)]
     setcolorder(res, "DT")
     if(ncol(res) == 2){
@@ -1901,7 +1901,7 @@ rMPVar <- function(rData, m = 2, p = 2, alignBy = NULL, alignPeriod = NULL, make
 
       q <- abs(rollApplyProdWrapper(q, m))
       #q <- abs(rollapply(q,width=m,FUN=prod,align="left"))
-      N <- nrow(rData)
+      N <- nrow(as.matrix(rData))
 
       dmp <- (2^((p/m)/2) * gamma((p/m + 1)/2) / gamma(1/2))^(-m)
 
@@ -2355,7 +2355,7 @@ rSVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #' @keywords volatility
 #' @export
 rThresholdCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, ...) {
-
+  
   # Multiday adjustment:
   if (is.xts(rData) && isMultiXts(rData)) {
     if (is.null(dim(rData))) {
@@ -2755,7 +2755,7 @@ rRVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #' @keywords highfrequency rTPQuar
 #' @export
 rTPQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE) {
-
+  
   # self-reference for multi-day input
   if (is.xts(rData) && checkMultiDays(rData)) {
     result <- apply.daily(rData, rTPQuar, alignBy, alignPeriod, makeReturns)
@@ -2796,10 +2796,10 @@ rTPQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FAL
     if (makeReturns) {
       rData <- makeReturns(rData)
     }
-
+    
     q <- abs(as.matrix(rData))
     q <- rollApplyProdWrapper(q, 3)
-    N <- nrow(q)+2
+    N <- nrow(q) + 2
     rTPVar <- N * (N/(N - 2)) * ((gamma(0.5)/(2^(2/3)*gamma(7/6) ))^3) * colSums(q^(4/3))
     return(rTPVar)
   }
