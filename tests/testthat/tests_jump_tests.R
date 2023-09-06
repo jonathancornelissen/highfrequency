@@ -4,6 +4,7 @@ library(xts)
 
 # AJjumpTest ----------------------------------------------------
 test_that("AJjumpTest unit test",{
+  skip_on_cran()
   expect_equal(
     as.numeric(AJjumpTest(as.xts(sampleTData[,list(DT, PRICE)]), p = 2, k = 3, alignBy = "seconds", alignPeriod = 5, makeReturns = TRUE)[,1]),
     c(-0.63154307241, -0.03660544638)
@@ -14,6 +15,7 @@ test_that("AJjumpTest unit test",{
 
 # JO jump test ------------------------------------------------------------
 test_that("JO jump test unit test",{
+  skip_on_cran()
   expect_equal(
     as.numeric(JOjumpTest(as.xts(sampleOneMinuteData)[,1], power = 6)$ztest),
     c(1.58839272530, -2.23596371826, 1.43940624574, -1.62044376089, -0.16071177517, 0.42242944882, -0.51764968793, -3.84231423189, 6.11221556860, 0.42155384715,
@@ -31,6 +33,7 @@ test_that("JO jump test unit test",{
 
 # BNSjumpTest -------------------------------------------------------------
 test_that("BNSjumpTest", {
+  skip_on_cran()
   expect_equal(
     as.numeric(BNSjumpTest(as.xts(sampleTData[, list(DT, PRICE)]), IVestimator= "rMinRVar", IQestimator = "rMedRQuar", type= "linear", makeReturns = TRUE)[, "p.value"]),
     c(1.322998188e-01, 2.816329921e-05)

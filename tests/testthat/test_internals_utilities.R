@@ -3,7 +3,7 @@ set.seed(1)
 
 # colCumsum ---------------------------------------------------------------
 test_that("colCumsum works correctly", {
-  
+  skip_on_cran()
   x <- matrix(rnorm(100), nrow = 10, ncol = 10)
   expect_equal(colCumsum(x), apply(x, 2, cumsum))
   
@@ -11,12 +11,14 @@ test_that("colCumsum works correctly", {
 
 # tickGrouping_RETURNS ----------------------------------------------------
 test_that("tickGrouping_RETURNS works correctly", {
+  skip_on_cran()
   expect_equal(as.numeric(tickGrouping_RETURNS(100, 3)), c(rep(0:32, each = 3), 33))
 })
 
 
 # KK(.) -------------------------------------------------------------------
 test_that("KK cpp function works correctly", {
+  skip_on_cran()
   
   x <- 1.5
   expect_equal(highfrequency:::KK(x, 1), 1-x)

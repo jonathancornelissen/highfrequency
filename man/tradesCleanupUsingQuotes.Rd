@@ -64,6 +64,7 @@ When using the on-disk functionality and tradeDataSource and quoteDataSource are
 }
 \examples{
 # Consider you have raw trade data for 1 stock for 2 days 
+\dontrun{
 tDataAfterFirstCleaning <- tradesCleanup(tDataRaw = sampleTDataRaw, 
                                           exchanges = "N", report = FALSE)
 qData <- quotesCleanup(qDataRaw = sampleQDataRaw, 
@@ -73,6 +74,7 @@ tDataAfterFinalCleaning <-
   tradesCleanupUsingQuotes(qData = qData[as.Date(DT) == "2018-01-02"],
                            tData = tDataAfterFirstCleaning[as.Date(DT) == "2018-01-02"])
 dim(tDataAfterFinalCleaning)
+}
 # In case you have more data it is advised to use the on-disk functionality
 # via the "tradeDataSource", "quoteDataSource", and "dataDestination" arguments
 }

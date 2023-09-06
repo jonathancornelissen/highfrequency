@@ -13,6 +13,7 @@ price2 <- dat[,2]
 
 # leadLag -----------------------------------------------------------------
 test_that("leadLag", {
+  skip_on_cran()
   # skip_on_os("solaris")
   ## Test that the contrasts are as expected
   ll <- leadLag(price1, price2, seq(-3,3), normalize = FALSE)
