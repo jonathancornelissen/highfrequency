@@ -51,6 +51,7 @@ test_that("BNSjumpTest", {
 
 # intradayJumpTest --------------------------------------------------------
 test_that("LM test",{
+  skip_on_cran()
   ## Extract the prices and set the time-zone to the local time-zone
   library(xts)
   dat <- sampleTData[as.Date(DT) == "2018-01-02", list(DT, PRICE)]
@@ -72,6 +73,7 @@ test_that("LM test",{
 })
 
 test_that("FoF test",{
+  skip_on_cran()
   dat <- sampleTData[, list(DT, PRICE)]
   FoFtest <- intradayJumpTest(pData = dat, volEstimator = "PARM", driftEstimator = "none", alpha = 0.95, RM = "bipower", 
                               theta = 1, lookBackPeriod = 50, marketOpen = "9:30:00", marketClose = "16:00:00", tz = "GMT")
@@ -84,6 +86,7 @@ test_that("FoF test",{
 
 
 test_that("multiple intradayJumpTest", {
+  skip_on_cran()
   jumpTest <- intradayJumpTest(pData = sampleOneMinuteData[, list(DT, PRICE = MARKET)], volEstimator = "RM", driftEstimator = "none", alpha = 0.95, RM = "bipower", 
                                lookBackPeriod = 10, dontIncludeLast = TRUE, on = "minutes", k = 5,
                                marketOpen = "9:30:00", marketClose = "16:00:00", tz = "GMT")
@@ -98,6 +101,7 @@ test_that("multiple intradayJumpTest", {
 
 # Rank jump test ----------------------------------------------------------
 test_that("rank jump test", {
+  skip_on_cran()
   expect_error(rankJumpTest(marketPrice = as.xts(sampleOneMinuteData)[,1], stockPrices = list(as.xts(sampleOneMinuteData)[,2])), "Singular value decomposition cannot be calculated")
   rjt <- rankJumpTest(marketPrice = as.xts(sampleOneMinuteData)[,1], stockPrices = list(as.xts(sampleOneMinuteData)[,2], as.xts(sampleOneMinuteData)[,2] * 1.05))
   

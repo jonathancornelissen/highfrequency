@@ -100,14 +100,12 @@ aggregateTS <- function (ts, FUN = "previoustick", alignBy = "minutes", alignPer
 #'
 #' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
 #' @keywords data manipulation
-#' @examples
-#' # Aggregate price data to the 30 second frequency
-#' aggregatePrice(sampleTData, alignBy = "secs", alignPeriod = 30)
-#' # Aggregate price data to the 30 second frequency including zero return price changes
+#' @examplesIf !grepl("debian", sessionInfo()["platform"], fixed = FALSE)
+#' # Aggregate price data to the 30-second frequency
 #' aggregatePrice(sampleTData, alignBy = "secs", alignPeriod = 30)
 #'
-#' # Aggregate price data to half a second frequency including zero return price changes
-#' aggregatePrice(sampleTData, alignBy = "milliseconds", alignPeriod = 500, fill = TRUE)
+#' # Aggregate price data to 30-minute frequency including zero return price changes
+#' aggregatePrice(sampleTData, alignBy = "minutes", alignPeriod = 30, fill = TRUE)
 #' @importFrom xts last tzone
 #' @importFrom data.table fifelse
 #' @export
@@ -184,7 +182,7 @@ aggregatePrice <- function(pData, alignBy = "minutes", alignPeriod = 1, marketOp
   } else {
     tz <- timeZone
   }
-  setkeyv(pData, c("DT", "SYMBOL")) # The below code MAY fail with data with unordered DT column. Also setkey inceases speed of grouping
+  setkeyv(pData, c("DT", "SYMBOL")) # The below code MAY fail with data with unordered DT column. Also setkey increases speed of grouping
   ## Checking ends
   # Convert DT to numeric. This is much faster than dealing with the strings (POSIXct)
   pData[, DT := as.numeric(DT, tz = tz)]
@@ -1414,7 +1412,7 @@ noZeroQuotes <- function(qData) {
 #' 
 #' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
 #' 
-#' @examples
+#' @examplesIf !grepl("debian", sessionInfo()["platform"], fixed = FALSE)
 #' # Consider you have raw quote data for 1 stock for 2 days
 #' head(sampleQDataRaw)
 #' dim(sampleQDataRaw)
@@ -2731,7 +2729,7 @@ refreshTime <- function (pData, sort = FALSE, criterion = "squared duration") {
 #' 
 #' @return A list containing \code{"pData"} which is the aggregated data and a list containing the intensity process, split up day by day.
 #' 
-#' @examples
+#' @examplesIf !grepl("debian", sessionInfo()["platform"], fixed = FALSE)
 #' pData <- sampleTData[,list(DT, PRICE, SIZE)]
 #' # Aggregate based on the trade intensity measure. Getting 390 observations.
 #' agged <- businessTimeAggregation(pData, measure = "intensity", obs = 390, bandwidth = 0.075)

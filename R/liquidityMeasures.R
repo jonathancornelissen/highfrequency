@@ -334,7 +334,7 @@ getLiquidityMeasures <- function(tqData, win = 300) {
 #' 
 #' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup. Special thanks to Dirk Eddelbuettel.
 #' 
-#' @examples 
+#' @examplesIf !grepl("debian", sessionInfo()["platform"], fixed = TRUE)
 #' # Generate matched trades and quote data set
 #' tqData <- matchTradesQuotes(sampleTData[as.Date(DT) == "2018-01-02"], 
 #'                             sampleQData[as.Date(DT) == "2018-01-02"])

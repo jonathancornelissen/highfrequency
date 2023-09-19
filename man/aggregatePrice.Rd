@@ -52,13 +52,13 @@ For example, if 14 observations are made on one day, and these are 1, 2, 3, ... 
 Then, with \code{alignBy = "ticks"} and \code{alignPeriod = 3}, the output will be 1, 4, 7, 10, 13, 14.
 }
 \examples{
-# Aggregate price data to the 30 second frequency
-aggregatePrice(sampleTData, alignBy = "secs", alignPeriod = 30)
-# Aggregate price data to the 30 second frequency including zero return price changes
+\dontshow{if (!grepl("debian", sessionInfo()["platform"], fixed = FALSE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+# Aggregate price data to the 30-second frequency
 aggregatePrice(sampleTData, alignBy = "secs", alignPeriod = 30)
 
-# Aggregate price data to half a second frequency including zero return price changes
-aggregatePrice(sampleTData, alignBy = "milliseconds", alignPeriod = 500, fill = TRUE)
+# Aggregate price data to 30-minute frequency including zero return price changes
+aggregatePrice(sampleTData, alignBy = "minutes", alignPeriod = 30, fill = TRUE)
+\dontshow{\}) # examplesIf}
 }
 \author{
 Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.

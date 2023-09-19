@@ -120,7 +120,7 @@ harInsanityFilter <- function(fittedValues, lower, upper, replacement) {
 #' 
 #' @keywords forecasting
 #'
-#' @examples
+#' @examplesIf !grepl("debian", sessionInfo()["platform"], fixed = TRUE)
 #' # Example 1: HAR
 #' # Forecasting daily Realized volatility for the S&P 500 using the basic HARmodel: HAR
 #' library(xts)

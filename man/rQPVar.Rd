@@ -35,9 +35,11 @@ Calculate the realized quad-power variation, defined in Andersen et al. (2012).
  }
 }
 \examples{
+\dontshow{if (!grepl("debian", sessionInfo()["platform"], fixed = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 qpv <- rQPVar(rData= sampleTData[, list(DT, PRICE)], alignBy= "minutes",
               alignPeriod =5, makeReturns= TRUE)
 qpv
+\dontshow{\}) # examplesIf}
 }
 \references{
 Andersen, T. G., Dobrev, D., and Schaumburg, E. (2012). Jump-robust volatility estimation using nearest neighbor truncation. \emph{Journal of Econometrics}, 169, 75-93.

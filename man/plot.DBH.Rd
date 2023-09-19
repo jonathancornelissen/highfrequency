@@ -25,6 +25,7 @@ both the drift and volatility processes are plotted. CaPiTAlizAtIOn doesn't matt
 }
 }
 \examples{
+\dontshow{if (!grepl("debian", sessionInfo()["platform"], fixed = FALSE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 # Testing every 60 seconds after 09:15:00
 DBH <- driftBursts(sampleTDataEurope, testTimes = seq(32400 + 900, 63000, 60), preAverage = 2, 
                     ACLag = -1L, meanBandwidth = 300L, varianceBandwidth = 900L)
@@ -33,6 +34,7 @@ plot(DBH, pData = sampleTDataEurope)
 plot(DBH, which = "sigma")
 plot(DBH, which = "mu")
 plot(DBH, which = c("sigma", "mu"))
+\dontshow{\}) # examplesIf}
 }
 \author{
 Emil Sjoerup

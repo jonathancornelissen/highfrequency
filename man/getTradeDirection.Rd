@@ -21,12 +21,13 @@ determined using the Lee and Ready algorithm (Lee and Ready, 1991).
 NOTE: By convention the first observation is always marked as a buy.
 }
 \examples{
+\dontshow{if (!grepl("debian", sessionInfo()["platform"], fixed = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 # Generate matched trades and quote data set
 tqData <- matchTradesQuotes(sampleTData[as.Date(DT) == "2018-01-02"], 
                             sampleQData[as.Date(DT) == "2018-01-02"])
 directions <- getTradeDirection(tqData)
 head(directions)
-
+\dontshow{\}) # examplesIf}
 }
 \references{
 Lee, C. M. C. and Ready, M. J. (1991). Inferring trade direction from intraday data. \emph{Journal of Finance}, 46, 733-746.

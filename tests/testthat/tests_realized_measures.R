@@ -30,6 +30,8 @@ setnames(returnDatDT, old = "index", new = "DT")
 
 ##### rMedRVar #####
 test_that("rMedRVar", {
+  skip_on_cran()
+  
   expect_equal(
     as.numeric(colSums(rMedRVar(sampleOneMinuteData, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)[,!"DT"])),
     c(0.003387052289,0.001451676499)
@@ -48,6 +50,8 @@ test_that("rMedRVar", {
 })
 ##### rMedRQuar ##### 
 test_that("rMedRQuar", {
+  skip_on_cran()
+  
   expect_equal(
     as.numeric(rMedRQuar(as.xts(sampleTData[, list(DT, PRICE)]),alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE) * 1000000),
     c(0.015057721369, 0.003094834848)
@@ -68,6 +72,8 @@ test_that("rMedRQuar", {
 })
 ##### rMinRVar ##### 
 test_that("rMinRVar", {  
+  skip_on_cran()
+  
   expect_equal(
     as.numeric(colSums(rMinRVar(sampleOneMinuteData, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)[, !"DT"])),
     c(0.003344205602,0.001438168861)
@@ -89,6 +95,9 @@ test_that("rMinRVar", {
 })
 ##### rMinRQuar ##### 
 test_that("rMinRQuar", {
+  
+  skip_on_cran()
+  
   expect_equal(
     as.numeric(rMinRQuar(as.xts(sampleTData[, list(DT, PRICE)]), alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE) * 1000000),
     c(0.016174147040, 0.002659484761)
@@ -108,6 +117,9 @@ test_that("rMinRQuar", {
 
 ##### rMRCov #####  
 test_that("rMRCov", {
+  
+  skip_on_cran()
+  
   expect_equal({
     formatC(sum(rMRCov(list(as.xts(sampleOneMinuteData)["2001-08-04","MARKET"], as.xts(sampleOneMinuteData)["2001-08-04","STOCK"]), pairwise = TRUE, makePsd = TRUE)), digits = 5)
   },
@@ -124,6 +136,9 @@ test_that("rMRCov", {
 
 ##### rBeta #####
 test_that("rBeta", {
+  
+  skip_on_cran()
+  
   expect_equal({
     a <- as.xts(sampleOneMinuteData)["2001-08-04",1]
     b <- as.xts(sampleOneMinuteData)["2001-08-04",2]
@@ -156,6 +171,8 @@ test_that("rBPCov", {
 ##### RBPVar ##### 
 test_that("RBPVar", {
   
+  skip_on_cran()
+  
   if(!interactive()){ ## I don't want to test this everytime I manually run this script interactively
     expect_equal(
       formatC(sum(RBPVar(rData = diff(as.xts(sampleOneMinuteData))[-1,])), digits = 5),
@@ -165,6 +182,9 @@ test_that("RBPVar", {
 })
 ##### rCov #####
 test_that("rCov", {
+  
+  skip_on_cran()
+  
   expect_equal(
     formatC(sum(rCov(rData = sampleOneMinuteData, makeReturns = TRUE)[[1]][1:2,1:2]), digits = 5),
     "0.00081828"
@@ -194,6 +214,8 @@ test_that("rCov", {
 ##### rHYCov ##### 
 test_that("rHYCov gives correct results", {
   
+  skip_on_cran()
+  
   hy <- rHYCov(rData = as.xts(sampleOneMinuteData)["2001-08-05"],
               period = 5, alignBy = "minutes", alignPeriod = 5, makeReturns = TRUE)
   expect_equal(hy, matrix(c(0.0003355498, 0.0001639014,
@@ -203,6 +225,9 @@ test_that("rHYCov gives correct results", {
 
 ##### rKurt ##### 
 test_that("rKurt", {
+  
+  skip_on_cran()
+  
   expect_equal(
     as.numeric(colMeans(rKurt(sampleOneMinuteData, alignBy ="minutes", alignPeriod = 5, makeReturns = TRUE)[, !"DT"])),
     c(5.357363079, 5.186198676)
@@ -223,6 +248,9 @@ test_that("rKurt", {
 
 ##### rMPVar ##### 
 test_that("rMPVar", {
+  
+  skip_on_cran()
+  
   expect_equal(
     as.numeric(rMPVar(as.xts(sampleTData[, list(DT, PRICE)]), alignBy ="minutes", alignPeriod = 5, makeReturns = TRUE)),
     c(9.352083621e-05, 5.789397118e-05)
@@ -241,6 +269,9 @@ test_that("rMPVar", {
 })
 ##### rOWCov ##### 
 test_that("rOWCov", {
+  
+  skip_on_cran()
+  
   expect_equal(
     formatC(rOWCov(rData = as.xts(sampleOneMinuteData)["2001-08-04"], makeReturns = TRUE)[1,1], digits = 5),
     "0.00027182"
@@ -252,6 +283,9 @@ test_that("rOWCov", {
 })
 ##### rRTSCov ##### 
 test_that("rRTSCov", {
+  
+  skip_on_cran()
+  
   expect_equal(
     as.numeric(rRTSCov(pData = as.xts(sampleTData[as.Date(DT) == "2018-01-02", list(DT, PRICE)])) * 10000),
     0.4500523428
@@ -270,6 +304,9 @@ test_that("rRTSCov", {
 
 ##### rKernelCov ##### 
 test_that("rKernelCov", {
+  
+  skip_on_cran()
+  
   expect_equal(
     as.numeric(rKernelCov(rData = as.xts(sampleTData[, list(DT, PRICE)]), alignBy = "minutes",  alignPeriod = 5, makeReturns = TRUE)),
     c(1.313672470e-04,  6.263569337e-05)
@@ -295,6 +332,9 @@ test_that("rKernelCov", {
 
 ##### rSkew ##### 
 test_that("rSkew", {
+  
+  skip_on_cran()
+  
   expect_equal(
     as.numeric(colMeans(rSkew(sampleOneMinuteData, alignBy ="minutes", alignPeriod = 5, makeReturns = TRUE)[,!"DT"])),
     c(0.3159246000,0.3930917059)
@@ -312,6 +352,9 @@ test_that("rSkew", {
 })
 ##### rSVar ##### 
 test_that("rSVar", {
+  
+  skip_on_cran()
+  
   expect_equal(
     sum(rSVar(as.xts(sampleTData[, list(DT, PRICE)]), alignBy ="minutes", alignPeriod = 5, makeReturns = TRUE)),
     0.0001657447672
@@ -327,6 +370,9 @@ test_that("rSVar", {
 })
 ##### rThresholdCov ##### 
 test_that("rThresholdCov", {
+  
+  skip_on_cran()
+  
   expect_equal(
     formatC(sum(rThresholdCov(cbind(returnDat["1970-01-01",1], returnDat["1970-01-01",2]), alignBy = "minutes", alignPeriod = 1)), digits = 5),
     "1.7277"
@@ -352,6 +398,9 @@ test_that("rThresholdCov", {
 
 ##### rTPQuar ##### 
 test_that("rTPQuar", {
+  
+  skip_on_cran()
+  
   expect_equal(
     as.numeric(rTPQuar(as.xts(sampleTData[, list(DT, PRICE)]),alignBy ="minutes", alignPeriod = 5, makeReturns = TRUE) * 1000000),
     c(0.014641358869, 0.003225971764)
@@ -370,6 +419,9 @@ test_that("rTPQuar", {
 
 ##### rTSCov univariate ##### 
 test_that("rTSCov univariate", {
+  
+  skip_on_cran()
+  
   expect_equal(
     as.numeric(rTSCov(pData = as.xts(sampleTData[as.Date(DT) == "2018-01-02", list(DT, PRICE)]))),
     0.0001157509218
@@ -377,6 +429,9 @@ test_that("rTSCov univariate", {
 })
 ##### rTSCov multivariate ##### 
 test_that("rTSCov multivariate", {
+  
+  skip_on_cran()
+  
   expect_equal(
     formatC(sum(rTSCov(pData = list(dat["1970-01-01",1], dat["1970-01-01",2]))), digits = 5),
     "1.6068"
@@ -384,6 +439,9 @@ test_that("rTSCov multivariate", {
 })
 ##### rRVar  #####
 test_that("rRVar", {
+  
+  skip_on_cran()
+  
   expect_equal(
     formatC(as.numeric(rRVar(makeReturns(as.xts(sampleTData[as.Date(DT) == "2018-01-02", list(DT, PRICE)])))), digits = 5),
     "0.0001086"
@@ -392,6 +450,9 @@ test_that("rRVar", {
 
 ##### rQPVar  ##### 
 test_that("rQPVar", {
+  
+  skip_on_cran()
+  
   expect_equal(
     as.numeric(colMeans(rQPVar(sampleOneMinuteData, alignBy ="minutes", alignPeriod = 5, makeReturns = TRUE)[, -"DT"])) * 1000000,
     c(0.046268513319,0.007675935052)
@@ -411,6 +472,9 @@ test_that("rQPVar", {
 
 ##### rQuar  ##### 
 test_that("rQuar", {
+  
+  skip_on_cran()
+  
   expect_equal(
     as.numeric(colMeans(rQuar(sampleOneMinuteData, alignBy ="minutes", alignPeriod = 5, makeReturns = TRUE)[, -"DT"])) * 1000000,
     c(0.05486143300,0.01361880467)
@@ -430,6 +494,9 @@ test_that("rQuar", {
 
 ##### ivInference #####
 test_that("ivInference", {
+  
+  skip_on_cran()
+  
   expect_equal(
     formatC(IVinference(as.xts(sampleTData[, list(DT, PRICE)]), IVestimator= "rMinRVar", IQestimator = "rMedRQuar", 
                         confidence = 0.95, makeReturns = TRUE)[[1]]$cb * 10000, digits = 5),
@@ -439,6 +506,9 @@ test_that("ivInference", {
 
 ##### rAVGCov #####
 test_that("rAVGCov",{
+  
+  skip_on_cran()
+  
   rcovSub <- rAVGCov(rData = cbind(dat["1970-01-01",1], dat["1970-01-01",2]), alignBy = "minutes",alignPeriod = 5, k = 1, makeReturns = TRUE)
   expect_equal(as.numeric(rcovSub), c(0.78573656425, 0.06448478596, 0.06448478596, 0.73770313284))
   # Correct handling of seconds?
@@ -507,6 +577,9 @@ test_that("rCholCov", {
 
 ##### rSemiCov #####
 test_that("rSemiCov", {
+  
+  skip_on_cran()
+  
   rSC <- rSemiCov(sampleOneMinuteData, makeReturns = TRUE)
   mixed <- do.call(rbind, lapply(rSC, function(x) x[["mixed"]][1,2]))
   neg <- do.call(rbind, lapply(rSC, function(x) x[["negative"]][1,2]))
@@ -541,6 +614,9 @@ test_that("rSemiCov", {
 
 ##### ReMeDI #####
 test_that("ReMeDI Estimation matches expected output", { # We thank Merrick li for contributing Matlab code.
+  
+  skip_on_cran()
+  
   remed <- ReMeDI(sampleTData[, list(DT, PRICE = log(PRICE))], lags = 0:25, kn = 2)
 
   expected <- c(5.391986e-10,  3.873739e-09,  4.261547e-09,  3.118519e-09,  1.538245e-09,  6.805792e-10, -3.835125e-10, -2.232302e-10, -1.157490e-10, -1.110401e-09, -1.934303e-09,
@@ -563,6 +639,8 @@ test_that("ReMeDI Estimation matches expected output", { # We thank Merrick li f
 })
 
 test_that("ReMeDI lag choosing algorithm chooses the correct values", {
+  
+  skip_on_cran()
 
   optimalKn <- knChooseReMeDI(sampleTData, knMax = 10, tol = 0.05, size = 3, lower = 1, upper = 10, plot = FALSE)
   expect_equal(optimalKn, 5L)
@@ -574,6 +652,9 @@ test_that("ReMeDI lag choosing algorithm chooses the correct values", {
 
 
 test_that("ReMeDI asymptotic variance gives same result as Merrick Li's code", {
+  
+  skip_on_cran()
+  
   dat <- sampleTData[, list(DT, PRICE = log(PRICE))]
   avar <- ReMeDIAsymptoticVariance(dat, phi = 0.5, lags = 0:10, kn = 3, i = 1)
   remed <- ReMeDI(dat, 3, 0:10)
@@ -594,6 +675,9 @@ test_that("ReMeDI asymptotic variance gives same result as Merrick Li's code", {
 
 #### rBACov ####
 test_that("rBACov returns correct values", {
+  
+  skip_on_cran()
+  
   set.seed(123)
   iT <- 23400
   if(!require("mvtnorm")){skip("mvtnorm isn't installed")}

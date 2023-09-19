@@ -5,6 +5,7 @@ library(data.table)
 
 # autoSelectExchangeTrades ------------------------------------------------
 test_that("autoSelectExchangeTrades", {
+  skip_on_cran()
   expect_equal(
     unique(autoSelectExchangeTrades(sampleTDataRaw, printExchange = FALSE)$EX),
     "D"
@@ -21,6 +22,7 @@ test_that("autoSelectExchangeTrades", {
 
 # quotesCleanup -----------------------------------------------------------
 test_that("quotesCleanup", {
+  skip_on_cran()
   expect_equal(
     quotesCleanup(qDataRaw = sampleQDataRaw, exchanges = "N")$report["removedFromSelectingExchange"],
     c(removedFromSelectingExchange = 36109)
@@ -30,6 +32,7 @@ test_that("quotesCleanup", {
 
 # aggregatePrice ----------------------------------------------------------
 test_that("aggregatePrice", {
+  skip_on_cran()
   expect_equal(
     formatC(sum(head(aggregatePrice(sampleTData, alignBy = "secs", alignPeriod = 30))$PRICE), digits = 10),
     "     950.79"
@@ -40,6 +43,7 @@ test_that("aggregatePrice", {
 # selectExchange and data cleaning functions ------------------------------
 
 test_that("selectExchange and data cleaning functions", {
+  skip_on_cran()
   expect_equal(
     unique(selectExchange(sampleQDataRaw, c("N", "P"))$EX),
     c("P", "N")
@@ -90,7 +94,7 @@ test_that("selectExchange and data cleaning functions", {
 
 # tradesCleanup -----------------------------------------------------------
 test_that("tradesCleanup gives same data as the shipped data", {
-  
+  skip_on_cran()
   cleaned <-
     tradesCleanupUsingQuotes(
       tData = tradesCleanup(tDataRaw = sampleTDataRaw, exchanges = "N", report = FALSE),
@@ -192,6 +196,7 @@ test_that("tradesCleanup on-disk functionality", {
 
 # aggregateTS xts vs data.table for previoustick --------------------------
 test_that("aggregateTS xts vs data.table for previoustick", {
+  skip_on_cran()
   res_DT <- aggregateTS(sampleTData[, list(DT, PRICE)])
   expect_true(all.equal(as.xts(res_DT) , c(aggregateTS(as.xts(sampleTData[as.Date(DT) == "2018-01-02", list(DT, PRICE)])),
                                          aggregateTS(as.xts(sampleTData[as.Date(DT) == "2018-01-03", list(DT, PRICE)]))))
@@ -201,6 +206,7 @@ test_that("aggregateTS xts vs data.table for previoustick", {
 
 # aggregateTS edge cases --------------------------------------------------
 test_that("aggregateTS edge cases", {
+  skip_on_cran()
   # Test edge cases of aggregateTS
   expect_equal(index(aggregateTS(xts(1:23400, as.POSIXct(seq(34200, 57600, length.out = 23400), origin = '1970-01-01')))),
                      index(aggregateTS(xts(1:23400, as.POSIXct(seq(34200, 57599, length.out = 23400), origin = '1970-01-01'))))
@@ -217,6 +223,7 @@ test_that("aggregateTS edge cases", {
 
 # aggregateTS tick returns behave correctly -------------------------------
 test_that("aggregateTS tick returns behave correctly",{
+  skip_on_cran()
   
   ## Test using every second tick as well as two prime numbers since it's cheap and the primes should give the best coverage.
   DT <- aggregateTS(sampleTData[, list(DT, PRICE)], alignBy = "ticks", alignPeriod = 2)
@@ -241,6 +248,8 @@ test_that("aggregateTS tick returns behave correctly",{
 
 # aggregatePrice time zones -----------------------------------------------
 test_that("aggregatePrice time zones", {
+  skip_on_cran()
+  
   dat <- data.table(DT = as.POSIXct(c(34150, 34201, 34201, 34500, 34500 + 1e-6, 34799, 34799, 34801, 34803, 35099), origin = "1970-01-01", tz = "EST"), PRICE = 0:9)
   
   output <- aggregatePrice(dat, alignBy = "minutes", alignPeriod = 5, marketOpen = "04:30:00", marketClose = "11:00:00", fill = FALSE)
@@ -289,6 +298,9 @@ test_that("aggregatePrice filling different number of symbols over multiple days
 
 # aggregatePrice milliseconds vs seconds ----------------------------------
 test_that("aggregatePrice milliseconds vs seconds", {
+  
+  skip_on_cran()
+  
   dat <- data.table(DT = as.POSIXct(c(34150 ,34201, 34500, 34500 + 1e-9, 34799, 34801, 34803, 35099), origin = "1970-01-01", tz = "GMT"), PRICE = 0:7)
   expect_equal(aggregatePrice(dat, alignBy = "milliseconds", alignPeriod = 5000, marketOpen = "09:30:00", marketClose = "16:00:00", fill = TRUE),
                aggregatePrice(dat, alignBy = "secs", alignPeriod = 5, marketOpen = "09:30:00", marketClose = "16:00:00", fill = TRUE))
@@ -298,6 +310,9 @@ test_that("aggregatePrice milliseconds vs seconds", {
 
 # aggregatePrice filling correctly ----------------------------------------
 test_that("aggregatePrice filling correctly", {
+  
+  skip_on_cran()
+  
   dat <- data.table(DT = as.POSIXct(c(34150 ,34201, 34800, 45500, 45799, 50801, 50803, 57599.01, 57601), origin = "1970-01-01", tz = "GMT"), PRICE = 0:8)
   output <- aggregatePrice(dat, alignBy = "milliseconds", alignPeriod = 1000, marketOpen = "09:30:00", marketClose = "16:00:00", fill = TRUE)
   expect_equal(sum(output$PRICE == 0), 0) # This should be removed since it happens before the market opens
@@ -315,6 +330,7 @@ test_that("aggregatePrice filling correctly", {
 
 # aggregateQuotes edge cases ----------------------------------------------
 test_that("aggregateQuotes edge cases", {
+  skip_on_cran()
   dat <- data.table(DT = as.POSIXct(c(34150 ,34201, 34500, 34500 + 1e-9, 34799, 34801, 34803, 35099), origin = "1970-01-01", tz = "GMT"), 
                     SYMBOL = "XXX", BID = as.numeric(0:7), BIDSIZ = as.numeric(1), OFR = as.numeric(1:8), OFRSIZ = as.numeric(2))
   output <- aggregateQuotes(dat, alignBy = "minutes", alignPeriod = 5, marketOpen = "09:30:00", marketClose = "16:00:00")
@@ -331,6 +347,7 @@ test_that("aggregateQuotes edge cases", {
 
 # aggregateQuotes milliseconds vs seconds ---------------------------------
 test_that("aggregateQuotes milliseconds vs seconds", {
+  skip_on_cran()
   dat <- data.table(DT = as.POSIXct(c(34150 ,34201, 34500, 34500 + 1e-12, 34799, 34801, 34803, 35099), origin = "1970-01-01", tz = "GMT"), 
                     SYMBOL = "XXX", BID = as.numeric(0:7), BIDSIZ = as.numeric(1), OFR = as.numeric(1:8), OFRSIZ = as.numeric(2))
   expect_equal(aggregateQuotes(dat, alignBy = "milliseconds", alignPeriod = 5000, marketOpen = "09:30:00", marketClose = "16:00:00"),
@@ -343,6 +360,7 @@ test_that("aggregateQuotes milliseconds vs seconds", {
 
 # business time aggregation -----------------------------------------------
 test_that("business time aggregation",{
+  skip_on_cran()
   skip_if_not(capabilities('long.double'), 'Skip tests when long double is not available')
   pData <- sampleTData
   agged1 <- suppressWarnings(businessTimeAggregation(pData, measure = "intensity", obs = 390, bandwidth = 0.075))
@@ -372,7 +390,7 @@ test_that("business time aggregation",{
 
 # refreshTime -------------------------------------------------------------
 test_that("refreshTime", {
-  
+  skip_on_cran()
   # Unit test for the refreshTime algorithm based on Kris' example in http://past.rinfinance.com/agenda/2015/workshop/KrisBoudt.pdf
   #suppose irregular timepoints: 
   start <- as.POSIXct("2010-01-01 09:30:00", tz = "GMT") 
@@ -432,6 +450,7 @@ library(data.table)
 
 # spreadPrices ------------------------------------------------------------
 test_that("spreadPrices",{
+  skip_on_cran()
   set.seed(1)
   PRICE <- DT <- .N <- NULL
   data1 <- copy(sampleTData)[,  `:=`(PRICE = PRICE * runif(.N, min = 0.99, max = 1.01),
@@ -453,7 +472,8 @@ test_that("spreadPrices",{
 
 
 # gatherPrices and spreadPrices back and forth ----------------------------
-test_that("gatherPrices and spreadPrices back and forth",{
+test_that("gatherPrices and spreadPrices back and forth", {
+  skip_on_cran()
   set.seed(1)
   PRICE <- DT <- .N <- NULL
   data1 <- copy(sampleTData)[,  `:=`(PRICE = PRICE * runif(.N, min = 0.99, max = 1.01),
@@ -470,7 +490,7 @@ test_that("gatherPrices and spreadPrices back and forth",{
 
 # aggregateTrades, aggregatePrice, and aggregateQuotes multisymbol --------
 test_that("aggregateTrades, aggregatePrice, and aggregateQuotes multisymbol multiday",{
-  
+  skip_on_cran()
   datTrades <- merge.data.table(sampleTData, copy(sampleTData)[, SYMBOL := "ABC"][], by = c(colnames(sampleTData)), all = TRUE)
   datQuotes <- merge.data.table(sampleQData, copy(sampleQData)[, SYMBOL := "ABC"][], by = colnames(sampleQData), all = TRUE)
   
@@ -487,7 +507,7 @@ test_that("aggregateTrades, aggregatePrice, and aggregateQuotes multisymbol mult
 
 # Backwards-forwards matching algorithm produces correct result -----------
 test_that("Backwards-forwards matching algorithm produces correct result", {
-  
+  skip_on_cran()
   bfmMatched <- tradesCleanupUsingQuotes(tData = tradesCleanup(tDataRaw = sampleTDataRaw, report = FALSE, exchanges = 'D'),
                                   qData = quotesCleanup(qDataRaw = sampleQDataRaw, type = 'standard', report = FALSE, exchanges = 'N'), 
                                   BFM = TRUE, lagQuotes = 0)
@@ -499,7 +519,7 @@ test_that("Backwards-forwards matching algorithm produces correct result", {
 
 # seqInclEnds -------------------------------------------------------------
 test_that("seqInclEnds gives expected result", {
-  
+  skip_on_cran()
   target <- c(1,5,9,10)
   expect_equal(target, seqInclEnds(1, 10, 4))
   

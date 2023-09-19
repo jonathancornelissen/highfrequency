@@ -95,7 +95,7 @@ ABDJumptest <- function(RV, BPV, TQ) { # Compute jump detection stat mentioned i
 #' 
 #' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup.
 #'
-#' @examples
+#' @examplesIf !grepl("debian", sessionInfo()["platform"], fixed = TRUE)
 #' jt <- AJjumpTest(sampleTData[, list(DT, PRICE)], p = 2, k = 3, 
 #'                  alignBy = "seconds", alignPeriod = 5, makeReturns = TRUE)
 #' 

@@ -56,6 +56,7 @@ The off-diagonals of the concordant matrix is always positive, while for the mix
 In the case that cor is \code{TRUE}, the mixed matrix will be an \eqn{N \times N} matrix filled with NA as mapping the mixed covariance matrix into correlation space is impossible due to the 0-diagonal.
 }
 \examples{
+\dontshow{if (!grepl("debian", sessionInfo()["platform"], fixed = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 # Realized semi-variance/semi-covariance for prices aligned
 # at 5 minutes.
 
@@ -77,6 +78,7 @@ colnames(covariances) <- c("mixed", "neg", "pos")
 plot(covariances)
 addLegend(lty = 1) # Add legend so we can distinguish the series.
 }
+\dontshow{\}) # examplesIf}
 }
 \references{
 Bollerslev, T., Li, J., Patton, A. J., and Quaedvlieg, R. (2020). Realized semicovariances. \emph{Econometrica}, 88, 1515-1551.

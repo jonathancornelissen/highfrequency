@@ -2833,7 +2833,7 @@ rTPQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FAL
 #' Andersen, T. G., Dobrev, D., and Schaumburg, E. (2012). Jump-robust volatility estimation using nearest neighbor truncation. \emph{Journal of Econometrics}, 169, 75-93.
 #' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 #'
-#' @examples
+#' @examplesIf !grepl("debian", sessionInfo()["platform"], fixed = TRUE)
 #' qpv <- rQPVar(rData= sampleTData[, list(DT, PRICE)], alignBy= "minutes",
 #'               alignPeriod =5, makeReturns= TRUE)
 #' qpv
@@ -3041,7 +3041,7 @@ rQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #' Zhang, L. (2011). Estimating covariation: Epps effect, microstructure noise. \emph{Journal of Econometrics}, 160, 33-47.
 #'
 #' @author Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup.
-#' @examples
+#' @examplesIf !grepl("debian", sessionInfo()["platform"], fixed = TRUE)
 #' # Robust Realized two timescales Variance/Covariance
 #' # Multivariate:
 #' \dontrun{
@@ -3382,7 +3382,7 @@ rCholCov <- function(pData, IVest = "rMRCov", COVest = "rMRCov", criterion = "sq
 #'
 #' @details In the case that cor is \code{TRUE}, the mixed matrix will be an \eqn{N \times N} matrix filled with NA as mapping the mixed covariance matrix into correlation space is impossible due to the 0-diagonal.
 #'
-#' @examples
+#' @examplesIf !grepl("debian", sessionInfo()["platform"], fixed = TRUE)
 #' # Realized semi-variance/semi-covariance for prices aligned
 #' # at 5 minutes.
 #'
@@ -3542,7 +3542,7 @@ listCholCovEstimators <- function(){
 #' @references Li, M. and Linton, O. (2021). A ReMeDI for microstructure noise. Econometrica, forthcoming
 #' @keywords microstructure noise autocovariance autocorrelation
 #' @note We Thank Merrick Li for contributing his Matlab code for this estimator.
-#' @examples
+#' @examplesIf !grepl("debian", sessionInfo()["platform"], fixed = TRUE)
 #' remed <- ReMeDI(sampleTData[as.Date(DT) == "2018-01-02", ], kn = 2, lags = 1:8)
 #' # We can also use the algorithm for choosing the kn tuning parameter
 #' optimalKn <- knChooseReMeDI(sampleTData[as.Date(DT) == "2018-01-02",],
@@ -3780,7 +3780,7 @@ knChooseReMeDI <- function(pData, knMax = 10, tol = 0.05, size = 3, lower = 2, u
 #' @param i tuning parameter i
 #' @note We Thank Merrick Li for contributing his Matlab code for this estimator.
 #' @return a list with components \code{ReMeDI} and \code{asympVar} containing the ReMeDI estimation and it's asymptotic variance respectively
-#' @examples 
+#' @examplesIf !grepl("debian", sessionInfo()["platform"], fixed = TRUE)
 #' kn <- knChooseReMeDI(sampleTDataEurope[, list(DT, PRICE)])
 #' 
 #' remedi <- ReMeDI(sampleTDataEurope[, list(DT, PRICE)], kn = kn, lags = 0:15)

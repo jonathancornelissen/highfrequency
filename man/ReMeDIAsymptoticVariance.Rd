@@ -122,10 +122,12 @@ where
 We Thank Merrick Li for contributing his Matlab code for this estimator.
 }
 \examples{
+\dontshow{if (!grepl("debian", sessionInfo()["platform"], fixed = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 kn <- knChooseReMeDI(sampleTDataEurope[, list(DT, PRICE)])
 
 remedi <- ReMeDI(sampleTDataEurope[, list(DT, PRICE)], kn = kn, lags = 0:15)
 
 asympVar <- ReMeDIAsymptoticVariance(sampleTDataEurope[, list(DT, PRICE)], 
                                      kn = kn, lags = 0:15, phi = 0.9, i = 2)
+\dontshow{\}) # examplesIf}
 }

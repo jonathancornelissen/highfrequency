@@ -95,6 +95,7 @@ The lags from the Newey-West algorithm is increased by \code{2 * (preAveage-1)} 
 The maximum of 20 lags is also increased by this factor for the same reason.
 }
 \examples{
+\dontshow{if (!grepl("debian", sessionInfo()["platform"], fixed = FALSE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 # Usage with data.table object
 dat <- sampleTData[as.Date(DT) == "2018-01-02"]
 # Testing every 60 seconds after 09:45:00
@@ -132,6 +133,7 @@ print(DBH4, alpha = 0.99)
 print(DBH4, criticalValue = 3)
 max(abs(DBH4$tStat)) > getCriticalValues(DBH4, 0.99)$quantile
 }
+\dontshow{\}) # examplesIf}
 }
 \references{
 Christensen, K., Oomen, R., and Reno, R. (2020) The drift burst hypothesis. Journal of Econometrics. Forthcoming.

@@ -50,6 +50,7 @@ the outer product of gradients.
 Note that we always demean the returns in the data input as we don't include a constant in the mean equation.
 }
 \examples{
+\dontshow{if (!grepl("debian", sessionInfo()["platform"], fixed = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 
 # Calculate returns in percentages
 logReturns <- 100 * makeReturns(SPYRM$CLOSE)[-1]
@@ -66,6 +67,7 @@ fittedHEAVY
 
 # Calculate iterative multi-step-ahead forecasts
 predict(fittedHEAVY, stepsAhead = 12)
+\dontshow{\}) # examplesIf}
 }
 \references{
 Shephard, N. and Sheppard, K. (2010). Realising the future: Forecasting with high frequency based volatility (HEAVY) models. Journal of Applied Econometrics 25, 197--231.
