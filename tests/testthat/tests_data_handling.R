@@ -2,6 +2,7 @@ library(xts)
 library(testthat)
 library(data.table)
 
+data.table::setDTthreads(2)
 
 # autoSelectExchangeTrades ------------------------------------------------
 test_that("autoSelectExchangeTrades", {

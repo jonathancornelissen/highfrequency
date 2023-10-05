@@ -2,6 +2,8 @@ library("highfrequency")
 library("testthat")
 library("xts")
 
+data.table::setDTthreads(2)
+
 
 # spotDrift ---------------------------------------------------------------
 test_that("spotDrift",{

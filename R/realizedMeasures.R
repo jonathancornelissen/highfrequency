@@ -3543,6 +3543,7 @@ listCholCovEstimators <- function(){
 #' @keywords microstructure noise autocovariance autocorrelation
 #' @note We Thank Merrick Li for contributing his Matlab code for this estimator.
 #' @examplesIf !grepl("debian", sessionInfo()["platform"], fixed = TRUE)
+#' \dontshow{data.table::setDTthreads(2)}
 #' remed <- ReMeDI(sampleTData[as.Date(DT) == "2018-01-02", ], kn = 2, lags = 1:8)
 #' # We can also use the algorithm for choosing the kn tuning parameter
 #' optimalKn <- knChooseReMeDI(sampleTData[as.Date(DT) == "2018-01-02",],
@@ -3628,6 +3629,7 @@ ReMeDI <- function(pData, kn = 1, lags = 1, makeCorrelation = FALSE) {
 #' @details This is the algorithm B.2 in the appendix of the Li and Linton (2019) working paper.
 #' @note We Thank Merrick Li for contributing his Matlab code for this estimator.
 #' @examples
+#' \dontshow{data.table::setDTthreads(2)}
 #' optimalKn <- knChooseReMeDI(sampleTData[as.Date(DT) == "2018-01-02",],
 #'                             knMax = 10, tol = 0.05, size = 3,
 #'                             lower = 2, upper = 5, plot = TRUE)
@@ -3781,6 +3783,7 @@ knChooseReMeDI <- function(pData, knMax = 10, tol = 0.05, size = 3, lower = 2, u
 #' @note We Thank Merrick Li for contributing his Matlab code for this estimator.
 #' @return a list with components \code{ReMeDI} and \code{asympVar} containing the ReMeDI estimation and it's asymptotic variance respectively
 #' @examplesIf !grepl("debian", sessionInfo()["platform"], fixed = TRUE)
+#' \dontshow{data.table::setDTthreads(2)}
 #' kn <- knChooseReMeDI(sampleTDataEurope[, list(DT, PRICE)])
 #' 
 #' remedi <- ReMeDI(sampleTDataEurope[, list(DT, PRICE)], kn = kn, lags = 0:15)

@@ -2,6 +2,8 @@ library(testthat)
 library(highfrequency)
 library(xts)
 
+data.table::setDTthreads(2)
+
 # AJjumpTest ----------------------------------------------------
 test_that("AJjumpTest unit test",{
   skip_on_cran()

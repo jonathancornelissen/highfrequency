@@ -104,6 +104,7 @@ If the input \code{data.table} does not contain a \code{DT} column but it does c
 }
 \examples{
 \dontshow{if (!grepl("debian", sessionInfo()["platform"], fixed = FALSE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{data.table::setDTthreads(2)}
 # Consider you have raw quote data for 1 stock for 2 days
 head(sampleQDataRaw)
 dim(sampleQDataRaw)

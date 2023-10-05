@@ -37,6 +37,8 @@ For example when sampling based on volume, business time aggregation will result
 }
 \examples{
 \dontshow{if (!grepl("debian", sessionInfo()["platform"], fixed = FALSE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{data.table::setDTthreads(2)}
+
 pData <- sampleTData[,list(DT, PRICE, SIZE)]
 # Aggregate based on the trade intensity measure. Getting 390 observations.
 agged <- businessTimeAggregation(pData, measure = "intensity", obs = 390, bandwidth = 0.075)

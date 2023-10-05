@@ -2,6 +2,8 @@ library(testthat)
 library(highfrequency)
 library(xts)
 
+data.table::setDTthreads(2)
+
 
 # matchTradesQuotes & getTradeDirection quotes ----------------------------
 test_that("matchTradesQuotes & getTradeDirection quotes", {

@@ -2,6 +2,8 @@ library("testthat")
 library("data.table")
 library("xts")
 
+data.table::setDTthreads(2)
+
 # DBH C++ error tests -----------------------------------------------------
 test_that("DBH C++ error tests",{
   skip_on_cran()

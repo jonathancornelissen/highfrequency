@@ -2,6 +2,9 @@ library(testthat)
 library(xts)
 library(data.table)
 library(highfrequency)
+
+data.table::setDTthreads(2)
+
 set.seed(123)
 start <- strptime("1970-01-01", format = "%Y-%m-%d", tz = "UTC")
 timestamps <- start + rep(seq(34200, 57600, length.out = 23401), 3) + rep(0:2 * 86400, each = 23401)

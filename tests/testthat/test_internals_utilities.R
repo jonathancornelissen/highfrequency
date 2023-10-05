@@ -1,6 +1,8 @@
 library(testthat)
 set.seed(1)
 
+data.table::setDTthreads(2)
+
 # colCumsum ---------------------------------------------------------------
 test_that("colCumsum works correctly", {
   skip_on_cran()

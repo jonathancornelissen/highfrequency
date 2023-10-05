@@ -1413,6 +1413,7 @@ noZeroQuotes <- function(qData) {
 #' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
 #' 
 #' @examplesIf !grepl("debian", sessionInfo()["platform"], fixed = FALSE)
+#' \dontshow{data.table::setDTthreads(2)}
 #' # Consider you have raw quote data for 1 stock for 2 days
 #' head(sampleQDataRaw)
 #' dim(sampleQDataRaw)
@@ -2730,6 +2731,8 @@ refreshTime <- function (pData, sort = FALSE, criterion = "squared duration") {
 #' @return A list containing \code{"pData"} which is the aggregated data and a list containing the intensity process, split up day by day.
 #' 
 #' @examplesIf !grepl("debian", sessionInfo()["platform"], fixed = FALSE)
+#' \dontshow{data.table::setDTthreads(2)}
+#' 
 #' pData <- sampleTData[,list(DT, PRICE, SIZE)]
 #' # Aggregate based on the trade intensity measure. Getting 390 observations.
 #' agged <- businessTimeAggregation(pData, measure = "intensity", obs = 390, bandwidth = 0.075)

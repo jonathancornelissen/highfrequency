@@ -1,5 +1,8 @@
 library("testthat")
 library("xts")
+
+data.table::setDTthreads(2)
+
 rets <- as.xts(sampleOneMinuteData)[, 1]
 
 for (date in unique(as.character(as.Date(index(rets))))) {

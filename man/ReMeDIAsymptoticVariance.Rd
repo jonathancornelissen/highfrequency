@@ -123,6 +123,7 @@ We Thank Merrick Li for contributing his Matlab code for this estimator.
 }
 \examples{
 \dontshow{if (!grepl("debian", sessionInfo()["platform"], fixed = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{data.table::setDTthreads(2)}
 kn <- knChooseReMeDI(sampleTDataEurope[, list(DT, PRICE)])
 
 remedi <- ReMeDI(sampleTDataEurope[, list(DT, PRICE)], kn = kn, lags = 0:15)

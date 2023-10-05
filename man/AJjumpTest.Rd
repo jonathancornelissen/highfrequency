@@ -105,6 +105,7 @@ or to another deterministic and known number in the absence of jumps (Theodosiou
 }
 \examples{
 \dontshow{if (!grepl("debian", sessionInfo()["platform"], fixed = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{data.table::setDTthreads(2)}
 jt <- AJjumpTest(sampleTData[, list(DT, PRICE)], p = 2, k = 3, 
                  alignBy = "seconds", alignPeriod = 5, makeReturns = TRUE)
 \dontshow{\}) # examplesIf}

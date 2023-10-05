@@ -32,6 +32,7 @@ We Thank Merrick Li for contributing his Matlab code for this estimator.
 }
 \examples{
 \dontshow{if (!grepl("debian", sessionInfo()["platform"], fixed = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{data.table::setDTthreads(2)}
 remed <- ReMeDI(sampleTData[as.Date(DT) == "2018-01-02", ], kn = 2, lags = 1:8)
 # We can also use the algorithm for choosing the kn tuning parameter
 optimalKn <- knChooseReMeDI(sampleTData[as.Date(DT) == "2018-01-02",],

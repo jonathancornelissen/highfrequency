@@ -96,6 +96,7 @@ The maximum of 20 lags is also increased by this factor for the same reason.
 }
 \examples{
 \dontshow{if (!grepl("debian", sessionInfo()["platform"], fixed = FALSE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{data.table::setDTthreads(2)}
 # Usage with data.table object
 dat <- sampleTData[as.Date(DT) == "2018-01-02"]
 # Testing every 60 seconds after 09:45:00
