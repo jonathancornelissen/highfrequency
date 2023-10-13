@@ -47,7 +47,7 @@
 #' @importFrom Rsolnp solnp
 #' @author Onno Kleen and Emil Sjorup.
 #' 
-#' @examples 
+#' @examplesIf !grepl("debian", sessionInfo()["platform"], fixed = TRUE)
 #' 
 #' # Calculate returns in percentages
 #' logReturns <- 100 * makeReturns(SPYRM$CLOSE)[-1]

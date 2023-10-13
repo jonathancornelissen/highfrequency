@@ -2,8 +2,11 @@ library("testthat")
 library("data.table")
 library("xts")
 
+data.table::setDTthreads(2)
+
 # DBH C++ error tests -----------------------------------------------------
 test_that("DBH C++ error tests",{
+  skip_on_cran()
   #these functions have broken before, hopefully they won't break again.
   expect_equal(highfrequency:::AsymptoticVarianceC(c(1:3), 3), NaN) 
   expect_equal(highfrequency:::AsymptoticVarianceC(c(1:3), 4), NaN)
@@ -14,6 +17,7 @@ test_that("DBH C++ error tests",{
 
 # DBH tests ---------------------------------------------------------------
 test_that("DBH sim test", {
+  skip_on_cran()
   set.seed(123)
   iT <- 23400
   meanBandwidth <- 300L

@@ -36,6 +36,9 @@ Time series aggregation based on `business time` statistics. Instead of equidist
 For example when sampling based on volume, business time aggregation will result in a time series that has an equal amount of volume between each observation (if possible).
 }
 \examples{
+\dontshow{if (!grepl("debian", sessionInfo()["platform"], fixed = FALSE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{data.table::setDTthreads(2)}
+
 pData <- sampleTData[,list(DT, PRICE, SIZE)]
 # Aggregate based on the trade intensity measure. Getting 390 observations.
 agged <- businessTimeAggregation(pData, measure = "intensity", obs = 390, bandwidth = 0.075)
@@ -48,7 +51,7 @@ rCov(pData[,list(DT, PRICE)], makeReturns = TRUE, alignBy = "minutes", alignPeri
 agged <- businessTimeAggregation(pData, measure = "volume", obs = 78)
 rCov(agged$pData[,list(DT, PRICE)], makeReturns = TRUE)
 rCov(pData[,list(DT, PRICE)], makeReturns = TRUE, alignBy = "minutes", alignPeriod = 5)
-
+\dontshow{\}) # examplesIf}
 }
 \references{
 Dong, Y., and Tse, Y. K. (2017). Business time sampling scheme with applications to testing semi-martingale hypothesis and estimating integrated volatility. \emph{Econometrics}, 5, 51.

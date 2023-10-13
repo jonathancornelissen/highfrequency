@@ -1,5 +1,8 @@
 library("testthat")
 library("xts")
+
+data.table::setDTthreads(2)
+
 rets <- as.xts(sampleOneMinuteData)[, 1]
 
 for (date in unique(as.character(as.Date(index(rets))))) {
@@ -10,6 +13,7 @@ for (date in unique(as.character(as.Date(index(rets))))) {
 
 # HARmodel ----------------------------------------------------------------
 test_that("HARModel",{
+  skip_on_cran()
   
   expect_equal(
     formatC(sum(HARmodel(rets, periods = c(1, 5, 10), periodsJ = c(1),
@@ -79,6 +83,7 @@ test_that("HARModel",{
 # HEAVYmodel --------------------------------------------------------------
 
 test_that("HEAVYmodel",{
+  skip_on_cran()
   
   logReturns <- 100 * makeReturns(SPYRM$CLOSE)[-1]
   logReturns <- logReturns - mean(logReturns)

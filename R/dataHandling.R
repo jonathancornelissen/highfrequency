@@ -100,14 +100,12 @@ aggregateTS <- function (ts, FUN = "previoustick", alignBy = "minutes", alignPer
 #'
 #' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
 #' @keywords data manipulation
-#' @examples
-#' # Aggregate price data to the 30 second frequency
-#' aggregatePrice(sampleTData, alignBy = "secs", alignPeriod = 30)
-#' # Aggregate price data to the 30 second frequency including zero return price changes
+#' @examplesIf !grepl("debian", sessionInfo()["platform"], fixed = FALSE)
+#' # Aggregate price data to the 30-second frequency
 #' aggregatePrice(sampleTData, alignBy = "secs", alignPeriod = 30)
 #'
-#' # Aggregate price data to half a second frequency including zero return price changes
-#' aggregatePrice(sampleTData, alignBy = "milliseconds", alignPeriod = 500, fill = TRUE)
+#' # Aggregate price data to 30-minute frequency including zero return price changes
+#' aggregatePrice(sampleTData, alignBy = "minutes", alignPeriod = 30, fill = TRUE)
 #' @importFrom xts last tzone
 #' @importFrom data.table fifelse
 #' @export
@@ -184,7 +182,7 @@ aggregatePrice <- function(pData, alignBy = "minutes", alignPeriod = 1, marketOp
   } else {
     tz <- timeZone
   }
-  setkeyv(pData, c("DT", "SYMBOL")) # The below code MAY fail with data with unordered DT column. Also setkey inceases speed of grouping
+  setkeyv(pData, c("DT", "SYMBOL")) # The below code MAY fail with data with unordered DT column. Also setkey increases speed of grouping
   ## Checking ends
   # Convert DT to numeric. This is much faster than dealing with the strings (POSIXct)
   pData[, DT := as.numeric(DT, tz = tz)]
@@ -794,7 +792,6 @@ autoSelectExchangeQuotes <- function(qData, printExchange = TRUE) {
 exchangeHoursOnly <- function(data, marketOpen = "09:30:00", marketClose = "16:00:00", tz = NULL) {
   .N <- N <- DATE <- DT <- NULL # needed for data table (otherwise notes pop up in check())
   data <- checkColumnNames(data)
-  nm <- toupper(colnames(data))
   
   inputWasXts <- FALSE
   if (!is.data.table(data)) {
@@ -838,8 +835,10 @@ exchangeHoursOnly <- function(data, marketOpen = "09:30:00", marketClose = "16:0
     
   }
   
+  nm <- toupper(colnames(data))
+  
   # Subset observations that does not fall between their respective market opening and market closing times.
-  data <- data[between(DT, rep(marketOpenNumeric, obsPerDay[[2]]), rep(marketCloseNumeric, obsPerDay[[2]])), nm, with = FALSE]
+  data <- data[between(data$DT, rep(marketOpenNumeric, obsPerDay[[2]]), rep(marketCloseNumeric, obsPerDay[[2]])), nm, with = FALSE]
   if (inputWasXts) {
     return(xts(as.matrix(data[, -c("DT")]), order.by = data$DT, tzone = tzone(data$DT)))
   } else {
@@ -1413,7 +1412,8 @@ noZeroQuotes <- function(qData) {
 #' 
 #' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup.
 #' 
-#' @examples
+#' @examplesIf !grepl("debian", sessionInfo()["platform"], fixed = FALSE)
+#' \dontshow{data.table::setDTthreads(2)}
 #' # Consider you have raw quote data for 1 stock for 2 days
 #' head(sampleQDataRaw)
 #' dim(sampleQDataRaw)
@@ -1786,9 +1786,6 @@ rmTradeOutliersUsingQuotes <- function(tData, qData, lagQuotes = 0, nSpreads = 1
     return(tqData[])
     
   }
-  
-  
-  
 }
 
 #' Remove outliers in quotes
@@ -1841,7 +1838,7 @@ rmTradeOutliersUsingQuotes <- function(tData, qData, lagQuotes = 0, nSpreads = 1
 #' @importFrom data.table as.data.table is.data.table setnames
 #' @importFrom xts is.xts as.xts
 #' @export
-rmOutliersQuotes <- function (qData, maxi = 10, window = 50, type = "standard", tz = NULL) {
+rmOutliersQuotes <- function (qData, maxi = 10, window = 50, type = "advanced", tz = NULL) {
   # NOTE: Median Absolute deviation chosen contrary to Barndorff-Nielsen et al.
   # Setting those variables equal NULL is for suppressing NOTES in devtools::check
   # References inside data.table-operations throw "no visible binding for global variable ..." error
@@ -1916,6 +1913,125 @@ rmOutliersQuotes <- function (qData, maxi = 10, window = 50, type = "standard", 
     return(xts(as.matrix(qData[, -c("DT", "DATE", "MADALL", "CRITERION", "MIDQUOTE")]), order.by = qData$DT))
   } else {
     return(qData[, -c("MADALL", "CRITERION")][])
+  }
+}
+
+#' Remove outliers in trades without using quote data
+#' 
+#' @description 
+#' Delete entries for which the price is outlying with respect to surrounding entries. 
+#' In comparison to \link{tradesCleanupUsingQuotes}, this function doesn't need quote data.
+#' 
+#' @param pData a \code{data.table} or \code{xts} object at least containing the column \code{"PRICE"}.
+#' @param maxi an integer, indicating the maximum number of median absolute deviations allowed.
+#' @param window an integer, indicating the time window for which the "outlyingness" is considered.
+#' @param type should be \code{"standard"} or \code{"advanced"} (see details).
+#' @param tz fallback time zone used in case we we are unable to identify the timezone of the data, by default: \code{tz = NULL}. 
+#' With the non-disk functionality, we attempt to extract the timezone from the \code{DT} column (or index) of the data, which may fail. 
+#' In case of failure we use \code{tz} if specified, and if it is not specified, we use \code{"UTC"}. 
+#' 
+#' @return \code{xts} object or \code{data.table} depending on type of input.
+#' 
+#' @details
+#' 
+#' \itemize{
+#' \item If \code{type = "standard"}: Function deletes entries for which the price deviated by more than "maxi"
+#' median absolute deviations from a rolling centered median (excluding
+#' the observation under consideration) of window observations.
+#' \item If \code{type = "advanced"}:  Function deletes entries for which the price deviates by more than "maxi"
+#' median absolute deviations from the value closest to the price of
+#' these three options:
+#' \enumerate{
+#'  \item Rolling centered median (excluding the observation under consideration)
+#'  \item Rolling median of the following window of observations
+#'  \item Rolling median of the previous window of observations
+#' }
+#' The advantage of this procedure compared to the "standard" proposed
+#' by Barndorff-Nielsen et al. (2010, footnote 8) is that it will not incorrectly remove
+#' large price jumps. Therefore this procedure has been set as the default
+#' for removing outliers. 
+#' 
+#' Note that the median absolute deviation is taken over the entire
+#' day. In case it is zero (which can happen if prices don't change much), 
+#' the median absolute deviation is taken over a subsample without constant prices.
+#' }
+#' 
+#' @references Barndorff-Nielsen, O. E., P. R. Hansen, A. Lunde, and N. Shephard (2009). Realized kernels in practice: Trades and quotes. \emph{Econometrics Journal}, 12, C1-C32.
+#' 
+#' @author Jonathan Cornelissen, Kris Boudt, and Onno Kleen.
+#' 
+#' @keywords cleaning
+#' @export
+rmOutliersTrades <- function (pData, maxi = 10, window = 50, type = "advanced", tz = NULL) {
+  # NOTE: Median Absolute deviation chosen contrary to Barndorff-Nielsen et al.
+  # Setting those variables equal NULL is for suppressing NOTES in devtools::check
+  # References inside data.table-operations throw "no visible binding for global variable ..." error
+  SYMBOL <- PRICE <- DATE <- DT <- MADALL <- CRITERION <- NULL
+  if ((window %% 2) != 0) {
+    stop("Window size can't be odd.")
+  }
+  
+  pData <- checkColumnNames(pData)
+  
+  inputWasXts <- FALSE
+  if (!is.data.table(pData)) {
+    if (is.xts(pData)) {
+      pData <- as.data.table(pData)
+      pData <- setnames(pData , old = "index", new = "DT")
+      inputWasXts <- TRUE
+    } else {
+      stop("Input has to be data.table or xts.")
+    }
+  } else {
+    if (!("DT" %in% colnames(pData))) {
+      stop("Data.table neeeds DT column (date-time ).")
+    }
+    
+  }
+  
+  if (!("SYMBOL" %in% colnames(pData))) {
+    pData[, SYMBOL := "UNKNOWN"]
+  }
+  
+  timeZone <- format(pData$DT[1], format = "%Z")
+  if(is.null(timeZone) || timeZone == ""){
+    if(is.null(tz)){
+      tz <- "UTC"
+    }
+    if(!("POSIXct" %in% class(pData$DT))){
+      pData[, DT := as.POSIXct(format(DT, digits = 20, nsmall = 20), tz = tz)]
+    }
+  } else {
+    tz <- timeZone
+  }
+  
+  if (!(type %in% c("standard", "advanced"))) {
+    stop("type has to be \"standard\" or \"advanced\".")
+  }
+  
+  # weights_med_center_incl <- rep(1, times = window + 1)
+  weights_med_center_excl <- c(rep(1, times = window / 2), 0, rep(1, times = window / 2))
+  weights_med_follow  <- c(0 , rep(1, times = window))
+  weights_med_trail    <- c(rep(1, times = window), 0)
+  
+  pData <- pData[, `:=`(DATE = as.Date(DT, tz = tz))][, MADALL := mad(PRICE), by = list(DATE, SYMBOL)]
+  
+  if (type == "standard") {
+    pData <- pData[ , CRITERION := abs(PRICE - rollingMedianInclEnds(PRICE, window = window, weights = weights_med_center_excl)), by = list(DATE,SYMBOL)][
+      CRITERION < maxi * MADALL]
+    
+  }
+  if (type == "advanced") {
+    pData <- pData[, CRITERION := pmin(abs(PRICE - rollingMedianInclEnds(PRICE, window = window, weights = weights_med_center_excl, direction = "center")),
+                                       abs(PRICE - rollingMedianInclEnds(PRICE, window = window, weights = weights_med_trail, direction = "left")),
+                                       abs(PRICE - rollingMedianInclEnds(PRICE, window = window, weights = weights_med_follow, direction = "right")),
+                                       na.rm = TRUE), by = list(DATE,SYMBOL)][
+                                         CRITERION < maxi * MADALL]
+  }
+  if (inputWasXts) {
+    return(xts(as.matrix(pData[, -c("DT", "DATE", "MADALL", "CRITERION", "PRICE")]), order.by = pData$DT))
+  } else {
+    return(pData[, -c("MADALL", "CRITERION")][])
   }
 }
 
@@ -2333,6 +2449,7 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
 #' 
 #' @examples 
 #' # Consider you have raw trade data for 1 stock for 2 days 
+#' \dontrun{
 #' tDataAfterFirstCleaning <- tradesCleanup(tDataRaw = sampleTDataRaw, 
 #'                                           exchanges = "N", report = FALSE)
 #' qData <- quotesCleanup(qDataRaw = sampleQDataRaw, 
@@ -2342,6 +2459,7 @@ tradesCleanup <- function(dataSource = NULL, dataDestination = NULL, exchanges =
 #'   tradesCleanupUsingQuotes(qData = qData[as.Date(DT) == "2018-01-02"],
 #'                            tData = tDataAfterFirstCleaning[as.Date(DT) == "2018-01-02"])
 #' dim(tDataAfterFinalCleaning)
+#' }
 #' # In case you have more data it is advised to use the on-disk functionality
 #' # via the "tradeDataSource", "quoteDataSource", and "dataDestination" arguments
 #' @keywords cleaning
@@ -2612,7 +2730,9 @@ refreshTime <- function (pData, sort = FALSE, criterion = "squared duration") {
 #' 
 #' @return A list containing \code{"pData"} which is the aggregated data and a list containing the intensity process, split up day by day.
 #' 
-#' @examples
+#' @examplesIf !grepl("debian", sessionInfo()["platform"], fixed = FALSE)
+#' \dontshow{data.table::setDTthreads(2)}
+#' 
 #' pData <- sampleTData[,list(DT, PRICE, SIZE)]
 #' # Aggregate based on the trade intensity measure. Getting 390 observations.
 #' agged <- businessTimeAggregation(pData, measure = "intensity", obs = 390, bandwidth = 0.075)

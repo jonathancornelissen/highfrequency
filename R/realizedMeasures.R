@@ -408,9 +408,8 @@ rMinRVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FA
     if (makeReturns) {
       rData <- makeReturns(rData)
     }
-    q <- abs(rData)#as.zoo(abs(as.nueric(rData))) #absolute value
+    q <- abs(as.matrix(rData))#as.zoo(abs(as.nueric(rData))) #absolute value
     q <- rollApplyMinWrapper(q)
-    # q <- rollapply(q, width = 2, FUN = min, by = 1, align = "left", by.column = TRUE, fill = NULL)
     N <- dim(q)[1] + 1 #number of obs because of fill = NULL
     colnames(q) <- names(rData)
     minrv <- (pi/(pi - 2)) * (N/(N - 1)) * colSums(q^2, na.rm = TRUE)
@@ -1873,6 +1872,7 @@ rMPVar <- function(rData, m = 2, p = 2, alignBy = NULL, alignPeriod = NULL, make
     for (i in 1:length(dates)) {
       res[[dates[i]]] <- rMPVar(dat[starts[i]:ends[i], ], m = m, p = p, makeReturns = makeReturns, alignBy = NULL, alignPeriod = NULL)
     }
+    
     res <- setDT(transpose(res))[, DT := as.Date(dates)]
     setcolorder(res, "DT")
     if(ncol(res) == 2){
@@ -1901,7 +1901,7 @@ rMPVar <- function(rData, m = 2, p = 2, alignBy = NULL, alignPeriod = NULL, make
 
       q <- abs(rollApplyProdWrapper(q, m))
       #q <- abs(rollapply(q,width=m,FUN=prod,align="left"))
-      N <- nrow(rData)
+      N <- nrow(as.matrix(rData))
 
       dmp <- (2^((p/m)/2) * gamma((p/m + 1)/2) / gamma(1/2))^(-m)
 
@@ -2355,7 +2355,7 @@ rSVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #' @keywords volatility
 #' @export
 rThresholdCov <- function(rData, cor = FALSE, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE, ...) {
-
+  
   # Multiday adjustment:
   if (is.xts(rData) && isMultiXts(rData)) {
     if (is.null(dim(rData))) {
@@ -2755,7 +2755,7 @@ rRVar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #' @keywords highfrequency rTPQuar
 #' @export
 rTPQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE) {
-
+  
   # self-reference for multi-day input
   if (is.xts(rData) && checkMultiDays(rData)) {
     result <- apply.daily(rData, rTPQuar, alignBy, alignPeriod, makeReturns)
@@ -2796,10 +2796,10 @@ rTPQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FAL
     if (makeReturns) {
       rData <- makeReturns(rData)
     }
-
+    
     q <- abs(as.matrix(rData))
     q <- rollApplyProdWrapper(q, 3)
-    N <- nrow(q)+2
+    N <- nrow(q) + 2
     rTPVar <- N * (N/(N - 2)) * ((gamma(0.5)/(2^(2/3)*gamma(7/6) ))^3) * colSums(q^(4/3))
     return(rTPVar)
   }
@@ -2833,7 +2833,7 @@ rTPQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FAL
 #' Andersen, T. G., Dobrev, D., and Schaumburg, E. (2012). Jump-robust volatility estimation using nearest neighbor truncation. \emph{Journal of Econometrics}, 169, 75-93.
 #' @author Giang Nguyen, Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup
 #'
-#' @examples
+#' @examplesIf !grepl("debian", sessionInfo()["platform"], fixed = TRUE)
 #' qpv <- rQPVar(rData= sampleTData[, list(DT, PRICE)], alignBy= "minutes",
 #'               alignPeriod =5, makeReturns= TRUE)
 #' qpv
@@ -3041,7 +3041,7 @@ rQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
 #' Zhang, L. (2011). Estimating covariation: Epps effect, microstructure noise. \emph{Journal of Econometrics}, 160, 33-47.
 #'
 #' @author Jonathan Cornelissen, Kris Boudt, and Emil Sjoerup.
-#' @examples
+#' @examplesIf !grepl("debian", sessionInfo()["platform"], fixed = TRUE)
 #' # Robust Realized two timescales Variance/Covariance
 #' # Multivariate:
 #' \dontrun{
@@ -3382,7 +3382,7 @@ rCholCov <- function(pData, IVest = "rMRCov", COVest = "rMRCov", criterion = "sq
 #'
 #' @details In the case that cor is \code{TRUE}, the mixed matrix will be an \eqn{N \times N} matrix filled with NA as mapping the mixed covariance matrix into correlation space is impossible due to the 0-diagonal.
 #'
-#' @examples
+#' @examplesIf !grepl("debian", sessionInfo()["platform"], fixed = TRUE)
 #' # Realized semi-variance/semi-covariance for prices aligned
 #' # at 5 minutes.
 #'
@@ -3542,7 +3542,8 @@ listCholCovEstimators <- function(){
 #' @references Li, M. and Linton, O. (2021). A ReMeDI for microstructure noise. Econometrica, forthcoming
 #' @keywords microstructure noise autocovariance autocorrelation
 #' @note We Thank Merrick Li for contributing his Matlab code for this estimator.
-#' @examples
+#' @examplesIf !grepl("debian", sessionInfo()["platform"], fixed = TRUE)
+#' \dontshow{data.table::setDTthreads(2)}
 #' remed <- ReMeDI(sampleTData[as.Date(DT) == "2018-01-02", ], kn = 2, lags = 1:8)
 #' # We can also use the algorithm for choosing the kn tuning parameter
 #' optimalKn <- knChooseReMeDI(sampleTData[as.Date(DT) == "2018-01-02",],
@@ -3628,6 +3629,7 @@ ReMeDI <- function(pData, kn = 1, lags = 1, makeCorrelation = FALSE) {
 #' @details This is the algorithm B.2 in the appendix of the Li and Linton (2019) working paper.
 #' @note We Thank Merrick Li for contributing his Matlab code for this estimator.
 #' @examples
+#' \dontshow{data.table::setDTthreads(2)}
 #' optimalKn <- knChooseReMeDI(sampleTData[as.Date(DT) == "2018-01-02",],
 #'                             knMax = 10, tol = 0.05, size = 3,
 #'                             lower = 2, upper = 5, plot = TRUE)
@@ -3780,7 +3782,8 @@ knChooseReMeDI <- function(pData, knMax = 10, tol = 0.05, size = 3, lower = 2, u
 #' @param i tuning parameter i
 #' @note We Thank Merrick Li for contributing his Matlab code for this estimator.
 #' @return a list with components \code{ReMeDI} and \code{asympVar} containing the ReMeDI estimation and it's asymptotic variance respectively
-#' @examples 
+#' @examplesIf !grepl("debian", sessionInfo()["platform"], fixed = TRUE)
+#' \dontshow{data.table::setDTthreads(2)}
 #' kn <- knChooseReMeDI(sampleTDataEurope[, list(DT, PRICE)])
 #' 
 #' remedi <- ReMeDI(sampleTDataEurope[, list(DT, PRICE)], kn = kn, lags = 0:15)

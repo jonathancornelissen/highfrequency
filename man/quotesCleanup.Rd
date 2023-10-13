@@ -103,6 +103,8 @@ ours.
 If the input \code{data.table} does not contain a \code{DT} column but it does contain \code{DATE} and \code{TIME_M} columns, we create the \code{DT} column by REFERENCE, altering the \code{data.table} that may be in the user's environment!
 }
 \examples{
+\dontshow{if (!grepl("debian", sessionInfo()["platform"], fixed = FALSE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{data.table::setDTthreads(2)}
 # Consider you have raw quote data for 1 stock for 2 days
 head(sampleQDataRaw)
 dim(sampleQDataRaw)
@@ -112,7 +114,7 @@ dim(qDataAfterCleaning$qData)
 
 # In case you have more data it is advised to use the on-disk functionality
 # via "dataSource" and "dataDestination" arguments
-
+\dontshow{\}) # examplesIf}
 }
 \references{
 Barndorff-Nielsen, O. E., Hansen, P. R., Lunde, A., and Shephard, N. (2009). Realized kernels in practice: Trades and quotes. Econometrics Journal 12, C1-C32.

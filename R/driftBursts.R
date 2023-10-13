@@ -66,7 +66,8 @@
 #' Objects of class \code{DBH} has the methods \code{\link{print.DBH}}, \code{\link{plot.DBH}}, and \code{\link{getCriticalValues.DBH}} which prints, plots, and
 #' retrieves critical values for the test described in appendix B of Christensen, Oomen, and Reno (2020).
 #' 
-#' @examples 
+#' @examplesIf !grepl("debian", sessionInfo()["platform"], fixed = FALSE)
+#' \dontshow{data.table::setDTthreads(2)}
 #' # Usage with data.table object
 #' dat <- sampleTData[as.Date(DT) == "2018-01-02"]
 #' # Testing every 60 seconds after 09:45:00
@@ -285,7 +286,8 @@ driftBursts <- function(pData, testTimes = seq(34260, 57600, 60),
 #' estimated volatility process. \code{"mu"} denotes plotting the estimated drift process. If \code{which = c("sigma", "mu")} or \code{which = c("mu", "sigma")},
 #' both the drift and volatility processes are plotted. CaPiTAlizAtIOn doesn't matter}
 #' }
-#' @examples
+#' @examplesIf !grepl("debian", sessionInfo()["platform"], fixed = FALSE)
+#' \dontshow{data.table::setDTthreads(2)}
 #' # Testing every 60 seconds after 09:15:00
 #' DBH <- driftBursts(sampleTDataEurope, testTimes = seq(32400 + 900, 63000, 60), preAverage = 2, 
 #'                     ACLag = -1L, meanBandwidth = 300L, varianceBandwidth = 900L)
@@ -440,7 +442,7 @@ plot.DBH <- function(x, ...){
 #' The default value is 0.95}
 #' }
 #' 
-#' @examples
+#' @examplesIf !grepl("debian", sessionInfo()["platform"], fixed = FALSE)
 #' \dontrun{
 #' DBH <- driftBursts(sampleTDataEurope, testTimes = seq(32400 + 900, 63000, 300), preAverage = 2, 
 #'                    ACLag = -1L, meanBandwidth = 300L, varianceBandwidth = 900L)

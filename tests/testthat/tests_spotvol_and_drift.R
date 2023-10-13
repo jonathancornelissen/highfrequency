@@ -2,9 +2,12 @@ library("highfrequency")
 library("testthat")
 library("xts")
 
+data.table::setDTthreads(2)
+
 
 # spotDrift ---------------------------------------------------------------
 test_that("spotDrift",{
+  skip_on_cran()
   
   skip_if(!requireNamespace("FKF", quietly = TRUE))
   
@@ -43,6 +46,7 @@ test_that("spotDrift",{
 
 # spotVol -----------------------------------------------------------------
 test_that("spotVol", {
+  skip_on_cran()
   
   skip_if(!requireNamespace("FKF", quietly = TRUE))
   

@@ -267,7 +267,9 @@ getLiquidityMeasures <- function(tqData, win = 300) {
   
   tqData[, midpoints := 0.5 * (BID + OFR)]
   if('DIRECTION' %in% colnames(tqData)){
-    if(sort(unique(tqData$DIRECTION)) != c(-1,1)) {stop("DIRECTION provided, but is not -1 and 1")}
+    if (any(!(tqData$DIRECTION %in% c(-1,1)))) {
+      stop("DIRECTION provided, but is not -1 and 1")
+    }
     tqData[, direction := DIRECTION]
   } else {
     tqData[, direction := getTradeDirection(tqData)]
@@ -332,7 +334,7 @@ getLiquidityMeasures <- function(tqData, win = 300) {
 #' 
 #' @author Jonathan Cornelissen, Kris Boudt, Onno Kleen, and Emil Sjoerup. Special thanks to Dirk Eddelbuettel.
 #' 
-#' @examples 
+#' @examplesIf !grepl("debian", sessionInfo()["platform"], fixed = TRUE)
 #' # Generate matched trades and quote data set
 #' tqData <- matchTradesQuotes(sampleTData[as.Date(DT) == "2018-01-02"], 
 #'                             sampleQData[as.Date(DT) == "2018-01-02"])

@@ -47,6 +47,7 @@ This is the algorithm B.2 in the appendix of the Li and Linton (2019) working pa
 We Thank Merrick Li for contributing his Matlab code for this estimator.
 }
 \examples{
+\dontshow{data.table::setDTthreads(2)}
 optimalKn <- knChooseReMeDI(sampleTData[as.Date(DT) == "2018-01-02",],
                             knMax = 10, tol = 0.05, size = 3,
                             lower = 2, upper = 5, plot = TRUE)

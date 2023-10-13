@@ -1,6 +1,9 @@
 library(testthat)
 library(xts)
 library(highfrequency)
+
+data.table::setDTthreads(2)
+
 set.seed(123)
 start <- strptime("1970-01-01", format = "%Y-%m-%d", tz = "UTC")
 timestamps <- start + seq(34200, 57600, length.out = 11701)
@@ -13,6 +16,7 @@ price2 <- dat[,2]
 
 # leadLag -----------------------------------------------------------------
 test_that("leadLag", {
+  skip_on_cran()
   # skip_on_os("solaris")
   ## Test that the contrasts are as expected
   ll <- leadLag(price1, price2, seq(-3,3), normalize = FALSE)

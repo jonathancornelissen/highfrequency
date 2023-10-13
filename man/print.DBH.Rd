@@ -23,6 +23,7 @@ The default value is 0.95}
 }
 }
 \examples{
+\dontshow{if (!grepl("debian", sessionInfo()["platform"], fixed = FALSE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 \dontrun{
 DBH <- driftBursts(sampleTDataEurope, testTimes = seq(32400 + 900, 63000, 300), preAverage = 2, 
                    ACLag = -1L, meanBandwidth = 300L, varianceBandwidth = 900L)
@@ -31,6 +32,7 @@ print(DBH, criticalValue = 1) # This value doesn't make sense - don't actually u
 print(DBH, alpha = 0.95) # 5\% confidence level - this is the standard
 print(DBH, alpha = 0.99) # 1\% confidence level
 }
+\dontshow{\}) # examplesIf}
 }
 \author{
 Emil Sjoerup

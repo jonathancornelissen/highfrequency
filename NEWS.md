@@ -1,3 +1,9 @@
+## highfrequency 1.0.1
+
+- New function: rmOutliersTrades
+- Bug fix: exchangeHoursOnly doesn't work for xts
+- Bug fix: rMinRVar and rMPVar didn't work with data.table
+
 ## highfrequency 1.0.0
 
 - Updated citation as a paper on our package will be published in the Journal of Statistical Software

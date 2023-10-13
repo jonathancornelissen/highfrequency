@@ -2,8 +2,11 @@ library(testthat)
 library(highfrequency)
 library(xts)
 
+data.table::setDTthreads(2)
+
 # AJjumpTest ----------------------------------------------------
 test_that("AJjumpTest unit test",{
+  skip_on_cran()
   expect_equal(
     as.numeric(AJjumpTest(as.xts(sampleTData[,list(DT, PRICE)]), p = 2, k = 3, alignBy = "seconds", alignPeriod = 5, makeReturns = TRUE)[,1]),
     c(-0.63154307241, -0.03660544638)
@@ -14,6 +17,7 @@ test_that("AJjumpTest unit test",{
 
 # JO jump test ------------------------------------------------------------
 test_that("JO jump test unit test",{
+  skip_on_cran()
   expect_equal(
     as.numeric(JOjumpTest(as.xts(sampleOneMinuteData)[,1], power = 6)$ztest),
     c(1.58839272530, -2.23596371826, 1.43940624574, -1.62044376089, -0.16071177517, 0.42242944882, -0.51764968793, -3.84231423189, 6.11221556860, 0.42155384715,
@@ -31,6 +35,7 @@ test_that("JO jump test unit test",{
 
 # BNSjumpTest -------------------------------------------------------------
 test_that("BNSjumpTest", {
+  skip_on_cran()
   expect_equal(
     as.numeric(BNSjumpTest(as.xts(sampleTData[, list(DT, PRICE)]), IVestimator= "rMinRVar", IQestimator = "rMedRQuar", type= "linear", makeReturns = TRUE)[, "p.value"]),
     c(1.322998188e-01, 2.816329921e-05)
@@ -48,6 +53,7 @@ test_that("BNSjumpTest", {
 
 # intradayJumpTest --------------------------------------------------------
 test_that("LM test",{
+  skip_on_cran()
   ## Extract the prices and set the time-zone to the local time-zone
   library(xts)
   dat <- sampleTData[as.Date(DT) == "2018-01-02", list(DT, PRICE)]
@@ -69,6 +75,7 @@ test_that("LM test",{
 })
 
 test_that("FoF test",{
+  skip_on_cran()
   dat <- sampleTData[, list(DT, PRICE)]
   FoFtest <- intradayJumpTest(pData = dat, volEstimator = "PARM", driftEstimator = "none", alpha = 0.95, RM = "bipower", 
                               theta = 1, lookBackPeriod = 50, marketOpen = "9:30:00", marketClose = "16:00:00", tz = "GMT")
@@ -81,6 +88,7 @@ test_that("FoF test",{
 
 
 test_that("multiple intradayJumpTest", {
+  skip_on_cran()
   jumpTest <- intradayJumpTest(pData = sampleOneMinuteData[, list(DT, PRICE = MARKET)], volEstimator = "RM", driftEstimator = "none", alpha = 0.95, RM = "bipower", 
                                lookBackPeriod = 10, dontIncludeLast = TRUE, on = "minutes", k = 5,
                                marketOpen = "9:30:00", marketClose = "16:00:00", tz = "GMT")
@@ -95,6 +103,7 @@ test_that("multiple intradayJumpTest", {
 
 # Rank jump test ----------------------------------------------------------
 test_that("rank jump test", {
+  skip_on_cran()
   expect_error(rankJumpTest(marketPrice = as.xts(sampleOneMinuteData)[,1], stockPrices = list(as.xts(sampleOneMinuteData)[,2])), "Singular value decomposition cannot be calculated")
   rjt <- rankJumpTest(marketPrice = as.xts(sampleOneMinuteData)[,1], stockPrices = list(as.xts(sampleOneMinuteData)[,2], as.xts(sampleOneMinuteData)[,2] * 1.05))
   

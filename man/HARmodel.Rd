@@ -97,6 +97,8 @@ For other specifications, please refer to the cited papers.
 The standard errors reporting in the \code{print} and \code{summary} methods are Newey-West standard errors calculated with the \pkg{sandwich} package.
 }
 \examples{
+\dontshow{if (!grepl("debian", sessionInfo()["platform"], fixed = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+\dontshow{data.table::setDTthreads(2)}
 # Example 1: HAR
 # Forecasting daily Realized volatility for the S&P 500 using the basic HARmodel: HAR
 library(xts)
@@ -158,7 +160,7 @@ predict(x)
 testStats <- sqrt(390) * (SPYRM$RV1 - SPYRM$BPV1)/sqrt((pi^2/4+pi-3 - 2) * SPYRM$medRQ1)
 model <- HARmodel(cbind(as.xts(SPYRM[, list(DT, RV5, BPV5)]), testStats), type = "HARCJ")
 
-
+\dontshow{\}) # examplesIf}
 }
 \references{
 Andersen, T. G., Bollerslev, T., and Diebold, F. (2007). Roughing it up: Including jump components in the measurement, modelling and forecasting of return volatility. \emph{The Review of Economics and Statistics}, 89, 701-720.
