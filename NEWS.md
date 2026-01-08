@@ -1,3 +1,7 @@
+## highfrequency 1.0.3
+
+- Bug fix: time zone handling via Github issue #104.
+
 ## highfrequency 1.0.2
 
 - Bug fix: spotVol had some clash arguments when specifying m

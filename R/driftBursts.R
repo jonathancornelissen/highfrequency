@@ -144,7 +144,7 @@ driftBursts <- function(pData, testTimes = seq(34260, 57600, 60),
       stop("pData must have columns DT and PRICE")
     }
     
-    timeZone <- format(pData$DT[1], format = "%Z")
+    timeZone <- getTimeZone(pData)
     if(is.null(timeZone) || timeZone == ""){
       tz <- "UTC"
       pData[, DT := as.POSIXct(format(DT, digits = 20, nsmall = 20), tz = tz)]
@@ -274,6 +274,7 @@ driftBursts <- function(pData, testTimes = seq(34260, 57600, 60),
   return(lDriftBursts)
 }
 
+
 #' Plotting method for \code{DBH} objects
 #' @param x an object of class \code{DBH}
 #' @param ... optional arguments, see details
@@ -334,7 +335,7 @@ plot.DBH <- function(x, ...){
         stop("pData must have columns DT and PRICE")
       }
       
-      timeZone <- format(pData$DT[1], format = "%Z")
+      timeZone <- getTimeZone(pData)
       if(is.null(timeZone) || timeZone == ""){
         tz <- "UTC"
         pData[, DT := as.POSIXct(format(DT, digits = 20, nsmall = 20), tz = tz)]

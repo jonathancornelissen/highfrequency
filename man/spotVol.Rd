@@ -473,7 +473,8 @@ xts::addLegend("topright", c("h = simple estimate", "h = quarticity corrected",
 \dontrun{
 vol5 <- spotVol(sampleOneMinuteData[, list(DT, PRICE = MARKET)], 
                 method = "piecewise", m = 200, n  = 100, online = FALSE)
-plot(vol5)}
+plot(vol5)
+}
 
 # Compare regular GARCH(1,1) model to eGARCH, both with external regressors
 \dontrun{

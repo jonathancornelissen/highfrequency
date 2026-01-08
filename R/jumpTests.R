@@ -608,7 +608,7 @@ intradayJumpTest <- function(pData, volEstimator = "RM", driftEstimator = "none"
     }
   }
   
-  timeZone <- format(pData$DT[1], format = "%Z")
+  timeZone <- getTimeZone(pData)
   if(is.null(timeZone) || timeZone == ""){
     if(is.null(tz)){
       tz <- "UTC"
