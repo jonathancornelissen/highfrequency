@@ -171,7 +171,7 @@ aggregatePrice <- function(pData, alignBy = "minutes", alignPeriod = 1, marketOp
   
   
   
-  timeZone <- format(pData$DT[1], format = "%Z")
+  timeZone <- getTimeZone(pData)
   if(is.null(timeZone) || timeZone == ""){
     if(is.null(tz)){
       tz <- "UTC"
@@ -1998,7 +1998,7 @@ rmOutliersTrades <- function (pData, maxi = 10, window = 50, type = "advanced", 
     pData[, SYMBOL := "UNKNOWN"]
   }
   
-  timeZone <- format(pData$DT[1], format = "%Z")
+  timeZone <- getTimeZone(pData)
   if(is.null(timeZone) || timeZone == ""){
     if(is.null(tz)){
       tz <- "UTC"
@@ -2786,7 +2786,7 @@ businessTimeAggregation <- function(pData, measure = "volume", obs = 390, bandwi
     }
   }
   
-  timeZone <- format(pData$DT[1], format = "%Z")
+  timeZone <- getTimeZone(pData)
   if(is.null(timeZone) || timeZone == ""){
     if(is.null(tz)){
       tz <- "UTC"
@@ -2943,7 +2943,7 @@ makeOHLCV <- function(pData, alignBy = "minutes", alignPeriod = 5, tz = NULL){
     pData <- pData[, list(DT, PRICE, SIZE, SYMBOL)]
   }
   
-  timeZone <- format(pData$DT[1], format = "%Z")
+  timeZone <- getTimeZone(pData)
   if(is.null(timeZone) || timeZone == ""){
     if(is.null(tz)){
       tz <- "UTC"

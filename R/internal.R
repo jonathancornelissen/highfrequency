@@ -144,7 +144,11 @@ checkMultiDays <- function(x) {
   }
 } 
 
-
+### The time zone, or NULL if it could not be determined
+#' @keywords internal 
+getTimeZone <- function(dt) {
+  attr(dt$DT, "tzone")
+}
 
 
 ### functions used to calculate whether a burst of drift has occured.

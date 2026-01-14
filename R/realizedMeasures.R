@@ -4198,7 +4198,7 @@ rBACov <- function(pData, shares, outstanding, nonEquity, ETFNAME = "ETF",
   setkey(pData, "DT")
   # setkey(backup, "DT")
   
-  timeZone <- format(pData$DT[1], format = "%Z")
+  timeZone <- getTimeZone(pData)
   tz <- NULL
   if(is.null(timeZone) || timeZone == ""){
     if(is.null(tz)){
