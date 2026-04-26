@@ -86,11 +86,11 @@ Rcpp::List DriftBurstLoopC(const arma::colvec& vPreAveraged, const arma::colvec&
                            const arma::colvec& vTime, const arma::colvec& vTesttime, 
                            double iMeanBandwidth, double iVarBandwidth, int iPreAverage, int iAcLag){
 #ifdef _OPENMP
-  // From experimentation, setting the number of threads to 1 is much faster than using multi-threaded code. (Why??)
-  // We capture the number of threads that omp is set to, 
+  // We capture the number of threads that omp is set to,
   // set the number of threads using omp_set_num_threads and reset it to the previous value.
-  const int THREADS = omp_get_num_threads(); // Get number of threads to reset later
-  omp_set_num_threads(1); // Set the threading to 1.
+  // Use omp_get_max_threads() since omp_get_num_threads() returns 1 outside a parallel region.
+  const int THREADS = omp_get_max_threads();
+  omp_set_num_threads(1);
 #endif
   // Initialization
   int iT = vTesttime.size();

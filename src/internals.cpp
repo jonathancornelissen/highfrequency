@@ -1,6 +1,20 @@
 #include <RcppArmadillo.h>
+#ifdef _OPENMP
+#include <omp.h>
+#endif
 using namespace arma;
 using namespace Rcpp;
+
+
+//' @keywords internal
+// [[Rcpp::export]]
+int getOMPMaxThreads() {
+#ifdef _OPENMP
+  return omp_get_max_threads();
+#else
+  return NA_INTEGER;
+#endif
+}
 
 
 

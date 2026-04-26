@@ -120,6 +120,16 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// getOMPMaxThreads
+int getOMPMaxThreads();
+RcppExport SEXP _highfrequency_getOMPMaxThreads() {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    rcpp_result_gen = Rcpp::wrap(getOMPMaxThreads());
+    return rcpp_result_gen;
+END_RCPP
+}
 // colCumsum
 arma::mat colCumsum(const arma::mat& x);
 RcppExport SEXP _highfrequency_colCumsum(SEXP xSEXP) {
@@ -413,6 +423,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_highfrequency_AutomaticLagSelectionC", (DL_FUNC) &_highfrequency_AutomaticLagSelectionC, 2},
     {"_highfrequency_DriftBurstLoopC", (DL_FUNC) &_highfrequency_DriftBurstLoopC, 8},
     {"_highfrequency_DriftBurstLoopCPAR", (DL_FUNC) &_highfrequency_DriftBurstLoopCPAR, 9},
+    {"_highfrequency_getOMPMaxThreads", (DL_FUNC) &_highfrequency_getOMPMaxThreads, 0},
     {"_highfrequency_colCumsum", (DL_FUNC) &_highfrequency_colCumsum, 1},
     {"_highfrequency_refreshTimeMatching", (DL_FUNC) &_highfrequency_refreshTimeMatching, 2},
     {"_highfrequency_preAveragingReturnsInternal", (DL_FUNC) &_highfrequency_preAveragingReturnsInternal, 2},

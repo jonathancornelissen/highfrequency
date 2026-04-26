@@ -37,6 +37,11 @@ DriftBurstLoopCPAR <- function(vPreAveraged, diffedlogprices, vTime, vTesttime, 
 NULL
 
 #' @keywords internal
+getOMPMaxThreads <- function() {
+    .Call(`_highfrequency_getOMPMaxThreads`)
+}
+
+#' @keywords internal
 colCumsum <- function(x) {
     .Call(`_highfrequency_colCumsum`, x)
 }
