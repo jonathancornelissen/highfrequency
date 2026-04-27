@@ -425,9 +425,6 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
     }
 
     x1 <- cbind(x1, RQmatrix[,1:nperiodsQ] * x1[,1:nperiodsQ])
-    if (is.null(colnames(RQmatrix))) { #special case for 1 aggregation period of realized quarticity. This appends the RQ1 name
-      colnames(x1) <- c(colnames(x1[,1:nperiods]),"RQ1")
-    }
     if(all(colnames(x1) == c(paste0("RV", periods), rep("", nperiodsQ)))){
       colnames(x1) <- c(colnames(x1[,1:nperiods]), paste0("RQ", periodsQ))
     }
@@ -449,9 +446,6 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
       warning("The realized quarticity is already transformed with sqrt() thus only realized variance is transformed")
     }
     x1 <- cbind(x1, J, RQmatrix[,1:nperiodsQ] * x1[,1:nperiodsQ])
-    if(is.null(colnames(RQmatrix))){ #special case for 1 aggregation period of realized quarticity. This appends the RQ1 name
-      colnames(x1) <- c(colnames(x1[,1:(dim(x1)[2]-1)]), "RQ1")
-    }
     if(all(colnames(x1) == c(paste0("RV", periods), paste0("J", periodsJ), rep("", nperiodsQ)))){
       colnames(x1) <- c(colnames(x1[,1:(nperiods+length(periodsJ))]), paste0("RQ", periodsQ))
     }
@@ -484,9 +478,8 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
       warning("The realized quarticity is already transformed with sqrt() thus only realized variance and bipower variation is transformed")
     }
     x2 <- cbind(x2, RQmatrix[,1:nperiodsQ] * x2[,1:nperiodsQ])
-
-    if (is.null(colnames(RQmatrix))) { #special case for 1 aggregation period of realized quarticity. This appends the RQ1 name
-      colnames(x2) <- c(colnames(x2[,1:nperiods]), "RQ1")
+    if(all(colnames(x2) == c(paste0("J", periods), rep("", nperiodsQ)))){
+      colnames(x2) <- c(colnames(x2[,1:nperiods]), paste0("RQ", periodsQ))
     }
     x2 <- cbind(x2,rmin)
     model <- estimhar(y = y, x = x2, externalRegressor = externalRegressor)

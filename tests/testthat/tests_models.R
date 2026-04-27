@@ -53,6 +53,11 @@ test_that("HARModel",{
                  "RQ1" = -3.581803794e-01 , "RQ5" = -1.695874367e-01  , "RQ22" = -2.373133e-01))
   expect_equal(summary(model)$r.squared, 0.3205499342)
   
+  model <- HARmodel(as.xts(SPYRM[, list(DT, RV5, BPV5, RQ5)]), type = "CHARQ", periodsQ = c(1))
+  expect_equal(model$coefficients,
+               c("(Intercept)" = 4.676123825e-06, "J1" = 9.430126857e-01, "J5" = 3.955722766e-02, "J22" = 4.678487252e-02,
+                 "RQ1" = -3.836656242e-01))
+
   model <- HARmodel(as.xts(SPYRM[, list(DT, RV5, BPV5, RQ5)]), type = "HARQJ", periodsJ = c(1))
   expect_equal(model$coefficients,
                c("(Intercept)" = 3.278421768e-06, "RV1" = 9.738665838e-01, "RV5" = 7.578418611e-03, "RV22" = 2.352647045e-02 , 
