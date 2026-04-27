@@ -178,7 +178,7 @@ test_that("RBPVar", {
   
   if(!interactive()){ ## I don't want to test this everytime I manually run this script interactively
     expect_equal(
-      formatC(sum(RBPVar(rData = diff(as.xts(sampleOneMinuteData))[-1,])), digits = 5),
+      formatC(sum(highfrequency:::RBPVar(rData = diff(as.xts(sampleOneMinuteData))[-1,])), digits = 5),
       "150.48"
     )
   }
