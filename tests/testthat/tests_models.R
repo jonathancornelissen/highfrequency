@@ -77,6 +77,9 @@ test_that("HARModel",{
   x <- HARmodel(dat, periods = c(1,3), RVest = c("rCov"), type="HAR", inputType = "returns", leverage = c(1,3))
   expect_equal(sum(coef(x)), 0.5175878)
   
+  model <- HARmodel(as.xts(SPYRM[, list(DT, RV5)]))
+  expect_false(identical(summary(model, lag = 22)$coefficients, summary(model, lag = 50)$coefficients))
+
 })
 
 

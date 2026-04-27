@@ -972,8 +972,9 @@ print.HARmodel <- function(x, ...){
 #' @importFrom sandwich NeweyWest
 #' @export
 summary.HARmodel <- function(object, ...){
+  options <- list(...)
   op <- list(lag = 22)
-  op[names(options)] <- list(...)
+  op[names(options)] <- options
   dd <- summary.lm(object)
   dd$coefficients[,"Std. Error"] <- sqrt(diag(NeweyWest(object, lag = op$lag)))
   dd$coefficients[,"t value"] <- dd$coefficients[,"Estimate"] / dd$coefficients[,"Std. Error"]
