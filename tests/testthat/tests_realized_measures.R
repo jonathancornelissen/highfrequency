@@ -478,12 +478,13 @@ test_that("rQuar", {
   
   skip_on_cran()
   
-  expect_equal(
-    as.numeric(colMeans(rQuar(sampleOneMinuteData, alignBy ="minutes", alignPeriod = 5, makeReturns = TRUE)[, -"DT"])) * 1000000,
-    c(0.05486143300,0.01361880467)
-  )
-  
-  expect_equal(lapply(rQuar(returnDat), sum), list("PRICE1" = 2.997549025, "PRICE2" = 3.030800189, "PRICE3" = 3.055064757))
+  # closed form: if |r_i| = c for all i, then rQuar = N^2 * c^4 / 3
+  for (N in c(2L, 5L, 100L)) {
+    cc <- 0.01
+    r <- matrix(rep(c(cc, -cc), length.out = N), ncol = 1)
+    expect_equal(as.numeric(rQuar(r)), N^2 * cc^4 / 3)
+  }
+
   expect_equal(lapply(rQuar(returnDat), sum), lapply(rQuar(dat, makeReturns = TRUE), sum))
   
   expect_equal(matrix(rQuar(returnDat), ncol = 3), matrix(as.matrix(rQuar(returnDatDT)[,-1]), ncol = 3))

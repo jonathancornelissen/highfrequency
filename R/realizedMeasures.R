@@ -2970,7 +2970,7 @@ rQuar <- function(rData, alignBy = NULL, alignPeriod = NULL, makeReturns = FALSE
       rData <- makeReturns(rData)
     }
     q <- as.matrix(rData)
-    N <- nrow(q) + 1
+    N <- nrow(q)
     rQuar <- N/3 * colSums(q^4)
     return(rQuar)
   }
