@@ -757,7 +757,7 @@ predict.HARmodel <- function(object, ... ){
     if (type %in% quarticityModels) { #in case realized quarticity estimator is supplied
       # RQmatrix <- aggRQ(RM3,periodsQ)[(maxp:(n - h)), ]
       RQmatrix <- har_agg(RM3, periodsQ, nperiodsQ)
-      colnames(RVmatrix1) <- paste0("RV", periods)
+      colnames(RQmatrix) <- paste0("RQ", periodsQ)
       if(nperiodsQ == 1){
         RQmatrix <- as.matrix(sqrt(RQmatrix) - sqrt(mean(RM3)))
       } else {
@@ -857,9 +857,6 @@ predict.HARmodel <- function(object, ... ){
         warning("The realized quarticity is already transformed with sqrt() thus only realized variance is transformed")
       }
       x1 <- cbind(x1, RQmatrix[,1:nperiodsQ] * x1[,1:nperiodsQ])
-      if (is.null(colnames(RQmatrix))) { #special case for 1 aggregation period of realized quarticity. This appends the RQ1 name
-        colnames(x1) <- c(colnames(x1[, 1:nperiods]),"RQ1")
-      }
       x <- cbind(x1,rmin)
     }
 
@@ -874,9 +871,6 @@ predict.HARmodel <- function(object, ... ){
         warning("The realized quarticity is already transformed with sqrt() thus only realized variance is transformed")
       }
       x1 <- cbind(x1, J, RQmatrix[,1:nperiodsQ] * x1[,1:nperiodsQ])
-      if(is.null(colnames(RQmatrix))){ #special case for 1 aggregation period of realized quarticity. This appends the RQ1 name
-        colnames(x1) <- c(colnames(x1[,1:(dim(x1)[2]-1)]), "RQ1")
-      }
       x <- cbind(x1,rmin)
     }
 
@@ -895,9 +889,6 @@ predict.HARmodel <- function(object, ... ){
         warning("The realized quarticity is already transformed with sqrt() thus only realized variance and bipower variation is transformed")
       }
       x2 = cbind(x2, RQmatrix[,1:nperiodsQ] * x2[,1:nperiodsQ])
-      if(is.null(colnames(RQmatrix))){ #special case for 1 aggregation period of realized quarticity. This appends the RQ1 name
-        colnames(x2) = c(colnames(x2[,1:nperiods]), "RQ1")
-      }
       x = cbind(x2,rmin)
     } #End CHAR-RVQ if cond
 
