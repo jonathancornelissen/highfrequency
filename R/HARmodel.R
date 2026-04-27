@@ -314,7 +314,7 @@ HARmodel <- function(data, periods = c(1, 5, 22), periodsJ = c(1, 5, 22), period
     # Get the rmins:
     rmintemp <- pmin(e,0)
     # Aggregate everything:
-    rmin <- har_agg(rmintemp, leverage, length(leverage))[(maxp:(n-h)),]
+    rmin <- har_agg(rmintemp, leverage, length(leverage))[(maxp:(n-h)), , drop = FALSE]
     colnames(rmin) <- paste0("Rmin", leverage)
     # Select:
     #rmin <- rmin[(maxp:(n-h)),]
