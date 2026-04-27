@@ -3089,12 +3089,10 @@ spreadPrices <- function(data){
 #' @export
 gatherPrices <- function(data){
   
-  inputWasXts <- FALSE
   if (!is.data.table(data)) {
     if (is.xts(data)) {
       data <- as.data.table(data)
       data <- setnames(data , old = "index", new = "DT")
-      inputWasXts <- TRUE
     } else {
       stop("Input has to be data.table or xts.")
     }
@@ -3105,13 +3103,6 @@ gatherPrices <- function(data){
   }
   data <- melt(data, 1, na.rm = TRUE, variable.factor = FALSE)
   setnames(data, old = c("variable", "value"), new = c("SYMBOL", "PRICE"))
-  
-  if (inputWasXts) {
-    data <- as.xts(data)
-    storage.mode(data) <- 'numeric'
-    return(data)
-  } else {
-    setkeyv(data, c("DT", "SYMBOL"))
-    return(data[])
-  }
+  setkeyv(data, c("DT", "SYMBOL"))
+  return(data[])
 }

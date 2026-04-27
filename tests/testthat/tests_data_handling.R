@@ -487,6 +487,11 @@ test_that("gatherPrices and spreadPrices back and forth", {
   expect_equal(dat1, gatherPrices(dat))
   expect_equal(spreadPrices(gatherPrices(dat)), dat)
   
+  xt <- xts(dat1[SYMBOL == "XYZ", list(PRICE)], order.by = dat1[SYMBOL == "XYZ", DT])
+  out <- gatherPrices(xt)
+  expect_true(is.data.table(out))
+  expect_equal(sort(colnames(out)), c("DT", "PRICE", "SYMBOL"))
+
 })
 
 # aggregateTrades, aggregatePrice, and aggregateQuotes multisymbol --------
